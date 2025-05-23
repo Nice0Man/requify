@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.models.release import ReleaseStatus
+from requify.app.models.release import ReleaseStatus
 
 
 class ReleaseBase(BaseModel):

@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.router import api_router
-from app.core.config import settings
+from requify.app.api.v1.router import api_router
+from requify.app.core.config import settings
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -11,7 +11,7 @@ app = FastAPI(
 )
 
 # Настройка CORS
-app.add_middleware(
+requify.app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
@@ -20,10 +20,10 @@ app.add_middleware(
 )
 
 # Подключение маршрутизатора API
-app.include_router(api_router, prefix=settings.API_V1_STR)
+requify.app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
-@app.get("/")
+@requify.app.get("/")
 async def root():
     """
     Корневой эндпоинт для проверки работоспособности API.
@@ -35,7 +35,7 @@ async def root():
     }
 
 
-@app.get("/health")
+@requify.app.get("/health")
 async def health_check():
     """
     Эндпоинт для проверки работоспособности сервиса.

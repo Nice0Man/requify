@@ -1,0 +1,4780 @@
+[
+    {
+        "label": "asyncio",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "asyncio",
+        "description": "asyncio",
+        "detail": "asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "fileConfig",
+        "importPath": "logging.config",
+        "description": "logging.config",
+        "isExtraImport": true,
+        "detail": "logging.config",
+        "documentation": {}
+    },
+    {
+        "label": "pool",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "create_engine",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Engine",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "create_engine",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Column",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Enum",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "JSON",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Column",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Column",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Column",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Enum",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "create_engine",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "create_engine",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Connection",
+        "importPath": "sqlalchemy.engine",
+        "description": "sqlalchemy.engine",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.engine",
+        "documentation": {}
+    },
+    {
+        "label": "async_engine_from_config",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "create_async_engine",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncEngine",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "async_sessionmaker",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "async_sessionmaker",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "create_async_engine",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "create_async_engine",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "context",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "command",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "script",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseConfig",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "Base",
+        "importPath": "requify.app.models.base",
+        "description": "requify.app.models.base",
+        "isExtraImport": true,
+        "detail": "requify.app.models.base",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Protocol",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TypeVar",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Query",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Query",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Request",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_superuser",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_superuser",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPBearer",
+        "importPath": "fastapi.security",
+        "description": "fastapi.security",
+        "isExtraImport": true,
+        "detail": "fastapi.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_async_session",
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "isExtraImport": true,
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "get_async_session",
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "isExtraImport": true,
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "PostgresDsn",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "EmailStr",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseSettings",
+        "importPath": "pydantic_settings",
+        "description": "pydantic_settings",
+        "isExtraImport": true,
+        "detail": "pydantic_settings",
+        "documentation": {}
+    },
+    {
+        "label": "SettingsConfigDict",
+        "importPath": "pydantic_settings",
+        "description": "pydantic_settings",
+        "isExtraImport": true,
+        "detail": "pydantic_settings",
+        "documentation": {}
+    },
+    {
+        "label": "JSONResponse",
+        "importPath": "fastapi.responses",
+        "description": "fastapi.responses",
+        "isExtraImport": true,
+        "detail": "fastapi.responses",
+        "documentation": {}
+    },
+    {
+        "label": "RequestValidationError",
+        "importPath": "fastapi.exceptions",
+        "description": "fastapi.exceptions",
+        "isExtraImport": true,
+        "detail": "fastapi.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "starlette.exceptions",
+        "description": "starlette.exceptions",
+        "isExtraImport": true,
+        "detail": "starlette.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "secrets",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "secrets",
+        "description": "secrets",
+        "detail": "secrets",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "jwt",
+        "importPath": "jose",
+        "description": "jose",
+        "isExtraImport": true,
+        "detail": "jose",
+        "documentation": {}
+    },
+    {
+        "label": "CryptContext",
+        "importPath": "passlib.context",
+        "description": "passlib.context",
+        "isExtraImport": true,
+        "detail": "passlib.context",
+        "documentation": {}
+    },
+    {
+        "label": "ABC",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "ABC",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "abstractmethod",
+        "importPath": "abc",
+        "description": "abc",
+        "isExtraImport": true,
+        "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "asynccontextmanager",
+        "importPath": "contextlib",
+        "description": "contextlib",
+        "isExtraImport": true,
+        "detail": "contextlib",
+        "documentation": {}
+    },
+    {
+        "label": "sessionmaker",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Session",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Session",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "sessionmaker",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Session",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "DeclarativeBase",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "declared_attr",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "sessionmaker",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "QueuePool",
+        "importPath": "sqlalchemy.pool",
+        "description": "sqlalchemy.pool",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.pool",
+        "documentation": {}
+    },
+    {
+        "label": "Base",
+        "importPath": "requify.app.db.base",
+        "description": "requify.app.db.base",
+        "isExtraImport": true,
+        "detail": "requify.app.db.base",
+        "documentation": {}
+    },
+    {
+        "label": "Base",
+        "importPath": "requify.app.db.base",
+        "description": "requify.app.db.base",
+        "isExtraImport": true,
+        "detail": "requify.app.db.base",
+        "documentation": {}
+    },
+    {
+        "label": "Base",
+        "importPath": "requify.app.db.base",
+        "description": "requify.app.db.base",
+        "isExtraImport": true,
+        "detail": "requify.app.db.base",
+        "documentation": {}
+    },
+    {
+        "label": "engine",
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "isExtraImport": true,
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserCreate",
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "create_user",
+        "importPath": "requify.app.services.users",
+        "description": "requify.app.services.users",
+        "isExtraImport": true,
+        "detail": "requify.app.services.users",
+        "documentation": {}
+    },
+    {
+        "label": "dataclass",
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "isExtraImport": true,
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
+        "label": "dataclass",
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "isExtraImport": true,
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
+        "label": "dataclass",
+        "importPath": "dataclasses",
+        "description": "dataclasses",
+        "isExtraImport": true,
+        "detail": "dataclasses",
+        "documentation": {}
+    },
+    {
+        "label": "httpx",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "httpx",
+        "description": "httpx",
+        "detail": "httpx",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncClient",
+        "importPath": "httpx",
+        "description": "httpx",
+        "isExtraImport": true,
+        "detail": "httpx",
+        "documentation": {}
+    },
+    {
+        "label": "ExternalSystemError",
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ExternalServiceError",
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationError",
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ReportGenerationError",
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "requify.app.models.project",
+        "description": "requify.app.models.project",
+        "isExtraImport": true,
+        "detail": "requify.app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "requify.app.models.project",
+        "description": "requify.app.models.project",
+        "isExtraImport": true,
+        "detail": "requify.app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "requify.app.models.project",
+        "description": "requify.app.models.project",
+        "isExtraImport": true,
+        "detail": "requify.app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "isExtraImport": true,
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementPriority",
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "isExtraImport": true,
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementStatus",
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "isExtraImport": true,
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "isExtraImport": true,
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "isExtraImport": true,
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "enum",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "enum",
+        "description": "enum",
+        "detail": "enum",
+        "documentation": {}
+    },
+    {
+        "label": "Enum",
+        "importPath": "enum",
+        "description": "enum",
+        "isExtraImport": true,
+        "detail": "enum",
+        "documentation": {}
+    },
+    {
+        "label": "Enum",
+        "importPath": "enum",
+        "description": "enum",
+        "isExtraImport": true,
+        "detail": "enum",
+        "documentation": {}
+    },
+    {
+        "label": "uuid",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "uuid",
+        "description": "uuid",
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "sqlalchemy.dialects.postgresql",
+        "description": "sqlalchemy.dialects.postgresql",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.dialects.postgresql",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "sqlalchemy.dialects.postgresql",
+        "description": "sqlalchemy.dialects.postgresql",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.dialects.postgresql",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseStatus",
+        "importPath": "requify.app.models.release",
+        "description": "requify.app.models.release",
+        "isExtraImport": true,
+        "detail": "requify.app.models.release",
+        "documentation": {}
+    },
+    {
+        "label": "TestStatus",
+        "importPath": "requify.app.models.test_result",
+        "description": "requify.app.models.test_result",
+        "isExtraImport": true,
+        "detail": "requify.app.models.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "TestResult",
+        "importPath": "requify.app.models.test_result",
+        "description": "requify.app.models.test_result",
+        "isExtraImport": true,
+        "detail": "requify.app.models.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "smtplib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "smtplib",
+        "description": "smtplib",
+        "detail": "smtplib",
+        "documentation": {}
+    },
+    {
+        "label": "MIMEText",
+        "importPath": "email.mime.text",
+        "description": "email.mime.text",
+        "isExtraImport": true,
+        "detail": "email.mime.text",
+        "documentation": {}
+    },
+    {
+        "label": "MIMEMultipart",
+        "importPath": "email.mime.multipart",
+        "description": "email.mime.multipart",
+        "isExtraImport": true,
+        "detail": "email.mime.multipart",
+        "documentation": {}
+    },
+    {
+        "label": "MIMEBase",
+        "importPath": "email.mime.base",
+        "description": "email.mime.base",
+        "isExtraImport": true,
+        "detail": "email.mime.base",
+        "documentation": {}
+    },
+    {
+        "label": "encoders",
+        "importPath": "email",
+        "description": "email",
+        "isExtraImport": true,
+        "detail": "email",
+        "documentation": {}
+    },
+    {
+        "label": "io",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "io",
+        "description": "io",
+        "detail": "io",
+        "documentation": {}
+    },
+    {
+        "label": "csv",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "csv",
+        "description": "csv",
+        "detail": "csv",
+        "documentation": {}
+    },
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "defaultdict",
+        "importPath": "collections",
+        "description": "collections",
+        "isExtraImport": true,
+        "detail": "collections",
+        "documentation": {}
+    },
+    {
+        "label": "CORSMiddleware",
+        "importPath": "fastapi.middleware.cors",
+        "description": "fastapi.middleware.cors",
+        "isExtraImport": true,
+        "detail": "fastapi.middleware.cors",
+        "documentation": {}
+    },
+    {
+        "label": "api_router",
+        "importPath": "requify.app.api.v1.router",
+        "description": "requify.app.api.v1.router",
+        "isExtraImport": true,
+        "detail": "requify.app.api.v1.router",
+        "documentation": {}
+    },
+    {
+        "label": "argparse",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "argparse",
+        "description": "argparse",
+        "detail": "argparse",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "subprocess",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "subprocess",
+        "description": "subprocess",
+        "detail": "subprocess",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "OperationalError",
+        "importPath": "sqlalchemy.exc",
+        "description": "sqlalchemy.exc",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.exc",
+        "documentation": {}
+    },
+    {
+        "label": "OperationalError",
+        "importPath": "sqlalchemy.exc",
+        "description": "sqlalchemy.exc",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.exc",
+        "documentation": {}
+    },
+    {
+        "label": "Config",
+        "importPath": "alembic.config",
+        "description": "alembic.config",
+        "isExtraImport": true,
+        "detail": "alembic.config",
+        "documentation": {}
+    },
+    {
+        "label": "MigrationContext",
+        "importPath": "alembic.runtime.migration",
+        "description": "alembic.runtime.migration",
+        "isExtraImport": true,
+        "detail": "alembic.runtime.migration",
+        "documentation": {}
+    },
+    {
+        "label": "get_password_hash",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "pytest",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pytest",
+        "description": "pytest",
+        "detail": "pytest",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "importPath": "requify.app.main",
+        "description": "requify.app.main",
+        "isExtraImport": true,
+        "detail": "requify.app.main",
+        "documentation": {}
+    },
+    {
+        "label": "run_migrations_offline",
+        "kind": 2,
+        "importPath": "requify.alembic.env",
+        "description": "requify.alembic.env",
+        "peekOfCode": "def run_migrations_offline() -> None:\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable\n    here as well.  By skipping the Engine creation\n    we don't even need a DBAPI to be available.\n    Calls to context.execute() here emit the given string to the\n    script output.\n    \"\"\"\n    url = config.get_main_option(\"sqlalchemy.url\")",
+        "detail": "requify.alembic.env",
+        "documentation": {}
+    },
+    {
+        "label": "do_run_migrations",
+        "kind": 2,
+        "importPath": "requify.alembic.env",
+        "description": "requify.alembic.env",
+        "peekOfCode": "def do_run_migrations(connection: Connection) -> None:\n    context.configure(connection=connection, target_metadata=target_metadata)\n    with context.begin_transaction():\n        context.run_migrations()\nasync def run_async_migrations() -> None:\n    \"\"\"In this scenario we need to create an Engine\n    and associate a connection with the context.\n    \"\"\"\n    connectable = async_engine_from_config(\n        config.get_section(config.config_ini_section, {}),",
+        "detail": "requify.alembic.env",
+        "documentation": {}
+    },
+    {
+        "label": "run_migrations_online",
+        "kind": 2,
+        "importPath": "requify.alembic.env",
+        "description": "requify.alembic.env",
+        "peekOfCode": "def run_migrations_online() -> None:\n    \"\"\"Run migrations in 'online' mode.\"\"\"\n    asyncio.run(run_async_migrations())\nif context.is_offline_mode():\n    run_migrations_offline()\nelse:\n    run_migrations_online()",
+        "detail": "requify.alembic.env",
+        "documentation": {}
+    },
+    {
+        "label": "config",
+        "kind": 5,
+        "importPath": "requify.alembic.env",
+        "description": "requify.alembic.env",
+        "peekOfCode": "config = context.config\n# Interpret the config file for Python logging.\n# This line sets up loggers basically.\nif config.config_file_name is not None:\n    fileConfig(config.config_file_name)\n# add your model's MetaData object here\n# for 'autogenerate' support\n# from myapp import mymodel\n# target_metadata = mymodel.Base.metadata\ntarget_metadata = Base.metadata",
+        "detail": "requify.alembic.env",
+        "documentation": {}
+    },
+    {
+        "label": "target_metadata",
+        "kind": 5,
+        "importPath": "requify.alembic.env",
+        "description": "requify.alembic.env",
+        "peekOfCode": "target_metadata = Base.metadata\n# other values from the config, defined by the needs of env.py,\n# can be acquired:\n# my_important_option = config.get_main_option(\"my_important_option\")\n# ... etc.\nconfig.set_main_option(\"sqlalchemy.url\", str(settings.ASYNC_DATABASE_URI))\ndef run_migrations_offline() -> None:\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable",
+        "detail": "requify.alembic.env",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.endpoints.admin",
+        "description": "requify.app.api.v1.endpoints.admin",
+        "peekOfCode": "router = APIRouter()\n@router.post(\"/users/{user_id}/grant-access\", response_model=dict)\nasync def grant_user_access(\n    user_id: int,\n    access_data: dict,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_superuser),\n):\n    \"\"\"\n    Выдача доступа к функционалу системы.",
+        "detail": "requify.app.api.v1.endpoints.admin",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.endpoints.projects",
+        "description": "requify.app.api.v1.endpoints.projects",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[dict])\nasync def get_projects(\n    skip: int = 0,\n    limit: int = 100,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_current_user),\n):\n    \"\"\"\n    Получить список проектов.",
+        "detail": "requify.app.api.v1.endpoints.projects",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.endpoints.releases",
+        "description": "requify.app.api.v1.endpoints.releases",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[dict])\nasync def get_releases(\n    skip: int = 0,\n    limit: int = 100,\n    project_id: Optional[int] = None,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_current_user),\n):\n    \"\"\"",
+        "detail": "requify.app.api.v1.endpoints.releases",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.endpoints.requirements",
+        "description": "requify.app.api.v1.endpoints.requirements",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/search\", response_model=List[dict])\nasync def search_requirements(\n    query: str = Query(..., description=\"Поисковый запрос\"),\n    project_id: Optional[int] = Query(None, description=\"Фильтр по ID проекта\"),\n    status_filter: Optional[str] = Query(None, description=\"Фильтр по статусу\"),\n    priority_filter: Optional[str] = Query(None, description=\"Фильтр по приоритету\"),\n    type_filter: Optional[str] = Query(None, description=\"Фильтр по типу\"),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(",
+        "detail": "requify.app.api.v1.endpoints.requirements",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.endpoints.testing",
+        "description": "requify.app.api.v1.endpoints.testing",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/plans\", response_model=List[dict])\nasync def get_test_plans(\n    skip: int = 0,\n    limit: int = 100,\n    project_id: Optional[int] = None,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_current_user),\n):\n    \"\"\"",
+        "detail": "requify.app.api.v1.endpoints.testing",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.endpoints.users",
+        "description": "requify.app.api.v1.endpoints.users",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[dict])\nasync def get_users(\n    skip: int = 0,\n    limit: int = 100,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_current_user),\n):\n    \"\"\"\n    Получить список пользователей.",
+        "detail": "requify.app.api.v1.endpoints.users",
+        "documentation": {}
+    },
+    {
+        "label": "api_router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.router",
+        "description": "requify.app.api.v1.router",
+        "peekOfCode": "api_router = APIRouter()\n# Подключаем роутеры эндпоинтов\napi_router.include_router(users.router, prefix=\"/users\", tags=[\"users\"])\napi_router.include_router(projects.router, prefix=\"/projects\", tags=[\"projects\"])\napi_router.include_router(\n    requirements.router, prefix=\"/requirements\", tags=[\"requirements\"]\n)\napi_router.include_router(releases.router, prefix=\"/releases\", tags=[\"releases\"])\napi_router.include_router(testing.router, prefix=\"/testing\", tags=[\"testing\"])\napi_router.include_router(admin.router, prefix=\"/admin\", tags=[\"admin\"])",
+        "detail": "requify.app.api.v1.router",
+        "documentation": {}
+    },
+    {
+        "label": "security",
+        "kind": 5,
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "peekOfCode": "security = HTTPBearer()\nasync def get_db() -> AsyncGenerator[AsyncSession, None]:\n    \"\"\"\n    Зависимость для получения сессии базы данных.\n    Yields:\n        AsyncSession: Асинхронная сессия SQLAlchemy\n    \"\"\"\n    async with get_async_session() as session:\n        yield session\nasync def get_current_user(",
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "RunConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class RunConfig(BaseModel):\n    \"\"\"Конфигурация запуска приложения\"\"\"\n    env: str = \"development\"\n    name: str = \"Requify\"\n    version: str = \"0.1.0\"\n    host: str = \"0.0.0.0\"\n    port: int = 8000\n    debug: bool = True\nclass ApiV1Prefix(BaseModel):\n    \"\"\"Префиксы для API v1 маршрутов\"\"\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "ApiV1Prefix",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class ApiV1Prefix(BaseModel):\n    \"\"\"Префиксы для API v1 маршрутов\"\"\"\n    prefix: str = \"/v1\"\n    auth: str = \"/auth\"\n    users: str = \"/users\"\n    requirements: str = \"/requirements\"\n    projects: str = \"/projects\"\n    templates: str = \"/templates\"\n    analysis: str = \"/analysis\"\n    reports: str = \"/reports\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "ApiConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class ApiConfig(BaseModel):\n    \"\"\"Конфигурация API\"\"\"\n    prefix: str = \"/api\"\n    v1_str: str = \"/api/v1\"\n    v1: ApiV1Prefix = ApiV1Prefix()\n    @property\n    def bearer_token_url(self) -> str:\n        \"\"\"URL для получения bearer токена\"\"\"\n        parts = (self.prefix, self.v1.prefix, self.v1.auth, \"/login\")\n        path = \"\".join(parts)",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "SecurityConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class SecurityConfig(BaseModel):\n    \"\"\"Конфигурация безопасности и JWT\"\"\"\n    secret_key: str = \"super-secret-key-change-in-production-minimum-32-characters\"\n    algorithm: str = \"HS256\"\n    access_token_expire_minutes: int = 30\n    # JWT сертификаты (опционально для RS256)\n    private_key_path: Path = BASE_DIR / \"certs\" / \"jwt-private.pem\"\n    public_key_path: Path = BASE_DIR / \"certs\" / \"jwt-public.pem\"\n    jwt_public_key: Optional[str] = None\n    jwt_private_key: Optional[str] = None",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class DatabaseConfig(BaseModel):\n    \"\"\"Конфигурация базы данных\"\"\"\n    name: str = \"requify-db\"\n    password: str = \"postgres\"\n    user: str = \"postgres\"\n    host: str = \"localhost\"\n    port: int = 5432\n    # Настройки пула соединений\n    pool_size: int = 20\n    max_overflow: int = 10",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "RedisConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class RedisConfig(BaseModel):\n    \"\"\"Конфигурация Redis\"\"\"\n    host: str = \"localhost\"\n    port: int = 6379\n    db: int = 0\n    password: Optional[str] = None\n    @property\n    def url(self) -> str:\n        \"\"\"URL подключения к Redis\"\"\"\n        if self.password:",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "IntegrationsConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class IntegrationsConfig(BaseModel):\n    \"\"\"Конфигурация внешних интеграций\"\"\"\n    testing_system_api_url: str = \"http://localhost:8001/api/v1\"\n    testing_system_api_key: str = \"test-api-key-change-in-production\"\n    project_management_api_url: str = \"http://localhost:8002/api/v1\"\n    project_management_api_key: str = \"project-api-key-change-in-production\"\nclass FileStorageConfig(BaseModel):\n    \"\"\"Конфигурация файлового хранилища\"\"\"\n    upload_dir: str = \"uploads\"\n    max_file_size: int = 10485760  # 10MB",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "FileStorageConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class FileStorageConfig(BaseModel):\n    \"\"\"Конфигурация файлового хранилища\"\"\"\n    upload_dir: str = \"uploads\"\n    max_file_size: int = 10485760  # 10MB\n    allowed_extensions: str = \"pdf,doc,docx,txt,jpg,jpeg,png,gif\"\n    @property\n    def allowed_extensions_list(self) -> List[str]:\n        \"\"\"Возвращает список разрешенных расширений файлов\"\"\"\n        return [ext.strip() for ext in self.allowed_extensions.split(\",\")]\nclass EmailConfig(BaseModel):",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "EmailConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class EmailConfig(BaseModel):\n    \"\"\"Конфигурация Email\"\"\"\n    smtp_host: Optional[str] = None\n    smtp_port: int = 587\n    smtp_user: Optional[str] = None\n    smtp_password: Optional[str] = None\n    smtp_tls: bool = True\n    smtp_ssl: bool = False\n    from_email: str = \"noreply@requify.local\"\n    from_name: str = \"Requify\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "LoggingConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class LoggingConfig(BaseModel):\n    \"\"\"Конфигурация логирования\"\"\"\n    level: str = \"INFO\"\n    file: str = \"logs/requify.log\"\n    max_size: int = 10485760\n    backup_count: int = 5\nclass AdminConfig(BaseModel):\n    \"\"\"Конфигурация первого администратора\"\"\"\n    email: str = \"admin@requify.local\"\n    password: str = \"admin123\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "AdminConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class AdminConfig(BaseModel):\n    \"\"\"Конфигурация первого администратора\"\"\"\n    email: str = \"admin@requify.local\"\n    password: str = \"admin123\"\n    name: str = \"Admin User\"\nclass CorsConfig(BaseModel):\n    \"\"\"Конфигурация CORS\"\"\"\n    origins: str = '[\"http://localhost:3000\", \"http://localhost:8080\", \"http://127.0.0.1:3000\"]'\n    @property\n    def origins_list(self) -> List[str]:",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "CorsConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class CorsConfig(BaseModel):\n    \"\"\"Конфигурация CORS\"\"\"\n    origins: str = '[\"http://localhost:3000\", \"http://localhost:8080\", \"http://127.0.0.1:3000\"]'\n    @property\n    def origins_list(self) -> List[str]:\n        \"\"\"Возвращает список CORS origins\"\"\"\n        import json\n        return json.loads(self.origins)\nclass Settings(BaseSettings):\n    \"\"\"Основные настройки приложения\"\"\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "Settings",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class Settings(BaseSettings):\n    \"\"\"Основные настройки приложения\"\"\"\n    model_config = SettingsConfigDict(\n        env_file=(\".env.template\", \".env\"),\n        env_file_encoding=\"utf-8\",\n        case_sensitive=False,\n        env_nested_delimiter=\"__\",\n        env_prefix=\"APP_CONFIG__\",\n        extra=\"allow\",  # Разрешаем дополнительные поля\n    )",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "BASE_DIR",
+        "kind": 5,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "BASE_DIR = Path(__file__).parent.parent.parent\n# Загружаем переменные окружения\nload_dotenv(dotenv_path=BASE_DIR / \".env\")\nclass RunConfig(BaseModel):\n    \"\"\"Конфигурация запуска приложения\"\"\"\n    env: str = \"development\"\n    name: str = \"Requify\"\n    version: str = \"0.1.0\"\n    host: str = \"0.0.0.0\"\n    port: int = 8000",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "kind": 5,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "settings = Settings()",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "RequifyException",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class RequifyException(Exception):\n    \"\"\"Базовое исключение для приложения Requify.\"\"\"\n    def __init__(\n        self,\n        message: str,\n        status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,\n        details: Optional[Dict[str, Any]] = None,\n    ):\n        self.message = message\n        self.status_code = status_code",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class ValidationError(RequifyException):\n    \"\"\"Исключение для ошибок валидации данных.\"\"\"\n    def __init__(self, message: str, field: Optional[str] = None):\n        details = {\"field\": field} if field else {}\n        super().__init__(\n            message=message,\n            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,\n            details=details,\n        )\nclass NotFoundError(RequifyException):",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "NotFoundError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class NotFoundError(RequifyException):\n    \"\"\"Исключение для случаев, когда ресурс не найден.\"\"\"\n    def __init__(self, resource: str, identifier: Any):\n        message = f\"{resource} with identifier '{identifier}' not found\"\n        super().__init__(\n            message=message,\n            status_code=status.HTTP_404_NOT_FOUND,\n            details={\"resource\": resource, \"identifier\": str(identifier)},\n        )\nclass PermissionDeniedError(RequifyException):",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "PermissionDeniedError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class PermissionDeniedError(RequifyException):\n    \"\"\"Исключение для ошибок доступа.\"\"\"\n    def __init__(self, action: str, resource: Optional[str] = None):\n        message = f\"Permission denied for action: {action}\"\n        if resource:\n            message += f\" on resource: {resource}\"\n        super().__init__(\n            message=message,\n            status_code=status.HTTP_403_FORBIDDEN,\n            details={\"action\": action, \"resource\": resource},",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "BusinessLogicError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class BusinessLogicError(RequifyException):\n    \"\"\"Исключение для ошибок бизнес-логики.\"\"\"\n    def __init__(self, message: str, error_code: Optional[str] = None):\n        super().__init__(\n            message=message,\n            status_code=status.HTTP_400_BAD_REQUEST,\n            details={\"error_code\": error_code} if error_code else {},\n        )\nclass ExternalServiceError(RequifyException):\n    \"\"\"Исключение для ошибок внешних сервисов.\"\"\"",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ExternalServiceError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class ExternalServiceError(RequifyException):\n    \"\"\"Исключение для ошибок внешних сервисов.\"\"\"\n    def __init__(self, service_name: str, message: str):\n        super().__init__(\n            message=f\"External service '{service_name}' error: {message}\",\n            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,\n            details={\"service\": service_name, \"original_message\": message},\n        )\nclass DatabaseError(RequifyException):    \"\"\"Исключение для ошибок базы данных.\"\"\"    def __init__(self, message: str, operation: Optional[str] = None):        super().__init__(            message=f\"Database error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"operation\": operation} if operation else {},        )class ExternalSystemError(RequifyException):    \"\"\"Исключение для ошибок внешних систем.\"\"\"    def __init__(self, message: str, system_name: Optional[str] = None):        super().__init__(            message=f\"External system error: {message}\",            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,            details={\"system\": system_name} if system_name else {},        )class NotificationError(RequifyException):    \"\"\"Исключение для ошибок системы уведомлений.\"\"\"    def __init__(self, message: str, notification_type: Optional[str] = None):        super().__init__(            message=f\"Notification error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"type\": notification_type} if notification_type else {},        )class ReportGenerationError(RequifyException):    \"\"\"Исключение для ошибок генерации отчётов.\"\"\"    def __init__(self, message: str, report_type: Optional[str] = None):        super().__init__(            message=f\"Report generation error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"report_type\": report_type} if report_type else {},        )\n# Обработчики исключений для FastAPI",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class DatabaseError(RequifyException):    \"\"\"Исключение для ошибок базы данных.\"\"\"    def __init__(self, message: str, operation: Optional[str] = None):        super().__init__(            message=f\"Database error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"operation\": operation} if operation else {},        )class ExternalSystemError(RequifyException):    \"\"\"Исключение для ошибок внешних систем.\"\"\"    def __init__(self, message: str, system_name: Optional[str] = None):        super().__init__(            message=f\"External system error: {message}\",            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,            details={\"system\": system_name} if system_name else {},        )class NotificationError(RequifyException):    \"\"\"Исключение для ошибок системы уведомлений.\"\"\"    def __init__(self, message: str, notification_type: Optional[str] = None):        super().__init__(            message=f\"Notification error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"type\": notification_type} if notification_type else {},        )class ReportGenerationError(RequifyException):    \"\"\"Исключение для ошибок генерации отчётов.\"\"\"    def __init__(self, message: str, report_type: Optional[str] = None):        super().__init__(            message=f\"Report generation error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"report_type\": report_type} if report_type else {},        )\n# Обработчики исключений для FastAPI\nasync def requify_exception_handler(\n    request: Request, exc: RequifyException\n) -> JSONResponse:\n    \"\"\"\n    Обработчик кастомных исключений Requify.\n    Args:\n        request: HTTP запрос\n        exc: Исключение Requify",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "register_exception_handlers",
+        "kind": 2,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "def register_exception_handlers(app):\n    \"\"\"\n    Регистрация всех обработчиков исключений в FastAPI приложении.\n    Args:\n        app: Экземпляр FastAPI приложения\n    \"\"\"\n    requify.app.add_exception_handler(RequifyException, requify_exception_handler)\n    requify.app.add_exception_handler(StarletteHTTPException, http_exception_handler)\n    requify.app.add_exception_handler(RequestValidationError, validation_exception_handler)\n    requify.app.add_exception_handler(Exception, general_exception_handler)",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass RequifyException(Exception):\n    \"\"\"Базовое исключение для приложения Requify.\"\"\"\n    def __init__(\n        self,\n        message: str,\n        status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,\n        details: Optional[Dict[str, Any]] = None,\n    ):\n        self.message = message",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "PermissionChecker",
+        "kind": 6,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "class PermissionChecker:\n    \"\"\"\n    Класс для проверки прав доступа (Open/Closed Principle).\n    \"\"\"\n    @staticmethod\n    def can_read_project(user: Dict[str, Any], project_id: int) -> bool:\n        \"\"\"\n        Проверить право на чтение проекта.\n        Args:\n            user: Данные пользователя",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "create_access_token",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def create_access_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT токен доступа.\n    Args:\n        subject: Субъект токена (обычно user_id)\n        expires_delta: Время жизни токена\n    Returns:\n        str: JWT токен",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "create_refresh_token",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def create_refresh_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT refresh токен.\n    Args:\n        subject: Субъект токена (обычно user_id)\n        expires_delta: Время жизни токена\n    Returns:\n        str: JWT refresh токен",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_token",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def verify_token(token: str) -> Optional[Dict[str, Any]]:\n    \"\"\"\n    Проверить и декодировать JWT токен.\n    Args:\n        token: JWT токен\n    Returns:\n        Optional[Dict[str, Any]]: Декодированные данные токена или None\n    \"\"\"\n    try:\n        payload = jwt.decode(token, settings.auth.secret_key, algorithms=[ALGORITHM])",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_password_hash",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def get_password_hash(password: str) -> str:\n    \"\"\"\n    Хэшировать пароль.\n    Args:\n        password: Пароль в открытом виде\n    Returns:\n        str: Хэшированный пароль\n    \"\"\"\n    return pwd_context.hash(password)\ndef verify_password(plain_password: str, hashed_password: str) -> bool:",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_password",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def verify_password(plain_password: str, hashed_password: str) -> bool:\n    \"\"\"\n    Проверить пароль.\n    Args:\n        plain_password: Пароль в открытом виде\n        hashed_password: Хэшированный пароль\n    Returns:\n        bool: True если пароль верный, False иначе\n    \"\"\"\n    return pwd_context.verify(plain_password, hashed_password)",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "generate_password_reset_token",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def generate_password_reset_token(email: str) -> str:\n    \"\"\"\n    Генерировать токен для сброса пароля.\n    Args:\n        email: Email пользователя\n    Returns:\n        str: Токен для сброса пароля\n    \"\"\"\n    delta = timedelta(hours=settings.auth.email_reset_token_expire_hours)\n    now = datetime.utcnow()",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_password_reset_token",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def verify_password_reset_token(token: str) -> Optional[str]:\n    \"\"\"\n    Проверить токен сброса пароля.\n    Args:\n        token: Токен сброса пароля\n    Returns:\n        Optional[str]: Email пользователя или None\n    \"\"\"\n    try:\n        decoded_token = jwt.decode(",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "generate_api_key",
+        "kind": 2,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "def generate_api_key() -> str:\n    \"\"\"\n    Генерировать случайный API ключ.\n    Returns:\n        str: API ключ\n    \"\"\"\n    return secrets.token_urlsafe(32)\nclass PermissionChecker:\n    \"\"\"\n    Класс для проверки прав доступа (Open/Closed Principle).",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "pwd_context",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "pwd_context = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\n# Алгоритм для JWT\nALGORITHM = \"HS256\"\ndef create_access_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT токен доступа.\n    Args:\n        subject: Субъект токена (обычно user_id)",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "ALGORITHM",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "ALGORITHM = \"HS256\"\ndef create_access_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT токен доступа.\n    Args:\n        subject: Субъект токена (обычно user_id)\n        expires_delta: Время жизни токена\n    Returns:",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "permission_checker",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "permission_checker = PermissionChecker()",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseConnectionProtocol",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class DatabaseConnectionProtocol(Protocol):\n    \"\"\"Протокол для подключения к базе данных (Interface Segregation Principle)\"\"\"\n    def get_url(self) -> str:\n        \"\"\"Возвращает URL подключения к базе данных\"\"\"\n        ...\n    def get_pool_size(self) -> int:\n        \"\"\"Возвращает размер пула соединений\"\"\"\n        ...\n    def get_max_overflow(self) -> int:\n        \"\"\"Возвращает максимальное количество дополнительных соединений\"\"\"",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "SessionManagerProtocol",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class SessionManagerProtocol(Protocol[TSession]):\n    \"\"\"Протокол для управления сессиями (Interface Segregation Principle)\"\"\"\n    @abstractmethod\n    def create_session(self) -> TSession:\n        \"\"\"Создает новую сессию\"\"\"\n        ...\n    @abstractmethod\n    def close_session(self, session: TSession) -> None:\n        \"\"\"Закрывает сессию\"\"\"\n        ...",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSessionManagerProtocol",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class AsyncSessionManagerProtocol(Protocol):\n    \"\"\"Протокол для асинхронного управления сессиями\"\"\"\n    @abstractmethod\n    async def create_session(self) -> AsyncSession:\n        \"\"\"Создает новую асинхронную сессию\"\"\"\n        ...\n    @abstractmethod\n    async def close_session(self, session: AsyncSession) -> None:\n        \"\"\"Закрывает асинхронную сессию\"\"\"\n        ...",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseEngineBase",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class DatabaseEngineBase(ABC):\n    \"\"\"Базовый абстрактный класс для движков БД (Open/Closed Principle)\"\"\"\n    def __init__(self, config: DatabaseConfig):\n        self._config = config\n        self._engine = None\n    @abstractmethod\n    def _create_engine(self):\n        \"\"\"Создает движок базы данных\"\"\"\n        pass\n    @property",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "SyncDatabaseEngine",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class SyncDatabaseEngine(DatabaseEngineBase):\n    \"\"\"Синхронный движок базы данных (Single Responsibility Principle)\"\"\"\n    def _create_engine(self) -> Engine:\n        \"\"\"Создает синхронный движок SQLAlchemy\"\"\"\n        return create_engine(\n            self._config.sync_url,\n            pool_size=self._config.pool_size,\n            max_overflow=self._config.max_overflow,\n            pool_pre_ping=self._config.pool_pre_ping,\n            pool_recycle=self._config.pool_recycle,",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncDatabaseEngine",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class AsyncDatabaseEngine(DatabaseEngineBase):\n    \"\"\"Асинхронный движок базы данных (Single Responsibility Principle)\"\"\"\n    def _create_engine(self) -> AsyncEngine:\n        \"\"\"Создает асинхронный движок SQLAlchemy\"\"\"\n        return create_async_engine(\n            self._config.async_url,\n            pool_size=self._config.pool_size,\n            max_overflow=self._config.max_overflow,\n            pool_pre_ping=self._config.pool_pre_ping,\n            pool_recycle=self._config.pool_recycle,",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "SyncSessionManager",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class SyncSessionManager:\n    \"\"\"Менеджер синхронных сессий (Single Responsibility Principle)\"\"\"\n    def __init__(self, engine: Engine):\n        self._session_factory = sessionmaker(\n            bind=engine,\n            autoflush=False,\n            autocommit=False,\n            expire_on_commit=False,\n        )\n    def create_session(self) -> Session:",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSessionManager",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class AsyncSessionManager:\n    \"\"\"Менеджер асинхронных сессий (Single Responsibility Principle)\"\"\"\n    def __init__(self, engine: AsyncEngine):\n        self._session_factory = async_sessionmaker(\n            bind=engine,\n            autoflush=False,\n            autocommit=False,\n            expire_on_commit=False,\n        )\n    async def create_session(self) -> AsyncSession:",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseHelper",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class DatabaseHelper:\n    \"\"\"\n    Главный класс для работы с базой данных (Facade Pattern + Dependency Injection).\n    Применяет принцип Dependency Inversion - зависит от абстракций, а не от конкретных реализаций.\n    \"\"\"\n    def __init__(\n        self,\n        sync_engine: SyncDatabaseEngine,\n        async_engine: AsyncDatabaseEngine,\n    ):",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseFactory",
+        "kind": 6,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "class DatabaseFactory:\n    \"\"\"\n    Фабрика для создания экземпляров DatabaseHelper (Factory Pattern).\n    Применяет принцип Open/Closed - можно расширить для поддержки новых типов БД.\n    \"\"\"\n    @staticmethod\n    def create_database_helper(config: DatabaseConfig) -> DatabaseHelper:\n        \"\"\"Создает экземпляр DatabaseHelper с заданной конфигурацией\"\"\"\n        sync_engine = SyncDatabaseEngine(config)\n        async_engine = AsyncDatabaseEngine(config)",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "TSession",
+        "kind": 5,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "TSession = TypeVar(\"TSession\", bound=Session)\nclass DatabaseConnectionProtocol(Protocol):\n    \"\"\"Протокол для подключения к базе данных (Interface Segregation Principle)\"\"\"\n    def get_url(self) -> str:\n        \"\"\"Возвращает URL подключения к базе данных\"\"\"\n        ...\n    def get_pool_size(self) -> int:\n        \"\"\"Возвращает размер пула соединений\"\"\"\n        ...\n    def get_max_overflow(self) -> int:",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "main_db_helper",
+        "kind": 5,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "main_db_helper = DatabaseFactory.create_main_database_helper()\ntest_db_helper = DatabaseFactory.create_test_database_helper()\n# Алиас для обратной совместимости\ndb_helper = main_db_helper\n# Функция-генератор для FastAPI Dependency Injection\nasync def get_async_session() -> AsyncGenerator[AsyncSession, None]:\n    \"\"\"\n    Генератор асинхронных сессий для использования в FastAPI dependencies.\n    Пример использования:\n    @requify.app.get(\"/users/\")",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "test_db_helper",
+        "kind": 5,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "test_db_helper = DatabaseFactory.create_test_database_helper()\n# Алиас для обратной совместимости\ndb_helper = main_db_helper\n# Функция-генератор для FastAPI Dependency Injection\nasync def get_async_session() -> AsyncGenerator[AsyncSession, None]:\n    \"\"\"\n    Генератор асинхронных сессий для использования в FastAPI dependencies.\n    Пример использования:\n    @requify.app.get(\"/users/\")\n    async def get_users(session: AsyncSession = Depends(get_async_session)):",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "db_helper",
+        "kind": 5,
+        "importPath": "requify.app.db.db_helper",
+        "description": "requify.app.db.db_helper",
+        "peekOfCode": "db_helper = main_db_helper\n# Функция-генератор для FastAPI Dependency Injection\nasync def get_async_session() -> AsyncGenerator[AsyncSession, None]:\n    \"\"\"\n    Генератор асинхронных сессий для использования в FastAPI dependencies.\n    Пример использования:\n    @requify.app.get(\"/users/\")\n    async def get_users(session: AsyncSession = Depends(get_async_session)):\n        ...\n    \"\"\"",
+        "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "init_db",
+        "kind": 2,
+        "importPath": "requify.app.db.init_db",
+        "description": "requify.app.db.init_db",
+        "peekOfCode": "def init_db(db: Session) -> None:\n    \"\"\"\n    Инициализация базы данных.\n    Создание всех таблиц и первого администратора.\n    \"\"\"\n    # Создание всех таблиц\n    Base.metadata.create_all(bind=engine)\n    # Создание первого администратора, если он не существует\n    user = db.query(User).filter(User.email == settings.FIRST_ADMIN_EMAIL).first()\n    if not user:",
+        "detail": "requify.app.db.init_db",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "kind": 2,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "def get_db():\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()\n# Функция для получения асинхронной сессии\nasync def get_async_session():\n    async with AsyncSessionLocal() as session:\n        try:",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "check_db_connection",
+        "kind": 2,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "def check_db_connection():\n    \"\"\"Проверяет соединение с основной базой данных\"\"\"\n    try:\n        with engine.connect() as connection:\n            result = connection.execute(text(\"SELECT 1\"))\n            return True\n    except Exception as e:\n        print(f\"Ошибка подключения к основной базе данных: {e}\")\n        return False\n# Функция для проверки асинхронного соединения",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "get_test_db",
+        "kind": 2,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "def get_test_db():\n    \"\"\"Функция для получения тестовой синхронной сессии\"\"\"\n    db = TestSessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()\nasync def get_test_async_session():\n    \"\"\"Функция для получения тестовой асинхронной сессии\"\"\"\n    async with TestAsyncSessionLocal() as session:",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "check_test_db_connection",
+        "kind": 2,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "def check_test_db_connection():\n    \"\"\"Проверяет соединение с тестовой базой данных\"\"\"\n    try:\n        with test_engine.connect() as connection:\n            result = connection.execute(text(\"SELECT 1\"))\n            return True\n    except Exception as e:\n        print(f\"Ошибка подключения к тестовой базе данных: {e}\")\n        return False\nasync def check_test_async_db_connection():",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "engine",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "engine = create_engine(\n    settings.DATABASE_URI,\n    pool_size=settings.DB_POOL_SIZE,\n    max_overflow=settings.DB_MAX_OVERFLOW,\n    pool_pre_ping=settings.DB_POOL_PRE_PING,\n    pool_recycle=settings.DB_POOL_RECYCLE,\n    echo=settings.DEBUG,\n    # Упрощенные настройки для Windows совместимости\n    pool_timeout=30,\n)",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "async_engine",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "async_engine = create_async_engine(\n    settings.ASYNC_DATABASE_URI,\n    pool_size=settings.DB_POOL_SIZE,\n    max_overflow=settings.DB_MAX_OVERFLOW,\n    pool_pre_ping=settings.DB_POOL_PRE_PING,\n    pool_recycle=settings.DB_POOL_RECYCLE,\n    echo=settings.DEBUG,\n    # Упрощенные настройки для Windows совместимости\n    pool_timeout=30,\n)",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "SessionLocal",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "SessionLocal = sessionmaker(\n    autocommit=False, autoflush=False, bind=engine, class_=Session\n)\n# Создаем фабрику асинхронных сессий для основной БД\nAsyncSessionLocal = async_sessionmaker(\n    async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ТЕСТОВАЯ БАЗА ДАННЫХ\n# =============================================================================",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSessionLocal",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "AsyncSessionLocal = async_sessionmaker(\n    async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ТЕСТОВАЯ БАЗА ДАННЫХ\n# =============================================================================\n# Создаем движки для тестовой базы данных\ntest_engine = create_engine(\n    settings.TEST_DATABASE_URI,\n    pool_size=5,  # Меньший пул для тестов",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "test_engine",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "test_engine = create_engine(\n    settings.TEST_DATABASE_URI,\n    pool_size=5,  # Меньший пул для тестов\n    max_overflow=5,\n    pool_pre_ping=True,\n    pool_recycle=3600,\n    echo=settings.DEBUG,\n    pool_timeout=30,\n)\ntest_async_engine = create_async_engine(",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "test_async_engine",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "test_async_engine = create_async_engine(\n    settings.TEST_ASYNC_DATABASE_URI,\n    pool_size=5,  # Меньший пул для тестов\n    max_overflow=5,\n    pool_pre_ping=True,\n    pool_recycle=3600,\n    echo=settings.DEBUG,\n    pool_timeout=30,\n)\n# Создаем фабрики сессий для тестовой БД",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "TestSessionLocal",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "TestSessionLocal = sessionmaker(\n    autocommit=False, autoflush=False, bind=test_engine, class_=Session\n)\nTestAsyncSessionLocal = async_sessionmaker(\n    test_async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ФУНКЦИИ ДЛЯ РАБОТЫ С ОСНОВНОЙ БД\n# =============================================================================\n# Функция для получения синхронной сессии",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "TestAsyncSessionLocal",
+        "kind": 5,
+        "importPath": "requify.app.db.session",
+        "description": "requify.app.db.session",
+        "peekOfCode": "TestAsyncSessionLocal = async_sessionmaker(\n    test_async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ФУНКЦИИ ДЛЯ РАБОТЫ С ОСНОВНОЙ БД\n# =============================================================================\n# Функция для получения синхронной сессии\ndef get_db():\n    db = SessionLocal()\n    try:",
+        "detail": "requify.app.db.session",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectData",
+        "kind": 6,
+        "importPath": "requify.app.integrations.project_management",
+        "description": "requify.app.integrations.project_management",
+        "peekOfCode": "class ProjectData:\n    \"\"\"Данные проекта из внешней системы\"\"\"\n    external_id: str\n    name: str\n    description: Optional[str]\n    status: str\n    start_date: Optional[datetime]\n    end_date: Optional[datetime]\n    manager_email: Optional[str]\n    budget: Optional[float]",
+        "detail": "requify.app.integrations.project_management",
+        "documentation": {}
+    },
+    {
+        "label": "TaskData",
+        "kind": 6,
+        "importPath": "requify.app.integrations.project_management",
+        "description": "requify.app.integrations.project_management",
+        "peekOfCode": "class TaskData:\n    \"\"\"Данные задачи из внешней системы\"\"\"\n    external_id: str\n    project_id: str\n    name: str\n    description: Optional[str]\n    status: str\n    assignee_email: Optional[str]\n    due_date: Optional[datetime]\n    priority: Optional[str]",
+        "detail": "requify.app.integrations.project_management",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectManagementIntegration",
+        "kind": 6,
+        "importPath": "requify.app.integrations.project_management",
+        "description": "requify.app.integrations.project_management",
+        "peekOfCode": "class ProjectManagementIntegration:\n    \"\"\"\n    Интеграция с системой управления проектами.\n    Реализует принципы SOLID:\n    - Single Responsibility: отвечает только за интеграцию с PM системой\n    - Open/Closed: легко расширяется для новых типов данных\n    - Liskov Substitution: может быть заменена другой реализацией\n    - Interface Segregation: предоставляет только необходимые методы\n    - Dependency Inversion: зависит от абстракций, а не от конкретных реализаций\n    \"\"\"",
+        "detail": "requify.app.integrations.project_management",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "requify.app.integrations.project_management",
+        "description": "requify.app.integrations.project_management",
+        "peekOfCode": "logger = logging.getLogger(__name__)\n@dataclass\nclass ProjectData:\n    \"\"\"Данные проекта из внешней системы\"\"\"\n    external_id: str\n    name: str\n    description: Optional[str]\n    status: str\n    start_date: Optional[datetime]\n    end_date: Optional[datetime]",
+        "detail": "requify.app.integrations.project_management",
+        "documentation": {}
+    },
+    {
+        "label": "TestingSystemInterface",
+        "kind": 6,
+        "importPath": "requify.app.integrations.testing_system",
+        "description": "requify.app.integrations.testing_system",
+        "peekOfCode": "class TestingSystemInterface(ABC):\n    \"\"\"\n    Интерфейс для интеграции с системой тестирования (Interface Segregation Principle).\n    \"\"\"\n    @abstractmethod\n    async def create_test_plan(self, plan_data: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Создать тестовый план во внешней системе.\"\"\"\n        pass\n    @abstractmethod\n    async def execute_test_case(",
+        "detail": "requify.app.integrations.testing_system",
+        "documentation": {}
+    },
+    {
+        "label": "TestingSystemIntegration",
+        "kind": 6,
+        "importPath": "requify.app.integrations.testing_system",
+        "description": "requify.app.integrations.testing_system",
+        "peekOfCode": "class TestingSystemIntegration(TestingSystemInterface):\n    \"\"\"\n    Основная реализация интеграции с системой тестирования (Dependency Inversion Principle).\n    \"\"\"\n    def __init__(self):\n        self.base_url = settings.integrations.testing_system.base_url\n        self.api_key = settings.integrations.testing_system.api_key\n        self.timeout = settings.integrations.testing_system.timeout\n    async def _make_request(\n        self,",
+        "detail": "requify.app.integrations.testing_system",
+        "documentation": {}
+    },
+    {
+        "label": "MockTestingSystemIntegration",
+        "kind": 6,
+        "importPath": "requify.app.integrations.testing_system",
+        "description": "requify.app.integrations.testing_system",
+        "peekOfCode": "class MockTestingSystemIntegration(TestingSystemInterface):\n    \"\"\"\n    Mock-реализация интеграции для тестирования и разработки.\n    \"\"\"\n    async def create_test_plan(self, plan_data: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Mock создание тестового плана.\"\"\"\n        return {\n            \"id\": \"mock-plan-123\",\n            \"external_id\": \"ext-plan-456\",\n            \"name\": plan_data.get(\"name\"),",
+        "detail": "requify.app.integrations.testing_system",
+        "documentation": {}
+    },
+    {
+        "label": "get_testing_system_integration",
+        "kind": 2,
+        "importPath": "requify.app.integrations.testing_system",
+        "description": "requify.app.integrations.testing_system",
+        "peekOfCode": "def get_testing_system_integration() -> TestingSystemInterface:\n    \"\"\"\n    Фабричная функция для получения интеграции с системой тестирования.\n    Returns:\n        TestingSystemInterface: Экземпляр интеграции\n    \"\"\"\n    if settings.debug:\n        return MockTestingSystemIntegration()\n    else:\n        return TestingSystemIntegration()",
+        "detail": "requify.app.integrations.testing_system",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "requify.app.integrations.testing_system",
+        "description": "requify.app.integrations.testing_system",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass TestingSystemInterface(ABC):\n    \"\"\"\n    Интерфейс для интеграции с системой тестирования (Interface Segregation Principle).\n    \"\"\"\n    @abstractmethod\n    async def create_test_plan(self, plan_data: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"Создать тестовый план во внешней системе.\"\"\"\n        pass\n    @abstractmethod",
+        "detail": "requify.app.integrations.testing_system",
+        "documentation": {}
+    },
+    {
+        "label": "Base",
+        "kind": 6,
+        "importPath": "requify.app.models.base",
+        "description": "requify.app.models.base",
+        "peekOfCode": "class Base(DeclarativeBase):\n    \"\"\"\n    Базовый класс для всех моделей SQLAlchemy.\n    Автоматически генерирует имя таблицы в snake_case на основе имени класса.\n    \"\"\"\n    id: Any\n    __name__: str\n    @declared_attr.directive  # Важно для SQLAlchemy 2.0+\n    def __tablename__(cls) -> str:\n        return camel_to_snake(cls.__name__)",
+        "detail": "requify.app.models.base",
+        "documentation": {}
+    },
+    {
+        "label": "camel_to_snake",
+        "kind": 2,
+        "importPath": "requify.app.models.base",
+        "description": "requify.app.models.base",
+        "peekOfCode": "def camel_to_snake(name: str) -> str:\n    \"\"\"\n    Конвертирует CamelCase в snake_case.\n    Пример:\n        \"UserProfile\" → \"user_profile\"\n        \"HTTPRequest\" → \"http_request\"\n    \"\"\"\n    # Добавляем подчеркивание перед заглавными буквами, кроме первого символа\n    name = re.sub(r\"(?<!^)(?=[A-Z])\", \"_\", name)\n    return name.lower()",
+        "detail": "requify.app.models.base",
+        "documentation": {}
+    },
+    {
+        "label": "Comment",
+        "kind": 6,
+        "importPath": "requify.app.models.comment",
+        "description": "requify.app.models.comment",
+        "peekOfCode": "class Comment(Base):\n    \"\"\"\n    Модель комментария к требованию.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    text: Mapped[str] = mapped_column(Text, nullable=False)\n    requirement_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirement.id\"), nullable=False\n    )\n    author_id: Mapped[int] = mapped_column(",
+        "detail": "requify.app.models.comment",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "kind": 6,
+        "importPath": "requify.app.models.project",
+        "description": "requify.app.models.project",
+        "peekOfCode": "class Project(Base):\n    \"\"\"\n    Модель проекта.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    code: Mapped[str] = mapped_column(\n        String(50), unique=True, nullable=False, comment=\"Кодировка проекта\"\n    )\n    name: Mapped[str] = mapped_column(String(100), nullable=False)\n    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)",
+        "detail": "requify.app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Relationship",
+        "kind": 6,
+        "importPath": "requify.app.models.relationship",
+        "description": "requify.app.models.relationship",
+        "peekOfCode": "class Relationship(Base):\n    \"\"\"\n    Модель связи между требованиями.\n    \"\"\"\n    # Используем составной первичный ключ из трех полей\n    source_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirement.id\"), primary_key=True\n    )\n    target_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirement.id\"), primary_key=True",
+        "detail": "requify.app.models.relationship",
+        "documentation": {}
+    },
+    {
+        "label": "RelationshipType",
+        "kind": 6,
+        "importPath": "requify.app.models.relationship_types",
+        "description": "requify.app.models.relationship_types",
+        "peekOfCode": "class RelationshipType(Base):\n    \"\"\"\n    Справочник типов связей между требованиями (depends, implements, conflicts)\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)\n    # Отношения\n    relationships: Mapped[list[\"Relationship\"]] = relationship(\n        \"Relationship\", back_populates=\"type\"\n    )",
+        "detail": "requify.app.models.relationship_types",
+        "documentation": {}
+    },
+    {
+        "label": "Release",
+        "kind": 6,
+        "importPath": "requify.app.models.release",
+        "description": "requify.app.models.release",
+        "peekOfCode": "class Release(Base):\n    \"\"\"\n    Модель релиза.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    project_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"project.id\"), nullable=False\n    )\n    version: Mapped[str] = mapped_column(\n        String(50), nullable=False, comment=\"SemVer format\"",
+        "detail": "requify.app.models.release",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementStatus",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "peekOfCode": "class RequirementStatus(str, enum.Enum):\n    \"\"\"\n    Статусы требований.\n    \"\"\"\n    DRAFT = \"draft\"  # Черновик\n    PENDING = \"pending\"  # На рассмотрении\n    APPROVED = \"approved\"  # Утверждено\n    IN_PROGRESS = \"in_progress\"  # В разработке\n    TESTING = \"testing\"  # На тестировании\n    COMPLETED = \"completed\"  # Завершено",
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementPriority",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "peekOfCode": "class RequirementPriority(str, enum.Enum):\n    \"\"\"\n    Приоритеты требований.\n    \"\"\"\n    LOW = \"low\"  # Низкий\n    MEDIUM = \"medium\"  # Средний\n    HIGH = \"high\"  # Высокий\n    CRITICAL = \"critical\"  # Критический\nclass Requirement(Base):\n    \"\"\"",
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement",
+        "description": "requify.app.models.requirement",
+        "peekOfCode": "class Requirement(Base):\n    \"\"\"\n    Модель требования.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    title: Mapped[str] = mapped_column(String(200), nullable=False)\n    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)\n    # Внешние ключи для справочников\n    type_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirementtype.id\"), nullable=False",
+        "detail": "requify.app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementGroup",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement_group",
+        "description": "requify.app.models.requirement_group",
+        "peekOfCode": "class RequirementGroup(Base):\n    \"\"\"\n    Модель группы требований.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    name: Mapped[str] = mapped_column(String(100), nullable=False)\n    project_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"project.id\"), nullable=False\n    )\n    created_at: Mapped[datetime] = mapped_column(",
+        "detail": "requify.app.models.requirement_group",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementGroupVersion",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement_group_version",
+        "description": "requify.app.models.requirement_group_version",
+        "peekOfCode": "class RequirementGroupVersion(Base):\n    \"\"\"\n    Модель версии группы требований.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    group_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirementgroup.id\"), nullable=False\n    )\n    version: Mapped[int] = mapped_column(Integer, nullable=False)\n    snapshot_data: Mapped[dict] = mapped_column(",
+        "detail": "requify.app.models.requirement_group_version",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementPriority",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement_priorities",
+        "description": "requify.app.models.requirement_priorities",
+        "peekOfCode": "class RequirementPriority(Base):\n    \"\"\"\n    Справочник приоритетов требований (critical, high, medium, low)\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)\n    # Отношения\n    requirements: Mapped[list[\"Requirement\"]] = relationship(\n        \"Requirement\", back_populates=\"priority\"\n    )",
+        "detail": "requify.app.models.requirement_priorities",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementStatus",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement_statuses",
+        "description": "requify.app.models.requirement_statuses",
+        "peekOfCode": "class RequirementStatus(Base):\n    \"\"\"\n    Справочник статусов требований (draft, approved, implemented, rejected)\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)\n    # Отношения\n    requirements: Mapped[list[\"Requirement\"]] = relationship(\n        \"Requirement\", back_populates=\"status\"\n    )",
+        "detail": "requify.app.models.requirement_statuses",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementType",
+        "kind": 6,
+        "importPath": "requify.app.models.requirement_types",
+        "description": "requify.app.models.requirement_types",
+        "peekOfCode": "class RequirementType(Base):\n    \"\"\"\n    Справочник типов требований (functional, non-functional, business)\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)\n    # Отношения\n    requirements: Mapped[list[\"Requirement\"]] = relationship(\n        \"Requirement\", back_populates=\"type\"\n    )",
+        "detail": "requify.app.models.requirement_types",
+        "documentation": {}
+    },
+    {
+        "label": "Spec",
+        "kind": 6,
+        "importPath": "requify.app.models.spec",
+        "description": "requify.app.models.spec",
+        "peekOfCode": "class Spec(Base):\n    \"\"\"\n    Модель спецификации.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    project_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"project.id\"), nullable=False\n    )\n    name: Mapped[str] = mapped_column(String(100), nullable=False)\n    template_id: Mapped[Optional[int]] = mapped_column(",
+        "detail": "requify.app.models.spec",
+        "documentation": {}
+    },
+    {
+        "label": "TestStatus",
+        "kind": 6,
+        "importPath": "requify.app.models.test_result",
+        "description": "requify.app.models.test_result",
+        "peekOfCode": "class TestStatus(str, enum.Enum):\n    \"\"\"\n    Статусы тестирования.\n    \"\"\"\n    NOT_STARTED = \"not_started\"  # Не начато\n    IN_PROGRESS = \"in_progress\"  # В процессе\n    PASSED = \"passed\"  # Успешно пройдено\n    FAILED = \"failed\"  # Провалено\n    BLOCKED = \"blocked\"  # Заблокировано\nclass TestResult(Base):",
+        "detail": "requify.app.models.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "TestResult",
+        "kind": 6,
+        "importPath": "requify.app.models.test_result",
+        "description": "requify.app.models.test_result",
+        "peekOfCode": "class TestResult(Base):\n    \"\"\"\n    Модель результатов тестирования требования.\n    \"\"\"\n    id: Mapped[uuid.UUID] = mapped_column(\n        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4\n    )\n    status: Mapped[TestStatus] = mapped_column(\n        Enum(TestStatus), default=TestStatus.NOT_STARTED, nullable=False\n    )",
+        "detail": "requify.app.models.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "kind": 6,
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "peekOfCode": "class User(Base):\n    \"\"\"\n    Модель пользователя системы.\n    \"\"\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)\n    role: Mapped[str] = mapped_column(String(20), nullable=False)\n    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, default=datetime.now(UTC), nullable=False",
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.project",
+        "description": "requify.app.schemas.project",
+        "peekOfCode": "class ProjectBase(BaseModel):\n    \"\"\"\n    Базовая схема проекта.\n    \"\"\"\n    name: str = Field(..., min_length=2, max_length=100)\n    description: Optional[str] = None\n    is_active: bool = True\n    external_id: Optional[str] = Field(None, max_length=50)\nclass ProjectCreate(ProjectBase):\n    \"\"\"",
+        "detail": "requify.app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectCreate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.project",
+        "description": "requify.app.schemas.project",
+        "peekOfCode": "class ProjectCreate(ProjectBase):\n    \"\"\"\n    Схема для создания проекта.\n    \"\"\"\n    pass\nclass ProjectUpdate(ProjectBase):\n    \"\"\"\n    Схема для обновления проекта.\n    \"\"\"\n    name: Optional[str] = Field(None, min_length=2, max_length=100)",
+        "detail": "requify.app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectUpdate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.project",
+        "description": "requify.app.schemas.project",
+        "peekOfCode": "class ProjectUpdate(ProjectBase):\n    \"\"\"\n    Схема для обновления проекта.\n    \"\"\"\n    name: Optional[str] = Field(None, min_length=2, max_length=100)\n    is_active: Optional[bool] = None\nclass ProjectInDBBase(ProjectBase):\n    \"\"\"\n    Базовая схема проекта с данными из БД.\n    \"\"\"",
+        "detail": "requify.app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectInDBBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.project",
+        "description": "requify.app.schemas.project",
+        "peekOfCode": "class ProjectInDBBase(ProjectBase):\n    \"\"\"\n    Базовая схема проекта с данными из БД.\n    \"\"\"\n    id: UUID\n    created_at: datetime\n    updated_at: datetime\n    class Config:\n        from_attributes = True\nclass Project(ProjectInDBBase):",
+        "detail": "requify.app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "kind": 6,
+        "importPath": "requify.app.schemas.project",
+        "description": "requify.app.schemas.project",
+        "peekOfCode": "class Project(ProjectInDBBase):\n    \"\"\"\n    Схема проекта для API.\n    \"\"\"\n    pass\nclass ProjectWithStats(Project):\n    \"\"\"\n    Схема проекта с дополнительной статистикой.\n    \"\"\"\n    total_requirements: int",
+        "detail": "requify.app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectWithStats",
+        "kind": 6,
+        "importPath": "requify.app.schemas.project",
+        "description": "requify.app.schemas.project",
+        "peekOfCode": "class ProjectWithStats(Project):\n    \"\"\"\n    Схема проекта с дополнительной статистикой.\n    \"\"\"\n    total_requirements: int\n    requirements_completed: int\n    active_releases: int",
+        "detail": "requify.app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.release",
+        "description": "requify.app.schemas.release",
+        "peekOfCode": "class ReleaseBase(BaseModel):\n    \"\"\"\n    Базовая схема релиза.\n    \"\"\"\n    name: str = Field(..., min_length=2, max_length=100)\n    version: str = Field(..., min_length=1, max_length=50)\n    description: Optional[str] = None\n    status: ReleaseStatus = ReleaseStatus.PLANNED\n    planned_date: Optional[datetime] = None\n    release_date: Optional[datetime] = None",
+        "detail": "requify.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseCreate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.release",
+        "description": "requify.app.schemas.release",
+        "peekOfCode": "class ReleaseCreate(ReleaseBase):\n    \"\"\"\n    Схема для создания релиза.\n    \"\"\"\n    project_id: UUID\nclass ReleaseUpdate(BaseModel):\n    \"\"\"\n    Схема для обновления релиза.\n    \"\"\"\n    name: Optional[str] = Field(None, min_length=2, max_length=100)",
+        "detail": "requify.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseUpdate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.release",
+        "description": "requify.app.schemas.release",
+        "peekOfCode": "class ReleaseUpdate(BaseModel):\n    \"\"\"\n    Схема для обновления релиза.\n    \"\"\"\n    name: Optional[str] = Field(None, min_length=2, max_length=100)\n    version: Optional[str] = Field(None, min_length=1, max_length=50)\n    description: Optional[str] = None\n    status: Optional[ReleaseStatus] = None\n    planned_date: Optional[datetime] = None\n    release_date: Optional[datetime] = None",
+        "detail": "requify.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseInDBBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.release",
+        "description": "requify.app.schemas.release",
+        "peekOfCode": "class ReleaseInDBBase(ReleaseBase):\n    \"\"\"\n    Базовая схема релиза с данными из БД.\n    \"\"\"\n    id: UUID\n    project_id: UUID\n    creator_id: UUID\n    created_at: datetime\n    updated_at: datetime\n    class Config:",
+        "detail": "requify.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "Release",
+        "kind": 6,
+        "importPath": "requify.app.schemas.release",
+        "description": "requify.app.schemas.release",
+        "peekOfCode": "class Release(ReleaseInDBBase):\n    \"\"\"\n    Схема релиза для API.\n    \"\"\"\n    pass\nclass ReleaseWithRequirements(Release):\n    \"\"\"\n    Схема релиза с требованиями.\n    \"\"\"\n    total_requirements: int = 0",
+        "detail": "requify.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseWithRequirements",
+        "kind": 6,
+        "importPath": "requify.app.schemas.release",
+        "description": "requify.app.schemas.release",
+        "peekOfCode": "class ReleaseWithRequirements(Release):\n    \"\"\"\n    Схема релиза с требованиями.\n    \"\"\"\n    total_requirements: int = 0\n    completed_requirements: int = 0\n    requirements_in_testing: int = 0",
+        "detail": "requify.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.requirement",
+        "description": "requify.app.schemas.requirement",
+        "peekOfCode": "class RequirementBase(BaseModel):\n    \"\"\"\n    Базовая схема требования.\n    \"\"\"\n    title: str = Field(..., min_length=3, max_length=200)\n    description: str\n    priority: RequirementPriority = RequirementPriority.MEDIUM\n    status: RequirementStatus = RequirementStatus.DRAFT\n    deadline: Optional[datetime] = None\nclass RequirementCreate(RequirementBase):",
+        "detail": "requify.app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementCreate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.requirement",
+        "description": "requify.app.schemas.requirement",
+        "peekOfCode": "class RequirementCreate(RequirementBase):\n    \"\"\"\n    Схема для создания требования.\n    \"\"\"\n    project_id: UUID\n    release_id: Optional[UUID] = None\nclass RequirementUpdate(BaseModel):\n    \"\"\"\n    Схема для обновления требования.\n    \"\"\"",
+        "detail": "requify.app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementUpdate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.requirement",
+        "description": "requify.app.schemas.requirement",
+        "peekOfCode": "class RequirementUpdate(BaseModel):\n    \"\"\"\n    Схема для обновления требования.\n    \"\"\"\n    title: Optional[str] = Field(None, min_length=3, max_length=200)\n    description: Optional[str] = None\n    priority: Optional[RequirementPriority] = None\n    status: Optional[RequirementStatus] = None\n    deadline: Optional[datetime] = None\n    release_id: Optional[UUID] = None",
+        "detail": "requify.app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementInDBBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.requirement",
+        "description": "requify.app.schemas.requirement",
+        "peekOfCode": "class RequirementInDBBase(RequirementBase):\n    \"\"\"\n    Базовая схема требования с данными из БД.\n    \"\"\"\n    id: UUID\n    project_id: UUID\n    creator_id: UUID\n    release_id: Optional[UUID] = None\n    created_at: datetime\n    updated_at: datetime",
+        "detail": "requify.app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "kind": 6,
+        "importPath": "requify.app.schemas.requirement",
+        "description": "requify.app.schemas.requirement",
+        "peekOfCode": "class Requirement(RequirementInDBBase):\n    \"\"\"\n    Схема требования для API.\n    \"\"\"\n    pass\nclass RequirementWithTestResults(Requirement):\n    \"\"\"\n    Схема требования с результатами тестирования.\n    \"\"\"\n    latest_test_status: Optional[str] = None",
+        "detail": "requify.app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementWithTestResults",
+        "kind": 6,
+        "importPath": "requify.app.schemas.requirement",
+        "description": "requify.app.schemas.requirement",
+        "peekOfCode": "class RequirementWithTestResults(Requirement):\n    \"\"\"\n    Схема требования с результатами тестирования.\n    \"\"\"\n    latest_test_status: Optional[str] = None\n    test_count: int = 0\n    tests_passed: int = 0",
+        "detail": "requify.app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "TestResultBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.test_result",
+        "description": "requify.app.schemas.test_result",
+        "peekOfCode": "class TestResultBase(BaseModel):\n    \"\"\"\n    Базовая схема результата тестирования.\n    \"\"\"\n    status: TestStatus = TestStatus.NOT_STARTED\n    notes: Optional[str] = None\n    started_at: Optional[datetime] = None\n    completed_at: Optional[datetime] = None\n    external_id: Optional[str] = Field(None, max_length=50)\nclass TestResultCreate(TestResultBase):",
+        "detail": "requify.app.schemas.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "TestResultCreate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.test_result",
+        "description": "requify.app.schemas.test_result",
+        "peekOfCode": "class TestResultCreate(TestResultBase):\n    \"\"\"\n    Схема для создания результата тестирования.\n    \"\"\"\n    requirement_id: UUID\n    tester_id: Optional[UUID] = None\nclass TestResultUpdate(BaseModel):\n    \"\"\"\n    Схема для обновления результата тестирования.\n    \"\"\"",
+        "detail": "requify.app.schemas.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "TestResultUpdate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.test_result",
+        "description": "requify.app.schemas.test_result",
+        "peekOfCode": "class TestResultUpdate(BaseModel):\n    \"\"\"\n    Схема для обновления результата тестирования.\n    \"\"\"\n    status: Optional[TestStatus] = None\n    notes: Optional[str] = None\n    started_at: Optional[datetime] = None\n    completed_at: Optional[datetime] = None\n    external_id: Optional[str] = Field(None, max_length=50)\n    tester_id: Optional[UUID] = None",
+        "detail": "requify.app.schemas.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "TestResultInDBBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.test_result",
+        "description": "requify.app.schemas.test_result",
+        "peekOfCode": "class TestResultInDBBase(TestResultBase):\n    \"\"\"\n    Базовая схема результата тестирования с данными из БД.\n    \"\"\"\n    id: UUID\n    requirement_id: UUID\n    tester_id: Optional[UUID] = None\n    created_at: datetime\n    updated_at: datetime\n    class Config:",
+        "detail": "requify.app.schemas.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "TestResult",
+        "kind": 6,
+        "importPath": "requify.app.schemas.test_result",
+        "description": "requify.app.schemas.test_result",
+        "peekOfCode": "class TestResult(TestResultInDBBase):\n    \"\"\"\n    Схема результата тестирования для API.\n    \"\"\"\n    pass",
+        "detail": "requify.app.schemas.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "Token",
+        "kind": 6,
+        "importPath": "requify.app.schemas.token",
+        "description": "requify.app.schemas.token",
+        "peekOfCode": "class Token(BaseModel):\n    \"\"\"\n    Схема токена аутентификации.\n    \"\"\"\n    access_token: str\n    token_type: str\nclass TokenPayload(BaseModel):\n    \"\"\"\n    Схема полезной нагрузки JWT токена.\n    \"\"\"",
+        "detail": "requify.app.schemas.token",
+        "documentation": {}
+    },
+    {
+        "label": "TokenPayload",
+        "kind": 6,
+        "importPath": "requify.app.schemas.token",
+        "description": "requify.app.schemas.token",
+        "peekOfCode": "class TokenPayload(BaseModel):\n    \"\"\"\n    Схема полезной нагрузки JWT токена.\n    \"\"\"\n    sub: Optional[UUID] = None\n    exp: Optional[int] = None",
+        "detail": "requify.app.schemas.token",
+        "documentation": {}
+    },
+    {
+        "label": "UserBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
+        "peekOfCode": "class UserBase(BaseModel):\n    \"\"\"\n    Базовая схема пользователя.\n    \"\"\"\n    email: EmailStr\n    full_name: str = Field(..., min_length=2, max_length=100)\n    is_active: bool = True\n    is_admin: bool = False\nclass UserCreate(UserBase):\n    \"\"\"",
+        "detail": "requify.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserCreate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
+        "peekOfCode": "class UserCreate(UserBase):\n    \"\"\"\n    Схема для создания пользователя.\n    \"\"\"\n    password: str = Field(..., min_length=8)\nclass UserUpdate(UserBase):\n    \"\"\"\n    Схема для обновления пользователя.\n    \"\"\"\n    email: Optional[EmailStr] = None",
+        "detail": "requify.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserUpdate",
+        "kind": 6,
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
+        "peekOfCode": "class UserUpdate(UserBase):\n    \"\"\"\n    Схема для обновления пользователя.\n    \"\"\"\n    email: Optional[EmailStr] = None\n    full_name: Optional[str] = Field(None, min_length=2, max_length=100)\n    is_active: Optional[bool] = None\n    is_admin: Optional[bool] = None\n    password: Optional[str] = Field(None, min_length=8)\nclass UserInDBBase(UserBase):",
+        "detail": "requify.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserInDBBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
+        "peekOfCode": "class UserInDBBase(UserBase):\n    \"\"\"\n    Базовая схема пользователя с данными из БД.\n    \"\"\"\n    id: UUID\n    created_at: datetime\n    updated_at: datetime\n    class Config:\n        from_attributes = True\nclass User(UserInDBBase):",
+        "detail": "requify.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "kind": 6,
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
+        "peekOfCode": "class User(UserInDBBase):\n    \"\"\"\n    Схема для возврата пользователя API.\n    \"\"\"\n    pass\nclass UserInDB(UserInDBBase):\n    \"\"\"\n    Схема пользователя в БД.\n    \"\"\"\n    hashed_password: str",
+        "detail": "requify.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserInDB",
+        "kind": 6,
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
+        "peekOfCode": "class UserInDB(UserInDBBase):\n    \"\"\"\n    Схема пользователя в БД.\n    \"\"\"\n    hashed_password: str",
+        "detail": "requify.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationType",
+        "kind": 6,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "class NotificationType(str, Enum):\n    \"\"\"Типы уведомлений\"\"\"\n    REQUIREMENT_STATUS_CHANGED = \"requirement_status_changed\"\n    REQUIREMENT_CREATED = \"requirement_created\"\n    REQUIREMENT_UPDATED = \"requirement_updated\"\n    REQUIREMENT_ASSIGNED = \"requirement_assigned\"\n    REQUIREMENT_DEADLINE_APPROACHING = \"requirement_deadline_approaching\"\n    PROJECT_STATUS_CHANGED = \"project_status_changed\"\n    PROJECT_CREATED = \"project_created\"\n    PROJECT_UPDATED = \"project_updated\"",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationChannel",
+        "kind": 6,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "class NotificationChannel(str, Enum):\n    \"\"\"Каналы доставки уведомлений\"\"\"\n    EMAIL = \"email\"\n    IN_APP = \"in_app\"\n    SMS = \"sms\"  # Для будущего расширения\n    WEBHOOK = \"webhook\"  # Для будущего расширения\n@dataclass\nclass NotificationTemplate:\n    \"\"\"Шаблон уведомления\"\"\"\n    type: NotificationType",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationTemplate",
+        "kind": 6,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "class NotificationTemplate:\n    \"\"\"Шаблон уведомления\"\"\"\n    type: NotificationType\n    subject_template: str\n    body_template: str\n    html_template: Optional[str] = None\n@dataclass\nclass NotificationRecipient:\n    \"\"\"Получатель уведомления\"\"\"\n    user_id: int",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationRecipient",
+        "kind": 6,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "class NotificationRecipient:\n    \"\"\"Получатель уведомления\"\"\"\n    user_id: int\n    email: str\n    name: str\n    preferred_channels: List[NotificationChannel]\n@dataclass\nclass NotificationContext:\n    \"\"\"Контекст для формирования уведомления\"\"\"\n    type: NotificationType",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationContext",
+        "kind": 6,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "class NotificationContext:\n    \"\"\"Контекст для формирования уведомления\"\"\"\n    type: NotificationType\n    recipients: List[NotificationRecipient]\n    data: Dict[str, Any]\n    channels: List[NotificationChannel]\n    priority: str = \"normal\"  # low, normal, high, urgent\n    scheduled_time: Optional[datetime] = None\nclass NotificationService:\n    \"\"\"",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationService",
+        "kind": 6,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "class NotificationService:\n    \"\"\"\n    Сервис уведомлений.\n    Реализует принципы SOLID:\n    - Single Responsibility: отвечает только за уведомления\n    - Open/Closed: легко расширяется новыми каналами доставки\n    - Liskov Substitution: может быть заменен другой реализацией\n    - Interface Segregation: разделены интерфейсы для разных каналов\n    - Dependency Inversion: зависит от абстракций\n    \"\"\"",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass NotificationType(str, Enum):\n    \"\"\"Типы уведомлений\"\"\"\n    REQUIREMENT_STATUS_CHANGED = \"requirement_status_changed\"\n    REQUIREMENT_CREATED = \"requirement_created\"\n    REQUIREMENT_UPDATED = \"requirement_updated\"\n    REQUIREMENT_ASSIGNED = \"requirement_assigned\"\n    REQUIREMENT_DEADLINE_APPROACHING = \"requirement_deadline_approaching\"\n    PROJECT_STATUS_CHANGED = \"project_status_changed\"\n    PROJECT_CREATED = \"project_created\"",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "notification_service",
+        "kind": 5,
+        "importPath": "requify.app.services.notification_service",
+        "description": "requify.app.services.notification_service",
+        "peekOfCode": "notification_service = NotificationService()",
+        "detail": "requify.app.services.notification_service",
+        "documentation": {}
+    },
+    {
+        "label": "ReportFormat",
+        "kind": 6,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "class ReportFormat(str, Enum):\n    \"\"\"Форматы отчётов\"\"\"\n    JSON = \"json\"\n    CSV = \"csv\"\n    HTML = \"html\"\n    PDF = \"pdf\"  # Для будущего расширения\nclass ReportType(str, Enum):\n    \"\"\"Типы отчётов\"\"\"\n    REQUIREMENTS_STATUS = \"requirements_status\"\n    REQUIREMENTS_BY_PROJECT = \"requirements_by_project\"",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "ReportType",
+        "kind": 6,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "class ReportType(str, Enum):\n    \"\"\"Типы отчётов\"\"\"\n    REQUIREMENTS_STATUS = \"requirements_status\"\n    REQUIREMENTS_BY_PROJECT = \"requirements_by_project\"\n    REQUIREMENTS_BY_USER = \"requirements_by_user\"\n    PROJECT_PROGRESS = \"project_progress\"\n    TESTING_RESULTS = \"testing_results\"\n    DEADLINES_OVERVIEW = \"deadlines_overview\"\n    CHANGE_HISTORY = \"change_history\"\n    PERFORMANCE_METRICS = \"performance_metrics\"",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "ReportFilter",
+        "kind": 6,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "class ReportFilter:\n    \"\"\"Фильтры для отчётов\"\"\"\n    project_ids: Optional[List[int]] = None\n    user_ids: Optional[List[int]] = None\n    statuses: Optional[List[str]] = None\n    priorities: Optional[List[str]] = None\n    types: Optional[List[str]] = None\n    date_from: Optional[datetime] = None\n    date_to: Optional[datetime] = None\n    include_archived: bool = False",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "ReportConfig",
+        "kind": 6,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "class ReportConfig:\n    \"\"\"Конфигурация отчёта\"\"\"\n    type: ReportType\n    format: ReportFormat\n    filters: ReportFilter\n    include_details: bool = True\n    include_statistics: bool = True\n    group_by: Optional[str] = None  # status, project, user, date\n@dataclass\nclass ReportData:",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "ReportData",
+        "kind": 6,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "class ReportData:\n    \"\"\"Данные отчёта\"\"\"\n    title: str\n    description: str\n    generated_at: datetime\n    generated_by: Optional[str]\n    filters_applied: Dict[str, Any]\n    summary: Dict[str, Any]\n    data: List[Dict[str, Any]]\n    metadata: Dict[str, Any]",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "ReportingService",
+        "kind": 6,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "class ReportingService:\n    \"\"\"\n    Сервис отчётности.\n    Реализует принципы SOLID:\n    - Single Responsibility: отвечает только за генерацию отчётов\n    - Open/Closed: легко расширяется новыми типами отчётов\n    - Liskov Substitution: может быть заменен другой реализацией\n    - Interface Segregation: разделены интерфейсы для разных типов отчётов\n    - Dependency Inversion: зависит от абстракций\n    \"\"\"",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass ReportFormat(str, Enum):\n    \"\"\"Форматы отчётов\"\"\"\n    JSON = \"json\"\n    CSV = \"csv\"\n    HTML = \"html\"\n    PDF = \"pdf\"  # Для будущего расширения\nclass ReportType(str, Enum):\n    \"\"\"Типы отчётов\"\"\"\n    REQUIREMENTS_STATUS = \"requirements_status\"",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "reporting_service",
+        "kind": 5,
+        "importPath": "requify.app.services.reporting_service",
+        "description": "requify.app.services.reporting_service",
+        "peekOfCode": "reporting_service = ReportingService()",
+        "detail": "requify.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "requify.app.main",
+        "description": "requify.app.main",
+        "peekOfCode": "app = FastAPI(\n    title=settings.APP_NAME,\n    version=settings.APP_VERSION,\n    description=\"API для автоматизированной системы управления требованиями Requify\",\n)\n# Настройка CORS\nrequify.app.add_middleware(\n    CORSMiddleware,\n    allow_origins=settings.CORS_ORIGINS,\n    allow_credentials=True,",
+        "detail": "requify.app.main",
+        "documentation": {}
+    },
+    {
+        "label": "DatabaseUtilities",
+        "kind": 6,
+        "importPath": "requify.scripts.db_utils",
+        "description": "requify.scripts.db_utils",
+        "peekOfCode": "class DatabaseUtilities:\n    \"\"\"Утилиты для работы с базой данных (Single Responsibility Principle)\"\"\"\n    def __init__(self):\n        self.db_config = settings.db\n        self.admin_url = f\"postgresql+psycopg2://{self.db_config.user}:{self.db_config.password}@{self.db_config.host}:{self.db_config.port}/postgres\"\n    def create_database(self, db_name: Optional[str] = None) -> None:\n        \"\"\"Создает базу данных\"\"\"\n        db_name = db_name or self.db_config.name\n        try:\n            # Подключаемся к БД postgres для создания новой БД",
+        "detail": "requify.scripts.db_utils",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "requify.scripts.db_utils",
+        "description": "requify.scripts.db_utils",
+        "peekOfCode": "def main():\n    \"\"\"Главная функция CLI\"\"\"\n    parser = argparse.ArgumentParser(\n        description=\"Утилиты для работы с базой данных\",\n        formatter_class=argparse.RawDescriptionHelpFormatter,\n        epilog=\"\"\"\nПримеры использования:\n  %(prog)s create-db\n  %(prog)s create-db --name test_db\n  %(prog)s drop-db",
+        "detail": "requify.scripts.db_utils",
+        "documentation": {}
+    },
+    {
+        "label": "MigrationManager",
+        "kind": 6,
+        "importPath": "requify.scripts.migrations",
+        "description": "requify.scripts.migrations",
+        "peekOfCode": "class MigrationManager:\n    \"\"\"Менеджер миграций для работы с Alembic (Single Responsibility Principle)\"\"\"\n    def __init__(self):\n        self.config = self._get_alembic_config()\n        self.engine = create_engine(\n            settings.db.sync_url,\n            echo=False,\n            connect_args={\"options\": \"-c client_encoding=utf8\"},\n        )\n    def _get_alembic_config(self) -> Config:",
+        "detail": "requify.scripts.migrations",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "requify.scripts.migrations",
+        "description": "requify.scripts.migrations",
+        "peekOfCode": "def main():\n    \"\"\"Главная функция CLI\"\"\"\n    parser = argparse.ArgumentParser(\n        description=\"Управление миграциями базы данных\",\n        formatter_class=argparse.RawDescriptionHelpFormatter,\n        epilog=\"\"\"\nПримеры использования:\n  %(prog)s create \"Добавление таблицы пользователей\"\n  %(prog)s create \"Изменение структуры проектов\" --no-autogenerate\n  %(prog)s upgrade",
+        "detail": "requify.scripts.migrations",
+        "documentation": {}
+    },
+    {
+        "label": "event_loop",
+        "kind": 2,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "def event_loop():\n    \"\"\"Создать event loop для всех тестов.\"\"\"\n    loop = asyncio.get_event_loop_policy().new_event_loop()\n    yield loop\n    loop.close()\n@pytest.fixture(scope=\"session\")\nasync def test_engine():\n    \"\"\"Создать тестовый движок БД.\"\"\"\n    engine = create_async_engine(TEST_DATABASE_URL, echo=False)\n    # Создаем таблицы",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "sample_user_data",
+        "kind": 2,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "def sample_user_data():\n    \"\"\"Пример данных пользователя для тестов.\"\"\"\n    return {\n        \"email\": \"test@example.com\",\n        \"name\": \"Test User\",\n        \"password\": \"testpass123\",\n        \"is_active\": True,\n        \"is_superuser\": False,\n    }\n@pytest.fixture",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "sample_project_data",
+        "kind": 2,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "def sample_project_data():\n    \"\"\"Пример данных проекта для тестов.\"\"\"\n    return {\n        \"name\": \"Test Project\",\n        \"description\": \"Test project description\",\n        \"status\": \"active\",\n    }\n@pytest.fixture\ndef sample_requirement_data():\n    \"\"\"Пример данных требования для тестов.\"\"\"",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "sample_requirement_data",
+        "kind": 2,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "def sample_requirement_data():\n    \"\"\"Пример данных требования для тестов.\"\"\"\n    return {\n        \"title\": \"Test Requirement\",\n        \"description\": \"Test requirement description\",\n        \"priority\": \"high\",\n        \"type\": \"functional\",\n        \"status\": \"draft\",\n    }\n@pytest.fixture",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "auth_headers",
+        "kind": 2,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "def auth_headers():\n    \"\"\"Заголовки авторизации для тестов.\"\"\"\n    # TODO: Заменить на реальный токен при реализации аутентификации\n    return {\"Authorization\": \"Bearer test-token\"}",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "TEST_DATABASE_URL",
+        "kind": 5,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "TEST_DATABASE_URL = settings.test_db.async_url\n@pytest.fixture(scope=\"session\")\ndef event_loop():\n    \"\"\"Создать event loop для всех тестов.\"\"\"\n    loop = asyncio.get_event_loop_policy().new_event_loop()\n    yield loop\n    loop.close()\n@pytest.fixture(scope=\"session\")\nasync def test_engine():\n    \"\"\"Создать тестовый движок БД.\"\"\"",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    }
+]

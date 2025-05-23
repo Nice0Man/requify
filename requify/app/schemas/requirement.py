@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.models.requirement import RequirementPriority, RequirementStatus
+from requify.app.models.requirement import RequirementPriority, RequirementStatus
 
 
 class RequirementBase(BaseModel):

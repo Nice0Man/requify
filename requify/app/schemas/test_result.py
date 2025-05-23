@@ -1,10 +1,10 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from app.models.test_result import TestStatus
+from requify.app.models.test_result import TestStatus
 
 
 class TestResultBase(BaseModel):

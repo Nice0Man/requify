@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
-from app.db.base import Base
-from app.db.session import engine
-from app.models.user import User
-from app.schemas.user import UserCreate
-from app.services.users import create_user
+from requify.app.core.config import settings
+from requify.app.db.base import Base
+from requify.app.db.session import engine
+from requify.app.models.user import User
+from requify.app.schemas.user import UserCreate
+from requify.app.services.users import create_user
 
 
 def init_db(db: Session) -> None:

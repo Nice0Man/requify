@@ -1,12 +1,10 @@
-import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import List, Optional
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Table
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base
+from .base import Base
 
 
 class User(Base):
@@ -14,26 +12,27 @@ class User(Base):
     Модель пользователя системы.
     """
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
-    email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
-    full_name: Mapped[str] = mapped_column(String)
-    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    role: Mapped[str] = mapped_column(String(20), nullable=False)
+    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now(UTC), nullable=False
     )
 
     # Отношения
-    created_requirements: Mapped[List["Requirement"]] = relationship(
-        "Requirement", foreign_keys="Requirement.creator_id", back_populates="creator"
+    authored_requirements: Mapped[List["Requirement"]] = relationship(
+        "Requirement", foreign_keys="Requirement.author_id", back_populates="author"
     )
-    created_releases: Mapped[List["Release"]] = relationship(
-        "Release", foreign_keys="Release.creator_id", back_populates="creator"
+
+    modified_requirements: Mapped[List["Requirement"]] = relationship(
+        "Requirement",
+        foreign_keys="Requirement.last_modified_by",
+        back_populates="last_modifier",
     )
-    test_results: Mapped[List["TestResult"]] = relationship(
-        "TestResult", foreign_keys="TestResult.tester_id", back_populates="tester"
+
+    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="author")
+
+    group_versions: Mapped[List["RequirementGroupVersion"]] = relationship(
+        "RequirementGroupVersion", back_populates="created_by"
     )

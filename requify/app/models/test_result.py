@@ -1,13 +1,13 @@
 import enum
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base
+from .base import Base
 
 
 class TestStatus(str, enum.Enum):
@@ -35,10 +35,13 @@ class TestResult(Base):
     )
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
+        DateTime, default=datetime.now(UTC), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime,
+        default=datetime.now(UTC),
+        onupdate=datetime.now(UTC),
+        nullable=False,
     )
     started_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

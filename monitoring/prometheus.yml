@@ -1,0 +1,62 @@
+# Конфигурация Prometheus для мониторинга Requify
+# Соответствует требованиям ТЗ п. 4.1.5 (диагностирование системы)
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Мониторинг самого Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Мониторинг приложения Requify
+  - job_name: 'requify-app'
+    static_configs:
+      - targets: ['app:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Мониторинг PostgreSQL (через postgres_exporter)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+
+  # Мониторинг Redis (через redis_exporter)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+
+  # Мониторинг Nginx
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    metrics_path: '/nginx_status'
+    scrape_interval: 30s
+
+  # Мониторинг системных метрик (если используется node_exporter)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+
+# Правила алертинга
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Конфигурация хранения данных
+storage:
+  tsdb:
+    retention.time: "30d"
+    retention.size: "10GB" 
