@@ -41,3 +41,6 @@ async def health_check():
     Эндпоинт для проверки работоспособности сервиса.
     """
     return {"status": "healthy"}
+
+
+

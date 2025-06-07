@@ -24,7 +24,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     Yields:
         AsyncSession: Асинхронная сессия SQLAlchemy
     """
-    async with get_async_session() as session:
+    async for session in get_async_session():
         yield session
 
 
@@ -44,22 +44,18 @@ async def get_current_user(
     Raises:
         HTTPException: Если токен недействителен
     """
-    # TODO: Реализовать проверку токена и получение пользователя
-    # Пока заглушка
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    # Здесь будет логика проверки токена
-    # user = await verify_token(token.credentials, session)
-    # if user is None:
-    #     raise credentials_exception
-    # return user
-
-    # Временная заглушка
-    return {"id": 1, "email": "admin@requify.local"}
+    # Временная проверка mock токена
+    if token.credentials == "mock-jwt-token-123":
+        return {"id": 1, "email": "admin@requify.local", "name": "Admin User", "is_superuser": True}
+    
+    # Если токен не соответствует mock, возвращаем ошибку
+    raise credentials_exception
 
 
 async def get_superuser(current_user=Depends(get_current_user)):
