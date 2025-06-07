@@ -8,6 +8,7 @@ class RequirementStatus(Base):
     """
     Справочник статусов требований (draft, approved, implemented, rejected)
     """
+    __tablename__ = "requirement_statuses"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)

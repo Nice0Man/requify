@@ -10,10 +10,11 @@ class RequirementGroupVersion(Base):
     """
     Модель версии группы требований.
     """
+    __tablename__ = "requirement_group_versions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     group_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("requirementgroup.id"), nullable=False
+        Integer, ForeignKey("requirement_groups.id"), nullable=False
     )
     version: Mapped[int] = mapped_column(Integer, nullable=False)
     snapshot_data: Mapped[dict] = mapped_column(

@@ -90,7 +90,48 @@ class ExternalServiceError(RequifyException):
         )
 
 
-class DatabaseError(RequifyException):    """Исключение для ошибок базы данных."""    def __init__(self, message: str, operation: Optional[str] = None):        super().__init__(            message=f"Database error: {message}",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={"operation": operation} if operation else {},        )class ExternalSystemError(RequifyException):    """Исключение для ошибок внешних систем."""    def __init__(self, message: str, system_name: Optional[str] = None):        super().__init__(            message=f"External system error: {message}",            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,            details={"system": system_name} if system_name else {},        )class NotificationError(RequifyException):    """Исключение для ошибок системы уведомлений."""    def __init__(self, message: str, notification_type: Optional[str] = None):        super().__init__(            message=f"Notification error: {message}",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={"type": notification_type} if notification_type else {},        )class ReportGenerationError(RequifyException):    """Исключение для ошибок генерации отчётов."""    def __init__(self, message: str, report_type: Optional[str] = None):        super().__init__(            message=f"Report generation error: {message}",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={"report_type": report_type} if report_type else {},        )
+class DatabaseError(RequifyException):
+    """Исключение для ошибок базы данных."""
+
+    def __init__(self, message: str, operation: Optional[str] = None):
+        super().__init__(
+            message=f"Database error: {message}",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            details={"operation": operation} if operation else {},
+        )
+
+
+class ExternalSystemError(RequifyException):
+    """Исключение для ошибок внешних систем."""
+
+    def __init__(self, message: str, system_name: Optional[str] = None):
+        super().__init__(
+            message=f"External system error: {message}",
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            details={"system": system_name} if system_name else {},
+        )
+
+
+class NotificationError(RequifyException):
+    """Исключение для ошибок системы уведомлений."""
+
+    def __init__(self, message: str, notification_type: Optional[str] = None):
+        super().__init__(
+            message=f"Notification error: {message}",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            details={"type": notification_type} if notification_type else {},
+        )
+
+
+class ReportGenerationError(RequifyException):
+    """Исключение для ошибок генерации отчётов."""
+
+    def __init__(self, message: str, report_type: Optional[str] = None):
+        super().__init__(
+            message=f"Report generation error: {message}",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            details={"report_type": report_type} if report_type else {},
+        )
 
 
 # Обработчики исключений для FastAPI
@@ -261,7 +302,7 @@ def register_exception_handlers(app):
     Args:
         app: Экземпляр FastAPI приложения
     """
-    requify.app.add_exception_handler(RequifyException, requify_exception_handler)
-    requify.app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    requify.app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    requify.app.add_exception_handler(Exception, general_exception_handler)
+    app.add_exception_handler(RequifyException, requify_exception_handler)
+    app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+    app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    app.add_exception_handler(Exception, general_exception_handler)

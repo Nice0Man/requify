@@ -1,19 +1,587 @@
 [
     {
-        "label": "asyncio",
-        "kind": 6,
+        "label": "Sequence",
+        "importPath": "typing",
+        "description": "typing",
         "isExtraImport": true,
-        "importPath": "asyncio",
-        "description": "asyncio",
-        "detail": "asyncio",
+        "detail": "typing",
         "documentation": {}
     },
     {
-        "label": "fileConfig",
-        "importPath": "logging.config",
-        "description": "logging.config",
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
         "isExtraImport": true,
-        "detail": "logging.config",
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Protocol",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TypeVar",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "context",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "command",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "script",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "sqlalchemy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "detail": "sqlalchemy",
         "documentation": {}
     },
     {
@@ -513,6 +1081,23 @@
         "documentation": {}
     },
     {
+        "label": "asyncio",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "asyncio",
+        "description": "asyncio",
+        "detail": "asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "fileConfig",
+        "importPath": "logging.config",
+        "description": "logging.config",
+        "isExtraImport": true,
+        "detail": "logging.config",
+        "documentation": {}
+    },
+    {
         "label": "Connection",
         "importPath": "sqlalchemy.engine",
         "description": "sqlalchemy.engine",
@@ -665,27 +1250,21 @@
         "documentation": {}
     },
     {
-        "label": "context",
-        "importPath": "alembic",
-        "description": "alembic",
+        "label": "sys",
+        "kind": 6,
         "isExtraImport": true,
-        "detail": "alembic",
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
         "documentation": {}
     },
     {
-        "label": "command",
-        "importPath": "alembic",
-        "description": "alembic",
+        "label": "os",
+        "kind": 6,
         "isExtraImport": true,
-        "detail": "alembic",
-        "documentation": {}
-    },
-    {
-        "label": "script",
-        "importPath": "alembic",
-        "description": "alembic",
-        "isExtraImport": true,
-        "detail": "alembic",
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
         "documentation": {}
     },
     {
@@ -881,539 +1460,11 @@
         "documentation": {}
     },
     {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncGenerator",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncGenerator",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Protocol",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TypeVar",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncGenerator",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
+        "label": "*",
+        "importPath": "requify.app.models",
+        "description": "requify.app.models",
+        "isExtraImport": true,
+        "detail": "requify.app.models",
         "documentation": {}
     },
     {
@@ -1866,6 +1917,14 @@
     },
     {
         "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
         "importPath": "pydantic",
         "description": "pydantic",
         "isExtraImport": true,
@@ -3236,30 +3295,12 @@
         "documentation": {}
     },
     {
-        "label": "os",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "os",
-        "description": "os",
-        "detail": "os",
-        "documentation": {}
-    },
-    {
         "label": "subprocess",
         "kind": 6,
         "isExtraImport": true,
         "importPath": "subprocess",
         "description": "subprocess",
         "detail": "subprocess",
-        "documentation": {}
-    },
-    {
-        "label": "sys",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "sys",
-        "description": "sys",
-        "detail": "sys",
         "documentation": {}
     },
     {
@@ -3320,11 +3361,38 @@
         "documentation": {}
     },
     {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "requify.alembic.versions.2025_06_07_1305-78fef4e20dc8_initial_migration",
+        "description": "requify.alembic.versions.2025_06_07_1305-78fef4e20dc8_initial_migration",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    pass\ndef downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    pass",
+        "detail": "requify.alembic.versions.2025_06_07_1305-78fef4e20dc8_initial_migration",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "requify.alembic.versions.2025_06_07_1305-78fef4e20dc8_initial_migration",
+        "description": "requify.alembic.versions.2025_06_07_1305-78fef4e20dc8_initial_migration",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    pass",
+        "detail": "requify.alembic.versions.2025_06_07_1305-78fef4e20dc8_initial_migration",
+        "documentation": {}
+    },
+    {
+        "label": "get_url",
+        "kind": 2,
+        "importPath": "requify.alembic.env",
+        "description": "requify.alembic.env",
+        "peekOfCode": "def get_url():\n    \"\"\"Получаем URL базы данных из настроек\"\"\"\n    return settings.db.async_url\ndef run_migrations_offline() -> None:\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable\n    here as well.  By skipping the Engine creation\n    we don't even need a DBAPI to be available.\n    Calls to context.execute() here emit the given string to the",
+        "detail": "requify.alembic.env",
+        "documentation": {}
+    },
+    {
         "label": "run_migrations_offline",
         "kind": 2,
         "importPath": "requify.alembic.env",
         "description": "requify.alembic.env",
-        "peekOfCode": "def run_migrations_offline() -> None:\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable\n    here as well.  By skipping the Engine creation\n    we don't even need a DBAPI to be available.\n    Calls to context.execute() here emit the given string to the\n    script output.\n    \"\"\"\n    url = config.get_main_option(\"sqlalchemy.url\")",
+        "peekOfCode": "def run_migrations_offline() -> None:\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable\n    here as well.  By skipping the Engine creation\n    we don't even need a DBAPI to be available.\n    Calls to context.execute() here emit the given string to the\n    script output.\n    \"\"\"\n    url = get_url()",
         "detail": "requify.alembic.env",
         "documentation": {}
     },
@@ -3333,7 +3401,7 @@
         "kind": 2,
         "importPath": "requify.alembic.env",
         "description": "requify.alembic.env",
-        "peekOfCode": "def do_run_migrations(connection: Connection) -> None:\n    context.configure(connection=connection, target_metadata=target_metadata)\n    with context.begin_transaction():\n        context.run_migrations()\nasync def run_async_migrations() -> None:\n    \"\"\"In this scenario we need to create an Engine\n    and associate a connection with the context.\n    \"\"\"\n    connectable = async_engine_from_config(\n        config.get_section(config.config_ini_section, {}),",
+        "peekOfCode": "def do_run_migrations(connection: Connection) -> None:\n    context.configure(\n        connection=connection, \n        target_metadata=target_metadata,\n        compare_type=True,\n        compare_server_default=True,\n    )\n    with context.begin_transaction():\n        context.run_migrations()\nasync def run_async_migrations() -> None:",
         "detail": "requify.alembic.env",
         "documentation": {}
     },
@@ -3351,7 +3419,7 @@
         "kind": 5,
         "importPath": "requify.alembic.env",
         "description": "requify.alembic.env",
-        "peekOfCode": "config = context.config\n# Interpret the config file for Python logging.\n# This line sets up loggers basically.\nif config.config_file_name is not None:\n    fileConfig(config.config_file_name)\n# add your model's MetaData object here\n# for 'autogenerate' support\n# from myapp import mymodel\n# target_metadata = mymodel.Base.metadata\ntarget_metadata = Base.metadata",
+        "peekOfCode": "config = context.config\n# Interpret the config file for Python logging.\n# This line sets up loggers basically.\nif config.config_file_name is not None:\n    fileConfig(config.config_file_name)\n# add your model's MetaData object here\n# for 'autogenerate' support\ntarget_metadata = Base.metadata\n# other values from the config, defined by the needs of env.py,\n# can be acquired:",
         "detail": "requify.alembic.env",
         "documentation": {}
     },
@@ -3360,7 +3428,7 @@
         "kind": 5,
         "importPath": "requify.alembic.env",
         "description": "requify.alembic.env",
-        "peekOfCode": "target_metadata = Base.metadata\n# other values from the config, defined by the needs of env.py,\n# can be acquired:\n# my_important_option = config.get_main_option(\"my_important_option\")\n# ... etc.\nconfig.set_main_option(\"sqlalchemy.url\", str(settings.ASYNC_DATABASE_URI))\ndef run_migrations_offline() -> None:\n    \"\"\"Run migrations in 'offline' mode.\n    This configures the context with just a URL\n    and not an Engine, though an Engine is acceptable",
+        "peekOfCode": "target_metadata = Base.metadata\n# other values from the config, defined by the needs of env.py,\n# can be acquired:\n# my_important_option = config.get_main_option(\"my_important_option\")\n# ... etc.\ndef get_url():\n    \"\"\"Получаем URL базы данных из настроек\"\"\"\n    return settings.db.async_url\ndef run_migrations_offline() -> None:\n    \"\"\"Run migrations in 'offline' mode.",
         "detail": "requify.alembic.env",
         "documentation": {}
     },
@@ -3441,7 +3509,7 @@
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class RunConfig(BaseModel):\n    \"\"\"Конфигурация запуска приложения\"\"\"\n    env: str = \"development\"\n    name: str = \"Requify\"\n    version: str = \"0.1.0\"\n    host: str = \"0.0.0.0\"\n    port: int = 8000\n    debug: bool = True\nclass ApiV1Prefix(BaseModel):\n    \"\"\"Префиксы для API v1 маршрутов\"\"\"",
+        "peekOfCode": "class RunConfig(BaseModel):\n    env: str = \"development\"\n    name: str = \"Requify\"\n    version: str = \"0.1.0\"\n    api_v1_str: str = \"/api/v1\"\n    host: str = \"0.0.0.0\"\n    port: int = 8000\n    debug: bool = True\nclass ApiV1Prefix(BaseModel):\n    prefix: str = \"/v1\"",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -3450,7 +3518,16 @@
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class ApiV1Prefix(BaseModel):\n    \"\"\"Префиксы для API v1 маршрутов\"\"\"\n    prefix: str = \"/v1\"\n    auth: str = \"/auth\"\n    users: str = \"/users\"\n    requirements: str = \"/requirements\"\n    projects: str = \"/projects\"\n    templates: str = \"/templates\"\n    analysis: str = \"/analysis\"\n    reports: str = \"/reports\"",
+        "peekOfCode": "class ApiV1Prefix(BaseModel):\n    prefix: str = \"/v1\"\n    auth: str = \"/auth\"\n    users: str = \"/users\"\n    requirements: str = \"/requirements\"\n    projects: str = \"/projects\"\n    templates: str = \"/templates\"\n    analysis: str = \"/analysis\"\n    reports: str = \"/reports\"\n    integrations: str = \"/integrations\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "JWT",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class JWT(BaseModel):\n    private_key_path: Path = BASE_DIR / \"certs\" / \"jwt-private.pem\"\n    public_key_path: Path = BASE_DIR / \"certs\" / \"jwt-public.pem\"\n    JWT_PUBLIC_KEY: str = \"guess-me\"\n    JWT_PRIVATE_KEY: str = \"guess-me\"\n    JWT_ALGORITHM: str = \"HS256\"\n    TOKEN_EXPIRES_MINUTES: int = 30\n    TOKEN_URLSAFE_LEN: int = 32\n    SUB: str = \"requify-user\"\nclass ApiConfig(BaseModel):",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -3459,16 +3536,7 @@
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class ApiConfig(BaseModel):\n    \"\"\"Конфигурация API\"\"\"\n    prefix: str = \"/api\"\n    v1_str: str = \"/api/v1\"\n    v1: ApiV1Prefix = ApiV1Prefix()\n    @property\n    def bearer_token_url(self) -> str:\n        \"\"\"URL для получения bearer токена\"\"\"\n        parts = (self.prefix, self.v1.prefix, self.v1.auth, \"/login\")\n        path = \"\".join(parts)",
-        "detail": "requify.app.core.config",
-        "documentation": {}
-    },
-    {
-        "label": "SecurityConfig",
-        "kind": 6,
-        "importPath": "requify.app.core.config",
-        "description": "requify.app.core.config",
-        "peekOfCode": "class SecurityConfig(BaseModel):\n    \"\"\"Конфигурация безопасности и JWT\"\"\"\n    secret_key: str = \"super-secret-key-change-in-production-minimum-32-characters\"\n    algorithm: str = \"HS256\"\n    access_token_expire_minutes: int = 30\n    # JWT сертификаты (опционально для RS256)\n    private_key_path: Path = BASE_DIR / \"certs\" / \"jwt-private.pem\"\n    public_key_path: Path = BASE_DIR / \"certs\" / \"jwt-public.pem\"\n    jwt_public_key: Optional[str] = None\n    jwt_private_key: Optional[str] = None",
+        "peekOfCode": "class ApiConfig(BaseModel):\n    prefix: str = \"/api\"\n    v1: ApiV1Prefix = ApiV1Prefix()\n    @property\n    def bearer_token_url(self) -> str:\n        # api/v1/auth/login\n        parts = (self.prefix, self.v1.prefix, self.v1.auth, \"/login\")\n        path = \"\".join(parts)\n        return path.removeprefix(\"/\")\nclass DatabaseConfig(BaseModel):",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -3477,52 +3545,25 @@
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class DatabaseConfig(BaseModel):\n    \"\"\"Конфигурация базы данных\"\"\"\n    name: str = \"requify-db\"\n    password: str = \"postgres\"\n    user: str = \"postgres\"\n    host: str = \"localhost\"\n    port: int = 5432\n    # Настройки пула соединений\n    pool_size: int = 20\n    max_overflow: int = 10",
+        "peekOfCode": "class DatabaseConfig(BaseModel):\n    name: str = \"requify-db\"\n    password: str = \"postgres\"\n    user: str = \"postgres\"\n    host: str = \"localhost\"\n    port: int = 5432\n    # Connection pool settings\n    pool_size: int = 20\n    max_overflow: int = 10\n    pool_pre_ping: bool = True",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
     {
-        "label": "RedisConfig",
+        "label": "TestDatabaseConfig",
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class RedisConfig(BaseModel):\n    \"\"\"Конфигурация Redis\"\"\"\n    host: str = \"localhost\"\n    port: int = 6379\n    db: int = 0\n    password: Optional[str] = None\n    @property\n    def url(self) -> str:\n        \"\"\"URL подключения к Redis\"\"\"\n        if self.password:",
+        "peekOfCode": "class TestDatabaseConfig(BaseModel):\n    name: str = \"requify-test-db\"\n    password: str = \"postgres\"\n    user: str = \"postgres\"\n    host: str = \"localhost\"\n    port: int = 5433\n    # Connection pool settings\n    pool_size: int = 20\n    max_overflow: int = 10\n    pool_pre_ping: bool = True",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
     {
-        "label": "IntegrationsConfig",
+        "label": "SecurityConfig",
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class IntegrationsConfig(BaseModel):\n    \"\"\"Конфигурация внешних интеграций\"\"\"\n    testing_system_api_url: str = \"http://localhost:8001/api/v1\"\n    testing_system_api_key: str = \"test-api-key-change-in-production\"\n    project_management_api_url: str = \"http://localhost:8002/api/v1\"\n    project_management_api_key: str = \"project-api-key-change-in-production\"\nclass FileStorageConfig(BaseModel):\n    \"\"\"Конфигурация файлового хранилища\"\"\"\n    upload_dir: str = \"uploads\"\n    max_file_size: int = 10485760  # 10MB",
-        "detail": "requify.app.core.config",
-        "documentation": {}
-    },
-    {
-        "label": "FileStorageConfig",
-        "kind": 6,
-        "importPath": "requify.app.core.config",
-        "description": "requify.app.core.config",
-        "peekOfCode": "class FileStorageConfig(BaseModel):\n    \"\"\"Конфигурация файлового хранилища\"\"\"\n    upload_dir: str = \"uploads\"\n    max_file_size: int = 10485760  # 10MB\n    allowed_extensions: str = \"pdf,doc,docx,txt,jpg,jpeg,png,gif\"\n    @property\n    def allowed_extensions_list(self) -> List[str]:\n        \"\"\"Возвращает список разрешенных расширений файлов\"\"\"\n        return [ext.strip() for ext in self.allowed_extensions.split(\",\")]\nclass EmailConfig(BaseModel):",
-        "detail": "requify.app.core.config",
-        "documentation": {}
-    },
-    {
-        "label": "EmailConfig",
-        "kind": 6,
-        "importPath": "requify.app.core.config",
-        "description": "requify.app.core.config",
-        "peekOfCode": "class EmailConfig(BaseModel):\n    \"\"\"Конфигурация Email\"\"\"\n    smtp_host: Optional[str] = None\n    smtp_port: int = 587\n    smtp_user: Optional[str] = None\n    smtp_password: Optional[str] = None\n    smtp_tls: bool = True\n    smtp_ssl: bool = False\n    from_email: str = \"noreply@requify.local\"\n    from_name: str = \"Requify\"",
-        "detail": "requify.app.core.config",
-        "documentation": {}
-    },
-    {
-        "label": "LoggingConfig",
-        "kind": 6,
-        "importPath": "requify.app.core.config",
-        "description": "requify.app.core.config",
-        "peekOfCode": "class LoggingConfig(BaseModel):\n    \"\"\"Конфигурация логирования\"\"\"\n    level: str = \"INFO\"\n    file: str = \"logs/requify.log\"\n    max_size: int = 10485760\n    backup_count: int = 5\nclass AdminConfig(BaseModel):\n    \"\"\"Конфигурация первого администратора\"\"\"\n    email: str = \"admin@requify.local\"\n    password: str = \"admin123\"",
+        "peekOfCode": "class SecurityConfig(BaseModel):\n    secret_key: str = \"super-secret-key-change-in-production-minimum-32-characters\"\n    algorithm: str = \"HS256\"\n    access_token_expire_minutes: int = 30\nclass AdminConfig(BaseModel):\n    email: str = \"admin@requify.local\"\n    password: str = \"admin123\"\n    name: str = \"Admin User\"\nclass IntegrationsConfig(BaseModel):\n    testing_system_api_url: str = \"http://localhost:8001/api/v1\"",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -3531,16 +3572,61 @@
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class AdminConfig(BaseModel):\n    \"\"\"Конфигурация первого администратора\"\"\"\n    email: str = \"admin@requify.local\"\n    password: str = \"admin123\"\n    name: str = \"Admin User\"\nclass CorsConfig(BaseModel):\n    \"\"\"Конфигурация CORS\"\"\"\n    origins: str = '[\"http://localhost:3000\", \"http://localhost:8080\", \"http://127.0.0.1:3000\"]'\n    @property\n    def origins_list(self) -> List[str]:",
+        "peekOfCode": "class AdminConfig(BaseModel):\n    email: str = \"admin@requify.local\"\n    password: str = \"admin123\"\n    name: str = \"Admin User\"\nclass IntegrationsConfig(BaseModel):\n    testing_system_api_url: str = \"http://localhost:8001/api/v1\"\n    testing_system_api_key: str = \"test-api-key-change-in-production\"\n    project_management_api_url: str = \"http://localhost:8002/api/v1\"\n    project_management_api_key: str = \"project-api-key-change-in-production\"\nclass LoggingConfig(BaseModel):",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
     {
-        "label": "CorsConfig",
+        "label": "IntegrationsConfig",
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class CorsConfig(BaseModel):\n    \"\"\"Конфигурация CORS\"\"\"\n    origins: str = '[\"http://localhost:3000\", \"http://localhost:8080\", \"http://127.0.0.1:3000\"]'\n    @property\n    def origins_list(self) -> List[str]:\n        \"\"\"Возвращает список CORS origins\"\"\"\n        import json\n        return json.loads(self.origins)\nclass Settings(BaseSettings):\n    \"\"\"Основные настройки приложения\"\"\"",
+        "peekOfCode": "class IntegrationsConfig(BaseModel):\n    testing_system_api_url: str = \"http://localhost:8001/api/v1\"\n    testing_system_api_key: str = \"test-api-key-change-in-production\"\n    project_management_api_url: str = \"http://localhost:8002/api/v1\"\n    project_management_api_key: str = \"project-api-key-change-in-production\"\nclass LoggingConfig(BaseModel):\n    level: str = \"INFO\"\n    file: str = \"logs/requify.log\"\n    max_size: int = 10485760\n    backup_count: int = 5",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "LoggingConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class LoggingConfig(BaseModel):\n    level: str = \"INFO\"\n    file: str = \"logs/requify.log\"\n    max_size: int = 10485760\n    backup_count: int = 5\nclass RedisConfig(BaseModel):\n    host: str = \"localhost\"\n    port: int = 6379\n    db: int = 0\n    password: str = \"\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "RedisConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class RedisConfig(BaseModel):\n    host: str = \"localhost\"\n    port: int = 6379\n    db: int = 0\n    password: str = \"\"\nclass EmailConfig(BaseModel):\n    smtp_host: str = \"\"\n    smtp_port: int = 587\n    smtp_user: str = \"\"\n    smtp_password: str = \"\"",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "EmailConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class EmailConfig(BaseModel):\n    smtp_host: str = \"\"\n    smtp_port: int = 587\n    smtp_user: str = \"\"\n    smtp_password: str = \"\"\n    smtp_tls: bool = True\n    smtp_ssl: bool = False\n    from_email: str = \"noreply@requify.local\"\n    from_name: str = \"Requify\"\nclass FileStorageConfig(BaseModel):",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "FileStorageConfig",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class FileStorageConfig(BaseModel):\n    upload_dir: str = \"uploads\"\n    max_file_size: int = 10485760\n    allowed_extensions: str = \"pdf,doc,docx,txt,jpg,jpeg,png,gif\"\nclass AccessToken(BaseModel):\n    lifetime_seconds: int = 1800  # 30 minutes (30 * 60)\n    reset_password_token_secret: str = \"reset-password-secret-change-in-production\"\n    verification_token_secret: str = \"verification-secret-change-in-production\"\nclass Settings(BaseSettings):\n    model_config = SettingsConfigDict(",
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "AccessToken",
+        "kind": 6,
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "peekOfCode": "class AccessToken(BaseModel):\n    lifetime_seconds: int = 1800  # 30 minutes (30 * 60)\n    reset_password_token_secret: str = \"reset-password-secret-change-in-production\"\n    verification_token_secret: str = \"verification-secret-change-in-production\"\nclass Settings(BaseSettings):\n    model_config = SettingsConfigDict(\n        env_file=\".env\",\n        env_file_encoding=\"utf-8\",\n        case_sensitive=False,\n        env_nested_delimiter=\"__\",",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -3549,7 +3635,7 @@
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class Settings(BaseSettings):\n    \"\"\"Основные настройки приложения\"\"\"\n    model_config = SettingsConfigDict(\n        env_file=(\".env.template\", \".env\"),\n        env_file_encoding=\"utf-8\",\n        case_sensitive=False,\n        env_nested_delimiter=\"__\",\n        env_prefix=\"APP_CONFIG__\",\n        extra=\"allow\",  # Разрешаем дополнительные поля\n    )",
+        "peekOfCode": "class Settings(BaseSettings):\n    model_config = SettingsConfigDict(\n        env_file=\".env\",\n        env_file_encoding=\"utf-8\",\n        case_sensitive=False,\n        env_nested_delimiter=\"__\",\n        env_prefix=\"APP_CONFIG__\",\n        extra=\"allow\",\n    )\n    # Main app config",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -3558,7 +3644,7 @@
         "kind": 5,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "BASE_DIR = Path(__file__).parent.parent.parent\n# Загружаем переменные окружения\nload_dotenv(dotenv_path=BASE_DIR / \".env\")\nclass RunConfig(BaseModel):\n    \"\"\"Конфигурация запуска приложения\"\"\"\n    env: str = \"development\"\n    name: str = \"Requify\"\n    version: str = \"0.1.0\"\n    host: str = \"0.0.0.0\"\n    port: int = 8000",
+        "peekOfCode": "BASE_DIR = Path(__file__).parent.parent.parent.parent\nload_dotenv(dotenv_path=BASE_DIR)\nclass RunConfig(BaseModel):\n    env: str = \"development\"\n    name: str = \"Requify\"\n    version: str = \"0.1.0\"\n    api_v1_str: str = \"/api/v1\"\n    host: str = \"0.0.0.0\"\n    port: int = 8000\n    debug: bool = True",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -3621,7 +3707,7 @@
         "kind": 6,
         "importPath": "requify.app.core.exceptions",
         "description": "requify.app.core.exceptions",
-        "peekOfCode": "class ExternalServiceError(RequifyException):\n    \"\"\"Исключение для ошибок внешних сервисов.\"\"\"\n    def __init__(self, service_name: str, message: str):\n        super().__init__(\n            message=f\"External service '{service_name}' error: {message}\",\n            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,\n            details={\"service\": service_name, \"original_message\": message},\n        )\nclass DatabaseError(RequifyException):    \"\"\"Исключение для ошибок базы данных.\"\"\"    def __init__(self, message: str, operation: Optional[str] = None):        super().__init__(            message=f\"Database error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"operation\": operation} if operation else {},        )class ExternalSystemError(RequifyException):    \"\"\"Исключение для ошибок внешних систем.\"\"\"    def __init__(self, message: str, system_name: Optional[str] = None):        super().__init__(            message=f\"External system error: {message}\",            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,            details={\"system\": system_name} if system_name else {},        )class NotificationError(RequifyException):    \"\"\"Исключение для ошибок системы уведомлений.\"\"\"    def __init__(self, message: str, notification_type: Optional[str] = None):        super().__init__(            message=f\"Notification error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"type\": notification_type} if notification_type else {},        )class ReportGenerationError(RequifyException):    \"\"\"Исключение для ошибок генерации отчётов.\"\"\"    def __init__(self, message: str, report_type: Optional[str] = None):        super().__init__(            message=f\"Report generation error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"report_type\": report_type} if report_type else {},        )\n# Обработчики исключений для FastAPI",
+        "peekOfCode": "class ExternalServiceError(RequifyException):\n    \"\"\"Исключение для ошибок внешних сервисов.\"\"\"\n    def __init__(self, service_name: str, message: str):\n        super().__init__(\n            message=f\"External service '{service_name}' error: {message}\",\n            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,\n            details={\"service\": service_name, \"original_message\": message},\n        )\nclass DatabaseError(RequifyException):\n    \"\"\"Исключение для ошибок базы данных.\"\"\"",
         "detail": "requify.app.core.exceptions",
         "documentation": {}
     },
@@ -3630,7 +3716,34 @@
         "kind": 6,
         "importPath": "requify.app.core.exceptions",
         "description": "requify.app.core.exceptions",
-        "peekOfCode": "class DatabaseError(RequifyException):    \"\"\"Исключение для ошибок базы данных.\"\"\"    def __init__(self, message: str, operation: Optional[str] = None):        super().__init__(            message=f\"Database error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"operation\": operation} if operation else {},        )class ExternalSystemError(RequifyException):    \"\"\"Исключение для ошибок внешних систем.\"\"\"    def __init__(self, message: str, system_name: Optional[str] = None):        super().__init__(            message=f\"External system error: {message}\",            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,            details={\"system\": system_name} if system_name else {},        )class NotificationError(RequifyException):    \"\"\"Исключение для ошибок системы уведомлений.\"\"\"    def __init__(self, message: str, notification_type: Optional[str] = None):        super().__init__(            message=f\"Notification error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"type\": notification_type} if notification_type else {},        )class ReportGenerationError(RequifyException):    \"\"\"Исключение для ошибок генерации отчётов.\"\"\"    def __init__(self, message: str, report_type: Optional[str] = None):        super().__init__(            message=f\"Report generation error: {message}\",            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,            details={\"report_type\": report_type} if report_type else {},        )\n# Обработчики исключений для FastAPI\nasync def requify_exception_handler(\n    request: Request, exc: RequifyException\n) -> JSONResponse:\n    \"\"\"\n    Обработчик кастомных исключений Requify.\n    Args:\n        request: HTTP запрос\n        exc: Исключение Requify",
+        "peekOfCode": "class DatabaseError(RequifyException):\n    \"\"\"Исключение для ошибок базы данных.\"\"\"\n    def __init__(self, message: str, operation: Optional[str] = None):\n        super().__init__(\n            message=f\"Database error: {message}\",\n            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n            details={\"operation\": operation} if operation else {},\n        )\nclass ExternalSystemError(RequifyException):\n    \"\"\"Исключение для ошибок внешних систем.\"\"\"",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ExternalSystemError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class ExternalSystemError(RequifyException):\n    \"\"\"Исключение для ошибок внешних систем.\"\"\"\n    def __init__(self, message: str, system_name: Optional[str] = None):\n        super().__init__(\n            message=f\"External system error: {message}\",\n            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,\n            details={\"system\": system_name} if system_name else {},\n        )\nclass NotificationError(RequifyException):\n    \"\"\"Исключение для ошибок системы уведомлений.\"\"\"",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class NotificationError(RequifyException):\n    \"\"\"Исключение для ошибок системы уведомлений.\"\"\"\n    def __init__(self, message: str, notification_type: Optional[str] = None):\n        super().__init__(\n            message=f\"Notification error: {message}\",\n            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n            details={\"type\": notification_type} if notification_type else {},\n        )\nclass ReportGenerationError(RequifyException):\n    \"\"\"Исключение для ошибок генерации отчётов.\"\"\"",
+        "detail": "requify.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ReportGenerationError",
+        "kind": 6,
+        "importPath": "requify.app.core.exceptions",
+        "description": "requify.app.core.exceptions",
+        "peekOfCode": "class ReportGenerationError(RequifyException):\n    \"\"\"Исключение для ошибок генерации отчётов.\"\"\"\n    def __init__(self, message: str, report_type: Optional[str] = None):\n        super().__init__(\n            message=f\"Report generation error: {message}\",\n            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n            details={\"report_type\": report_type} if report_type else {},\n        )\n# Обработчики исключений для FastAPI\nasync def requify_exception_handler(",
         "detail": "requify.app.core.exceptions",
         "documentation": {}
     },
@@ -3639,7 +3752,7 @@
         "kind": 2,
         "importPath": "requify.app.core.exceptions",
         "description": "requify.app.core.exceptions",
-        "peekOfCode": "def register_exception_handlers(app):\n    \"\"\"\n    Регистрация всех обработчиков исключений в FastAPI приложении.\n    Args:\n        app: Экземпляр FastAPI приложения\n    \"\"\"\n    requify.app.add_exception_handler(RequifyException, requify_exception_handler)\n    requify.app.add_exception_handler(StarletteHTTPException, http_exception_handler)\n    requify.app.add_exception_handler(RequestValidationError, validation_exception_handler)\n    requify.app.add_exception_handler(Exception, general_exception_handler)",
+        "peekOfCode": "def register_exception_handlers(app):\n    \"\"\"\n    Регистрация всех обработчиков исключений в FastAPI приложении.\n    Args:\n        app: Экземпляр FastAPI приложения\n    \"\"\"\n    app.add_exception_handler(RequifyException, requify_exception_handler)\n    app.add_exception_handler(StarletteHTTPException, http_exception_handler)\n    app.add_exception_handler(RequestValidationError, validation_exception_handler)\n    app.add_exception_handler(Exception, general_exception_handler)",
         "detail": "requify.app.core.exceptions",
         "documentation": {}
     },

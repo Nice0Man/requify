@@ -7,8 +7,11 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from requify.app.core.config import settings
 from requify.app.models.base import Base
+from requify.app.core.config import settings
+
+# Импортируем все модели для автогенерации
+from requify.app.models import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,9 +32,7 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
-config.set_main_option("sqlalchemy.url", str(settings.ASYNC_DATABASE_URI))
-
+config.set_main_option("sqlalchemy.url", settings.db.async_url)
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

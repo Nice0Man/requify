@@ -1,10 +1,8 @@
 import enum
-import uuid
 from datetime import datetime, UTC
 from typing import Optional
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -27,9 +25,7 @@ class TestResult(Base):
     Модель результатов тестирования требования.
     """
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
     status: Mapped[TestStatus] = mapped_column(
         Enum(TestStatus), default=TestStatus.NOT_STARTED, nullable=False
     )
@@ -48,11 +44,11 @@ class TestResult(Base):
     external_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
 
     # Внешние ключи
-    requirement_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("requirement.id"), nullable=False
+    requirement_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("requirement.id"), nullable=False
     )
-    tester_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("user.id"), nullable=True
+    tester_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("user.id"), nullable=True
     )
 
     # Отношения

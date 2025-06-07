@@ -10,31 +10,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
 
-class RequirementStatus(str, enum.Enum):
-    """
-    Статусы требований.
-    """
-
-    DRAFT = "draft"  # Черновик
-    PENDING = "pending"  # На рассмотрении
-    APPROVED = "approved"  # Утверждено
-    IN_PROGRESS = "in_progress"  # В разработке
-    TESTING = "testing"  # На тестировании
-    COMPLETED = "completed"  # Завершено
-    ARCHIVED = "archived"  # Архивировано
-
-
-class RequirementPriority(str, enum.Enum):
-    """
-    Приоритеты требований.
-    """
-
-    LOW = "low"  # Низкий
-    MEDIUM = "medium"  # Средний
-    HIGH = "high"  # Высокий
-    CRITICAL = "critical"  # Критический
-
-
 class Requirement(Base):
     """
     Модель требования.
@@ -46,13 +21,13 @@ class Requirement(Base):
 
     # Внешние ключи для справочников
     type_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("requirementtype.id"), nullable=False
+        Integer, ForeignKey("requirement_types.id"), nullable=False
     )
     priority_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("requirementpriority.id"), nullable=False
+        Integer, ForeignKey("requirement_priorities.id"), nullable=False
     )
     status_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("requirementstatus.id"), nullable=False
+        Integer, ForeignKey("requirement_statuses.id"), nullable=False
     )
 
     # Внешние ключи для связанных сущностей

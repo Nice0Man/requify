@@ -8,6 +8,7 @@ class RequirementPriority(Base):
     """
     Справочник приоритетов требований (critical, high, medium, low)
     """
+    __tablename__ = "requirement_priorities"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)

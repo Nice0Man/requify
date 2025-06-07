@@ -1,370 +1,306 @@
-# =============================================================================
-# Adaptive Makefile for Requify Project (Windows & UNIX)
-# =============================================================================
+# Makefile для проекта Requify
+# Автоматизированная система управления требованиями
 
-.PHONY: help install setup db-up db-down db-create db-drop db-reset db-migrate db-upgrade db-downgrade db-revision test test-db clean dev-server check-env
+# Переменные
+COMPOSE_FILE = docker-compose.yml
+PROJECT_NAME = requify
+ENV_FILE = .env
 
-# =============================================================================
-# OS DETECTION AND VARIABLES
-# =============================================================================
+# Цвета для вывода
+RED = \033[0;31m
+GREEN = \033[0;32m
+YELLOW = \033[1;33m
+BLUE = \033[0;34m
+NC = \033[0m # No Color
 
-# Detect operating system
-ifeq ($(OS),Windows_NT)
-    detected_OS := Windows
-    SHELL := cmd
-    PYTHON := python
-        PIP := pip    ALEMBIC := alembic    DOCKER_COMPOSE := docker-compose    DB_CONTAINER := requify-postgres    DB_TEST_CONTAINER := requify-postgres-test        # Windows commands
-    COPY_FILE = copy
-    MKDIR = if not exist $(1) mkdir $(1)
-    RMDIR = if exist $(1) rmdir /s /q $(1) 2>nul
-    DEL_FILE = if exist $(1) del $(1) 2>nul
-    SLEEP = timeout /t $(1) /nobreak >nul
-    PAUSE = pause >nul
-    NULL_REDIRECT = >nul 2>&1
-    EXISTS_CHECK = if not exist $(1)
-    PROMPT = set /p $(1)="$(2): "
-    ECHO = @echo
-    
-    # File operations
-    CREATE_ENV = $(COPY_FILE) env.example .env
-    CREATE_DIRS = $(call MKDIR,logs) & $(call MKDIR,uploads)
-    CLEAN_PYCS = for /r . %%f in (*.pyc) do del "%%f" 2>nul
-    CLEAN_PYCACHE = for /d /r . %%d in (__pycache__) do rmdir /s /q "%%d" 2>nul
-    
-else
-    detected_OS := $(shell uname -s)
-    SHELL := /bin/bash
-    PYTHON := python3
-    PIP := pip3
-        ALEMBIC := alembic    DOCKER_COMPOSE := docker-compose    DB_CONTAINER := requify-postgres    DB_TEST_CONTAINER := requify-postgres-test
-    
-    # UNIX commands
-    COPY_FILE = cp
-    MKDIR = mkdir -p $(1)
-    RMDIR = rm -rf $(1)
-    DEL_FILE = rm -f $(1)
-    SLEEP = sleep $(1)
-    PAUSE = read -p "Press any key to continue..."
-    NULL_REDIRECT = >/dev/null 2>&1
-    EXISTS_CHECK = if [ ! -f $(1) ]; then
-    PROMPT = read -p "$(2): " $(1)
-    ECHO = @echo
-    
-    # File operations
-    CREATE_ENV = cp env.example .env
-    CREATE_DIRS = mkdir -p logs uploads
-    CLEAN_PYCS = find . -type f -name "*.pyc" -delete
-    CLEAN_PYCACHE = find . -type d -name "__pycache__" -delete
-endif
+.PHONY: help setup build up down restart logs clean test migrate init-db seed-db backup restore
 
-# =============================================================================
-# MAIN COMMANDS
-# =============================================================================
+# Помощь - описание доступных команд
+help:
+	@echo "$(BLUE)Requify - Система управления требованиями$(NC)"
+	@echo "$(BLUE)Доступные команды:$(NC)"
+	@echo ""
+	@echo "$(GREEN)Основные команды:$(NC)"
+	@echo "  make setup          - Первоначальная настройка проекта"
+	@echo "  make build          - Сборка Docker образов"
+	@echo "  make up             - Запуск всех сервисов"
+	@echo "  make down           - Остановка всех сервисов"
+	@echo "  make restart        - Перезапуск всех сервисов"
+	@echo "  make status         - Показать статус сервисов"
+	@echo ""
+	@echo "$(GREEN)База данных:$(NC)"
+	@echo "  make migrate        - Запуск миграций Alembic"
+	@echo "  make migrate-create - Создание новой миграции"
+	@echo "  make migrate-down   - Откат миграции"
+	@echo "  make init-db        - Инициализация базы данных"
+	@echo "  make seed-db        - Заполнение тестовыми данными"
+	@echo "  make reset-db       - Сброс и пересоздание БД"
+	@echo ""
+	@echo "$(GREEN)Разработка:$(NC)"
+	@echo "  make dev            - Запуск в режиме разработки (с Adminer)"
+	@echo "  make test           - Запуск тестов"
+	@echo "  make test-cov       - Запуск тестов с покрытием"
+	@echo "  make lint           - Проверка кода линтерами"
+	@echo "  make format         - Форматирование кода"
+	@echo ""
+	@echo "$(GREEN)Логи и мониторинг:$(NC)"
+	@echo "  make logs           - Просмотр логов всех сервисов"
+	@echo "  make logs-app       - Просмотр логов приложения"
+	@echo "  make logs-db        - Просмотр логов БД"
+	@echo "  make logs-nginx     - Просмотр логов Nginx"
+	@echo ""
+	@echo "$(GREEN)Резервное копирование:$(NC)"
+	@echo "  make backup         - Создание бэкапа БД"
+	@echo "  make restore        - Восстановление из бэкапа"
+	@echo "  make clean          - Очистка неиспользуемых ресурсов"
+	@echo ""
+	@echo "$(GREEN)Продакшен:$(NC)"
+	@echo "  make prod           - Запуск в продакшен режиме"
+	@echo "  make deploy         - Деплой приложения"
 
-help: ## Show this help message	$(ECHO) "Requify Project Makefile ($(detected_OS))"	$(ECHO) ""	$(ECHO) "Available commands:"	$(ECHO) "  setup              Full project setup"	$(ECHO) "  install            Install dependencies"	$(ECHO) "  db-up              Start PostgreSQL container"	$(ECHO) "  db-down            Stop PostgreSQL container"	$(ECHO) "  db-status          Check PostgreSQL status"	$(ECHO) "  db-logs            Show PostgreSQL logs"	$(ECHO) "  db-shell           Connect to PostgreSQL via psql"	$(ECHO) "  db-migrate         Apply migrations (sync)"	$(ECHO) "  db-migrate-async   Apply migrations (async)"	$(ECHO) "  db-revision        Create new migration (sync)"	$(ECHO) "  db-revision-async  Create new migration (async)"	$(ECHO) "  db-history         Show migration history"	$(ECHO) "  db-history-async   Show async migration history"	$(ECHO) "  db-current         Show current migration"	$(ECHO) "  db-current-async   Show current async migration"	$(ECHO) "  dev-server         Start development server"	$(ECHO) "  dev-full           Full development setup"	$(ECHO) "  check-db           Check database connection"	$(ECHO) "  check-async-db     Check async database connection"	$(ECHO) "  use-sqlite         Switch to SQLite for Windows development"	$(ECHO) "  use-postgres       Switch to PostgreSQL configuration"	$(ECHO) "  show-db-config     Show current database configuration"	$(ECHO) "  test               Run tests"	$(ECHO) "  clean              Clean temporary files"	$(ECHO) "  backup-db          Create database backup"	$(ECHO) "  docker-up          Start all Docker services"	$(ECHO) "  docker-down        Stop all Docker services"
-
-install: ## Install dependencies
-	$(ECHO) "Installing dependencies..."
-	poetry install
-	$(ECHO) "Dependencies installed successfully!"
-
-setup: install ## Full project setup
-	$(ECHO) "Setting up project..."
-ifeq ($(detected_OS),Windows)
-	@if not exist .env ($(CREATE_ENV)) else echo ".env file already exists"
-	@$(CREATE_DIRS)
-else
-	@if [ ! -f .env ]; then $(CREATE_ENV); else echo ".env file already exists"; fi
-	@$(CREATE_DIRS)
-endif
-	$(ECHO) "Project setup complete!"
-
-check-env: ## Check for .env file
-ifeq ($(detected_OS),Windows)
-	@if not exist .env (echo ".env file not found! Run 'make setup'" && exit 1)
-else
-	@if [ ! -f .env ]; then echo ".env file not found! Run 'make setup'"; exit 1; fi
-endif
-
-# =============================================================================
-# DATABASE MANAGEMENT
-# =============================================================================
-
-db-up: ## Start PostgreSQL container
-	$(ECHO) "Starting PostgreSQL..."
-	$(DOCKER_COMPOSE) up -d db
-	$(ECHO) "Waiting for database to be ready..."
-ifeq ($(detected_OS),Windows)
-	@$(call SLEEP,10)
-else
-	@$(call SLEEP,10)
-endif
-	$(ECHO) "PostgreSQL is up and ready!"
-
-db-down: ## Stop PostgreSQL container
-	$(ECHO) "Stopping PostgreSQL..."
-	$(DOCKER_COMPOSE) down
-	$(ECHO) "PostgreSQL stopped!"
-
-db-status: ## Check PostgreSQL status
-	$(ECHO) "PostgreSQL status:"
-	@$(DOCKER_COMPOSE) ps db
-
-db-logs: ## Show PostgreSQL logs
-	$(ECHO) "PostgreSQL logs:"
-	$(DOCKER_COMPOSE) logs -f db
-
-db-shell: ## Connect to PostgreSQL via psql
-	$(ECHO) "Connecting to PostgreSQL..."
-	$(DOCKER_COMPOSE) exec db psql -U postgres -d requify
-
-db-create: db-up ## Create database (if not exists)
-	$(ECHO) "Creating database..."
-	@$(DOCKER_COMPOSE) exec db psql -U postgres -c "SELECT 1;" $(NULL_REDIRECT) || echo "Database ready"
-	$(ECHO) "Database ready!"
-
-db-drop: ## Drop database
-	$(ECHO) "WARNING: This will delete all data!"
-ifeq ($(detected_OS),Windows)
-	$(ECHO) "Are you sure? Press Ctrl+C to cancel, or any key to continue..."
-	@$(PAUSE)
-else
-	@read -p "Are you sure? [y/N] " confirm && [ "$$confirm" = "y" ] || exit 1
-endif
-	$(DOCKER_COMPOSE) exec db psql -U postgres -c "DROP DATABASE IF EXISTS requify;"
-	$(ECHO) "Database dropped!"
-
-db-reset: db-drop db-create db-migrate ## Reset database
-	$(ECHO) "Database reset complete!"
-
-# =============================================================================
-# DATABASE MIGRATIONS
-# =============================================================================
-
-db-migrate: check-env ## Apply migrations
-	$(ECHO) "Applying migrations..."
-	cd requify && $(ALEMBIC) upgrade head
-	$(ECHO) "Migrations applied successfully!"
-
-db-upgrade: db-migrate ## Alias for db-migrate
-
-db-downgrade: check-env ## Rollback one migration
-	$(ECHO) "Rolling back last migration..."
-	cd requify && $(ALEMBIC) downgrade -1
-	$(ECHO) "Migration rolled back!"
-
-db-revision: check-env ## Create new migration
-	$(ECHO) "Creating new migration..."
-ifeq ($(detected_OS),Windows)
-	@$(call PROMPT,message,Enter migration description)
-	@cd requify && $(ALEMBIC) revision --autogenerate -m "%message%"
-else
-	@read -p "Enter migration description: " message; \
-	cd requify && $(ALEMBIC) revision --autogenerate -m "$$message"
-endif
-	$(ECHO) "Migration created!"
-
-db-history: check-env ## Show migration history
-	$(ECHO) "Migration history:"
-	cd requify && $(ALEMBIC) history
-
-db-current: check-env ## Show current migration
-	$(ECHO) "Current migration:"
-	cd requify && $(ALEMBIC) current
-
-# =============================================================================
-# TESTING
-# =============================================================================
-
-test-db-up: ## Start test database
-	$(ECHO) "Starting test database..."
-	$(DOCKER_COMPOSE) exec db psql -U postgres -c "CREATE DATABASE IF NOT EXISTS requify_test;" $(NULL_REDIRECT) || echo "Test DB ready"
-
-test-db-clean: ## Clean test database
-	$(ECHO) "Cleaning test database..."
-	$(DOCKER_COMPOSE) exec db psql -U postgres -c "DROP DATABASE IF EXISTS requify_test;" $(NULL_REDIRECT) || echo "Test DB cleaned"
-	$(DOCKER_COMPOSE) exec db psql -U postgres -c "CREATE DATABASE requify_test;" $(NULL_REDIRECT) || echo "Test DB created"
-
-test: check-env test-db-up ## Run tests
-	$(ECHO) "Running tests..."
-	$(PYTHON) -m pytest tests/ -v
-	$(ECHO) "Tests completed!"
-
-test-coverage: check-env test-db-up ## Run tests with coverage
-	$(ECHO) "Running tests with coverage..."
-	$(PYTHON) -m pytest tests/ --cov=requify --cov-report=html --cov-report=term
-	$(ECHO) "Coverage report generated in htmlcov/"
-
-# =============================================================================
-# DEVELOPMENT
-# =============================================================================
-
-dev-server: check-env db-up ## Start development server
-	$(ECHO) "Starting development server..."
-	cd requify && uvicorn requify.app.main:app --reload --host 0.0.0.0 --port 8000
-
-dev-full: setup db-up db-migrate dev-server ## Full development setup
-
-lint: ## Run linters
-	$(ECHO) "Running code checks..."
-	black requify/ --check
-	isort requify/ --check-only
-	flake8 requify/
-	$(ECHO) "Code checks completed!"
-
-format: ## Format code
-	$(ECHO) "Formatting code..."
-	black requify/
-	isort requify/
-	$(ECHO) "Code formatted!"
-
-# =============================================================================
-# UTILITIES
-# =============================================================================
-
-clean: ## Clean temporary files
-	$(ECHO) "Cleaning temporary files..."
-ifeq ($(detected_OS),Windows)
-	@$(CLEAN_PYCS)
-	@$(CLEAN_PYCACHE)
-	@$(call RMDIR,.pytest_cache)
-	@$(call RMDIR,htmlcov)
-	@$(call DEL_FILE,.coverage)
-else
-	@$(CLEAN_PYCS)
-	@$(CLEAN_PYCACHE)
-	@$(call RMDIR,.pytest_cache)
-	@$(call RMDIR,htmlcov)
-	@$(call DEL_FILE,.coverage)
-	@find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
-endif
-	$(ECHO) "Cleanup complete!"
-
-backup-db: ## Create database backup
-	$(ECHO) "Creating database backup..."
-ifeq ($(detected_OS),Windows)
-	@$(call MKDIR,backups)
-	$(DOCKER_COMPOSE) exec -T db pg_dump -U postgres requify > backups\backup_%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%.sql
-else
-	@$(call MKDIR,backups)
-	$(DOCKER_COMPOSE) exec -T db pg_dump -U postgres requify > backups/backup_$$(date +%Y%m%d_%H%M%S).sql
-endif
-	$(ECHO) "Backup created in backups/"
-
-restore-db: ## Restore database from backup
-	$(ECHO) "Restoring database..."
-ifeq ($(detected_OS),Windows)
-	@$(call PROMPT,backup_file,Enter backup file path)
-	@if exist "%backup_file%" ($(DOCKER_COMPOSE) exec -T db psql -U postgres requify < "%backup_file%" && echo "Database restored!") else (echo "File not found!" && exit 1)
-else
-	@read -p "Enter backup file path: " backup_file; \
-	if [ -f "$$backup_file" ]; then \
-		$(DOCKER_COMPOSE) exec -T db psql -U postgres requify < "$$backup_file"; \
-		echo "Database restored!"; \
+# Первоначальная настройка проекта
+setup:
+	@echo "$(BLUE)Настройка проекта Requify...$(NC)"
+	@if [ ! -f $(ENV_FILE) ]; then \
+		echo "$(YELLOW)Копирование env.example в .env...$(NC)"; \
+		cp env.example $(ENV_FILE); \
+		echo "$(GREEN)✓ .env файл создан$(NC)"; \
 	else \
-		echo "File not found!"; \
-		exit 1; \
+		echo "$(GREEN)✓ .env файл уже существует$(NC)"; \
 	fi
-endif
+	@echo "$(YELLOW)Создание необходимых директорий...$(NC)"
+	@mkdir -p logs uploads static backups monitoring/data
+	@chmod 755 logs uploads static backups
+	@echo "$(GREEN)✓ Директории созданы$(NC)"
+	@echo "$(GREEN)✓ Проект настроен! Теперь выполните 'make build && make up'$(NC)"
 
-docker-build: ## Build Docker image
-	$(ECHO) "Building Docker image..."
-	docker build -t requify:latest .
-	$(ECHO) "Docker image built!"
+# Сборка Docker образов
+build:
+	@echo "$(BLUE)Сборка Docker образов...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) build --no-cache
+	@echo "$(GREEN)✓ Образы собраны$(NC)"
 
-docker-up: ## Start all Docker services
-	$(ECHO) "Starting all services..."
-	$(DOCKER_COMPOSE) up -d
-	$(ECHO) "All services started!"
+# Быстрая сборка (с кэшем)
+build-fast:
+	@echo "$(BLUE)Быстрая сборка Docker образов...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) build
+	@echo "$(GREEN)✓ Образы собраны$(NC)"
 
-docker-down: ## Stop all Docker services
-	$(ECHO) "Stopping all services..."
-	$(DOCKER_COMPOSE) down
-	$(ECHO) "All services stopped!"
+# Запуск всех сервисов
+up:
+	@echo "$(BLUE)Запуск сервисов Requify...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) up -d
+	@echo "$(GREEN)✓ Сервисы запущены$(NC)"
+	@echo "$(BLUE)Проверка состояния...$(NC)"
+	@sleep 5
+	@make status
 
-# =============================================================================
-# CONNECTION CHECKS
-# =============================================================================
+# Запуск в режиме разработки (с Adminer)
+dev:
+	@echo "$(BLUE)Запуск в режиме разработки...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) --profile dev up -d
+	@echo "$(GREEN)✓ Режим разработки активен$(NC)"
+	@echo "$(BLUE)Доступные сервисы:$(NC)"
+	@echo "  - Приложение: http://localhost:8000"
+	@echo "  - API документация: http://localhost:8000/docs"
+	@echo "  - Adminer: http://localhost:8080"
+	@echo "  - Nginx: http://localhost"
 
-check-db: check-env ## Check database connection
-	$(ECHO) "Checking database connection..."
-	cd requify && $(PYTHON) -c "from requify.app.db.session import check_db_connection; print('Connection successful' if check_db_connection() else 'Connection failed')"
+# Остановка всех сервисов
+down:
+	@echo "$(BLUE)Остановка сервисов...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) down
+	@echo "$(GREEN)✓ Сервисы остановлены$(NC)"
 
-check-async-db: check-env ## Check async database connection
-	$(ECHO) "Checking async database connection..."
-	cd requify && $(PYTHON) -c "import asyncio; from requify.app.db.session import check_async_db_connection; print('Async connection successful' if asyncio.run(check_async_db_connection()) else 'Async connection failed')"
+# Остановка с удалением volumes
+down-volumes:
+	@echo "$(RED)Остановка сервисов и удаление данных...$(NC)"
+	@read -p "Вы уверены? Все данные будут удалены! (y/N): " confirm && [ "$$confirm" = "y" ]
+	@docker-compose -f $(COMPOSE_FILE) down -v
+	@echo "$(GREEN)✓ Сервисы остановлены, данные удалены$(NC)"
 
-# =============================================================================
-# OS-SPECIFIC DEBUG INFO
-# =============================================================================
+# Перезапуск всех сервисов
+restart:
+	@echo "$(BLUE)Перезапуск сервисов...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) restart
+	@echo "$(GREEN)✓ Сервисы перезапущены$(NC)"
 
-debug-os: ## Show OS detection information
-	$(ECHO) "=== OS Detection Debug ==="
-	$(ECHO) "Detected OS: $(detected_OS)"
-	$(ECHO) "Shell: $(SHELL)"
-	$(ECHO) "Python: $(PYTHON)"
-	$(ECHO) "Docker Compose: $(DOCKER_COMPOSE)"
-ifeq ($(detected_OS),Windows)
-	$(ECHO) "Using Windows commands"
-else
-	$(ECHO) "Using UNIX commands"
-endif
+# Перезапуск конкретного сервиса
+restart-app:
+	@docker-compose -f $(COMPOSE_FILE) restart app
 
-# =============================================================================
-# DATABASE TYPE SWITCHING (Windows/UNIX)
-# =============================================================================
+restart-db:
+	@docker-compose -f $(COMPOSE_FILE) restart postgres
 
-use-sqlite: ## Switch to SQLite for Windows development
-	$(ECHO) "Switching to SQLite configuration..."
-ifeq ($(detected_OS),Windows)
-	@$(COPY_FILE) env.windows.example .env
-else
-	@cp env.windows.example .env
-endif
-	$(ECHO) "SQLite configuration activated!"
-	$(ECHO) "This avoids asyncpg issues on Windows"
+restart-nginx:
+	@docker-compose -f $(COMPOSE_FILE) restart nginx
 
-use-postgres: ## Switch to PostgreSQL configuration
-	$(ECHO) "Switching to PostgreSQL configuration..."
-ifeq ($(detected_OS),Windows)
-	@$(COPY_FILE) env.example .env
-else
-	@cp env.example .env
-endif
-	$(ECHO) "PostgreSQL configuration activated!"
-	$(ECHO) "Make sure PostgreSQL is running with 'make db-up'"
+# Статус сервисов
+status:
+	@echo "$(BLUE)Статус сервисов:$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) ps
 
-show-db-config: ## Show current database configuration
-	$(ECHO) "Current database configuration:"
-	cd requify && $(PYTHON) -c "from requify.app.core.config import settings; print(f'DATABASE_URI: {settings.DATABASE_URI}'); print(f'ASYNC_DATABASE_URI: {settings.ASYNC_DATABASE_URI}')"
+# Логи всех сервисов
+logs:
+	@docker-compose -f $(COMPOSE_FILE) logs -f
 
-# =============================================================================
-# ASYNC MIGRATION SUPPORT
-# =============================================================================
+# Логи конкретных сервисов
+logs-app:
+	@docker-compose -f $(COMPOSE_FILE) logs -f app
 
-db-migrate-async: check-env ## Apply migrations using async engine
-	$(ECHO) "Applying async migrations..."
-	cd requify && $(PYTHON) -m requify.app.db.async_migrations upgrade
-	$(ECHO) "Async migrations applied successfully!"
+logs-db:
+	@docker-compose -f $(COMPOSE_FILE) logs -f postgres
 
-db-revision-async: check-env ## Create new migration with async support
-	$(ECHO) "Creating new async migration..."
-ifeq ($(detected_OS),Windows)
-	@$(call PROMPT,message,Enter migration description)
-	@cd requify && $(PYTHON) -m requify.app.db.async_migrations revision --autogenerate -m "%message%"
-else
-	@read -p "Enter migration description: " message; \
-	cd requify && $(PYTHON) -m requify.app.db.async_migrations revision --autogenerate -m "$$message"
-endif
-	$(ECHO) "Async migration created!"
+logs-nginx:
+	@docker-compose -f $(COMPOSE_FILE) logs -f nginx
 
-db-history-async: check-env ## Show async migration history
-	$(ECHO) "Async migration history:"
-	cd requify && $(PYTHON) -m requify.app.db.async_migrations history
+logs-redis:
+	@docker-compose -f $(COMPOSE_FILE) logs -f redis
 
-db-current-async: check-env ## Show current async migration
-	$(ECHO) "Current async migration:"
-	cd requify && $(PYTHON) -m requify.app.db.async_migrations current
+# Подключение к контейнерам
+shell-app:
+	@docker-compose -f $(COMPOSE_FILE) exec app bash
 
-# Default command
-.DEFAULT_GOAL := help
+shell-db:
+	@docker-compose -f $(COMPOSE_FILE) exec postgres psql -U postgres -d requify-db
+
+shell-redis:
+	@docker-compose -f $(COMPOSE_FILE) exec redis redis-cli
+
+# Миграции базы данных
+migrate:
+	@echo "$(BLUE)Запуск миграций...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic upgrade head
+	@echo "$(GREEN)✓ Миграции применены$(NC)"
+
+# Создание новой миграции
+migrate-create:
+	@read -p "Введите описание миграции: " message; \
+	docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic revision --autogenerate -m "$$message"
+
+# Откат миграции
+migrate-down:
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic downgrade -1
+
+# Информация о миграциях
+migrate-history:
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic history
+
+migrate-current:
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic current
+
+# Инициализация базы данных
+init-db:
+	@echo "$(BLUE)Инициализация базы данных...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run python -m requify.scripts.db_utils init
+	@echo "$(GREEN)✓ База данных инициализирована$(NC)"
+
+# Заполнение тестовыми данными
+seed-db:
+	@echo "$(BLUE)Заполнение базы тестовыми данными...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run python -m requify.scripts.seed_db
+	@echo "$(GREEN)✓ Тестовые данные загружены$(NC)"
+
+# Сброс и пересоздание БД
+reset-db:
+	@echo "$(RED)Сброс базы данных...$(NC)"
+	@read -p "Вы уверены? Все данные будут удалены! (y/N): " confirm && [ "$$confirm" = "y" ]
+	@docker-compose -f $(COMPOSE_FILE) exec postgres psql -U postgres -c "DROP DATABASE IF EXISTS \"requify-db\";"
+	@docker-compose -f $(COMPOSE_FILE) exec postgres psql -U postgres -c "CREATE DATABASE \"requify-db\";"
+	@make migrate
+	@make seed-db
+	@echo "$(GREEN)✓ База данных пересоздана$(NC)"
+
+# Тестирование
+test:
+	@echo "$(BLUE)Запуск тестов...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run pytest
+
+test-cov:
+	@echo "$(BLUE)Запуск тестов с покрытием...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run pytest --cov=requify --cov-report=html --cov-report=term
+
+# Линтеры и форматирование
+lint:
+	@echo "$(BLUE)Проверка кода линтерами...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run black --check .
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run isort --check-only .
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run flake8 .
+
+format:
+	@echo "$(BLUE)Форматирование кода...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run black .
+	@docker-compose -f $(COMPOSE_FILE) exec app poetry run isort .
+	@echo "$(GREEN)✓ Код отформатирован$(NC)"
+
+# Резервное копирование
+backup:
+	@echo "$(BLUE)Создание резервной копии...$(NC)"
+	@mkdir -p backups
+	@docker-compose -f $(COMPOSE_FILE) exec postgres pg_dump -U postgres requify-db | gzip > backups/backup_$(shell date +%Y%m%d_%H%M%S).sql.gz
+	@echo "$(GREEN)✓ Резервная копия создана в папке backups/$(NC)"
+
+# Восстановление из резервной копии
+restore:
+	@echo "$(BLUE)Восстановление из резервной копии...$(NC)"
+	@echo "Доступные резервные копии:"
+	@ls -la backups/
+	@read -p "Введите имя файла резервной копии: " backup_file; \
+	gunzip -c backups/$$backup_file | docker-compose -f $(COMPOSE_FILE) exec -T postgres psql -U postgres requify-db
+
+# Очистка неиспользуемых ресурсов
+clean:
+	@echo "$(BLUE)Очистка неиспользуемых ресурсов...$(NC)"
+	@docker system prune -f
+	@docker volume prune -f
+	@docker image prune -f
+	@echo "$(GREEN)✓ Очистка завершена$(NC)"
+
+# Продакшен режим
+prod:
+	@echo "$(BLUE)Запуск в продакшен режиме...$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) -f docker-compose.prod.yml up -d
+	@echo "$(GREEN)✓ Продакшен режим активен$(NC)"
+
+# Деплой приложения
+deploy:
+	@echo "$(BLUE)Деплой приложения...$(NC)"
+	@make build
+	@make down
+	@make up
+	@make migrate
+	@echo "$(GREEN)✓ Деплой завершен$(NC)"
+
+# Проверка здоровья
+health:
+	@echo "$(BLUE)Проверка состояния сервисов...$(NC)"
+	@curl -f http://localhost:8000/health || echo "$(RED)Приложение недоступно$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec postgres pg_isready -U postgres || echo "$(RED)PostgreSQL недоступен$(NC)"
+	@docker-compose -f $(COMPOSE_FILE) exec redis redis-cli ping || echo "$(RED)Redis недоступен$(NC)"
+
+# Мониторинг ресурсов
+monitor:
+	@docker stats $(PROJECT_NAME)_postgres $(PROJECT_NAME)_app $(PROJECT_NAME)_nginx $(PROJECT_NAME)_redis
+
+# Установка зависимостей для разработки локально
+install-dev:
+	@echo "$(BLUE)Установка зависимостей для разработки...$(NC)"
+	@poetry install
+	@echo "$(GREEN)✓ Зависимости установлены$(NC)"
+
+# Запуск приложения локально (без Docker)
+run-local:
+	@echo "$(BLUE)Запуск приложения локально...$(NC)"
+	@poetry run uvicorn requify.app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Информация о проекте
+info:
+	@echo "$(BLUE)Информация о проекте Requify$(NC)"
+	@echo "Версия: 0.1.0"
+	@echo "Порты:"
+	@echo "  - Приложение: 8000"
+	@echo "  - PostgreSQL: 5432"
+	@echo "  - PostgreSQL (тест): 5433"
+	@echo "  - Redis: 6379"
+	@echo "  - Nginx: 80, 443"
+	@echo "  - Adminer: 8080" 

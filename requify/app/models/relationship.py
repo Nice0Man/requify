@@ -19,7 +19,7 @@ class Relationship(Base):
         Integer, ForeignKey("requirement.id"), primary_key=True
     )
     type_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("relationshiptype.id"), primary_key=True
+        Integer, ForeignKey("relationship_types.id"), primary_key=True
     )
 
     created_at: Mapped[datetime] = mapped_column(
