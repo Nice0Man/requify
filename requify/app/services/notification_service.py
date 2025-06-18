@@ -8,7 +8,7 @@
 import asyncio
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, UTC, timedelta
 from enum import Enum
 import logging
 import smtplib
@@ -199,7 +199,7 @@ class NotificationService:
                     "Результат тестирования: {test_result}\n"
                     "Тестировщик: {tester}\n"
                     "Время завершения: {completed_at}\n\n"
-                    "Перейти к результатам: {test_results_url}\n\n"
+                    "Перейти к требованию: {requirement_url}\n\n"
                     "С уважением,\nКоманда Requify"
                 ),
             ),
@@ -329,12 +329,37 @@ class NotificationService:
         data: Dict[str, Any],
     ) -> None:
         """Отправляет внутрисистемное уведомление"""
-        # TODO: Реализовать сохранение уведомления в базе данных
-        # для отображения в интерфейсе пользователя
-        logger.info(
-            f"In-app уведомление для пользователя {recipient.user_id}: {template.type}"
-        )
-        pass
+        # Реализуем сохранение уведомления через создание комментария
+        try:
+            from requify.app import crud
+            from requify.app.db.session import async_session_scope
+            from requify.app.schemas.comment import CommentCreate
+
+            template_data = {"user_name": recipient.name, **data}
+            subject = template.subject_template.format(**template_data)
+            body = template.body_template.format(**template_data)
+
+            # Создаем комментарий как in-app уведомление
+            async with async_session_scope() as db:
+                # Проверяем, есть ли requirement_id в данных
+                requirement_id = data.get("requirement_id")
+                if requirement_id:
+                    # Создаем системный комментарий как уведомление
+                    comment_data = CommentCreate(
+                        content=f"🔔 {subject}\n\n{body}",
+                        requirement_id=requirement_id,
+                        author_id=1,  # Системный пользователь
+                    )
+                    await crud.comment.create(db, obj_in=comment_data)
+
+            logger.info(
+                f"In-app уведомление сохранено для пользователя {recipient.user_id}: {template.type}"
+            )
+
+        except Exception as e:
+            logger.error(f"Ошибка сохранения in-app уведомления: {e}")
+            # Не бросаем исключение, чтобы не прерывать другие уведомления
+            pass
 
     async def notify_requirement_status_change(
         self,
@@ -362,7 +387,7 @@ class NotificationService:
             type=NotificationType.REQUIREMENT_STATUS_CHANGED,
             recipients=notification_recipients,
             data={
-                "requirement_name": requirement.name,
+                "requirement_name": requirement.title,
                 "requirement_id": requirement.id,
                 "old_status": old_status,
                 "new_status": new_status,
@@ -370,7 +395,7 @@ class NotificationService:
                     requirement.project.name if requirement.project else "Неизвестный"
                 ),
                 "changed_by": changed_by.name,
-                "changed_at": lambda:  datetime.now(UTC).strftime("%d.%m.%Y %H:%M"),
+                "changed_at": datetime.now(UTC).strftime("%d.%m.%Y %H:%M"),
                 "requirement_url": f"{settings.app_host}/requirements/{requirement.id}",
             },
             channels=[NotificationChannel.EMAIL, NotificationChannel.IN_APP],
@@ -399,7 +424,7 @@ class NotificationService:
             type=NotificationType.REQUIREMENT_CREATED,
             recipients=notification_recipients,
             data={
-                "requirement_name": requirement.name,
+                "requirement_name": requirement.title,
                 "requirement_id": requirement.id,
                 "description": requirement.description or "Описание не указано",
                 "project_name": (
@@ -407,9 +432,9 @@ class NotificationService:
                 ),
                 "author": author.name,
                 "priority": (
-                    requirement.priority.value if requirement.priority else "Не указан"
+                    requirement.priority.name if requirement.priority else "Не указан"
                 ),
-                "type": requirement.type.value if requirement.type else "Не указан",
+                "type": requirement.type.name if requirement.type else "Не указан",
                 "created_at": (
                     requirement.created_at.strftime("%d.%m.%Y %H:%M")
                     if requirement.created_at
@@ -426,7 +451,7 @@ class NotificationService:
         self, requirement: Requirement, deadline: datetime, recipients: List[User]
     ) -> Dict[str, Any]:
         """Уведомляет о приближающемся дедлайне"""
-        time_left = deadline - lambda:  datetime.now(UTC)
+        time_left = deadline - datetime.now(UTC)
 
         if time_left.days > 0:
             time_left_str = f"{time_left.days} дней"
@@ -453,7 +478,7 @@ class NotificationService:
             type=NotificationType.REQUIREMENT_DEADLINE_APPROACHING,
             recipients=notification_recipients,
             data={
-                "requirement_name": requirement.name,
+                "requirement_name": requirement.title,
                 "requirement_id": requirement.id,
                 "project_name": (
                     requirement.project.name if requirement.project else "Неизвестный"
@@ -461,7 +486,7 @@ class NotificationService:
                 "deadline": deadline.strftime("%d.%m.%Y %H:%M"),
                 "time_left": time_left_str,
                 "current_status": (
-                    requirement.status.value if requirement.status else "Неизвестен"
+                    requirement.status.name if requirement.status else "Неизвестен"
                 ),
                 "requirement_url": f"{settings.app_host}/requirements/{requirement.id}",
             },
@@ -497,7 +522,7 @@ class NotificationService:
             type=NotificationType.COMMENT_ADDED,
             recipients=notification_recipients,
             data={
-                "requirement_name": requirement.name,
+                "requirement_name": requirement.title,
                 "requirement_id": requirement.id,
                 "comment_text": (
                     comment_text[:200] + "..."
@@ -505,7 +530,7 @@ class NotificationService:
                     else comment_text
                 ),
                 "comment_author": comment_author.name,
-                "comment_time": lambda:  datetime.now(UTC).strftime("%d.%m.%Y %H:%M"),
+                "comment_time": datetime.now(UTC).strftime("%d.%m.%Y %H:%M"),
                 "requirement_url": f"{settings.app_host}/requirements/{requirement.id}",
             },
             channels=[NotificationChannel.EMAIL, NotificationChannel.IN_APP],
@@ -515,9 +540,89 @@ class NotificationService:
 
     async def bulk_notify_deadline_check(self) -> Dict[str, Any]:
         """Проверяет дедлайны и отправляет уведомления (для планировщика задач)"""
-        # TODO: Реализовать получение требований с приближающимися дедлайнами из базы данных
-        logger.info("Выполняется проверка дедлайнов требований")
-        return {"checked": 0, "notifications_sent": 0}
+        # Реализуем получение требований с приближающимися дедлайнами из базы данных
+        try:
+            from requify.app import crud
+            from requify.app.db.session import async_session_scope
+            from sqlalchemy import select, and_
+            from requify.app.models.requirement import Requirement
+
+            logger.info("Выполняется проверка дедлайнов требований")
+
+            notifications_sent = 0
+            checked_requirements = 0
+
+            async with async_session_scope() as db:
+                # Определяем временные рамки для уведомлений (1 день, 3 дня, 1 неделя)
+                now = datetime.now(UTC)
+                warning_periods = [
+                    timedelta(days=1),
+                    timedelta(days=3),
+                    timedelta(days=7),
+                ]
+
+                for period in warning_periods:
+                    deadline_threshold = now + period
+                    logger.info(f"Проверяем дедлайны в период: {deadline_threshold}")
+
+                    # Ищем требования с дедлайнами в указанном периоде
+                    # Предполагаем, что в модели Requirement есть поле deadline
+                    # Если его нет, используем планируемую дату релиза
+                    stmt = (
+                        select(Requirement)
+                        .where(
+                            and_(
+                                Requirement.release.has(),  # Есть связанный релиз
+                                # Используем планируемую дату релиза как дедлайн
+                            )
+                        )
+                        .limit(100)
+                    )
+
+                    result = await db.execute(stmt)
+                    requirements = result.scalars().all()
+
+                    for req in requirements:
+                        checked_requirements += 1
+
+                        # Проверяем, есть ли у релиза планируемая дата
+                        if req.release and req.release.planned_date:
+                            deadline = req.release.planned_date
+                            time_diff = deadline - now
+
+                            # Проверяем, попадает ли в период предупреждения
+                            if timedelta(0) <= time_diff <= period:
+                                # Получаем заинтересованных пользователей
+                                # (автор требования, участники проекта)
+                                recipients = []
+
+                                if req.author:
+                                    recipients.append(req.author)
+
+                                # Уведомляем о приближающемся дедлайне
+                                await self.notify_deadline_approaching(
+                                    req, deadline, recipients
+                                )
+                                notifications_sent += 1
+
+                                logger.info(
+                                    f"Отправлено уведомление о дедлайне для требования {req.id}"
+                                )
+
+            return {
+                "checked": checked_requirements,
+                "notifications_sent": notifications_sent,
+                "status": "completed",
+            }
+
+        except Exception as e:
+            logger.error(f"Ошибка при проверке дедлайнов: {e}")
+            return {
+                "checked": 0,
+                "notifications_sent": 0,
+                "status": "error",
+                "error": str(e),
+            }
 
 
 # Экземпляр сервиса для использования в приложении

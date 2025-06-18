@@ -13,7 +13,12 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import get_db, get_current_user, get_optional_user
+from requify.app.api.deps import (
+    get_db,
+    get_current_user,
+    get_current_active_user,
+    get_optional_user,
+)
 from requify.app.core.config import settings
 from requify.app.core.security import (
     JWTTokenManager,
@@ -43,11 +48,58 @@ from requify.app.schemas.auth import (
     UserProfile,
     AuthError,
 )
+from requify.app.schemas.user import UserCreate
 
 router = APIRouter()
 
 
 # === Authentication Endpoints ===
+
+
+@router.post(
+    "/register", response_model=UserProfile, status_code=status.HTTP_201_CREATED
+)
+async def register_user(
+    user_in: UserCreate,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    Регистрация нового пользователя.
+
+    Args:
+        user_in: Данные нового пользователя
+        db: Сессия базы данных
+
+    Returns:
+        UserProfile: Профиль зарегистрированного пользователя
+
+    Raises:
+        HTTPException: Если пользователь с таким email или username уже существует
+    """
+    # Проверяем уникальность email
+    existing_user = await crud_user.get_by_email(db, email=user_in.email)
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this email already exists",
+        )
+
+    # Проверяем уникальность username
+    if user_in.username:
+        existing_username = await crud_user.get_by_username(
+            db, username=user_in.username
+        )
+        if existing_username:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="User with this username already exists",
+            )
+
+    # Создаем пользователя
+    user = await crud_user.create(db, obj_in=user_in)
+
+    # Возвращаем профиль пользователя
+    return UserProfile.model_validate(user)
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -260,7 +312,7 @@ async def refresh_token(
 async def logout(
     logout_request: LogoutRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Выйти из системы и отозвать токены.
@@ -351,7 +403,7 @@ async def validate_token(
 async def change_password(
     password_request: PasswordChangeRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ) -> dict:
     """
     Изменить пароль пользователя.
@@ -481,7 +533,7 @@ async def confirm_password_reset(
 async def get_user_sessions(
     request: Request,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Получить список активных сессий пользователя.
@@ -534,7 +586,7 @@ async def get_user_sessions(
 async def revoke_sessions(
     revoke_request: RevokeSessionRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ) -> dict:
     """
     Отозвать сессии пользователя.
@@ -580,25 +632,119 @@ async def revoke_sessions(
 
 def _get_user_scopes(user: User) -> list[str]:
     """
-    Получить права доступа пользователя.
+    Получить права доступа пользователя на основе роли.
 
     Args:
         user: Пользователь
 
     Returns:
-        list[str]: Список прав доступа
+        list[str]: Список прав доступа (scopes)
     """
-    scopes = ["user:read"]
+    scopes = ["me"]  # Базовый scope для всех пользователей
 
     if user.is_superuser:
+        # Суперпользователь имеет все права
         scopes.extend(
-            ["admin:read", "admin:write", "user:write", "user:delete", "system:admin"]
+            [
+                "users:read",
+                "users:write",
+                "users:delete",
+                "projects:read",
+                "projects:write",
+                "projects:delete",
+                "requirements:read",
+                "requirements:write",
+                "requirements:delete",
+                "releases:read",
+                "releases:write",
+                "releases:delete",
+                "testing:read",
+                "testing:write",
+                "testing:execute",
+                "admin:read",
+                "admin:write",
+                "system:admin",
+            ]
         )
-    elif user.role in ["admin", "manager"]:
-        scopes.extend(["user:write", "project:admin"])
-    elif user.role in ["analyst", "developer"]:
-        scopes.extend(["project:write", "requirement:write"])
+    elif user.role == "admin":
+        # Администратор имеет широкие права, но не системные
+        scopes.extend(
+            [
+                "users:read",
+                "users:write",
+                "users:delete",
+                "projects:read",
+                "projects:write",
+                "projects:delete",
+                "requirements:read",
+                "requirements:write",
+                "requirements:delete",
+                "releases:read",
+                "releases:write",
+                "releases:delete",
+                "testing:read",
+                "testing:write",
+                "testing:execute",
+                "admin:read",
+                "admin:write",
+            ]
+        )
+    elif user.role == "manager":
+        # Менеджер может управлять проектами и требованиями
+        scopes.extend(
+            [
+                "users:read",
+                "projects:read",
+                "projects:write",
+                "requirements:read",
+                "requirements:write",
+                "requirements:delete",
+                "releases:read",
+                "releases:write",
+                "testing:read",
+                "testing:write",
+                "admin:read",
+            ]
+        )
+    elif user.role == "analyst":
+        # Аналитик работает с требованиями и может создавать проекты
+        scopes.extend(
+            [
+                "projects:read",
+                "projects:write",
+                "requirements:read",
+                "requirements:write",
+                "releases:read",
+                "testing:read",
+            ]
+        )
+    elif user.role == "developer":
+        # Разработчик читает требования и работает с релизами
+        scopes.extend(
+            [
+                "projects:read",
+                "requirements:read",
+                "releases:read",
+                "releases:write",
+                "testing:read",
+            ]
+        )
     elif user.role == "tester":
-        scopes.extend(["test:write", "requirement:read"])
+        # Тестировщик работает с тестированием и читает требования
+        scopes.extend(
+            [
+                "projects:read",
+                "requirements:read",
+                "releases:read",
+                "testing:read",
+                "testing:write",
+                "testing:execute",
+            ]
+        )
+    else:
+        # Пользователь по умолчанию (роль "user") имеет только права чтения
+        scopes.extend(
+            ["projects:read", "requirements:read", "releases:read", "testing:read"]
+        )
 
     return scopes

@@ -179,9 +179,30 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
         groups_count = await db.execute(groups_stmt)
         groups_count = groups_count.scalar() or 0
 
+        # Подсчет завершенных требований по статусам
+        from requify.app.models.requirement_statuses import RequirementStatus
+
+        # Получаем ID статусов для завершенных требований
+        completed_statuses_stmt = select(RequirementStatus.id).where(
+            RequirementStatus.name.in_(["done", "completed", "closed", "implemented"])
+        )
+        completed_statuses_result = await db.execute(completed_statuses_stmt)
+        completed_status_ids = [row[0] for row in completed_statuses_result.fetchall()]
+
+        # Подсчитываем требования с завершенными статусами
+        if completed_status_ids:
+            completed_requirements_stmt = select(func.count(Requirement.id)).where(
+                Requirement.project_id == project_id,
+                Requirement.status_id.in_(completed_status_ids),
+            )
+            completed_requirements = await db.execute(completed_requirements_stmt)
+            completed_requirements = completed_requirements.scalar() or 0
+        else:
+            completed_requirements = 0
+
         return {
             "total_requirements": total_requirements,
-            "requirements_completed": 0,  # TODO: Подсчитать по статусам
+            "requirements_completed": completed_requirements,
             "active_releases": releases_count,
             "specs_count": specs_count,
             "requirement_groups_count": groups_count,

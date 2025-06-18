@@ -94,6 +94,37 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
         result = await db.execute(stmt)
         return result.scalars().all()
 
+    async def get_by_spec(
+        self, db: AsyncSession, *, spec_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Requirement]:
+        """
+        Получить требования спецификации.
+
+        Args:
+            db: Сессия базы данных
+            spec_id: ID спецификации
+            skip: Количество пропускаемых записей
+            limit: Максимальное количество записей
+
+        Returns:
+            Список требований
+        """
+        stmt = (
+            select(Requirement)
+            .where(Requirement.spec_id == spec_id)
+            .options(
+                selectinload(Requirement.type),
+                selectinload(Requirement.priority),
+                selectinload(Requirement.status),
+                selectinload(Requirement.author),
+                selectinload(Requirement.last_modifier),
+            )
+            .offset(skip)
+            .limit(limit)
+        )
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
     async def search(
         self,
         db: AsyncSession,

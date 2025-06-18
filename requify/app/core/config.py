@@ -272,19 +272,205 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context):
         """Post-initialization to handle legacy variables and setup derived fields"""
+        from urllib.parse import urlparse
+
         # Handle legacy database URIs if they exist
         if self.database_uri:
             # Parse legacy URI format for main DB
-            pass
+            parsed = urlparse(self.database_uri)
+            if parsed.hostname:
+                self.db.host = parsed.hostname
+            if parsed.port:
+                self.db.port = parsed.port
+            if parsed.username:
+                self.db.user = parsed.username
+            if parsed.password:
+                self.db.password = parsed.password
+            if parsed.path and len(parsed.path) > 1:
+                self.db.name = parsed.path[1:]  # Remove leading '/'
+
         if self.async_database_uri:
-            # Parse legacy URI format for main DB
-            pass
+            # Parse legacy URI format for main DB (async)
+            parsed = urlparse(self.async_database_uri)
+            if parsed.hostname:
+                self.db.host = parsed.hostname
+            if parsed.port:
+                self.db.port = parsed.port
+            if parsed.username:
+                self.db.user = parsed.username
+            if parsed.password:
+                self.db.password = parsed.password
+            if parsed.path and len(parsed.path) > 1:
+                self.db.name = parsed.path[1:]
+
         if self.test_database_uri:
             # Parse legacy URI format for test DB
-            pass
+            parsed = urlparse(self.test_database_uri)
+            if parsed.hostname:
+                self.test_db.host = parsed.hostname
+            if parsed.port:
+                self.test_db.port = parsed.port
+            if parsed.username:
+                self.test_db.user = parsed.username
+            if parsed.password:
+                self.test_db.password = parsed.password
+            if parsed.path and len(parsed.path) > 1:
+                self.test_db.name = parsed.path[1:]
+
         if self.test_async_database_uri:
-            # Parse legacy URI format for test DB
-            pass
+            # Parse legacy URI format for test DB (async)
+            parsed = urlparse(self.test_async_database_uri)
+            if parsed.hostname:
+                self.test_db.host = parsed.hostname
+            if parsed.port:
+                self.test_db.port = parsed.port
+            if parsed.username:
+                self.test_db.user = parsed.username
+            if parsed.password:
+                self.test_db.password = parsed.password
+            if parsed.path and len(parsed.path) > 1:
+                self.test_db.name = parsed.path[1:]
+
+        # Validate critical settings
+        self._validate_security_settings()
+        self._validate_database_settings()
+        self._validate_email_settings()
+        self._validate_file_storage_settings()
+
+    def _validate_security_settings(self) -> None:
+        """Validate security configuration"""
+        # Check secret key strength
+        if len(self.security.secret_key) < 32:
+            raise ValueError("Security secret key must be at least 32 characters long")
+
+        # Check if using default secrets in production
+        if self.app_config.env == "production":
+            dangerous_defaults = [
+                "super-secret-key-change-in-production-minimum-32-characters",
+                "password-reset-secret-change-in-production",
+                "email-verification-secret-change-in-production",
+            ]
+
+            if self.security.secret_key in dangerous_defaults:
+                raise ValueError("Must change default secret key in production")
+            if self.security.password_reset_secret in dangerous_defaults:
+                raise ValueError(
+                    "Must change default password reset secret in production"
+                )
+            if self.security.email_verification_secret in dangerous_defaults:
+                raise ValueError(
+                    "Must change default email verification secret in production"
+                )
+
+        # Validate password requirements
+        if self.security.password_min_length < 8:
+            raise ValueError("Password minimum length must be at least 8 characters")
+
+        if self.security.bcrypt_rounds < 10 or self.security.bcrypt_rounds > 15:
+            raise ValueError("BCrypt rounds must be between 10 and 15")
+
+    def _validate_database_settings(self) -> None:
+        """Validate database configuration"""
+        # Check connection pool settings
+        if self.db.pool_size < 1:
+            raise ValueError("Database pool size must be at least 1")
+
+        if self.db.max_overflow < 0:
+            raise ValueError("Database max overflow cannot be negative")
+
+        if self.db.pool_recycle < 3600:  # 1 hour minimum
+            raise ValueError(
+                "Database pool recycle time should be at least 3600 seconds"
+            )
+
+        # Validate database names
+        if not self.db.name.strip():
+            raise ValueError("Database name cannot be empty")
+
+        if not self.test_db.name.strip():
+            raise ValueError("Test database name cannot be empty")
+
+        # Ensure test DB is different from main DB
+        if (
+            self.db.name == self.test_db.name
+            and self.db.host == self.test_db.host
+            and self.db.port == self.test_db.port
+        ):
+            raise ValueError("Test database must be different from main database")
+
+    def _validate_email_settings(self) -> None:
+        """Validate email configuration"""
+        # Check SMTP settings if email is configured
+        if self.email.smtp_host:
+            if not self.email.smtp_user or not self.email.smtp_password:
+                if self.app_config.env == "production":
+                    raise ValueError(
+                        "SMTP user and password are required in production"
+                    )
+
+            if self.email.smtp_port not in [25, 465, 587, 2525]:
+                raise ValueError("SMTP port should be one of: 25, 465, 587, 2525")
+
+            # Validate email format
+            import re
+
+            email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+            if not re.match(email_pattern, self.email.from_email):
+                raise ValueError("Invalid from_email format")
+
+    def _validate_file_storage_settings(self) -> None:
+        """Validate file storage configuration"""
+        # Check file size limits
+        if self.file_storage.max_file_size < 1024:  # 1KB minimum
+            raise ValueError("Max file size must be at least 1KB")
+
+        if self.file_storage.max_file_size > 100 * 1024 * 1024:  # 100MB maximum
+            raise ValueError("Max file size cannot exceed 100MB")
+
+        # Validate allowed extensions
+        extensions = [
+            ext.strip().lower()
+            for ext in self.file_storage.allowed_extensions.split(",")
+        ]
+        if not extensions or not any(ext for ext in extensions):
+            raise ValueError("At least one file extension must be allowed")
+
+        # Check for potentially dangerous extensions
+        dangerous_extensions = ["exe", "bat", "cmd", "com", "pif", "scr", "vbs", "js"]
+        if any(ext in dangerous_extensions for ext in extensions):
+            raise ValueError(
+                f"Dangerous file extensions not allowed: {dangerous_extensions}"
+            )
+
+        # Validate upload directory
+        if not self.file_storage.upload_dir.strip():
+            raise ValueError("Upload directory cannot be empty")
+
+    def get_database_url(self, async_: bool = True, test: bool = False) -> str:
+        """
+        Get database URL for the specified configuration.
+
+        Args:
+            async_: Whether to return async URL
+            test: Whether to return test database URL
+
+        Returns:
+            str: Database URL
+        """
+        db_config = self.test_db if test else self.db
+        return db_config.async_url if async_ else db_config.sync_url
+
+    def is_development(self) -> bool:
+        """Check if running in development mode"""
+        return self.app_config.env.lower() in ("development", "dev", "local")
+
+    def is_production(self) -> bool:
+        """Check if running in production mode"""
+        return self.app_config.env.lower() in ("production", "prod")
+
+    def is_testing(self) -> bool:
+        """Check if running in testing mode"""
+        return self.app_config.env.lower() in ("testing", "test")
 
 
 settings = Settings()

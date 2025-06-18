@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select, and_, or_, func, desc
+from sqlalchemy import select, and_, or_, func, desc, case
 
 from requify.app.crud.base import CRUDBase
 from requify.app.models.test_result import TestResult
@@ -19,7 +19,7 @@ class CRUDTestResult(CRUDBase[TestResult, TestResultCreate, TestResultUpdate]):
             .options(selectinload(self.model.requirement))
             .offset(skip)
             .limit(limit)
-            .order_by(desc(self.model.executed_at))
+            .order_by(desc(self.model.completed_at), desc(self.model.created_at))
         )
         result = await db.execute(query)
         return result.scalars().all()
@@ -34,7 +34,7 @@ class CRUDTestResult(CRUDBase[TestResult, TestResultCreate, TestResultUpdate]):
             .options(selectinload(self.model.requirement))
             .offset(skip)
             .limit(limit)
-            .order_by(desc(self.model.executed_at))
+            .order_by(desc(self.model.completed_at), desc(self.model.created_at))
         )
         result = await db.execute(query)
         return result.scalars().all()
@@ -52,14 +52,14 @@ class CRUDTestResult(CRUDBase[TestResult, TestResultCreate, TestResultUpdate]):
 
         query = select(
             func.count(self.model.id).label("total_tests"),
-            func.sum(func.case((self.model.status == "passed", 1), else_=0)).label(
+            func.sum(case((self.model.status == "passed", 1), else_=0)).label(
                 "passed_tests"
             ),
-            func.sum(func.case((self.model.status == "failed", 1), else_=0)).label(
+            func.sum(case((self.model.status == "failed", 1), else_=0)).label(
                 "failed_tests"
             ),
-            func.sum(func.case((self.model.status == "skipped", 1), else_=0)).label(
-                "skipped_tests"
+            func.sum(case((self.model.status == "blocked", 1), else_=0)).label(
+                "blocked_tests"
             ),
         )
 
@@ -77,7 +77,7 @@ class CRUDTestResult(CRUDBase[TestResult, TestResultCreate, TestResultUpdate]):
             "total_tests": row.total_tests or 0,
             "passed_tests": row.passed_tests or 0,
             "failed_tests": row.failed_tests or 0,
-            "skipped_tests": row.skipped_tests or 0,
+            "blocked_tests": row.blocked_tests or 0,
             "pass_rate": round(
                 (row.passed_tests or 0) / max(row.total_tests or 1, 1) * 100, 2
             ),

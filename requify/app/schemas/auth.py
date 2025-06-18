@@ -7,9 +7,8 @@
 
 from datetime import datetime
 from typing import Optional
-from uuid import UUID
 
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field, EmailStr, field_validator, model_validator
 
 
 # === Base Token Schemas (Single Responsibility Principle) ===
@@ -90,7 +89,7 @@ class LoginRequest(BaseModel):
     password: str = Field(..., min_length=1, description="Пароль")
     remember_me: bool = Field(default=False, description="Запомнить меня")
 
-    @validator("username")
+    @field_validator("username")
     def validate_username(cls, v):
         """Валидация username."""
         if not v or not v.strip():
@@ -179,12 +178,12 @@ class PasswordChangeRequest(BaseModel):
     new_password: str = Field(..., min_length=8, description="Новый пароль")
     confirm_password: str = Field(..., description="Подтверждение нового пароля")
 
-    @validator("confirm_password")
-    def passwords_match(cls, v, values):
+    @model_validator(mode="after")
+    def passwords_match(self):
         """Проверка совпадения паролей."""
-        if "new_password" in values and v != values["new_password"]:
+        if self.new_password != self.confirm_password:
             raise ValueError("Пароли не совпадают")
-        return v
+        return self
 
 
 class PasswordResetRequest(BaseModel):
@@ -200,12 +199,12 @@ class PasswordResetConfirm(BaseModel):
     new_password: str = Field(..., min_length=8, description="Новый пароль")
     confirm_password: str = Field(..., description="Подтверждение нового пароля")
 
-    @validator("confirm_password")
-    def passwords_match(cls, v, values):
+    @model_validator(mode="after")
+    def passwords_match(self):
         """Проверка совпадения паролей."""
-        if "new_password" in values and v != values["new_password"]:
+        if self.new_password != self.confirm_password:
             raise ValueError("Пароли не совпадают")
-        return v
+        return self
 
 
 # === Token Validation Schemas ===

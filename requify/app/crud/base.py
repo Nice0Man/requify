@@ -17,6 +17,7 @@ from typing import (
 )
 from abc import ABC, abstractmethod
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select, func, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel

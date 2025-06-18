@@ -94,6 +94,8 @@ services:
       - APP_CONFIG__TEST_DB__PORT=5432
       - APP_CONFIG__REDIS__HOST=redis
       - APP_CONFIG__REDIS__PORT=6379
+      - APP_CONFIG__REDIS__DB=0
+      - APP_CONFIG__REDIS__PASSWORD=
     ports:
       - "8000:8000"
     volumes:

@@ -8,7 +8,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import get_db, get_current_user
+from requify.app.api.deps import (
+    get_db,
+    get_projects_read_user,
+    get_projects_write_user,
+    get_projects_delete_user,
+)
 from requify.app.core.config import settings
 from requify.app import crud, schemas
 from requify.app.models.user import User
@@ -25,7 +30,7 @@ async def get_projects(
     status: Optional[str] = Query(None, description="Фильтр по статусу"),
     search: Optional[str] = Query(None, description="Поиск по названию или описанию"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_read_user),
 ):
     """
     Получить список проектов с фильтрацией и поиском.
@@ -59,7 +64,7 @@ async def get_projects(
 async def create_project(
     project_in: schemas.ProjectCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_write_user),
 ):
     """
     Создать новый проект.
@@ -91,7 +96,7 @@ async def create_project(
 async def get_project(
     project_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_read_user),
 ):
     """
     Получить проект по ID с подробной информацией.
@@ -120,7 +125,7 @@ async def update_project(
     project_id: int,
     project_in: schemas.ProjectUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_write_user),
 ):
     """
     Обновить данные проекта.
@@ -160,7 +165,7 @@ async def update_project(
 async def delete_project(
     project_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_delete_user),
 ):
     """
     Удалить проект.
@@ -191,7 +196,7 @@ async def get_project_requirements(
     type_id: Optional[int] = Query(None, description="Фильтр по типу"),
     priority_id: Optional[int] = Query(None, description="Фильтр по приоритету"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_read_user),
 ):
     """
     Получить требования проекта с фильтрацией.
@@ -199,7 +204,7 @@ async def get_project_requirements(
     Args:
         project_id: ID проекта
         skip: Количество пропускаемых записей
-        limit: Максимальное количество записей
+        limit: Максимальное количество возвращаемых записей
         status_id: Фильтр по ID статуса
         type_id: Фильтр по ID типа
         priority_id: Фильтр по ID приоритета
@@ -212,12 +217,14 @@ async def get_project_requirements(
     Raises:
         HTTPException: Если проект не найден
     """
+    # Проверяем существование проекта
     project = await crud.project.get(db, id=project_id)
     if not project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
+    # Фильтры для требований
     filters = {}
     if status_id:
         filters["status_id"] = status_id
@@ -238,7 +245,7 @@ async def get_project_releases(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_read_user),
 ):
     """
     Получить релизы проекта.
@@ -246,7 +253,7 @@ async def get_project_releases(
     Args:
         project_id: ID проекта
         skip: Количество пропускаемых записей
-        limit: Максимальное количество записей
+        limit: Максимальное количество возвращаемых записей
         db: Сессия базы данных
         current_user: Текущий пользователь
 
@@ -256,6 +263,7 @@ async def get_project_releases(
     Raises:
         HTTPException: Если проект не найден
     """
+    # Проверяем существование проекта
     project = await crud.project.get(db, id=project_id)
     if not project:
         raise HTTPException(
@@ -272,7 +280,7 @@ async def get_project_releases(
 async def get_project_stats(
     project_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_projects_read_user),
 ):
     """
     Получить статистику проекта.
@@ -288,11 +296,27 @@ async def get_project_stats(
     Raises:
         HTTPException: Если проект не найден
     """
+    # Проверяем существование проекта
     project = await crud.project.get(db, id=project_id)
     if not project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
-    stats = await crud.project.get_project_statistics(db, project_id=project_id)
+    # Получаем реальную статистику из БД
+    stats = await crud.project.get_project_stats(db, project_id=project_id)
+
+    # Дополняем статистику метаданными
+    stats.update(
+        {
+            "project_id": project_id,
+            "project_name": project.name,
+            "project_code": project.code,
+            "project_status": project.status,
+            "last_updated": (
+                project.updated_at.isoformat() if project.updated_at else None
+            ),
+        }
+    )
+
     return stats

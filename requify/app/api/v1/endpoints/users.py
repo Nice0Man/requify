@@ -8,7 +8,14 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import get_db, get_current_user, get_superuser
+from requify.app.api.deps import (
+    get_db,
+    get_current_active_user,
+    get_users_read_user,
+    get_users_write_user,
+    get_users_delete_user,
+    get_superuser,
+)
 from requify.app.core.config import settings
 from requify.app import crud, schemas
 from requify.app.models.user import User
@@ -26,7 +33,7 @@ async def get_users(
     role: Optional[str] = Query(None, description="Фильтр по роли"),
     search: Optional[str] = Query(None, description="Поиск по email или имени"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_users_read_user),
 ):
     """
     Получить список пользователей с фильтрацией.
@@ -63,7 +70,7 @@ async def get_users(
 async def create_user(
     user_in: schemas.UserCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_superuser),
+    current_user: User = Depends(get_users_write_user),
 ):
     """
     Создать нового пользователя.
@@ -71,7 +78,7 @@ async def create_user(
     Args:
         user_in: Данные создаваемого пользователя
         db: Сессия базы данных
-        current_user: Текущий пользователь (должен быть суперпользователем)
+        current_user: Текущий пользователь (должен иметь права users:write)
 
     Returns:
         schemas.User: Созданный пользователь
@@ -103,7 +110,7 @@ async def create_user(
 
 
 @router.get("/me", response_model=schemas.User)
-async def get_current_user_info(current_user: User = Depends(get_current_user)):
+async def get_current_user_info(current_user: User = Depends(get_current_active_user)):
     """
     Получить информацию о текущем пользователе.
 
@@ -120,7 +127,7 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 async def update_current_user(
     user_in: schemas.UserUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Обновить данные текущего пользователя.
@@ -164,7 +171,7 @@ async def update_current_user(
 async def get_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_users_read_user),
 ):
     """
     Получить пользователя по ID.
@@ -193,7 +200,7 @@ async def update_user(
     user_id: int,
     user_in: schemas.UserUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_users_write_user),
 ):
     """
     Обновить данные пользователя.
@@ -244,7 +251,7 @@ async def update_user(
 async def delete_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_superuser),
+    current_user: User = Depends(get_users_delete_user),
 ):
     """
     Удалить пользователя.
@@ -252,7 +259,7 @@ async def delete_user(
     Args:
         user_id: ID пользователя
         db: Сессия базы данных
-        current_user: Текущий пользователь (должен быть суперпользователем)
+        current_user: Текущий пользователь (должен иметь права users:delete)
 
     Raises:
         HTTPException: Если пользователь не найден

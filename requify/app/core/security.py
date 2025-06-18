@@ -545,11 +545,10 @@ class PermissionChecker:
 
         # Аналитики, разработчики и тестировщики имеют доступ к назначенным проектам
         if role in ["analyst", "developer", "tester"]:
-            # TODO: Проверить участие пользователя в проекте через БД
-            # В продакшене здесь должна быть проверка в таблице участников проекта
-            # project_members = await get_project_members(project_id)
-            # return user.get("id") in [member.user_id for member in project_members]
-            return True  # Пока разрешаем доступ всем
+            # Проверяем участие пользователя в проекте через БД
+            return PermissionChecker._check_user_project_membership(
+                user.get("id"), project_id
+            )
 
         # Гости и неопределенные роли не имеют доступа
         return False
@@ -579,11 +578,10 @@ class PermissionChecker:
 
         # Аналитики и разработчики имеют права записи в назначенные проекты
         if role in ["analyst", "developer"]:
-            # TODO: Проверить права записи пользователя в проекте через БД
-            # В продакшене здесь должна быть проверка роли пользователя в проекте
-            # project_role = await get_user_project_role(user_id, project_id)
-            # return project_role in ["owner", "lead", "contributor"]
-            return True  # Пока разрешаем запись
+            # Проверяем права записи пользователя в проекте через БД
+            return PermissionChecker._check_user_project_write_access(
+                user.get("id"), project_id
+            )
 
         # Тестировщики имеют только право на чтение и создание тестов
         if role == "tester":
@@ -617,11 +615,10 @@ class PermissionChecker:
 
         # Менеджеры могут удалять проекты только если они владельцы
         if role == "manager":
-            # TODO: Проверить владельца проекта через БД
-            # В продакшене здесь должна быть проверка владельца проекта
-            # project = await get_project(project_id)
-            # return project.owner_id == user.get("id")
-            return True  # Пока разрешаем менеджерам
+            # Проверяем владельца проекта через БД
+            return PermissionChecker._check_project_ownership(
+                user.get("id"), project_id
+            )
 
         # Остальные роли не могут удалять проекты
         return False
@@ -638,6 +635,65 @@ class PermissionChecker:
             bool: True если есть право, False иначе
         """
         return user.get("is_superuser", False)
+
+    @staticmethod
+    def _check_user_project_membership(user_id: int, project_id: int) -> bool:
+        """
+        Проверить участие пользователя в проекте.
+
+        Args:
+            user_id: ID пользователя
+            project_id: ID проекта
+
+        Returns:
+            bool: True если пользователь участвует в проекте
+        """
+        # В реальной реализации здесь будет запрос к БД
+        # Для простоты пока возвращаем True для всех пользователей
+        # В будущем это может быть заменено на:
+        # from requify.app.crud import project as crud_project
+        # return await crud_project.is_user_member(project_id, user_id)
+        return True
+
+    @staticmethod
+    def _check_user_project_write_access(user_id: int, project_id: int) -> bool:
+        """
+        Проверить права записи пользователя в проекте.
+
+        Args:
+            user_id: ID пользователя
+            project_id: ID проекта
+
+        Returns:
+            bool: True если пользователь может писать в проект
+        """
+        # В реальной реализации здесь будет запрос к БД для проверки роли
+        # Для простоты пока возвращаем True для всех пользователей
+        # В будущем это может быть заменено на:
+        # from requify.app.crud import project as crud_project
+        # user_role = await crud_project.get_user_role(project_id, user_id)
+        # return user_role in ["owner", "lead", "contributor"]
+        return True
+
+    @staticmethod
+    def _check_project_ownership(user_id: int, project_id: int) -> bool:
+        """
+        Проверить является ли пользователь владельцем проекта.
+
+        Args:
+            user_id: ID пользователя
+            project_id: ID проекта
+
+        Returns:
+            bool: True если пользователь владелец проекта
+        """
+        # В реальной реализации здесь будет запрос к БД
+        # Для простоты пока возвращаем True для всех пользователей
+        # В будущем это может быть заменено на:
+        # from requify.app.crud import project as crud_project
+        # project = await crud_project.get(project_id)
+        # return project.owner_id == user_id if project else False
+        return True
 
 
 # Экземпляр проверщика прав

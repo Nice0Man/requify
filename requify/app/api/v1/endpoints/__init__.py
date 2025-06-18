@@ -12,3 +12,6 @@ from .users import router as users_router
 from .testing import router as testing_router
 from .admin import router as admin_router
 from .reference import router as reference_router
+from .specifications import router as specifications_router
+from .relationships import router as relationships_router
+from .comments import router as comments_router

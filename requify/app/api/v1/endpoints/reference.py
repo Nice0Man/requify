@@ -8,7 +8,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import get_db, get_current_user, get_superuser
+from requify.app.api.deps import get_db, get_current_active_user, get_admin_user
 from requify.app import crud, schemas
 from requify.app.models.user import User
 
@@ -21,7 +21,7 @@ async def get_requirement_types(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """Получить список типов требований."""
     types = await crud.requirement_type.get_active_types(db, skip=skip, limit=limit)
@@ -36,19 +36,19 @@ async def get_requirement_types(
 async def create_requirement_type(
     type_in: schemas.RequirementTypeCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_superuser),
+    current_user: User = Depends(get_admin_user),
 ):
     """Создать новый тип требования."""
-    # Проверяем уникальность имени
+    # Проверяем уникальность названия
     existing_type = await crud.requirement_type.get_by_name(db, name=type_in.name)
     if existing_type:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Тип требования с таким именем уже существует",
+            detail="Тип с таким названием уже существует",
         )
 
-    requirement_type = await crud.requirement_type.create(db, obj_in=type_in)
-    return requirement_type
+    req_type = await crud.requirement_type.create(db, obj_in=type_in)
+    return req_type
 
 
 # Приоритеты требований
@@ -57,7 +57,7 @@ async def get_requirement_priorities(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """Получить список приоритетов требований."""
     priorities = await crud.requirement_priority.get_active_priorities(
@@ -74,17 +74,17 @@ async def get_requirement_priorities(
 async def create_requirement_priority(
     priority_in: schemas.RequirementPriorityCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_superuser),
+    current_user: User = Depends(get_admin_user),
 ):
     """Создать новый приоритет требования."""
-    # Проверяем уникальность имени
+    # Проверяем уникальность названия
     existing_priority = await crud.requirement_priority.get_by_name(
         db, name=priority_in.name
     )
     if existing_priority:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Приоритет требования с таким именем уже существует",
+            detail="Приоритет с таким названием уже существует",
         )
 
     priority = await crud.requirement_priority.create(db, obj_in=priority_in)
@@ -97,7 +97,7 @@ async def get_requirement_statuses(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
     """Получить список статусов требований."""
     statuses = await crud.requirement_status.get_active_statuses(
@@ -114,19 +114,19 @@ async def get_requirement_statuses(
 async def create_requirement_status(
     status_in: schemas.RequirementStatusCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_superuser),
+    current_user: User = Depends(get_admin_user),
 ):
     """Создать новый статус требования."""
-    # Проверяем уникальность имени
+    # Проверяем уникальность названия
     existing_status = await crud.requirement_status.get_by_name(db, name=status_in.name)
     if existing_status:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Статус требования с таким именем уже существует",
+            detail="Статус с таким названием уже существует",
         )
 
-    requirement_status = await crud.requirement_status.create(db, obj_in=status_in)
-    return requirement_status
+    req_status = await crud.requirement_status.create(db, obj_in=status_in)
+    return req_status
 
 
 # Типы связей
@@ -135,11 +135,13 @@ async def get_relationship_types(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
 ):
-    """Получить список типов связей."""
-    types = await crud.relationship_type.get_active_types(db, skip=skip, limit=limit)
-    return types
+    """Получить список типов связей между требованиями."""
+    relationship_types = await crud.relationship_type.get_active_types(
+        db, skip=skip, limit=limit
+    )
+    return relationship_types
 
 
 @router.post(
@@ -150,16 +152,16 @@ async def get_relationship_types(
 async def create_relationship_type(
     type_in: schemas.RelationshipTypeCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_superuser),
+    current_user: User = Depends(get_admin_user),
 ):
     """Создать новый тип связи."""
-    # Проверяем уникальность имени
+    # Проверяем уникальность названия
     existing_type = await crud.relationship_type.get_by_name(db, name=type_in.name)
     if existing_type:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Тип связи с таким именем уже существует",
+            detail="Тип связи с таким названием уже существует",
         )
 
-    relationship_type = await crud.relationship_type.create(db, obj_in=type_in)
-    return relationship_type
+    rel_type = await crud.relationship_type.create(db, obj_in=type_in)
+    return rel_type

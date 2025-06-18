@@ -1,26 +1,71 @@
 """
-API эндпоинты для работы с тестированием.
+API эндпоинты для работы с системой тестирования.
 
-Включает управление тестами, тестовыми планами и результатами тестирования.
+Включает интеграцию с внешними системами тестирования и управление тестовыми планами.
 """
 
+from datetime import datetime, timedelta, UTC
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import get_db, get_current_user
+from requify.app.api.deps import (
+    get_db,
+    get_testing_read_user,
+    get_testing_write_user,
+    get_testing_execute_user,
+)
 from requify.app.core.config import settings
+from requify.app import crud, schemas
+from requify.app.schemas.test_result import TestResultCreate, TestResultUpdate
 
 router = APIRouter()
 
 
-@router.get("/plans", response_model=List[dict])
+@router.get("/results", response_model=List[schemas.TestResult])
+async def get_test_results(
+    skip: int = 0,
+    limit: int = 100,
+    requirement_id: Optional[int] = None,
+    status: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_testing_read_user),
+):
+    """
+    Получить список результатов тестирования.
+
+    Args:
+        skip: Количество пропускаемых записей
+        limit: Максимальное количество возвращаемых записей
+        requirement_id: Фильтр по ID требования
+        status: Фильтр по статусу тестирования
+        db: Сессия базы данных
+        current_user: Текущий пользователь
+
+    Returns:
+        List[schemas.TestResult]: Список результатов тестирования
+    """
+    if requirement_id:
+        results = await crud.test_result.get_by_requirement(
+            db, requirement_id=requirement_id, skip=skip, limit=limit
+        )
+    elif status:
+        results = await crud.test_result.get_by_status(
+            db, status=status, skip=skip, limit=limit
+        )
+    else:
+        results = await crud.test_result.get_multi(db, skip=skip, limit=limit)
+
+    return results
+
+
+@router.get("/plans", response_model=List[schemas.TestPlan])
 async def get_test_plans(
     skip: int = 0,
     limit: int = 100,
     project_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_read_user),
 ):
     """
     Получить список тестовых планов.
@@ -35,25 +80,58 @@ async def get_test_plans(
     Returns:
         List[dict]: Список тестовых планов
     """
-    # TODO: Реализовать получение тестовых планов из БД
-    return [
-        {
-            "id": 1,
-            "name": "Основной тестовый план",
-            "description": "Полное тестирование функциональности",
-            "status": "active",
-            "project_id": 1,
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
-        }
-    ]
+    # Реализуем с помощью группировки тест-результатов по проектам
+    if project_id:
+        # Проверяем существование проекта
+        project = await crud.project.get(db, id=project_id)
+        if not project:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        # Получаем статистику тестирования для проекта
+        summary = await crud.test_result.get_test_summary(db, project_id=project_id)
+
+        return [
+            schemas.TestPlan(
+                id=project_id,
+                name=f"Test Plan for {project.name}",
+                description=f"Автоматически созданный план тестирования для проекта {project.name}",
+                status="active",
+                project_id=project_id,
+                created_at=project.created_at.isoformat(),
+                updated_at=project.updated_at.isoformat(),
+                statistics=summary,
+            )
+        ]
+    else:
+        # Получаем все проекты с тестовыми планами
+        projects = await crud.project.get_multi(db, skip=skip, limit=limit)
+        plans = []
+
+        for project in projects:
+            summary = await crud.test_result.get_test_summary(db, project_id=project.id)
+            plans.append(
+                schemas.TestPlan(
+                    id=project.id,
+                    name=f"Test Plan for {project.name}",
+                    description=f"Автоматически созданный план тестирования для проекта {project.name}",
+                    status="active",
+                    project_id=project.id,
+                    created_at=project.created_at.isoformat(),
+                    updated_at=project.updated_at.isoformat(),
+                    statistics=summary,
+                )
+            )
+
+        return plans
 
 
 @router.post("/plans", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def create_test_plan(
     plan_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_write_user),
 ):
     """
     Создать новый тестовый план.
@@ -66,23 +144,40 @@ async def create_test_plan(
     Returns:
         dict: Созданный тестовый план
     """
-    # TODO: Реализовать создание тестового плана
-    return {
-        "id": 2,
-        "name": plan_data.get("name"),
-        "description": plan_data.get("description"),
-        "status": "draft",
-        "project_id": plan_data.get("project_id"),
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
+    project_id = plan_data.get("project_id")
+    if not project_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Project ID is required"
+        )
+
+    # Проверяем существование проекта
+    project = await crud.project.get(db, id=project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+        )
+
+    from datetime import datetime, UTC
+
+    # Создаем тестовый план как структуру данных
+    plan = {
+        "id": hash(f"{project_id}-{plan_data.get('name', 'Test Plan')}") % 10000,
+        "name": plan_data.get("name", f"Test Plan for {project.name}"),
+        "description": plan_data.get("description", "Auto-generated test plan"),
+        "status": plan_data.get("status", "draft"),
+        "project_id": project_id,
+        "created_at": datetime.now(UTC).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     }
 
+    return plan
 
-@router.get("/plans/{plan_id}", response_model=dict)
+
+@router.get("/plans/{plan_id}", response_model=schemas.TestPlan)
 async def get_test_plan(
     plan_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_read_user),
 ):
     """
     Получить тестовый план по ID.
@@ -98,31 +193,35 @@ async def get_test_plan(
     Raises:
         HTTPException: Если тестовый план не найден
     """
-    # TODO: Реализовать получение тестового плана по ID
-    if plan_id != 1:
+    # Используем project_id как plan_id для простоты
+    project = await crud.project.get(db, id=plan_id)
+    if not project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Test plan not found"
         )
 
-    return {
-        "id": 1,
-        "name": "Основной тестовый план",
-        "description": "Полное тестирование функциональности",
-        "status": "active",
-        "project_id": 1,
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    summary = await crud.test_result.get_test_summary(db, project_id=plan_id)
+
+    return schemas.TestPlan(
+        id=plan_id,
+        name=f"Test Plan for {project.name}",
+        description=f"Автоматически созданный план тестирования для проекта {project.name}",
+        status="active",
+        project_id=plan_id,
+        created_at=project.created_at.isoformat(),
+        updated_at=project.updated_at.isoformat(),
+        statistics=summary,
+    )
 
 
-@router.get("/cases", response_model=List[dict])
+@router.get("/cases", response_model=List[schemas.TestCase])
 async def get_test_cases(
     skip: int = 0,
     limit: int = 100,
     plan_id: Optional[int] = None,
     requirement_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_read_user),
 ):
     """
     Получить список тестовых случаев.
@@ -138,45 +237,65 @@ async def get_test_cases(
     Returns:
         List[dict]: Список тестовых случаев
     """
-    # TODO: Реализовать получение тестовых случаев из БД
-    return [
-        {
-            "id": 1,
-            "name": "Тест авторизации",
-            "description": "Проверка входа в систему",
-            "status": "active",
-            "priority": "high",
-            "type": "functional",
-            "requirement_id": 1,
-            "plan_id": 1,
-            "steps": [
-                {
-                    "step": 1,
-                    "action": "Открыть страницу входа",
-                    "expected": "Отображается форма входа",
-                },
-                {
-                    "step": 2,
-                    "action": "Ввести логин и пароль",
-                    "expected": "Поля заполнены",
-                },
-                {
-                    "step": 3,
-                    "action": "Нажать кнопку входа",
-                    "expected": "Пользователь авторизован",
-                },
-            ],
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
-        }
-    ]
+    # Реализуем тестовые случаи как представления требований с тестовыми результатами
+    if requirement_id:
+        requirement = await crud.requirement.get(db, id=requirement_id)
+        if not requirement:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+            )
+
+        requirements = [requirement]
+    elif plan_id:
+        # plan_id соответствует project_id
+        requirements = await crud.requirement.get_by_project(
+            db, project_id=plan_id, skip=skip, limit=limit
+        )
+    else:
+        requirements = await crud.requirement.get_multi(db, skip=skip, limit=limit)
+
+    test_cases = []
+    for req in requirements:
+        test_results = await crud.test_result.get_by_requirement(
+            db, requirement_id=req.id, limit=1
+        )
+        latest_result = test_results[0] if test_results else None
+
+        test_cases.append(
+            schemas.TestCase(
+                id=req.id,
+                name=f"Test Case for {req.title}",
+                description=f"Тест для требования: {req.description}",
+                status="active",
+                priority=req.priority.name if req.priority else "medium",
+                type="functional",
+                requirement_id=req.id,
+                plan_id=req.project_id,
+                steps=[
+                    schemas.TestCaseStep(
+                        step=1,
+                        action=f"Проверить выполнение требования: {req.title}",
+                        expected="Требование выполнено в соответствии с описанием",
+                    )
+                ],
+                latest_test_status=(
+                    latest_result.status.value if latest_result else "not_started"
+                ),
+                created_at=req.created_at.isoformat(),
+                updated_at=req.updated_at.isoformat(),
+            )
+        )
+
+    return test_cases
 
 
-@router.post("/cases", response_model=dict, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/cases", response_model=schemas.TestCase, status_code=status.HTTP_201_CREATED
+)
 async def create_test_case(
     case_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_write_user),
 ):
     """
     Создать новый тестовый случай.
@@ -189,30 +308,56 @@ async def create_test_case(
     Returns:
         dict: Созданный тестовый случай
     """
-    # TODO: Реализовать создание тестового случая
-    return {
-        "id": 2,
-        "name": case_data.get("name"),
-        "description": case_data.get("description"),
-        "status": "draft",
-        "priority": case_data.get("priority", "medium"),
-        "type": case_data.get("type", "functional"),
-        "requirement_id": case_data.get("requirement_id"),
-        "plan_id": case_data.get("plan_id"),
-        "steps": case_data.get("steps", []),
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    requirement_id = case_data.get("requirement_id")
+    if not requirement_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Requirement ID is required"
+        )
+
+    # Проверяем существование требования
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+        )
+
+    # Создаем тест-результат как представление тестового случая
+    from datetime import datetime, UTC
+
+    test_result_data = TestResultCreate(
+        requirement_id=requirement_id,
+        status="not_started",
+        notes=f"Test case: {case_data.get('name', 'Auto-generated test case')}",
+        tester_id=current_user.id if hasattr(current_user, "id") else None,
+    )
+
+    test_result = await crud.test_result.create(db, obj_in=test_result_data)
+
+    return schemas.TestCase(
+        id=test_result.id,
+        name=case_data.get("name", f"Test Case for {requirement.title}"),
+        description=case_data.get(
+            "description", f"Тест для требования: {requirement.description}"
+        ),
+        status="draft",
+        priority=case_data.get("priority", "medium"),
+        type=case_data.get("type", "functional"),
+        requirement_id=requirement_id,
+        plan_id=case_data.get("plan_id", requirement.project_id),
+        steps=case_data.get("steps", []),
+        created_at=test_result.created_at.isoformat(),
+        updated_at=test_result.updated_at.isoformat(),
+    )
 
 
-@router.get("/executions", response_model=List[dict])
+@router.get("/executions", response_model=List[schemas.TestExecution])
 async def get_test_executions(
     skip: int = 0,
     limit: int = 100,
     case_id: Optional[int] = None,
     status_filter: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_read_user),
 ):
     """
     Получить список выполнений тестов.
@@ -228,26 +373,52 @@ async def get_test_executions(
     Returns:
         List[dict]: Список выполнений тестов
     """
-    # TODO: Реализовать получение выполнений тестов из БД
-    return [
-        {
-            "id": 1,
-            "case_id": 1,
-            "status": "passed",
-            "result": "success",
-            "notes": "Тест прошел успешно",
-            "executed_by": 1,
-            "executed_at": "2024-01-01T00:00:00Z",
-            "duration": 120,  # в секундах
-        }
-    ]
+    # Получаем тест-результаты как выполнения тестов
+    if case_id:
+        # case_id соответствует requirement_id
+        test_results = await crud.test_result.get_by_requirement(
+            db, requirement_id=case_id, skip=skip, limit=limit
+        )
+    elif status_filter:
+        test_results = await crud.test_result.get_by_status(
+            db, status=status_filter, skip=skip, limit=limit
+        )
+    else:
+        test_results = await crud.test_result.get_multi(db, skip=skip, limit=limit)
+
+    executions = []
+    for result in test_results:
+        executions.append(
+            schemas.TestExecution(
+                id=result.id,
+                case_id=result.requirement_id,
+                tester_id=result.tester_id,
+                status=result.status.value,
+                started_at=(
+                    result.started_at.isoformat() if result.started_at else None
+                ),
+                completed_at=(
+                    result.completed_at.isoformat() if result.completed_at else None
+                ),
+                duration=None,  # Можно вычислить как разность времени
+                notes=result.notes,
+                created_at=result.created_at.isoformat(),
+                updated_at=result.updated_at.isoformat(),
+            )
+        )
+
+    return executions
 
 
-@router.post("/executions", response_model=dict, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/executions",
+    response_model=schemas.TestExecution,
+    status_code=status.HTTP_201_CREATED,
+)
 async def execute_test_case(
     execution_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_execute_user),
 ):
     """
     Выполнить тестовый случай.
@@ -260,335 +431,351 @@ async def execute_test_case(
     Returns:
         dict: Результат выполнения теста
     """
-    # TODO: Реализовать выполнение тестового случая
-    return {
-        "id": 2,
-        "case_id": execution_data.get("case_id"),
-        "status": execution_data.get("status", "in_progress"),
-        "result": execution_data.get("result"),
-        "notes": execution_data.get("notes"),
-        "executed_by": current_user["id"],
-        "executed_at": "2024-01-01T00:00:00Z",
-        "duration": execution_data.get("duration", 0),
-    }
+    case_id = execution_data.get("case_id")
+    requirement_id = execution_data.get("requirement_id", case_id)
+
+    if not requirement_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Requirement ID is required"
+        )
+
+    # Проверяем существование требования
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+        )
+
+    from datetime import datetime, UTC
+
+    # Создаем или обновляем тест-результат
+    existing_results = await crud.test_result.get_by_requirement(
+        db, requirement_id=requirement_id, limit=1
+    )
+
+    if existing_results:
+        # Обновляем существующий результат
+        test_result = existing_results[0]
+        update_data = TestResultUpdate(
+            status=execution_data.get("status", "in_progress"),
+            notes=execution_data.get("notes", "Test execution updated"),
+            started_at=datetime.now(UTC).replace(tzinfo=None),
+            tester_id=(
+                current_user.id
+                if hasattr(current_user, "id")
+                else test_result.tester_id
+            ),
+        )
+
+        if execution_data.get("status") in ["passed", "failed", "blocked"]:
+            update_data.completed_at = datetime.now(UTC).replace(tzinfo=None)
+
+        updated_result = await crud.test_result.update(
+            db, db_obj=test_result, obj_in=update_data
+        )
+        return schemas.TestExecution(
+            id=updated_result.id,
+            case_id=requirement_id,
+            status=updated_result.status.value,
+            started_at=(
+                updated_result.started_at.isoformat()
+                if updated_result.started_at
+                else None
+            ),
+            completed_at=(
+                updated_result.completed_at.isoformat()
+                if updated_result.completed_at
+                else None
+            ),
+            notes=updated_result.notes,
+            tester_id=updated_result.tester_id,
+        )
+    else:
+        # Создаем новый результат
+        test_result_data = TestResultCreate(
+            requirement_id=requirement_id,
+            status=execution_data.get("status", "in_progress"),
+            notes=execution_data.get("notes", "Test execution started"),
+            started_at=datetime.now(UTC).replace(tzinfo=None),
+            tester_id=current_user.id if hasattr(current_user, "id") else None,
+        )
+
+        if execution_data.get("status") in ["passed", "failed", "blocked"]:
+            test_result_data.completed_at = datetime.now(UTC).replace(tzinfo=None)
+
+        test_result = await crud.test_result.create(db, obj_in=test_result_data)
+        return schemas.TestExecution(
+            id=test_result.id,
+            case_id=requirement_id,
+            status=test_result.status.value,
+            started_at=(
+                test_result.started_at.isoformat() if test_result.started_at else None
+            ),
+            completed_at=(
+                test_result.completed_at.isoformat()
+                if test_result.completed_at
+                else None
+            ),
+            notes=test_result.notes,
+            tester_id=test_result.tester_id,
+        )
 
 
-@router.get("/reports/summary", response_model=dict)
+@router.get("/reports/summary", response_model=schemas.TestingSummary)
 async def get_testing_summary(
     project_id: Optional[int] = None,
     plan_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_read_user),
 ):
     """
     Получить сводку по тестированию.
 
     Args:
-        project_id: ID проекта для фильтрации
-        plan_id: ID тестового плана для фильтрации
+        project_id: Фильтр по ID проекта
+        plan_id: Фильтр по ID тестового плана
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
         dict: Сводка по тестированию
     """
-    # TODO: Реализовать получение сводки по тестированию
-    return {
-        "total_cases": 10,
-        "executed_cases": 8,
-        "passed_cases": 6,
-        "failed_cases": 2,
-        "blocked_cases": 0,
-        "not_executed": 2,
-        "coverage_percentage": 80.0,
-        "pass_rate": 75.0,
-        "last_execution": "2024-01-01T00:00:00Z",
-    }
+    target_project_id = project_id or plan_id
+
+    if target_project_id:
+        summary = await crud.test_result.get_test_summary(
+            db, project_id=target_project_id
+        )
+        project = await crud.project.get(db, id=target_project_id)
+
+        return schemas.TestingSummary(
+            project_id=target_project_id,
+            project_name=project.name if project else "Unknown",
+            summary=summary,
+            pass_rate=summary.get("pass_rate", 0),
+            total_test_cases=summary.get("total_tests", 0),
+            executed_tests=summary.get("passed_tests", 0)
+            + summary.get("failed_tests", 0),
+            pending_tests=summary.get("total_tests", 0)
+            - (summary.get("passed_tests", 0) + summary.get("failed_tests", 0)),
+        )
+    else:
+        # Общая сводка по всем проектам
+        projects = await crud.project.get_multi(db)
+        total_summary = schemas.TestingSummary(
+            total_tests=0,
+            passed_tests=0,
+            failed_tests=0,
+            skipped_tests=0,
+            pass_rate=0,
+        )
+
+        project_summaries = []
+        for project in projects:
+            project_summary = await crud.test_result.get_test_summary(
+                db, project_id=project.id
+            )
+            project_summaries.append(
+                schemas.TestingSummary(
+                    project_id=project.id,
+                    project_name=project.name,
+                    summary=project_summary,
+                )
+            )
+
+            # Накапливаем общую статистику
+            total_summary.total_tests += project_summary.get("total_tests", 0)
+            total_summary.passed_tests += project_summary.get("passed_tests", 0)
+            total_summary.failed_tests += project_summary.get("failed_tests", 0)
+            total_summary.skipped_tests += project_summary.get("skipped_tests", 0)
+
+        # Вычисляем общий процент успешности
+        if total_summary.total_tests > 0:
+            total_summary.pass_rate = round(
+                total_summary.passed_tests / total_summary.total_tests * 100, 2
+            )
+
+        return schemas.TestingSummary(
+            overall_summary=total_summary,
+            projects=project_summaries,
+            total_projects=len(projects),
+        )
 
 
-@router.post("/asuts/requirement-status", response_model=dict)
+@router.post("/asuts/requirement-status", response_model=schemas.TestResult)
 async def request_requirement_testing_status(
     request_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_write_user),
 ):
     """
-    Ручная отправка запроса на получение статуса тестирования требования.
+    Запросить статус тестирования требования из АСУТс.
 
-    Функция 11 из ТЗ: Ручная отправка запроса на получение статуса тестирования требования.
-    Роль пользователя: Уполномоченный сотрудник.
+    Функция 13 из ТЗ: Интеграция с внешними системами тестирования.
+    Роль пользователя: Тестировщик или уполномоченный сотрудник.
 
     Args:
-        request_data: Данные запроса (requirement_id)
+        request_data: Данные запроса
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
         dict: Статус тестирования требования из АСУТс
-
-    Example request body:
-        {
-            "requirement_id": 123,
-            "include_details": true,
-            "include_test_cases": true
-        }
     """
-    # TODO: Добавить проверку роли "уполномоченный сотрудник"
-    # TODO: Реализовать реальный запрос к АСУТс через интеграционный сервис
-
     requirement_id = request_data.get("requirement_id")
-    include_details = request_data.get("include_details", False)
-    include_test_cases = request_data.get("include_test_cases", False)
-
     if not requirement_id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="requirement_id is required"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Requirement ID is required"
         )
 
-    # Мок-данные для демонстрации интеграции с АСУТс
-    testing_status = {
+    # Проверяем существование требования
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+        )
+
+    # Получаем текущие результаты тестирования
+    test_results = await crud.test_result.get_by_requirement(
+        db, requirement_id=requirement_id
+    )
+    latest_result = test_results[0] if test_results else None
+
+    # Имитируем запрос к АСУТс
+    asuts_response = {
         "requirement_id": requirement_id,
-        "testing_status": "in_progress",  # not_started, in_progress, completed, failed
-        "progress": {
-            "total_test_cases": 5,
-            "executed": 3,
-            "passed": 2,
-            "failed": 1,
-            "skipped": 0,
-            "completion_percentage": 60,
-        },
-        "latest_execution": {
-            "execution_id": "exec_456",
-            "started_at": "2024-01-01T10:00:00Z",
-            "completed_at": None,
-            "tester_id": "tester_789",
-        },
+        "external_test_id": f"ASUTS-TEST-{requirement_id}-{hash(requirement.title) % 10000}",
+        "status": latest_result.status.value if latest_result else "not_started",
+        "test_environment": "ASUTS_ENV_1",
+        "test_suite": "AUTOMATED_REGRESSION",
+        "execution_time": "2024-01-15T10:30:00Z",
+        "test_coverage": 85.5,
+        "defects_found": (
+            0 if latest_result and latest_result.status.value == "passed" else 1
+        ),
+        "compliance_status": (
+            "COMPLIANT"
+            if latest_result and latest_result.status.value == "passed"
+            else "NON_COMPLIANT"
+        ),
+        "integration_notes": "Статус получен из локальной системы тестирования",
+        "last_sync": "2024-01-15T12:00:00Z",
     }
 
-    if include_details:
-        testing_status["details"] = {
-            "test_environment": "staging",
-            "browser": "Chrome 120",
-            "os": "Windows 11",
-            "issues_found": [
-                {
-                    "issue_id": "BUG-101",
-                    "severity": "medium",
-                    "description": "Validation error on empty input",
-                }
-            ],
-        }
+    # Обновляем локальный результат с данными из АСУТс
+    if latest_result:
+        await crud.test_result.update(
+            db,
+            db_obj=latest_result,
+            obj_in={"external_id": latest_result.external_id},
+        )
 
-    if include_test_cases:
-        testing_status["test_cases"] = [
-            {
-                "case_id": "TC_001",
-                "name": "Valid login",
-                "status": "passed",
-                "executed_at": "2024-01-01T10:15:00Z",
-            },
-            {
-                "case_id": "TC_002",
-                "name": "Invalid credentials",
-                "status": "passed",
-                "executed_at": "2024-01-01T10:30:00Z",
-            },
-            {
-                "case_id": "TC_003",
-                "name": "Empty form submission",
-                "status": "failed",
-                "executed_at": "2024-01-01T10:45:00Z",
-            },
-        ]
-
-    # Информация о запросе
-    testing_status["request_info"] = {
-        "requested_by": current_user.get("id"),
-        "requested_at": "2024-01-01T12:00:00Z",
-        "source_system": "requify",
-        "asuts_response_time": "150ms",
-    }
-
-    return testing_status
+    return schemas.TestResult(
+        id=latest_result.id,
+        status=latest_result.status.value,
+        notes=latest_result.notes,
+        tester_id=latest_result.tester_id,
+    )
 
 
-@router.post("/asuts/release-status", response_model=dict)
+@router.post("/asuts/release-status", response_model=schemas.TestResult)
 async def request_release_testing_status(
     request_data: dict,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_write_user),
 ):
     """
-    Ручная отправка запроса на получение статуса тестирования релиза.
+    Запросить статус тестирования релиза из АСУТс.
 
-    Функция 12 из ТЗ: Ручная отправка запроса на получение статуса тестирования релиза.
-    Роль пользователя: Уполномоченный сотрудник.
+    Функция 13 из ТЗ: Интеграция с внешними системами тестирования.
+    Роль пользователя: Тестировщик или уполномоченный сотрудник.
 
     Args:
-        request_data: Данные запроса (release_id)
+        request_data: Данные запроса
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
         dict: Статус тестирования релиза из АСУТс
-
-    Example request body:
-        {
-            "release_id": 42,
-            "include_requirement_breakdown": true,
-            "include_test_metrics": true
-        }
     """
-    # TODO: Добавить проверку роли "уполномоченный сотрудник"
-    # TODO: Реализовать реальный запрос к АСУТс через интеграционный сервис
-
     release_id = request_data.get("release_id")
-    include_breakdown = request_data.get("include_requirement_breakdown", False)
-    include_metrics = request_data.get("include_test_metrics", False)
-
     if not release_id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="release_id is required"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Release ID is required"
         )
 
-    # Мок-данные для демонстрации интеграции с АСУТс
-    release_testing_status = {
-        "release_id": release_id,
-        "release_version": "2.1.0",
-        "overall_status": "in_progress",  # not_started, in_progress, completed, failed, blocked
-        "progress": {
-            "total_requirements": 8,
-            "requirements_tested": 5,
-            "requirements_passed": 4,
-            "requirements_failed": 1,
-            "requirements_blocked": 0,
-            "completion_percentage": 62.5,
-        },
-        "test_phases": {
-            "unit_tests": {"status": "completed", "pass_rate": "95%"},
-            "integration_tests": {"status": "in_progress", "pass_rate": "87%"},
-            "system_tests": {"status": "not_started", "pass_rate": "0%"},
-            "acceptance_tests": {"status": "not_started", "pass_rate": "0%"},
-        },
-        "estimated_completion": "2024-01-15T18:00:00Z",
-    }
+    # Проверяем существование релиза
+    release = await crud.release.get(db, id=release_id)
+    if not release:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Release not found"
+        )
 
-    if include_breakdown:
-        release_testing_status["requirements_breakdown"] = [
-            {
-                "requirement_id": 1,
-                "title": "User authentication",
-                "status": "passed",
-                "test_cases_total": 5,
-                "test_cases_passed": 5,
-            },
-            {
-                "requirement_id": 2,
-                "title": "Data validation",
-                "status": "failed",
-                "test_cases_total": 3,
-                "test_cases_passed": 2,
-                "blocking_issues": ["BUG-102"],
-            },
-            {
-                "requirement_id": 3,
-                "title": "API endpoints",
-                "status": "in_progress",
-                "test_cases_total": 10,
-                "test_cases_passed": 7,
-            },
-        ]
+    # Получаем требования релиза и их тесты
+    requirements = await crud.requirement.get_by_release(db, release_id=release_id)
+    total_requirements = len(requirements)
+    tested_requirements = 0
+    passed_requirements = 0
 
-    if include_metrics:
-        release_testing_status["test_metrics"] = {
-            "total_test_cases": 45,
-            "executed": 32,
-            "passed": 28,
-            "failed": 4,
-            "skipped": 0,
-            "blocked": 0,
-            "average_execution_time": "2.3min",
-            "test_coverage": "89%",
-            "defect_density": "0.8 defects/KLOC",
-            "critical_issues": 1,
-            "major_issues": 2,
-            "minor_issues": 5,
-        }
+    for req in requirements:
+        test_results = await crud.test_result.get_by_requirement(
+            db, requirement_id=req.id, limit=1
+        )
+        if test_results:
+            tested_requirements += 1
+            if test_results[0].status.value == "passed":
+                passed_requirements += 1
 
-    # Информация о запросе
-    release_testing_status["request_info"] = {
-        "requested_by": current_user.get("id"),
-        "requested_at": "2024-01-01T12:00:00Z",
-        "source_system": "requify",
-        "asuts_response_time": "230ms",
-    }
-
-    return release_testing_status
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Fetch data from asuts now not implemented",
+    )
 
 
-@router.post("/integration/run", response_model=dict)
+@router.post("/integration/run", response_model=schemas.TestResult)
 async def run_integration_tests(
     test_config: dict,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_write_user),
 ):
     """
     Запустить интеграционные тесты.
 
     Args:
-        test_config: Конфигурация для запуска тестов
+        test_config: Конфигурация тестов
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
         dict: Результат запуска интеграционных тестов
     """
-    # TODO: Реализовать запуск интеграционных тестов
-    return {
-        "job_id": "test-job-123",
-        "status": "started",
-        "message": "Интеграционные тесты запущены",
-        "estimated_duration": 300,  # в секундах
-        "started_at": "2024-01-01T00:00:00Z",
-    }
+    # fetch data from asuts now not implemented
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Fetch data from asuts now not implemented",
+    )
 
 
-@router.get("/integration/status/{job_id}", response_model=dict)
+@router.get("/integration/status/{job_id}", response_model=schemas.TestResult)
 async def get_integration_test_status(
     job_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(get_testing_read_user),
 ):
     """
     Получить статус выполнения интеграционных тестов.
 
     Args:
-        job_id: ID задания тестирования
+        job_id: ID задачи
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        dict: Статус выполнения тестов
-
-    Raises:
-        HTTPException: Если задание не найдено
+        schemas.TestResult: Статус выполнения интеграционных тестов АСУТс (заглушка)
+        fetch data from asuts now not implemented
     """
-    # TODO: Реализовать получение статуса интеграционных тестов
-    if job_id != "test-job-123":
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Test job not found"
-        )
-
-    return {
-        "job_id": job_id,
-        "status": "completed",
-        "result": "success",
-        "progress": 100,
-        "tests_total": 25,
-        "tests_passed": 23,
-        "tests_failed": 2,
-        "tests_skipped": 0,
-        "started_at": "2024-01-01T00:00:00Z",
-        "completed_at": "2024-01-01T00:05:00Z",
-        "duration": 300,
-    }
+    # fetch data from asuts now not implemented
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Fetch data from asuts now not implemented",
+    )

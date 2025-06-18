@@ -8,7 +8,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import get_db, get_current_user
+from requify.app.api.deps import (
+    get_db,
+    get_requirements_read_user,
+    get_requirements_write_user,
+    get_requirements_delete_user,
+)
 from requify.app.core.config import settings
 from requify.app import crud, schemas
 from requify.app.models.user import User
@@ -28,7 +33,7 @@ async def search_requirements(
         100, le=1000, description="Максимальное количество возвращаемых записей"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_read_user),
 ):
     """
     Поиск требований по различным критериям.
@@ -75,7 +80,7 @@ async def get_requirements(
     priority_id: Optional[int] = Query(None, description="Фильтр по ID приоритета"),
     type_id: Optional[int] = Query(None, description="Фильтр по ID типа"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_read_user),
 ):
     """
     Получить список требований с фильтрацией.
@@ -119,7 +124,7 @@ async def get_requirements(
 async def create_requirement(
     requirement_in: schemas.RequirementCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_write_user),
 ):
     """
     Создать новое требование.
@@ -176,7 +181,7 @@ async def create_requirement(
 async def get_requirement(
     requirement_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_read_user),
 ):
     """
     Получить требование по ID с подробной информацией.
@@ -207,7 +212,7 @@ async def update_requirement(
     requirement_id: int,
     requirement_in: schemas.RequirementUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_write_user),
 ):
     """
     Обновить данные требования.
@@ -222,7 +227,7 @@ async def update_requirement(
         schemas.Requirement: Обновленное требование
 
     Raises:
-        HTTPException: Если требование не найдено или ссылочные данные некорректны
+        HTTPException: Если требование не найдено или данные некорректны
     """
     requirement = await crud.requirement.get(db, id=requirement_id)
     if not requirement:
@@ -230,17 +235,7 @@ async def update_requirement(
             status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
 
-    # Проверяем ссылочные данные, если они изменяются
-    if (
-        requirement_in.project_id
-        and requirement_in.project_id != requirement.project_id
-    ):
-        project = await crud.project.get(db, id=requirement_in.project_id)
-        if not project:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
-            )
-
+    # Проверяем существование связанных сущностей, если они изменились
     if requirement_in.type_id and requirement_in.type_id != requirement.type_id:
         req_type = await crud.requirement_type.get(db, id=requirement_in.type_id)
         if not req_type:
@@ -279,7 +274,7 @@ async def update_requirement(
 async def delete_requirement(
     requirement_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_delete_user),
 ):
     """
     Удалить требование.
@@ -306,7 +301,7 @@ async def change_requirement_status(
     requirement_id: int,
     status_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_write_user),
 ):
     """
     Изменить статус требования.
@@ -318,7 +313,7 @@ async def change_requirement_status(
         current_user: Текущий пользователь
 
     Returns:
-        schemas.Requirement: Требование с обновленным статусом
+        schemas.Requirement: Обновленное требование
 
     Raises:
         HTTPException: Если требование или статус не найдены
@@ -333,11 +328,13 @@ async def change_requirement_status(
     status_obj = await crud.requirement_status.get(db, id=status_id)
     if not status_obj:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Статус требования не найден"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Статус требования не найден",
         )
 
-    requirement = await crud.requirement.update_status(
-        db, requirement_id=requirement_id, status_id=status_id
+    # Обновляем статус
+    requirement = await crud.requirement.update(
+        db, db_obj=requirement, obj_in={"status_id": status_id}
     )
     return requirement
 
@@ -348,20 +345,20 @@ async def get_requirement_tests(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_read_user),
 ):
     """
-    Получить результаты тестов для требования.
+    Получить результаты тестирования требования.
 
     Args:
         requirement_id: ID требования
         skip: Количество пропускаемых записей
-        limit: Максимальное количество записей
+        limit: Максимальное количество возвращаемых записей
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        List[schemas.TestResult]: Список результатов тестов
+        List[schemas.TestResult]: Список результатов тестирования
 
     Raises:
         HTTPException: Если требование не найдено
@@ -372,10 +369,10 @@ async def get_requirement_tests(
             status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
 
-    tests = await crud.test_result.get_by_requirement(
+    test_results = await crud.test_result.get_by_requirement(
         db, requirement_id=requirement_id, skip=skip, limit=limit
     )
-    return tests
+    return test_results
 
 
 @router.get(
@@ -384,7 +381,7 @@ async def get_requirement_tests(
 async def get_requirement_relationships(
     requirement_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_read_user),
 ):
     """
     Получить связи требования с другими требованиями.
@@ -395,7 +392,7 @@ async def get_requirement_relationships(
         current_user: Текущий пользователь
 
     Returns:
-        List[schemas.Relationship]: Список связей
+        List[schemas.Relationship]: Список связей требования
 
     Raises:
         HTTPException: Если требование не найдено
@@ -421,7 +418,7 @@ async def create_requirement_relationship(
     requirement_id: int,
     relationship_in: schemas.RelationshipCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_requirements_write_user),
 ):
     """
     Создать связь между требованиями.
@@ -457,13 +454,15 @@ async def create_requirement_relationship(
         )
 
     # Проверяем существование типа связи
-    relationship_type = await crud.relationship_type.get(db, id=relationship_in.type_id)
+    relationship_type = await crud.relationship_type.get(
+        db, id=relationship_in.relationship_type_id
+    )
     if not relationship_type:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Тип связи не найден"
         )
 
-    # Устанавливаем ID исходного требования
+    # Устанавливаем исходное требование
     relationship_in.source_requirement_id = requirement_id
 
     relationship = await crud.relationship.create(db, obj_in=relationship_in)

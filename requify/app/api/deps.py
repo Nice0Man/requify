@@ -6,38 +6,51 @@
 """
 
 from typing import AsyncGenerator, Optional, List
-from fastapi import Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Depends, HTTPException, status, Request, Security
+from fastapi.security import (
+    OAuth2PasswordBearer,
+    HTTPBearer,
+    HTTPAuthorizationCredentials,
+    SecurityScopes,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, UTC
 
 from requify.app.core.config import settings
 from requify.app.core.security import JWTTokenManager, TokenType, get_client_ip
 from requify.app.db.db_helper import get_async_session
 from requify.app.crud import user as crud_user
 from requify.app.models.user import User
+from requify.app.utils.logger import logger
 
-# OAuth2 scheme for FastAPI docs
+# OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.app_config.api_v1_str}/auth/login",
     scopes={
         "me": "Read information about the current user",
-        "users:read": "Read users information", 
+        "users:read": "Read users information",
         "users:write": "Create and update users",
         "users:delete": "Delete users",
         "projects:read": "Read projects information",
-        "projects:write": "Create and update projects", 
+        "projects:write": "Create and update projects",
         "projects:delete": "Delete projects",
         "requirements:read": "Read requirements information",
         "requirements:write": "Create and update requirements",
         "requirements:delete": "Delete requirements",
+        "releases:read": "Read releases information",
+        "releases:write": "Create and update releases",
+        "releases:delete": "Delete releases",
+        "testing:read": "Read testing information",
+        "testing:write": "Create and update tests",
+        "testing:execute": "Execute tests",
         "admin:read": "Read admin information",
         "admin:write": "Admin write operations",
         "system:admin": "System administration operations",
     },
-    auto_error=False
+    auto_error=True,  # Enable proper error handling
 )
 
-# Fallback HTTPBearer for non-OAuth2 scenarios
+# Simplified HTTPBearer for cases where OAuth2 doesn't work
 security = HTTPBearer(auto_error=False)
 
 
@@ -59,105 +72,171 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def get_current_user(
+    security_scopes: SecurityScopes,
     request: Request,
-    oauth2_token: Optional[str] = Depends(oauth2_scheme),
-    bearer_token: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db: AsyncSession = Depends(get_db),
+    token: str = Security(oauth2_scheme),
 ) -> User:
     """
-    Зависимость для получения текущего пользователя из access токена.
+    Simplified dependency for getting current user from access token with scope checking.
+
+    Prioritizes OAuth2PasswordBearer for better FastAPI docs integration.
 
     Args:
-        request: HTTP запрос
-        oauth2_token: JWT токен из OAuth2PasswordBearer (для FastAPI docs)
-        bearer_token: JWT токен из HTTPBearer (для прямых API вызовов)
-        db: Сессия базы данных
+        security_scopes: Required access scopes
+        request: HTTP request
+        db: Database session
+        token: JWT token from OAuth2PasswordBearer
 
     Returns:
-        User: Объект пользователя
+        User: User object
 
     Raises:
-        HTTPException: Если токен недействителен или пользователь не найден
+        HTTPException: If token is invalid or user not found
     """
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = "Bearer"
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+        headers={"WWW-Authenticate": authenticate_value},
     )
 
-    # Получаем токен из любого источника
-    token_str = None
-    if oauth2_token:
-        token_str = oauth2_token
-    elif bearer_token:
-        token_str = bearer_token.credentials
-
-    # Проверяем наличие токена
-    if not token_str:
-        raise credentials_exception
-
-    # Проверяем и декодируем access токен
-    payload = JWTTokenManager.verify_token(token_str, TokenType.ACCESS)
+    # Verify and decode access token
+    payload = JWTTokenManager.verify_token(token, TokenType.ACCESS)
     if payload is None:
         raise credentials_exception
 
-    # Извлекаем данные из токена
+    # Extract data from token
     user_id = payload.get("user_id")
     email = payload.get("sub")
+    token_scopes = payload.get("scopes", [])
 
     if user_id is None or email is None:
         raise credentials_exception
 
-    # Получаем пользователя из базы данных
+    # Get user from database
     user = await crud_user.get(db, id=user_id)
     if user is None:
         raise credentials_exception
 
-    # Дополнительная проверка email для безопасности
+    # Additional email verification for security
     if user.email != email:
         raise credentials_exception
 
-    # Проверяем активность пользователя
+    # Check user activity
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User account is deactivated",
         )
 
-    # Можно добавить дополнительные проверки безопасности
-    # например, проверку IP адреса если требуется
-    # _validate_user_access(request, user, payload)
+    # Check scopes
+    for scope in security_scopes.scopes:
+        if scope not in token_scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )
+
+    return user
+
+
+async def get_current_user_fallback(
+    security_scopes: SecurityScopes,
+    request: Request,
+    oauth2_token: Optional[str] = Depends(oauth2_scheme),
+    bearer_token: Optional[HTTPAuthorizationCredentials] = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """
+    Fallback dependency with dual authentication support for problematic endpoints.
+    Use this only when oauth2_scheme causes issues.
+    """
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = "Bearer"
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": authenticate_value},
+    )
+
+    # Get token from any source
+    token_str = None
+    if oauth2_token:
+        token_str = oauth2_token
+    elif bearer_token:
+        token_str = bearer_token.credentials
+
+    # Check token presence
+    if not token_str:
+        raise credentials_exception
+
+    # Verify and decode access token
+    payload = JWTTokenManager.verify_token(token_str, TokenType.ACCESS)
+    if payload is None:
+        raise credentials_exception
+
+    # Extract data from token
+    user_id = payload.get("user_id")
+    email = payload.get("sub")
+    token_scopes = payload.get("scopes", [])
+
+    if user_id is None or email is None:
+        raise credentials_exception
+
+    # Get user from database
+    user = await crud_user.get(db, id=user_id)
+    if user is None:
+        raise credentials_exception
+
+    # Additional email verification for security
+    if user.email != email:
+        raise credentials_exception
+
+    # Check user activity
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User account is deactivated",
+        )
+
+    # Check scopes
+    for scope in security_scopes.scopes:
+        if scope not in token_scopes:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not enough permissions",
+                headers={"WWW-Authenticate": authenticate_value},
+            )
 
     return user
 
 
 async def get_current_active_user(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Security(get_current_user, scopes=["me"]),
 ) -> User:
     """
     Зависимость для получения текущего активного пользователя.
-
-    Дублирует проверку активности для явности и обратной совместимости.
 
     Args:
         current_user: Текущий пользователь
 
     Returns:
         User: Объект активного пользователя
-
-    Raises:
-        HTTPException: Если пользователь неактивен
     """
-    if not current_user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account is deactivated",
-        )
     return current_user
 
 
 async def get_superuser(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_user, scopes=["system:admin"]),
 ) -> User:
     """
     Зависимость для проверки прав суперпользователя.
@@ -211,17 +290,142 @@ async def get_optional_user(
         return None
 
     try:
-        # Используем get_current_user но ловим исключения
-        return await get_current_user(request, oauth2_token, bearer_token, db)
+        # Создаем пустой SecurityScopes для вызова get_current_user_fallback
+        security_scopes = SecurityScopes()
+        return await get_current_user_fallback(
+            security_scopes, request, oauth2_token, bearer_token, db
+        )
     except HTTPException:
         return None
 
 
-# === Role-based Dependencies ===
+# === Scope-based Dependencies ===
+
+
+async def get_users_read_user(
+    current_user: User = Security(get_current_user, scopes=["users:read"]),
+) -> User:
+    """Пользователь с правами чтения пользователей."""
+    return current_user
+
+
+async def get_users_write_user(
+    current_user: User = Security(get_current_user, scopes=["users:write"]),
+) -> User:
+    """Пользователь с правами записи пользователей."""
+    return current_user
+
+
+async def get_users_delete_user(
+    current_user: User = Security(get_current_user, scopes=["users:delete"]),
+) -> User:
+    """Пользователь с правами удаления пользователей."""
+    return current_user
+
+
+async def get_projects_read_user(
+    current_user: User = Security(get_current_user, scopes=["projects:read"]),
+) -> User:
+    """Пользователь с правами чтения проектов."""
+    return current_user
+
+
+async def get_projects_write_user(
+    current_user: User = Security(get_current_user, scopes=["projects:write"]),
+) -> User:
+    """Пользователь с правами записи проектов."""
+    return current_user
+
+
+async def get_projects_delete_user(
+    current_user: User = Security(get_current_user, scopes=["projects:delete"]),
+) -> User:
+    """Пользователь с правами удаления проектов."""
+    return current_user
+
+
+async def get_requirements_read_user(
+    current_user: User = Security(get_current_user, scopes=["requirements:read"]),
+) -> User:
+    """Пользователь с правами чтения требований."""
+    return current_user
+
+
+async def get_requirements_write_user(
+    current_user: User = Security(get_current_user, scopes=["requirements:write"]),
+) -> User:
+    """Пользователь с правами записи требований."""
+    return current_user
+
+
+async def get_requirements_delete_user(
+    current_user: User = Security(get_current_user, scopes=["requirements:delete"]),
+) -> User:
+    """Пользователь с правами удаления требований."""
+    return current_user
+
+
+async def get_releases_read_user(
+    current_user: User = Security(get_current_user, scopes=["releases:read"]),
+) -> User:
+    """Пользователь с правами чтения релизов."""
+    return current_user
+
+
+async def get_releases_write_user(
+    current_user: User = Security(get_current_user, scopes=["releases:write"]),
+) -> User:
+    """Пользователь с правами записи релизов."""
+    return current_user
+
+
+async def get_releases_delete_user(
+    current_user: User = Security(get_current_user, scopes=["releases:delete"]),
+) -> User:
+    """Пользователь с правами удаления релизов."""
+    return current_user
+
+
+async def get_testing_read_user(
+    current_user: User = Security(get_current_user, scopes=["testing:read"]),
+) -> User:
+    """Пользователь с правами чтения тестирования."""
+    return current_user
+
+
+async def get_testing_write_user(
+    current_user: User = Security(get_current_user, scopes=["testing:write"]),
+) -> User:
+    """Пользователь с правами записи тестирования."""
+    return current_user
+
+
+async def get_testing_execute_user(
+    current_user: User = Security(get_current_user, scopes=["testing:execute"]),
+) -> User:
+    """Пользователь с правами выполнения тестов."""
+    return current_user
+
+
+async def get_admin_read_user(
+    current_user: User = Security(get_current_user, scopes=["admin:read"]),
+) -> User:
+    """Пользователь с правами чтения админских данных."""
+    return current_user
+
+
+async def get_admin_write_user(
+    current_user: User = Security(get_current_user, scopes=["admin:write"]),
+) -> User:
+    """Пользователь с правами записи админских данных."""
+    return current_user
+
+
+# === Role-based Dependencies (Backward Compatibility) ===
 
 
 async def get_admin_user(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_user, scopes=["admin:write"]),
 ) -> User:
     """
     Зависимость для проверки роли администратора.
@@ -244,7 +448,7 @@ async def get_admin_user(
 
 
 async def get_manager_user(
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Security(get_current_user, scopes=["admin:read"]),
 ) -> User:
     """
     Зависимость для проверки роли менеджера или выше.
@@ -267,70 +471,6 @@ async def get_manager_user(
     return current_user
 
 
-# === Scope-based Dependencies ===
-
-
-def require_scopes(required_scopes: List[str]):
-    """
-    Фабрика зависимостей для проверки областей доступа (scopes).
-
-    Args:
-        required_scopes: Список требуемых областей доступа
-
-    Returns:
-        Функция зависимости
-    """
-
-    async def check_scopes(
-        request: Request,
-        oauth2_token: Optional[str] = Depends(oauth2_scheme),
-        bearer_token: Optional[HTTPAuthorizationCredentials] = Depends(security),
-        db: AsyncSession = Depends(get_db),
-    ) -> User:
-        """
-        Проверить области доступа пользователя.
-
-        Args:
-            request: HTTP запрос
-            oauth2_token: JWT токен из OAuth2PasswordBearer (для FastAPI docs)
-            bearer_token: JWT токен из HTTPBearer (для прямых API вызовов)
-            db: Сессия базы данных
-
-        Returns:
-            User: Пользователь с достаточными правами
-
-        Raises:
-            HTTPException: Если не хватает прав доступа
-        """
-        # Получаем пользователя
-        user = await get_current_user(request, oauth2_token, bearer_token, db)
-
-        # Получаем токен для проверки scopes
-        token_str = None
-        if oauth2_token:
-            token_str = oauth2_token
-        elif bearer_token:
-            token_str = bearer_token.credentials
-
-        # Проверяем токен на наличие scopes
-        if token_str:
-            payload = JWTTokenManager.verify_token(token_str, TokenType.ACCESS)
-            if payload:
-                user_scopes = payload.get("scopes", [])
-
-                # Проверяем наличие всех требуемых scopes
-                missing_scopes = set(required_scopes) - set(user_scopes)
-                if missing_scopes:
-                    raise HTTPException(
-                        status_code=status.HTTP_403_FORBIDDEN,
-                        detail=f"Insufficient permissions. Missing scopes: {', '.join(missing_scopes)}",
-                    )
-
-        return user
-
-    return check_scopes
-
-
 # === Utility Functions ===
 
 
@@ -338,32 +478,71 @@ def _validate_user_access(request: Request, user: User, token_payload: dict) -> 
     """
     Дополнительная валидация доступа пользователя.
 
-    Можно расширить для проверки IP-адресов, времени доступа и т.д.
-
     Args:
         request: HTTP запрос
         user: Пользователь
-        token_payload: Данные из токена
+        token_payload: Данные JWT токена
 
     Raises:
-        HTTPException: Если доступ должен быть запрещен
+        HTTPException: Если доступ должен быть ограничен
     """
-    # Пример: проверка времени создания токена
-    issued_at = token_payload.get("iat")
-    if issued_at and user.last_login:
-        # Если токен создан до последнего входа в систему - он мог быть скомпрометирован
-        token_time = issued_at
-        login_time = user.last_login.timestamp()
+    # Проверка активности пользователя
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is inactive",
+        )
 
-        # Позволяем небольшую разницу во времени (5 минут)
-        if token_time < login_time - 300:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token issued before last login. Please re-authenticate.",
+    # Проверка валидности токена по времени
+    current_time = datetime.now(UTC).timestamp()
+    token_exp = token_payload.get("exp")
+    if token_exp and current_time > token_exp:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+        )
+
+    # Проверка соответствия пользователя в токене
+    token_user_id = token_payload.get("sub")
+    if token_user_id and str(user.id) != str(token_user_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Token user mismatch",
+        )
+
+    # Проверка User-Agent для базовой защиты от автоматизированных атак
+    user_agent = request.headers.get("User-Agent", "")
+    if not user_agent or len(user_agent) < 10:
+        logger.warning(
+            f"Suspicious request without proper User-Agent from user {user.id}"
+        )
+
+    # Проверка на подозрительную активность
+    # В продакшене можно добавить проверку IP адреса, геолокации, частоты запросов
+    client_ip = request.client.host if request.client else "unknown"
+    if client_ip and client_ip != "127.0.0.1" and client_ip != "localhost":
+        # Базовая проверка на подозрительные IP (можно расширить)
+        suspicious_patterns = ["192.168.", "10.", "172."]
+        if not any(pattern in client_ip for pattern in suspicious_patterns):
+            logger.info(f"External access from IP {client_ip} for user {user.id}")
+
+    # Проверка времени последней активности (если доступно в модели)
+    if hasattr(user, "last_login") and user.last_login:
+        time_since_last_login = datetime.now(UTC) - user.last_login
+        if time_since_last_login.days > 90:  # 90 дней без активности
+            logger.warning(
+                f"User {user.id} accessed after {time_since_last_login.days} days of inactivity"
             )
 
-    # Дополнительные проверки безопасности можно добавить здесь
-    # Например, проверка IP-адреса, User-Agent и т.д.
+    # Проверка scopes из токена
+    token_scopes = token_payload.get("scopes", [])
+    if isinstance(token_scopes, str):
+        token_scopes = token_scopes.split(" ")
+
+    # Логирование успешной валидации для аудита
+    logger.debug(
+        f"User {user.id} ({user.username}) validated successfully with scopes: {token_scopes}"
+    )
 
 
 # === Backward Compatibility ===

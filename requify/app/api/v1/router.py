@@ -15,6 +15,9 @@ from .endpoints import (
     testing_router,
     admin_router,
     reference_router,
+    specifications_router,
+    relationships_router,
+    comments_router,
 )
 
 # Создаем основной роутер для API v1
@@ -37,6 +40,16 @@ api_router.include_router(testing_router, prefix="/testing", tags=["testing"])
 api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
 
 api_router.include_router(reference_router, prefix="/reference", tags=["reference"])
+
+api_router.include_router(
+    specifications_router, prefix="/specifications", tags=["specifications"]
+)
+
+api_router.include_router(
+    relationships_router, prefix="/relationships", tags=["relationships"]
+)
+
+api_router.include_router(comments_router, prefix="/comments", tags=["comments"])
 
 
 @api_router.get("/")

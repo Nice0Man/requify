@@ -89,7 +89,10 @@ class User(Base, TimestampedMixin):
     )
 
     group_versions: Mapped[List["RequirementGroupVersion"]] = relationship(
-        "RequirementGroupVersion", back_populates="created_by_user", lazy="select"
+        "RequirementGroupVersion",
+        foreign_keys="RequirementGroupVersion.created_by",
+        back_populates="created_by_user",
+        lazy="select",
     )
 
     test_results: Mapped[List["TestResult"]] = relationship(

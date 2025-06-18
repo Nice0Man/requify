@@ -21,6 +21,8 @@ python-jose = {extras = ["cryptography"], version = "^3.5.0"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pg8000 = "^1.31.2"
 requests = "^2.32.3"
+psutil = "^6.1.0"
+redis = "^5.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

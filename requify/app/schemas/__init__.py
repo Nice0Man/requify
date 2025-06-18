@@ -13,6 +13,25 @@ from .user import (
     UserWithStats,
 )
 
+# Auth schemas
+from .auth import (
+    UserProfile,
+    LoginRequest,
+    LoginResponse,
+    RefreshTokenRequest,
+    RefreshTokenResponse,
+    LogoutRequest,
+    LogoutResponse,
+    PasswordChangeRequest,
+    PasswordResetRequest,
+    PasswordResetConfirm,
+    TokenValidationRequest,
+    TokenValidationResponse,
+    SessionListResponse,
+    RevokeSessionRequest,
+    AuthError,
+)
+
 # Project schemas
 from .project import (
     Project,
@@ -60,21 +79,46 @@ from .test_result import (
     TestStatus,
 )
 
+# Test Plan schemas
+from .test_plan import (
+    TestPlan,
+    TestPlanCreate,
+    TestPlanUpdate,
+    TestPlanInDB,
+    TestPlanBase,
+    TestPlanInDBBase,
+)
+
+# Test Case schemas
+from .test_case import (
+    TestCase,
+    TestCaseCreate,
+    TestCaseUpdate,
+    TestCaseInDB,
+    TestCaseBase,
+    TestCaseInDBBase,
+    TestExecution,
+    TestingSummary,
+)
+
 # Comment schemas
 from .comment import (
     Comment,
     CommentCreate,
+    CommentCreateForRequirement,
     CommentUpdate,
     CommentInDB,
     CommentBase,
     CommentInDBBase,
     CommentWithAuthor,
+    CommentStatistics,
 )
 
 # Relationship schemas
 from .relationship import (
     Relationship,
     RelationshipCreate,
+    RelationshipCreateForRequirement,
     RelationshipUpdate,
     RelationshipInDB,
     RelationshipBase,
@@ -155,6 +199,31 @@ from .spec import (
     SpecWithRequirements,
 )
 
+# Report schemas
+from .report import (
+    Report,
+    ReportCreate,
+    ReportUpdate,
+    ReportInDB,
+    ReportBase,
+    ReportInDBBase,
+    ReportWithDetails,
+    ReportFilter,
+    ReportConfig,
+    ReportType,
+    ReportFormat,
+)
+
+# Trace Matrix schemas
+from .trace_matrix import (
+    TraceMatrix,
+    TraceNode,
+    TraceLink,
+    TraceMatrixConfig,
+    TraceMatrixSummary,
+    TraceMatrixExport,
+)
+
 # Token schemas
 from .token import Token, TokenPayload
 
@@ -167,6 +236,22 @@ __all__ = [
     "UserBase",
     "UserInDBBase",
     "UserWithStats",
+    # Auth
+    "UserProfile",
+    "LoginRequest",
+    "LoginResponse",
+    "RefreshTokenRequest",
+    "RefreshTokenResponse",
+    "LogoutRequest",
+    "LogoutResponse",
+    "PasswordChangeRequest",
+    "PasswordResetRequest",
+    "PasswordResetConfirm",
+    "TokenValidationRequest",
+    "TokenValidationResponse",
+    "SessionListResponse",
+    "RevokeSessionRequest",
+    "AuthError",
     # Project
     "Project",
     "ProjectCreate",
@@ -202,17 +287,36 @@ __all__ = [
     "TestResultInDBBase",
     "TestResultWithDetails",
     "TestStatus",
+    # Test Plan
+    "TestPlan",
+    "TestPlanCreate",
+    "TestPlanUpdate",
+    "TestPlanInDB",
+    "TestPlanBase",
+    "TestPlanInDBBase",
+    # Test Case
+    "TestCase",
+    "TestCaseCreate",
+    "TestCaseUpdate",
+    "TestCaseInDB",
+    "TestCaseBase",
+    "TestCaseInDBBase",
+    "TestExecution",
+    "TestingSummary",
     # Comment
     "Comment",
     "CommentCreate",
+    "CommentCreateForRequirement",
     "CommentUpdate",
     "CommentInDB",
     "CommentBase",
     "CommentInDBBase",
     "CommentWithAuthor",
+    "CommentStatistics",
     # Relationship
     "Relationship",
     "RelationshipCreate",
+    "RelationshipCreateForRequirement",
     "RelationshipUpdate",
     "RelationshipInDB",
     "RelationshipBase",
@@ -270,6 +374,25 @@ __all__ = [
     "SpecBase",
     "SpecInDBBase",
     "SpecWithRequirements",
+    # Report
+    "Report",
+    "ReportCreate",
+    "ReportUpdate",
+    "ReportInDB",
+    "ReportBase",
+    "ReportInDBBase",
+    "ReportWithDetails",
+    "ReportFilter",
+    "ReportConfig",
+    "ReportType",
+    "ReportFormat",
+    # Trace Matrix
+    "TraceMatrix",
+    "TraceNode",
+    "TraceLink",
+    "TraceMatrixConfig",
+    "TraceMatrixSummary",
+    "TraceMatrixExport",
     # Token
     "Token",
     "TokenPayload",

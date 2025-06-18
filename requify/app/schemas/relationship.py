@@ -10,9 +10,10 @@ from pydantic import BaseModel, Field
 class RelationshipBase(BaseModel):
     """Базовая схема связи между требованиями."""
 
-    source_id: int = Field(..., gt=0, description="ID исходного требования")
-    target_id: int = Field(..., gt=0, description="ID целевого требования")
-    type_id: int = Field(..., gt=0, description="ID типа связи")
+    source_requirement_id: int = Field(..., gt=0, description="ID исходного требования")
+    target_requirement_id: int = Field(..., gt=0, description="ID целевого требования")
+    relationship_type_id: int = Field(..., gt=0, description="ID типа связи")
+    description: Optional[str] = Field(None, description="Описание связи")
 
 
 class RelationshipCreate(RelationshipBase):
@@ -21,10 +22,19 @@ class RelationshipCreate(RelationshipBase):
     pass
 
 
+class RelationshipCreateForRequirement(BaseModel):
+    """Схема для создания связи для конкретного требования (без source_requirement_id)."""
+
+    target_requirement_id: int = Field(..., gt=0, description="ID целевого требования")
+    relationship_type_id: int = Field(..., gt=0, description="ID типа связи")
+    description: Optional[str] = Field(None, description="Описание связи")
+
+
 class RelationshipUpdate(BaseModel):
     """Схема для обновления связи между требованиями."""
 
-    type_id: Optional[int] = Field(None, gt=0, description="ID типа связи")
+    relationship_type_id: Optional[int] = Field(None, gt=0, description="ID типа связи")
+    description: Optional[str] = Field(None, description="Описание связи")
 
 
 class RelationshipInDBBase(RelationshipBase):
