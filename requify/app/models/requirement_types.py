@@ -18,6 +18,7 @@ class RequirementType(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
+    description: Mapped[str] = mapped_column(String(500), nullable=True)
 
     # Отношения
     requirements: Mapped[list["Requirement"]] = relationship(

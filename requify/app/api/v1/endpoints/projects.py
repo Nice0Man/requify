@@ -112,7 +112,7 @@ async def get_project(
     Raises:
         HTTPException: Если проект не найден
     """
-    project = await crud.project.get_with_stats(db, project_id=project_id)
+    project = await crud.project.get_with_stats(db, id=project_id)
     if not project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"

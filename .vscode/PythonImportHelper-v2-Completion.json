@@ -9188,7 +9188,7 @@
         "kind": 6,
         "importPath": "requify.app.models.requirement_types",
         "description": "requify.app.models.requirement_types",
-        "peekOfCode": "class RequirementType(Base):\n    \"\"\"\n    Справочник типов требований (functional, non-functional, business)\n    \"\"\"\n    __tablename__ = \"requirement_types\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)\n    # Отношения\n    requirements: Mapped[list[\"Requirement\"]] = relationship(\n        \"Requirement\", back_populates=\"type\"",
+        "peekOfCode": "class RequirementType(Base):\n    \"\"\"\n    Справочник типов требований (functional, non-functional, business)\n    \"\"\"\n    __tablename__ = \"requirement_types\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)\n    description: Mapped[str] = mapped_column(String(500), nullable=True)\n    # Отношения\n    requirements: Mapped[list[\"Requirement\"]] = relationship(",
         "detail": "requify.app.models.requirement_types",
         "documentation": {}
     },
@@ -10367,7 +10367,7 @@
         "kind": 6,
         "importPath": "requify.app.schemas.test_case",
         "description": "requify.app.schemas.test_case",
-        "peekOfCode": "class TestingSummary(BaseModel):\n    \"\"\"Схема сводных данных по тестированию.\"\"\"\n    total_tests: int\n    passed_tests: int\n    failed_tests: int\n    errors: Optional[List[str]] = None",
+        "peekOfCode": "class TestingSummary(BaseModel):\n    \"\"\"Схема сводных данных по тестированию.\"\"\"\n    total_tests: int = Field(default=0, description=\"Общее количество тестов\")\n    passed_tests: int = Field(default=0, description=\"Количество пройденных тестов\")\n    failed_tests: int = Field(default=0, description=\"Количество проваленных тестов\")\n    skipped_tests: Optional[int] = Field(default=0, description=\"Количество пропущенных тестов\")\n    pass_rate: Optional[float] = Field(default=0.0, description=\"Процент успешности\")\n    # Поля для группировки по проектам\n    project_id: Optional[int] = Field(None, description=\"ID проекта\")\n    project_name: Optional[str] = Field(None, description=\"Название проекта\")",
         "detail": "requify.app.schemas.test_case",
         "documentation": {}
     },

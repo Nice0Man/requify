@@ -278,6 +278,18 @@ __all__ = [
     "ReleaseInDBBase",
     "ReleaseWithRequirements",
     "ReleaseWithDetails",
+    # Report
+    "Report",
+    "ReportCreate",
+    "ReportUpdate",
+    "ReportInDB",
+    "ReportBase",
+    "ReportInDBBase",
+    "ReportWithDetails",
+    "ReportFilter",
+    "ReportConfig",
+    "ReportType",
+    "ReportFormat",
     # Test Result
     "TestResult",
     "TestResultCreate",

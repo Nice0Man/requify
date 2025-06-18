@@ -64,7 +64,24 @@ class TestExecution(BaseModel):
 class TestingSummary(BaseModel):
     """Схема сводных данных по тестированию."""
 
-    total_tests: int
-    passed_tests: int
-    failed_tests: int
-    errors: Optional[List[str]] = None
+    total_tests: int = Field(default=0, description="Общее количество тестов")
+    passed_tests: int = Field(default=0, description="Количество пройденных тестов")
+    failed_tests: int = Field(default=0, description="Количество проваленных тестов")
+    skipped_tests: Optional[int] = Field(default=0, description="Количество пропущенных тестов")
+    pass_rate: Optional[float] = Field(default=0.0, description="Процент успешности")
+    
+    # Поля для группировки по проектам
+    project_id: Optional[int] = Field(None, description="ID проекта")
+    project_name: Optional[str] = Field(None, description="Название проекта")
+    summary: Optional[dict] = Field(None, description="Детальная сводка")
+    
+    # Поля для общей сводки
+    overall_summary: Optional["TestingSummary"] = Field(None, description="Общая сводка")
+    projects: Optional[List["TestingSummary"]] = Field(None, description="Сводки по проектам")
+    total_projects: Optional[int] = Field(None, description="Общее количество проектов")
+    
+    errors: Optional[List[str]] = Field(None, description="Ошибки")
+
+
+# Обновляем TestingSummary для поддержки рекурсивных ссылок
+TestingSummary.model_rebuild()

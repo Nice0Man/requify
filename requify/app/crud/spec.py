@@ -47,10 +47,7 @@ class CRUDSpec(CRUDBase[Spec, SpecCreate, SpecUpdate]):
         limit: int = 100,
     ) -> List[Spec]:
         """Search specifications by name or description"""
-        search_filter = or_(
-            self.model.name.ilike(f"%{search_term}%"),
-            self.model.description.ilike(f"%{search_term}%"),
-        )
+        search_filter = self.model.name.ilike(f"%{search_term}%")
 
         query = select(self.model).where(search_filter)
 
