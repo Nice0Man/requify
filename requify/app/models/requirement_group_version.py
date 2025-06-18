@@ -1,7 +1,13 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+
+if TYPE_CHECKING:
+    from .requirement_group import RequirementGroup
+    from .user import User
 
 from .base import Base
 
@@ -10,6 +16,7 @@ class RequirementGroupVersion(Base):
     """
     Модель версии группы требований.
     """
+
     __tablename__ = "requirement_group_versions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -21,10 +28,10 @@ class RequirementGroupVersion(Base):
         JSON, nullable=False, comment="Снимок группы требований и связей"
     )
     created_by: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("users.id"), nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(UTC), nullable=False
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), nullable=False
     )
 
     # Отношения
@@ -33,5 +40,5 @@ class RequirementGroupVersion(Base):
     )
 
     created_by_user: Mapped["User"] = relationship(
-        "User", back_populates="group_versions"
+        "User", foreign_keys=[created_by], back_populates="group_versions"
     )

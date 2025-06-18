@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from requify.app.core.config import settings
-from requify.app.db.base import Base
+from requify.app.models.base import Base
 from requify.app.db.session import engine
 from requify.app.models.user import User
 from requify.app.schemas.user import UserCreate

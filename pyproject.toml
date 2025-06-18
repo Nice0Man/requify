@@ -17,6 +17,10 @@ pydantic-settings = "^2.9.1"
 psycopg2-binary = "^2.9.10"
 python-dotenv = "^1.1.0"
 alembic = "^1.13.0"
+python-jose = {extras = ["cryptography"], version = "^3.5.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pg8000 = "^1.31.2"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -25,7 +29,22 @@ pytest-cov = "^6.0.0"
 httpx = "^0.28.0"
 isort = "^5.13.0"
 flake8 = "^7.0.0"
+pylint = "^3.3.7"
 
+
+[tool.pytest.ini_options]
+testpaths = ["requify/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-v --strict-markers --tb=short"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

@@ -52,8 +52,13 @@ async def get_current_user(
 
     # Временная проверка mock токена
     if token.credentials == "mock-jwt-token-123":
-        return {"id": 1, "email": "admin@requify.local", "name": "Admin User", "is_superuser": True}
-    
+        return {
+            "id": 1,
+            "email": "admin@requify.local",
+            "name": "Admin User",
+            "is_superuser": True,
+        }
+
     # Если токен не соответствует mock, возвращаем ошибку
     raise credentials_exception
 

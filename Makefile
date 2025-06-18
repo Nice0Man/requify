@@ -1,131 +1,131 @@
-# Makefile для проекта Requify
-# Автоматизированная система управления требованиями
+# Makefile for Requify project
+# Automated Requirements Management System
 
-# Переменные
+# Variables
 COMPOSE_FILE = docker-compose.yml
 PROJECT_NAME = requify
 ENV_FILE = .env
 
-# Цвета для вывода
-RED = \033[0;31m
-GREEN = \033[0;32m
-YELLOW = \033[1;33m
-BLUE = \033[0;34m
-NC = \033[0m # No Color
+# No colors for output
 
 .PHONY: help setup build up down restart logs clean test migrate init-db seed-db backup restore
 
-# Помощь - описание доступных команд
+# Help - description of available commands
 help:
-	@echo "$(BLUE)Requify - Система управления требованиями$(NC)"
-	@echo "$(BLUE)Доступные команды:$(NC)"
+	@echo "Requify - Requirements Management System"
+	@echo "Available commands:"
 	@echo ""
-	@echo "$(GREEN)Основные команды:$(NC)"
-	@echo "  make setup          - Первоначальная настройка проекта"
-	@echo "  make build          - Сборка Docker образов"
-	@echo "  make up             - Запуск всех сервисов"
-	@echo "  make down           - Остановка всех сервисов"
-	@echo "  make restart        - Перезапуск всех сервисов"
-	@echo "  make status         - Показать статус сервисов"
+	@echo "Main commands:"
+	@echo "  make setup          - Initial project setup"
+	@echo "  make build          - Build Docker images"
+	@echo "  make up             - Start all services"
+	@echo "  make down           - Stop all services"
+	@echo "  make restart        - Restart all services"
+	@echo "  make status         - Show services status"
 	@echo ""
-	@echo "$(GREEN)База данных:$(NC)"
-	@echo "  make migrate        - Запуск миграций Alembic"
-	@echo "  make migrate-create - Создание новой миграции"
-	@echo "  make migrate-down   - Откат миграции"
-	@echo "  make init-db        - Инициализация базы данных"
-	@echo "  make seed-db        - Заполнение тестовыми данными"
-	@echo "  make reset-db       - Сброс и пересоздание БД"
+	@echo "Database:"
+	@echo "  make migrate        - Run Alembic migrations"
+	@echo "  make migrate-create - Create new migration"
+	@echo "  make migrate-down   - Rollback migration"
+	@echo "  make init-db        - Initialize database"
+	@echo "  make seed-db        - Populate with test data"
+	@echo "  make reset-db       - Reset and recreate DB"
 	@echo ""
-	@echo "$(GREEN)Разработка:$(NC)"
-	@echo "  make dev            - Запуск в режиме разработки (с Adminer)"
-	@echo "  make test           - Запуск тестов"
-	@echo "  make test-cov       - Запуск тестов с покрытием"
-	@echo "  make lint           - Проверка кода линтерами"
-	@echo "  make format         - Форматирование кода"
+	@echo "Development:"
+	@echo "  make dev            - Run in development mode (with Adminer)"
+	@echo "  make test           - Run tests"
+	@echo "  make test-cov       - Run tests with coverage"
+	@echo "  make lint           - Code linting check"
+	@echo "  make format         - Code formatting"
 	@echo ""
-	@echo "$(GREEN)Логи и мониторинг:$(NC)"
-	@echo "  make logs           - Просмотр логов всех сервисов"
-	@echo "  make logs-app       - Просмотр логов приложения"
-	@echo "  make logs-db        - Просмотр логов БД"
-	@echo "  make logs-nginx     - Просмотр логов Nginx"
+	@echo "Logs and monitoring:"
+	@echo "  make logs           - View logs of all services"
+	@echo "  make logs-app       - View application logs"
+	@echo "  make logs-db        - View database logs"
+	@echo "  make logs-nginx     - View Nginx logs"
 	@echo ""
-	@echo "$(GREEN)Резервное копирование:$(NC)"
-	@echo "  make backup         - Создание бэкапа БД"
-	@echo "  make restore        - Восстановление из бэкапа"
-	@echo "  make clean          - Очистка неиспользуемых ресурсов"
+	@echo "Backup:"
+	@echo "  make backup         - Create database backup"
+	@echo "  make restore        - Restore from backup"
+	@echo "  make clean          - Clean unused resources"
 	@echo ""
-	@echo "$(GREEN)Продакшен:$(NC)"
-	@echo "  make prod           - Запуск в продакшен режиме"
-	@echo "  make deploy         - Деплой приложения"
+	@echo "Production:"
+	@echo "  make prod           - Run in production mode"
+	@echo "  make deploy         - Deploy application"
 
-# Первоначальная настройка проекта
+# Initial project setup
 setup:
-	@echo "$(BLUE)Настройка проекта Requify...$(NC)"
+	@echo "Setting up Requify project..."
 	@if [ ! -f $(ENV_FILE) ]; then \
-		echo "$(YELLOW)Копирование env.example в .env...$(NC)"; \
+		echo "Copying env.example to .env..."; \
 		cp env.example $(ENV_FILE); \
-		echo "$(GREEN)✓ .env файл создан$(NC)"; \
+		echo "✓ .env file created"; \
 	else \
-		echo "$(GREEN)✓ .env файл уже существует$(NC)"; \
+		echo "✓ .env file already exists"; \
 	fi
-	@echo "$(YELLOW)Создание необходимых директорий...$(NC)"
-	@mkdir -p logs uploads static backups monitoring/data
-	@chmod 755 logs uploads static backups
-	@echo "$(GREEN)✓ Директории созданы$(NC)"
-	@echo "$(GREEN)✓ Проект настроен! Теперь выполните 'make build && make up'$(NC)"
+	@echo "Creating necessary directories..."
+	@if not exist logs mkdir logs
+	@if not exist uploads mkdir uploads
+	@if not exist static mkdir static
+	@if not exist backups mkdir backups
+	@if not exist monitoring mkdir monitoring
+	@if not exist monitoring\data mkdir monitoring\data
+	@echo "✓ Directories created"
+	@echo "✓ Project setup complete! Now run 'make build && make up'"
 
-# Сборка Docker образов
+# Build Docker images
 build:
-	@echo "$(BLUE)Сборка Docker образов...$(NC)"
+	@echo "Building Docker images..."
 	@docker-compose -f $(COMPOSE_FILE) build --no-cache
-	@echo "$(GREEN)✓ Образы собраны$(NC)"
+	@echo "✓ Images built"
 
-# Быстрая сборка (с кэшем)
+# Fast build (with cache)
 build-fast:
-	@echo "$(BLUE)Быстрая сборка Docker образов...$(NC)"
+	@echo "Fast building Docker images..."
 	@docker-compose -f $(COMPOSE_FILE) build
-	@echo "$(GREEN)✓ Образы собраны$(NC)"
+	@echo "✓ Images built"
 
-# Запуск всех сервисов
+# Start all services
 up:
-	@echo "$(BLUE)Запуск сервисов Requify...$(NC)"
+	@echo "Starting Requify services..."
 	@docker-compose -f $(COMPOSE_FILE) up -d
-	@echo "$(GREEN)✓ Сервисы запущены$(NC)"
-	@echo "$(BLUE)Проверка состояния...$(NC)"
-	@sleep 5
+	@echo "✓ Services started"
+	@echo "Checking status..."
+	@timeout /t 5 /nobreak > nul 2>&1 || ping 127.0.0.1 -n 6 > nul
 	@make status
 
-# Запуск в режиме разработки (с Adminer)
+# Run in development mode (with Adminer)
 dev:
-	@echo "$(BLUE)Запуск в режиме разработки...$(NC)"
+	@echo "Starting in development mode..."
 	@docker-compose -f $(COMPOSE_FILE) --profile dev up -d
-	@echo "$(GREEN)✓ Режим разработки активен$(NC)"
-	@echo "$(BLUE)Доступные сервисы:$(NC)"
-	@echo "  - Приложение: http://localhost:8000"
-	@echo "  - API документация: http://localhost:8000/docs"
+	@echo "✓ Development mode active"
+	@echo "Available services:"
+	@echo "  - Application: http://localhost:8000"
+	@echo "  - API documentation: http://localhost:8000/docs"
 	@echo "  - Adminer: http://localhost:8080"
 	@echo "  - Nginx: http://localhost"
 
-# Остановка всех сервисов
+# Stop all services
 down:
-	@echo "$(BLUE)Остановка сервисов...$(NC)"
+	@echo "Stopping services..."
 	@docker-compose -f $(COMPOSE_FILE) down
-	@echo "$(GREEN)✓ Сервисы остановлены$(NC)"
+	@echo "✓ Services stopped"
 
-# Остановка с удалением volumes
+# Stop with volumes removal
 down-volumes:
-	@echo "$(RED)Остановка сервисов и удаление данных...$(NC)"
-	@read -p "Вы уверены? Все данные будут удалены! (y/N): " confirm && [ "$$confirm" = "y" ]
+	@echo "WARNING: Stopping services and removing data..."
+	@echo "This will delete all data! Press Ctrl+C to cancel or any key to continue..."
+	@pause > nul
 	@docker-compose -f $(COMPOSE_FILE) down -v
-	@echo "$(GREEN)✓ Сервисы остановлены, данные удалены$(NC)"
+	@echo "✓ Services stopped, data removed"
 
-# Перезапуск всех сервисов
+# Restart all services
 restart:
-	@echo "$(BLUE)Перезапуск сервисов...$(NC)"
+	@echo "Restarting services..."
 	@docker-compose -f $(COMPOSE_FILE) restart
-	@echo "$(GREEN)✓ Сервисы перезапущены$(NC)"
+	@echo "✓ Services restarted"
 
-# Перезапуск конкретного сервиса
+# Restart specific service
 restart-app:
 	@docker-compose -f $(COMPOSE_FILE) restart app
 
@@ -135,29 +135,43 @@ restart-db:
 restart-nginx:
 	@docker-compose -f $(COMPOSE_FILE) restart nginx
 
-# Статус сервисов
+# Services status
 status:
-	@echo "$(BLUE)Статус сервисов:$(NC)"
+	@echo "Services status:"
 	@docker-compose -f $(COMPOSE_FILE) ps
 
-# Логи всех сервисов
+# Logs of all services
 logs:
-	@docker-compose -f $(COMPOSE_FILE) logs -f
+	@docker-compose -f $(COMPOSE_FILE) logs -f > logs/all.log 2>&1	
+	@echo "Logs of all services saved to logs/all.log"
+	@echo "--------------------------------"
+	cat logs/all.log
 
-# Логи конкретных сервисов
+# Logs of specific services
 logs-app:
-	@docker-compose -f $(COMPOSE_FILE) logs -f app
+	@docker-compose -f $(COMPOSE_FILE) logs -f app  > logs/app.log 2>&1
+	@echo "Logs of app service saved to logs/app.log"
+	@echo "--------------------------------"
+	cat logs/app.log
 
 logs-db:
-	@docker-compose -f $(COMPOSE_FILE) logs -f postgres
+	@docker-compose -f $(COMPOSE_FILE) logs -f postgres > logs/db.log 2>&1
+	@echo "Logs of db service saved to logs/db.log"		
+	@echo "--------------------------------"
+	cat logs/db.log
 
 logs-nginx:
-	@docker-compose -f $(COMPOSE_FILE) logs -f nginx
-
+	@docker-compose -f $(COMPOSE_FILE) logs -f nginx > logs/nginx.log 2>&1
+	@echo "Logs of nginx service saved to logs/nginx.log"
+	@echo "--------------------------------"
+	cat logs/nginx.log
+	
 logs-redis:
-	@docker-compose -f $(COMPOSE_FILE) logs -f redis
-
-# Подключение к контейнерам
+	@docker-compose -f $(COMPOSE_FILE) logs -f redis > logs/redis.log 2>&1	
+	@echo "Logs of redis service saved to logs/redis.log"	
+	@echo "--------------------------------"
+	cat logs/redis.log
+# Connect to containers
 shell-app:
 	@docker-compose -f $(COMPOSE_FILE) exec app bash
 
@@ -167,140 +181,141 @@ shell-db:
 shell-redis:
 	@docker-compose -f $(COMPOSE_FILE) exec redis redis-cli
 
-# Миграции базы данных
+# Database migrations
 migrate:
-	@echo "$(BLUE)Запуск миграций...$(NC)"
+	@echo "Running migrations..."
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic upgrade head
-	@echo "$(GREEN)✓ Миграции применены$(NC)"
+	@echo "✓ Migrations applied"
 
-# Создание новой миграции
+# Create new migration
 migrate-create:
-	@read -p "Введите описание миграции: " message; \
-	docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic revision --autogenerate -m "$$message"
+	@echo "Enter migration description and press Enter:"
+	@set /p message= && docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic revision --autogenerate -m "%message%"
 
-# Откат миграции
+# Rollback migration
 migrate-down:
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic downgrade -1
 
-# Информация о миграциях
+# Migration information
 migrate-history:
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic history
 
 migrate-current:
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run alembic current
 
-# Инициализация базы данных
+# Database initialization
 init-db:
-	@echo "$(BLUE)Инициализация базы данных...$(NC)"
+	@echo "Initializing database..."
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run python -m requify.scripts.db_utils init
-	@echo "$(GREEN)✓ База данных инициализирована$(NC)"
+	@echo "✓ Database initialized"
 
-# Заполнение тестовыми данными
+# Populate with test data
 seed-db:
-	@echo "$(BLUE)Заполнение базы тестовыми данными...$(NC)"
+	@echo "Populating database with test data..."
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run python -m requify.scripts.seed_db
-	@echo "$(GREEN)✓ Тестовые данные загружены$(NC)"
+	@echo "✓ Test data loaded"
 
-# Сброс и пересоздание БД
+# Reset and recreate DB
 reset-db:
-	@echo "$(RED)Сброс базы данных...$(NC)"
-	@read -p "Вы уверены? Все данные будут удалены! (y/N): " confirm && [ "$$confirm" = "y" ]
+	@echo "WARNING: Resetting database..."
+	@echo "This will delete all database data! Press Ctrl+C to cancel or any key to continue..."
+	@pause > nul
 	@docker-compose -f $(COMPOSE_FILE) exec postgres psql -U postgres -c "DROP DATABASE IF EXISTS \"requify-db\";"
 	@docker-compose -f $(COMPOSE_FILE) exec postgres psql -U postgres -c "CREATE DATABASE \"requify-db\";"
 	@make migrate
 	@make seed-db
-	@echo "$(GREEN)✓ База данных пересоздана$(NC)"
+	@echo "✓ Database recreated"
 
-# Тестирование
+# Testing
 test:
-	@echo "$(BLUE)Запуск тестов...$(NC)"
+	@echo "Running tests..."
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run pytest
 
 test-cov:
-	@echo "$(BLUE)Запуск тестов с покрытием...$(NC)"
+	@echo "Running tests with coverage..."
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run pytest --cov=requify --cov-report=html --cov-report=term
 
-# Линтеры и форматирование
+# Linters and formatting
 lint:
-	@echo "$(BLUE)Проверка кода линтерами...$(NC)"
+	@echo "Checking code with linters..."
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run black --check .
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run isort --check-only .
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run flake8 .
 
 format:
-	@echo "$(BLUE)Форматирование кода...$(NC)"
+	@echo "Formatting code..."
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run black .
 	@docker-compose -f $(COMPOSE_FILE) exec app poetry run isort .
-	@echo "$(GREEN)✓ Код отформатирован$(NC)"
+	@echo "✓ Code formatted"
 
-# Резервное копирование
+# Backup
 backup:
-	@echo "$(BLUE)Создание резервной копии...$(NC)"
+	@echo "Creating backup..."
 	@mkdir -p backups
 	@docker-compose -f $(COMPOSE_FILE) exec postgres pg_dump -U postgres requify-db | gzip > backups/backup_$(shell date +%Y%m%d_%H%M%S).sql.gz
-	@echo "$(GREEN)✓ Резервная копия создана в папке backups/$(NC)"
+	@echo "✓ Backup created in backups/ folder"
 
-# Восстановление из резервной копии
+# Restore from backup
 restore:
-	@echo "$(BLUE)Восстановление из резервной копии...$(NC)"
-	@echo "Доступные резервные копии:"
-	@ls -la backups/
-	@read -p "Введите имя файла резервной копии: " backup_file; \
-	gunzip -c backups/$$backup_file | docker-compose -f $(COMPOSE_FILE) exec -T postgres psql -U postgres requify-db
+	@echo "Restoring from backup..."
+	@echo "Available backups:"
+	@dir backups\
+	@echo "Enter backup file name and press Enter:"
+	@set /p backup_file= && gunzip -c backups\%backup_file% | docker-compose -f $(COMPOSE_FILE) exec -T postgres psql -U postgres requify-db
 
-# Очистка неиспользуемых ресурсов
+# Clean unused resources
 clean:
-	@echo "$(BLUE)Очистка неиспользуемых ресурсов...$(NC)"
+	@echo "Cleaning unused resources..."
 	@docker system prune -f
 	@docker volume prune -f
 	@docker image prune -f
-	@echo "$(GREEN)✓ Очистка завершена$(NC)"
+	@echo "✓ Cleanup completed"
 
-# Продакшен режим
+# Production mode
 prod:
-	@echo "$(BLUE)Запуск в продакшен режиме...$(NC)"
+	@echo "Starting in production mode..."
 	@docker-compose -f $(COMPOSE_FILE) -f docker-compose.prod.yml up -d
-	@echo "$(GREEN)✓ Продакшен режим активен$(NC)"
+	@echo "✓ Production mode active"
 
-# Деплой приложения
+# Deploy application
 deploy:
-	@echo "$(BLUE)Деплой приложения...$(NC)"
+	@echo "Deploying application..."
 	@make build
 	@make down
 	@make up
 	@make migrate
-	@echo "$(GREEN)✓ Деплой завершен$(NC)"
+	@echo "✓ Deployment completed"
 
-# Проверка здоровья
+# Health check
 health:
-	@echo "$(BLUE)Проверка состояния сервисов...$(NC)"
-	@curl -f http://localhost:8000/health || echo "$(RED)Приложение недоступно$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec postgres pg_isready -U postgres || echo "$(RED)PostgreSQL недоступен$(NC)"
-	@docker-compose -f $(COMPOSE_FILE) exec redis redis-cli ping || echo "$(RED)Redis недоступен$(NC)"
+	@echo "Checking services health..."
+	@curl -f http://localhost:8000/health || echo "Application unavailable"
+	@docker-compose -f $(COMPOSE_FILE) exec postgres pg_isready -U postgres || echo "PostgreSQL unavailable"
+	@docker-compose -f $(COMPOSE_FILE) exec redis redis-cli ping || echo "Redis unavailable"
 
-# Мониторинг ресурсов
+# Resource monitoring
 monitor:
 	@docker stats $(PROJECT_NAME)_postgres $(PROJECT_NAME)_app $(PROJECT_NAME)_nginx $(PROJECT_NAME)_redis
 
-# Установка зависимостей для разработки локально
+# Install development dependencies locally
 install-dev:
-	@echo "$(BLUE)Установка зависимостей для разработки...$(NC)"
+	@echo "Installing development dependencies..."
 	@poetry install
-	@echo "$(GREEN)✓ Зависимости установлены$(NC)"
+	@echo "✓ Dependencies installed"
 
-# Запуск приложения локально (без Docker)
+# Run application locally (without Docker)
 run-local:
-	@echo "$(BLUE)Запуск приложения локально...$(NC)"
+	@echo "Running application locally..."
 	@poetry run uvicorn requify.app.main:app --reload --host 0.0.0.0 --port 8000
 
-# Информация о проекте
+# Project information
 info:
-	@echo "$(BLUE)Информация о проекте Requify$(NC)"
-	@echo "Версия: 0.1.0"
-	@echo "Порты:"
-	@echo "  - Приложение: 8000"
+	@echo "Requify Project Information"
+	@echo "Version: 0.1.0"
+	@echo "Ports:"
+	@echo "  - Application: 8000"
 	@echo "  - PostgreSQL: 5432"
-	@echo "  - PostgreSQL (тест): 5433"
+	@echo "  - PostgreSQL (test): 5433"
 	@echo "  - Redis: 6379"
 	@echo "  - Nginx: 80, 443"
 	@echo "  - Adminer: 8080" 

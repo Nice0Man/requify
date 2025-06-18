@@ -10,23 +10,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from requify.app.api.deps import get_db, get_current_user
 from requify.app.core.config import settings
+from requify.app import crud, schemas
+from requify.app.models.user import User
 
 router = APIRouter()
 
 
-@router.get("/search", response_model=List[dict])
+@router.get("/search", response_model=List[schemas.Requirement])
 async def search_requirements(
     query: str = Query(..., description="Поисковый запрос"),
     project_id: Optional[int] = Query(None, description="Фильтр по ID проекта"),
-    status_filter: Optional[str] = Query(None, description="Фильтр по статусу"),
-    priority_filter: Optional[str] = Query(None, description="Фильтр по приоритету"),
-    type_filter: Optional[str] = Query(None, description="Фильтр по типу"),
+    status_id: Optional[int] = Query(None, description="Фильтр по ID статуса"),
+    priority_id: Optional[int] = Query(None, description="Фильтр по ID приоритета"),
+    type_id: Optional[int] = Query(None, description="Фильтр по ID типа"),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, le=1000, description="Максимальное количество возвращаемых записей"
     ),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Поиск требований по различным критериям.
@@ -37,168 +39,147 @@ async def search_requirements(
     Args:
         query: Поисковый запрос (ищет в названии и описании)
         project_id: Фильтр по ID проекта
-        status_filter: Фильтр по статусу (draft, active, in_review, approved, archived)
-        priority_filter: Фильтр по приоритету (low, medium, high, critical)
-        type_filter: Фильтр по типу (functional, non_functional, business)
+        status_id: Фильтр по ID статуса
+        priority_id: Фильтр по ID приоритета
+        type_id: Фильтр по ID типа
         skip: Количество пропускаемых записей
         limit: Максимальное количество возвращаемых записей
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        List[dict]: Отфильтрованный список требований
+        List[schemas.Requirement]: Отфильтрованный список требований
     """
-    # TODO: Реализовать реальный поиск в БД с использованием full-text search
-    # Пока возвращаем тестовые данные, отфильтрованные по запросу
+    filters = {}
+    if project_id:
+        filters["project_id"] = project_id
+    if status_id:
+        filters["status_id"] = status_id
+    if priority_id:
+        filters["priority_id"] = priority_id
+    if type_id:
+        filters["type_id"] = type_id
 
-    mock_requirements = [
-        {
-            "id": 1,
-            "title": "Система авторизации пользователей",
-            "description": "Требование к реализации системы входа в приложение",
-            "status": "active",
-            "priority": "high",
-            "type": "functional",
-            "project_id": 1,
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
-        },
-        {
-            "id": 2,
-            "title": "API для управления требованиями",
-            "description": "Создание REST API для CRUD операций с требованиями",
-            "status": "draft",
-            "priority": "medium",
-            "type": "functional",
-            "project_id": 1,
-            "created_at": "2024-01-02T00:00:00Z",
-            "updated_at": "2024-01-02T00:00:00Z",
-        },
-        {
-            "id": 3,
-            "title": "Интеграция с системой тестирования",
-            "description": "Подключение к внешней АСУТс для автоматического обновления статусов",
-            "status": "in_review",
-            "priority": "high",
-            "type": "non_functional",
-            "project_id": 2,
-            "created_at": "2024-01-03T00:00:00Z",
-            "updated_at": "2024-01-03T00:00:00Z",
-        },
-    ]
-
-    # Фильтрация по поисковому запросу (в названии или описании)
-    filtered_requirements = []
-    for req in mock_requirements:
-        if (
-            query.lower() in req["title"].lower()
-            or query.lower() in req["description"].lower()
-        ):
-            filtered_requirements.append(req)
-
-    # Применение дополнительных фильтров
-    if project_id is not None:
-        filtered_requirements = [
-            req for req in filtered_requirements if req["project_id"] == project_id
-        ]
-
-    if status_filter:
-        filtered_requirements = [
-            req for req in filtered_requirements if req["status"] == status_filter
-        ]
-
-    if priority_filter:
-        filtered_requirements = [
-            req for req in filtered_requirements if req["priority"] == priority_filter
-        ]
-
-    if type_filter:
-        filtered_requirements = [
-            req for req in filtered_requirements if req["type"] == type_filter
-        ]
-
-    # Применение пагинации
-    return filtered_requirements[skip : skip + limit]
+    requirements = await crud.requirement.search_requirements(
+        db, search_term=query, skip=skip, limit=limit, **filters
+    )
+    return requirements
 
 
-@router.get("/", response_model=List[dict])
+@router.get("/", response_model=List[schemas.Requirement])
 async def get_requirements(
-    skip: int = 0,
-    limit: int = 100,
-    project_id: Optional[int] = None,
-    status_filter: Optional[str] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    project_id: Optional[int] = Query(None, description="Фильтр по ID проекта"),
+    status_id: Optional[int] = Query(None, description="Фильтр по ID статуса"),
+    priority_id: Optional[int] = Query(None, description="Фильтр по ID приоритета"),
+    type_id: Optional[int] = Query(None, description="Фильтр по ID типа"),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
-    Получить список требований.
+    Получить список требований с фильтрацией.
 
     Args:
         skip: Количество пропускаемых записей
         limit: Максимальное количество возвращаемых записей
         project_id: Фильтр по ID проекта
-        status_filter: Фильтр по статусу
+        status_id: Фильтр по ID статуса
+        priority_id: Фильтр по ID приоритета
+        type_id: Фильтр по ID типа
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        List[dict]: Список требований
+        List[schemas.Requirement]: Список требований
     """
-    # TODO: Реализовать получение требований из БД с фильтрацией
-    return [
-        {
-            "id": 1,
-            "title": "Требование 1",
-            "description": "Описание требования 1",
-            "status": "active",
-            "priority": "high",
-            "type": "functional",
-            "project_id": 1,
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
-        }
-    ]
+    filters = {}
+    if status_id:
+        filters["status_id"] = status_id
+    if priority_id:
+        filters["priority_id"] = priority_id
+    if type_id:
+        filters["type_id"] = type_id
+
+    if project_id:
+        requirements = await crud.requirement.get_by_project(
+            db, project_id=project_id, skip=skip, limit=limit, **filters
+        )
+    else:
+        requirements = await crud.requirement.get_multi_with_filters(
+            db, skip=skip, limit=limit, **filters
+        )
+
+    return requirements
 
 
-@router.post("/", response_model=dict, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=schemas.Requirement, status_code=status.HTTP_201_CREATED
+)
 async def create_requirement(
-    requirement_data: dict,
+    requirement_in: schemas.RequirementCreate,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Создать новое требование.
 
     Args:
-        requirement_data: Данные требования
+        requirement_in: Данные создаваемого требования
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        dict: Созданное требование
+        schemas.Requirement: Созданное требование
+
+    Raises:
+        HTTPException: Если проект не найден или ссылочные данные некорректны
     """
-    # TODO: Реализовать создание требования
-    return {
-        "id": 2,
-        "title": requirement_data.get("title"),
-        "description": requirement_data.get("description"),
-        "status": "draft",
-        "priority": requirement_data.get("priority", "medium"),
-        "type": requirement_data.get("type", "functional"),
-        "project_id": requirement_data.get("project_id"),
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    # Проверяем существование проекта
+    project = await crud.project.get(db, id=requirement_in.project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+        )
+
+    # Проверяем существование типа, приоритета и статуса
+    if requirement_in.type_id:
+        req_type = await crud.requirement_type.get(db, id=requirement_in.type_id)
+        if not req_type:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Тип требования не найден"
+            )
+
+    if requirement_in.priority_id:
+        priority = await crud.requirement_priority.get(
+            db, id=requirement_in.priority_id
+        )
+        if not priority:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Приоритет требования не найден",
+            )
+
+    if requirement_in.status_id:
+        status_obj = await crud.requirement_status.get(db, id=requirement_in.status_id)
+        if not status_obj:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Статус требования не найден",
+            )
+
+    requirement = await crud.requirement.create(db, obj_in=requirement_in)
+    return requirement
 
 
-@router.get("/{requirement_id}", response_model=dict)
+@router.get("/{requirement_id}", response_model=schemas.RequirementWithDetails)
 async def get_requirement(
     requirement_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
-    Получить требование по ID.
+    Получить требование по ID с подробной информацией.
 
     Args:
         requirement_id: ID требования
@@ -206,78 +187,99 @@ async def get_requirement(
         current_user: Текущий пользователь
 
     Returns:
-        dict: Данные требования
+        schemas.RequirementWithDetails: Требование с дополнительной информацией
 
     Raises:
         HTTPException: Если требование не найдено
     """
-    # TODO: Реализовать получение требования по ID
-    if requirement_id != 1:
+    requirement = await crud.requirement.get_with_details(
+        db, requirement_id=requirement_id
+    )
+    if not requirement:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
-
-    return {
-        "id": 1,
-        "title": "Требование 1",
-        "description": "Подробное описание требования 1",
-        "status": "active",
-        "priority": "high",
-        "type": "functional",
-        "project_id": 1,
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    return requirement
 
 
-@router.put("/{requirement_id}", response_model=dict)
+@router.put("/{requirement_id}", response_model=schemas.Requirement)
 async def update_requirement(
     requirement_id: int,
-    requirement_data: dict,
+    requirement_in: schemas.RequirementUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Обновить данные требования.
 
     Args:
         requirement_id: ID требования
-        requirement_data: Обновленные данные требования
+        requirement_in: Обновленные данные требования
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        dict: Обновленные данные требования
+        schemas.Requirement: Обновленное требование
 
     Raises:
-        HTTPException: Если требование не найдено
+        HTTPException: Если требование не найдено или ссылочные данные некорректны
     """
-    # TODO: Реализовать обновление требования
-    if requirement_id != 1:
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
 
-    return {
-        "id": requirement_id,
-        "title": requirement_data.get("title", "Требование 1"),
-        "description": requirement_data.get(
-            "description", "Подробное описание требования 1"
-        ),
-        "status": requirement_data.get("status", "active"),
-        "priority": requirement_data.get("priority", "high"),
-        "type": requirement_data.get("type", "functional"),
-        "project_id": requirement_data.get("project_id", 1),
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    # Проверяем ссылочные данные, если они изменяются
+    if (
+        requirement_in.project_id
+        and requirement_in.project_id != requirement.project_id
+    ):
+        project = await crud.project.get(db, id=requirement_in.project_id)
+        if not project:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+            )
+
+    if requirement_in.type_id and requirement_in.type_id != requirement.type_id:
+        req_type = await crud.requirement_type.get(db, id=requirement_in.type_id)
+        if not req_type:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Тип требования не найден"
+            )
+
+    if (
+        requirement_in.priority_id
+        and requirement_in.priority_id != requirement.priority_id
+    ):
+        priority = await crud.requirement_priority.get(
+            db, id=requirement_in.priority_id
+        )
+        if not priority:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Приоритет требования не найден",
+            )
+
+    if requirement_in.status_id and requirement_in.status_id != requirement.status_id:
+        status_obj = await crud.requirement_status.get(db, id=requirement_in.status_id)
+        if not status_obj:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Статус требования не найден",
+            )
+
+    requirement = await crud.requirement.update(
+        db, db_obj=requirement, obj_in=requirement_in
+    )
+    return requirement
 
 
 @router.delete("/{requirement_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_requirement(
     requirement_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Удалить требование.
@@ -290,120 +292,102 @@ async def delete_requirement(
     Raises:
         HTTPException: Если требование не найдено
     """
-    # TODO: Реализовать удаление требования
-    if requirement_id != 1:
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
 
-    # Пока ничего не удаляем, только возвращаем успешный статус
-    pass
+    await crud.requirement.remove(db, id=requirement_id)
 
 
-@router.post("/{requirement_id}/change-status", response_model=dict)
+@router.post("/{requirement_id}/change-status", response_model=schemas.Requirement)
 async def change_requirement_status(
     requirement_id: int,
-    new_status: str,
+    status_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Изменить статус требования.
 
     Args:
         requirement_id: ID требования
-        new_status: Новый статус
+        status_id: ID нового статуса
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        dict: Обновленные данные требования
+        schemas.Requirement: Требование с обновленным статусом
 
     Raises:
-        HTTPException: Если требование не найдено
+        HTTPException: Если требование или статус не найдены
     """
-    # TODO: Реализовать изменение статуса требования
-    if requirement_id != 1:
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
 
-    # Проверяем допустимые статусы
-    valid_statuses = [
-        "draft",
-        "active",
-        "under_review",
-        "approved",
-        "implemented",
-        "tested",
-        "deprecated",
-    ]
-    if new_status not in valid_statuses:
+    # Проверяем существование статуса
+    status_obj = await crud.requirement_status.get(db, id=status_id)
+    if not status_obj:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid status. Valid statuses: {', '.join(valid_statuses)}",
+            status_code=status.HTTP_404_NOT_FOUND, detail="Статус требования не найден"
         )
 
-    return {
-        "id": requirement_id,
-        "title": "Требование 1",
-        "description": "Подробное описание требования 1",
-        "status": new_status,
-        "priority": "high",
-        "type": "functional",
-        "project_id": 1,
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    requirement = await crud.requirement.update_status(
+        db, requirement_id=requirement_id, status_id=status_id
+    )
+    return requirement
 
 
-@router.get("/{requirement_id}/tests", response_model=List[dict])
+@router.get("/{requirement_id}/tests", response_model=List[schemas.TestResult])
 async def get_requirement_tests(
     requirement_id: int,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
-    Получить тесты для требования.
+    Получить результаты тестов для требования.
 
     Args:
         requirement_id: ID требования
+        skip: Количество пропускаемых записей
+        limit: Максимальное количество записей
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        List[dict]: Список тестов для требования
+        List[schemas.TestResult]: Список результатов тестов
 
     Raises:
         HTTPException: Если требование не найдено
     """
-    # TODO: Реализовать получение тестов для требования
-    if requirement_id != 1:
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
 
-    return [
-        {
-            "id": 1,
-            "name": "Тест для требования 1",
-            "description": "Описание теста",
-            "status": "passed",
-            "result": "success",
-            "requirement_id": requirement_id,
-            "executed_at": "2024-01-01T00:00:00Z",
-        }
-    ]
+    tests = await crud.test_result.get_by_requirement(
+        db, requirement_id=requirement_id, skip=skip, limit=limit
+    )
+    return tests
 
 
-@router.get("/{requirement_id}/relationships", response_model=List[dict])
+@router.get(
+    "/{requirement_id}/relationships", response_model=List[schemas.Relationship]
+)
 async def get_requirement_relationships(
     requirement_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
-    Получить связи требования.
+    Получить связи требования с другими требованиями.
 
     Args:
         requirement_id: ID требования
@@ -411,23 +395,76 @@ async def get_requirement_relationships(
         current_user: Текущий пользователь
 
     Returns:
-        List[dict]: Список связей требования
+        List[schemas.Relationship]: Список связей
 
     Raises:
         HTTPException: Если требование не найдено
     """
-    # TODO: Реализовать получение связей требования
-    if requirement_id != 1:
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Требование не найдено"
         )
 
-    return [
-        {
-            "id": 1,
-            "source_requirement_id": requirement_id,
-            "target_requirement_id": 2,
-            "relationship_type": "depends_on",
-            "description": "Зависит от требования 2",
-        }
-    ]
+    relationships = await crud.relationship.get_by_requirement(
+        db, requirement_id=requirement_id
+    )
+    return relationships
+
+
+@router.post(
+    "/{requirement_id}/relationships",
+    response_model=schemas.Relationship,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_requirement_relationship(
+    requirement_id: int,
+    relationship_in: schemas.RelationshipCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Создать связь между требованиями.
+
+    Args:
+        requirement_id: ID исходного требования
+        relationship_in: Данные создаваемой связи
+        db: Сессия базы данных
+        current_user: Текущий пользователь
+
+    Returns:
+        schemas.Relationship: Созданная связь
+
+    Raises:
+        HTTPException: Если требования или тип связи не найдены
+    """
+    # Проверяем существование исходного требования
+    source_requirement = await crud.requirement.get(db, id=requirement_id)
+    if not source_requirement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Исходное требование не найдено",
+        )
+
+    # Проверяем существование целевого требования
+    target_requirement = await crud.requirement.get(
+        db, id=relationship_in.target_requirement_id
+    )
+    if not target_requirement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Целевое требование не найдено",
+        )
+
+    # Проверяем существование типа связи
+    relationship_type = await crud.relationship_type.get(db, id=relationship_in.type_id)
+    if not relationship_type:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Тип связи не найден"
+        )
+
+    # Устанавливаем ID исходного требования
+    relationship_in.source_requirement_id = requirement_id
+
+    relationship = await crud.relationship.create(db, obj_in=relationship_in)
+    return relationship

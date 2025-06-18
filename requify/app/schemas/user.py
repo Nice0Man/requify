@@ -1,65 +1,68 @@
-from datetime import datetime, UTC
-from typing import Optional
-from uuid import UUID
+"""
+Схемы для модели User.
+"""
 
-from pydantic import BaseModel, EmailStr, Field
+from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
 
 
 class UserBase(BaseModel):
-    """
-    Базовая схема пользователя.
-    """
+    """Базовая схема пользователя."""
 
-    email: EmailStr
-    full_name: str = Field(..., min_length=2, max_length=100)
-    is_active: bool = True
-    is_admin: bool = False
+    username: str = Field(
+        ..., min_length=2, max_length=50, description="Имя пользователя"
+    )
+    email: EmailStr = Field(..., description="Email пользователя")
+    role: str = Field(..., min_length=1, max_length=20, description="Роль пользователя")
 
 
 class UserCreate(UserBase):
-    """
-    Схема для создания пользователя.
-    """
+    """Схема для создания пользователя."""
 
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=8, description="Пароль пользователя")
 
 
-class UserUpdate(UserBase):
-    """
-    Схема для обновления пользователя.
-    """
+class UserUpdate(BaseModel):
+    """Схема для обновления пользователя."""
 
-    email: Optional[EmailStr] = None
-    full_name: Optional[str] = Field(None, min_length=2, max_length=100)
-    is_active: Optional[bool] = None
-    is_admin: Optional[bool] = None
-    password: Optional[str] = Field(None, min_length=8)
+    username: Optional[str] = Field(
+        None, min_length=2, max_length=50, description="Имя пользователя"
+    )
+    email: Optional[EmailStr] = Field(None, description="Email пользователя")
+    role: Optional[str] = Field(
+        None, min_length=1, max_length=20, description="Роль пользователя"
+    )
+    password: Optional[str] = Field(
+        None, min_length=8, description="Пароль пользователя"
+    )
 
 
 class UserInDBBase(UserBase):
-    """
-    Базовая схема пользователя с данными из БД.
-    """
+    """Базовая схема пользователя с данными из БД."""
 
-    id: UUID
+    id: int
     created_at: datetime
-    updated_at: datetime
 
     class Config:
         from_attributes = True
 
 
 class User(UserInDBBase):
-    """
-    Схема для возврата пользователя API.
-    """
+    """Схема пользователя для ответов API."""
 
     pass
 
 
-class UserInDB(UserInDBBase):
-    """
-    Схема пользователя в БД.
-    """
+class UserWithStats(User):
+    """Схема пользователя со статистикой."""
 
-    hashed_password: str
+    authored_requirements_count: int = 0
+    modified_requirements_count: int = 0
+    comments_count: int = 0
+
+
+class UserInDB(UserInDBBase):
+    """Схема пользователя в БД."""
+
+    hashed_password: str = Field(..., description="Хэшированный пароль")

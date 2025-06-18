@@ -10,26 +10,40 @@ from requify.app.core.config import settings
 
 # Создаем синхронный движок для соединения с основной базой данных
 engine = create_engine(
-    settings.DATABASE_URI,
-    pool_size=settings.DB_POOL_SIZE,
-    max_overflow=settings.DB_MAX_OVERFLOW,
-    pool_pre_ping=settings.DB_POOL_PRE_PING,
-    pool_recycle=settings.DB_POOL_RECYCLE,
-    echo=settings.DEBUG,
-    # Упрощенные настройки для Windows совместимости
+    settings.db.sync_url,
+    pool_size=settings.db.pool_size,
+    max_overflow=settings.db.max_overflow,
+    pool_pre_ping=settings.db.pool_pre_ping,
+    pool_recycle=settings.db.pool_recycle,
+    echo=settings.db.echo,
+    # Настройки для стабильного соединения
     pool_timeout=30,
+    pool_reset_on_return="commit",
+    connect_args={
+        "client_encoding": "utf8",
+        "connect_timeout": 10,
+        "options": "-c client_encoding=utf8",
+    },
 )
 
 # Создаем асинхронный движок для соединения с основной базой данных
 async_engine = create_async_engine(
-    settings.ASYNC_DATABASE_URI,
-    pool_size=settings.DB_POOL_SIZE,
-    max_overflow=settings.DB_MAX_OVERFLOW,
-    pool_pre_ping=settings.DB_POOL_PRE_PING,
-    pool_recycle=settings.DB_POOL_RECYCLE,
-    echo=settings.DEBUG,
-    # Упрощенные настройки для Windows совместимости
+    settings.db.async_url,
+    pool_size=settings.db.pool_size,
+    max_overflow=settings.db.max_overflow,
+    pool_pre_ping=settings.db.pool_pre_ping,
+    pool_recycle=settings.db.pool_recycle,
+    echo=settings.db.echo,
+    # Настройки для стабильного асинхронного соединения
     pool_timeout=30,
+    pool_reset_on_return="commit",
+    connect_args={
+        "server_settings": {
+            "client_encoding": "utf8",
+            "application_name": "requify_app",
+        },
+        "command_timeout": 60,
+    },
 )
 
 # Создаем фабрику синхронных сессий для основной БД
@@ -48,23 +62,34 @@ AsyncSessionLocal = async_sessionmaker(
 
 # Создаем движки для тестовой базы данных
 test_engine = create_engine(
-    settings.TEST_DATABASE_URI,
+    settings.test_db.sync_url,
     pool_size=5,  # Меньший пул для тестов
     max_overflow=5,
     pool_pre_ping=True,
     pool_recycle=3600,
-    echo=settings.DEBUG,
+    echo=settings.test_db.echo,
     pool_timeout=30,
+    pool_reset_on_return="commit",
+    connect_args={
+        "server_side_cursors": False,
+        "prepared_statement_cache_size": 0,
+    },
 )
 
 test_async_engine = create_async_engine(
-    settings.TEST_ASYNC_DATABASE_URI,
+    settings.test_db.async_url,
     pool_size=5,  # Меньший пул для тестов
     max_overflow=5,
     pool_pre_ping=True,
     pool_recycle=3600,
-    echo=settings.DEBUG,
+    echo=settings.test_db.echo,
     pool_timeout=30,
+    pool_reset_on_return="commit",
+    connect_args={
+        "server_side_cursors": False,
+        "prepared_statement_cache_size": 0,
+        "command_timeout": 60,
+    },
 )
 
 # Создаем фабрики сессий для тестовой БД

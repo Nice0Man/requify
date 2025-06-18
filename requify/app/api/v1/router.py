@@ -6,8 +6,15 @@
 
 from fastapi import APIRouter
 
-from requify.app.core.config import settings
-from .endpoints import users, projects, requirements, releases, testing, admin
+from .endpoints import (
+    users,
+    projects,
+    requirements,
+    releases,
+    testing,
+    admin,
+    reference,
+)
 
 # Создаем основной роутер для API v1
 api_router = APIRouter()
@@ -26,6 +33,8 @@ api_router.include_router(releases.router, prefix="/releases", tags=["releases"]
 api_router.include_router(testing.router, prefix="/testing", tags=["testing"])
 
 api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
+
+api_router.include_router(reference.router, prefix="/reference", tags=["reference"])
 
 
 @api_router.get("/")

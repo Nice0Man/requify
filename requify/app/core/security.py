@@ -35,9 +35,9 @@ def create_access_token(
         str: JWT токен
     """
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = lambda: datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
+        expire = lambda: datetime.now(UTC) + timedelta(
             minutes=settings.auth.access_token_expire_minutes
         )
 
@@ -60,9 +60,9 @@ def create_refresh_token(
         str: JWT refresh токен
     """
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = lambda: datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
+        expire = lambda: datetime.now(UTC) + timedelta(
             days=settings.auth.refresh_token_expire_days
         )
 
@@ -126,7 +126,7 @@ def generate_password_reset_token(email: str) -> str:
         str: Токен для сброса пароля
     """
     delta = timedelta(hours=settings.auth.email_reset_token_expire_hours)
-    now = datetime.utcnow()
+    now = lambda: datetime.now(UTC)
     expires = now + delta
 
     exp = expires.timestamp()

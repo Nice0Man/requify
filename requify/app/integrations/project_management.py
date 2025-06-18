@@ -334,7 +334,7 @@ class ProjectManagementIntegration:
                 "requirement_id": requirement_id,
                 "change_type": change_type,
                 "details": details,
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": lambda: datetime.now(UTC).isoformat(),
             }
 
             await self._make_request(
@@ -353,9 +353,9 @@ class ProjectManagementIntegration:
     async def health_check(self) -> Dict[str, Any]:
         """Проверяет состояние внешней системы"""
         try:
-            start_time = datetime.utcnow()
+            start_time = lambda: datetime.now(UTC)
             response = await self._make_request("GET", "/health")
-            end_time = datetime.utcnow()
+            end_time = lambda: datetime.now(UTC)
 
             response_time = (end_time - start_time).total_seconds()
 
@@ -370,7 +370,7 @@ class ProjectManagementIntegration:
             return {
                 "status": "unhealthy",
                 "error": str(e),
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": lambda: datetime.now(UTC).isoformat(),
             }
 
     def _parse_date(self, date_str: Optional[str]) -> Optional[datetime]:

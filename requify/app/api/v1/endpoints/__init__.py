@@ -10,3 +10,4 @@ from .releases import router as releases_router
 from .users import router as users_router
 from .testing import router as testing_router
 from .admin import router as admin_router
+from .reference import router as reference_router

@@ -198,7 +198,7 @@ class ReportingService:
         return ReportData(
             title="Отчёт по статусам требований",
             description="Сводка по текущим статусам всех требований в системе",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -252,7 +252,7 @@ class ReportingService:
         return ReportData(
             title="Отчёт по требованиям в разрезе проектов",
             description="Статистика выполнения требований по проектам",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -307,7 +307,7 @@ class ReportingService:
         return ReportData(
             title="Отчёт по требованиям в разрезе пользователей",
             description="Статистика работы пользователей с требованиями",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -354,12 +354,12 @@ class ReportingService:
         return ReportData(
             title="Отчёт по прогрессу проектов",
             description="Анализ текущего состояния и прогресса проектов",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
             data=progress_data,
-            metadata={"analysis_date": datetime.utcnow().isoformat()},
+            metadata={"analysis_date": lambda: datetime.now(UTC).isoformat()},
         )
 
     async def _generate_testing_results_report(
@@ -412,7 +412,7 @@ class ReportingService:
         return ReportData(
             title="Отчёт по результатам тестирования",
             description="Сводка результатов тестирования требований",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -453,7 +453,7 @@ class ReportingService:
         return ReportData(
             title="Обзор дедлайнов",
             description="Анализ приближающихся и просроченных дедлайнов",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -491,7 +491,7 @@ class ReportingService:
         return ReportData(
             title="История изменений",
             description="Детализированная история всех изменений в системе",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -538,7 +538,7 @@ class ReportingService:
         return ReportData(
             title="Метрики производительности",
             description="Ключевые показатели эффективности системы",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -577,7 +577,7 @@ class ReportingService:
         return ReportData(
             title="Активность пользователей",
             description="Статистика активности и вовлечённости пользователей",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,
@@ -610,7 +610,7 @@ class ReportingService:
         return ReportData(
             title="Полный экспорт данных",
             description="Экспорт всех данных системы для резервного копирования",
-            generated_at=datetime.utcnow(),
+            generated_at=lambda: datetime.now(UTC),
             generated_by=generated_by,
             filters_applied=self._serialize_filters(filters),
             summary=summary,

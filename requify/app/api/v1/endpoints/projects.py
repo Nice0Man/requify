@@ -5,83 +5,96 @@ API эндпоинты для работы с проектами.
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from requify.app.api.deps import get_db, get_current_user
 from requify.app.core.config import settings
+from requify.app import crud, schemas
+from requify.app.models.user import User
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[dict])
+@router.get("/", response_model=List[schemas.Project])
 async def get_projects(
-    skip: int = 0,
-    limit: int = 100,
+    skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
+    limit: int = Query(
+        100, ge=1, le=1000, description="Максимальное количество записей"
+    ),
+    status: Optional[str] = Query(None, description="Фильтр по статусу"),
+    search: Optional[str] = Query(None, description="Поиск по названию или описанию"),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
-    Получить список проектов.
+    Получить список проектов с фильтрацией и поиском.
 
     Args:
         skip: Количество пропускаемых записей
         limit: Максимальное количество возвращаемых записей
+        status: Фильтр по статусу проекта
+        search: Поисковый запрос
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        List[dict]: Список проектов
+        List[schemas.Project]: Список проектов
     """
-    # TODO: Реализовать получение проектов из БД
-    return [
-        {
-            "id": 1,
-            "name": "Проект 1",
-            "description": "Описание первого проекта",
-            "status": "active",
-            "created_at": "2024-01-01T00:00:00Z",
-            "updated_at": "2024-01-01T00:00:00Z",
-        }
-    ]
+    if search:
+        projects = await crud.project.search_projects(
+            db, search_term=search, skip=skip, limit=limit
+        )
+    elif status:
+        projects = await crud.project.get_by_status(
+            db, status=status, skip=skip, limit=limit
+        )
+    else:
+        projects = await crud.project.get_multi(db, skip=skip, limit=limit)
+
+    return projects
 
 
-@router.post("/", response_model=dict, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=schemas.Project, status_code=status.HTTP_201_CREATED)
 async def create_project(
-    project_data: dict,
+    project_in: schemas.ProjectCreate,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Создать новый проект.
 
     Args:
-        project_data: Данные проекта
+        project_in: Данные создаваемого проекта
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        dict: Созданный проект
+        schemas.Project: Созданный проект
+
+    Raises:
+        HTTPException: Если проект с таким кодом уже существует
     """
-    # TODO: Реализовать создание проекта
-    return {
-        "id": 2,
-        "name": project_data.get("name"),
-        "description": project_data.get("description"),
-        "status": "active",
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    # Проверяем уникальность кода проекта
+    existing_project = await crud.project.get_by_code(db, code=project_in.code)
+    if existing_project:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Проект с таким кодом уже существует",
+        )
+
+    project = await crud.project.create(db, obj_in=project_in)
+    return project
 
 
-@router.get("/{project_id}", response_model=dict)
+@router.get("/{project_id}", response_model=schemas.ProjectWithStats)
 async def get_project(
     project_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
-    Получить проект по ID.
+    Получить проект по ID с подробной информацией.
 
     Args:
         project_id: ID проекта
@@ -89,70 +102,65 @@ async def get_project(
         current_user: Текущий пользователь
 
     Returns:
-        dict: Данные проекта
+        schemas.ProjectWithStats: Проект с дополнительной информацией
 
     Raises:
         HTTPException: Если проект не найден
     """
-    # TODO: Реализовать получение проекта по ID
-    if project_id != 1:
+    project = await crud.project.get_with_stats(db, project_id=project_id)
+    if not project:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
-
-    return {
-        "id": 1,
-        "name": "Проект 1",
-        "description": "Описание первого проекта",
-        "status": "active",
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    return project
 
 
-@router.put("/{project_id}", response_model=dict)
+@router.put("/{project_id}", response_model=schemas.Project)
 async def update_project(
     project_id: int,
-    project_data: dict,
+    project_in: schemas.ProjectUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Обновить данные проекта.
 
     Args:
         project_id: ID проекта
-        project_data: Обновленные данные проекта
+        project_in: Обновленные данные проекта
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        dict: Обновленные данные проекта
+        schemas.Project: Обновленный проект
 
     Raises:
-        HTTPException: Если проект не найден
+        HTTPException: Если проект не найден или код уже используется
     """
-    # TODO: Реализовать обновление проекта
-    if project_id != 1:
+    project = await crud.project.get(db, id=project_id)
+    if not project:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
-    return {
-        "id": project_id,
-        "name": project_data.get("name", "Проект 1"),
-        "description": project_data.get("description", "Описание первого проекта"),
-        "status": project_data.get("status", "active"),
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    # Проверяем уникальность кода, если он изменился
+    if project_in.code and project_in.code != project.code:
+        existing_project = await crud.project.get_by_code(db, code=project_in.code)
+        if existing_project:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Проект с таким кодом уже существует",
+            )
+
+    project = await crud.project.update(db, db_obj=project, obj_in=project_in)
+    return project
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_project(
     project_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Удалить проект.
@@ -165,87 +173,126 @@ async def delete_project(
     Raises:
         HTTPException: Если проект не найден
     """
-    # TODO: Реализовать удаление проекта
-    if project_id != 1:
+    project = await crud.project.get(db, id=project_id)
+    if not project:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
-    # Пока ничего не удаляем, только возвращаем успешный статус
-    pass
+    await crud.project.remove(db, id=project_id)
 
 
-@router.get("/{project_id}/requirements", response_model=List[dict])
+@router.get("/{project_id}/requirements", response_model=List[schemas.Requirement])
 async def get_project_requirements(
     project_id: int,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    status_id: Optional[int] = Query(None, description="Фильтр по статусу"),
+    type_id: Optional[int] = Query(None, description="Фильтр по типу"),
+    priority_id: Optional[int] = Query(None, description="Фильтр по приоритету"),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
-    Получить требования проекта.
+    Получить требования проекта с фильтрацией.
 
     Args:
         project_id: ID проекта
+        skip: Количество пропускаемых записей
+        limit: Максимальное количество записей
+        status_id: Фильтр по ID статуса
+        type_id: Фильтр по ID типа
+        priority_id: Фильтр по ID приоритета
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        List[dict]: Список требований проекта
+        List[schemas.Requirement]: Список требований проекта
 
     Raises:
         HTTPException: Если проект не найден
     """
-    # TODO: Реализовать получение требований проекта
-    if project_id != 1:
+    project = await crud.project.get(db, id=project_id)
+    if not project:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
-    return [
-        {
-            "id": 1,
-            "title": "Требование 1",
-            "description": "Описание требования 1",
-            "status": "active",
-            "priority": "high",
-            "project_id": project_id,
-        }
-    ]
+    filters = {}
+    if status_id:
+        filters["status_id"] = status_id
+    if type_id:
+        filters["type_id"] = type_id
+    if priority_id:
+        filters["priority_id"] = priority_id
+
+    requirements = await crud.requirement.get_by_project(
+        db, project_id=project_id, skip=skip, limit=limit, **filters
+    )
+    return requirements
 
 
-@router.get("/{project_id}/releases", response_model=List[dict])
+@router.get("/{project_id}/releases", response_model=List[schemas.Release])
 async def get_project_releases(
     project_id: int,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """
     Получить релизы проекта.
 
     Args:
         project_id: ID проекта
+        skip: Количество пропускаемых записей
+        limit: Максимальное количество записей
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
-        List[dict]: Список релизов проекта
+        List[schemas.Release]: Список релизов проекта
 
     Raises:
         HTTPException: Если проект не найден
     """
-    # TODO: Реализовать получение релизов проекта
-    if project_id != 1:
+    project = await crud.project.get(db, id=project_id)
+    if not project:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
-    return [
-        {
-            "id": 1,
-            "name": "Релиз 1.0.0",
-            "version": "1.0.0",
-            "status": "released",
-            "release_date": "2024-01-01T00:00:00Z",
-            "project_id": project_id,
-        }
-    ]
+    releases = await crud.release.get_by_project(
+        db, project_id=project_id, skip=skip, limit=limit
+    )
+    return releases
+
+
+@router.get("/{project_id}/stats", response_model=dict)
+async def get_project_stats(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Получить статистику проекта.
+
+    Args:
+        project_id: ID проекта
+        db: Сессия базы данных
+        current_user: Текущий пользователь
+
+    Returns:
+        dict: Статистика проекта
+
+    Raises:
+        HTTPException: Если проект не найден
+    """
+    project = await crud.project.get(db, id=project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+        )
+
+    stats = await crud.project.get_project_statistics(db, project_id=project_id)
+    return stats

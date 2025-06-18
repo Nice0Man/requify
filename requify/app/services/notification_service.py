@@ -370,7 +370,7 @@ class NotificationService:
                     requirement.project.name if requirement.project else "Неизвестный"
                 ),
                 "changed_by": changed_by.name,
-                "changed_at": datetime.utcnow().strftime("%d.%m.%Y %H:%M"),
+                "changed_at": lambda:  datetime.now(UTC).strftime("%d.%m.%Y %H:%M"),
                 "requirement_url": f"{settings.app_host}/requirements/{requirement.id}",
             },
             channels=[NotificationChannel.EMAIL, NotificationChannel.IN_APP],
@@ -426,7 +426,7 @@ class NotificationService:
         self, requirement: Requirement, deadline: datetime, recipients: List[User]
     ) -> Dict[str, Any]:
         """Уведомляет о приближающемся дедлайне"""
-        time_left = deadline - datetime.utcnow()
+        time_left = deadline - lambda:  datetime.now(UTC)
 
         if time_left.days > 0:
             time_left_str = f"{time_left.days} дней"
@@ -505,7 +505,7 @@ class NotificationService:
                     else comment_text
                 ),
                 "comment_author": comment_author.name,
-                "comment_time": datetime.utcnow().strftime("%d.%m.%Y %H:%M"),
+                "comment_time": lambda:  datetime.now(UTC).strftime("%d.%m.%Y %H:%M"),
                 "requirement_url": f"{settings.app_host}/requirements/{requirement.id}",
             },
             channels=[NotificationChannel.EMAIL, NotificationChannel.IN_APP],

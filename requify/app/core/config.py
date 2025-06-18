@@ -62,7 +62,7 @@ class DatabaseConfig(BaseModel):
     user: str = "postgres"
     host: str = "localhost"
     port: int = 5432
-    
+
     # Connection pool settings
     pool_size: int = 20
     max_overflow: int = 10
@@ -74,7 +74,7 @@ class DatabaseConfig(BaseModel):
     @property
     def sync_url(self) -> str:
         return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
-    
+
     @property
     def async_url(self) -> str:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
@@ -94,7 +94,7 @@ class TestDatabaseConfig(BaseModel):
     user: str = "postgres"
     host: str = "localhost"
     port: int = 5433
-    
+
     # Connection pool settings
     pool_size: int = 20
     max_overflow: int = 10
@@ -106,7 +106,7 @@ class TestDatabaseConfig(BaseModel):
     @property
     def sync_url(self) -> str:
         return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
-    
+
     @property
     def async_url(self) -> str:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
@@ -177,39 +177,39 @@ class Settings(BaseSettings):
         env_prefix="APP_CONFIG__",
         extra="allow",
     )
-    
+
     # Main app config
     app_config: RunConfig = Field(default_factory=RunConfig)
-    
+
     # Database configs
     db: DatabaseConfig = Field(default_factory=DatabaseConfig)
     test_db: TestDatabaseConfig = Field(default_factory=TestDatabaseConfig)
-    
+
     # Security
     security: SecurityConfig = Field(default_factory=SecurityConfig)
-    
+
     # CORS origins
     cors_origins: List[str] = [
         "http://localhost:3000",
-        "http://localhost:8080", 
-        "http://127.0.0.1:3000"
+        "http://localhost:8080",
+        "http://127.0.0.1:3000",
     ]
-    
+
     # Admin user
     admin: AdminConfig = Field(default_factory=AdminConfig)
-    
+
     # Integrations
     integrations: IntegrationsConfig = Field(default_factory=IntegrationsConfig)
-    
+
     # Logging
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
-    
+
     # Redis
     redis: RedisConfig = Field(default_factory=RedisConfig)
-    
+
     # Email
     email: EmailConfig = Field(default_factory=EmailConfig)
-    
+
     # File storage
     file_storage: FileStorageConfig = Field(default_factory=FileStorageConfig)
 

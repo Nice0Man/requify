@@ -5,15 +5,18 @@
 """
 
 import pytest
+import pytest_asyncio
+
+# Configure pytest-asyncio mode
+pytestmark = pytest.mark.asyncio(mode="auto")
 import asyncio
 from typing import AsyncGenerator
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 from requify.app.main import app
 from requify.app.core.config import settings
-from requify.app.db.base import Base
+from requify.app.models.base import Base
 from requify.app.api.deps import get_db
 
 
@@ -21,15 +24,7 @@ from requify.app.api.deps import get_db
 TEST_DATABASE_URL = settings.test_db.async_url
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Создать event loop для всех тестов."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture
 async def test_engine():
     """Создать тестовый движок БД."""
     engine = create_async_engine(TEST_DATABASE_URL, echo=False)
@@ -47,10 +42,10 @@ async def test_engine():
     await engine.dispose()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     """Создать тестовую сессию БД."""
-    TestingSessionLocal = sessionmaker(
+    TestingSessionLocal = async_sessionmaker(
         test_engine, class_=AsyncSession, expire_on_commit=False
     )
 
@@ -58,19 +53,24 @@ async def test_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client(test_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Создать тестовый HTTP клиент."""
 
     def override_get_db():
         return test_session
 
-    requify.app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    # For newer httpx versions, use transport instead of app parameter
+    from httpx import ASGITransport
+
+    transport = ASGITransport(app=app)
+
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 
-    requify.app.dependency_overrides.clear()
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
@@ -110,5 +110,4 @@ def sample_requirement_data():
 @pytest.fixture
 def auth_headers():
     """Заголовки авторизации для тестов."""
-    # TODO: Заменить на реальный токен при реализации аутентификации
-    return {"Authorization": "Bearer test-token"}
+    return {"Authorization": "Bearer mock-jwt-token-123"}

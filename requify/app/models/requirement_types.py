@@ -1,13 +1,19 @@
-from sqlalchemy import Column, Integer, String
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .requirement import Requirement
 
 
 class RequirementType(Base):
     """
     Справочник типов требований (functional, non-functional, business)
     """
+
     __tablename__ = "requirement_types"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

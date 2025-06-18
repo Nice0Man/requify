@@ -1,9 +1,14 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .requirement import Requirement
+    from .relationship_type import RelationshipType
 
 
 class Relationship(Base):
@@ -11,19 +16,21 @@ class Relationship(Base):
     Модель связи между требованиями.
     """
 
+    __tablename__ = "relationships"  
+
     # Используем составной первичный ключ из трех полей
     source_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("requirement.id"), primary_key=True
+        Integer, ForeignKey("requirements.id"), primary_key=True
     )
     target_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("requirement.id"), primary_key=True
+        Integer, ForeignKey("requirements.id"), primary_key=True
     )
     type_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("relationship_types.id"), primary_key=True
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(UTC), nullable=False
+        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), nullable=False
     )
 
     # Отношения
