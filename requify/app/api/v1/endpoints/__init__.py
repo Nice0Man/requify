@@ -4,6 +4,7 @@
 Содержит все обработчики HTTP-запросов для различных ресурсов.
 """
 
+from .auth import router as auth_router
 from .requirements import router as requirements_router
 from .projects import router as projects_router
 from .releases import router as releases_router

@@ -28,7 +28,7 @@ class TestResult(Base):
     """
     Модель результатов тестирования требования.
     """
-    
+
     __tablename__ = "test_results"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

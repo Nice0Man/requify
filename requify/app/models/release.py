@@ -15,7 +15,7 @@ class Release(Base):
     """
     Модель релиза.
     """
-    
+
     __tablename__ = "releases"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

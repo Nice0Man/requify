@@ -33,7 +33,7 @@ class Base(DeclarativeBase):
             "pk": "pk_%(table_name)s",
         }
     )
-    
+
     id: Any
     __name__: str
 
@@ -44,9 +44,9 @@ class Base(DeclarativeBase):
         если не определено явно.
         """
         # Если __tablename__ уже определён, используем его
-        if hasattr(cls, '__tablename__') and cls.__tablename__ is not None:
+        if hasattr(cls, "__tablename__") and cls.__tablename__ is not None:
             return cls.__tablename__
-        
+
         # Иначе генерируем автоматически
         return camel_to_snake(cls.__name__)
 
@@ -61,7 +61,7 @@ class Base(DeclarativeBase):
                 if isinstance(value, str) and len(value) > 50:
                     value = f"{value[:47]}..."
                 attrs.append(f"{key}={value!r}")
-        
+
         return f"{self.__class__.__name__}({', '.join(attrs)})"
 
 
@@ -70,18 +70,18 @@ class TimestampedMixin:
     Миксин для моделей с полями временных меток.
     Следует принципу DRY для общих полей created_at и updated_at.
     """
-    
+
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, 
-        default=lambda: datetime.now(UTC).replace(tzinfo=None), 
+        DateTime,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
         nullable=False,
-        comment="Время создания записи"
+        comment="Время создания записи",
     )
-    
+
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=lambda: datetime.now(UTC).replace(tzinfo=None),
         onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
         nullable=False,
-        comment="Время последнего обновления записи"
+        comment="Время последнего обновления записи",
     )

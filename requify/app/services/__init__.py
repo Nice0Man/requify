@@ -1,20 +1,13 @@
 """
-Модуль сервисов для бизнес-логики Requify.
+Сервисы приложения.
 
-Содержит все сервисы, реализующие бизнес-логику приложения
-в соответствии с принципами SOLID.
+Модуль содержит различные сервисы для работы с внешними системами,
+уведомлениями, отчетами и другой бизнес-логикой.
 """
 
-from .users import UserService
-from .projects import ProjectService
-from .requirements import RequirementService
-from .releases import ReleaseService
-from .testing import TestingService
+from .email_service import EmailService, email_service
 
 __all__ = [
-    "UserService",
-    "ProjectService",
-    "RequirementService",
-    "ReleaseService",
-    "TestingService",
+    "EmailService",
+    "email_service",
 ]

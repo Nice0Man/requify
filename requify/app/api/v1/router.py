@@ -7,34 +7,36 @@
 from fastapi import APIRouter
 
 from .endpoints import (
-    users,
-    projects,
-    requirements,
-    releases,
-    testing,
-    admin,
-    reference,
+    auth_router,
+    users_router,
+    projects_router,
+    requirements_router,
+    releases_router,
+    testing_router,
+    admin_router,
+    reference_router,
 )
 
 # Создаем основной роутер для API v1
 api_router = APIRouter()
 
 # Подключаем роутеры эндпоинтов
-api_router.include_router(users.router, prefix="/users", tags=["users"])
+api_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
+api_router.include_router(users_router, prefix="/users", tags=["users"])
 
-api_router.include_router(projects.router, prefix="/projects", tags=["projects"])
+api_router.include_router(projects_router, prefix="/projects", tags=["projects"])
 
 api_router.include_router(
-    requirements.router, prefix="/requirements", tags=["requirements"]
+    requirements_router, prefix="/requirements", tags=["requirements"]
 )
 
-api_router.include_router(releases.router, prefix="/releases", tags=["releases"])
+api_router.include_router(releases_router, prefix="/releases", tags=["releases"])
 
-api_router.include_router(testing.router, prefix="/testing", tags=["testing"])
+api_router.include_router(testing_router, prefix="/testing", tags=["testing"])
 
-api_router.include_router(admin.router, prefix="/admin", tags=["admin"])
+api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
 
-api_router.include_router(reference.router, prefix="/reference", tags=["reference"])
+api_router.include_router(reference_router, prefix="/reference", tags=["reference"])
 
 
 @api_router.get("/")

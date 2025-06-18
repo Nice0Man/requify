@@ -113,9 +113,57 @@ class TestDatabaseConfig(BaseModel):
 
 
 class SecurityConfig(BaseModel):
+    """Настройки безопасности."""
+
+    # Основные настройки
     secret_key: str = "super-secret-key-change-in-production-minimum-32-characters"
     algorithm: str = "HS256"
+
+    # URL фронтенда для ссылок в email
+    frontend_url: str = "http://localhost:3000"
+
+    # Настройки access токенов
     access_token_expire_minutes: int = 30
+    access_token_algorithm: str = "HS256"
+
+    # Настройки refresh токенов
+    refresh_token_expire_days: int = 7
+    refresh_token_algorithm: str = "HS256"
+    refresh_token_rotate: bool = (
+        True  # Ротация refresh токенов для дополнительной безопасности
+    )
+
+    # Настройки паролей
+    password_min_length: int = 8
+    password_require_uppercase: bool = True
+    password_require_lowercase: bool = True
+    password_require_digits: bool = True
+    password_require_special: bool = False
+
+    # Настройки сессий
+    max_refresh_tokens_per_user: int = (
+        5  # Максимум активных refresh токенов на пользователя
+    )
+    cleanup_expired_tokens_hours: int = 24  # Частота очистки истекших токенов
+
+    # Настройки сброса пароля
+    password_reset_token_expire_minutes: int = 60
+    password_reset_secret: str = "password-reset-secret-change-in-production"
+
+    # Настройки верификации email
+    email_verification_token_expire_hours: int = 24
+    email_verification_secret: str = "email-verification-secret-change-in-production"
+
+    # Настройки безопасности
+    bcrypt_rounds: int = 12  # Количество раундов для bcrypt
+    failed_login_attempts_limit: int = 5
+    account_lockout_duration_minutes: int = 30
+
+    # CORS настройки
+    cors_allow_credentials: bool = True
+    cors_allow_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    cors_allow_methods: list[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    cors_allow_headers: list[str] = ["*"]
 
 
 class AdminConfig(BaseModel):

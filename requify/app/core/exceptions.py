@@ -4,6 +4,7 @@
 Содержит кастомные исключения и обработчики ошибок для FastAPI.
 """
 
+from datetime import datetime, UTC
 from typing import Any, Dict, Optional
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
@@ -167,7 +168,7 @@ async def requify_exception_handler(
                 "type": exc.__class__.__name__,
                 "message": exc.message,
                 "details": exc.details,
-                "timestamp": "2024-01-01T00:00:00Z",  # TODO: Использовать реальный timestamp
+                "timestamp": datetime.now(UTC).isoformat(),
                 "path": request.url.path,
             }
         },
@@ -203,7 +204,7 @@ async def http_exception_handler(
                 "type": "HTTPException",
                 "message": exc.detail,
                 "details": {},
-                "timestamp": "2024-01-01T00:00:00Z",  # TODO: Использовать реальный timestamp
+                "timestamp": datetime.now(UTC).isoformat(),
                 "path": request.url.path,
             }
         },
@@ -250,7 +251,7 @@ async def validation_exception_handler(
                 "type": "ValidationError",
                 "message": "Validation failed",
                 "details": {"validation_errors": formatted_errors},
-                "timestamp": "2024-01-01T00:00:00Z",  # TODO: Использовать реальный timestamp
+                "timestamp": datetime.now(UTC).isoformat(),
                 "path": request.url.path,
             }
         },
@@ -285,7 +286,7 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
                 "type": "InternalServerError",
                 "message": "An internal server error occurred",
                 "details": {"exception_type": exc.__class__.__name__},
-                "timestamp": "2024-01-01T00:00:00Z",  # TODO: Использовать реальный timestamp
+                "timestamp": datetime.now(UTC).isoformat(),
                 "path": request.url.path,
             }
         },

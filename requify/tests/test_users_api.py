@@ -218,9 +218,9 @@ class TestUsersAPI:
         assert data["email"] == created_user["email"]
         assert data["username"] == created_user["username"]
 
-    async def test_get_user_not_found(self, client: AsyncClient):
+    async def test_get_user_not_found(self, client: AsyncClient, auth_headers: dict):
         """Test getting non-existent user returns 404."""
-        response = await client.get("/api/v1/users/99999")
+        response = await client.get("/api/v1/users/99999", headers=auth_headers)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     async def test_update_user(self, client: AsyncClient, sample_user_create_data):

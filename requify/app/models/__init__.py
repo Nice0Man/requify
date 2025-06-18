@@ -4,6 +4,7 @@ SQLAlchemy модели.
 
 # Импортируем все модели для Alembic автогенерации миграций
 from .user import User
+from .refresh_token import RefreshToken
 from .project import Project
 from .requirement import Requirement
 from .requirement_group import RequirementGroup
@@ -22,6 +23,7 @@ from .relationship_types import RelationshipType
 
 __all__ = [
     "User",
+    "RefreshToken",
     "Project",
     "Requirement",
     "RequirementGroup",

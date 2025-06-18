@@ -1,19 +1,1227 @@
 [
     {
-        "label": "asyncio",
-        "kind": 6,
+        "label": "Sequence",
+        "importPath": "typing",
+        "description": "typing",
         "isExtraImport": true,
-        "importPath": "asyncio",
-        "description": "asyncio",
-        "detail": "asyncio",
+        "detail": "typing",
         "documentation": {}
     },
     {
-        "label": "fileConfig",
-        "importPath": "logging.config",
-        "description": "logging.config",
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
         "isExtraImport": true,
-        "detail": "logging.config",
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Generic",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Protocol",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Type",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TypeVar",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Protocol",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TypeVar",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncGenerator",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "context",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "command",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "script",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "sqlalchemy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
         "documentation": {}
     },
     {
@@ -74,6 +1282,46 @@
     },
     {
         "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "delete",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "update",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -441,6 +1689,62 @@
         "documentation": {}
     },
     {
+        "label": "Boolean",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Index",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "DateTime",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -761,6 +2065,14 @@
         "documentation": {}
     },
     {
+        "label": "Boolean",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "DateTime",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -833,6 +2145,23 @@
         "documentation": {}
     },
     {
+        "label": "asyncio",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "asyncio",
+        "description": "asyncio",
+        "detail": "asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "fileConfig",
+        "importPath": "logging.config",
+        "description": "logging.config",
+        "isExtraImport": true,
+        "detail": "logging.config",
+        "documentation": {}
+    },
+    {
         "label": "Connection",
         "importPath": "sqlalchemy.engine",
         "description": "sqlalchemy.engine",
@@ -842,6 +2171,22 @@
     },
     {
         "label": "async_engine_from_config",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
         "importPath": "sqlalchemy.ext.asyncio",
         "description": "sqlalchemy.ext.asyncio",
         "isExtraImport": true,
@@ -1129,30 +2474,6 @@
         "documentation": {}
     },
     {
-        "label": "context",
-        "importPath": "alembic",
-        "description": "alembic",
-        "isExtraImport": true,
-        "detail": "alembic",
-        "documentation": {}
-    },
-    {
-        "label": "command",
-        "importPath": "alembic",
-        "description": "alembic",
-        "isExtraImport": true,
-        "detail": "alembic",
-        "documentation": {}
-    },
-    {
-        "label": "script",
-        "importPath": "alembic",
-        "description": "alembic",
-        "isExtraImport": true,
-        "detail": "alembic",
-        "documentation": {}
-    },
-    {
         "label": "Base",
         "importPath": "requify.app.models.base",
         "description": "requify.app.models.base",
@@ -1182,6 +2503,22 @@
         "description": "requify.app.models.base",
         "isExtraImport": true,
         "detail": "requify.app.models.base",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
         "documentation": {}
     },
     {
@@ -1369,1051 +2706,11 @@
         "documentation": {}
     },
     {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncGenerator",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Generic",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Protocol",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Type",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TypeVar",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncGenerator",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Protocol",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TypeVar",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "TYPE_CHECKING",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncGenerator",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
+        "label": "settings",
+        "importPath": "requify.app.core.config",
+        "description": "requify.app.core.config",
+        "isExtraImport": true,
+        "detail": "requify.app.core.config",
         "documentation": {}
     },
     {
@@ -2450,6 +2747,46 @@
     },
     {
         "label": "Query",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Request",
         "importPath": "fastapi",
         "description": "fastapi",
         "isExtraImport": true,
@@ -2713,6 +3050,14 @@
         "documentation": {}
     },
     {
+        "label": "Request",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
         "label": "status",
         "importPath": "fastapi",
         "description": "fastapi",
@@ -2825,55 +3170,7 @@
         "documentation": {}
     },
     {
-        "label": "get_db",
-        "importPath": "requify.app.api.deps",
-        "description": "requify.app.api.deps",
-        "isExtraImport": true,
-        "detail": "requify.app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_user",
-        "importPath": "requify.app.api.deps",
-        "description": "requify.app.api.deps",
-        "isExtraImport": true,
-        "detail": "requify.app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_superuser",
-        "importPath": "requify.app.api.deps",
-        "description": "requify.app.api.deps",
-        "isExtraImport": true,
-        "detail": "requify.app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "requify.app.api.deps",
-        "description": "requify.app.api.deps",
-        "isExtraImport": true,
-        "detail": "requify.app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_user",
-        "importPath": "requify.app.api.deps",
-        "description": "requify.app.api.deps",
-        "isExtraImport": true,
-        "detail": "requify.app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "requify.app.api.deps",
-        "description": "requify.app.api.deps",
-        "isExtraImport": true,
-        "detail": "requify.app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_user",
+        "label": "get_optional_user",
         "importPath": "requify.app.api.deps",
         "description": "requify.app.api.deps",
         "isExtraImport": true,
@@ -2929,6 +3226,14 @@
         "documentation": {}
     },
     {
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "isExtraImport": true,
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
         "label": "get_db",
         "importPath": "requify.app.api.deps",
         "description": "requify.app.api.deps",
@@ -2937,147 +3242,571 @@
         "documentation": {}
     },
     {
-        "label": "crud",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "schemas",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "crud",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "schemas",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "crud",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_current_user",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "schemas",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_superuser",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "crud",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "schemas",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "get_db",
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
-        "label": "crud",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "schemas",
-        "importPath": "requify.app",
-        "description": "requify.app",
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "timezone",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "requify.app.models.user",
-        "description": "requify.app.models.user",
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
         "isExtraImport": true,
-        "detail": "requify.app.models.user",
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "OAuth2PasswordRequestForm",
+        "importPath": "fastapi.security",
+        "description": "fastapi.security",
+        "isExtraImport": true,
+        "detail": "fastapi.security",
+        "documentation": {}
+    },
+    {
+        "label": "OAuth2PasswordBearer",
+        "importPath": "fastapi.security",
+        "description": "fastapi.security",
+        "isExtraImport": true,
+        "detail": "fastapi.security",
         "documentation": {}
     },
     {
@@ -3089,6 +3818,446 @@
         "documentation": {}
     },
     {
+        "label": "HTTPAuthorizationCredentials",
+        "importPath": "fastapi.security",
+        "description": "fastapi.security",
+        "isExtraImport": true,
+        "detail": "fastapi.security",
+        "documentation": {}
+    },
+    {
+        "label": "JWTTokenManager",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordManager",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_password",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_client_ip",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_user_agent",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "TokenType",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "JWTTokenManager",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "TokenType",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_client_ip",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_password_hash",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_password",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_password_hash",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_password_hash",
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "isExtraImport": true,
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "user",
+        "importPath": "requify.app.crud",
+        "description": "requify.app.crud",
+        "isExtraImport": true,
+        "detail": "requify.app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "crud_refresh_token",
+        "importPath": "requify.app.crud",
+        "description": "requify.app.crud",
+        "isExtraImport": true,
+        "detail": "requify.app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "user",
+        "importPath": "requify.app.crud",
+        "description": "requify.app.crud",
+        "isExtraImport": true,
+        "detail": "requify.app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "user",
+        "importPath": "requify.app.crud",
+        "description": "requify.app.crud",
+        "isExtraImport": true,
+        "detail": "requify.app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "requify.app.models.user",
+        "description": "requify.app.models.user",
+        "isExtraImport": true,
+        "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "email_service",
+        "importPath": "requify.app.services.email_service",
+        "description": "requify.app.services.email_service",
+        "isExtraImport": true,
+        "detail": "requify.app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "LoginRequest",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LoginResponse",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshTokenRequest",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshTokenResponse",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LogoutRequest",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LogoutResponse",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordChangeRequest",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordResetRequest",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordResetConfirm",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "TokenValidationRequest",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "TokenValidationResponse",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "SessionListResponse",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RevokeSessionRequest",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfile",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "AuthError",
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "crud",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "schemas",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "crud",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "schemas",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "crud",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "schemas",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "crud",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "schemas",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "crud",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
+        "label": "schemas",
+        "importPath": "requify.app",
+        "description": "requify.app",
+        "isExtraImport": true,
+        "detail": "requify.app",
+        "documentation": {}
+    },
+    {
         "label": "get_async_session",
         "importPath": "requify.app.db.db_helper",
         "description": "requify.app.db.db_helper",
@@ -3102,6 +4271,14 @@
         "description": "requify.app.db.db_helper",
         "isExtraImport": true,
         "detail": "requify.app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
         "documentation": {}
     },
     {
@@ -3178,6 +4355,38 @@
     },
     {
         "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "EmailStr",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "validator",
         "importPath": "pydantic",
         "description": "pydantic",
         "isExtraImport": true,
@@ -3474,6 +4683,15 @@
         "documentation": {}
     },
     {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
         "label": "secrets",
         "kind": 6,
         "isExtraImport": true,
@@ -3483,391 +4701,56 @@
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
+        "label": "enum",
+        "kind": 6,
         "isExtraImport": true,
-        "detail": "datetime",
+        "importPath": "enum",
+        "description": "enum",
+        "detail": "enum",
         "documentation": {}
     },
     {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
+        "label": "Enum",
+        "importPath": "enum",
+        "description": "enum",
         "isExtraImport": true,
-        "detail": "datetime",
+        "detail": "enum",
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
+        "label": "Enum",
+        "importPath": "enum",
+        "description": "enum",
         "isExtraImport": true,
-        "detail": "datetime",
+        "detail": "enum",
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
+        "label": "Enum",
+        "importPath": "enum",
+        "description": "enum",
         "isExtraImport": true,
-        "detail": "datetime",
+        "detail": "enum",
         "documentation": {}
     },
     {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
+        "label": "Enum",
+        "importPath": "enum",
+        "description": "enum",
         "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
+        "detail": "enum",
         "documentation": {}
     },
     {
         "label": "jwt",
+        "importPath": "jose",
+        "description": "jose",
+        "isExtraImport": true,
+        "detail": "jose",
+        "documentation": {}
+    },
+    {
+        "label": "JWTError",
         "importPath": "jose",
         "description": "jose",
         "isExtraImport": true,
@@ -3928,6 +4811,14 @@
         "description": "abc",
         "isExtraImport": true,
         "detail": "abc",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
         "documentation": {}
     },
     {
@@ -4411,6 +5302,38 @@
         "documentation": {}
     },
     {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "CRUDBase",
+        "importPath": "requify.app.crud.base",
+        "description": "requify.app.crud.base",
+        "isExtraImport": true,
+        "detail": "requify.app.crud.base",
+        "documentation": {}
+    },
+    {
         "label": "CRUDBase",
         "importPath": "requify.app.crud.base",
         "description": "requify.app.crud.base",
@@ -4592,6 +5515,71 @@
         "description": "requify.app.schemas.project",
         "isExtraImport": true,
         "detail": "requify.app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "uuid",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "uuid",
+        "description": "uuid",
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "uuid4",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "uuid4",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "UUID",
+        "importPath": "uuid",
+        "description": "uuid",
+        "isExtraImport": true,
+        "detail": "uuid",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshToken",
+        "importPath": "requify.app.models.refresh_token",
+        "description": "requify.app.models.refresh_token",
+        "isExtraImport": true,
+        "detail": "requify.app.models.refresh_token",
         "documentation": {}
     },
     {
@@ -4915,27 +5903,11 @@
         "documentation": {}
     },
     {
-        "label": "get_password_hash",
-        "importPath": "requify.app.core.security",
-        "description": "requify.app.core.security",
+        "label": "UserCreate",
+        "importPath": "requify.app.schemas.user",
+        "description": "requify.app.schemas.user",
         "isExtraImport": true,
-        "detail": "requify.app.core.security",
-        "documentation": {}
-    },
-    {
-        "label": "verify_password",
-        "importPath": "requify.app.core.security",
-        "description": "requify.app.core.security",
-        "isExtraImport": true,
-        "detail": "requify.app.core.security",
-        "documentation": {}
-    },
-    {
-        "label": "get_password_hash",
-        "importPath": "requify.app.core.security",
-        "description": "requify.app.core.security",
-        "isExtraImport": true,
-        "detail": "requify.app.core.security",
+        "detail": "requify.app.schemas.user",
         "documentation": {}
     },
     {
@@ -5005,6 +5977,14 @@
     },
     {
         "label": "AsyncClient",
+        "importPath": "httpx",
+        "description": "httpx",
+        "isExtraImport": true,
+        "detail": "httpx",
+        "documentation": {}
+    },
+    {
+        "label": "ASGITransport",
         "importPath": "httpx",
         "description": "httpx",
         "isExtraImport": true,
@@ -5100,81 +6080,6 @@
         "documentation": {}
     },
     {
-        "label": "re",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "re",
-        "description": "re",
-        "detail": "re",
-        "documentation": {}
-    },
-    {
-        "label": "enum",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "enum",
-        "description": "enum",
-        "detail": "enum",
-        "documentation": {}
-    },
-    {
-        "label": "Enum",
-        "importPath": "enum",
-        "description": "enum",
-        "isExtraImport": true,
-        "detail": "enum",
-        "documentation": {}
-    },
-    {
-        "label": "Enum",
-        "importPath": "enum",
-        "description": "enum",
-        "isExtraImport": true,
-        "detail": "enum",
-        "documentation": {}
-    },
-    {
-        "label": "Enum",
-        "importPath": "enum",
-        "description": "enum",
-        "isExtraImport": true,
-        "detail": "enum",
-        "documentation": {}
-    },
-    {
-        "label": "uuid",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "uuid",
-        "description": "uuid",
-        "detail": "uuid",
-        "documentation": {}
-    },
-    {
-        "label": "UUID",
-        "importPath": "uuid",
-        "description": "uuid",
-        "isExtraImport": true,
-        "detail": "uuid",
-        "documentation": {}
-    },
-    {
-        "label": "UUID",
-        "importPath": "uuid",
-        "description": "uuid",
-        "isExtraImport": true,
-        "detail": "uuid",
-        "documentation": {}
-    },
-    {
-        "label": "UUID",
-        "importPath": "uuid",
-        "description": "uuid",
-        "isExtraImport": true,
-        "detail": "uuid",
-        "documentation": {}
-    },
-    {
         "label": "UUID",
         "importPath": "sqlalchemy.dialects.postgresql",
         "description": "sqlalchemy.dialects.postgresql",
@@ -5183,12 +6088,11 @@
         "documentation": {}
     },
     {
-        "label": "smtplib",
-        "kind": 6,
+        "label": "MIMEText",
+        "importPath": "email.mime.text",
+        "description": "email.mime.text",
         "isExtraImport": true,
-        "importPath": "smtplib",
-        "description": "smtplib",
-        "detail": "smtplib",
+        "detail": "email.mime.text",
         "documentation": {}
     },
     {
@@ -5208,6 +6112,22 @@
         "documentation": {}
     },
     {
+        "label": "MIMEMultipart",
+        "importPath": "email.mime.multipart",
+        "description": "email.mime.multipart",
+        "isExtraImport": true,
+        "detail": "email.mime.multipart",
+        "documentation": {}
+    },
+    {
+        "label": "MIMEBase",
+        "importPath": "email.mime.base",
+        "description": "email.mime.base",
+        "isExtraImport": true,
+        "detail": "email.mime.base",
+        "documentation": {}
+    },
+    {
         "label": "MIMEBase",
         "importPath": "email.mime.base",
         "description": "email.mime.base",
@@ -5221,6 +6141,64 @@
         "description": "email",
         "isExtraImport": true,
         "detail": "email",
+        "documentation": {}
+    },
+    {
+        "label": "encoders",
+        "importPath": "email",
+        "description": "email",
+        "isExtraImport": true,
+        "detail": "email",
+        "documentation": {}
+    },
+    {
+        "label": "smtplib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "smtplib",
+        "description": "smtplib",
+        "detail": "smtplib",
+        "documentation": {}
+    },
+    {
+        "label": "ssl",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "ssl",
+        "description": "ssl",
+        "detail": "ssl",
+        "documentation": {}
+    },
+    {
+        "label": "ThreadPoolExecutor",
+        "importPath": "concurrent.futures",
+        "description": "concurrent.futures",
+        "isExtraImport": true,
+        "detail": "concurrent.futures",
+        "documentation": {}
+    },
+    {
+        "label": "Environment",
+        "importPath": "jinja2",
+        "description": "jinja2",
+        "isExtraImport": true,
+        "detail": "jinja2",
+        "documentation": {}
+    },
+    {
+        "label": "FileSystemLoader",
+        "importPath": "jinja2",
+        "description": "jinja2",
+        "isExtraImport": true,
+        "detail": "jinja2",
+        "documentation": {}
+    },
+    {
+        "label": "Template",
+        "importPath": "jinja2",
+        "description": "jinja2",
+        "isExtraImport": true,
+        "detail": "jinja2",
         "documentation": {}
     },
     {
@@ -5386,6 +6364,24 @@
         "documentation": {}
     },
     {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "requify.alembic.versions.2025_06_18_1219-add_user_fields_and_refresh_token",
+        "description": "requify.alembic.versions.2025_06_18_1219-add_user_fields_and_refresh_token",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # First, add nullable columns to users table\n    op.add_column(\n        \"users\",\n        sa.Column(\n            \"name\",\n            sa.String(length=100),\n            nullable=True,\n            comment=\"Полное имя пользователя\",",
+        "detail": "requify.alembic.versions.2025_06_18_1219-add_user_fields_and_refresh_token",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "requify.alembic.versions.2025_06_18_1219-add_user_fields_and_refresh_token",
+        "description": "requify.alembic.versions.2025_06_18_1219-add_user_fields_and_refresh_token",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # Drop refresh_tokens table and indexes\n    op.drop_index(\"ix_refresh_tokens_user_id\", table_name=\"refresh_tokens\")\n    op.drop_index(\"ix_refresh_tokens_user_active\", table_name=\"refresh_tokens\")\n    op.drop_index(\"ix_refresh_tokens_token_unique\", table_name=\"refresh_tokens\")\n    op.drop_index(\"ix_refresh_tokens_is_active\", table_name=\"refresh_tokens\")\n    op.drop_index(\"ix_refresh_tokens_expires_at\", table_name=\"refresh_tokens\")\n    op.drop_table(\"refresh_tokens\")\n    # Drop user indexes and columns",
+        "detail": "requify.alembic.versions.2025_06_18_1219-add_user_fields_and_refresh_token",
+        "documentation": {}
+    },
+    {
         "label": "run_migrations_offline",
         "kind": 2,
         "importPath": "requify.alembic.env",
@@ -5437,6 +6433,15 @@
         "description": "requify.app.api.v1.endpoints.admin",
         "peekOfCode": "router = APIRouter()\n@router.post(\"/users/{user_id}/grant-access\", response_model=dict)\nasync def grant_user_access(\n    user_id: int,\n    access_data: dict,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_superuser),\n):\n    \"\"\"\n    Выдача доступа к функционалу системы.",
         "detail": "requify.app.api.v1.endpoints.admin",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "requify.app.api.v1.endpoints.auth",
+        "description": "requify.app.api.v1.endpoints.auth",
+        "peekOfCode": "router = APIRouter()\n# === Authentication Endpoints ===\n@router.post(\"/login\", response_model=LoginResponse)\nasync def login_for_access_token(\n    request: Request,\n    db: AsyncSession = Depends(get_db),\n    form_data: OAuth2PasswordRequestForm = Depends(),\n) -> Any:\n    \"\"\"\n    OAuth2 совместимый эндпоинт для получения токенов доступа.",
+        "detail": "requify.app.api.v1.endpoints.auth",
         "documentation": {}
     },
     {
@@ -5498,8 +6503,26 @@
         "kind": 5,
         "importPath": "requify.app.api.v1.router",
         "description": "requify.app.api.v1.router",
-        "peekOfCode": "api_router = APIRouter()\n# Подключаем роутеры эндпоинтов\napi_router.include_router(users.router, prefix=\"/users\", tags=[\"users\"])\napi_router.include_router(projects.router, prefix=\"/projects\", tags=[\"projects\"])\napi_router.include_router(\n    requirements.router, prefix=\"/requirements\", tags=[\"requirements\"]\n)\napi_router.include_router(releases.router, prefix=\"/releases\", tags=[\"releases\"])\napi_router.include_router(testing.router, prefix=\"/testing\", tags=[\"testing\"])\napi_router.include_router(admin.router, prefix=\"/admin\", tags=[\"admin\"])",
+        "peekOfCode": "api_router = APIRouter()\n# Подключаем роутеры эндпоинтов\napi_router.include_router(auth_router, prefix=\"/auth\", tags=[\"authentication\"])\napi_router.include_router(users_router, prefix=\"/users\", tags=[\"users\"])\napi_router.include_router(projects_router, prefix=\"/projects\", tags=[\"projects\"])\napi_router.include_router(\n    requirements_router, prefix=\"/requirements\", tags=[\"requirements\"]\n)\napi_router.include_router(releases_router, prefix=\"/releases\", tags=[\"releases\"])\napi_router.include_router(testing_router, prefix=\"/testing\", tags=[\"testing\"])",
         "detail": "requify.app.api.v1.router",
+        "documentation": {}
+    },
+    {
+        "label": "require_scopes",
+        "kind": 2,
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "peekOfCode": "def require_scopes(required_scopes: List[str]):\n    \"\"\"\n    Фабрика зависимостей для проверки областей доступа (scopes).\n    Args:\n        required_scopes: Список требуемых областей доступа\n    Returns:\n        Функция зависимости\n    \"\"\"\n    async def check_scopes(\n        request: Request,",
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "oauth2_scheme",
+        "kind": 5,
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "peekOfCode": "oauth2_scheme = OAuth2PasswordBearer(\n    tokenUrl=f\"{settings.app_config.api_v1_str}/auth/login\",\n    scopes={\n        \"me\": \"Read information about the current user\",\n        \"users:read\": \"Read users information\", \n        \"users:write\": \"Create and update users\",\n        \"users:delete\": \"Delete users\",\n        \"projects:read\": \"Read projects information\",\n        \"projects:write\": \"Create and update projects\", \n        \"projects:delete\": \"Delete projects\",",
+        "detail": "requify.app.api.deps",
         "documentation": {}
     },
     {
@@ -5507,7 +6530,25 @@
         "kind": 5,
         "importPath": "requify.app.api.deps",
         "description": "requify.app.api.deps",
-        "peekOfCode": "security = HTTPBearer()\nasync def get_db() -> AsyncGenerator[AsyncSession, None]:\n    \"\"\"\n    Зависимость для получения сессии базы данных.\n    Yields:\n        AsyncSession: Асинхронная сессия SQLAlchemy\n    \"\"\"\n    async for session in get_async_session():\n        yield session\nasync def get_current_user(",
+        "peekOfCode": "security = HTTPBearer(auto_error=False)\n# === Database Dependencies ===\nasync def get_db() -> AsyncGenerator[AsyncSession, None]:\n    \"\"\"\n    Зависимость для получения сессии базы данных.\n    Yields:\n        AsyncSession: Асинхронная сессия SQLAlchemy\n    \"\"\"\n    async for session in get_async_session():\n        yield session",
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user_dep",
+        "kind": 5,
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "peekOfCode": "get_current_user_dep = get_current_user\nget_superuser_dep = get_superuser",
+        "detail": "requify.app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_superuser_dep",
+        "kind": 5,
+        "importPath": "requify.app.api.deps",
+        "description": "requify.app.api.deps",
+        "peekOfCode": "get_superuser_dep = get_superuser",
         "detail": "requify.app.api.deps",
         "documentation": {}
     },
@@ -5570,7 +6611,7 @@
         "kind": 6,
         "importPath": "requify.app.core.config",
         "description": "requify.app.core.config",
-        "peekOfCode": "class SecurityConfig(BaseModel):\n    secret_key: str = \"super-secret-key-change-in-production-minimum-32-characters\"\n    algorithm: str = \"HS256\"\n    access_token_expire_minutes: int = 30\nclass AdminConfig(BaseModel):\n    email: str = \"admin@requify.local\"\n    password: str = \"admin123\"\n    name: str = \"Admin User\"\nclass IntegrationsConfig(BaseModel):\n    testing_system_api_url: str = \"http://localhost:8001/api/v1\"",
+        "peekOfCode": "class SecurityConfig(BaseModel):\n    \"\"\"Настройки безопасности.\"\"\"\n    # Основные настройки\n    secret_key: str = \"super-secret-key-change-in-production-minimum-32-characters\"\n    algorithm: str = \"HS256\"\n    # URL фронтенда для ссылок в email\n    frontend_url: str = \"http://localhost:3000\"\n    # Настройки access токенов\n    access_token_expire_minutes: int = 30\n    access_token_algorithm: str = \"HS256\"",
         "detail": "requify.app.core.config",
         "documentation": {}
     },
@@ -5773,6 +6814,42 @@
         "documentation": {}
     },
     {
+        "label": "TokenType",
+        "kind": 6,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "class TokenType(str, Enum):\n    \"\"\"Типы JWT токенов.\"\"\"\n    ACCESS = \"access\"\n    REFRESH = \"refresh\"\n    PASSWORD_RESET = \"password_reset\"\n    EMAIL_VERIFICATION = \"email_verification\"\nclass PasswordStrength(str, Enum):\n    \"\"\"Уровни надежности пароля.\"\"\"\n    WEAK = \"weak\"\n    MEDIUM = \"medium\"",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordStrength",
+        "kind": 6,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "class PasswordStrength(str, Enum):\n    \"\"\"Уровни надежности пароля.\"\"\"\n    WEAK = \"weak\"\n    MEDIUM = \"medium\"\n    STRONG = \"strong\"\n    VERY_STRONG = \"very_strong\"\n# === Конфигурация безопасности ===\n# Контекст для хэширования паролей\npwd_context = CryptContext(\n    schemes=[\"bcrypt\"],",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordManager",
+        "kind": 6,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "class PasswordManager:\n    \"\"\"Менеджер для работы с паролями.\"\"\"\n    @staticmethod\n    def hash_password(password: str) -> str:\n        \"\"\"\n        Хэшировать пароль.\n        Args:\n            password: Пароль в открытом виде\n        Returns:\n            str: Хэшированный пароль",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "JWTTokenManager",
+        "kind": 6,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "class JWTTokenManager:\n    \"\"\"Менеджер для работы с JWT токенами.\"\"\"\n    @staticmethod\n    def create_access_token(\n        subject: Union[str, Any],\n        user_id: int,\n        scopes: Optional[List[str]] = None,\n        expires_delta: Optional[timedelta] = None,\n    ) -> str:\n        \"\"\"",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
         "label": "PermissionChecker",
         "kind": 6,
         "importPath": "requify.app.core.security",
@@ -5782,74 +6859,47 @@
         "documentation": {}
     },
     {
-        "label": "create_access_token",
+        "label": "generate_secure_random_string",
         "kind": 2,
         "importPath": "requify.app.core.security",
         "description": "requify.app.core.security",
-        "peekOfCode": "def create_access_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT токен доступа.\n    Args:\n        subject: Субъект токена (обычно user_id)\n        expires_delta: Время жизни токена\n    Returns:\n        str: JWT токен",
+        "peekOfCode": "def generate_secure_random_string(length: int = 32) -> str:\n    \"\"\"\n    Генерировать безопасную случайную строку.\n    Args:\n        length: Длина строки\n    Returns:\n        str: Случайная строка\n    \"\"\"\n    return secrets.token_urlsafe(length)\ndef constant_time_compare(val1: str, val2: str) -> bool:",
         "detail": "requify.app.core.security",
         "documentation": {}
     },
     {
-        "label": "create_refresh_token",
+        "label": "constant_time_compare",
         "kind": 2,
         "importPath": "requify.app.core.security",
         "description": "requify.app.core.security",
-        "peekOfCode": "def create_refresh_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT refresh токен.\n    Args:\n        subject: Субъект токена (обычно user_id)\n        expires_delta: Время жизни токена\n    Returns:\n        str: JWT refresh токен",
+        "peekOfCode": "def constant_time_compare(val1: str, val2: str) -> bool:\n    \"\"\"\n    Безопасное сравнение строк (защита от timing attacks).\n    Args:\n        val1: Первая строка\n        val2: Вторая строка\n    Returns:\n        bool: True если строки равны\n    \"\"\"\n    return secrets.compare_digest(val1, val2)",
         "detail": "requify.app.core.security",
         "documentation": {}
     },
     {
-        "label": "verify_token",
+        "label": "get_client_ip",
         "kind": 2,
         "importPath": "requify.app.core.security",
         "description": "requify.app.core.security",
-        "peekOfCode": "def verify_token(token: str) -> Optional[Dict[str, Any]]:\n    \"\"\"\n    Проверить и декодировать JWT токен.\n    Args:\n        token: JWT токен\n    Returns:\n        Optional[Dict[str, Any]]: Декодированные данные токена или None\n    \"\"\"\n    try:\n        payload = jwt.decode(token, settings.auth.secret_key, algorithms=[ALGORITHM])",
+        "peekOfCode": "def get_client_ip(request) -> Optional[str]:\n    \"\"\"\n    Получить IP адрес клиента.\n    Args:\n        request: FastAPI Request объект\n    Returns:\n        Optional[str]: IP адрес клиента\n    \"\"\"\n    # Проверяем заголовки прокси\n    forwarded_for = request.headers.get(\"X-Forwarded-For\")",
         "detail": "requify.app.core.security",
         "documentation": {}
     },
     {
-        "label": "get_password_hash",
+        "label": "get_user_agent",
         "kind": 2,
         "importPath": "requify.app.core.security",
         "description": "requify.app.core.security",
-        "peekOfCode": "def get_password_hash(password: str) -> str:\n    \"\"\"\n    Хэшировать пароль.\n    Args:\n        password: Пароль в открытом виде\n    Returns:\n        str: Хэшированный пароль\n    \"\"\"\n    return pwd_context.hash(password)\ndef verify_password(plain_password: str, hashed_password: str) -> bool:",
+        "peekOfCode": "def get_user_agent(request) -> Optional[str]:\n    \"\"\"\n    Получить User-Agent клиента.\n    Args:\n        request: FastAPI Request объект\n    Returns:\n        Optional[str]: User-Agent\n    \"\"\"\n    return request.headers.get(\"User-Agent\")\n# === Backwards Compatibility ===",
         "detail": "requify.app.core.security",
         "documentation": {}
     },
     {
-        "label": "verify_password",
+        "label": "validate_password",
         "kind": 2,
         "importPath": "requify.app.core.security",
         "description": "requify.app.core.security",
-        "peekOfCode": "def verify_password(plain_password: str, hashed_password: str) -> bool:\n    \"\"\"\n    Проверить пароль.\n    Args:\n        plain_password: Пароль в открытом виде\n        hashed_password: Хэшированный пароль\n    Returns:\n        bool: True если пароль верный, False иначе\n    \"\"\"\n    return pwd_context.verify(plain_password, hashed_password)",
-        "detail": "requify.app.core.security",
-        "documentation": {}
-    },
-    {
-        "label": "generate_password_reset_token",
-        "kind": 2,
-        "importPath": "requify.app.core.security",
-        "description": "requify.app.core.security",
-        "peekOfCode": "def generate_password_reset_token(email: str) -> str:\n    \"\"\"\n    Генерировать токен для сброса пароля.\n    Args:\n        email: Email пользователя\n    Returns:\n        str: Токен для сброса пароля\n    \"\"\"\n    delta = timedelta(hours=settings.auth.email_reset_token_expire_hours)\n    now = lambda: datetime.now(UTC)",
-        "detail": "requify.app.core.security",
-        "documentation": {}
-    },
-    {
-        "label": "verify_password_reset_token",
-        "kind": 2,
-        "importPath": "requify.app.core.security",
-        "description": "requify.app.core.security",
-        "peekOfCode": "def verify_password_reset_token(token: str) -> Optional[str]:\n    \"\"\"\n    Проверить токен сброса пароля.\n    Args:\n        token: Токен сброса пароля\n    Returns:\n        Optional[str]: Email пользователя или None\n    \"\"\"\n    try:\n        decoded_token = jwt.decode(",
-        "detail": "requify.app.core.security",
-        "documentation": {}
-    },
-    {
-        "label": "generate_api_key",
-        "kind": 2,
-        "importPath": "requify.app.core.security",
-        "description": "requify.app.core.security",
-        "peekOfCode": "def generate_api_key() -> str:\n    \"\"\"\n    Генерировать случайный API ключ.\n    Returns:\n        str: API ключ\n    \"\"\"\n    return secrets.token_urlsafe(32)\nclass PermissionChecker:\n    \"\"\"\n    Класс для проверки прав доступа (Open/Closed Principle).",
+        "peekOfCode": "def validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).\n    Args:\n        password: Пароль для проверки\n    Returns:\n        tuple: (валиден, список ошибок)\n    \"\"\"\n    is_valid, errors, _ = PasswordManager.validate_password_strength(password)\n    return is_valid, errors",
         "detail": "requify.app.core.security",
         "documentation": {}
     },
@@ -5858,16 +6908,88 @@
         "kind": 5,
         "importPath": "requify.app.core.security",
         "description": "requify.app.core.security",
-        "peekOfCode": "pwd_context = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\n# Алгоритм для JWT\nALGORITHM = \"HS256\"\ndef create_access_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT токен доступа.\n    Args:\n        subject: Субъект токена (обычно user_id)",
+        "peekOfCode": "pwd_context = CryptContext(\n    schemes=[\"bcrypt\"],\n    deprecated=\"auto\",\n    bcrypt__rounds=settings.security.bcrypt_rounds,\n)\n# Алгоритмы для разных типов токенов\nALGORITHMS = {\n    TokenType.ACCESS: settings.security.access_token_algorithm,\n    TokenType.REFRESH: settings.security.refresh_token_algorithm,\n    TokenType.PASSWORD_RESET: \"HS256\",",
         "detail": "requify.app.core.security",
         "documentation": {}
     },
     {
-        "label": "ALGORITHM",
+        "label": "ALGORITHMS",
         "kind": 5,
         "importPath": "requify.app.core.security",
         "description": "requify.app.core.security",
-        "peekOfCode": "ALGORITHM = \"HS256\"\ndef create_access_token(\n    subject: Union[str, Any], expires_delta: Optional[timedelta] = None\n) -> str:\n    \"\"\"\n    Создать JWT токен доступа.\n    Args:\n        subject: Субъект токена (обычно user_id)\n        expires_delta: Время жизни токена\n    Returns:",
+        "peekOfCode": "ALGORITHMS = {\n    TokenType.ACCESS: settings.security.access_token_algorithm,\n    TokenType.REFRESH: settings.security.refresh_token_algorithm,\n    TokenType.PASSWORD_RESET: \"HS256\",\n    TokenType.EMAIL_VERIFICATION: \"HS256\",\n}\n# === Password Management (Single Responsibility Principle) ===\nclass PasswordManager:\n    \"\"\"Менеджер для работы с паролями.\"\"\"\n    @staticmethod",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "hash_password",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "hash_password = PasswordManager.hash_password\nget_password_hash = PasswordManager.hash_password  # Alias for backward compatibility\nverify_password = PasswordManager.verify_password\ncreate_access_token = JWTTokenManager.create_access_token\ncreate_refresh_token = JWTTokenManager.create_refresh_token\nverify_token = JWTTokenManager.verify_token\ngenerate_password_reset_token = JWTTokenManager.create_password_reset_token\nverify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "get_password_hash",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "get_password_hash = PasswordManager.hash_password  # Alias for backward compatibility\nverify_password = PasswordManager.verify_password\ncreate_access_token = JWTTokenManager.create_access_token\ncreate_refresh_token = JWTTokenManager.create_refresh_token\nverify_token = JWTTokenManager.verify_token\ngenerate_password_reset_token = JWTTokenManager.create_password_reset_token\nverify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_password",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "verify_password = PasswordManager.verify_password\ncreate_access_token = JWTTokenManager.create_access_token\ncreate_refresh_token = JWTTokenManager.create_refresh_token\nverify_token = JWTTokenManager.verify_token\ngenerate_password_reset_token = JWTTokenManager.create_password_reset_token\nverify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "create_access_token",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "create_access_token = JWTTokenManager.create_access_token\ncreate_refresh_token = JWTTokenManager.create_refresh_token\nverify_token = JWTTokenManager.verify_token\ngenerate_password_reset_token = JWTTokenManager.create_password_reset_token\nverify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).\n    Args:",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "create_refresh_token",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "create_refresh_token = JWTTokenManager.create_refresh_token\nverify_token = JWTTokenManager.verify_token\ngenerate_password_reset_token = JWTTokenManager.create_password_reset_token\nverify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).\n    Args:\n        password: Пароль для проверки",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_token",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "verify_token = JWTTokenManager.verify_token\ngenerate_password_reset_token = JWTTokenManager.create_password_reset_token\nverify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).\n    Args:\n        password: Пароль для проверки\n    Returns:",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "generate_password_reset_token",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "generate_password_reset_token = JWTTokenManager.create_password_reset_token\nverify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).\n    Args:\n        password: Пароль для проверки\n    Returns:\n        tuple: (валиден, список ошибок)",
+        "detail": "requify.app.core.security",
+        "documentation": {}
+    },
+    {
+        "label": "verify_password_reset_token",
+        "kind": 5,
+        "importPath": "requify.app.core.security",
+        "description": "requify.app.core.security",
+        "peekOfCode": "verify_password_reset_token = JWTTokenManager.verify_password_reset_token\n# === Password validation function for external use ===\ndef validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).\n    Args:\n        password: Пароль для проверки\n    Returns:\n        tuple: (валиден, список ошибок)\n    \"\"\"",
         "detail": "requify.app.core.security",
         "documentation": {}
     },
@@ -5950,6 +7072,24 @@
         "description": "requify.app.crud.project",
         "peekOfCode": "project = CRUDProject(Project)",
         "detail": "requify.app.crud.project",
+        "documentation": {}
+    },
+    {
+        "label": "CRUDRefreshToken",
+        "kind": 6,
+        "importPath": "requify.app.crud.refresh_token",
+        "description": "requify.app.crud.refresh_token",
+        "peekOfCode": "class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):\n    \"\"\"CRUD операции для RefreshToken.\"\"\"\n    async def create_for_user(\n        self,\n        db: AsyncSession,\n        *,\n        user_id: int,\n        expires_at: datetime,\n        user_agent: Optional[str] = None,\n        ip_address: Optional[str] = None,",
+        "detail": "requify.app.crud.refresh_token",
+        "documentation": {}
+    },
+    {
+        "label": "crud_refresh_token",
+        "kind": 5,
+        "importPath": "requify.app.crud.refresh_token",
+        "description": "requify.app.crud.refresh_token",
+        "peekOfCode": "crud_refresh_token = CRUDRefreshToken(RefreshToken)",
+        "detail": "requify.app.crud.refresh_token",
         "documentation": {}
     },
     {
@@ -6506,7 +7646,7 @@
         "kind": 6,
         "importPath": "requify.app.models.base",
         "description": "requify.app.models.base",
-        "peekOfCode": "class TimestampedMixin:\n    \"\"\"\n    Миксин для моделей с полями временных меток.\n    Следует принципу DRY для общих полей created_at и updated_at.\n    \"\"\"\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime, \n        default=lambda: datetime.now(UTC).replace(tzinfo=None), \n        nullable=False,\n        comment=\"Время создания записи\"",
+        "peekOfCode": "class TimestampedMixin:\n    \"\"\"\n    Миксин для моделей с полями временных меток.\n    Следует принципу DRY для общих полей created_at и updated_at.\n    \"\"\"\n    created_at: Mapped[datetime] = mapped_column(\n        DateTime,\n        default=lambda: datetime.now(UTC).replace(tzinfo=None),\n        nullable=False,\n        comment=\"Время создания записи\",",
         "detail": "requify.app.models.base",
         "documentation": {}
     },
@@ -6533,8 +7673,17 @@
         "kind": 6,
         "importPath": "requify.app.models.project",
         "description": "requify.app.models.project",
-        "peekOfCode": "class Project(Base, TimestampedMixin):\n    \"\"\"\n    Модель проекта.\n    Представляет отдельный проект с его требованиями, релизами, \n    спецификациями и группами требований.\n    \"\"\"\n    __tablename__ = \"projects\"\n    __table_args__ = (\n        Index('ix_projects_status_created', 'status', 'created_at'),\n        Index('ix_projects_code_unique', 'code', unique=True),",
+        "peekOfCode": "class Project(Base, TimestampedMixin):\n    \"\"\"\n    Модель проекта.\n    Представляет отдельный проект с его требованиями, релизами,\n    спецификациями и группами требований.\n    \"\"\"\n    __tablename__ = \"projects\"\n    __table_args__ = (\n        Index(\"ix_projects_status_created\", \"status\", \"created_at\"),\n        Index(\"ix_projects_code_unique\", \"code\", unique=True),",
         "detail": "requify.app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshToken",
+        "kind": 6,
+        "importPath": "requify.app.models.refresh_token",
+        "description": "requify.app.models.refresh_token",
+        "peekOfCode": "class RefreshToken(Base):\n    \"\"\"\n    Модель для хранения refresh токенов в базе данных.\n    Обеспечивает безопасное управление токенами обновления с возможностью\n    отзыва и отслеживания активности пользователя.\n    \"\"\"\n    __tablename__ = \"refresh_tokens\"\n    __table_args__ = (\n        Index(\"ix_refresh_tokens_token_unique\", \"token\", unique=True),\n        Index(\"ix_refresh_tokens_user_id\", \"user_id\"),",
+        "detail": "requify.app.models.refresh_token",
         "documentation": {}
     },
     {
@@ -6542,7 +7691,7 @@
         "kind": 6,
         "importPath": "requify.app.models.relationship",
         "description": "requify.app.models.relationship",
-        "peekOfCode": "class Relationship(Base):\n    \"\"\"\n    Модель связи между требованиями.\n    \"\"\"\n    __tablename__ = \"relationships\"  \n    # Используем составной первичный ключ из трех полей\n    source_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirements.id\"), primary_key=True\n    )\n    target_id: Mapped[int] = mapped_column(",
+        "peekOfCode": "class Relationship(Base):\n    \"\"\"\n    Модель связи между требованиями.\n    \"\"\"\n    __tablename__ = \"relationships\"\n    # Используем составной первичный ключ из трех полей\n    source_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirements.id\"), primary_key=True\n    )\n    target_id: Mapped[int] = mapped_column(",
         "detail": "requify.app.models.relationship",
         "documentation": {}
     },
@@ -6569,7 +7718,7 @@
         "kind": 6,
         "importPath": "requify.app.models.requirement",
         "description": "requify.app.models.requirement",
-        "peekOfCode": "class Requirement(Base, TimestampedMixin):\n    \"\"\"\n    Модель требования.\n    Представляет отдельное требование в рамках проекта.\n    Содержит информацию о типе, приоритете, статусе и связях с другими сущностями.\n    \"\"\"\n    __tablename__ = \"requirements\"\n    __table_args__ = (\n        Index('ix_requirements_project_status', 'project_id', 'status_id'),\n        Index('ix_requirements_author_created', 'author_id', 'created_at'),",
+        "peekOfCode": "class Requirement(Base, TimestampedMixin):\n    \"\"\"\n    Модель требования.\n    Представляет отдельное требование в рамках проекта.\n    Содержит информацию о типе, приоритете, статусе и связях с другими сущностями.\n    \"\"\"\n    __tablename__ = \"requirements\"\n    __table_args__ = (\n        Index(\"ix_requirements_project_status\", \"project_id\", \"status_id\"),\n        Index(\"ix_requirements_author_created\", \"author_id\", \"created_at\"),",
         "detail": "requify.app.models.requirement",
         "documentation": {}
     },
@@ -6650,8 +7799,215 @@
         "kind": 6,
         "importPath": "requify.app.models.user",
         "description": "requify.app.models.user",
-        "peekOfCode": "class User(Base, TimestampedMixin):\n    \"\"\"\n    Модель пользователя системы.\n    Представляет пользователя с его ролями, созданными требованиями,\n    комментариями и другими связанными сущностями.\n    \"\"\"\n    __tablename__ = \"users\"\n    __table_args__ = (\n        Index('ix_users_email_unique', 'email', unique=True),\n        Index('ix_users_username_unique', 'username', unique=True),",
+        "peekOfCode": "class User(Base, TimestampedMixin):\n    \"\"\"\n    Модель пользователя системы.\n    Представляет пользователя с его ролями, созданными требованиями,\n    комментариями и другими связанными сущностями.\n    \"\"\"\n    __tablename__ = \"users\"\n    __table_args__ = (\n        Index(\"ix_users_email_unique\", \"email\", unique=True),\n        Index(\"ix_users_username_unique\", \"username\", unique=True),",
         "detail": "requify.app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "TokenBase",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class TokenBase(BaseModel):\n    \"\"\"Базовая схема токена.\"\"\"\n    token_type: str = Field(default=\"bearer\", description=\"Тип токена\")\nclass AccessToken(TokenBase):\n    \"\"\"Схема для access токена.\"\"\"\n    access_token: str = Field(..., description=\"Access токен\")\n    expires_in: int = Field(..., description=\"Время жизни токена в секундах\")\nclass RefreshToken(TokenBase):\n    \"\"\"Схема для refresh токена.\"\"\"\n    refresh_token: str = Field(..., description=\"Refresh токен\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "AccessToken",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class AccessToken(TokenBase):\n    \"\"\"Схема для access токена.\"\"\"\n    access_token: str = Field(..., description=\"Access токен\")\n    expires_in: int = Field(..., description=\"Время жизни токена в секундах\")\nclass RefreshToken(TokenBase):\n    \"\"\"Схема для refresh токена.\"\"\"\n    refresh_token: str = Field(..., description=\"Refresh токен\")\n    expires_in: int = Field(..., description=\"Время жизни токена в секундах\")\nclass TokenPair(BaseModel):\n    \"\"\"Схема для пары токенов (access + refresh).\"\"\"",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshToken",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class RefreshToken(TokenBase):\n    \"\"\"Схема для refresh токена.\"\"\"\n    refresh_token: str = Field(..., description=\"Refresh токен\")\n    expires_in: int = Field(..., description=\"Время жизни токена в секундах\")\nclass TokenPair(BaseModel):\n    \"\"\"Схема для пары токенов (access + refresh).\"\"\"\n    access_token: str = Field(..., description=\"Access токен\")\n    refresh_token: str = Field(..., description=\"Refresh токен\")\n    token_type: str = Field(default=\"bearer\", description=\"Тип токена\")\n    expires_in: int = Field(..., description=\"Время жизни access токена в секундах\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "TokenPair",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class TokenPair(BaseModel):\n    \"\"\"Схема для пары токенов (access + refresh).\"\"\"\n    access_token: str = Field(..., description=\"Access токен\")\n    refresh_token: str = Field(..., description=\"Refresh токен\")\n    token_type: str = Field(default=\"bearer\", description=\"Тип токена\")\n    expires_in: int = Field(..., description=\"Время жизни access токена в секундах\")\n    refresh_expires_in: int = Field(\n        ..., description=\"Время жизни refresh токена в секундах\"\n    )\n# === JWT Payload Schemas ===",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "AccessTokenPayload",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class AccessTokenPayload(BaseModel):\n    \"\"\"Схема для данных внутри access JWT токена.\"\"\"\n    sub: str = Field(..., description=\"Subject (user email)\")\n    exp: int = Field(..., description=\"Expiration time (timestamp)\")\n    iat: int = Field(..., description=\"Issued at (timestamp)\")\n    type: str = Field(default=\"access\", description=\"Тип токена\")\n    user_id: int = Field(..., description=\"ID пользователя\")\n    scopes: list[str] = Field(default_factory=list, description=\"Права доступа\")\nclass RefreshTokenPayload(BaseModel):\n    \"\"\"Схема для данных внутри refresh JWT токена.\"\"\"",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshTokenPayload",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class RefreshTokenPayload(BaseModel):\n    \"\"\"Схема для данных внутри refresh JWT токена.\"\"\"\n    sub: str = Field(..., description=\"Subject (user email)\")\n    exp: int = Field(..., description=\"Expiration time (timestamp)\")\n    iat: int = Field(..., description=\"Issued at (timestamp)\")\n    type: str = Field(default=\"refresh\", description=\"Тип токена\")\n    user_id: int = Field(..., description=\"ID пользователя\")\n    token_id: str = Field(..., description=\"ID refresh токена в БД\")\nclass TokenData(BaseModel):\n    \"\"\"Схема для валидации токена.\"\"\"",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "TokenData",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class TokenData(BaseModel):\n    \"\"\"Схема для валидации токена.\"\"\"\n    email: Optional[str] = Field(None, description=\"Email пользователя\")\n    user_id: Optional[int] = Field(None, description=\"ID пользователя\")\n    scopes: list[str] = Field(default_factory=list, description=\"Права доступа\")\n# === Authentication Request/Response Schemas ===\nclass LoginRequest(BaseModel):\n    \"\"\"Схема для запроса аутентификации.\"\"\"\n    username: str = Field(..., min_length=1, description=\"Username или email\")\n    password: str = Field(..., min_length=1, description=\"Пароль\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LoginRequest",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class LoginRequest(BaseModel):\n    \"\"\"Схема для запроса аутентификации.\"\"\"\n    username: str = Field(..., min_length=1, description=\"Username или email\")\n    password: str = Field(..., min_length=1, description=\"Пароль\")\n    remember_me: bool = Field(default=False, description=\"Запомнить меня\")\n    @validator(\"username\")\n    def validate_username(cls, v):\n        \"\"\"Валидация username.\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Username не может быть пустым\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LoginResponse",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class LoginResponse(BaseModel):\n    \"\"\"Схема для ответа после успешной аутентификации.\"\"\"\n    access_token: str = Field(..., description=\"Access токен\")\n    refresh_token: str = Field(..., description=\"Refresh токен\")\n    token_type: str = Field(default=\"bearer\", description=\"Тип токена\")\n    expires_in: int = Field(..., description=\"Время жизни access токена в секундах\")\n    refresh_expires_in: int = Field(\n        ..., description=\"Время жизни refresh токена в секундах\"\n    )\n    # Информация о пользователе",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshTokenRequest",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class RefreshTokenRequest(BaseModel):\n    \"\"\"Схема для запроса обновления токена.\"\"\"\n    refresh_token: str = Field(..., description=\"Refresh токен\")\nclass RefreshTokenResponse(BaseModel):\n    \"\"\"Схема для ответа при обновлении токена.\"\"\"\n    access_token: str = Field(..., description=\"Новый access токен\")\n    refresh_token: Optional[str] = Field(\n        None, description=\"Новый refresh токен (если ротация включена)\"\n    )\n    token_type: str = Field(default=\"bearer\", description=\"Тип токена\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RefreshTokenResponse",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class RefreshTokenResponse(BaseModel):\n    \"\"\"Схема для ответа при обновлении токена.\"\"\"\n    access_token: str = Field(..., description=\"Новый access токен\")\n    refresh_token: Optional[str] = Field(\n        None, description=\"Новый refresh токен (если ротация включена)\"\n    )\n    token_type: str = Field(default=\"bearer\", description=\"Тип токена\")\n    expires_in: int = Field(..., description=\"Время жизни access токена в секундах\")\n    refresh_expires_in: Optional[int] = Field(\n        None, description=\"Время жизни refresh токена в секундах\"",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LogoutRequest",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class LogoutRequest(BaseModel):\n    \"\"\"Схема для запроса выхода из системы.\"\"\"\n    refresh_token: Optional[str] = Field(None, description=\"Refresh токен для отзыва\")\n    logout_all: bool = Field(default=False, description=\"Выйти из всех устройств\")\nclass LogoutResponse(BaseModel):\n    \"\"\"Схема для ответа при выходе из системы.\"\"\"\n    message: str = Field(default=\"Successfully logged out\", description=\"Сообщение\")\n    revoked_tokens: int = Field(default=0, description=\"Количество отозванных токенов\")\n# === User Profile Schema (for authentication responses) ===\nclass UserProfile(BaseModel):",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "LogoutResponse",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class LogoutResponse(BaseModel):\n    \"\"\"Схема для ответа при выходе из системы.\"\"\"\n    message: str = Field(default=\"Successfully logged out\", description=\"Сообщение\")\n    revoked_tokens: int = Field(default=0, description=\"Количество отозванных токенов\")\n# === User Profile Schema (for authentication responses) ===\nclass UserProfile(BaseModel):\n    \"\"\"Схема профиля пользователя для аутентификации.\"\"\"\n    id: int = Field(..., description=\"ID пользователя\")\n    username: str = Field(..., description=\"Имя пользователя\")\n    email: EmailStr = Field(..., description=\"Email пользователя\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfile",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class UserProfile(BaseModel):\n    \"\"\"Схема профиля пользователя для аутентификации.\"\"\"\n    id: int = Field(..., description=\"ID пользователя\")\n    username: str = Field(..., description=\"Имя пользователя\")\n    email: EmailStr = Field(..., description=\"Email пользователя\")\n    name: Optional[str] = Field(None, description=\"Полное имя\")\n    role: str = Field(..., description=\"Роль пользователя\")\n    is_active: bool = Field(..., description=\"Активен ли пользователь\")\n    is_superuser: bool = Field(..., description=\"Является ли суперпользователем\")\n    last_login: Optional[datetime] = Field(None, description=\"Время последнего входа\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordChangeRequest",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class PasswordChangeRequest(BaseModel):\n    \"\"\"Схема для смены пароля.\"\"\"\n    current_password: str = Field(..., description=\"Текущий пароль\")\n    new_password: str = Field(..., min_length=8, description=\"Новый пароль\")\n    confirm_password: str = Field(..., description=\"Подтверждение нового пароля\")\n    @validator(\"confirm_password\")\n    def passwords_match(cls, v, values):\n        \"\"\"Проверка совпадения паролей.\"\"\"\n        if \"new_password\" in values and v != values[\"new_password\"]:\n            raise ValueError(\"Пароли не совпадают\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordResetRequest",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class PasswordResetRequest(BaseModel):\n    \"\"\"Схема для запроса сброса пароля.\"\"\"\n    email: EmailStr = Field(..., description=\"Email пользователя\")\nclass PasswordResetConfirm(BaseModel):\n    \"\"\"Схема для подтверждения сброса пароля.\"\"\"\n    token: str = Field(..., description=\"Токен сброса пароля\")\n    new_password: str = Field(..., min_length=8, description=\"Новый пароль\")\n    confirm_password: str = Field(..., description=\"Подтверждение нового пароля\")\n    @validator(\"confirm_password\")\n    def passwords_match(cls, v, values):",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "PasswordResetConfirm",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class PasswordResetConfirm(BaseModel):\n    \"\"\"Схема для подтверждения сброса пароля.\"\"\"\n    token: str = Field(..., description=\"Токен сброса пароля\")\n    new_password: str = Field(..., min_length=8, description=\"Новый пароль\")\n    confirm_password: str = Field(..., description=\"Подтверждение нового пароля\")\n    @validator(\"confirm_password\")\n    def passwords_match(cls, v, values):\n        \"\"\"Проверка совпадения паролей.\"\"\"\n        if \"new_password\" in values and v != values[\"new_password\"]:\n            raise ValueError(\"Пароли не совпадают\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "TokenValidationRequest",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class TokenValidationRequest(BaseModel):\n    \"\"\"Схема для валидации токена.\"\"\"\n    token: str = Field(..., description=\"Токен для валидации\")\nclass TokenValidationResponse(BaseModel):\n    \"\"\"Схема для ответа валидации токена.\"\"\"\n    valid: bool = Field(..., description=\"Валиден ли токен\")\n    expires_at: Optional[datetime] = Field(None, description=\"Время истечения\")\n    user: Optional[UserProfile] = Field(None, description=\"Информация о пользователе\")\n# === Session Management Schemas ===\nclass ActiveSession(BaseModel):",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "TokenValidationResponse",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class TokenValidationResponse(BaseModel):\n    \"\"\"Схема для ответа валидации токена.\"\"\"\n    valid: bool = Field(..., description=\"Валиден ли токен\")\n    expires_at: Optional[datetime] = Field(None, description=\"Время истечения\")\n    user: Optional[UserProfile] = Field(None, description=\"Информация о пользователе\")\n# === Session Management Schemas ===\nclass ActiveSession(BaseModel):\n    \"\"\"Схема для активной сессии пользователя.\"\"\"\n    id: int = Field(..., description=\"ID сессии\")\n    created_at: datetime = Field(..., description=\"Время создания\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "ActiveSession",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class ActiveSession(BaseModel):\n    \"\"\"Схема для активной сессии пользователя.\"\"\"\n    id: int = Field(..., description=\"ID сессии\")\n    created_at: datetime = Field(..., description=\"Время создания\")\n    last_used_at: Optional[datetime] = Field(\n        None, description=\"Время последнего использования\"\n    )\n    expires_at: datetime = Field(..., description=\"Время истечения\")\n    ip_address: Optional[str] = Field(None, description=\"IP адрес\")\n    user_agent: Optional[str] = Field(None, description=\"User agent\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "SessionListResponse",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class SessionListResponse(BaseModel):\n    \"\"\"Схема для списка активных сессий.\"\"\"\n    sessions: list[ActiveSession] = Field(..., description=\"Список активных сессий\")\n    total: int = Field(..., description=\"Общее количество сессий\")\nclass RevokeSessionRequest(BaseModel):\n    \"\"\"Схема для отзыва сессии.\"\"\"\n    session_id: Optional[int] = Field(None, description=\"ID сессии для отзыва\")\n    revoke_all: bool = Field(default=False, description=\"Отозвать все сессии\")\n# === Error Schemas ===\nclass AuthError(BaseModel):",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "RevokeSessionRequest",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class RevokeSessionRequest(BaseModel):\n    \"\"\"Схема для отзыва сессии.\"\"\"\n    session_id: Optional[int] = Field(None, description=\"ID сессии для отзыва\")\n    revoke_all: bool = Field(default=False, description=\"Отозвать все сессии\")\n# === Error Schemas ===\nclass AuthError(BaseModel):\n    \"\"\"Схема для ошибок аутентификации.\"\"\"\n    error: str = Field(..., description=\"Код ошибки\")\n    error_description: str = Field(..., description=\"Описание ошибки\")\n    error_details: Optional[dict] = Field(None, description=\"Дополнительные детали\")",
+        "detail": "requify.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "AuthError",
+        "kind": 6,
+        "importPath": "requify.app.schemas.auth",
+        "description": "requify.app.schemas.auth",
+        "peekOfCode": "class AuthError(BaseModel):\n    \"\"\"Схема для ошибок аутентификации.\"\"\"\n    error: str = Field(..., description=\"Код ошибки\")\n    error_description: str = Field(..., description=\"Описание ошибки\")\n    error_details: Optional[dict] = Field(None, description=\"Дополнительные детали\")\n# Forward reference resolution\nLoginResponse.model_rebuild()\nTokenValidationResponse.model_rebuild()",
+        "detail": "requify.app.schemas.auth",
         "documentation": {}
     },
     {
@@ -7546,6 +8902,51 @@
         "documentation": {}
     },
     {
+        "label": "EmailConfig",
+        "kind": 6,
+        "importPath": "requify.app.services.email_service",
+        "description": "requify.app.services.email_service",
+        "peekOfCode": "class EmailConfig:\n    \"\"\"Конфигурация для email сервиса.\"\"\"\n    # SMTP настройки\n    SMTP_HOST: str = \"localhost\"\n    SMTP_PORT: int = 587\n    SMTP_USERNAME: Optional[str] = None\n    SMTP_PASSWORD: Optional[str] = None\n    SMTP_USE_TLS: bool = True\n    SMTP_USE_SSL: bool = False\n    # Настройки отправителя",
+        "detail": "requify.app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "EmailTemplates",
+        "kind": 6,
+        "importPath": "requify.app.services.email_service",
+        "description": "requify.app.services.email_service",
+        "peekOfCode": "class EmailTemplates:\n    \"\"\"Менеджер email шаблонов.\"\"\"\n    def __init__(self, templates_dir: Optional[str] = None):\n        \"\"\"\n        Инициализация менеджера шаблонов.\n        Args:\n            templates_dir: Путь к директории с шаблонами\n        \"\"\"\n        self.templates_dir = templates_dir or EmailConfig.TEMPLATES_DIR\n        self.env = None",
+        "detail": "requify.app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "EmailService",
+        "kind": 6,
+        "importPath": "requify.app.services.email_service",
+        "description": "requify.app.services.email_service",
+        "peekOfCode": "class EmailService:\n    \"\"\"Сервис для отправки email уведомлений.\"\"\"\n    def __init__(self, config: Optional[EmailConfig] = None):\n        \"\"\"\n        Инициализация email сервиса.\n        Args:\n            config: Конфигурация email сервиса\n        \"\"\"\n        self.config = config or EmailConfig.from_settings()\n        self.templates = EmailTemplates()",
+        "detail": "requify.app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "requify.app.services.email_service",
+        "description": "requify.app.services.email_service",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass EmailConfig:\n    \"\"\"Конфигурация для email сервиса.\"\"\"\n    # SMTP настройки\n    SMTP_HOST: str = \"localhost\"\n    SMTP_PORT: int = 587\n    SMTP_USERNAME: Optional[str] = None\n    SMTP_PASSWORD: Optional[str] = None\n    SMTP_USE_TLS: bool = True\n    SMTP_USE_SSL: bool = False",
+        "detail": "requify.app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "email_service",
+        "kind": 5,
+        "importPath": "requify.app.services.email_service",
+        "description": "requify.app.services.email_service",
+        "peekOfCode": "email_service = EmailService()",
+        "detail": "requify.app.services.email_service",
+        "documentation": {}
+    },
+    {
         "label": "NotificationType",
         "kind": 6,
         "importPath": "requify.app.services.notification_service",
@@ -7735,38 +9136,38 @@
         "documentation": {}
     },
     {
-        "label": "sample_user_data",
+        "label": "event_loop",
         "kind": 2,
         "importPath": "requify.tests.conftest",
         "description": "requify.tests.conftest",
-        "peekOfCode": "def sample_user_data():\n    \"\"\"Пример данных пользователя для тестов.\"\"\"\n    return {\n        \"email\": \"test@example.com\",\n        \"name\": \"Test User\",\n        \"password\": \"testpass123\",\n        \"is_active\": True,\n        \"is_superuser\": False,\n    }\n@pytest.fixture",
+        "peekOfCode": "def event_loop():\n    \"\"\"Create event loop for the test session.\"\"\"\n    policy = asyncio.get_event_loop_policy()\n    loop = policy.new_event_loop()\n    yield loop\n    loop.close()\n@pytest.fixture(scope=\"session\", autouse=True)\nasync def setup_test_db():\n    \"\"\"Setup test database for the session.\"\"\"\n    # Create all tables",
         "detail": "requify.tests.conftest",
         "documentation": {}
     },
     {
-        "label": "sample_project_data",
+        "label": "sample_user_create_data",
         "kind": 2,
         "importPath": "requify.tests.conftest",
         "description": "requify.tests.conftest",
-        "peekOfCode": "def sample_project_data():\n    \"\"\"Пример данных проекта для тестов.\"\"\"\n    return {\n        \"name\": \"Test Project\",\n        \"description\": \"Test project description\",\n        \"status\": \"active\",\n    }\n@pytest.fixture\ndef sample_requirement_data():\n    \"\"\"Пример данных требования для тестов.\"\"\"",
+        "peekOfCode": "def sample_user_create_data():\n    \"\"\"Sample user creation data.\"\"\"\n    return {\n        \"email\": \"newuser@example.com\",\n        \"username\": \"newuser\",\n        \"password\": \"securepassword123\",\n        \"name\": \"New User\",\n        \"role\": \"user\",\n        \"is_active\": True,\n        \"is_superuser\": False,",
         "detail": "requify.tests.conftest",
         "documentation": {}
     },
     {
-        "label": "sample_requirement_data",
+        "label": "sample_project_create_data",
         "kind": 2,
         "importPath": "requify.tests.conftest",
         "description": "requify.tests.conftest",
-        "peekOfCode": "def sample_requirement_data():\n    \"\"\"Пример данных требования для тестов.\"\"\"\n    return {\n        \"title\": \"Test Requirement\",\n        \"description\": \"Test requirement description\",\n        \"priority\": \"high\",\n        \"type\": \"functional\",\n        \"status\": \"draft\",\n    }\n@pytest.fixture",
+        "peekOfCode": "def sample_project_create_data():\n    \"\"\"Sample project creation data.\"\"\"\n    return {\n        \"name\": \"Test Project\",\n        \"description\": \"Test project description\",\n        \"status\": \"active\",\n    }\n@pytest.fixture\ndef sample_requirement_create_data():\n    \"\"\"Sample requirement creation data.\"\"\"",
         "detail": "requify.tests.conftest",
         "documentation": {}
     },
     {
-        "label": "auth_headers",
+        "label": "sample_requirement_create_data",
         "kind": 2,
         "importPath": "requify.tests.conftest",
         "description": "requify.tests.conftest",
-        "peekOfCode": "def auth_headers():\n    \"\"\"Заголовки авторизации для тестов.\"\"\"\n    return {\"Authorization\": \"Bearer mock-jwt-token-123\"}",
+        "peekOfCode": "def sample_requirement_create_data():\n    \"\"\"Sample requirement creation data.\"\"\"\n    return {\n        \"title\": \"Test Requirement\",\n        \"description\": \"Test requirement description\",\n        \"priority\": \"medium\",\n        \"status\": \"draft\",\n    }",
         "detail": "requify.tests.conftest",
         "documentation": {}
     },
@@ -7775,7 +9176,16 @@
         "kind": 5,
         "importPath": "requify.tests.conftest",
         "description": "requify.tests.conftest",
-        "peekOfCode": "pytestmark = pytest.mark.asyncio(mode=\"auto\")\nimport asyncio\nfrom typing import AsyncGenerator\nfrom httpx import AsyncClient\nfrom sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker\nfrom requify.app.main import app\nfrom requify.app.core.config import settings\nfrom requify.app.models.base import Base\nfrom requify.app.api.deps import get_db\n# Тестовая база данных",
+        "peekOfCode": "pytestmark = pytest.mark.asyncio(mode=\"auto\")\n# Set testing environment variable\nos.environ[\"TESTING\"] = \"true\"\nimport asyncio\nfrom typing import AsyncGenerator\nfrom httpx import AsyncClient, ASGITransport\nfrom sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker\nfrom requify.app.main import app\nfrom requify.app.core.config import settings\nfrom requify.app.models.base import Base",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "os.environ[\"TESTING\"]",
+        "kind": 5,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "os.environ[\"TESTING\"] = \"true\"\nimport asyncio\nfrom typing import AsyncGenerator\nfrom httpx import AsyncClient, ASGITransport\nfrom sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker\nfrom requify.app.main import app\nfrom requify.app.core.config import settings\nfrom requify.app.models.base import Base\nfrom requify.app.api.deps import get_db\nfrom requify.app.crud import user as crud_user",
         "detail": "requify.tests.conftest",
         "documentation": {}
     },
@@ -7784,7 +9194,25 @@
         "kind": 5,
         "importPath": "requify.tests.conftest",
         "description": "requify.tests.conftest",
-        "peekOfCode": "TEST_DATABASE_URL = settings.test_db.async_url\n@pytest_asyncio.fixture\nasync def test_engine():\n    \"\"\"Создать тестовый движок БД.\"\"\"\n    engine = create_async_engine(TEST_DATABASE_URL, echo=False)\n    # Создаем таблицы\n    async with engine.begin() as conn:\n        await conn.run_sync(Base.metadata.create_all)\n    yield engine\n    # Очищаем после тестов",
+        "peekOfCode": "TEST_DATABASE_URL = settings.test_db.async_url\n# Test database engine and session\ntest_engine = create_async_engine(\n    TEST_DATABASE_URL,\n    echo=False,\n    future=True,\n    pool_pre_ping=True,\n)\nTestSessionLocal = async_sessionmaker(\n    bind=test_engine,",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "test_engine",
+        "kind": 5,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "test_engine = create_async_engine(\n    TEST_DATABASE_URL,\n    echo=False,\n    future=True,\n    pool_pre_ping=True,\n)\nTestSessionLocal = async_sessionmaker(\n    bind=test_engine,\n    class_=AsyncSession,\n    expire_on_commit=False,",
+        "detail": "requify.tests.conftest",
+        "documentation": {}
+    },
+    {
+        "label": "TestSessionLocal",
+        "kind": 5,
+        "importPath": "requify.tests.conftest",
+        "description": "requify.tests.conftest",
+        "peekOfCode": "TestSessionLocal = async_sessionmaker(\n    bind=test_engine,\n    class_=AsyncSession,\n    expire_on_commit=False,\n    autoflush=False,\n)\nasync def get_test_db() -> AsyncGenerator[AsyncSession, None]:\n    \"\"\"Database session override for testing.\"\"\"\n    async with TestSessionLocal() as session:\n        try:",
         "detail": "requify.tests.conftest",
         "documentation": {}
     },

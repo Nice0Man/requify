@@ -7,6 +7,7 @@ CRUD операции для всех моделей.
 
 from .base import CRUDBase
 from .user import user
+from .refresh_token import crud_refresh_token
 from .project import project
 from .requirement import requirement
 from .release import release
@@ -24,6 +25,7 @@ from .test_result import test_result
 __all__ = [
     "CRUDBase",
     "user",
+    "crud_refresh_token",
     "project",
     "requirement",
     "release",

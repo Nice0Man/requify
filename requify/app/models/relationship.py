@@ -16,7 +16,7 @@ class Relationship(Base):
     Модель связи между требованиями.
     """
 
-    __tablename__ = "relationships"  
+    __tablename__ = "relationships"
 
     # Используем составной первичный ключ из трех полей
     source_id: Mapped[int] = mapped_column(

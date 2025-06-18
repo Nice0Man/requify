@@ -8,7 +8,6 @@ from requify.app.api.deps import get_db
 from requify.app.api.v1.router import api_router
 from requify.app.core.config import settings
 
-
 # Создаем FastAPI приложение
 app = FastAPI(
     title=settings.app_config.name,
@@ -48,17 +47,13 @@ async def health_check():
     Выполняет базовые проверки компонентов системы.
     """
 
-    
     # Базовый статус
     health_status = {
         "status": "healthy",
         "timestamp": datetime.now(UTC).isoformat(),
-        "checks": {
-            "database": "unknown",
-            "api": "healthy"
-        }
+        "checks": {"database": "unknown", "api": "healthy"},
     }
-    
+
     # Проверка подключения к базе данных
     try:
         db = next(get_db())
@@ -67,11 +62,12 @@ async def health_check():
         health_status["checks"]["database"] = "healthy"
     except Exception as e:
         health_status["status"] = "unhealthy"
-        health_status["checks"]["database"] = f"error: {str(e)}"
+        health_status["checks"]["database"] = "error"
+        health_status["checks"]["database_error"] = str(e)
     finally:
         try:
             db.close()
         except:
             pass
-    
+
     return health_status
