@@ -3,9 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select, and_, or_, desc, func
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.requirement_group_version import RequirementGroupVersion
-from requify.app.schemas.requirement_group_version import (
+from app.crud.base import CRUDBase
+from app.models.requirement_group_version import RequirementGroupVersion
+from app.schemas.requirement_group_version import (
     RequirementGroupVersionCreate,
     RequirementGroupVersionUpdate,
 )

@@ -8,7 +8,7 @@ from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from typing import Optional
 
-from requify.app.core.config import settings
+from app.core.config import settings
 
 
 def setup_logger(

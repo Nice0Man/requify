@@ -15,8 +15,8 @@ from typing import Dict, List, Optional, Any, Union
 import logging
 from dataclasses import dataclass
 
-from requify.app.core.config import settings
-from requify.app.core.exceptions import ReportGenerationError
+from app.core.config import settings
+from app.core.exceptions import ReportGenerationError
 
 logger = logging.getLogger(__name__)
 
@@ -182,10 +182,10 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по статусам требований"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
         from sqlalchemy import func, select
-        from requify.app.models.requirement import Requirement
+        from app.models.requirement import Requirement
 
         async with async_session_scope() as db:
             # Базовый запрос для требований
@@ -265,11 +265,11 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по требованиям в разрезе проектов"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
         from sqlalchemy import func, select
-        from requify.app.models.project import Project
-        from requify.app.models.requirement import Requirement
+        from app.models.project import Project
+        from app.models.requirement import Requirement
 
         async with async_session_scope() as db:
             # Получаем проекты с количеством требований
@@ -345,11 +345,11 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по требованиям в разрезе пользователей"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
         from sqlalchemy import select, func
-        from requify.app.models.user import User
-        from requify.app.models.requirement import Requirement
+        from app.models.user import User
+        from app.models.requirement import Requirement
 
         async with async_session_scope() as db:
             # Получаем пользователей
@@ -423,8 +423,8 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по прогрессу проектов"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
         from datetime import timedelta
 
         async with async_session_scope() as db:
@@ -520,8 +520,8 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по результатам тестирования"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
 
         async with async_session_scope() as db:
             # Получаем результаты тестирования
@@ -588,8 +588,8 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по дедлайнам"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
         from datetime import timedelta
 
         async with async_session_scope() as db:
@@ -656,8 +656,8 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по истории изменений"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
 
         async with async_session_scope() as db:
             # Получаем комментарии как историю изменений
@@ -719,8 +719,8 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по метрикам производительности"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
 
         async with async_session_scope() as db:
             # Собираем метрики из различных источников
@@ -777,8 +777,8 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по активности пользователей"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
         from sqlalchemy import func
 
         async with async_session_scope() as db:
@@ -847,8 +847,8 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует полный экспорт данных"""
-        from requify.app import crud
-        from requify.app.db.session import async_session_scope
+        from app import crud
+        from app.db.session import async_session_scope
 
         async with async_session_scope() as db:
             # Собираем все данные системы

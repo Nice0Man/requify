@@ -15,11 +15,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
-from requify.app.api.deps import get_db, get_admin_user
-from requify.app.core.config import settings
-from requify.app.models.user import User
-from requify.app.schemas.auth import UserProfile
-from requify.app import crud
+from app.api.deps import get_db, get_admin_user
+from app.core.config import settings
+from app.models.user import User
+from app.schemas.auth import UserProfile
+from app import crud
 
 router = APIRouter()
 

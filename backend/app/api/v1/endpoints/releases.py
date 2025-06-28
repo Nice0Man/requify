@@ -8,15 +8,15 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import (
+from app.api.deps import (
     get_db,
     get_releases_read_user,
     get_releases_write_user,
     get_releases_delete_user,
 )
-from requify.app.core.config import settings
-from requify.app import crud, schemas
-from requify.app.schemas.release import ReleaseCreate, ReleaseUpdate
+from app.core.config import settings
+from app import crud, schemas
+from app.schemas.release import ReleaseCreate, ReleaseUpdate
 
 router = APIRouter()
 
@@ -319,7 +319,7 @@ async def generate_release_specification(
 
     # Создаем спецификацию
     from datetime import datetime, UTC
-    from requify.app.schemas.spec import SpecCreate
+    from app.schemas.spec import SpecCreate
 
     spec_data = SpecCreate(
         name=f"Specification for {release.name} {release.version}",

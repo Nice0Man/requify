@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from datetime import datetime
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.relationship import Relationship
-from requify.app.schemas.relationship import RelationshipCreate, RelationshipUpdate
-from requify.app.schemas.trace_matrix import TraceNode, TraceLink
+from app.crud.base import CRUDBase
+from app.models.relationship import Relationship
+from app.schemas.relationship import RelationshipCreate, RelationshipUpdate
+from app.schemas.trace_matrix import TraceNode, TraceLink
 
 
 class CRUDRelationship(CRUDBase[Relationship, RelationshipCreate, RelationshipUpdate]):
@@ -169,8 +169,8 @@ class CRUDRelationship(CRUDBase[Relationship, RelationshipCreate, RelationshipUp
         self, db: AsyncSession, *, requirement_id: int, depth: int = 3
     ) -> List[List[TraceNode]]:
         """Построить матрицу трассируемости."""
-        from requify.app.models.requirement import Requirement
-        from requify.app.models.requirement_types import RequirementType
+        from app.models.requirement import Requirement
+        from app.models.requirement_types import RequirementType
 
         # Получаем центральное требование
         central_req_stmt = (
@@ -301,8 +301,8 @@ class CRUDRelationship(CRUDBase[Relationship, RelationshipCreate, RelationshipUp
         self, db: AsyncSession, *, project_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """Получить статистику связей."""
-        from requify.app.models.requirement import Requirement
-        from requify.app.models.relationship_types import RelationshipType
+        from app.models.requirement import Requirement
+        from app.models.relationship_types import RelationshipType
 
         # Базовый запрос
         base_query = select(Relationship)

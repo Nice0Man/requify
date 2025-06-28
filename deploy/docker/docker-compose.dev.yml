@@ -1,27 +1,18 @@
-version: '3.8'
-
 services:
   # PostgreSQL основная база данных
   postgres:
-    image: postgres:16.0
-    container_name: requify_postgres_dev
-    environment:
-      POSTGRES_DB: requify-db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    image: postgres:15-alpine
+    container_name: requify-postgres-dev
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_DB: requify_dev
+      POSTGRES_USER: requify_user
+      POSTGRES_PASSWORD: requify_password
     volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - "postgres_data:/var/lib/postgresql/data"
     networks:
       - requify-dev-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d requify-db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # PostgreSQL тестовая база данных
   postgres-test:
@@ -45,106 +36,84 @@ services:
 
   # Redis
   redis:
-    image: redis:7.2-alpine
-    container_name: requify_redis_dev
+    image: redis:alpine
+    container_name: requify-redis-dev
     ports:
       - "6379:6379"
     volumes:
-      - redis_dev_data:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf
+      - "redis_data:/data"
     networks:
       - requify-dev-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # Backend FastAPI с hot reload
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.backend.dev
-    container_name: requify_backend_dev
+      context: ../../
+      dockerfile: ./deploy/docker/backend/Dockerfile.dev
+    container_name: requify-backend-dev
+    ports:
+      - "8000:8000"
     environment:
       - APP_CONFIG__ENV=development
       - APP_CONFIG__DB__HOST=postgres
       - APP_CONFIG__DB__PORT=5432
-      - APP_CONFIG__TEST_DB__HOST=postgres-test
-      - APP_CONFIG__TEST_DB__PORT=5432
+      - APP_CONFIG__DB__NAME=requify_dev
+      - APP_CONFIG__DB__USER=requify_user
+      - APP_CONFIG__DB__PASSWORD=requify_password
       - APP_CONFIG__REDIS__HOST=redis
       - APP_CONFIG__REDIS__PORT=6379
       - APP_CONFIG__REDIS__DB=0
       - PYTHONPATH=/app
-    ports:
-      - "8000:8000"
-      - "5678:5678"  # Порт для debugpy
+      - FASTAPI_ENV=development
+      - DATABASE_URL=postgresql://requify_user:requify_password@postgres:5432/requify_dev
+      - REDIS_URL=redis://redis:6379/0
     volumes:
-      - ./requify:/app/requify:ro  # Read-only для кода
-      - ./logs:/app/logs
-      - ./uploads:/app/uploads
-      - ./.env:/app/.env:ro
-      - ./alembic.ini:/app/alembic.ini:ro
+      - "../../backend:/app"
+      - "static_volume:/app/static"
+      - "uploads_volume:/app/uploads"
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgres
+      - redis
     networks:
       - requify-dev-network
-    restart: unless-stopped
-    develop:
-      watch:
-        - action: sync
-          path: ./requify
-          target: /app/requify
-        - action: rebuild
-          path: ./pyproject.toml
+    working_dir: /app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   # Frontend с hot reload
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend.dev
-    container_name: requify_frontend_dev
-    environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://localhost:8000
-      - CHOKIDAR_USEPOLLING=true  # Для Windows
+      context: ../../frontend
+      dockerfile: ../deploy/docker/frontend/Dockerfile.dev
+    container_name: requify-frontend-dev
+    volumes:
+      - "../../frontend:/app"
+      - "/app/node_modules"
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app:delegated
-      - /app/node_modules  # Исключаем node_modules из bind mount
-    depends_on:
-      - backend
+    environment:
+      - VITE_API_URL=http://localhost/api/v1
+      - NODE_ENV=development
     networks:
       - requify-dev-network
-    restart: unless-stopped
-    develop:
-      watch:
-        - action: sync
-          path: ./frontend/src
-          target: /app/src
-        - action: rebuild
-          path: ./frontend/package.json
+    command: npm run dev -- --host 0.0.0.0
 
   # Nginx для разработки
-  nginx-dev:
+  nginx:
     image: nginx:alpine
-    container_name: requify_nginx_dev
+    container_name: requify-nginx-dev
     ports:
       - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/dev.conf:/etc/nginx/nginx.conf:ro
-      - ./logs:/var/log/nginx
+      - "../nginx/dev.conf:/etc/nginx/nginx.conf:ro"
+      - "../nginx/ssl:/etc/nginx/ssl:ro"
+      - "static_volume:/var/www/static"
+      - "uploads_volume:/var/www/uploads"
     depends_on:
       - backend
       - frontend
     networks:
       - requify-dev-network
-    restart: unless-stopped
 
   # Adminer для управления БД
   adminer:
@@ -168,12 +137,22 @@ services:
       - requify-dev-network
 
 volumes:
-  postgres_dev_data:
+  postgres_data:
     name: requify_postgres_dev_data
   postgres_test_dev_data:
     name: requify_postgres_test_dev_data
-  redis_dev_data:
+  redis_data:
     name: requify_redis_dev_data
+  static_volume:
+    name: requify_static_dev_data
+  uploads_volume:
+    name: requify_uploads_dev_data
+  backend_logs:
+    name: requify_backend_logs_dev
+  backend_uploads:
+    name: requify_backend_uploads_dev
+  nginx_logs:
+    name: requify_nginx_logs_dev
 
 networks:
   requify-dev-network:

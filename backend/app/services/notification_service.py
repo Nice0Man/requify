@@ -17,11 +17,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
-from requify.app.core.config import settings
-from requify.app.core.exceptions import NotificationError
-from requify.app.models.user import User
-from requify.app.models.requirement import Requirement
-from requify.app.models.project import Project
+from app.core.config import settings
+from app.core.exceptions import NotificationError
+from app.models.user import User
+from app.models.requirement import Requirement
+from app.models.project import Project
 
 logger = logging.getLogger(__name__)
 
@@ -331,9 +331,9 @@ class NotificationService:
         """Отправляет внутрисистемное уведомление"""
         # Реализуем сохранение уведомления через создание комментария
         try:
-            from requify.app import crud
-            from requify.app.db.session import async_session_scope
-            from requify.app.schemas.comment import CommentCreate
+            from app import crud
+            from app.db.session import async_session_scope
+            from app.schemas.comment import CommentCreate
 
             template_data = {"user_name": recipient.name, **data}
             subject = template.subject_template.format(**template_data)
@@ -542,10 +542,10 @@ class NotificationService:
         """Проверяет дедлайны и отправляет уведомления (для планировщика задач)"""
         # Реализуем получение требований с приближающимися дедлайнами из базы данных
         try:
-            from requify.app import crud
-            from requify.app.db.session import async_session_scope
+            from app import crud
+            from app.db.session import async_session_scope
             from sqlalchemy import select, and_
-            from requify.app.models.requirement import Requirement
+            from app.models.requirement import Requirement
 
             logger.info("Выполняется проверка дедлайнов требований")
 

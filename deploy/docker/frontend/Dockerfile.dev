@@ -17,7 +17,8 @@ RUN addgroup -g 1001 -S frontend && \
     adduser -S frontend -u 1001 -G frontend
 
 # Устанавливаем права
-RUN chown -R frontend:frontend /app
+RUN chown -R frontend:frontend /app && \
+    chown -R frontend:frontend /app/node_modules || true
 USER frontend
 
 EXPOSE 3000

@@ -8,9 +8,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import get_db, get_current_active_user, get_admin_user
-from requify.app import crud, schemas
-from requify.app.models.user import User
+from app.api.deps import get_db, get_current_active_user, get_admin_user
+from app import crud, schemas
+from app.models.user import User
 
 router = APIRouter()
 

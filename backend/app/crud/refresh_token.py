@@ -13,10 +13,10 @@ from sqlalchemy import select, delete, and_, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.refresh_token import RefreshToken
-from requify.app.models.user import User
-from requify.app.core.config import settings
+from app.crud.base import CRUDBase
+from app.models.refresh_token import RefreshToken
+from app.models.user import User
+from app.core.config import settings
 
 
 class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):

@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, Session
 
-from requify.app.core.config import settings
+from app.core.config import settings
 
 # =============================================================================
 # ОСНОВНАЯ БАЗА ДАННЫХ

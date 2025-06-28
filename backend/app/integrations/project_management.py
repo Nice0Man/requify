@@ -12,10 +12,10 @@ from datetime import datetime
 import httpx
 import logging
 
-from requify.app.core.config import settings
-from requify.app.core.exceptions import ExternalSystemError
-from requify.app.models.project import Project
-from requify.app.models.requirement import Requirement
+from app.core.config import settings
+from app.core.exceptions import ExternalSystemError
+from app.models.project import Project
+from app.models.requirement import Requirement
 
 logger = logging.getLogger(__name__)
 

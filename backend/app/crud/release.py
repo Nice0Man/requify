@@ -5,9 +5,9 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.release import Release
-from requify.app.schemas.release import ReleaseCreate, ReleaseUpdate
+from app.crud.base import CRUDBase
+from app.models.release import Release
+from app.schemas.release import ReleaseCreate, ReleaseUpdate
 
 
 class CRUDRelease(CRUDBase[Release, ReleaseCreate, ReleaseUpdate]):

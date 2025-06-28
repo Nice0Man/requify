@@ -5,9 +5,9 @@ from contextlib import asynccontextmanager
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from requify.app.api.v1.router import api_router
-from requify.app.core.config import settings
-from requify.app.utils.logger import logger, LoggedOperation
+from app.api.v1.router import api_router
+from app.core.config import settings
+from app.utils.logger import logger, LoggedOperation
 
 
 @asynccontextmanager
@@ -28,7 +28,7 @@ async def lifespan(app: FastAPI):
 
             # Проверка подключения к базе данных
             try:
-                from requify.app.db.session import check_async_db_connection
+                from app.db.session import check_async_db_connection
 
                 if await check_async_db_connection():
                     logger.info("Database connection successful")
@@ -125,7 +125,7 @@ async def lifespan(app: FastAPI):
             logger.info("Starting application shutdown...")
 
             # Закрытие соединений с базой данных
-            from requify.app.db.db_helper import main_db_helper
+            from app.db.db_helper import main_db_helper
 
             await main_db_helper.dispose()
             logger.info("Database connections closed")
@@ -197,7 +197,7 @@ async def health_check():
 
     # Проверка подключения к базе данных
     try:
-        from requify.app.db.session import get_async_session
+        from app.db.session import get_async_session
 
         async for db in get_async_session():
             # Выполняем простой запрос для проверки соединения

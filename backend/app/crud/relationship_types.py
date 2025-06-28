@@ -2,9 +2,9 @@ from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.relationship_types import RelationshipType
-from requify.app.schemas.relationship_types import (
+from app.crud.base import CRUDBase
+from app.models.relationship_types import RelationshipType
+from app.schemas.relationship_types import (
     RelationshipTypeCreate,
     RelationshipTypeUpdate,
 )

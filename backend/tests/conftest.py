@@ -19,13 +19,13 @@ from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
-from requify.app.main import app
-from requify.app.core.config import settings
-from requify.app.models.base import Base
-from requify.app.api.deps import get_db
-from requify.app.crud import user as crud_user
-from requify.app.schemas.user import UserCreate
-from requify.app.core.security import get_password_hash
+from app.main import app
+from app.core.config import settings
+from app.models.base import Base
+from app.api.deps import get_db
+from app.crud import user as crud_user
+from app.schemas.user import UserCreate
+from app.core.security import get_password_hash
 
 
 # Тестовая база данных

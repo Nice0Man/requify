@@ -23,7 +23,7 @@ from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool
 
-from requify.app.core.config import DatabaseConfig, settings
+from app.core.config import DatabaseConfig, settings
 
 # Типы для generic классов
 TSession = TypeVar("TSession", bound=Session)

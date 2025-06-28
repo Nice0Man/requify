@@ -7,9 +7,9 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.project import Project
-from requify.app.schemas.project import ProjectCreate, ProjectUpdate
+from app.crud.base import CRUDBase
+from app.models.project import Project
+from app.schemas.project import ProjectCreate, ProjectUpdate
 
 
 class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
@@ -146,7 +146,7 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
             Словарь со статистикой проекта
         """
         # Подсчет требований
-        from requify.app.models.requirement import Requirement
+        from app.models.requirement import Requirement
 
         total_requirements_stmt = select(func.count(Requirement.id)).where(
             Requirement.project_id == project_id
@@ -155,7 +155,7 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
         total_requirements = total_requirements.scalar() or 0
 
         # Подсчет релизов
-        from requify.app.models.release import Release
+        from app.models.release import Release
 
         releases_stmt = select(func.count(Release.id)).where(
             Release.project_id == project_id
@@ -164,14 +164,14 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
         releases_count = releases_count.scalar() or 0
 
         # Подсчет спецификаций
-        from requify.app.models.spec import Spec
+        from app.models.spec import Spec
 
         specs_stmt = select(func.count(Spec.id)).where(Spec.project_id == project_id)
         specs_count = await db.execute(specs_stmt)
         specs_count = specs_count.scalar() or 0
 
         # Подсчет групп требований
-        from requify.app.models.requirement_group import RequirementGroup
+        from app.models.requirement_group import RequirementGroup
 
         groups_stmt = select(func.count(RequirementGroup.id)).where(
             RequirementGroup.project_id == project_id
@@ -180,7 +180,7 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
         groups_count = groups_count.scalar() or 0
 
         # Подсчет завершенных требований по статусам
-        from requify.app.models.requirement_statuses import RequirementStatus
+        from app.models.requirement_statuses import RequirementStatus
 
         # Получаем ID статусов для завершенных требований
         completed_statuses_stmt = select(RequirementStatus.id).where(

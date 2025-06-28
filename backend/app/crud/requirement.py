@@ -7,9 +7,9 @@ from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.requirement import Requirement
-from requify.app.schemas.requirement import RequirementCreate, RequirementUpdate
+from app.crud.base import CRUDBase
+from app.models.requirement import Requirement
+from app.schemas.requirement import RequirementCreate, RequirementUpdate
 
 
 class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate]):

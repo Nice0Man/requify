@@ -10,8 +10,8 @@ from typing import Any, Dict, List, Optional
 import httpx
 import logging
 
-from requify.app.core.config import settings
-from requify.app.core.exceptions import ExternalServiceError
+from app.core.config import settings
+from app.core.exceptions import ExternalServiceError
 
 logger = logging.getLogger(__name__)
 

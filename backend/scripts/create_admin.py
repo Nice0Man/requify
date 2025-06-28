@@ -10,10 +10,10 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.core.security import get_password_hash
-from requify.app.db.session import AsyncSessionLocal
-from requify.app.models.user import User
-from requify.app.utils.logger import get_logger
+from app.core.security import get_password_hash
+from app.db.session import AsyncSessionLocal
+from app.models.user import User
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

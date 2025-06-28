@@ -7,10 +7,10 @@ from typing import List, Optional
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.user import User
-from requify.app.schemas.user import UserCreate, UserUpdate
-from requify.app.core.security import get_password_hash, verify_password
+from app.crud.base import CRUDBase
+from app.models.user import User
+from app.schemas.user import UserCreate, UserUpdate
+from app.core.security import get_password_hash, verify_password
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):

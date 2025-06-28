@@ -3,9 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select, and_, or_, desc, func
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.spec import Spec
-from requify.app.schemas.spec import SpecCreate, SpecUpdate
+from app.crud.base import CRUDBase
+from app.models.spec import Spec
+from app.schemas.spec import SpecCreate, SpecUpdate
 
 
 class CRUDSpec(CRUDBase[Spec, SpecCreate, SpecUpdate]):
@@ -68,7 +68,7 @@ class CRUDSpec(CRUDBase[Spec, SpecCreate, SpecUpdate]):
         self, db: AsyncSession, *, spec_id: int
     ) -> Optional[Spec]:
         """Get specification with all its requirements"""
-        from requify.app.models.requirement import Requirement
+        from app.models.requirement import Requirement
 
         query = (
             select(self.model)
@@ -82,7 +82,7 @@ class CRUDSpec(CRUDBase[Spec, SpecCreate, SpecUpdate]):
 
     async def get_requirements_count(self, db: AsyncSession, *, spec_id: int) -> int:
         """Get count of requirements for a specification"""
-        from requify.app.models.requirement import Requirement
+        from app.models.requirement import Requirement
 
         query = select(func.count(Requirement.id)).where(Requirement.spec_id == spec_id)
         result = await db.execute(query)
@@ -97,7 +97,7 @@ class CRUDSpec(CRUDBase[Spec, SpecCreate, SpecUpdate]):
         limit: int = 100,
     ) -> List[dict]:
         """Get specifications with requirement statistics"""
-        from requify.app.models.requirement import Requirement
+        from app.models.requirement import Requirement
 
         query = select(
             self.model, func.count(Requirement.id).label("requirements_count")

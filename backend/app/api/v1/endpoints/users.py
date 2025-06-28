@@ -8,7 +8,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import (
+from app.api.deps import (
     get_db,
     get_current_active_user,
     get_users_read_user,
@@ -16,9 +16,9 @@ from requify.app.api.deps import (
     get_users_delete_user,
     get_superuser,
 )
-from requify.app.core.config import settings
-from requify.app import crud, schemas
-from requify.app.models.user import User
+from app.core.config import settings
+from app import crud, schemas
+from app.models.user import User
 
 router = APIRouter()
 

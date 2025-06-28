@@ -15,7 +15,7 @@ from enum import Enum
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
-from requify.app.core.config import settings
+from app.core.config import settings
 
 
 # === Enums для типов токенов ===
@@ -651,7 +651,7 @@ class PermissionChecker:
         # В реальной реализации здесь будет запрос к БД
         # Для простоты пока возвращаем True для всех пользователей
         # В будущем это может быть заменено на:
-        # from requify.app.crud import project as crud_project
+        # from app.crud import project as crud_project
         # return await crud_project.is_user_member(project_id, user_id)
         return True
 
@@ -670,7 +670,7 @@ class PermissionChecker:
         # В реальной реализации здесь будет запрос к БД для проверки роли
         # Для простоты пока возвращаем True для всех пользователей
         # В будущем это может быть заменено на:
-        # from requify.app.crud import project as crud_project
+        # from app.crud import project as crud_project
         # user_role = await crud_project.get_user_role(project_id, user_id)
         # return user_role in ["owner", "lead", "contributor"]
         return True
@@ -690,7 +690,7 @@ class PermissionChecker:
         # В реальной реализации здесь будет запрос к БД
         # Для простоты пока возвращаем True для всех пользователей
         # В будущем это может быть заменено на:
-        # from requify.app.crud import project as crud_project
+        # from app.crud import project as crud_project
         # project = await crud_project.get(project_id)
         # return project.owner_id == user_id if project else False
         return True

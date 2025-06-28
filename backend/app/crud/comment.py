@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.comment import Comment
-from requify.app.schemas.comment import CommentCreate, CommentUpdate
+from app.crud.base import CRUDBase
+from app.models.comment import Comment
+from app.schemas.comment import CommentCreate, CommentUpdate
 
 
 class CRUDComment(CRUDBase[Comment, CommentCreate, CommentUpdate]):
@@ -61,7 +61,7 @@ class CRUDComment(CRUDBase[Comment, CommentCreate, CommentUpdate]):
         limit: int = 100
     ) -> List[Comment]:
         """Получить комментарии с фильтрами."""
-        from requify.app.models.requirement import Requirement
+        from app.models.requirement import Requirement
         
         query = select(Comment).options(
             selectinload(Comment.author),
@@ -105,7 +105,7 @@ class CRUDComment(CRUDBase[Comment, CommentCreate, CommentUpdate]):
         project_id: Optional[int] = None
     ) -> List[Comment]:
         """Получить последние комментарии."""
-        from requify.app.models.requirement import Requirement
+        from app.models.requirement import Requirement
         
         query = select(Comment).options(
             selectinload(Comment.author),
@@ -133,8 +133,8 @@ class CRUDComment(CRUDBase[Comment, CommentCreate, CommentUpdate]):
         requirement_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """Получить статистику комментариев."""
-        from requify.app.models.requirement import Requirement
-        from requify.app.models.user import User
+        from app.models.requirement import Requirement
+        from app.models.user import User
         
         now = datetime.now()
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)

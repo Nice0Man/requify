@@ -3,9 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select, and_, or_, func, desc, case
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.test_result import TestResult
-from requify.app.schemas.test_result import TestResultCreate, TestResultUpdate
+from app.crud.base import CRUDBase
+from app.models.test_result import TestResult
+from app.schemas.test_result import TestResultCreate, TestResultUpdate
 
 
 class CRUDTestResult(CRUDBase[TestResult, TestResultCreate, TestResultUpdate]):
@@ -47,8 +47,8 @@ class CRUDTestResult(CRUDBase[TestResult, TestResultCreate, TestResultUpdate]):
         project_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """Get test execution summary with statistics"""
-        from requify.app.models.requirement import Requirement
-        from requify.app.models.project import Project
+        from app.models.requirement import Requirement
+        from app.models.project import Project
 
         query = select(
             func.count(self.model.id).label("total_tests"),

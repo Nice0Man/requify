@@ -19,8 +19,9 @@ ENV POETRY_NO_INTERACTION=1 \
 
 WORKDIR /app
 
-# Копируем файлы зависимостей
-COPY pyproject.toml poetry.lock* ./
+# Копируем файлы зависимостей и конфигурации
+COPY config/pyproject.toml poetry.lock* ./
+COPY config/alembic.ini ./alembic.ini
 
 # Устанавливаем зависимости с dev пакетами
 RUN poetry config virtualenvs.create false && \
@@ -38,4 +39,4 @@ USER requify
 EXPOSE 8000
 
 # Hot reload для разработки
-CMD ["uvicorn", "requify.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"] 
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"] 

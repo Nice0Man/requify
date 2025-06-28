@@ -16,12 +16,12 @@ from fastapi.security import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, UTC
 
-from requify.app.core.config import settings
-from requify.app.core.security import JWTTokenManager, TokenType, get_client_ip
-from requify.app.db.db_helper import get_async_session
-from requify.app.crud import user as crud_user
-from requify.app.models.user import User
-from requify.app.utils.logger import logger
+from app.core.config import settings
+from app.core.security import JWTTokenManager, TokenType, get_client_ip
+from app.db.db_helper import get_async_session
+from app.crud import user as crud_user
+from app.models.user import User
+from app.utils.logger import logger
 
 # OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(

@@ -5,7 +5,7 @@
 """
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from requify.app import crud, schemas
+from app import crud, schemas
 
 
 async def init_requirement_types(db: AsyncSession):

@@ -9,15 +9,15 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import (
+from app.api.deps import (
     get_db,
     get_testing_read_user,
     get_testing_write_user,
     get_testing_execute_user,
 )
-from requify.app.core.config import settings
-from requify.app import crud, schemas
-from requify.app.schemas.test_result import TestResultCreate, TestResultUpdate
+from app.core.config import settings
+from app import crud, schemas
+from app.schemas.test_result import TestResultCreate, TestResultUpdate
 
 router = APIRouter()
 

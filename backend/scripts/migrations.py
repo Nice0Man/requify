@@ -31,8 +31,8 @@ from alembic.runtime.migration import MigrationContext
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 
-from requify.app.core.config import settings
-from requify.app.db.base import Base
+from app.core.config import settings
+from app.db.base import Base
 
 
 class MigrationManager:

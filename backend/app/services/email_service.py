@@ -21,7 +21,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-from requify.app.core.config import settings
+from app.core.config import settings
 
 
 # === Email Configuration ===

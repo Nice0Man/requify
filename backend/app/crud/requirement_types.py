@@ -2,9 +2,9 @@ from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from requify.app.crud.base import CRUDBase
-from requify.app.models.requirement_types import RequirementType
-from requify.app.schemas.requirement_types import (
+from app.crud.base import CRUDBase
+from app.models.requirement_types import RequirementType
+from app.schemas.requirement_types import (
     RequirementTypeCreate,
     RequirementTypeUpdate,
 )

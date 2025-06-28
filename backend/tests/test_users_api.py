@@ -9,7 +9,7 @@ import uuid
 from httpx import AsyncClient
 from fastapi import status
 
-from requify.app.core.config import settings
+from app.core.config import settings
 
 
 class TestUsersAPI:
