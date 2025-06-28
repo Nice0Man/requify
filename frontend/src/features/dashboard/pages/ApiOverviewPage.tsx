@@ -52,6 +52,7 @@ import {
   Dashboard,
 } from "@mui/icons-material";
 import { useAuth } from "@/features/auth/context/auth.context";
+import { useNavigate } from "react-router-dom";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -80,6 +81,7 @@ const TabPanel: React.FC<TabPanelProps> = ({
 
 const ApiOverviewPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [openTokenDialog, setOpenTokenDialog] = useState(false);
   const [testToken, setTestToken] = useState("");
@@ -897,7 +899,7 @@ curl -X POST "http://localhost/api/v1/auth/refresh" \\
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
             <Button
               variant="text"
-              onClick={() => (window.location.href = "/start")}
+              onClick={() => navigate("/start")}
               startIcon={<Launch />}
             >
               Home
@@ -906,7 +908,7 @@ curl -X POST "http://localhost/api/v1/auth/refresh" \\
               <>
                 <Button
                   variant="text"
-                  onClick={() => (window.location.href = "/dashboard")}
+                  onClick={() => navigate("/dashboard")}
                   startIcon={<Dashboard />}
                 >
                   Dashboard
@@ -918,7 +920,7 @@ curl -X POST "http://localhost/api/v1/auth/refresh" \\
             ) : (
               <Button
                 variant="contained"
-                onClick={() => (window.location.href = "/login")}
+                onClick={() => navigate("/login")}
                 startIcon={<Security />}
               >
                 Sign In
@@ -1120,6 +1122,8 @@ curl -X POST "http://localhost/api/v1/auth/refresh" \\
                               )}
                             </Box>
                           }
+                          primaryTypographyProps={{ component: "div" }}
+                          secondaryTypographyProps={{ component: "div" }}
                         />
                       </ListItem>
                     ))}
@@ -1230,7 +1234,7 @@ curl -X POST "http://localhost/api/v1/auth/refresh" \\
                         <Button
                           variant="text"
                           size="small"
-                          onClick={() => (window.location.href = "/login")}
+                          onClick={() => navigate("/login")}
                           sx={{ mt: 1, p: 0 }}
                         >
                           Sign In
@@ -1254,6 +1258,8 @@ curl -X POST "http://localhost/api/v1/auth/refresh" \\
                           <ListItemText
                             primary={<code>{scopeInfo.scope}</code>}
                             secondary={scopeInfo.description}
+                            primaryTypographyProps={{ component: "div" }}
+                            secondaryTypographyProps={{ component: "div" }}
                           />
                         </ListItem>
                       ))}

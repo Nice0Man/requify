@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from contextlib import asynccontextmanager
 
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware  # CORS handled by Nginx
 
 from app.api.v1.router import api_router
 from app.core.config import settings
@@ -147,14 +147,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Настройка CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS is handled by Nginx reverse proxy
+# Commented out to prevent duplicate headers
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=settings.cors_origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 # Подключение маршрутизатора API
 app.include_router(api_router, prefix=settings.app_config.api_v1_str)

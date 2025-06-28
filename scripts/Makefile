@@ -61,6 +61,12 @@ help:	## Show this help message
 	@echo "  logs-frontend      - Show frontend logs"
 	@echo "  status             - Show status of all containers"
 	@echo ""
+	@echo "EMAIL & SMTP:"
+	@echo "  email-setup        - Interactive SMTP configuration setup"
+	@echo "  email-dev          - Start development environment with MailHog"
+	@echo "  email-test         - Test email configuration"
+	@echo "  email-mailhog      - Test MailHog email setup"
+	@echo ""
 	@echo "UTILITIES:"
 	@echo "  shell-backend      - Open shell in backend container"
 	@echo "  shell-frontend     - Open shell in frontend container"
@@ -71,8 +77,9 @@ help:	## Show this help message
 	@echo ""
 	@echo "==============================================="
 	@echo "Common Workflows:"
-	@echo "  First time:    make setup && make dev && make db-migrate"
-	@echo "  Daily dev:     make dev"
+	@echo "  First time:    make setup && make email-dev && make db-migrate"
+	@echo "  Daily dev:     make email-dev"
+	@echo "  Email testing: make email-dev && make email-test"
 	@echo "  Fresh start:   make fresh"
 	@echo "  Stop all:      make dev-stop"
 	@echo "==============================================="
@@ -232,3 +239,38 @@ fresh:	## Fresh start development environment
 	$(MAKE) dev-build
 	$(MAKE) db-migrate
 	$(MAKE) db-seed 
+
+# =============================================================================
+# Email & SMTP Configuration
+# =============================================================================
+
+email-setup:	## Interactive SMTP configuration setup
+	@echo "Starting interactive SMTP setup..."
+	@bash setup-smtp.sh
+
+email-dev:	## Start development environment with MailHog email testing
+	@echo "Starting development environment with MailHog email testing..."
+	@if [ -f "start-with-email.ps1" ]; then \
+		powershell -ExecutionPolicy Bypass -File start-with-email.ps1; \
+	elif [ -f "start-with-email.sh" ]; then \
+		bash start-with-email.sh; \
+	else \
+		echo "Email start script not found. Using regular dev environment..."; \
+		$(MAKE) dev; \
+	fi
+
+email-test:	## Test current email configuration
+	@echo "Testing email configuration..."
+	cd ../backend && python test_email.py
+
+email-mailhog:	## Test MailHog email setup specifically
+	@echo "Testing MailHog email configuration..."
+	cd ../backend && python test_mailhog.py
+
+email-status:	## Show email service status and configuration
+	@echo "=== Email Service Status ==="
+	@echo "MailHog Web UI: http://localhost:8025"
+	@echo "Backend API:    http://localhost:8000"
+	@echo ""
+	@echo "=== Container Status ==="
+	cd ../deploy/docker && docker compose -f docker-compose.dev.yml ps 

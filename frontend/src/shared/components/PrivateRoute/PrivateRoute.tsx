@@ -1,6 +1,6 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth, usePermissions } from '@/features/auth/context/auth.context';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -11,7 +11,7 @@ interface PrivateRouteProps {
 export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   children,
   requiredPermissions = [],
-  fallback
+  fallback,
 }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const { hasPermissions } = usePermissions();
@@ -19,10 +19,12 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
 
   // Show loading while checking authentication
   if (isLoading) {
-    return fallback || (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
+    return (
+      fallback || (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      )
     );
   }
 
@@ -36,7 +38,9 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Access Denied
+          </h1>
           <p className="text-gray-600 mb-8">
             You don't have permission to access this page.
           </p>
@@ -52,4 +56,4 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   }
 
   return <>{children}</>;
-}; 
+};

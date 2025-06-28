@@ -29,6 +29,7 @@ class User(Base, TimestampedMixin):
         Index("ix_users_role_created", "role", "created_at"),
         Index("ix_users_is_active", "is_active"),
         Index("ix_users_last_login", "last_login"),
+        Index("ix_users_email_verified", "email_verified"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -46,6 +47,18 @@ class User(Base, TimestampedMixin):
     name: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True, comment="Полное имя пользователя"
     )
+    first_name: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True, comment="Имя пользователя"
+    )
+    last_name: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True, comment="Фамилия пользователя"
+    )
+    department: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True, comment="Отдел пользователя"
+    )
+    phone: Mapped[Optional[str]] = mapped_column(
+        String(20), nullable=True, comment="Телефон пользователя"
+    )
     role: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
@@ -62,6 +75,15 @@ class User(Base, TimestampedMixin):
         default=False,
         nullable=False,
         comment="Является ли пользователь суперпользователем",
+    )
+    email_verified: Mapped[bool] = mapped_column(
+        Boolean,
+        default=False,
+        nullable=False,
+        comment="Подтвержден ли email пользователя",
+    )
+    email_verified_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True, comment="Время подтверждения email"
     )
 
     # Временные метки активности

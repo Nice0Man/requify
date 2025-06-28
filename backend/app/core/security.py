@@ -42,11 +42,21 @@ class PasswordStrength(str, Enum):
 # === Конфигурация безопасности ===
 
 # Контекст для хэширования паролей
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=settings.security.bcrypt_rounds,
-)
+try:
+    pwd_context = CryptContext(
+        schemes=["bcrypt"],
+        deprecated="auto",
+        bcrypt__rounds=settings.security.bcrypt_rounds,
+    )
+except Exception as e:
+    # Фиксируем проблему совместимости bcrypt с passlib
+    # Создаем контекст без проверки версии bcrypt
+    pwd_context = CryptContext(
+        schemes=["bcrypt"],
+        deprecated="auto",
+        bcrypt__rounds=settings.security.bcrypt_rounds,
+        bcrypt__default_rounds=settings.security.bcrypt_rounds,
+    )
 
 # Алгоритмы для разных типов токенов
 ALGORITHMS = {

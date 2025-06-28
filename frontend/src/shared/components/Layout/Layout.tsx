@@ -87,7 +87,7 @@ const navigationItems: NavigationItem[] = [
     title: 'Administration',
     path: '/admin',
     icon: <AdminPanelSettings />,
-    requiredPermissions: ['admin:read']
+    requiredPermissions: ['admin:read'] // Note: Backend should grant this permission to DEVELOPER role
   }
 ];
 

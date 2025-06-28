@@ -13,6 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
 from app.api.deps import (
     get_db,
     get_current_user,
@@ -31,6 +32,7 @@ from app.core.security import (
 from app.crud import user as crud_user, crud_refresh_token
 from app.models.user import User
 from app.services.email_service import email_service
+from app.utils.logger import logger
 from app.schemas.auth import (
     LoginRequest,
     LoginResponse,
@@ -47,6 +49,9 @@ from app.schemas.auth import (
     RevokeSessionRequest,
     UserProfile,
     AuthError,
+    EmailVerificationRequest,
+    EmailVerificationConfirm,
+    EmailVerificationResponse,
 )
 from app.schemas.user import UserCreate
 
@@ -97,6 +102,19 @@ async def register_user(
 
     # Создаем пользователя
     user = await crud_user.create(db, obj_in=user_in)
+
+    # Отправляем email для верификации
+    try:
+        verification_token = JWTTokenManager.create_email_verification_token(user.email)
+        await email_service.send_email_verification(
+            user_email=user.email,
+            verification_token=verification_token,
+            user_name=user.first_name or user.username,
+        )
+        logger.info(f"Verification email sent to {user.email}")
+    except Exception as e:
+        logger.error(f"Failed to send verification email to {user.email}: {e}")
+        # Не прерываем регистрацию из-за ошибки отправки email
 
     # Возвращаем профиль пользователя
     return UserProfile.model_validate(user)
@@ -524,6 +542,96 @@ async def confirm_password_reset(
     )
 
     return {"message": "Password reset successfully"}
+
+
+# === Email Verification ===
+
+
+@router.post("/verify-email/request")
+async def request_email_verification(
+    verification_request: EmailVerificationRequest, db: AsyncSession = Depends(get_db)
+) -> dict:
+    """
+    Запросить повторную отправку email для верификации.
+
+    Args:
+        verification_request: Запрос верификации email
+        db: Сессия базы данных
+
+    Returns:
+        dict: Результат операции
+    """
+    user = await crud_user.get_by_email(db, email=verification_request.email)
+
+    # Всегда возвращаем успех для безопасности (не раскрываем существование email)
+    if user and user.is_active:
+        if user.email_verified:
+            return {"message": "Email is already verified"}
+        
+        try:
+            verification_token = JWTTokenManager.create_email_verification_token(user.email)
+            await email_service.send_email_verification(
+                user_email=user.email,
+                verification_token=verification_token,
+                user_name=user.first_name or user.username,
+            )
+            logger.info(f"Verification email resent to {user.email}")
+        except Exception as e:
+            logger.error(f"Failed to send verification email to {user.email}: {e}")
+
+    return {"message": "If the email exists and is not verified, a verification link has been sent"}
+
+
+@router.post("/verify-email/confirm", response_model=EmailVerificationResponse)
+async def confirm_email_verification(
+    verification_confirm: EmailVerificationConfirm, db: AsyncSession = Depends(get_db)
+) -> EmailVerificationResponse:
+    """
+    Подтвердить верификацию email.
+
+    Args:
+        verification_confirm: Подтверждение верификации email
+        db: Сессия базы данных
+
+    Returns:
+        EmailVerificationResponse: Результат верификации
+    """
+    email = JWTTokenManager.verify_email_verification_token(verification_confirm.token)
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification token",
+        )
+
+    user = await crud_user.get_by_email(db, email=email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    if user.email_verified:
+        return EmailVerificationResponse(
+            message="Email is already verified",
+            verified=True
+        )
+
+    # Помечаем email как подтвержденный
+    from datetime import datetime, timezone
+    await crud_user.update(
+        db, 
+        db_obj=user, 
+        obj_in={
+            "email_verified": True, 
+            "email_verified_at": datetime.now(timezone.utc).replace(tzinfo=None)
+        }
+    )
+
+    logger.info(f"Email verified for user {user.email}")
+
+    return EmailVerificationResponse(
+        message="Email verified successfully",
+        verified=True
+    )
 
 
 # === Session Management ===

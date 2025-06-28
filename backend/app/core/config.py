@@ -44,6 +44,14 @@ class JWT(BaseModel):
     SUB: str = "requify-user"
 
 
+class SMTP(BaseModel):
+    host: str = "localhost"
+    port: int = 1025
+    user: str = "user"
+    password: str = "password"
+    from_email: str = "noreply@requify.local"
+    from_name: str = "Requify"
+
 class ApiConfig(BaseModel):
     prefix: str = "/api"
     v1: ApiV1Prefix = ApiV1Prefix()
@@ -161,7 +169,12 @@ class SecurityConfig(BaseModel):
 
     # CORS настройки
     cors_allow_credentials: bool = True
-    cors_allow_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    cors_allow_origins: list[str] = [
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000",
+        "http://localhost",  # Added for Nginx reverse proxy
+        "http://127.0.0.1",  # Added for Nginx reverse proxy
+    ]
     cors_allow_methods: list[str] = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     cors_allow_headers: list[str] = ["*"]
 
@@ -241,6 +254,8 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost:8080",
         "http://127.0.0.1:3000",
+        "http://localhost",  # Added for Nginx reverse proxy
+        "http://127.0.0.1",  # Added for Nginx reverse proxy
     ]
 
     # Admin user
@@ -408,8 +423,10 @@ class Settings(BaseSettings):
                         "SMTP user and password are required in production"
                     )
 
-            if self.email.smtp_port not in [25, 465, 587, 2525]:
-                raise ValueError("SMTP port should be one of: 25, 465, 587, 2525")
+            # Allow standard SMTP ports and common development/testing ports
+            allowed_ports = [25, 465, 587, 2525, 1025, 1587, 2526]  # Added development ports
+            if self.email.smtp_port not in allowed_ports:
+                raise ValueError(f"SMTP port should be one of: {', '.join(map(str, allowed_ports))}")
 
             # Validate email format
             import re

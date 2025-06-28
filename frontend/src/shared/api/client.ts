@@ -1,9 +1,9 @@
-import axios, { 
-  AxiosInstance, 
-  AxiosRequestConfig, 
-  AxiosResponse, 
-  AxiosError 
-} from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+} from "axios";
 
 export interface ApiResponse<T = any> {
   data: T;
@@ -24,16 +24,17 @@ export class ApiClient {
 
   constructor(baseURL?: string) {
     // Use environment variable or default to nginx proxy path
-    const apiBaseUrl = baseURL || 
-      import.meta.env.VITE_API_URL || 
-      (import.meta.env.DEV ? '/api/v1' : 'http://localhost/api/v1');
+    const apiBaseUrl =
+      baseURL ||
+      import.meta.env.VITE_API_URL ||
+      (import.meta.env.DEV ? "/api/v1" : "http://localhost/api/v1");
 
     this.client = axios.create({
       baseURL: apiBaseUrl,
       timeout: 30000,
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       withCredentials: false, // Use Bearer token instead
     });
@@ -66,7 +67,9 @@ export class ApiClient {
         return response;
       },
       async (error: AxiosError) => {
-        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+        const originalRequest = error.config as AxiosRequestConfig & {
+          _retry?: boolean;
+        };
 
         // Handle 401 Unauthorized
         if (error.response?.status === 401 && !originalRequest._retry) {
@@ -84,7 +87,7 @@ export class ApiClient {
           } catch (refreshError) {
             // Refresh failed, redirect to login
             this.tokenManager?.clearTokens();
-            window.location.href = '/login';
+            window.location.href = "/login";
             return Promise.reject(this.handleError(refreshError as AxiosError));
           }
         }
@@ -99,85 +102,117 @@ export class ApiClient {
       // Server responded with error status
       const data = error.response.data as any;
       return {
-        message: data?.message || data?.detail || 'An error occurred',
+        message: data?.message || data?.detail || "An error occurred",
         status: error.response.status,
         code: data?.error || data?.code,
-        details: data?.details || data
+        details: data?.details || data,
       };
     } else if (error.request) {
       // Network error
       return {
-        message: 'Network error. Please check your connection.',
+        message: "Network error. Please check your connection.",
         status: 0,
-        code: 'NETWORK_ERROR'
+        code: "NETWORK_ERROR",
       };
     } else {
       // Something else happened
       return {
-        message: error.message || 'An unexpected error occurred',
+        message: error.message || "An unexpected error occurred",
         status: 0,
-        code: 'UNKNOWN_ERROR'
+        code: "UNKNOWN_ERROR",
       };
     }
   }
 
-  async get<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async get<T>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
     const response: AxiosResponse<T> = await this.client.get(url, config);
     return {
       data: response.data,
       status: response.status,
-      message: (response.data as any)?.message
+      message: (response.data as any)?.message,
     };
   }
 
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response: AxiosResponse<T> = await this.client.post(url, data, config);
+  async post<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
+    const response: AxiosResponse<T> = await this.client.post(
+      url,
+      data,
+      config
+    );
     return {
       data: response.data,
       status: response.status,
-      message: (response.data as any)?.message
+      message: (response.data as any)?.message,
     };
   }
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async put<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
     const response: AxiosResponse<T> = await this.client.put(url, data, config);
     return {
       data: response.data,
       status: response.status,
-      message: (response.data as any)?.message
+      message: (response.data as any)?.message,
     };
   }
 
-  async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
-    const response: AxiosResponse<T> = await this.client.patch(url, data, config);
+  async patch<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
+    const response: AxiosResponse<T> = await this.client.patch(
+      url,
+      data,
+      config
+    );
     return {
       data: response.data,
       status: response.status,
-      message: (response.data as any)?.message
+      message: (response.data as any)?.message,
     };
   }
 
-  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+  async delete<T>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
     const response: AxiosResponse<T> = await this.client.delete(url, config);
     return {
       data: response.data,
       status: response.status,
-      message: (response.data as any)?.message
+      message: (response.data as any)?.message,
     };
   }
 
   // File upload
-  async upload<T>(url: string, file: File, onProgress?: (progress: number) => void): Promise<ApiResponse<T>> {
+  async upload<T>(
+    url: string,
+    file: File,
+    onProgress?: (progress: number) => void
+  ): Promise<ApiResponse<T>> {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     const config: AxiosRequestConfig = {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
       onUploadProgress: (progressEvent) => {
         if (onProgress && progressEvent.total) {
-          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
           onProgress(progress);
         }
       },
@@ -189,14 +224,14 @@ export class ApiClient {
   // File download
   async download(url: string, filename?: string): Promise<void> {
     const response = await this.client.get(url, {
-      responseType: 'blob',
+      responseType: "blob",
     });
 
     const blob = new Blob([response.data]);
     const downloadUrl = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = downloadUrl;
-    link.download = filename || 'download';
+    link.download = filename || "download";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -211,4 +246,4 @@ export interface TokenManager {
 }
 
 // Create and export singleton instance
-export const apiClient = new ApiClient(); 
+export const apiClient = new ApiClient();

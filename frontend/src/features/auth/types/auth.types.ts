@@ -46,6 +46,18 @@ export interface UserCreate {
   phone?: string;
 }
 
+export interface UserUpdate {
+  email?: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  role?: UserRole;
+  department?: string;
+  phone?: string;
+  timezone?: string;
+  language?: string;
+}
+
 export interface LoginRequest {
   username: string;
   password: string;
@@ -107,6 +119,23 @@ export interface PasswordResetConfirm {
   confirm_password: string;
 }
 
+export interface EmailVerificationRequest {
+  email: string;
+}
+
+export interface EmailVerificationConfirm {
+  token: string;
+}
+
+export interface EmailVerificationResponse {
+  message: string;
+  verified: boolean;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+}
+
 export interface ActiveSession {
   id: number;
   created_at: string;
@@ -131,8 +160,10 @@ export enum UserRole {
   ADMIN = 'admin',
   MANAGER = 'manager',
   ANALYST = 'analyst',
+  DEVELOPER = 'developer',
   TESTER = 'tester',
-  USER = 'user'
+  VIEWER = 'viewer',
+  GUEST = 'guest'
 }
 
 export interface NotificationPreferences {

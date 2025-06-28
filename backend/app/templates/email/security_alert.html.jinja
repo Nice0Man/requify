@@ -1,0 +1,95 @@
+{% extends "base.html.jinja" %}
+
+{% block title %}Уведомление безопасности - Requify{% endblock %}
+
+{% block content %}
+<h1 class="email-title">🔒 Уведомление безопасности</h1>
+
+<p class="email-text">
+    Здравствуйте, <strong>{{ user_name | default(user_email) }}</strong>!
+</p>
+
+<p class="email-text">
+    Мы обнаружили новую активность в вашей учетной записи Requify и хотим убедиться, что это были вы.
+</p>
+
+<div class="alert">
+    <div class="alert-title">
+        {% if alert_type == 'password_change' %}
+            🔑 Пароль изменен
+        {% elif alert_type == 'login_new_device' %}
+            📱 Вход с нового устройства
+        {% elif alert_type == 'suspicious_activity' %}
+            ⚠️ Подозрительная активность
+        {% elif alert_type == 'account_locked' %}
+            🚫 Аккаунт заблокирован
+        {% else %}
+            🔔 {{ alert_type }}
+        {% endif %}
+    </div>
+    <div class="alert-text">
+        <strong>Время:</strong> {{ details.timestamp | default(now()) | strftime('%d.%m.%Y в %H:%M') }}<br>
+        <strong>IP-адрес:</strong> {{ details.ip_address | default('Неизвестно') }}<br>
+        {% if details.user_agent %}
+        <strong>Устройство:</strong> {{ details.user_agent }}<br>
+        {% endif %}
+        {% if details.location %}
+        <strong>Местоположение:</strong> {{ details.location }}<br>
+        {% endif %}
+    </div>
+</div>
+
+{% if alert_type == 'password_change' %}
+<div class="alert alert-success">
+    <div class="alert-title">✅ Пароль успешно изменен</div>
+    <div class="alert-text">
+        Ваш пароль был успешно изменен. Если это были вы, никаких дополнительных действий не требуется.
+    </div>
+</div>
+{% elif alert_type == 'login_new_device' %}
+<div class="alert alert-info">
+    <div class="alert-title">📱 Новое устройство</div>
+    <div class="alert-text">
+        Обнаружен вход в вашу учетную запись с нового устройства. Если это были вы, 
+        рекомендуем добавить это устройство в список доверенных в настройках безопасности.
+    </div>
+</div>
+{% elif alert_type == 'account_locked' %}
+<div class="alert alert-warning">
+    <div class="alert-title">🚫 Аккаунт временно заблокирован</div>
+    <div class="alert-text">
+        Ваш аккаунт был временно заблокирован из-за подозрительной активности или 
+        множественных неудачных попыток входа. Блокировка будет снята автоматически через 30 минут.
+    </div>
+</div>
+{% endif %}
+
+<div class="spacer"></div>
+
+<div class="alert alert-warning">
+    <div class="alert-title">🛡️ Если это были не вы</div>
+    <div class="alert-text">
+        <strong>Немедленно выполните следующие действия:</strong><br><br>
+        1. Смените пароль от вашей учетной записи<br>
+        2. Проверьте активные сессии и завершите подозрительные<br>
+        3. Включите двухфакторную аутентификацию<br>
+        4. Обратитесь в службу поддержки
+    </div>
+</div>
+
+{% if alert_type != 'account_locked' %}
+<div class="button-container">
+    <a href="{{ app_url | default('https://requify.com') }}/security" class="button">
+        Настройки безопасности
+    </a>
+    <a href="{{ app_url | default('https://requify.com') }}/support" class="button button-secondary">
+        Связаться с поддержкой
+    </a>
+</div>
+{% endif %}
+
+<p class="email-text text-small text-muted">
+    Это автоматическое уведомление системы безопасности. Мы отправляем такие письма, 
+    чтобы защитить вашу учетную запись от несанкционированного доступа.
+</p>
+{% endblock %} 

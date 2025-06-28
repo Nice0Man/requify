@@ -63,6 +63,15 @@ services:
       - APP_CONFIG__REDIS__HOST=redis
       - APP_CONFIG__REDIS__PORT=6379
       - APP_CONFIG__REDIS__DB=0
+      # Email Configuration - MailHog
+      - APP_CONFIG__EMAIL__SMTP_HOST=mailhog
+      - APP_CONFIG__EMAIL__SMTP_PORT=1025
+      - APP_CONFIG__EMAIL__SMTP_USER=
+      - APP_CONFIG__EMAIL__SMTP_PASSWORD=
+      - APP_CONFIG__EMAIL__SMTP_TLS=false
+      - APP_CONFIG__EMAIL__SMTP_SSL=false
+      - APP_CONFIG__EMAIL__FROM_EMAIL=noreply@requify.local
+      - APP_CONFIG__EMAIL__FROM_NAME=Requify Development
       - PYTHONPATH=/app
       - FASTAPI_ENV=development
       - DATABASE_URL=postgresql://requify_user:requify_password@postgres:5432/requify_dev
@@ -74,6 +83,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - mailhog
     networks:
       - requify-dev-network
     working_dir: /app

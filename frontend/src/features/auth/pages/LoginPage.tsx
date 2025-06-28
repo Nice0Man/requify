@@ -297,7 +297,8 @@ const LoginPage: React.FC = () => {
             Requify - Requirements Management System
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Version 1.0.0 | © 2024 Requify
+            {/* TODO: Fetch version info from http://localhost/api/v1/ */}
+            Version 1.0.0 | © 2025 Requify
           </Typography>
         </Box>
       </Box>

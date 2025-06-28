@@ -32,6 +32,38 @@
         "documentation": {}
     },
     {
+        "label": "Sequence",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Sequence",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Dict",
         "importPath": "typing",
         "description": "typing",
@@ -1413,6 +1445,22 @@
         "description": "typing",
         "isExtraImport": true,
         "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
         "documentation": {}
     },
     {
@@ -3130,6 +3178,22 @@
         "documentation": {}
     },
     {
+        "label": "settings",
+        "importPath": "app.core.config",
+        "description": "app.core.config",
+        "isExtraImport": true,
+        "detail": "app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
+        "importPath": "app.core.config",
+        "description": "app.core.config",
+        "isExtraImport": true,
+        "detail": "app.core.config",
+        "documentation": {}
+    },
+    {
         "label": "os",
         "kind": 6,
         "isExtraImport": true,
@@ -3839,6 +3903,14 @@
     },
     {
         "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -5014,6 +5086,30 @@
         "documentation": {}
     },
     {
+        "label": "EmailVerificationRequest",
+        "importPath": "app.schemas.auth",
+        "description": "app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "EmailVerificationConfirm",
+        "importPath": "app.schemas.auth",
+        "description": "app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "EmailVerificationResponse",
+        "importPath": "app.schemas.auth",
+        "description": "app.schemas.auth",
+        "isExtraImport": true,
+        "detail": "app.schemas.auth",
+        "documentation": {}
+    },
+    {
         "label": "crud",
         "importPath": "app",
         "description": "app",
@@ -5406,6 +5502,78 @@
         "documentation": {}
     },
     {
+        "label": "EmailService",
+        "importPath": "app.services.email_service",
+        "description": "app.services.email_service",
+        "isExtraImport": true,
+        "detail": "app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "EmailConfig",
+        "importPath": "app.services.email_service",
+        "description": "app.services.email_service",
+        "isExtraImport": true,
+        "detail": "app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "EmailService",
+        "importPath": "app.services.email_service",
+        "description": "app.services.email_service",
+        "isExtraImport": true,
+        "detail": "app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "email_service",
+        "importPath": "app.services.email_service",
+        "description": "app.services.email_service",
+        "isExtraImport": true,
+        "detail": "app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "importPath": "app.utils.logger",
+        "description": "app.utils.logger",
+        "isExtraImport": true,
+        "detail": "app.utils.logger",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "importPath": "app.utils.logger",
+        "description": "app.utils.logger",
+        "isExtraImport": true,
+        "detail": "app.utils.logger",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "importPath": "app.utils.logger",
+        "description": "app.utils.logger",
+        "isExtraImport": true,
+        "detail": "app.utils.logger",
+        "documentation": {}
+    },
+    {
+        "label": "LoggedOperation",
+        "importPath": "app.utils.logger",
+        "description": "app.utils.logger",
+        "isExtraImport": true,
+        "detail": "app.utils.logger",
+        "documentation": {}
+    },
+    {
+        "label": "get_logger",
+        "importPath": "app.utils.logger",
+        "description": "app.utils.logger",
+        "isExtraImport": true,
+        "detail": "app.utils.logger",
+        "documentation": {}
+    },
+    {
         "label": "UserCreate",
         "importPath": "app.schemas.user",
         "description": "app.schemas.user",
@@ -5423,6 +5591,14 @@
     },
     {
         "label": "UserUpdate",
+        "importPath": "app.schemas.user",
+        "description": "app.schemas.user",
+        "isExtraImport": true,
+        "detail": "app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserCreate",
         "importPath": "app.schemas.user",
         "description": "app.schemas.user",
         "isExtraImport": true,
@@ -5590,35 +5766,19 @@
         "documentation": {}
     },
     {
-        "label": "logger",
-        "importPath": "app.utils.logger",
-        "description": "app.utils.logger",
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
         "isExtraImport": true,
-        "detail": "app.utils.logger",
+        "detail": "pathlib",
         "documentation": {}
     },
     {
-        "label": "logger",
-        "importPath": "app.utils.logger",
-        "description": "app.utils.logger",
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
         "isExtraImport": true,
-        "detail": "app.utils.logger",
-        "documentation": {}
-    },
-    {
-        "label": "LoggedOperation",
-        "importPath": "app.utils.logger",
-        "description": "app.utils.logger",
-        "isExtraImport": true,
-        "detail": "app.utils.logger",
-        "documentation": {}
-    },
-    {
-        "label": "get_logger",
-        "importPath": "app.utils.logger",
-        "description": "app.utils.logger",
-        "isExtraImport": true,
-        "detail": "app.utils.logger",
+        "detail": "pathlib",
         "documentation": {}
     },
     {
@@ -7761,14 +7921,6 @@
         "documentation": {}
     },
     {
-        "label": "CORSMiddleware",
-        "importPath": "fastapi.middleware.cors",
-        "description": "fastapi.middleware.cors",
-        "isExtraImport": true,
-        "detail": "fastapi.middleware.cors",
-        "documentation": {}
-    },
-    {
         "label": "api_router",
         "importPath": "app.api.v1.router",
         "description": "app.api.v1.router",
@@ -7915,6 +8067,42 @@
         "documentation": {}
     },
     {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
+        "description": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.add_column(\n        \"users\",\n        sa.Column(\"first_name\", sa.String(length=100), nullable=True, comment=\"Имя пользователя\"),\n    )\n    op.add_column(\n        \"users\",\n        sa.Column(",
+        "detail": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
+        "description": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_column(\"users\", \"phone\")\n    op.drop_column(\"users\", \"department\")\n    op.drop_column(\"users\", \"last_name\")\n    op.drop_column(\"users\", \"first_name\")\n    # ### end Alembic commands ###",
+        "detail": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
+        "description": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.add_column(\n        \"users\",\n        sa.Column(\n            \"email_verified\",\n            sa.Boolean(),\n            nullable=False,\n            server_default=sa.text(\"false\"),",
+        "detail": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
+        "description": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_index(\"ix_users_email_verified\", table_name=\"users\")\n    op.drop_column(\"users\", \"email_verified_at\")\n    op.drop_column(\"users\", \"email_verified\")\n    # ### end Alembic commands ###",
+        "detail": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
+        "documentation": {}
+    },
+    {
         "label": "run_migrations_offline",
         "kind": 2,
         "importPath": "backend.alembic.env",
@@ -8054,7 +8242,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.users",
         "description": "backend.app.api.v1.endpoints.users",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.User])\nasync def get_users(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    is_active: Optional[bool] = Query(None, description=\"Фильтр по статусу активности\"),\n    role: Optional[str] = Query(None, description=\"Фильтр по роли\"),\n    search: Optional[str] = Query(None, description=\"Поиск по email или имени\"),",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.User])\nasync def get_users(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    is_active: Optional[bool] = Query(None, description=\"Фильтр по статусу активности\"),\n    role: Optional[str] = Query(None, description=\"Фильтр по роли\"),\n    search: Optional[str] = Query(None, description=\"Поиск по username, email, first_name, last_name, department, phone\"),",
         "detail": "backend.app.api.v1.endpoints.users",
         "documentation": {}
     },
@@ -8126,7 +8314,16 @@
         "kind": 6,
         "importPath": "backend.app.core.config",
         "description": "backend.app.core.config",
-        "peekOfCode": "class JWT(BaseModel):\n    private_key_path: Path = BASE_DIR / \"certs\" / \"jwt-private.pem\"\n    public_key_path: Path = BASE_DIR / \"certs\" / \"jwt-public.pem\"\n    JWT_PUBLIC_KEY: str = \"guess-me\"\n    JWT_PRIVATE_KEY: str = \"guess-me\"\n    JWT_ALGORITHM: str = \"HS256\"\n    TOKEN_EXPIRES_MINUTES: int = 30\n    TOKEN_URLSAFE_LEN: int = 32\n    SUB: str = \"requify-user\"\nclass ApiConfig(BaseModel):",
+        "peekOfCode": "class JWT(BaseModel):\n    private_key_path: Path = BASE_DIR / \"certs\" / \"jwt-private.pem\"\n    public_key_path: Path = BASE_DIR / \"certs\" / \"jwt-public.pem\"\n    JWT_PUBLIC_KEY: str = \"guess-me\"\n    JWT_PRIVATE_KEY: str = \"guess-me\"\n    JWT_ALGORITHM: str = \"HS256\"\n    TOKEN_EXPIRES_MINUTES: int = 30\n    TOKEN_URLSAFE_LEN: int = 32\n    SUB: str = \"requify-user\"\nclass SMTP(BaseModel):",
+        "detail": "backend.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "SMTP",
+        "kind": 6,
+        "importPath": "backend.app.core.config",
+        "description": "backend.app.core.config",
+        "peekOfCode": "class SMTP(BaseModel):\n    host: str = \"localhost\"\n    port: int = 1025\n    user: str = \"user\"\n    password: str = \"password\"\n    from_email: str = \"noreply@requify.local\"\n    from_name: str = \"Requify\"\nclass ApiConfig(BaseModel):\n    prefix: str = \"/api\"\n    v1: ApiV1Prefix = ApiV1Prefix()",
         "detail": "backend.app.core.config",
         "documentation": {}
     },
@@ -8378,7 +8575,7 @@
         "kind": 6,
         "importPath": "backend.app.core.security",
         "description": "backend.app.core.security",
-        "peekOfCode": "class PasswordStrength(str, Enum):\n    \"\"\"Уровни надежности пароля.\"\"\"\n    WEAK = \"weak\"\n    MEDIUM = \"medium\"\n    STRONG = \"strong\"\n    VERY_STRONG = \"very_strong\"\n# === Конфигурация безопасности ===\n# Контекст для хэширования паролей\npwd_context = CryptContext(\n    schemes=[\"bcrypt\"],",
+        "peekOfCode": "class PasswordStrength(str, Enum):\n    \"\"\"Уровни надежности пароля.\"\"\"\n    WEAK = \"weak\"\n    MEDIUM = \"medium\"\n    STRONG = \"strong\"\n    VERY_STRONG = \"very_strong\"\n# === Конфигурация безопасности ===\n# Контекст для хэширования паролей\ntry:\n    pwd_context = CryptContext(",
         "detail": "backend.app.core.security",
         "documentation": {}
     },
@@ -8451,15 +8648,6 @@
         "importPath": "backend.app.core.security",
         "description": "backend.app.core.security",
         "peekOfCode": "def validate_password(password: str) -> tuple[bool, List[str]]:\n    \"\"\"\n    Валидировать пароль (упрощенная версия для external API).\n    Args:\n        password: Пароль для проверки\n    Returns:\n        tuple: (валиден, список ошибок)\n    \"\"\"\n    is_valid, errors, _ = PasswordManager.validate_password_strength(password)\n    return is_valid, errors",
-        "detail": "backend.app.core.security",
-        "documentation": {}
-    },
-    {
-        "label": "pwd_context",
-        "kind": 5,
-        "importPath": "backend.app.core.security",
-        "description": "backend.app.core.security",
-        "peekOfCode": "pwd_context = CryptContext(\n    schemes=[\"bcrypt\"],\n    deprecated=\"auto\",\n    bcrypt__rounds=settings.security.bcrypt_rounds,\n)\n# Алгоритмы для разных типов токенов\nALGORITHMS = {\n    TokenType.ACCESS: settings.security.access_token_algorithm,\n    TokenType.REFRESH: settings.security.refresh_token_algorithm,\n    TokenType.PASSWORD_RESET: \"HS256\",",
         "detail": "backend.app.core.security",
         "documentation": {}
     },
@@ -9476,7 +9664,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.auth",
         "description": "backend.app.schemas.auth",
-        "peekOfCode": "class UserProfile(BaseModel):\n    \"\"\"Схема профиля пользователя для аутентификации.\"\"\"\n    id: int = Field(..., description=\"ID пользователя\")\n    username: str = Field(..., description=\"Имя пользователя\")\n    email: EmailStr = Field(..., description=\"Email пользователя\")\n    name: Optional[str] = Field(None, description=\"Полное имя\")\n    role: str = Field(..., description=\"Роль пользователя\")\n    is_active: bool = Field(..., description=\"Активен ли пользователь\")\n    is_superuser: bool = Field(..., description=\"Является ли суперпользователем\")\n    last_login: Optional[datetime] = Field(None, description=\"Время последнего входа\")",
+        "peekOfCode": "class UserProfile(BaseModel):\n    \"\"\"Схема профиля пользователя для аутентификации.\"\"\"\n    id: int = Field(..., description=\"ID пользователя\")\n    username: str = Field(..., description=\"Имя пользователя\")\n    email: EmailStr = Field(..., description=\"Email пользователя\")\n    name: Optional[str] = Field(None, description=\"Полное имя\")\n    role: str = Field(..., description=\"Роль пользователя\")\n    is_active: bool = Field(..., description=\"Активен ли пользователь\")\n    is_superuser: bool = Field(..., description=\"Является ли суперпользователем\")\n    email_verified: bool = Field(default=False, description=\"Подтвержден ли email\")",
         "detail": "backend.app.schemas.auth",
         "documentation": {}
     },
@@ -9557,7 +9745,34 @@
         "kind": 6,
         "importPath": "backend.app.schemas.auth",
         "description": "backend.app.schemas.auth",
-        "peekOfCode": "class AuthError(BaseModel):\n    \"\"\"Схема для ошибок аутентификации.\"\"\"\n    error: str = Field(..., description=\"Код ошибки\")\n    error_description: str = Field(..., description=\"Описание ошибки\")\n    error_details: Optional[dict] = Field(None, description=\"Дополнительные детали\")\n# Forward reference resolution\nLoginResponse.model_rebuild()\nTokenValidationResponse.model_rebuild()",
+        "peekOfCode": "class AuthError(BaseModel):\n    \"\"\"Схема для ошибок аутентификации.\"\"\"\n    error: str = Field(..., description=\"Код ошибки\")\n    error_description: str = Field(..., description=\"Описание ошибки\")\n    error_details: Optional[dict] = Field(None, description=\"Дополнительные детали\")\n# === Email Verification Schemas ===\nclass EmailVerificationRequest(BaseModel):\n    \"\"\"Схема для запроса верификации email.\"\"\"\n    email: EmailStr = Field(..., description=\"Email для верификации\")\n    @field_validator(\"email\")",
+        "detail": "backend.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "EmailVerificationRequest",
+        "kind": 6,
+        "importPath": "backend.app.schemas.auth",
+        "description": "backend.app.schemas.auth",
+        "peekOfCode": "class EmailVerificationRequest(BaseModel):\n    \"\"\"Схема для запроса верификации email.\"\"\"\n    email: EmailStr = Field(..., description=\"Email для верификации\")\n    @field_validator(\"email\")\n    def validate_email(cls, v):\n        \"\"\"Валидация email\"\"\"\n        return str(v).lower()\nclass EmailVerificationConfirm(BaseModel):\n    \"\"\"Схема для подтверждения верификации email.\"\"\"\n    token: str = Field(..., description=\"Токен верификации email\")",
+        "detail": "backend.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "EmailVerificationConfirm",
+        "kind": 6,
+        "importPath": "backend.app.schemas.auth",
+        "description": "backend.app.schemas.auth",
+        "peekOfCode": "class EmailVerificationConfirm(BaseModel):\n    \"\"\"Схема для подтверждения верификации email.\"\"\"\n    token: str = Field(..., description=\"Токен верификации email\")\n    @field_validator(\"token\")\n    def validate_token(cls, v):\n        \"\"\"Валидация токена\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Verification token cannot be empty\")\n        return v.strip()\nclass EmailVerificationResponse(BaseModel):",
+        "detail": "backend.app.schemas.auth",
+        "documentation": {}
+    },
+    {
+        "label": "EmailVerificationResponse",
+        "kind": 6,
+        "importPath": "backend.app.schemas.auth",
+        "description": "backend.app.schemas.auth",
+        "peekOfCode": "class EmailVerificationResponse(BaseModel):\n    \"\"\"Схема для ответа после верификации email.\"\"\"\n    message: str = Field(..., description=\"Сообщение о результате\")\n    verified: bool = Field(..., description=\"Успешно ли подтвержден email\")\n# Forward reference resolution\nLoginResponse.model_rebuild()\nTokenValidationResponse.model_rebuild()",
         "detail": "backend.app.schemas.auth",
         "documentation": {}
     },
@@ -10700,7 +10915,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.user",
         "description": "backend.app.schemas.user",
-        "peekOfCode": "class UserBase(BaseModel):\n    \"\"\"Базовая схема пользователя.\"\"\"\n    username: str = Field(\n        ..., min_length=2, max_length=50, description=\"Имя пользователя\"\n    )\n    email: EmailStr = Field(..., description=\"Email пользователя\")\n    role: str = Field(..., min_length=1, max_length=20, description=\"Роль пользователя\")\n    @field_validator(\"username\")\n    def validate_username(cls, v):\n        \"\"\"Валидация имени пользователя\"\"\"",
+        "peekOfCode": "class UserBase(BaseModel):\n    \"\"\"Базовая схема пользователя.\"\"\"\n    username: str = Field(\n        ..., min_length=2, max_length=50, description=\"Имя пользователя\"\n    )\n    email: EmailStr = Field(..., description=\"Email пользователя\")\n    role: str = Field(..., min_length=1, max_length=20, description=\"Роль пользователя\")\n    first_name: Optional[str] = Field(None, description=\"Имя пользователя\")\n    last_name: Optional[str] = Field(None, description=\"Фамилия пользователя\")\n    department: Optional[str] = Field(None, description=\"Отдел пользователя\")",
         "detail": "backend.app.schemas.user",
         "documentation": {}
     },
@@ -10727,7 +10942,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.user",
         "description": "backend.app.schemas.user",
-        "peekOfCode": "class UserInDBBase(UserBase):\n    \"\"\"Базовая схема пользователя с данными из БД.\"\"\"\n    id: int\n    created_at: datetime\n    class Config:\n        from_attributes = True\nclass User(UserInDBBase):\n    \"\"\"Схема пользователя для ответов API.\"\"\"\n    pass\nclass UserWithStats(User):",
+        "peekOfCode": "class UserInDBBase(UserBase):\n    \"\"\"Базовая схема пользователя с данными из БД.\"\"\"\n    id: int\n    created_at: datetime\n    email_verified: bool = False\n    email_verified_at: Optional[datetime] = None\n    class Config:\n        from_attributes = True\nclass User(UserInDBBase):\n    \"\"\"Схема пользователя для ответов API.\"\"\"",
         "detail": "backend.app.schemas.user",
         "documentation": {}
     },
@@ -10755,6 +10970,69 @@
         "importPath": "backend.app.schemas.user",
         "description": "backend.app.schemas.user",
         "peekOfCode": "class UserInDB(UserInDBBase):\n    \"\"\"Схема пользователя в БД.\"\"\"\n    hashed_password: str = Field(..., description=\"Хэшированный пароль\")\n    @field_validator(\"hashed_password\")\n    def validate_hashed_password(cls, v):\n        \"\"\"Валидация хэшированного пароля\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Hashed password cannot be empty\")\n        # Проверяем, что это похоже на bcrypt хэш\n        if (",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserLogin",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserLogin(BaseModel):\n    \"\"\"Схема для входа пользователя.\"\"\"\n    username: str = Field(..., description=\"Имя пользователя или email\")\n    password: str = Field(..., description=\"Пароль пользователя\")\n    @field_validator(\"username\")\n    def validate_username_or_email(cls, v):\n        \"\"\"Валидация имени пользователя или email для входа\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Username or email cannot be empty\")\n        return v.strip().lower()",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfile",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserProfile(BaseModel):\n    \"\"\"Схема профиля пользователя для публичного просмотра.\"\"\"\n    id: int\n    username: str\n    first_name: Optional[str] = None\n    last_name: Optional[str] = None\n    department: Optional[str] = None\n    role: str\n    created_at: datetime\n    class Config:",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserPasswordChange",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserPasswordChange(BaseModel):\n    \"\"\"Схема для смены пароля.\"\"\"\n    current_password: str = Field(..., description=\"Текущий пароль\")\n    new_password: str = Field(..., min_length=8, description=\"Новый пароль\")\n    confirm_password: str = Field(..., description=\"Подтверждение нового пароля\")\n    @field_validator(\"new_password\")\n    def validate_new_password(cls, v):\n        \"\"\"Валидация нового пароля\"\"\"\n        if not v or len(v) < 8:\n            raise ValueError(\"Password must be at least 8 characters long\")",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserPasswordReset",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserPasswordReset(BaseModel):\n    \"\"\"Схема для сброса пароля.\"\"\"\n    email: EmailStr = Field(..., description=\"Email пользователя\")\n    @field_validator(\"email\")\n    def validate_email(cls, v):\n        \"\"\"Валидация email для сброса пароля\"\"\"\n        return str(v).lower()\nclass UserPasswordResetConfirm(BaseModel):\n    \"\"\"Схема для подтверждения сброса пароля.\"\"\"\n    token: str = Field(..., description=\"Токен сброса пароля\")",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserPasswordResetConfirm",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserPasswordResetConfirm(BaseModel):\n    \"\"\"Схема для подтверждения сброса пароля.\"\"\"\n    token: str = Field(..., description=\"Токен сброса пароля\")\n    new_password: str = Field(..., min_length=8, description=\"Новый пароль\")\n    confirm_password: str = Field(..., description=\"Подтверждение нового пароля\")\n    @field_validator(\"new_password\")\n    def validate_new_password(cls, v):\n        \"\"\"Валидация нового пароля\"\"\"\n        if not v or len(v) < 8:\n            raise ValueError(\"Password must be at least 8 characters long\")",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "EmailVerificationRequest",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class EmailVerificationRequest(BaseModel):\n    \"\"\"Схема для запроса верификации email.\"\"\"\n    email: EmailStr = Field(..., description=\"Email для верификации\")\n    @field_validator(\"email\")\n    def validate_email(cls, v):\n        \"\"\"Валидация email\"\"\"\n        return str(v).lower()\nclass EmailVerificationConfirm(BaseModel):\n    \"\"\"Схема для подтверждения верификации email.\"\"\"\n    token: str = Field(..., description=\"Токен верификации email\")",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "EmailVerificationConfirm",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class EmailVerificationConfirm(BaseModel):\n    \"\"\"Схема для подтверждения верификации email.\"\"\"\n    token: str = Field(..., description=\"Токен верификации email\")\n    @field_validator(\"token\")\n    def validate_token(cls, v):\n        \"\"\"Валидация токена\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Verification token cannot be empty\")\n        return v.strip()",
         "detail": "backend.app.schemas.user",
         "documentation": {}
     },
@@ -10988,7 +11266,7 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "auth_logger = get_logger(\"auth\")\ndb_logger = get_logger(\"database\")\napi_logger = get_logger(\"api\")\nsecurity_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:",
+        "peekOfCode": "auth_logger = get_logger(\"auth\")\ndb_logger = get_logger(\"database\")\napi_logger = get_logger(\"api\")\nsecurity_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -10997,7 +11275,7 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "db_logger = get_logger(\"database\")\napi_logger = get_logger(\"api\")\nsecurity_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"",
+        "peekOfCode": "db_logger = get_logger(\"database\")\napi_logger = get_logger(\"api\")\nsecurity_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -11006,7 +11284,7 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "api_logger = get_logger(\"api\")\nsecurity_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):",
+        "peekOfCode": "api_logger = get_logger(\"api\")\nsecurity_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -11015,7 +11293,7 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "security_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name",
+        "peekOfCode": "security_logger = get_logger(\"security\")\nnotification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -11024,7 +11302,7 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "notification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger",
+        "peekOfCode": "notification_logger = get_logger(\"notifications\")\nintegration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -11033,7 +11311,7 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "integration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger\n    def __enter__(self):",
+        "peekOfCode": "integration_logger = get_logger(\"integrations\")\ntesting_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -11042,7 +11320,7 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "testing_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger\n    def __enter__(self):\n        self.logger.info(f\"Starting operation: {self.operation_name}\")",
+        "peekOfCode": "testing_logger = get_logger(\"testing\")\nadmin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger\n    def __enter__(self):",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -11051,7 +11329,16 @@
         "kind": 5,
         "importPath": "backend.app.utils.logger",
         "description": "backend.app.utils.logger",
-        "peekOfCode": "admin_logger = get_logger(\"admin\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger\n    def __enter__(self):\n        self.logger.info(f\"Starting operation: {self.operation_name}\")\n        return self",
+        "peekOfCode": "admin_logger = get_logger(\"admin\")\nemail_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger\n    def __enter__(self):\n        self.logger.info(f\"Starting operation: {self.operation_name}\")",
+        "detail": "backend.app.utils.logger",
+        "documentation": {}
+    },
+    {
+        "label": "email_logger",
+        "kind": 5,
+        "importPath": "backend.app.utils.logger",
+        "description": "backend.app.utils.logger",
+        "peekOfCode": "email_logger = get_logger(\"email\")\n# Контекстный менеджер для логирования операций\nclass LoggedOperation:\n    \"\"\"Контекстный менеджер для логирования операций.\"\"\"\n    def __init__(self, operation_name: str, logger_instance: logging.Logger = None):\n        self.operation_name = operation_name\n        self.logger = logger_instance or logger\n    def __enter__(self):\n        self.logger.info(f\"Starting operation: {self.operation_name}\")\n        return self",
         "detail": "backend.app.utils.logger",
         "documentation": {}
     },
@@ -11060,7 +11347,7 @@
         "kind": 5,
         "importPath": "backend.app.main",
         "description": "backend.app.main",
-        "peekOfCode": "app = FastAPI(\n    title=settings.app_config.name,\n    version=settings.app_config.version,\n    description=\"API для автоматизированной системы управления требованиями Requify\",\n    lifespan=lifespan,\n)\n# Настройка CORS\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=settings.cors_origins,",
+        "peekOfCode": "app = FastAPI(\n    title=settings.app_config.name,\n    version=settings.app_config.version,\n    description=\"API для автоматизированной системы управления требованиями Requify\",\n    lifespan=lifespan,\n)\n# CORS is handled by Nginx reverse proxy\n# Commented out to prevent duplicate headers\n# app.add_middleware(\n#     CORSMiddleware,",
         "detail": "backend.app.main",
         "documentation": {}
     },

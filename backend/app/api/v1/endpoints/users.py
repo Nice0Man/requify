@@ -31,7 +31,7 @@ async def get_users(
     ),
     is_active: Optional[bool] = Query(None, description="Фильтр по статусу активности"),
     role: Optional[str] = Query(None, description="Фильтр по роли"),
-    search: Optional[str] = Query(None, description="Поиск по email или имени"),
+    search: Optional[str] = Query(None, description="Поиск по username, email, first_name, last_name, department, phone"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_users_read_user),
 ):

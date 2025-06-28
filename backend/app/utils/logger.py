@@ -94,7 +94,8 @@ notification_logger = get_logger("notifications")
 integration_logger = get_logger("integrations")
 testing_logger = get_logger("testing")
 admin_logger = get_logger("admin")
-
+email_logger = get_logger("email")
+    
 
 # Контекстный менеджер для логирования операций
 class LoggedOperation:

@@ -162,6 +162,8 @@ class UserProfile(BaseModel):
     role: str = Field(..., description="Роль пользователя")
     is_active: bool = Field(..., description="Активен ли пользователь")
     is_superuser: bool = Field(..., description="Является ли суперпользователем")
+    email_verified: bool = Field(default=False, description="Подтвержден ли email")
+    email_verified_at: Optional[datetime] = Field(None, description="Время подтверждения email")
     last_login: Optional[datetime] = Field(None, description="Время последнего входа")
 
     class Config:
@@ -267,6 +269,40 @@ class AuthError(BaseModel):
     error: str = Field(..., description="Код ошибки")
     error_description: str = Field(..., description="Описание ошибки")
     error_details: Optional[dict] = Field(None, description="Дополнительные детали")
+
+
+# === Email Verification Schemas ===
+
+
+class EmailVerificationRequest(BaseModel):
+    """Схема для запроса верификации email."""
+    
+    email: EmailStr = Field(..., description="Email для верификации")
+
+    @field_validator("email")
+    def validate_email(cls, v):
+        """Валидация email"""
+        return str(v).lower()
+
+
+class EmailVerificationConfirm(BaseModel):
+    """Схема для подтверждения верификации email."""
+    
+    token: str = Field(..., description="Токен верификации email")
+
+    @field_validator("token")
+    def validate_token(cls, v):
+        """Валидация токена"""
+        if not v or not v.strip():
+            raise ValueError("Verification token cannot be empty")
+        return v.strip()
+
+
+class EmailVerificationResponse(BaseModel):
+    """Схема для ответа после верификации email."""
+    
+    message: str = Field(..., description="Сообщение о результате")
+    verified: bool = Field(..., description="Успешно ли подтвержден email")
 
 
 # Forward reference resolution

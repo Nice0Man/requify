@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  # Production SMTP Relay (optional - for organizations that need internal SMTP)
+  # Uncomment if you want to use a containerized SMTP relay
+  # smtp-relay:
+  #   image: namshi/smtp:latest
+  #   container_name: requify-smtp-relay-prod
+  #   environment:
+  #     - RELAY_NETWORKS=:192.168.0.0/16:10.0.0.0/8
+  #     - SMARTHOST_ADDRESS=your-external-smtp-server.com
+  #     - SMARTHOST_PORT=587
+  #     - SMARTHOST_USER=your-smtp-user
+  #     - SMARTHOST_PASSWORD=your-smtp-password
+  #   networks:
+  #     - requify-prod-network
+  #   restart: unless-stopped
   # PostgreSQL основная база данных
   postgres:
     image: postgres:16.0

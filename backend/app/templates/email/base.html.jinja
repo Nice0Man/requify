@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>{% block title %}{{ subject }} - Requify{% endblock %}</title>
+    
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #334155;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+        
+        /* Container styles */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        
+        .email-wrapper {
+            width: 100%;
+            background-color: #f8fafc;
+            padding: 40px 20px;
+        }
+        
+        /* Header styles */
+        .email-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .logo-subtitle {
+            color: #e2e8f0;
+            font-size: 14px;
+            font-weight: 400;
+            margin: 0;
+        }
+        
+        /* Content styles */
+        .email-content {
+            padding: 40px 30px;
+            background-color: #ffffff;
+        }
+        
+        .email-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0 0 20px 0;
+            line-height: 1.3;
+        }
+        
+        .email-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #475569;
+            margin: 0 0 20px 0;
+        }
+        
+        .email-text:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Button styles */
+        .button-container {
+            text-align: center;
+            margin: 32px 0;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 1;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button-secondary {
+            background: #f1f5f9;
+            color: #475569 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .button-secondary:hover {
+            background: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Alert styles */
+        .alert {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #fed7aa;
+        }
+        
+        .alert-success {
+            background-color: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        
+        .alert-info {
+            background-color: #eff6ff;
+            border-color: #bfdbfe;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 0 0 8px 0;
+            color: #1e293b;
+        }
+        
+        .alert-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #475569;
+            margin: 0;
+        }
+        
+        /* Code and link styles */
+        .code {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            color: #475569;
+        }
+        
+        .link {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        
+        .link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Footer styles */
+        .email-footer {
+            background-color: #f8fafc;
+            padding: 30px;
+            text-align: center;
+            border-radius: 0 0 12px 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0 0 12px 0;
+        }
+        
+        .footer-links {
+            margin: 16px 0 0 0;
+        }
+        
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 12px;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Utility classes */
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-small {
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .text-muted {
+            color: #64748b;
+        }
+        
+        .spacer {
+            height: 20px;
+            line-height: 20px;
+        }
+        
+        .spacer-large {
+            height: 40px;
+            line-height: 40px;
+        }
+        
+        /* Responsive styles */
+        @media screen and (max-width: 600px) {
+            .email-wrapper {
+                padding: 20px 10px !important;
+            }
+            
+            .email-header,
+            .email-content,
+            .email-footer {
+                padding: 30px 20px !important;
+            }
+            
+            .email-title {
+                font-size: 20px !important;
+            }
+            
+            .button {
+                padding: 14px 24px !important;
+                font-size: 15px !important;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .email-container {
+                background-color: #1e293b !important;
+            }
+            
+            .email-content {
+                background-color: #1e293b !important;
+            }
+            
+            .email-title {
+                color: #f1f5f9 !important;
+            }
+            
+            .email-text {
+                color: #cbd5e1 !important;
+            }
+            
+            .email-footer {
+                background-color: #0f172a !important;
+                border-top-color: #334155 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+                <td>
+                    <div class="email-container">
+                        <!-- Header -->
+                        <div class="email-header">
+                            <a href="{{ app_url | default('https://requify.com') }}" class="logo">
+                                Requify
+                            </a>
+                            <p class="logo-subtitle">Система управления требованиями</p>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="email-content">
+                            {% block content %}
+                            <!-- Email content goes here -->
+                            {% endblock %}
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="email-footer">
+                            <p class="footer-text">
+                                С уважением,<br>
+                                <strong>Команда Requify</strong>
+                            </p>
+                            
+                            <p class="footer-text text-small">
+                                Это автоматическое сообщение. Пожалуйста, не отвечайте на него.
+                            </p>
+                            
+                            {% if support_email %}
+                            <p class="footer-text text-small">
+                                Если у вас есть вопросы, обратитесь в службу поддержки: 
+                                <a href="mailto:{{ support_email }}" class="footer-link">{{ support_email }}</a>
+                            </p>
+                            {% endif %}
+                            
+                            <div class="footer-links">
+                                <a href="{{ app_url | default('https://requify.com') }}" class="footer-link">Главная</a>
+                                <a href="{{ app_url | default('https://requify.com') }}/help" class="footer-link">Помощь</a>
+                                <a href="{{ app_url | default('https://requify.com') }}/privacy" class="footer-link">Конфиденциальность</a>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html> 

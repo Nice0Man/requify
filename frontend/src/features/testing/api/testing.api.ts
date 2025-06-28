@@ -1,362 +1,429 @@
-import { ApiClient, ApiResponse } from '@/shared/api/client';
+import { apiClient } from '@/shared/api/client';
+import {
+  TestPlan,
+  TestPlanCreate,
+  TestPlanUpdate,
+  TestPlanListParams,
+  TestPlanListResponse,
+  TestPlanWithDetails,
+  TestCase,
+  TestCaseCreate,
+  TestCaseUpdate,
+  TestCaseListParams,
+  TestCaseListResponse,
+  TestCaseWithDetails,
+  TestExecution,
+  TestExecutionCreate,
+  TestExecutionUpdate,
+  TestExecutionListParams,
+  TestExecutionListResponse,
+  TestExecutionWithDetails,
+  TestResult,
+  TestResultCreate,
+  TestResultListParams,
+  TestResultListResponse,
+  TestSummaryReport,
+  TestCoverageReport,
+  AutomationJob,
+  AutomationJobCreate,
+  TestPlanStats,
+  TestAttachment
+} from '../types/testing.types';
 
-export interface TestResult {
-  id: number;
-  test_case_id: number;
-  requirement_id?: number;
-  execution_id: number;
-  status: TestStatus;
-  result: TestResultType;
-  executed_by: number;
-  executed_at: string;
-  duration?: number;
-  notes?: string;
-  attachments: string[];
-  error_details?: string;
-  environment?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface TestPlan {
-  id: number;
-  name: string;
-  description?: string;
-  project_id: number;
-  release_id?: number;
-  status: TestPlanStatus;
-  start_date?: string;
-  end_date?: string;
-  created_by: number;
-  test_cases_count: number;
-  execution_progress: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface TestCase {
-  id: number;
-  title: string;
-  description: string;
-  requirement_id?: number;
-  project_id: number;
-  priority: TestPriority;
-  type: TestType;
-  status: TestCaseStatus;
-  preconditions?: string;
-  test_steps: TestStep[];
-  expected_result: string;
-  created_by: number;
-  assigned_to?: number;
-  tags: string[];
-  automation_status?: AutomationStatus;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface TestExecution {
-  id: number;
-  test_plan_id: number;
-  test_case_id: number;
-  executed_by: number;
-  status: TestExecutionStatus;
-  start_time?: string;
-  end_time?: string;
-  environment?: string;
-  browser?: string;
-  platform?: string;
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface TestStep {
-  step_number: number;
-  action: string;
-  expected_result: string;
-  actual_result?: string;
-  status?: TestStepStatus;
-}
-
-export interface TestResultCreate {
-  test_case_id: number;
-  requirement_id?: number;
-  execution_id: number;
-  status: TestStatus;
-  result: TestResultType;
-  duration?: number;
-  notes?: string;
-  environment?: string;
-  error_details?: string;
-}
-
-export interface TestPlanCreate {
-  name: string;
-  description?: string;
-  project_id: number;
-  release_id?: number;
-  start_date?: string;
-  end_date?: string;
-}
-
-export interface TestCaseCreate {
-  title: string;
-  description: string;
-  requirement_id?: number;
-  project_id: number;
-  priority: TestPriority;
-  type: TestType;
-  preconditions?: string;
-  test_steps: Omit<TestStep, 'actual_result' | 'status'>[];
-  expected_result: string;
-  assigned_to?: number;
-  tags?: string[];
-}
-
-export interface TestExecutionCreate {
-  test_plan_id: number;
-  test_case_id: number;
-  environment?: string;
-  browser?: string;
-  platform?: string;
-  notes?: string;
-}
-
-export interface TestSummaryReport {
-  total_test_cases: number;
-  executed_test_cases: number;
-  passed_test_cases: number;
-  failed_test_cases: number;
-  blocked_test_cases: number;
-  pass_rate: number;
-  execution_progress: number;
-  test_coverage: number;
-  defects_found: number;
-  critical_defects: number;
-}
-
-export interface IntegrationTestRequest {
-  requirement_id?: number;
-  release_id?: number;
-  test_suite?: string;
-  environment?: string;
-  config?: Record<string, any>;
-}
-
-export interface IntegrationTestStatus {
-  job_id: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  progress: number;
-  start_time: string;
-  end_time?: string;
-  result?: TestResultType;
-  logs_url?: string;
-  report_url?: string;
-}
-
-export interface RequirementTestingStatus {
-  requirement_id: number;
-  total_tests: number;
-  passed_tests: number;
-  failed_tests: number;
-  pending_tests: number;
-  coverage_percentage: number;
-  last_test_date?: string;
-}
-
-export interface ReleaseTestingStatus {
-  release_id: number;
-  total_requirements: number;
-  tested_requirements: number;
-  passed_requirements: number;
-  failed_requirements: number;
-  overall_pass_rate: number;
-  test_completion: number;
-}
-
-export enum TestStatus {
-  NOT_EXECUTED = 'not_executed',
-  PASSED = 'passed',
-  FAILED = 'failed',
-  BLOCKED = 'blocked',
-  SKIPPED = 'skipped'
-}
-
-export enum TestResultType {
-  PASS = 'pass',
-  FAIL = 'fail',
-  BLOCK = 'block',
-  SKIP = 'skip'
-}
-
-export enum TestPlanStatus {
-  DRAFT = 'draft',
-  ACTIVE = 'active',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
-}
-
-export enum TestPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
-}
-
-export enum TestType {
-  FUNCTIONAL = 'functional',
-  INTEGRATION = 'integration',
-  REGRESSION = 'regression',
-  PERFORMANCE = 'performance',
-  SECURITY = 'security',
-  USABILITY = 'usability'
-}
-
-export enum TestCaseStatus {
-  DRAFT = 'draft',
-  REVIEW = 'review',
-  APPROVED = 'approved',
-  DEPRECATED = 'deprecated'
-}
-
-export enum TestExecutionStatus {
-  PENDING = 'pending',
-  RUNNING = 'running',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
-}
-
-export enum AutomationStatus {
-  MANUAL = 'manual',
-  AUTOMATED = 'automated',
-  TO_AUTOMATE = 'to_automate'
-}
-
-export enum TestStepStatus {
-  NOT_EXECUTED = 'not_executed',
-  PASSED = 'passed',
-  FAILED = 'failed',
-  BLOCKED = 'blocked'
-}
-
-export class TestingApi {
-  constructor(private client: ApiClient) {}
-
-  // 1. Get Test Results
-  async getTestResults(params?: { skip?: number; limit?: number; execution_id?: number; status?: TestStatus }): Promise<ApiResponse<{ items: TestResult[]; total: number }>> {
-    const queryParams = new URLSearchParams();
-    if (params?.skip) queryParams.append('skip', params.skip.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.execution_id) queryParams.append('execution_id', params.execution_id.toString());
-    if (params?.status) queryParams.append('status', params.status);
-
-    const queryString = queryParams.toString();
-    const url = queryString ? `/testing/results?${queryString}` : '/testing/results';
-    
-    return this.client.get<{ items: TestResult[]; total: number }>(url);
+class TestingApi {
+  // Test Plans
+  async getTestPlans(params?: TestPlanListParams) {
+    return apiClient.get<TestPlanListResponse>('/api/v1/testing/plans', { params });
   }
 
-  // 2. Create Test Result
-  async createTestResult(resultData: TestResultCreate): Promise<ApiResponse<TestResult>> {
-    return this.client.post<TestResult>('/testing/results', resultData);
+  async getTestPlan(id: number) {
+    return apiClient.get<TestPlan>(`/api/v1/testing/plans/${id}`);
   }
 
-  // 3. Get Test Plans
-  async getTestPlans(params?: { skip?: number; limit?: number; project_id?: number; status?: TestPlanStatus }): Promise<ApiResponse<{ items: TestPlan[]; total: number }>> {
-    const queryParams = new URLSearchParams();
-    if (params?.skip) queryParams.append('skip', params.skip.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.project_id) queryParams.append('project_id', params.project_id.toString());
-    if (params?.status) queryParams.append('status', params.status);
-
-    const queryString = queryParams.toString();
-    const url = queryString ? `/testing/plans?${queryString}` : '/testing/plans';
-    
-    return this.client.get<{ items: TestPlan[]; total: number }>(url);
+  async getTestPlanWithDetails(id: number) {
+    return apiClient.get<TestPlanWithDetails>(`/api/v1/testing/plans/${id}/details`);
   }
 
-  // 4. Create Test Plan
-  async createTestPlan(planData: TestPlanCreate): Promise<ApiResponse<TestPlan>> {
-    return this.client.post<TestPlan>('/testing/plans', planData);
+  async createTestPlan(data: TestPlanCreate) {
+    return apiClient.post<TestPlan>('/api/v1/testing/plans', data);
   }
 
-  // 5. Get Test Plan
-  async getTestPlan(planId: number): Promise<ApiResponse<TestPlan>> {
-    return this.client.get<TestPlan>(`/testing/plans/${planId}`);
+  async updateTestPlan(id: number, data: TestPlanUpdate) {
+    return apiClient.put<TestPlan>(`/api/v1/testing/plans/${id}`, data);
   }
 
-  // 6. Get Test Cases
-  async getTestCases(params?: { skip?: number; limit?: number; project_id?: number; requirement_id?: number; type?: TestType }): Promise<ApiResponse<{ items: TestCase[]; total: number }>> {
-    const queryParams = new URLSearchParams();
-    if (params?.skip) queryParams.append('skip', params.skip.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.project_id) queryParams.append('project_id', params.project_id.toString());
-    if (params?.requirement_id) queryParams.append('requirement_id', params.requirement_id.toString());
-    if (params?.type) queryParams.append('type', params.type);
-
-    const queryString = queryParams.toString();
-    const url = queryString ? `/testing/cases?${queryString}` : '/testing/cases';
-    
-    return this.client.get<{ items: TestCase[]; total: number }>(url);
+  async deleteTestPlan(id: number) {
+    return apiClient.delete(`/api/v1/testing/plans/${id}`);
   }
 
-  // 7. Create Test Case
-  async createTestCase(caseData: TestCaseCreate): Promise<ApiResponse<TestCase>> {
-    return this.client.post<TestCase>('/testing/cases', caseData);
+  async getTestPlanStats(id: number) {
+    return apiClient.get<TestPlanStats>(`/api/v1/testing/plans/${id}/stats`);
   }
 
-  // 8. Get Test Executions
-  async getTestExecutions(params?: { skip?: number; limit?: number; test_plan_id?: number; status?: TestExecutionStatus }): Promise<ApiResponse<{ items: TestExecution[]; total: number }>> {
-    const queryParams = new URLSearchParams();
-    if (params?.skip) queryParams.append('skip', params.skip.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
-    if (params?.test_plan_id) queryParams.append('test_plan_id', params.test_plan_id.toString());
-    if (params?.status) queryParams.append('status', params.status);
-
-    const queryString = queryParams.toString();
-    const url = queryString ? `/testing/executions?${queryString}` : '/testing/executions';
-    
-    return this.client.get<{ items: TestExecution[]; total: number }>(url);
+  async cloneTestPlan(id: number, data: { name: string; version: string }) {
+    return apiClient.post<TestPlan>(`/api/v1/testing/plans/${id}/clone`, data);
   }
 
-  // 9. Execute Test Case
-  async executeTestCase(executionData: TestExecutionCreate): Promise<ApiResponse<TestExecution>> {
-    return this.client.post<TestExecution>('/testing/executions', executionData);
+  // Test Cases
+  async getTestCases(params?: TestCaseListParams) {
+    return apiClient.get<TestCaseListResponse>('/api/v1/testing/cases', { params });
   }
 
-  // 10. Get Testing Summary
-  async getTestingSummary(params?: { project_id?: number; release_id?: number; test_plan_id?: number }): Promise<ApiResponse<TestSummaryReport>> {
-    const queryParams = new URLSearchParams();
-    if (params?.project_id) queryParams.append('project_id', params.project_id.toString());
-    if (params?.release_id) queryParams.append('release_id', params.release_id.toString());
-    if (params?.test_plan_id) queryParams.append('test_plan_id', params.test_plan_id.toString());
-
-    const queryString = queryParams.toString();
-    const url = queryString ? `/testing/reports/summary?${queryString}` : '/testing/reports/summary';
-    
-    return this.client.get<TestSummaryReport>(url);
+  async getTestCase(id: number) {
+    return apiClient.get<TestCase>(`/api/v1/testing/cases/${id}`);
   }
 
-  // 11. Request Requirement Testing Status
-  async requestRequirementTestingStatus(requirementId: number): Promise<ApiResponse<RequirementTestingStatus>> {
-    return this.client.post<RequirementTestingStatus>('/testing/asuts/requirement-status', { requirement_id: requirementId });
+  async getTestCaseWithDetails(id: number) {
+    return apiClient.get<TestCaseWithDetails>(`/api/v1/testing/cases/${id}/details`);
   }
 
-  // 12. Request Release Testing Status
-  async requestReleaseTestingStatus(releaseId: number): Promise<ApiResponse<ReleaseTestingStatus>> {
-    return this.client.post<ReleaseTestingStatus>('/testing/asuts/release-status', { release_id: releaseId });
+  async createTestCase(data: TestCaseCreate) {
+    return apiClient.post<TestCase>('/api/v1/testing/cases', data);
   }
 
-  // 13. Run Integration Tests
-  async runIntegrationTests(testRequest: IntegrationTestRequest): Promise<ApiResponse<{ job_id: string; status: string }>> {
-    return this.client.post<{ job_id: string; status: string }>('/testing/integration/run', testRequest);
+  async updateTestCase(id: number, data: TestCaseUpdate) {
+    return apiClient.put<TestCase>(`/api/v1/testing/cases/${id}`, data);
   }
 
-  // 14. Get Integration Test Status
-  async getIntegrationTestStatus(jobId: string): Promise<ApiResponse<IntegrationTestStatus>> {
-    return this.client.get<IntegrationTestStatus>(`/testing/integration/status/${jobId}`);
+  async deleteTestCase(id: number) {
+    return apiClient.delete(`/api/v1/testing/cases/${id}`);
+  }
+
+  async cloneTestCase(id: number, data: { name: string; test_plan_id?: number }) {
+    return apiClient.post<TestCase>(`/api/v1/testing/cases/${id}/clone`, data);
+  }
+
+  async bulkUpdateTestCases(ids: number[], data: Partial<TestCaseUpdate>) {
+    return apiClient.put('/api/v1/testing/cases/bulk', { ids, ...data });
+  }
+
+  async getTestCasesByRequirement(requirementId: number) {
+    return apiClient.get<TestCase[]>(`/api/v1/testing/cases/by-requirement/${requirementId}`);
+  }
+
+  // Test Executions
+  async getTestExecutions(params?: TestExecutionListParams) {
+    return apiClient.get<TestExecutionListResponse>('/api/v1/testing/executions', { params });
+  }
+
+  async getTestExecution(id: number) {
+    return apiClient.get<TestExecution>(`/api/v1/testing/executions/${id}`);
+  }
+
+  async getTestExecutionWithDetails(id: number) {
+    return apiClient.get<TestExecutionWithDetails>(`/api/v1/testing/executions/${id}/details`);
+  }
+
+  async createTestExecution(data: TestExecutionCreate) {
+    return apiClient.post<TestExecution>('/api/v1/testing/executions', data);
+  }
+
+  async updateTestExecution(id: number, data: TestExecutionUpdate) {
+    return apiClient.put<TestExecution>(`/api/v1/testing/executions/${id}`, data);
+  }
+
+  async deleteTestExecution(id: number) {
+    return apiClient.delete(`/api/v1/testing/executions/${id}`);
+  }
+
+  async executeTestCase(testCaseId: number, data: Omit<TestExecutionCreate, 'test_case_id'>) {
+    return apiClient.post<TestExecution>(`/api/v1/testing/cases/${testCaseId}/execute`, data);
+  }
+
+  async bulkExecuteTestCases(testCaseIds: number[], data: Omit<TestExecutionCreate, 'test_case_id'>) {
+    return apiClient.post<TestExecution[]>('/api/v1/testing/cases/bulk-execute', {
+      test_case_ids: testCaseIds,
+      ...data
+    });
+  }
+
+  async executeTestPlan(testPlanId: number, data: { environment?: string; build_version?: string; notes?: string }) {
+    return apiClient.post<TestExecution[]>(`/api/v1/testing/plans/${testPlanId}/execute`, data);
+  }
+
+  // Test Results (for requirement coverage)
+  async getTestResults(params?: TestResultListParams) {
+    return apiClient.get<TestResultListResponse>('/api/v1/testing/results', { params });
+  }
+
+  async getTestResult(id: number) {
+    return apiClient.get<TestResult>(`/api/v1/testing/results/${id}`);
+  }
+
+  async createTestResult(data: TestResultCreate) {
+    return apiClient.post<TestResult>('/api/v1/testing/results', data);
+  }
+
+  async updateTestResult(id: number, data: Partial<TestResultCreate>) {
+    return apiClient.put<TestResult>(`/api/v1/testing/results/${id}`, data);
+  }
+
+  async deleteTestResult(id: number) {
+    return apiClient.delete(`/api/v1/testing/results/${id}`);
+  }
+
+  // File attachments
+  async uploadTestAttachment(testCaseId: number, file: File, description?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (description) formData.append('description', description);
+
+    return apiClient.post<TestAttachment>(
+      `/api/v1/testing/cases/${testCaseId}/attachments`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+  }
+
+  async uploadExecutionAttachment(executionId: number, file: File, description?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (description) formData.append('description', description);
+
+    return apiClient.post<TestAttachment>(
+      `/api/v1/testing/executions/${executionId}/attachments`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+  }
+
+  async deleteTestAttachment(attachmentId: number) {
+    return apiClient.delete(`/api/v1/testing/attachments/${attachmentId}`);
+  }
+
+  async downloadTestAttachment(attachmentId: number) {
+    return apiClient.get(`/api/v1/testing/attachments/${attachmentId}/download`, {
+      responseType: 'blob',
+    });
+  }
+
+  // Automation
+  async getAutomationJobs(params?: { status?: string; test_plan_id?: number; limit?: number; skip?: number }) {
+    return apiClient.get<AutomationJob[]>('/api/v1/testing/automation/jobs', { params });
+  }
+
+  async getAutomationJob(jobId: string) {
+    return apiClient.get<AutomationJob>(`/api/v1/testing/automation/jobs/${jobId}`);
+  }
+
+  async createAutomationJob(data: AutomationJobCreate) {
+    return apiClient.post<AutomationJob>('/api/v1/testing/automation/jobs', data);
+  }
+
+  async cancelAutomationJob(jobId: string) {
+    return apiClient.post(`/api/v1/testing/automation/jobs/${jobId}/cancel`);
+  }
+
+  async getAutomationJobLogs(jobId: string) {
+    return apiClient.get<string[]>(`/api/v1/testing/automation/jobs/${jobId}/logs`);
+  }
+
+  // Reports and Analytics
+  async getTestSummaryReport(projectId: number, params?: {
+    start_date?: string;
+    end_date?: string;
+    test_plan_ids?: number[];
+  }) {
+    return apiClient.get<TestSummaryReport>(`/api/v1/testing/reports/summary/${projectId}`, { params });
+  }
+
+  async getTestCoverageReport(projectId: number, params?: {
+    requirement_ids?: number[];
+    include_untested?: boolean;
+  }) {
+    return apiClient.get<TestCoverageReport[]>(`/api/v1/testing/reports/coverage/${projectId}`, { params });
+  }
+
+  async getExecutionTrends(projectId: number, params?: {
+    start_date?: string;
+    end_date?: string;
+    granularity?: 'day' | 'week' | 'month';
+  }) {
+    return apiClient.get(`/api/v1/testing/reports/trends/${projectId}`, { params });
+  }
+
+  async getDefectMetrics(projectId: number, params?: {
+    start_date?: string;
+    end_date?: string;
+    test_plan_ids?: number[];
+  }) {
+    return apiClient.get(`/api/v1/testing/reports/defects/${projectId}`, { params });
+  }
+
+  async getAutomationMetrics(projectId: number) {
+    return apiClient.get(`/api/v1/testing/reports/automation/${projectId}`);
+  }
+
+  // Export functionality
+  async exportTestPlan(testPlanId: number, format: 'excel' | 'pdf' | 'csv') {
+    return apiClient.get(`/api/v1/testing/plans/${testPlanId}/export`, {
+      params: { format },
+      responseType: 'blob',
+    });
+  }
+
+  async exportTestCases(params: {
+    test_plan_id?: number;
+    requirement_id?: number;
+    format: 'excel' | 'pdf' | 'csv';
+    include_steps?: boolean;
+    include_executions?: boolean;
+  }) {
+    return apiClient.get('/api/v1/testing/cases/export', {
+      params,
+      responseType: 'blob',
+    });
+  }
+
+  async exportTestResults(params: {
+    test_plan_id?: number;
+    requirement_id?: number;
+    start_date?: string;
+    end_date?: string;
+    format: 'excel' | 'pdf' | 'csv';
+  }) {
+    return apiClient.get('/api/v1/testing/results/export', {
+      params,
+      responseType: 'blob',
+    });
+  }
+
+  // Import functionality
+  async importTestCases(testPlanId: number, file: File, options?: {
+    skip_header?: boolean;
+    update_existing?: boolean;
+    create_requirements?: boolean;
+  }) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (options) {
+      Object.entries(options).forEach(([key, value]) => {
+        formData.append(key, value.toString());
+      });
+    }
+
+    return apiClient.post(
+      `/api/v1/testing/plans/${testPlanId}/import-cases`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+  }
+
+  async importTestResults(file: File, options?: {
+    skip_header?: boolean;
+    test_plan_id?: number;
+    environment?: string;
+  }) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (options) {
+      Object.entries(options).forEach(([key, value]) => {
+        formData.append(key, value.toString());
+      });
+    }
+
+    return apiClient.post('/api/v1/testing/results/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  // Search and advanced queries
+  async searchTestCases(query: string, params?: {
+    project_id?: number;
+    test_plan_id?: number;
+    limit?: number;
+    include_steps?: boolean;
+  }) {
+    return apiClient.get<TestCase[]>('/api/v1/testing/cases/search', {
+      params: { q: query, ...params }
+    });
+  }
+
+  async getTestCaseDependencies(testCaseId: number) {
+    return apiClient.get(`/api/v1/testing/cases/${testCaseId}/dependencies`);
+  }
+
+  async getRequirementTestCoverage(requirementId: number) {
+    return apiClient.get(`/api/v1/testing/requirements/${requirementId}/coverage`);
+  }
+
+  async getTestExecutionHistory(testCaseId: number, params?: { limit?: number; skip?: number }) {
+    return apiClient.get(`/api/v1/testing/cases/${testCaseId}/execution-history`, { params });
+  }
+
+  // Test environments and configurations
+  async getTestEnvironments() {
+    return apiClient.get<string[]>('/api/v1/testing/environments');
+  }
+
+  async createTestEnvironment(data: { name: string; description?: string; configuration?: Record<string, any> }) {
+    return apiClient.post('/api/v1/testing/environments', data);
+  }
+
+  async updateTestEnvironment(name: string, data: { description?: string; configuration?: Record<string, any> }) {
+    return apiClient.put(`/api/v1/testing/environments/${name}`, data);
+  }
+
+  async deleteTestEnvironment(name: string) {
+    return apiClient.delete(`/api/v1/testing/environments/${name}`);
+  }
+
+  // Test data management
+  async getTestData(testCaseId: number) {
+    return apiClient.get(`/api/v1/testing/cases/${testCaseId}/test-data`);
+  }
+
+  async createTestData(testCaseId: number, data: { name: string; data: Record<string, any>; description?: string }) {
+    return apiClient.post(`/api/v1/testing/cases/${testCaseId}/test-data`, data);
+  }
+
+  async updateTestData(testDataId: number, data: { name?: string; data?: Record<string, any>; description?: string }) {
+    return apiClient.put(`/api/v1/testing/test-data/${testDataId}`, data);
+  }
+
+  async deleteTestData(testDataId: number) {
+    return apiClient.delete(`/api/v1/testing/test-data/${testDataId}`);
+  }
+
+  // Integration endpoints
+  async syncWithJira(params: {
+    jira_project_key: string;
+    test_plan_id?: number;
+    sync_executions?: boolean;
+    sync_defects?: boolean;
+  }) {
+    return apiClient.post('/api/v1/testing/integrations/jira/sync', params);
+  }
+
+  async syncWithTestRail(params: {
+    testrail_project_id: number;
+    test_plan_id?: number;
+    sync_results?: boolean;
+  }) {
+    return apiClient.post('/api/v1/testing/integrations/testrail/sync', params);
+  }
+
+  async triggerCIPipeline(testPlanId: number, params: {
+    branch?: string;
+    environment?: string;
+    build_parameters?: Record<string, any>;
+  }) {
+    return apiClient.post(`/api/v1/testing/plans/${testPlanId}/ci-trigger`, params);
   }
 }
 
-// Export singleton instance
-export const testingApi = new TestingApi(new ApiClient()); 
+export const testingApi = new TestingApi(); 

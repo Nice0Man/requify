@@ -1,0 +1,77 @@
+{% extends "base.html.jinja" %}
+
+{% block title %}Добро пожаловать в Requify!{% endblock %}
+
+{% block content %}
+<h1 class="email-title">🎉 Добро пожаловать в Requify!</h1>
+
+<p class="email-text">
+    Здравствуйте, <strong>{{ user_name | default(user_email) }}</strong>!
+</p>
+
+<p class="email-text">
+    Поздравляем! Ваша учетная запись в системе управления требованиями Requify успешно создана и активирована. 
+    Теперь вы можете использовать все возможности нашей платформы для эффективного управления проектами.
+</p>
+
+<div class="alert alert-success">
+    <div class="alert-title">✨ Что вы можете делать в Requify</div>
+    <div class="alert-text">
+        <strong>Управление проектами:</strong><br>
+        • Создавайте и настраивайте проекты<br>
+        • Приглашайте участников команды<br>
+        • Отслеживайте прогресс выполнения<br><br>
+        
+        <strong>Работа с требованиями:</strong><br>
+        • Создавайте и редактируйте требования<br>
+        • Устанавливайте связи между требованиями<br>
+        • Отслеживайте изменения и версии<br><br>
+        
+        <strong>Аналитика и отчеты:</strong><br>
+        • Получайте детальную аналитику<br>
+        • Экспортируйте данные в различных форматах<br>
+        • Настраивайте автоматические отчеты
+    </div>
+</div>
+
+<div class="button-container">
+    <a href="{{ app_url | default('https://requify.com') }}/dashboard" class="button">
+        Перейти в личный кабинет
+    </a>
+</div>
+
+<div class="alert alert-info">
+    <div class="alert-title">🚀 Быстрый старт</div>
+    <div class="alert-text">
+        <strong>Рекомендуем начать с:</strong><br><br>
+        1. <strong>Создания первого проекта</strong> - определите цели и участников<br>
+        2. <strong>Настройки профиля</strong> - добавьте информацию о себе<br>
+        3. <strong>Изучения документации</strong> - ознакомьтесь с возможностями системы<br>
+        4. <strong>Приглашения команды</strong> - добавьте коллег для совместной работы
+    </div>
+</div>
+
+<div class="button-container">
+    <a href="{{ app_url | default('https://requify.com') }}/help" class="button button-secondary">
+        Руководство пользователя
+    </a>
+    <a href="{{ app_url | default('https://requify.com') }}/support" class="button button-secondary">
+        Техническая поддержка
+    </a>
+</div>
+
+<div class="spacer"></div>
+
+<p class="email-text">
+    Если у вас возникнут вопросы или потребуется помощь, наша команда поддержки всегда готова помочь. 
+    Мы стремимся сделать вашу работу с требованиями максимально эффективной и удобной.
+</p>
+
+<p class="email-text">
+    Удачной работы с Requify! 🚀
+</p>
+
+<p class="email-text text-small text-muted">
+    Учетная запись создана {{ timestamp | default(now()) | strftime('%d.%m.%Y в %H:%M') }}.
+</p>
+{% endblock %} 

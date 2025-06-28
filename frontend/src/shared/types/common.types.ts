@@ -25,7 +25,7 @@ export interface PaginationInfo {
 
 export interface SortParams {
   sort_by?: string;
-  sort_order?: 'asc' | 'desc';
+  sort_order?: "asc" | "desc";
 }
 
 export interface BaseFilters {
@@ -59,7 +59,19 @@ export interface SelectOption {
 }
 
 export interface FormFieldConfig {
-  type: 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'multiselect' | 'checkbox' | 'radio' | 'date' | 'datetime' | 'file';
+  type:
+    | "text"
+    | "email"
+    | "password"
+    | "number"
+    | "textarea"
+    | "select"
+    | "multiselect"
+    | "checkbox"
+    | "radio"
+    | "date"
+    | "datetime"
+    | "file";
   label: string;
   placeholder?: string;
   required?: boolean;
@@ -76,7 +88,7 @@ export interface FormFieldConfig {
 export interface FileUpload {
   file: File;
   progress: number;
-  status: 'pending' | 'uploading' | 'completed' | 'error';
+  status: "pending" | "uploading" | "completed" | "error";
   error?: string;
   url?: string;
 }
@@ -106,7 +118,7 @@ export interface Comment {
 
 export interface Permission {
   scope: string;
-  action: 'read' | 'write' | 'delete' | 'admin';
+  action: "read" | "write" | "delete" | "admin";
   resource?: string;
 }
 
@@ -136,21 +148,21 @@ export interface Notification {
 }
 
 export enum NotificationType {
-  INFO = 'info',
-  SUCCESS = 'success',
-  WARNING = 'warning',
-  ERROR = 'error',
-  REQUIREMENT_UPDATED = 'requirement_updated',
-  TEST_COMPLETED = 'test_completed',
-  RELEASE_DEPLOYED = 'release_deployed',
-  PROJECT_UPDATED = 'project_updated',
-  COMMENT_ADDED = 'comment_added',
-  APPROVAL_REQUESTED = 'approval_requested'
+  INFO = "info",
+  SUCCESS = "success",
+  WARNING = "warning",
+  ERROR = "error",
+  REQUIREMENT_UPDATED = "requirement_updated",
+  TEST_COMPLETED = "test_completed",
+  RELEASE_DEPLOYED = "release_deployed",
+  PROJECT_UPDATED = "project_updated",
+  COMMENT_ADDED = "comment_added",
+  APPROVAL_REQUESTED = "approval_requested",
 }
 
 export interface Toast {
   id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: "success" | "error" | "warning" | "info";
   title?: string;
   message: string;
   duration?: number;
@@ -182,12 +194,12 @@ export interface TableColumn<T = any> {
   render?: (value: any, record: T, index: number) => React.ReactNode;
   sorter?: boolean | ((a: T, b: T) => number);
   filter?: {
-    type: 'text' | 'select' | 'date' | 'number';
+    type: "text" | "select" | "date" | "number";
     options?: SelectOption[];
   };
   width?: number | string;
-  fixed?: 'left' | 'right';
-  align?: 'left' | 'center' | 'right';
+  fixed?: "left" | "right";
+  align?: "left" | "center" | "right";
 }
 
 export interface TableConfig<T = any> {
@@ -201,12 +213,12 @@ export interface TableConfig<T = any> {
     showQuickJumper?: boolean;
   };
   selection?: {
-    type: 'checkbox' | 'radio';
+    type: "checkbox" | "radio";
     selectedKeys: string[];
     onChange: (selectedKeys: string[], selectedRows: T[]) => void;
   };
   loading?: boolean;
-  size?: 'small' | 'middle' | 'large';
+  size?: "small" | "middle" | "large";
 }
 
 export interface SearchableSelectProps {
@@ -247,16 +259,16 @@ export interface MetricCard {
   value: number | string;
   change?: {
     value: number;
-    type: 'increase' | 'decrease';
+    type: "increase" | "decrease";
     period: string;
   };
-  format?: 'number' | 'percentage' | 'currency' | 'duration';
-  color?: 'primary' | 'success' | 'warning' | 'error';
+  format?: "number" | "percentage" | "currency" | "duration";
+  color?: "primary" | "success" | "warning" | "error";
   icon?: string;
 }
 
 export interface Theme {
-  mode: 'light' | 'dark';
+  mode: "light" | "dark";
   primary: string;
   secondary: string;
   background: string;
@@ -266,11 +278,11 @@ export interface Theme {
 }
 
 export interface UserPreferences {
-  theme: Theme['mode'];
+  theme: Theme["mode"];
   language: string;
   timezone: string;
   date_format: string;
-  time_format: '12h' | '24h';
+  time_format: "12h" | "24h";
   notifications: {
     email: boolean;
     push: boolean;
@@ -278,4 +290,4 @@ export interface UserPreferences {
   };
   table_page_size: number;
   default_project?: number;
-} 
+}

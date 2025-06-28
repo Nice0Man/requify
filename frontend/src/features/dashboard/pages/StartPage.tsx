@@ -803,7 +803,7 @@ const StartPage: React.FC = () => {
             variant="body2"
             sx={{ opacity: 0.5, textAlign: "center" }}
           >
-            © 2024 Requify. All rights reserved.
+            © 2025 Requify. All rights reserved.
           </Typography>
         </Container>
       </Box>

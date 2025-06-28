@@ -1,27 +1,24 @@
 # Development Frontend Dockerfile
-FROM node:20-alpine as base
-
-# Устанавливаем pnpm (более быстрый пакетный менеджер)
-RUN npm install -g pnpm@latest
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Копируем файлы зависимостей
-COPY frontend/package*.json frontend/pnpm-lock.yaml* ./
-
-# Устанавливаем зависимости
-RUN pnpm install
-
-# Создаем пользователя
+# Create non-root user with home directory for npm cache
 RUN addgroup -g 1001 -S frontend && \
-    adduser -S frontend -u 1001 -G frontend
+    adduser -S -u 1001 -G frontend -h /app frontend
 
-# Устанавливаем права
-RUN chown -R frontend:frontend /app && \
-    chown -R frontend:frontend /app/node_modules || true
+# Copy package files first to leverage Docker cache
+COPY --chown=frontend:frontend package*.json ./
+
+# Install dependencies as non-root user
 USER frontend
+RUN npm install
+RUN npm audit fix --force
+
+# Copy application code with proper ownership
+COPY --chown=frontend:frontend . .
 
 EXPOSE 3000
 
-# Hot reload для разработки
-CMD ["pnpm", "dev", "--host", "0.0.0.0"] 
+# Hot reload for development
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

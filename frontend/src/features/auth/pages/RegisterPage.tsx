@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Container,
   Paper,
@@ -21,8 +21,8 @@ import {
   Step,
   StepLabel,
   Grid,
-  Divider
-} from '@mui/material';
+  Divider,
+} from "@mui/material";
 import {
   Visibility,
   VisibilityOff,
@@ -33,69 +33,72 @@ import {
   Business,
   PersonAdd,
   ArrowBack,
-  ArrowForward
-} from '@mui/icons-material';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { toast } from 'react-toastify';
-import { authApi } from '../api/auth.api';
-import { UserCreate, UserRole } from '../types/auth.types';
+  ArrowForward,
+} from "@mui/icons-material";
+import { useForm, Controller, Resolver } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast } from "react-toastify";
+import { authApi } from "../api/auth.api";
+import { UserCreate, UserRole } from "../types/auth.types";
 
 // Validation schema
 const registerSchema = yup.object({
   email: yup
     .string()
-    .email('Please enter a valid email address')
-    .required('Email is required'),
+    .email("Please enter a valid email address")
+    .required("Email is required"),
   username: yup
     .string()
-    .min(3, 'Username must be at least 3 characters')
-    .max(30, 'Username must be less than 30 characters')
-    .matches(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens')
-    .required('Username is required'),
+    .min(3, "Username must be at least 3 characters")
+    .max(30, "Username must be less than 30 characters")
+    .matches(
+      /^[a-zA-Z0-9_-]+$/,
+      "Username can only contain letters, numbers, underscores, and hyphens"
+    )
+    .required("Username is required"),
   password: yup
     .string()
-    .min(8, 'Password must be at least 8 characters')
+    .min(8, "Password must be at least 8 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     )
-    .required('Password is required'),
+    .required("Password is required"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password')], 'Passwords must match')
-    .required('Please confirm your password'),
+    .oneOf([yup.ref("password")], "Passwords must match")
+    .required("Please confirm your password"),
   first_name: yup
     .string()
-    .min(2, 'First name must be at least 2 characters')
-    .max(50, 'First name must be less than 50 characters')
-    .required('First name is required'),
+    .min(2, "First name must be at least 2 characters")
+    .max(50, "First name must be less than 50 characters")
+    .required("First name is required"),
   last_name: yup
     .string()
-    .min(2, 'Last name must be at least 2 characters')
-    .max(50, 'Last name must be less than 50 characters')
-    .required('Last name is required'),
+    .min(2, "Last name must be at least 2 characters")
+    .max(50, "Last name must be less than 50 characters")
+    .required("Last name is required"),
   department: yup
     .string()
-    .max(100, 'Department must be less than 100 characters')
+    .max(100, "Department must be less than 100 characters")
     .optional(),
   phone: yup
     .string()
-    .matches(/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number')
+    .matches(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
     .optional(),
   role: yup
     .string()
-    .oneOf(Object.values(UserRole), 'Please select a valid role')
-    .optional()
+    .oneOf(Object.values(UserRole), "Please select a valid role")
+    .optional(),
 });
 
-interface RegisterFormData extends Omit<UserCreate, 'password'> {
+interface RegisterFormData extends Omit<UserCreate, "password"> {
   password: string;
   confirmPassword: string;
 }
 
-const steps = ['Account Information', 'Personal Details', 'Review'];
+const steps = ["Account Information", "Personal Details", "Review"];
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -110,34 +113,33 @@ const RegisterPage: React.FC = () => {
     handleSubmit,
     control,
     formState: { errors },
-    watch,
     trigger,
-    getValues
+    getValues,
   } = useForm<RegisterFormData>({
-    resolver: yupResolver(registerSchema),
-    mode: 'onChange',
+    resolver: yupResolver(registerSchema) as Resolver<RegisterFormData>,
+    mode: "onChange",
     defaultValues: {
-      email: '',
-      username: '',
-      password: '',
-      confirmPassword: '',
-      first_name: '',
-      last_name: '',
-      department: '',
-      phone: '',
-      role: UserRole.USER
-    }
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      first_name: "",
+      last_name: "",
+      department: "",
+      phone: "",
+      role: UserRole.GUEST,
+    },
   });
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof RegisterFormData)[] = [];
-    
+
     switch (activeStep) {
       case 0:
-        fieldsToValidate = ['email', 'username', 'password', 'confirmPassword'];
+        fieldsToValidate = ["email", "username", "password", "confirmPassword"];
         break;
       case 1:
-        fieldsToValidate = ['first_name', 'last_name', 'department', 'phone'];
+        fieldsToValidate = ["first_name", "last_name", "department", "phone"];
         break;
     }
 
@@ -164,21 +166,49 @@ const RegisterPage: React.FC = () => {
         last_name: data.last_name,
         department: data.department || undefined,
         phone: data.phone || undefined,
-        role: data.role || UserRole.USER
+        role: data.role || UserRole.GUEST,
       };
 
       await authApi.register(userData);
-      
-      toast.success('Registration successful! Please check your email for verification.');
-      navigate('/login', { 
-        state: { 
-          message: 'Registration successful! Please sign in with your credentials.' 
-        }
+
+      toast.success(
+        "Registration successful! Please check your email for verification."
+      );
+      navigate("/login", {
+        state: {
+          message:
+            "Registration successful! Please sign in with your credentials.",
+        },
       });
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 
-                          error.message || 
-                          'Registration failed. Please try again.';
+      let errorMessage = "Registration failed. Please try again.";
+
+      if (error.response?.data?.detail) {
+        const detail = error.response.data.detail;
+
+        // Handle validation errors (array of error objects)
+        if (Array.isArray(detail)) {
+          errorMessage = detail
+            .map((err: any) => {
+              if (typeof err === "string") return err;
+              if (err.msg) return err.msg;
+              if (err.message) return err.message;
+              return "Validation error";
+            })
+            .join(", ");
+        }
+        // Handle single validation error object
+        else if (typeof detail === "object" && detail.msg) {
+          errorMessage = detail.msg;
+        }
+        // Handle string detail
+        else if (typeof detail === "string") {
+          errorMessage = detail;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -208,7 +238,7 @@ const RegisterPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                {...register('email')}
+                {...register("email")}
               />
             </Grid>
             <Grid item xs={12}>
@@ -228,7 +258,7 @@ const RegisterPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                {...register('username')}
+                {...register("username")}
               />
             </Grid>
             <Grid item xs={12}>
@@ -237,7 +267,7 @@ const RegisterPage: React.FC = () => {
                 fullWidth
                 label="Password"
                 placeholder="Create a strong password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 autoComplete="new-password"
                 error={!!errors.password}
@@ -261,7 +291,7 @@ const RegisterPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                {...register('password')}
+                {...register("password")}
               />
             </Grid>
             <Grid item xs={12}>
@@ -270,7 +300,7 @@ const RegisterPage: React.FC = () => {
                 fullWidth
                 label="Confirm Password"
                 placeholder="Confirm your password"
-                type={showConfirmPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? "text" : "password"}
                 id="confirmPassword"
                 autoComplete="new-password"
                 error={!!errors.confirmPassword}
@@ -285,16 +315,22 @@ const RegisterPage: React.FC = () => {
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle confirm password visibility"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                         edge="end"
                         size="small"
                       >
-                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
-                {...register('confirmPassword')}
+                {...register("confirmPassword")}
               />
             </Grid>
           </Grid>
@@ -320,7 +356,7 @@ const RegisterPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                {...register('first_name')}
+                {...register("first_name")}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -340,7 +376,7 @@ const RegisterPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                {...register('last_name')}
+                {...register("last_name")}
               />
             </Grid>
             <Grid item xs={12}>
@@ -358,7 +394,7 @@ const RegisterPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                {...register('department')}
+                {...register("department")}
               />
             </Grid>
             <Grid item xs={12}>
@@ -377,7 +413,7 @@ const RegisterPage: React.FC = () => {
                     </InputAdornment>
                   ),
                 }}
-                {...register('phone')}
+                {...register("phone")}
               />
             </Grid>
             <Grid item xs={12}>
@@ -387,15 +423,12 @@ const RegisterPage: React.FC = () => {
                   name="role"
                   control={control}
                   render={({ field }) => (
-                    <Select
-                      labelId="role-label"
-                      label="Role"
-                      {...field}
-                    >
-                      <MenuItem value={UserRole.USER}>User</MenuItem>
-                      <MenuItem value={UserRole.ANALYST}>Business Analyst</MenuItem>
+                    <Select labelId="role-label" label="Role" {...field}>
+                      <MenuItem value={UserRole.GUEST}>Guest</MenuItem>
+                      <MenuItem value={UserRole.VIEWER}>Viewer</MenuItem>
+                      <MenuItem value={UserRole.ANALYST}>Analyst</MenuItem>
                       <MenuItem value={UserRole.TESTER}>Tester</MenuItem>
-                      <MenuItem value={UserRole.MANAGER}>Manager</MenuItem>
+                      <MenuItem value={UserRole.DEVELOPER}>Developer</MenuItem>
                     </Select>
                   )}
                 />
@@ -420,38 +453,54 @@ const RegisterPage: React.FC = () => {
               </Typography>
             </Grid>
             <Grid item xs={12}>
-              <Paper sx={{ p: 2, backgroundColor: 'grey.50' }}>
+              <Paper sx={{ p: 2, backgroundColor: "grey.50" }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Email:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Email:
+                    </Typography>
                     <Typography variant="body1">{values.email}</Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Username:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Username:
+                    </Typography>
                     <Typography variant="body1">{values.username}</Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">First Name:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      First Name:
+                    </Typography>
                     <Typography variant="body1">{values.first_name}</Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Last Name:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Last Name:
+                    </Typography>
                     <Typography variant="body1">{values.last_name}</Typography>
                   </Grid>
                   {values.department && (
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">Department:</Typography>
-                      <Typography variant="body1">{values.department}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Department:
+                      </Typography>
+                      <Typography variant="body1">
+                        {values.department}
+                      </Typography>
                     </Grid>
                   )}
                   {values.phone && (
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">Phone:</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Phone:
+                      </Typography>
                       <Typography variant="body1">{values.phone}</Typography>
                     </Grid>
                   )}
                   <Grid item xs={12} sm={6}>
-                    <Typography variant="body2" color="text.secondary">Role:</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Role:
+                    </Typography>
                     <Typography variant="body1">{values.role}</Typography>
                   </Grid>
                 </Grid>
@@ -470,30 +519,45 @@ const RegisterPage: React.FC = () => {
       <Box
         sx={{
           marginTop: { xs: 4, md: 8 },
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          minHeight: 'calc(100vh - 64px)'
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          minHeight: "calc(100vh - 64px)",
         }}
       >
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            padding: { xs: 3, md: 4 }, 
-            width: '100%',
+        <Paper
+          elevation={3}
+          sx={{
+            padding: { xs: 3, md: 4 },
+            width: "100%",
             borderRadius: 2,
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
+            background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
           }}
         >
           {/* Header */}
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <PersonAdd sx={{ fontSize: 40, color: 'primary.main', mr: 1 }} />
-              <Typography component="h1" variant="h3" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+          <Box sx={{ textAlign: "center", mb: 4 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+              }}
+            >
+              <PersonAdd sx={{ fontSize: 40, color: "primary.main", mr: 1 }} />
+              <Typography
+                component="h1"
+                variant="h3"
+                sx={{ fontWeight: "bold", color: "primary.main" }}
+              >
                 Requify
               </Typography>
             </Box>
-            <Typography variant="h5" color="text.primary" sx={{ fontWeight: 500 }}>
+            <Typography
+              variant="h5"
+              color="text.primary"
+              sx={{ fontWeight: 500 }}
+            >
               Create Your Account
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -512,8 +576,8 @@ const RegisterPage: React.FC = () => {
 
           {/* Error Alert */}
           {error && (
-            <Alert 
-              severity="error" 
+            <Alert
+              severity="error"
               sx={{ mb: 3, borderRadius: 2 }}
               onClose={() => setError(null)}
             >
@@ -526,7 +590,9 @@ const RegisterPage: React.FC = () => {
             {renderStepContent(activeStep)}
 
             {/* Navigation Buttons */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
+            >
               <Button
                 disabled={activeStep === 0}
                 onClick={handleBack}
@@ -535,7 +601,7 @@ const RegisterPage: React.FC = () => {
               >
                 Back
               </Button>
-              
+
               {activeStep === steps.length - 1 ? (
                 <Button
                   type="submit"
@@ -546,16 +612,24 @@ const RegisterPage: React.FC = () => {
                     px: 4,
                     py: 1.5,
                     borderRadius: 2,
-                    fontSize: '1.1rem',
+                    fontSize: "1.1rem",
                     fontWeight: 600,
-                    background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-                    '&:hover': {
-                      background: 'linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)',
-                    }
+                    background:
+                      "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
+                    "&:hover": {
+                      background:
+                        "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)",
+                    },
                   }}
-                  startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <PersonAdd />}
+                  startIcon={
+                    isLoading ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      <PersonAdd />
+                    )
+                  }
                 >
-                  {isLoading ? 'Creating Account...' : 'Create Account'}
+                  {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
               ) : (
                 <Button
@@ -576,14 +650,14 @@ const RegisterPage: React.FC = () => {
           </Divider>
 
           {/* Login Link */}
-          <Box sx={{ textAlign: 'center' }}>
-            <Link 
-              component={RouterLink} 
-              to="/login" 
+          <Box sx={{ textAlign: "center" }}>
+            <Link
+              component={RouterLink}
+              to="/login"
               variant="body2"
-              sx={{ 
-                textDecoration: 'none',
-                '&:hover': { textDecoration: 'underline' }
+              sx={{
+                textDecoration: "none",
+                "&:hover": { textDecoration: "underline" },
               }}
             >
               Sign in to your account
@@ -592,12 +666,12 @@ const RegisterPage: React.FC = () => {
         </Paper>
 
         {/* Footer */}
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
+        <Box sx={{ mt: 4, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
             Requify - Requirements Management System
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Version 1.0.0 | © 2024 Requify
+            Version 1.0.0 | © 2025 Requify
           </Typography>
         </Box>
       </Box>
@@ -605,4 +679,4 @@ const RegisterPage: React.FC = () => {
   );
 };
 
-export default RegisterPage; 
+export default RegisterPage;

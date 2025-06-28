@@ -16,6 +16,10 @@ class UserBase(BaseModel):
     )
     email: EmailStr = Field(..., description="Email пользователя")
     role: str = Field(..., min_length=1, max_length=20, description="Роль пользователя")
+    first_name: Optional[str] = Field(None, description="Имя пользователя")
+    last_name: Optional[str] = Field(None, description="Фамилия пользователя")
+    department: Optional[str] = Field(None, description="Отдел пользователя")
+    phone: Optional[str] = Field(None, description="Телефон пользователя")
 
     @field_validator("username")
     def validate_username(cls, v):
@@ -84,6 +88,66 @@ class UserBase(BaseModel):
         if v not in valid_roles:
             raise ValueError(f"Invalid user role. Must be one of: {valid_roles}")
 
+        return v
+
+    @field_validator("phone")
+    def validate_phone(cls, v):
+        """Валидация номера телефона"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            
+            # Удаляем все символы кроме цифр и +
+            phone_digits = re.sub(r'[^\d+]', '', v)
+            
+            # Проверяем формат телефона (международный или российский)
+            if not re.match(r'^(\+7|8|7)?[0-9]{10}$', phone_digits):
+                raise ValueError("Invalid phone number format")
+            
+            # Нормализуем к формату +7XXXXXXXXXX
+            if phone_digits.startswith('8'):
+                phone_digits = '+7' + phone_digits[1:]
+            elif phone_digits.startswith('7') and not phone_digits.startswith('+7'):
+                phone_digits = '+' + phone_digits
+            elif not phone_digits.startswith('+7'):
+                phone_digits = '+7' + phone_digits
+                
+            return phone_digits
+        return v
+
+    @field_validator("first_name", "last_name")
+    def validate_names(cls, v):
+        """Валидация имени и фамилии"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            
+            # Проверяем, что содержит только буквы, пробелы и дефисы
+            if not re.match(r'^[a-zA-Zа-яА-ЯёЁ\s\-]+$', v):
+                raise ValueError("Name can only contain letters, spaces and hyphens")
+            
+            # Проверяем длину
+            if len(v) > 50:
+                raise ValueError("Name cannot exceed 50 characters")
+                
+            return v.title()  # Приводим к правильному регистру
+        return v
+
+    @field_validator("department")
+    def validate_department(cls, v):
+        """Валидация отдела"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            
+            # Проверяем длину
+            if len(v) > 100:
+                raise ValueError("Department name cannot exceed 100 characters")
+                
+            return v
         return v
 
 
@@ -172,6 +236,10 @@ class UserUpdate(BaseModel):
     password: Optional[str] = Field(
         None, min_length=8, description="Пароль пользователя"
     )
+    first_name: Optional[str] = Field(None, description="Имя пользователя")
+    last_name: Optional[str] = Field(None, description="Фамилия пользователя")
+    department: Optional[str] = Field(None, description="Отдел пользователя")
+    phone: Optional[str] = Field(None, description="Телефон пользователя")
 
     @field_validator("username")
     def validate_username(cls, v):
@@ -294,6 +362,66 @@ class UserUpdate(BaseModel):
             return v
         return v
 
+    @field_validator("phone")
+    def validate_phone(cls, v):
+        """Валидация номера телефона при обновлении"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            
+            # Удаляем все символы кроме цифр и +
+            phone_digits = re.sub(r'[^\d+]', '', v)
+            
+            # Проверяем формат телефона (международный или российский)
+            if not re.match(r'^(\+7|8|7)?[0-9]{10}$', phone_digits):
+                raise ValueError("Invalid phone number format")
+            
+            # Нормализуем к формату +7XXXXXXXXXX
+            if phone_digits.startswith('8'):
+                phone_digits = '+7' + phone_digits[1:]
+            elif phone_digits.startswith('7') and not phone_digits.startswith('+7'):
+                phone_digits = '+' + phone_digits
+            elif not phone_digits.startswith('+7'):
+                phone_digits = '+7' + phone_digits
+                
+            return phone_digits
+        return v
+
+    @field_validator("first_name", "last_name")
+    def validate_names(cls, v):
+        """Валидация имени и фамилии при обновлении"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            
+            # Проверяем, что содержит только буквы, пробелы и дефисы
+            if not re.match(r'^[a-zA-Zа-яА-ЯёЁ\s\-]+$', v):
+                raise ValueError("Name can only contain letters, spaces and hyphens")
+            
+            # Проверяем длину
+            if len(v) > 50:
+                raise ValueError("Name cannot exceed 50 characters")
+                
+            return v.title()  # Приводим к правильному регистру
+        return v
+
+    @field_validator("department")
+    def validate_department(cls, v):
+        """Валидация отдела при обновлении"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            
+            # Проверяем длину
+            if len(v) > 100:
+                raise ValueError("Department name cannot exceed 100 characters")
+                
+            return v
+        return v
+
     @model_validator(mode="before")
     @classmethod
     def validate_at_least_one_field(cls, data):
@@ -309,6 +437,8 @@ class UserInDBBase(UserBase):
 
     id: int
     created_at: datetime
+    email_verified: bool = False
+    email_verified_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -371,3 +501,167 @@ class UserInDB(UserInDBBase):
             raise ValueError("Invalid password hash format")
 
         return v
+
+
+class UserLogin(BaseModel):
+    """Схема для входа пользователя."""
+    
+    username: str = Field(..., description="Имя пользователя или email")
+    password: str = Field(..., description="Пароль пользователя")
+
+    @field_validator("username")
+    def validate_username_or_email(cls, v):
+        """Валидация имени пользователя или email для входа"""
+        if not v or not v.strip():
+            raise ValueError("Username or email cannot be empty")
+        
+        return v.strip().lower()
+
+    @field_validator("password")
+    def validate_password(cls, v):
+        """Валидация пароля для входа"""
+        if not v:
+            raise ValueError("Password cannot be empty")
+        
+        return v
+
+
+class UserProfile(BaseModel):
+    """Схема профиля пользователя для публичного просмотра."""
+    
+    id: int
+    username: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    department: Optional[str] = None
+    role: str
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+    @property
+    def display_name(self) -> str:
+        """Отображаемое имя пользователя"""
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        elif self.first_name:
+            return self.first_name
+        else:
+            return self.username
+
+
+class UserPasswordChange(BaseModel):
+    """Схема для смены пароля."""
+    
+    current_password: str = Field(..., description="Текущий пароль")
+    new_password: str = Field(..., min_length=8, description="Новый пароль")
+    confirm_password: str = Field(..., description="Подтверждение нового пароля")
+
+    @field_validator("new_password")
+    def validate_new_password(cls, v):
+        """Валидация нового пароля"""
+        if not v or len(v) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+
+        # Проверка сложности пароля
+        has_upper = any(c.isupper() for c in v)
+        has_lower = any(c.islower() for c in v)
+        has_digit = any(c.isdigit() for c in v)
+        has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in v)
+
+        if not has_upper:
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not has_lower:
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not has_digit:
+            raise ValueError("Password must contain at least one digit")
+        if not has_special:
+            raise ValueError("Password must contain at least one special character")
+
+        return v
+
+    @model_validator(mode="after")
+    def validate_passwords_match(self):
+        """Проверка совпадения паролей"""
+        if self.new_password != self.confirm_password:
+            raise ValueError("New password and confirmation do not match")
+        
+        if self.current_password == self.new_password:
+            raise ValueError("New password must be different from current password")
+        
+        return self
+
+
+class UserPasswordReset(BaseModel):
+    """Схема для сброса пароля."""
+    
+    email: EmailStr = Field(..., description="Email пользователя")
+
+    @field_validator("email")
+    def validate_email(cls, v):
+        """Валидация email для сброса пароля"""
+        return str(v).lower()
+
+
+class UserPasswordResetConfirm(BaseModel):
+    """Схема для подтверждения сброса пароля."""
+    
+    token: str = Field(..., description="Токен сброса пароля")
+    new_password: str = Field(..., min_length=8, description="Новый пароль")
+    confirm_password: str = Field(..., description="Подтверждение нового пароля")
+
+    @field_validator("new_password")
+    def validate_new_password(cls, v):
+        """Валидация нового пароля"""
+        if not v or len(v) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+
+        # Проверка сложности пароля
+        has_upper = any(c.isupper() for c in v)
+        has_lower = any(c.islower() for c in v)
+        has_digit = any(c.isdigit() for c in v)
+        has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in v)
+
+        if not has_upper:
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not has_lower:
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not has_digit:
+            raise ValueError("Password must contain at least one digit")
+        if not has_special:
+            raise ValueError("Password must contain at least one special character")
+
+        return v
+
+    @model_validator(mode="after")
+    def validate_passwords_match(self):
+        """Проверка совпадения паролей"""
+        if self.new_password != self.confirm_password:
+            raise ValueError("New password and confirmation do not match")
+        
+        return self
+
+
+class EmailVerificationRequest(BaseModel):
+    """Схема для запроса верификации email."""
+    
+    email: EmailStr = Field(..., description="Email для верификации")
+
+    @field_validator("email")
+    def validate_email(cls, v):
+        """Валидация email"""
+        return str(v).lower()
+
+
+class EmailVerificationConfirm(BaseModel):
+    """Схема для подтверждения верификации email."""
+    
+    token: str = Field(..., description="Токен верификации email")
+
+    @field_validator("token")
+    def validate_token(cls, v):
+        """Валидация токена"""
+        if not v or not v.strip():
+            raise ValueError("Verification token cannot be empty")
+        return v.strip()
