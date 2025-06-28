@@ -13,14 +13,14 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from requify.app.api.deps import (
+from app.api.deps import (
     get_db,
     get_current_user,
     get_current_active_user,
     get_optional_user,
 )
-from requify.app.core.config import settings
-from requify.app.core.security import (
+from app.core.config import settings
+from app.core.security import (
     JWTTokenManager,
     PasswordManager,
     verify_password,
@@ -28,10 +28,10 @@ from requify.app.core.security import (
     get_user_agent,
     TokenType,
 )
-from requify.app.crud import user as crud_user, crud_refresh_token
-from requify.app.models.user import User
-from requify.app.services.email_service import email_service
-from requify.app.schemas.auth import (
+from app.crud import user as crud_user, crud_refresh_token
+from app.models.user import User
+from app.services.email_service import email_service
+from app.schemas.auth import (
     LoginRequest,
     LoginResponse,
     RefreshTokenRequest,
@@ -48,7 +48,7 @@ from requify.app.schemas.auth import (
     UserProfile,
     AuthError,
 )
-from requify.app.schemas.user import UserCreate
+from app.schemas.user import UserCreate
 
 router = APIRouter()
 

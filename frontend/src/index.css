@@ -1,68 +1,248 @@
+/* Global CSS Reset and Base Styles for Requify */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CSS Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Root Variables */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Color System */
+  --color-primary: #1976d2;
+  --color-primary-light: #42a5f5;
+  --color-primary-dark: #1565c0;
+  --color-secondary: #dc004e;
+  --color-success: #2e7d32;
+  --color-warning: #ed6c02;
+  --color-error: #d32f2f;
+  --color-info: #0288d1;
+  
+  /* Neutral Colors */
+  --color-grey-50: #fafafa;
+  --color-grey-100: #f5f5f5;
+  --color-grey-200: #eeeeee;
+  --color-grey-300: #e0e0e0;
+  --color-grey-400: #bdbdbd;
+  --color-grey-500: #9e9e9e;
+  --color-grey-600: #757575;
+  --color-grey-700: #616161;
+  --color-grey-800: #424242;
+  --color-grey-900: #212121;
+  
+  /* Background Colors */
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-paper: #ffffff;
+  
+  /* Text Colors */
+  --color-text-primary: rgba(0, 0, 0, 0.87);
+  --color-text-secondary: rgba(0, 0, 0, 0.6);
+  --color-text-disabled: rgba(0, 0, 0, 0.38);
+  
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+  
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+}
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+/* Base HTML and Body */
+html {
+  height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  text-rendering: optimizeLegibility;
 }
 
 body {
+  height: 100%;
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+/* Root Element */
+#root {
+  height: 100%;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Typography Reset */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
+p {
+  margin: 0;
+}
+
+/* Button Reset */
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  border: none;
+  background: none;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
+/* Input Reset */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+
+/* Link Reset */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* List Reset */
+ul, ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Image Reset */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Table Reset */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Focus Styles */
+*:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Utility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-grey-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-grey-400);
+  border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-grey-500);
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --color-text-primary: #000000;
+    --color-text-secondary: #000000;
+    --color-background: #ffffff;
   }
-  a:hover {
-    color: #747bff;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+/* Dark Mode Support (for future implementation) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #121212;
+    --color-surface: #1e1e1e;
+    --color-paper: #262626;
+    --color-text-primary: rgba(255, 255, 255, 0.87);
+    --color-text-secondary: rgba(255, 255, 255, 0.6);
+    --color-text-disabled: rgba(255, 255, 255, 0.38);
   }
 }
