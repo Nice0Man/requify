@@ -1,0 +1,181 @@
+version: '3.8'
+
+services:
+  # PostgreSQL основная база данных
+  postgres:
+    image: postgres:16.0
+    container_name: requify_postgres_dev
+    environment:
+      POSTGRES_DB: requify-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - requify-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d requify-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL тестовая база данных
+  postgres-test:
+    image: postgres:16.0
+    container_name: requify_postgres_test_dev
+    environment:
+      POSTGRES_DB: requify-test-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_dev_data:/var/lib/postgresql/data
+    networks:
+      - requify-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d requify-test-db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:7.2-alpine
+    container_name: requify_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - requify-dev-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend FastAPI с hot reload
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.dev
+    container_name: requify_backend_dev
+    environment:
+      - APP_CONFIG__ENV=development
+      - APP_CONFIG__DB__HOST=postgres
+      - APP_CONFIG__DB__PORT=5432
+      - APP_CONFIG__TEST_DB__HOST=postgres-test
+      - APP_CONFIG__TEST_DB__PORT=5432
+      - APP_CONFIG__REDIS__HOST=redis
+      - APP_CONFIG__REDIS__PORT=6379
+      - APP_CONFIG__REDIS__DB=0
+      - PYTHONPATH=/app
+    ports:
+      - "8000:8000"
+      - "5678:5678"  # Порт для debugpy
+    volumes:
+      - ./requify:/app/requify:ro  # Read-only для кода
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+      - ./.env:/app/.env:ro
+      - ./alembic.ini:/app/alembic.ini:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - requify-dev-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./requify
+          target: /app/requify
+        - action: rebuild
+          path: ./pyproject.toml
+
+  # Frontend с hot reload
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.dev
+    container_name: requify_frontend_dev
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true  # Для Windows
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app:delegated
+      - /app/node_modules  # Исключаем node_modules из bind mount
+    depends_on:
+      - backend
+    networks:
+      - requify-dev-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+        - action: rebuild
+          path: ./frontend/package.json
+
+  # Nginx для разработки
+  nginx-dev:
+    image: nginx:alpine
+    container_name: requify_nginx_dev
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/dev.conf:/etc/nginx/nginx.conf:ro
+      - ./logs:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - requify-dev-network
+    restart: unless-stopped
+
+  # Adminer для управления БД
+  adminer:
+    image: adminer:4.8.1
+    container_name: requify_adminer_dev
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+    networks:
+      - requify-dev-network
+
+  # MailHog для тестирования email
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: requify_mailhog_dev
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - requify-dev-network
+
+volumes:
+  postgres_dev_data:
+    name: requify_postgres_dev_data
+  postgres_test_dev_data:
+    name: requify_postgres_test_dev_data
+  redis_dev_data:
+    name: requify_redis_dev_data
+
+networks:
+  requify-dev-network:
+    name: requify_dev_network
+    driver: bridge 

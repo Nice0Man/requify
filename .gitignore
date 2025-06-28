@@ -1,3 +1,6 @@
+# =============================================================================
+# Python Backend (.py files)
+# =============================================================================
 # Byte-compiled / optimized / DLL files
 .cursor
 __pycache__/
@@ -38,19 +41,19 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/.coverage
+backend/.coverage.*
+backend/.cache
+backend/nosetests.xml
+backend/coverage.xml
+backend/*.cover
+backend/*.py,cover
+backend/.hypothesis/
+backend/.pytest_cache/
+backend/cover/
 
 # Translations
 *.mo
@@ -106,7 +109,7 @@ ipython_config.py
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
 #   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
+backend/poetry.lock
 
 # pdm
 #   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
@@ -180,3 +183,241 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# =============================================================================
+# Frontend (Node.js/React)
+# =============================================================================
+# Dependencies
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+
+# Testing
+frontend/coverage/
+
+# Production builds
+frontend/build/
+frontend/dist/
+
+# Environment files
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Package manager logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Runtime data
+frontend/pids
+frontend/*.pid
+frontend/*.seed
+frontend/*.pid.lock
+
+# Vite
+frontend/.vite/
+
+# =============================================================================
+# Data Storage (logs, uploads, backups)
+# =============================================================================
+data/logs/*.log
+data/logs/*.log.*
+data/uploads/*
+!data/uploads/.gitkeep
+data/backups/*.sql
+data/backups/*.dump
+data/static/user-content/*
+!data/static/.gitkeep
+
+# =============================================================================
+# Environment & Configuration
+# =============================================================================
+# Environment files (keep examples)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+deploy/env/.env
+deploy/env/.env.dev
+deploy/env/.env.prod
+!deploy/env/.env.*.example
+
+# Local config overrides
+config/local.*
+config/alembic.ini.local
+
+# =============================================================================
+# Docker & Deploy
+# =============================================================================
+# Docker volumes and data
+.docker/
+docker-compose.override.yml
+
+# Kubernetes secrets
+deploy/k8s/secrets/
+
+# =============================================================================
+# IDE & Editor Files
+# =============================================================================
+# VS Code
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/tasks.json
+!.vscode/settings.example.json
+
+# Cursor
+.cursor/
+.cursorignore
+.cursorindexingignore
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =============================================================================
+# OS Files
+# =============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+
+# =============================================================================
+# Documentation & Reports
+# =============================================================================
+# Generated docs
+docs/build/
+docs/_build/
+docs/site/
+
+# Temporary documentation files
+docs/temp/
+docs/*.tmp
+
+# =============================================================================
+# Security & Secrets
+# =============================================================================
+# SSL certificates and keys
+*.pem
+*.key
+*.crt
+*.csr
+deploy/nginx/ssl/
+!deploy/nginx/ssl/.gitkeep
+
+# API keys and secrets
+secrets.json
+.secrets
+*.secret
+
+# =============================================================================
+# Development Tools
+# =============================================================================
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Pytest
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Coverage
+htmlcov/
+.coverage
+
+# Profiling
+*.prof
+
+# =============================================================================
+# Monitoring & Analytics
+# =============================================================================
+# Prometheus data
+monitoring/data/
+
+# Grafana data
+monitoring/grafana/data/
+
+# =============================================================================
+# Temporary & Cache Files
+# =============================================================================
+# General temp files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Cache directories
+.cache/
+cache/
+
+# Lock files (except package manager locks we want to keep)
+*.lock
+!frontend/package-lock.json
+!frontend/yarn.lock
+!frontend/pnpm-lock.yaml
+!config/poetry.lock
+
+# =============================================================================
+# Local Development Overrides
+# =============================================================================
+# Local scripts and utilities
+scripts/local/*
+!scripts/local/.gitkeep
+
+# Local documentation
+docs/local/*
+!docs/local/.gitkeep
+
+# Custom docker-compose files
+docker-compose.local.yml
+docker-compose.*.local.yml

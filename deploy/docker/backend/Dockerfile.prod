@@ -1,0 +1,62 @@
+# Production Backend Dockerfile - Multi-stage build
+FROM python:3.13-slim as builder
+
+# Системные зависимости для сборки
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем Poetry
+RUN pip install poetry==1.8.3
+
+# Настройки Poetry
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VENV_IN_PROJECT=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+WORKDIR /app
+
+# Копируем зависимости и устанавливаем их
+COPY pyproject.toml poetry.lock ./
+RUN poetry config virtualenvs.create true && \
+    poetry install --only=main && \
+    rm -rf $POETRY_CACHE_DIR
+
+# Production stage
+FROM python:3.13-slim as production
+
+# Минимальные системные зависимости
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Создаем пользователя
+RUN groupadd -r requify && useradd -r -g requify requify
+
+WORKDIR /app
+
+# Копируем виртуальное окружение из builder stage
+COPY --from=builder /app/.venv /app/.venv
+
+# Активируем виртуальное окружение
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Копируем код приложения
+COPY requify/ ./requify/
+COPY alembic.ini .env* ./
+
+# Создаем директории и устанавливаем права
+RUN mkdir -p logs uploads static && \
+    chown -R requify:requify /app
+
+USER requify
+
+EXPOSE 8000
+
+# Здоровая проверка
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Production команда с Gunicorn
+CMD ["gunicorn", "requify.app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"] 

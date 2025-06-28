@@ -1,0 +1,41 @@
+# Development Backend Dockerfile
+FROM python:3.13-slim as base
+
+# Системные зависимости
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем Poetry
+RUN pip install poetry==1.8.3
+
+# Настройки Poetry для разработки
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VENV_IN_PROJECT=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+WORKDIR /app
+
+# Копируем файлы зависимостей
+COPY pyproject.toml poetry.lock* ./
+
+# Устанавливаем зависимости с dev пакетами
+RUN poetry config virtualenvs.create false && \
+    poetry install --with dev && \
+    rm -rf $POETRY_CACHE_DIR
+
+# Создаем необходимые директории
+RUN mkdir -p logs uploads static
+
+# Пользователь для разработки
+RUN groupadd -r requify && useradd -r -g requify -s /bin/bash requify
+RUN chown -R requify:requify /app
+USER requify
+
+EXPOSE 8000
+
+# Hot reload для разработки
+CMD ["uvicorn", "requify.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"] 

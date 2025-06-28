@@ -1,0 +1,26 @@
+# Development Frontend Dockerfile
+FROM node:20-alpine as base
+
+# Устанавливаем pnpm (более быстрый пакетный менеджер)
+RUN npm install -g pnpm@latest
+
+WORKDIR /app
+
+# Копируем файлы зависимостей
+COPY frontend/package*.json frontend/pnpm-lock.yaml* ./
+
+# Устанавливаем зависимости
+RUN pnpm install
+
+# Создаем пользователя
+RUN addgroup -g 1001 -S frontend && \
+    adduser -S frontend -u 1001 -G frontend
+
+# Устанавливаем права
+RUN chown -R frontend:frontend /app
+USER frontend
+
+EXPOSE 3000
+
+# Hot reload для разработки
+CMD ["pnpm", "dev", "--host", "0.0.0.0"] 
