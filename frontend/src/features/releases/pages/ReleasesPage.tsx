@@ -5,7 +5,6 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
   Button,
   Chip,
   LinearProgress,
@@ -33,14 +32,9 @@ import {
   Snackbar,
   Tab,
   Tabs,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Divider,
   Badge,
 } from "@mui/material";
 import {
@@ -49,9 +43,6 @@ import {
   Edit,
   Delete,
   Schedule,
-  CheckCircle,
-  Warning,
-  Error,
   Launch,
   Timeline,
   Assignment,
@@ -61,15 +52,11 @@ import {
   GetApp,
   Visibility,
   PlayArrow,
-  Stop,
   Pending,
   CheckCircleOutline,
   ErrorOutline,
   CalendarToday,
   TrendingUp,
-  Code,
-  Security,
-  Build,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -87,8 +74,6 @@ import {
   Release,
   ReleaseStatus,
   ReleaseCreate,
-  ReleaseUpdate,
-  ReleaseListParams,
   ReleaseType,
 } from "../types/release.types";
 
@@ -130,16 +115,15 @@ const convertApiReleaseToRelease = (apiRelease: ApiRelease): Release => {
     requirements: apiRelease.requirements || [],
     change_log: apiRelease.change_log || [],
     dependencies: apiRelease.dependencies || [],
-    completion_percentage: apiRelease.completion_percentage || 0,
-    updated_by: apiRelease.updated_by || "Unknown",
     artifacts: apiRelease.artifacts || [],
     approvals: apiRelease.approvals || [],
+    completion_percentage: apiRelease.completion_percentage || 0,
     project_name: apiRelease.project_name || `Project #${apiRelease.project_id}`,
     created_by_name: apiRelease.created_by_name || "Unknown",
+    updated_by_name: apiRelease.updated_by_name || "Unknown",
     status: convertApiStatusToStatus(apiRelease.status),
   };
 };
-  
 // Convert API status to local status
 const convertApiStatusToStatus = (apiStatus: ApiReleaseStatus): ReleaseStatus => {
   switch (apiStatus) {
@@ -355,7 +339,7 @@ const ReleasesPage: React.FC = () => {
         version: releaseForm.version,
         description: releaseForm.description || "",
         planned_date: releaseForm.planned_date || "",
-        project_id: releaseForm.project_id || 0,
+        requirements_ids: releaseForm.requirement_ids || [],
       };
 
       await releasesApi.updateRelease(selectedRelease.id, updateData);

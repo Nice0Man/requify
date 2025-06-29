@@ -22,6 +22,10 @@ export interface Release {
   release_notes?: string;
   created_at: string;
   updated_at: string;
+  updated_by: number;
+  updated_by_name: string;
+  artifacts: never[];
+  approvals: never[];
 }
 
 export interface ReleaseCreate {

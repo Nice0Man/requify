@@ -19,7 +19,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormHelperText,
   Chip,
   Dialog,
   DialogTitle,
@@ -31,7 +30,9 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Switch,
-  Skeleton,
+  useTheme,
+  alpha,
+  Divider,
 } from "@mui/material";
 import {
   Person,
@@ -41,24 +42,28 @@ import {
   Edit,
   PhotoCamera,
   Security,
-  Settings,
   Save,
   Cancel,
   Logout,
   DeleteForever,
   Shield,
   NotificationsActive,
-  Schedule,
   Info,
   Key,
+  Language,
+  AccessTime,
 } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/auth.context";
-import { UserUpdate, UserRole, UserProfile } from "../types/auth.types";
-import { usersApi } from "../api/users.api";
+import { useAuth, usePermissions } from "../context/auth.context";
+import {
+  UserUpdate,
+  UserRole,
+  UserProfile,
+  NotificationPreferences,
+} from "../types/auth.types";
 
 // Validation schema
 const profileSchema = yup.object({
@@ -90,17 +95,40 @@ const profileSchema = yup.object({
     .string()
     .matches(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
     .optional(),
-  role: yup
-    .string()
-    .oneOf(Object.values(UserRole), "Please select a valid role")
-    .optional(),
+  timezone: yup.string().optional(),
+  language: yup.string().optional(),
 });
 
 const ProfilePage: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
-  const { user, updateProfile, logout } = useAuth();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [profileLoading, setProfileLoading] = useState(true);
+  const { user, updateProfile, logout, refreshUserData } = useAuth();
+  const { hasPermission } = usePermissions();
+  const isAdmin =
+    hasPermission("admin:read") ||
+    hasPermission("admin:write") ||
+    hasPermission("admin:delete");
+  const isManager =
+    hasPermission("manager:read") ||
+    hasPermission("manager:write") ||
+    hasPermission("manager:delete") ||
+    user?.role === UserRole.MANAGER;
+  const isDeveloper =
+    hasPermission("developer:read") ||
+    hasPermission("developer:write") ||
+    hasPermission("developer:delete") ||
+    user?.role === UserRole.DEVELOPER;
+  const isTester =
+    hasPermission("tester:read") ||
+    hasPermission("tester:write") ||
+    hasPermission("tester:delete") ||
+    user?.role === UserRole.TESTER;
+  const isViewer =
+    hasPermission("viewer:read") ||
+    hasPermission("viewer:write") ||
+    hasPermission("viewer:delete") ||
+    user?.role === UserRole.VIEWER;
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,15 +138,15 @@ const ProfilePage: React.FC = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  // Settings state
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    pushNotifications: false,
-    weeklyReports: true,
-    darkMode: false,
-    language: "en",
-    timezone: "UTC",
-  });
+  // Settings state for notification preferences
+  const [notificationSettings, setNotificationSettings] =
+    useState<NotificationPreferences>({
+      email_notifications: true,
+      push_notifications: false,
+      requirement_updates: true,
+      test_results: true,
+      system_alerts: true,
+    });
 
   const {
     register,
@@ -129,47 +157,37 @@ const ProfilePage: React.FC = () => {
   } = useForm<UserUpdate>({
     resolver: yupResolver(profileSchema),
     defaultValues: {
-      first_name: userProfile?.first_name || "",
-      last_name: userProfile?.last_name || "",
-      email: userProfile?.email || "",
-      username: userProfile?.username || "",
-      department: userProfile?.department || "",
-      phone: userProfile?.phone || "",
-      role: userProfile?.role || UserRole.GUEST,
+      first_name: user?.first_name || "",
+      last_name: user?.last_name || "",
+      email: user?.email || "",
+      username: user?.username || "",
+      department: user?.department || "",
+      phone: user?.phone || "",
+      timezone: user?.timezone || "UTC",
+      language: user?.language || "en",
     },
   });
 
-  // Fetch user profile data on component mount
+  // Update form when user data changes
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        setProfileLoading(true);
-        setError(null);
+    if (user) {
+      reset({
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        email: user.email || "",
+        username: user.username || "",
+        department: user.department || "",
+        phone: user.phone || "",
+        timezone: user.timezone || "UTC",
+        language: user.language || "en",
+      });
 
-        const response = await usersApi.getCurrentUser();
-        setUserProfile(response.data);
-
-        // Update form with fetched data
-        reset({
-          first_name: response.data.first_name || "",
-          last_name: response.data.last_name || "",
-          email: response.data.email || "",
-          username: response.data.username || "",
-          department: response.data.department || "",
-          phone: response.data.phone || "",
-          role: response.data.role || UserRole.GUEST,
-        });
-      } catch (error: any) {
-        console.error("Failed to fetch user profile:", error);
-        setError("Failed to load profile data. Please try again.");
-        toast.error("Failed to load profile data");
-      } finally {
-        setProfileLoading(false);
+      // Update notification settings
+      if (user.notification_preferences) {
+        setNotificationSettings(user.notification_preferences);
       }
-    };
-
-    fetchUserProfile();
-  }, [reset]);
+    }
+  }, [user, reset]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -197,15 +215,18 @@ const ProfilePage: React.FC = () => {
   const handleEditToggle = () => {
     if (isEditing) {
       // Cancel editing - reset form
-      reset({
-        first_name: userProfile?.first_name || "",
-        last_name: userProfile?.last_name || "",
-        email: userProfile?.email || "",
-        username: userProfile?.username || "",
-        department: userProfile?.department || "",
-        phone: userProfile?.phone || "",
-        role: userProfile?.role || UserRole.GUEST,
-      });
+      if (user) {
+        reset({
+          first_name: user.first_name || "",
+          last_name: user.last_name || "",
+          email: user.email || "",
+          username: user.username || "",
+          department: user.department || "",
+          phone: user.phone || "",
+          timezone: user.timezone || "UTC",
+          language: user.language || "en",
+        });
+      }
       setAvatarFile(null);
       setAvatarPreview(null);
     }
@@ -219,7 +240,7 @@ const ProfilePage: React.FC = () => {
       setIsLoading(true);
       setError(null);
 
-      // Convert UserUpdate to Partial<UserProfile> format
+      // Prepare profile update data
       const profileData: Partial<UserProfile> = {
         first_name: data.first_name,
         last_name: data.last_name,
@@ -227,15 +248,13 @@ const ProfilePage: React.FC = () => {
         username: data.username,
         department: data.department,
         phone: data.phone,
-        role: data.role,
         timezone: data.timezone,
         language: data.language,
+        notification_preferences: notificationSettings,
       };
 
       // For now, handle avatar upload separately if needed
-      // TODO: Implement avatar upload logic when backend supports it
       if (avatarFile) {
-        // This would typically be handled by a separate avatar upload endpoint
         toast.info(
           "Avatar upload will be implemented when backend supports it"
         );
@@ -248,29 +267,19 @@ const ProfilePage: React.FC = () => {
       setAvatarFile(null);
       setAvatarPreview(null);
       toast.success("Profile updated successfully");
+
+      // Refresh user data
+      await refreshUserData();
     } catch (error: any) {
       let errorMessage = "Failed to update profile. Please try again.";
 
       if (error.response?.data?.detail) {
         const detail = error.response.data.detail;
-
-        // Handle validation errors (array of error objects)
         if (Array.isArray(detail)) {
           errorMessage = detail
-            .map((err: any) => {
-              if (typeof err === "string") return err;
-              if (err.msg) return err.msg;
-              if (err.message) return err.message;
-              return "Validation error";
-            })
+            .map((err: any) => err.msg || err.message || "Validation error")
             .join(", ");
-        }
-        // Handle single validation error object
-        else if (typeof detail === "object" && detail.msg) {
-          errorMessage = detail.msg;
-        }
-        // Handle string detail
-        else if (typeof detail === "string") {
+        } else if (typeof detail === "string") {
           errorMessage = detail;
         }
       } else if (error.message) {
@@ -298,18 +307,18 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleDeleteAccount = () => {
-    // Implement account deletion logic
     toast.info("Account deletion feature coming soon");
     setDeleteDialogOpen(false);
   };
 
-  const handleSettingChange = (setting: string, value: boolean | string) => {
-    setSettings((prev) => ({
+  const handleNotificationChange = (
+    setting: keyof NotificationPreferences,
+    value: boolean
+  ) => {
+    setNotificationSettings((prev) => ({
       ...prev,
       [setting]: value,
     }));
-    // Here you would typically save to backend
-    toast.success("Setting updated");
   };
 
   const getInitials = (firstName?: string, lastName?: string) => {
@@ -320,15 +329,22 @@ const ProfilePage: React.FC = () => {
 
   const getRoleColor = (role: UserRole) => {
     switch (role) {
-      case UserRole.DEVELOPER:
+      case UserRole.ADMIN:
+        return "error";
+      case UserRole.PRODUCT_MANAGER:
+        return "secondary";
+      case UserRole.MANAGER:
         return "primary";
-      case UserRole.ANALYST:
+      case UserRole.SENIOR_DEVELOPER:
         return "info";
-      case UserRole.TESTER:
+      case UserRole.DEVELOPER:
         return "success";
-      case UserRole.VIEWER:
+      case UserRole.ANALYST:
         return "warning";
-      case UserRole.GUEST:
+      case UserRole.TESTER:
+        return "info";
+      case UserRole.VIEWER:
+        return "default";
       default:
         return "default";
     }
@@ -337,36 +353,46 @@ const ProfilePage: React.FC = () => {
   const getRoleLabel = (role: UserRole) => {
     switch (role) {
       case UserRole.ADMIN:
-        return "Admin";
+        return "Administrator";
+      case UserRole.PRODUCT_MANAGER:
+        return "Product Manager";
       case UserRole.MANAGER:
         return "Manager";
+      case UserRole.SENIOR_DEVELOPER:
+        return "Senior Developer";
       case UserRole.DEVELOPER:
         return "Developer";
       case UserRole.ANALYST:
-        return "Analyst";
+        return "Business Analyst";
       case UserRole.TESTER:
-        return "Tester";
+        return "QA Tester";
       case UserRole.VIEWER:
         return "Viewer";
-      case UserRole.GUEST:
-        return "Guest";
       default:
-        return "Guest";
+        return "Unknown";
     }
   };
 
   return (
     <Container component="main" maxWidth="lg">
-      <Box sx={{ mt: 4, mb: 4 }}>
+      <Box sx={{ py: 4 }}>
         {/* Header */}
         <Box sx={{ mb: 4 }}>
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{ fontWeight: 600, mb: 1 }}
-          >
-            Profile Settings
-          </Typography>
+          <Box display="flex" alignItems="center" gap={2} mb={2}>
+            <Person sx={{ fontSize: 32, color: theme.palette.primary.main }} />
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Profile Settings
+            </Typography>
+          </Box>
           <Typography variant="body1" color="text.secondary">
             Manage your account information and preferences
           </Typography>
@@ -375,8 +401,17 @@ const ProfilePage: React.FC = () => {
         <Grid container spacing={4}>
           {/* Profile Information Card */}
           <Grid item xs={12} md={8}>
-            <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
-              <CardContent sx={{ p: 4 }}>
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -386,7 +421,7 @@ const ProfilePage: React.FC = () => {
                   }}
                 >
                   <Typography
-                    variant="h5"
+                    variant="h6"
                     sx={{
                       fontWeight: 600,
                       display: "flex",
@@ -432,15 +467,11 @@ const ProfilePage: React.FC = () => {
                         width: 80,
                         height: 80,
                         fontSize: "2rem",
-                        background:
-                          "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
+                        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                       }}
-                      src={avatarPreview || userProfile?.avatar}
+                      src={avatarPreview || user?.avatar}
                     >
-                      {getInitials(
-                        userProfile?.first_name,
-                        userProfile?.last_name
-                      )}
+                      {getInitials(user?.first_name, user?.last_name)}
                     </Avatar>
                     {isEditing && (
                       <IconButton
@@ -466,46 +497,22 @@ const ProfilePage: React.FC = () => {
                     )}
                   </Box>
                   <Box sx={{ ml: 3 }}>
-                    {profileLoading ? (
-                      <>
-                        <Skeleton variant="text" width={200} height={32} />
-                        <Skeleton
-                          variant="text"
-                          width={120}
-                          height={20}
-                          sx={{ mb: 1 }}
-                        />
-                        <Skeleton
-                          variant="rectangular"
-                          width={80}
-                          height={24}
-                          sx={{ borderRadius: 3 }}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {userProfile?.first_name} {userProfile?.last_name}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 1 }}
-                        >
-                          @{userProfile?.username}
-                        </Typography>
-                        <Chip
-                          label={getRoleLabel(
-                            userProfile?.role || UserRole.GUEST
-                          )}
-                          color={getRoleColor(
-                            userProfile?.role || UserRole.GUEST
-                          )}
-                          size="small"
-                          icon={<Shield />}
-                        />
-                      </>
-                    )}
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {user?.first_name} {user?.last_name}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
+                      @{user?.username}
+                    </Typography>
+                    <Chip
+                      label={getRoleLabel(user?.role || UserRole.VIEWER)}
+                      color={getRoleColor(user?.role || UserRole.VIEWER)}
+                      size="small"
+                      icon={<Shield />}
+                    />
                   </Box>
                 </Box>
 
@@ -518,7 +525,6 @@ const ProfilePage: React.FC = () => {
                   <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        required
                         fullWidth
                         label="First Name"
                         disabled={!isEditing}
@@ -536,7 +542,6 @@ const ProfilePage: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        required
                         fullWidth
                         label="Last Name"
                         disabled={!isEditing}
@@ -554,7 +559,6 @@ const ProfilePage: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        required
                         fullWidth
                         label="Email Address"
                         disabled={!isEditing}
@@ -572,7 +576,6 @@ const ProfilePage: React.FC = () => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
-                        required
                         fullWidth
                         label="Username"
                         disabled={!isEditing}
@@ -620,45 +623,70 @@ const ProfilePage: React.FC = () => {
                         {...register("phone")}
                       />
                     </Grid>
-                    {userProfile?.role === UserRole.ADMIN && (
-                      <Grid item xs={12}>
-                        <FormControl
-                          fullWidth
-                          disabled={!isEditing}
-                          error={!!errors.role}
-                        >
-                          <InputLabel>Role</InputLabel>
-                          <Controller
-                            name="role"
-                            control={control}
-                            render={({ field }) => (
-                              <Select label="Role" {...field}>
-                                <MenuItem value={UserRole.GUEST}>
-                                  Guest
-                                </MenuItem>
-                                <MenuItem value={UserRole.VIEWER}>
-                                  Viewer
-                                </MenuItem>
-                                <MenuItem value={UserRole.ANALYST}>
-                                  Analyst
-                                </MenuItem>
-                                <MenuItem value={UserRole.TESTER}>
-                                  Tester
-                                </MenuItem>
-                                <MenuItem value={UserRole.DEVELOPER}>
-                                  Developer
-                                </MenuItem>
-                              </Select>
-                            )}
-                          />
-                          {errors.role && (
-                            <FormHelperText>
-                              {errors.role.message}
-                            </FormHelperText>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth disabled={!isEditing}>
+                        <InputLabel>Timezone</InputLabel>
+                        <Controller
+                          name="timezone"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              label="Timezone"
+                              startAdornment={
+                                <InputAdornment position="start">
+                                  <AccessTime />
+                                </InputAdornment>
+                              }
+                              {...field}
+                            >
+                              <MenuItem value="UTC">UTC</MenuItem>
+                              <MenuItem value="America/New_York">
+                                Eastern Time
+                              </MenuItem>
+                              <MenuItem value="America/Chicago">
+                                Central Time
+                              </MenuItem>
+                              <MenuItem value="America/Denver">
+                                Mountain Time
+                              </MenuItem>
+                              <MenuItem value="America/Los_Angeles">
+                                Pacific Time
+                              </MenuItem>
+                              <MenuItem value="Europe/London">London</MenuItem>
+                              <MenuItem value="Europe/Paris">Paris</MenuItem>
+                              <MenuItem value="Asia/Tokyo">Tokyo</MenuItem>
+                            </Select>
                           )}
-                        </FormControl>
-                      </Grid>
-                    )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth disabled={!isEditing}>
+                        <InputLabel>Language</InputLabel>
+                        <Controller
+                          name="language"
+                          control={control}
+                          render={({ field }) => (
+                            <Select
+                              label="Language"
+                              startAdornment={
+                                <InputAdornment position="start">
+                                  <Language />
+                                </InputAdornment>
+                              }
+                              {...field}
+                            >
+                              <MenuItem value="en">English</MenuItem>
+                              <MenuItem value="es">Spanish</MenuItem>
+                              <MenuItem value="fr">French</MenuItem>
+                              <MenuItem value="de">German</MenuItem>
+                              <MenuItem value="zh">Chinese</MenuItem>
+                              <MenuItem value="ja">Japanese</MenuItem>
+                            </Select>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
                   </Grid>
 
                   {isEditing && (
@@ -689,8 +717,18 @@ const ProfilePage: React.FC = () => {
           {/* Side Panel */}
           <Grid item xs={12} md={4}>
             {/* Security Card */}
-            <Card sx={{ borderRadius: 2, boxShadow: 3, mb: 3 }}>
-              <CardContent>
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                mb: 3,
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
                 <Typography
                   variant="h6"
                   sx={{
@@ -719,9 +757,19 @@ const ProfilePage: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Account Settings Card */}
-            <Card sx={{ borderRadius: 2, boxShadow: 3, mb: 3 }}>
-              <CardContent>
+            {/* Notification Preferences Card */}
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                mb: 3,
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
                 <Typography
                   variant="h6"
                   sx={{
@@ -731,21 +779,21 @@ const ProfilePage: React.FC = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Settings sx={{ mr: 1 }} />
-                  Preferences
+                  <NotificationsActive sx={{ mr: 1 }} />
+                  Notifications
                 </Typography>
                 <List dense>
                   <ListItem>
                     <ListItemIcon>
-                      <NotificationsActive />
+                      <Email />
                     </ListItemIcon>
                     <ListItemText primary="Email Notifications" />
                     <ListItemSecondaryAction>
                       <Switch
-                        checked={settings.emailNotifications}
+                        checked={notificationSettings.email_notifications}
                         onChange={(e) =>
-                          handleSettingChange(
-                            "emailNotifications",
+                          handleNotificationChange(
+                            "email_notifications",
                             e.target.checked
                           )
                         }
@@ -754,14 +802,60 @@ const ProfilePage: React.FC = () => {
                   </ListItem>
                   <ListItem>
                     <ListItemIcon>
-                      <Schedule />
+                      <NotificationsActive />
                     </ListItemIcon>
-                    <ListItemText primary="Weekly Reports" />
+                    <ListItemText primary="Push Notifications" />
                     <ListItemSecondaryAction>
                       <Switch
-                        checked={settings.weeklyReports}
+                        checked={notificationSettings.push_notifications}
                         onChange={(e) =>
-                          handleSettingChange("weeklyReports", e.target.checked)
+                          handleNotificationChange(
+                            "push_notifications",
+                            e.target.checked
+                          )
+                        }
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <Divider />
+                  <ListItem>
+                    <ListItemText primary="Requirement Updates" />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        checked={notificationSettings.requirement_updates}
+                        onChange={(e) =>
+                          handleNotificationChange(
+                            "requirement_updates",
+                            e.target.checked
+                          )
+                        }
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="Test Results" />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        checked={notificationSettings.test_results}
+                        onChange={(e) =>
+                          handleNotificationChange(
+                            "test_results",
+                            e.target.checked
+                          )
+                        }
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="System Alerts" />
+                    <ListItemSecondaryAction>
+                      <Switch
+                        checked={notificationSettings.system_alerts}
+                        onChange={(e) =>
+                          handleNotificationChange(
+                            "system_alerts",
+                            e.target.checked
+                          )
                         }
                       />
                     </ListItemSecondaryAction>
@@ -771,8 +865,17 @@ const ProfilePage: React.FC = () => {
             </Card>
 
             {/* Account Actions Card */}
-            <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
-              <CardContent>
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
                 <Typography
                   variant="h6"
                   sx={{
