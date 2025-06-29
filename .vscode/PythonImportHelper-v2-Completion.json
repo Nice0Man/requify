@@ -3290,6 +3290,14 @@
         "documentation": {}
     },
     {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
         "label": "Base",
         "importPath": "app.models.base",
         "description": "app.models.base",
@@ -5094,6 +5102,14 @@
         "documentation": {}
     },
     {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
         "label": "get_db",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
@@ -5103,6 +5119,14 @@
     },
     {
         "label": "get_admin_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_dashboard_admin_user",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
         "isExtraImport": true,
@@ -5174,14 +5198,6 @@
         "documentation": {}
     },
     {
-        "label": "get_current_user",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
-        "isExtraImport": true,
-        "detail": "app.api.deps",
-        "documentation": {}
-    },
-    {
         "label": "get_db",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
@@ -5191,6 +5207,38 @@
     },
     {
         "label": "get_current_active_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_dashboard_read_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_dashboard_admin_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_stats_read_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_export_user",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
         "isExtraImport": true,
@@ -5483,6 +5531,14 @@
         "description": "app.api.deps",
         "isExtraImport": true,
         "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "app.models.user",
+        "description": "app.models.user",
+        "isExtraImport": true,
+        "detail": "app.models.user",
         "documentation": {}
     },
     {
@@ -6126,6 +6182,14 @@
         "documentation": {}
     },
     {
+        "label": "create_access_token",
+        "importPath": "app.core.security",
+        "description": "app.core.security",
+        "isExtraImport": true,
+        "detail": "app.core.security",
+        "documentation": {}
+    },
+    {
         "label": "get_password_hash",
         "importPath": "app.core.security",
         "description": "app.core.security",
@@ -6454,6 +6518,14 @@
         "documentation": {}
     },
     {
+        "label": "user",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
         "label": "email_service",
         "importPath": "app.services.email_service",
         "description": "app.services.email_service",
@@ -6567,6 +6639,14 @@
     },
     {
         "label": "UserUpdate",
+        "importPath": "app.schemas.user",
+        "description": "app.schemas.user",
+        "isExtraImport": true,
+        "detail": "app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserCreate",
         "importPath": "app.schemas.user",
         "description": "app.schemas.user",
         "isExtraImport": true,
@@ -9324,6 +9404,14 @@
         "documentation": {}
     },
     {
+        "label": "AsyncClient",
+        "importPath": "httpx",
+        "description": "httpx",
+        "isExtraImport": true,
+        "detail": "httpx",
+        "documentation": {}
+    },
+    {
         "label": "ExternalSystemError",
         "importPath": "app.core.exceptions",
         "description": "app.core.exceptions",
@@ -9843,7 +9931,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.admin",
         "description": "backend.app.api.v1.endpoints.admin",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/users\", response_model=List[UserProfile])\nasync def get_admin_users(\n    skip: int = 0,\n    limit: int = 100,\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_admin_user),\n):\n    \"\"\"\n    Получить список всех пользователей для администрирования.",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/users\", response_model=List[UserProfile])\nasync def get_admin_users(\n    skip: int = 0,\n    limit: int = 100,\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_dashboard_admin_user),\n):\n    \"\"\"\n    Получить список всех пользователей для администрирования.",
         "detail": "backend.app.api.v1.endpoints.admin",
         "documentation": {}
     },
@@ -13850,6 +13938,51 @@
         "description": "backend.tests.test_projects_api",
         "peekOfCode": "class TestProjectsAPI:\n    \"\"\"Test class for Projects API endpoints.\"\"\"\n    @pytest.fixture\n    def unique_project_code(self):\n        \"\"\"Generate unique project code for testing.\"\"\"\n        return f\"PRJ{uuid.uuid4().hex[:8].upper()}\"\n    @pytest.fixture\n    def sample_project_create_data(self, unique_project_code):\n        \"\"\"Sample data for creating a project.\"\"\"\n        return {",
         "detail": "backend.tests.test_projects_api",
+        "documentation": {}
+    },
+    {
+        "label": "TestRBACPermissions",
+        "kind": 6,
+        "importPath": "backend.tests.test_rbac_validation",
+        "description": "backend.tests.test_rbac_validation",
+        "peekOfCode": "class TestRBACPermissions:\n    \"\"\"Test Role-Based Access Control permissions.\"\"\"\n    @pytest.mark.asyncio\n    async def test_role_scope_mapping(self, test_users):\n        \"\"\"Test that roles are correctly mapped to scopes.\"\"\"\n        from app.api.v1.endpoints.auth import _get_user_scopes\n        for role_name, expected_scopes in EXPECTED_SCOPES_BY_ROLE.items():\n            user = test_users[role_name]\n            actual_scopes = _get_user_scopes(user)\n            # Check all expected scopes are present",
+        "detail": "backend.tests.test_rbac_validation",
+        "documentation": {}
+    },
+    {
+        "label": "auth_headers",
+        "kind": 2,
+        "importPath": "backend.tests.test_rbac_validation",
+        "description": "backend.tests.test_rbac_validation",
+        "peekOfCode": "def auth_headers():\n    \"\"\"Generate auth headers for different user roles.\"\"\"\n    def _headers(user: User, scopes: list = None):\n        if scopes is None:\n            scopes = EXPECTED_SCOPES_BY_ROLE.get(user.role, [\"me\"])\n        token = create_access_token(\n            subject=user.email,\n            user_id=user.id,\n            scopes=scopes\n        )",
+        "detail": "backend.tests.test_rbac_validation",
+        "documentation": {}
+    },
+    {
+        "label": "USER_ROLES_TEST_DATA",
+        "kind": 5,
+        "importPath": "backend.tests.test_rbac_validation",
+        "description": "backend.tests.test_rbac_validation",
+        "peekOfCode": "USER_ROLES_TEST_DATA = {\n    \"superuser\": {\n        \"email\": \"superuser@test.com\",\n        \"username\": \"superuser\",\n        \"password\": \"superuser123\",\n        \"role\": \"admin\",\n        \"is_superuser\": True,\n    },\n    \"admin\": {\n        \"email\": \"admin@test.com\", ",
+        "detail": "backend.tests.test_rbac_validation",
+        "documentation": {}
+    },
+    {
+        "label": "EXPECTED_SCOPES_BY_ROLE",
+        "kind": 5,
+        "importPath": "backend.tests.test_rbac_validation",
+        "description": "backend.tests.test_rbac_validation",
+        "peekOfCode": "EXPECTED_SCOPES_BY_ROLE = {\n    \"superuser\": [\n        \"me\", \"users:read\", \"users:write\", \"users:delete\",\n        \"projects:read\", \"projects:write\", \"projects:delete\",\n        \"requirements:read\", \"requirements:write\", \"requirements:delete\", \n        \"releases:read\", \"releases:write\", \"releases:delete\",\n        \"testing:read\", \"testing:write\", \"testing:execute\",\n        \"admin:read\", \"admin:write\", \"system:admin\"\n    ],\n    \"admin\": [",
+        "detail": "backend.tests.test_rbac_validation",
+        "documentation": {}
+    },
+    {
+        "label": "API_ENDPOINTS_PERMISSIONS",
+        "kind": 5,
+        "importPath": "backend.tests.test_rbac_validation",
+        "description": "backend.tests.test_rbac_validation",
+        "peekOfCode": "API_ENDPOINTS_PERMISSIONS = {\n    # Users API\n    \"GET /api/v1/users/\": [\"users:read\"],\n    \"POST /api/v1/users/\": [\"users:write\"],\n    \"GET /api/v1/users/me\": [\"me\"],\n    \"PUT /api/v1/users/me\": [\"me\"],\n    \"GET /api/v1/users/1\": [\"users:read\"],\n    \"PUT /api/v1/users/1\": [\"users:write\"], \n    \"DELETE /api/v1/users/1\": [\"users:delete\"],\n    # Projects API",
+        "detail": "backend.tests.test_rbac_validation",
         "documentation": {}
     },
     {

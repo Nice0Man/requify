@@ -1,6 +1,7 @@
 // Release types based on backend contracts
 
 export interface Release {
+  completion_percentage: number;
   id: number;
   name: string;
   version: string;
@@ -64,7 +65,8 @@ export enum ReleaseType {
   PATCH = 'patch',
   HOTFIX = 'hotfix',
   BETA = 'beta',
-  ALPHA = 'alpha'
+  ALPHA = 'alpha',
+  FEATURE = "FEATURE"
 }
 
 export interface ReleaseRequirement {

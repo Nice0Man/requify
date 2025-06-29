@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -34,8 +34,7 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  Snackbar,
-} from '@mui/material';
+} from "@mui/material";
 import {
   AdminPanelSettings,
   Dashboard,
@@ -51,29 +50,23 @@ import {
   Info,
   Refresh,
   Download,
-  Upload,
   Add,
   Edit,
-  Delete,
   Block,
   CheckCircleOutline,
-  SettingsBackupRestore,
   SystemUpdateAlt,
-  MonitorHeart,
-  BugReport,
   Timeline,
-  BarChart,
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useAuth, usePermissions } from '@/features/auth/context/auth.context';
-import { UserRole } from '@/features/auth/types/auth.types';
-import { 
-  adminApi, 
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
+import { UserRole } from "@/features/auth/types/auth.types";
+import {
+  adminApi,
   AdminUserListParams,
   BackupListParams,
   LogListParams,
-} from '../api/admin.api';
+} from "../api/admin.api";
 import {
   SystemInfo,
   SystemMetrics,
@@ -84,7 +77,7 @@ import {
   AdminStats,
   LogLevel,
   BackupStatus,
-} from '../types/admin.types';
+} from "../types/admin.types";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -110,57 +103,60 @@ const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { hasPermission, hasAnyPermission } = usePermissions();
-
   // Check admin permissions
-  const isAdmin = user?.role === UserRole.ADMIN || user?.is_superuser || hasAnyPermission(['admin:read', 'admin:write']);
-  const canWrite = hasAnyPermission(['admin:write']) || user?.is_superuser;
+  const isAdmin =
+    user?.role === UserRole.ADMIN ||
+    hasAnyPermission(["admin:read", "admin:write"]);
+  const canWrite = hasAnyPermission(["admin:write"]);
 
   // State management
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Dashboard data
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null);
+  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(
+    null
+  );
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
-  
+
   // Users data
   const [users, setUsers] = useState<UserManagement[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersTotal, setUsersTotal] = useState(0);
   const [usersPage, setUsersPage] = useState(0);
-  
+
   // Logs data
   const [logs, setLogs] = useState<SystemLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsTotal, setLogsTotal] = useState(0);
-  
+
   // Backups data
   const [backups, setBackups] = useState<SystemBackup[]>([]);
   const [backupsLoading, setBackupsLoading] = useState(false);
-  
+
   // Settings data
   const [settings, setSettings] = useState<SystemSettings[]>([]);
   const [settingsLoading, setSettingsLoading] = useState(false);
-  
+
   // Dialog states
   const [createUserDialog, setCreateUserDialog] = useState(false);
   const [createBackupDialog, setCreateBackupDialog] = useState(false);
   const [newUserData, setNewUserData] = useState({
-    email: '',
-    username: '',
-    first_name: '',
-    last_name: '',
+    email: "",
+    username: "",
+    first_name: "",
+    last_name: "",
     role: UserRole.VIEWER,
-    password: '',
+    password: "",
   });
 
   // Redirect if not admin
   useEffect(() => {
     if (!isAdmin) {
-      navigate('/dashboard');
-      toast.error('Access denied. Admin privileges required.');
+      navigate("/dashboard");
+      toast.error("Access denied. Admin privileges required.");
       return;
     }
   }, [isAdmin, navigate]);
@@ -211,11 +207,11 @@ const AdminPage: React.FC = () => {
         const metricsResponse = await adminApi.getMetrics();
         setSystemMetrics(metricsResponse.data);
       } catch (err) {
-        console.warn('Failed to load metrics:', err);
+        console.warn("Failed to load metrics:", err);
       }
     } catch (err: any) {
-      console.error('Failed to load admin dashboard:', err);
-      setError(err.message || 'Failed to load dashboard data');
+      console.error("Failed to load admin dashboard:", err);
+      setError(err.message || "Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -228,16 +224,16 @@ const AdminPage: React.FC = () => {
       const params: AdminUserListParams = {
         skip: page * 25,
         limit: 25,
-        sort_by: 'created_at',
-        sort_order: 'desc',
+        sort_by: "created_at",
+        sort_order: "desc",
       };
-      
+
       const response = await adminApi.getAdminUsers(params);
       setUsers(response.data.items);
       setUsersTotal(response.data.total);
       setUsersPage(page);
     } catch (err: any) {
-      toast.error('Failed to load users');
+      toast.error("Failed to load users");
     } finally {
       setUsersLoading(false);
     }
@@ -249,15 +245,15 @@ const AdminPage: React.FC = () => {
       setLogsLoading(true);
       const params: LogListParams = {
         limit: 50,
-        sort_by: 'timestamp',
-        sort_order: 'desc',
+        sort_by: "timestamp",
+        sort_order: "desc",
       };
-      
+
       const response = await adminApi.getLogs(params);
       setLogs(response.data.items);
       setLogsTotal(response.data.total);
     } catch (err: any) {
-      toast.error('Failed to load logs');
+      toast.error("Failed to load logs");
     } finally {
       setLogsLoading(false);
     }
@@ -269,14 +265,14 @@ const AdminPage: React.FC = () => {
       setBackupsLoading(true);
       const params: BackupListParams = {
         limit: 20,
-        sort_by: 'started_at',
-        sort_order: 'desc',
+        sort_by: "started_at",
+        sort_order: "desc",
       };
-      
+
       const response = await adminApi.getBackups(params);
       setBackups(response.data.items);
     } catch (err: any) {
-      toast.error('Failed to load backups');
+      toast.error("Failed to load backups");
     } finally {
       setBackupsLoading(false);
     }
@@ -289,7 +285,7 @@ const AdminPage: React.FC = () => {
       const response = await adminApi.getSystemSettings();
       setSettings(response.data);
     } catch (err: any) {
-      toast.error('Failed to load settings');
+      toast.error("Failed to load settings");
     } finally {
       setSettingsLoading(false);
     }
@@ -304,15 +300,15 @@ const AdminPage: React.FC = () => {
   const handleCreateBackup = async () => {
     try {
       await adminApi.createBackup({
-        description: 'Manual backup from admin panel',
+        description: "Manual backup from admin panel",
         include_files: true,
         compression_level: 6,
       });
-      toast.success('Backup started successfully');
+      toast.success("Backup started successfully");
       setCreateBackupDialog(false);
       loadBackups();
     } catch (err: any) {
-      toast.error('Failed to create backup: ' + err.message);
+      toast.error("Failed to create backup: " + err.message);
     }
   };
 
@@ -321,47 +317,46 @@ const AdminPage: React.FC = () => {
     try {
       // Validate required fields
       if (!newUserData.email || !newUserData.password) {
-        toast.error('Email and password are required');
+        toast.error("Email and password are required");
         return;
       }
 
-      const response = await adminApi.createUser({
+      await adminApi.createUser({
         ...newUserData,
         send_invite_email: true,
       });
-      
-      toast.success('User created successfully');
+      toast.success("User created successfully");
       setCreateUserDialog(false);
       setNewUserData({
-        email: '',
-        username: '',
-        first_name: '',
-        last_name: '',
+        email: "",
+        username: "",
+        first_name: "",
+        last_name: "",
         role: UserRole.VIEWER,
-        password: '',
+        password: "",
       });
       loadUsers();
     } catch (err: any) {
-      toast.error('Failed to create user: ' + err.message);
+      toast.error("Failed to create user: " + err.message);
     }
   };
 
   // Get status color
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'healthy':
-      case 'up':
-      case 'completed':
-      case 'active':
+      case "healthy":
+      case "up":
+      case "completed":
+      case "active":
         return theme.palette.success.main;
-      case 'warning':
-      case 'degraded':
-      case 'in_progress':
+      case "warning":
+      case "degraded":
+      case "in_progress":
         return theme.palette.warning.main;
-      case 'critical':
-      case 'down':
-      case 'failed':
-      case 'inactive':
+      case "critical":
+      case "down":
+      case "failed":
+      case "inactive":
         return theme.palette.error.main;
       default:
         return theme.palette.grey[500];
@@ -415,7 +410,9 @@ const AdminPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Box display="flex" alignItems="center" gap={2} mb={2}>
-          <AdminPanelSettings sx={{ fontSize: 32, color: theme.palette.error.main }} />
+          <AdminPanelSettings
+            sx={{ fontSize: 32, color: theme.palette.error.main }}
+          />
           <Typography
             variant="h4"
             sx={{
@@ -448,7 +445,7 @@ const AdminPage: React.FC = () => {
           onChange={handleTabChange}
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
+          sx={{ borderBottom: 1, borderColor: "divider" }}
         >
           <Tab icon={<Dashboard />} label="Overview" />
           <Tab icon={<Group />} label="Users" />
@@ -459,31 +456,50 @@ const AdminPage: React.FC = () => {
       </Paper>
 
       {/* Tab Panels */}
-      
+
       {/* Overview Tab */}
       <TabPanel value={activeTab} index={0}>
         {/* System Status Cards */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Speed sx={{ 
-                  fontSize: 48, 
-                  color: systemInfo ? getStatusColor(systemInfo.api_health?.status || 'unknown') : theme.palette.grey[500],
-                  mb: 1 
-                }} />
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              }}
+            >
+              <CardContent sx={{ textAlign: "center", p: 3 }}>
+                <Speed
+                  sx={{
+                    fontSize: 48,
+                    color: systemInfo
+                      ? getStatusColor(
+                          systemInfo.api_health?.status || "unknown"
+                        )
+                      : theme.palette.grey[500],
+                    mb: 1,
+                  }}
+                />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   System Health
                 </Typography>
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    color: systemInfo ? getStatusColor(systemInfo.api_health?.status || 'unknown') : theme.palette.grey[500],
-                    textTransform: 'capitalize',
-                    fontWeight: 500 
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: systemInfo
+                      ? getStatusColor(
+                          systemInfo.api_health?.status || "unknown"
+                        )
+                      : theme.palette.grey[500],
+                    textTransform: "capitalize",
+                    fontWeight: 500,
                   }}
                 >
-                  {systemInfo?.api_health?.status || 'Unknown'}
+                  {systemInfo?.api_health?.status || "Unknown"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   Uptime: {Math.floor((systemInfo?.uptime || 0) / 3600)}h
@@ -493,25 +509,40 @@ const AdminPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Storage sx={{ 
-                  fontSize: 48, 
-                  color: systemInfo ? getStatusColor(systemInfo.database?.status || 'unknown') : theme.palette.grey[500],
-                  mb: 1 
-                }} />
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              }}
+            >
+              <CardContent sx={{ textAlign: "center", p: 3 }}>
+                <Storage
+                  sx={{
+                    fontSize: 48,
+                    color: systemInfo
+                      ? getStatusColor(systemInfo.database?.status || "unknown")
+                      : theme.palette.grey[500],
+                    mb: 1,
+                  }}
+                />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   Database
                 </Typography>
-                <Typography 
-                  variant="body1" 
-                  sx={{ 
-                    color: systemInfo ? getStatusColor(systemInfo.database?.status || 'unknown') : theme.palette.grey[500],
-                    textTransform: 'capitalize',
-                    fontWeight: 500 
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: systemInfo
+                      ? getStatusColor(systemInfo.database?.status || "unknown")
+                      : theme.palette.grey[500],
+                    textTransform: "capitalize",
+                    fontWeight: 500,
                   }}
                 >
-                  {systemInfo?.database?.status || 'Unknown'}
+                  {systemInfo?.database?.status || "Unknown"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {systemInfo?.database?.connection_count || 0} connections
@@ -521,13 +552,27 @@ const AdminPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Group sx={{ fontSize: 48, color: theme.palette.info.main, mb: 1 }} />
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              }}
+            >
+              <CardContent sx={{ textAlign: "center", p: 3 }}>
+                <Group
+                  sx={{ fontSize: 48, color: theme.palette.info.main, mb: 1 }}
+                />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   Total Users
                 </Typography>
-                <Typography variant="h4" sx={{ color: theme.palette.info.main, fontWeight: 700 }}>
+                <Typography
+                  variant="h4"
+                  sx={{ color: theme.palette.info.main, fontWeight: 700 }}
+                >
                   {adminStats?.users.total || 0}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
@@ -538,21 +583,38 @@ const AdminPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Security sx={{ 
-                  fontSize: 48, 
-                  color: (adminStats?.security.open_security_events || 0) > 0 ? theme.palette.warning.main : theme.palette.success.main,
-                  mb: 1 
-                }} />
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              }}
+            >
+              <CardContent sx={{ textAlign: "center", p: 3 }}>
+                <Security
+                  sx={{
+                    fontSize: 48,
+                    color:
+                      (adminStats?.security.open_security_events || 0) > 0
+                        ? theme.palette.warning.main
+                        : theme.palette.success.main,
+                    mb: 1,
+                  }}
+                />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   Security Events
                 </Typography>
-                <Typography 
-                  variant="h4" 
-                  sx={{ 
-                    color: (adminStats?.security.open_security_events || 0) > 0 ? theme.palette.warning.main : theme.palette.success.main,
-                    fontWeight: 700 
+                <Typography
+                  variant="h4"
+                  sx={{
+                    color:
+                      (adminStats?.security.open_security_events || 0) > 0
+                        ? theme.palette.warning.main
+                        : theme.palette.success.main,
+                    fontWeight: 700,
                   }}
                 >
                   {adminStats?.security.open_security_events || 0}
@@ -569,15 +631,30 @@ const AdminPage: React.FC = () => {
         {systemMetrics && (
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <Card sx={{ borderRadius: 3 }}>
-                <CardContent>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                     Performance Metrics
                   </Typography>
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
                       <Box textAlign="center">
-                        <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: 700,
+                            color: theme.palette.primary.main,
+                          }}
+                        >
                           {systemMetrics.cpu_usage?.toFixed(1) || 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -587,7 +664,13 @@ const AdminPage: React.FC = () => {
                     </Grid>
                     <Grid item xs={6}>
                       <Box textAlign="center">
-                        <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.secondary.main }}>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: 700,
+                            color: theme.palette.secondary.main,
+                          }}
+                        >
                           {systemMetrics.memory_usage?.toFixed(1) || 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -597,7 +680,13 @@ const AdminPage: React.FC = () => {
                     </Grid>
                     <Grid item xs={6}>
                       <Box textAlign="center">
-                        <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: 700,
+                            color: theme.palette.warning.main,
+                          }}
+                        >
                           {systemMetrics.disk_usage?.toFixed(1) || 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -607,8 +696,17 @@ const AdminPage: React.FC = () => {
                     </Grid>
                     <Grid item xs={6}>
                       <Box textAlign="center">
-                        <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.info.main }}>
-                          {systemMetrics.api_metrics?.avg_response_time?.toFixed(0) || 0}ms
+                        <Typography
+                          variant="h5"
+                          sx={{
+                            fontWeight: 700,
+                            color: theme.palette.info.main,
+                          }}
+                        >
+                          {systemMetrics.api_metrics?.avg_response_time?.toFixed(
+                            0
+                          ) || 0}
+                          ms
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Avg Response
@@ -621,8 +719,17 @@ const AdminPage: React.FC = () => {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <Card sx={{ borderRadius: 3 }}>
-                <CardContent>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                     API Metrics
                   </Typography>
@@ -630,13 +737,15 @@ const AdminPage: React.FC = () => {
                     <Box display="flex" justifyContent="space-between">
                       <Typography variant="body2">Total Requests</Typography>
                       <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        {systemMetrics.api_metrics?.total_requests?.toLocaleString() || 0}
+                        {systemMetrics.api_metrics?.total_requests?.toLocaleString() ||
+                          0}
                       </Typography>
                     </Box>
                     <Box display="flex" justifyContent="space-between">
                       <Typography variant="body2">Error Rate</Typography>
                       <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        {systemMetrics.api_metrics?.error_rate?.toFixed(2) || 0}%
+                        {systemMetrics.api_metrics?.error_rate?.toFixed(2) || 0}
+                        %
                       </Typography>
                     </Box>
                     <Box display="flex" justifyContent="space-between">
@@ -670,14 +779,21 @@ const AdminPage: React.FC = () => {
               variant="contained"
               startIcon={<Add />}
               onClick={() => setCreateUserDialog(true)}
-              sx={{ ml: 'auto' }}
+              sx={{ ml: "auto" }}
             >
               Create User
             </Button>
           )}
         </Box>
 
-        <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 3,
+            boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+            border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+          }}
+        >
           <Table>
             <TableHead>
               <TableRow>
@@ -710,21 +826,23 @@ const AdminPage: React.FC = () => {
                       </Box>
                     </TableCell>
                     <TableCell>
-                      <Chip 
+                      <Chip
                         label={user.role}
                         size="small"
-                        sx={{ textTransform: 'capitalize' }}
+                        sx={{ textTransform: "capitalize" }}
                       />
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={user.is_active ? 'Active' : 'Inactive'}
+                        label={user.is_active ? "Active" : "Inactive"}
                         size="small"
-                        color={user.is_active ? 'success' : 'error'}
+                        color={user.is_active ? "success" : "error"}
                       />
                     </TableCell>
                     <TableCell>
-                      {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
+                      {user.last_login
+                        ? new Date(user.last_login).toLocaleDateString()
+                        : "Never"}
                     </TableCell>
                     <TableCell>
                       {new Date(user.created_at).toLocaleDateString()}
@@ -737,9 +855,15 @@ const AdminPage: React.FC = () => {
                               <Edit />
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title={user.is_active ? 'Deactivate' : 'Activate'}>
+                          <Tooltip
+                            title={user.is_active ? "Deactivate" : "Activate"}
+                          >
                             <IconButton size="small">
-                              {user.is_active ? <Block /> : <CheckCircleOutline />}
+                              {user.is_active ? (
+                                <Block />
+                              ) : (
+                                <CheckCircleOutline />
+                              )}
                             </IconButton>
                           </Tooltip>
                         </>
@@ -793,22 +917,19 @@ const AdminPage: React.FC = () => {
                     <TableCell>
                       <Box display="flex" alignItems="center" gap={1}>
                         {getLogLevelIcon(log.level)}
-                        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ textTransform: "capitalize" }}
+                        >
                           {log.level}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">
-                        {log.message}
-                      </Typography>
+                      <Typography variant="body2">{log.message}</Typography>
                     </TableCell>
-                    <TableCell>
-                      {log.module}
-                    </TableCell>
-                    <TableCell>
-                      {log.user_email || 'System'}
-                    </TableCell>
+                    <TableCell>{log.module}</TableCell>
+                    <TableCell>{log.user_email || "System"}</TableCell>
                     <TableCell>
                       {new Date(log.timestamp).toLocaleString()}
                     </TableCell>
@@ -868,31 +989,40 @@ const AdminPage: React.FC = () => {
                     <TableCell>
                       <Box display="flex" alignItems="center" gap={1}>
                         {getBackupStatusIcon(backup.status)}
-                        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ textTransform: "capitalize" }}
+                        >
                           {backup.status}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {backup.file_size ? `${(backup.file_size / 1024 / 1024).toFixed(2)} MB` : '-'}
+                      {backup.file_size
+                        ? `${(backup.file_size / 1024 / 1024).toFixed(2)} MB`
+                        : "-"}
                     </TableCell>
                     <TableCell>
                       {new Date(backup.started_at).toLocaleString()}
                     </TableCell>
                     <TableCell>
-                      {backup.completed_at ? 
-                        `${Math.round((new Date(backup.completed_at).getTime() - new Date(backup.started_at).getTime()) / 1000)}s` :
-                        '-'
-                      }
+                      {backup.completed_at
+                        ? `${Math.round(
+                            (new Date(backup.completed_at).getTime() -
+                              new Date(backup.started_at).getTime()) /
+                              1000
+                          )}s`
+                        : "-"}
                     </TableCell>
                     <TableCell align="right">
-                      {backup.status === BackupStatus.COMPLETED && backup.file_path && (
-                        <Tooltip title="Download Backup">
-                          <IconButton size="small">
-                            <Download />
-                          </IconButton>
-                        </Tooltip>
-                      )}
+                      {backup.status === BackupStatus.COMPLETED &&
+                        backup.file_path && (
+                          <Tooltip title="Download Backup">
+                            <IconButton size="small">
+                              <Download />
+                            </IconButton>
+                          </Tooltip>
+                        )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -917,21 +1047,29 @@ const AdminPage: React.FC = () => {
                 <Card sx={{ borderRadius: 3 }}>
                   <CardContent>
                     <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                      {setting.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      {setting.key
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase())}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {setting.description || 'No description available'}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
+                      {setting.description || "No description available"}
                     </Typography>
-                    
-                    {setting.data_type === 'boolean' ? (
+
+                    {setting.data_type === "boolean" ? (
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={setting.value === 'true'}
+                            checked={setting.value === "true"}
                             disabled={!canWrite}
                           />
                         }
-                        label={setting.value === 'true' ? 'Enabled' : 'Disabled'}
+                        label={
+                          setting.value === "true" ? "Enabled" : "Disabled"
+                        }
                       />
                     ) : (
                       <TextField
@@ -939,14 +1077,18 @@ const AdminPage: React.FC = () => {
                         size="small"
                         value={setting.value}
                         disabled={!canWrite}
-                        type={setting.data_type === 'password' ? 'password' : 'text'}
+                        type={
+                          setting.data_type === "password" ? "password" : "text"
+                        }
                       />
                     )}
                   </CardContent>
                   {canWrite && (
                     <CardActions>
                       <Button size="small">Save</Button>
-                      <Button size="small" color="secondary">Reset</Button>
+                      <Button size="small" color="secondary">
+                        Reset
+                      </Button>
                     </CardActions>
                   )}
                 </Card>
@@ -957,7 +1099,12 @@ const AdminPage: React.FC = () => {
       </TabPanel>
 
       {/* Create User Dialog */}
-      <Dialog open={createUserDialog} onClose={() => setCreateUserDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={createUserDialog}
+        onClose={() => setCreateUserDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Create New User</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -967,7 +1114,9 @@ const AdminPage: React.FC = () => {
                 label="Email"
                 type="email"
                 value={newUserData.email}
-                onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
+                onChange={(e) =>
+                  setNewUserData({ ...newUserData, email: e.target.value })
+                }
                 required
               />
             </Grid>
@@ -976,7 +1125,9 @@ const AdminPage: React.FC = () => {
                 fullWidth
                 label="Username"
                 value={newUserData.username}
-                onChange={(e) => setNewUserData({ ...newUserData, username: e.target.value })}
+                onChange={(e) =>
+                  setNewUserData({ ...newUserData, username: e.target.value })
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -984,7 +1135,9 @@ const AdminPage: React.FC = () => {
                 fullWidth
                 label="First Name"
                 value={newUserData.first_name}
-                onChange={(e) => setNewUserData({ ...newUserData, first_name: e.target.value })}
+                onChange={(e) =>
+                  setNewUserData({ ...newUserData, first_name: e.target.value })
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -992,7 +1145,9 @@ const AdminPage: React.FC = () => {
                 fullWidth
                 label="Last Name"
                 value={newUserData.last_name}
-                onChange={(e) => setNewUserData({ ...newUserData, last_name: e.target.value })}
+                onChange={(e) =>
+                  setNewUserData({ ...newUserData, last_name: e.target.value })
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -1001,14 +1156,21 @@ const AdminPage: React.FC = () => {
                 <Select
                   value={newUserData.role}
                   label="Role"
-                  onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value as UserRole })}
+                  onChange={(e) =>
+                    setNewUserData({
+                      ...newUserData,
+                      role: e.target.value as UserRole,
+                    })
+                  }
                 >
                   <MenuItem value={UserRole.VIEWER}>Viewer</MenuItem>
                   <MenuItem value={UserRole.ANALYST}>Analyst</MenuItem>
                   <MenuItem value={UserRole.DEVELOPER}>Developer</MenuItem>
                   <MenuItem value={UserRole.TESTER}>Tester</MenuItem>
                   <MenuItem value={UserRole.MANAGER}>Manager</MenuItem>
-                  {user?.is_superuser && <MenuItem value={UserRole.ADMIN}>Admin</MenuItem>}
+                  {user?.role === UserRole.ADMIN && (
+                    <MenuItem value={UserRole.ADMIN}>Admin</MenuItem>
+                  )}
                 </Select>
               </FormControl>
             </Grid>
@@ -1018,7 +1180,9 @@ const AdminPage: React.FC = () => {
                 label="Temporary Password"
                 type="password"
                 value={newUserData.password}
-                onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
+                onChange={(e) =>
+                  setNewUserData({ ...newUserData, password: e.target.value })
+                }
                 required
               />
             </Grid>
@@ -1026,28 +1190,39 @@ const AdminPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateUserDialog(false)}>Cancel</Button>
-          <Button onClick={handleCreateUser} variant="contained">Create User</Button>
+          <Button onClick={handleCreateUser} variant="contained">
+            Create User
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Create Backup Dialog */}
-      <Dialog open={createBackupDialog} onClose={() => setCreateBackupDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog
+        open={createBackupDialog}
+        onClose={() => setCreateBackupDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Create System Backup</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            This will create a full system backup including database and uploaded files.
+            This will create a full system backup including database and
+            uploaded files.
           </Typography>
           <Alert severity="info">
-            The backup process may take several minutes to complete. You will be notified when it's ready.
+            The backup process may take several minutes to complete. You will be
+            notified when it's ready.
           </Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateBackupDialog(false)}>Cancel</Button>
-          <Button onClick={handleCreateBackup} variant="contained">Start Backup</Button>
+          <Button onClick={handleCreateBackup} variant="contained">
+            Start Backup
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
   );
 };
 
-export default AdminPage; 
+export default AdminPage;

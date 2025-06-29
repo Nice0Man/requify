@@ -63,6 +63,9 @@ export interface SystemSettingsUpdate {
 }
 
 export class AdminApi {
+  createUser(arg0: { send_invite_email: boolean; email: string; username: string; first_name: string; last_name: string; role: import("../../auth/types/auth.types").UserRole; password: string; }) {
+    throw new Error('Method not implemented.');
+  }
   constructor(private client = apiClient) {}
 
   // 1. Get Admin Users

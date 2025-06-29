@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -42,7 +42,7 @@ import {
   AccordionDetails,
   Divider,
   Badge,
-} from '@mui/material';
+} from "@mui/material";
 import {
   RocketLaunch,
   Add,
@@ -70,13 +70,27 @@ import {
   Code,
   Security,
   Build,
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { useAuth, usePermissions } from '@/features/auth/context/auth.context';
-import { UserRole } from '@/features/auth/types/auth.types';
-import { releasesApi, ReleaseListParams } from '../api/releases.api';
-import { Release, ReleaseStatus, ReleaseCreate, ReleaseUpdate } from '../types/release.types';
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
+import { UserRole } from "@/features/auth/types/auth.types";
+import { 
+  releasesApi,
+  ReleaseListParams as ApiReleaseListParams,
+  Release as ApiRelease,
+  ReleaseStatus as ApiReleaseStatus,
+  ReleaseCreate as ApiReleaseCreate,
+  ReleaseUpdate as ApiReleaseUpdate
+} from "../api/releases.api";
+import {
+  Release,
+  ReleaseStatus,
+  ReleaseCreate,
+  ReleaseUpdate,
+  ReleaseListParams,
+  ReleaseType,
+} from "../types/release.types";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -108,6 +122,64 @@ interface ReleaseStats {
   overdue: number;
 }
 
+// Convert API release to local release type
+const convertApiReleaseToRelease = (apiRelease: ApiRelease): Release => {
+  return {
+    ...apiRelease,
+    type: (apiRelease.type as ReleaseType) || ReleaseType.FEATURE,
+    requirements: apiRelease.requirements || [],
+    change_log: apiRelease.change_log || [],
+    dependencies: apiRelease.dependencies || [],
+    completion_percentage: apiRelease.completion_percentage || 0,
+    updated_by: apiRelease.updated_by || "Unknown",
+    artifacts: apiRelease.artifacts || [],
+    approvals: apiRelease.approvals || [],
+    project_name: apiRelease.project_name || `Project #${apiRelease.project_id}`,
+    created_by_name: apiRelease.created_by_name || "Unknown",
+    status: convertApiStatusToStatus(apiRelease.status),
+  };
+};
+  
+// Convert API status to local status
+const convertApiStatusToStatus = (apiStatus: ApiReleaseStatus): ReleaseStatus => {
+  switch (apiStatus) {
+    case ApiReleaseStatus.PLANNING:
+      return ReleaseStatus.PLANNING;
+    case ApiReleaseStatus.IN_PROGRESS:
+      return ReleaseStatus.IN_PROGRESS;
+    case ApiReleaseStatus.TESTING:
+      return ReleaseStatus.TESTING;
+    case ApiReleaseStatus.READY:
+      return ReleaseStatus.READY;
+    case ApiReleaseStatus.RELEASED:
+      return ReleaseStatus.RELEASED;
+    case ApiReleaseStatus.CANCELLED:
+      return ReleaseStatus.CANCELLED;
+    default:
+      return ReleaseStatus.PLANNING;
+  }
+};
+
+// Convert local status to API status
+const convertStatusToApiStatus = (status: ReleaseStatus): ApiReleaseStatus => {
+  switch (status) {
+    case ReleaseStatus.PLANNING:
+      return ApiReleaseStatus.PLANNING;
+    case ReleaseStatus.IN_PROGRESS:
+      return ApiReleaseStatus.IN_PROGRESS;
+    case ReleaseStatus.TESTING:
+      return ApiReleaseStatus.TESTING;
+    case ReleaseStatus.READY:
+      return ApiReleaseStatus.READY;
+    case ReleaseStatus.RELEASED:
+      return ApiReleaseStatus.RELEASED;
+    case ReleaseStatus.CANCELLED:
+      return ApiReleaseStatus.CANCELLED;
+    default:
+      return ApiReleaseStatus.PLANNING;
+  }
+};
+
 const ReleasesPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -115,8 +187,14 @@ const ReleasesPage: React.FC = () => {
   const { hasPermission, hasAnyPermission } = usePermissions();
 
   // Check permissions
-  const canWrite = hasAnyPermission(['releases:write', 'project:write']) || user?.role === UserRole.MANAGER || user?.role === UserRole.ADMIN;
-  const canApprove = hasAnyPermission(['releases:approve']) || user?.role === UserRole.MANAGER || user?.role === UserRole.ADMIN;
+  const canWrite =
+    hasAnyPermission(["releases:write", "project:write"]) ||
+    user?.role === UserRole.MANAGER ||
+    user?.role === UserRole.ADMIN;
+  const canApprove =
+    hasAnyPermission(["releases:approve"]) ||
+    user?.role === UserRole.MANAGER ||
+    user?.role === UserRole.ADMIN;
 
   // State management
   const [activeTab, setActiveTab] = useState(0);
@@ -133,15 +211,15 @@ const ReleasesPage: React.FC = () => {
     cancelled: 0,
     overdue: 0,
   });
-  
+
   // Pagination and filtering
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
   const [totalCount, setTotalCount] = useState(0);
   const [filters, setFilters] = useState({
-    status: '',
-    search: '',
-    project_id: '',
+    status: "",
+    search: "",
+    project_id: "",
   });
 
   // Dialog states
@@ -149,11 +227,10 @@ const ReleasesPage: React.FC = () => {
   const [editDialog, setEditDialog] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
   const [releaseForm, setReleaseForm] = useState<Partial<ReleaseCreate>>({
-    name: '',
-    version: '',
-    description: '',
-    status: ReleaseStatus.PLANNING,
-    planned_date: '',
+    name: "",
+    version: "",
+    description: "",
+    planned_date: "",
     project_id: undefined,
   });
 
@@ -168,38 +245,59 @@ const ReleasesPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const params: ReleaseListParams = {
+      const params: ApiReleaseListParams = {
         skip: page * pageSize,
         limit: pageSize,
-        search: filters.search || undefined,
-        status: filters.status || undefined,
-        project_id: filters.project_id ? parseInt(filters.project_id) : undefined,
-        sort_by: 'planned_date',
-        sort_order: 'desc',
+        status: filters.status ? convertStatusToApiStatus(filters.status as ReleaseStatus) : undefined,
+        project_id: filters.project_id
+          ? parseInt(filters.project_id)
+          : undefined,
+        sort_by: "planned_date",
+        sort_order: "desc",
       };
 
       const response = await releasesApi.getReleases(params);
-      setReleases(response.data.items || []);
+      const convertedReleases = (response.data.items || []).map(convertApiReleaseToRelease);
+      setReleases(convertedReleases);
       setTotalCount(response.data.total || 0);
 
       // Calculate stats
       const releaseStats: ReleaseStats = {
-        total: response.data.items?.length || 0,
-        planning: response.data.items?.filter(r => r.status === ReleaseStatus.PLANNING).length || 0,
-        in_progress: response.data.items?.filter(r => r.status === ReleaseStatus.IN_PROGRESS).length || 0,
-        testing: response.data.items?.filter(r => r.status === ReleaseStatus.TESTING).length || 0,
-        ready: response.data.items?.filter(r => r.status === ReleaseStatus.READY).length || 0,
-        released: response.data.items?.filter(r => r.status === ReleaseStatus.RELEASED).length || 0,
-        cancelled: response.data.items?.filter(r => r.status === ReleaseStatus.CANCELLED).length || 0,
-        overdue: response.data.items?.filter(r => {
-          const plannedDate = new Date(r.planned_date || '');
-          return plannedDate < new Date() && r.status !== ReleaseStatus.RELEASED;
-        }).length || 0,
+        total: convertedReleases.length,
+        planning:
+          convertedReleases.filter(
+            (r) => r.status === ReleaseStatus.PLANNING
+          ).length,
+        in_progress:
+          convertedReleases.filter(
+            (r) => r.status === ReleaseStatus.IN_PROGRESS
+          ).length,
+        testing:
+          convertedReleases.filter((r) => r.status === ReleaseStatus.TESTING)
+            .length,
+        ready:
+          convertedReleases.filter((r) => r.status === ReleaseStatus.READY)
+            .length,
+        released:
+          convertedReleases.filter(
+            (r) => r.status === ReleaseStatus.RELEASED
+          ).length,
+        cancelled:
+          convertedReleases.filter(
+            (r) => r.status === ReleaseStatus.CANCELLED
+          ).length,
+        overdue:
+          convertedReleases.filter((r) => {
+            const plannedDate = new Date(r.planned_date || "");
+            return (
+              plannedDate < new Date() && r.status !== ReleaseStatus.RELEASED
+            );
+          }).length,
       };
       setStats(releaseStats);
     } catch (err: any) {
-      console.error('Failed to load releases:', err);
-      setError(err.message || 'Failed to load releases');
+      console.error("Failed to load releases:", err);
+      setError(err.message || "Failed to load releases");
       setReleases([]);
       setTotalCount(0);
     } finally {
@@ -216,24 +314,31 @@ const ReleasesPage: React.FC = () => {
   const handleCreateRelease = async () => {
     try {
       if (!releaseForm.name || !releaseForm.version) {
-        toast.error('Name and version are required');
+        toast.error("Name and version are required");
         return;
       }
 
-      await releasesApi.createRelease(releaseForm as ReleaseCreate);
-      toast.success('Release created successfully');
+      const createData: ApiReleaseCreate = {
+        name: releaseForm.name,
+        version: releaseForm.version,
+        description: releaseForm.description || "",
+        planned_date: releaseForm.planned_date || "",
+        project_id: releaseForm.project_id || 0,
+      };
+
+      await releasesApi.createRelease(createData);
+      toast.success("Release created successfully");
       setCreateDialog(false);
       setReleaseForm({
-        name: '',
-        version: '',
-        description: '',
-        status: ReleaseStatus.PLANNING,
-        planned_date: '',
+        name: "",
+        version: "",
+        description: "",
+        planned_date: "",
         project_id: undefined,
       });
       loadReleases();
     } catch (err: any) {
-      toast.error('Failed to create release: ' + err.message);
+      toast.error("Failed to create release: " + err.message);
     }
   };
 
@@ -241,17 +346,25 @@ const ReleasesPage: React.FC = () => {
   const handleEditRelease = async () => {
     try {
       if (!selectedRelease || !releaseForm.name || !releaseForm.version) {
-        toast.error('Name and version are required');
+        toast.error("Name and version are required");
         return;
       }
 
-      await releasesApi.updateRelease(selectedRelease.id, releaseForm as ReleaseUpdate);
-      toast.success('Release updated successfully');
+      const updateData: ApiReleaseUpdate = {
+        name: releaseForm.name,
+        version: releaseForm.version,
+        description: releaseForm.description || "",
+        planned_date: releaseForm.planned_date || "",
+        project_id: releaseForm.project_id || 0,
+      };
+
+      await releasesApi.updateRelease(selectedRelease.id, updateData);
+      toast.success("Release updated successfully");
       setEditDialog(false);
       setSelectedRelease(null);
       loadReleases();
     } catch (err: any) {
-      toast.error('Failed to update release: ' + err.message);
+      toast.error("Failed to update release: " + err.message);
     }
   };
 
@@ -260,10 +373,10 @@ const ReleasesPage: React.FC = () => {
     if (window.confirm(`Are you sure you want to delete "${release.name}"?`)) {
       try {
         await releasesApi.deleteRelease(release.id);
-        toast.success('Release deleted successfully');
+        toast.success("Release deleted successfully");
         loadReleases();
       } catch (err: any) {
-        toast.error('Failed to delete release: ' + err.message);
+        toast.error("Failed to delete release: " + err.message);
       }
     }
   };
@@ -310,8 +423,10 @@ const ReleasesPage: React.FC = () => {
 
   // Check if release is overdue
   const isOverdue = (release: Release) => {
-    const plannedDate = new Date(release.planned_date || '');
-    return plannedDate < new Date() && release.status !== ReleaseStatus.RELEASED;
+    const plannedDate = new Date(release.planned_date || "");
+    return (
+      plannedDate < new Date() && release.status !== ReleaseStatus.RELEASED
+    );
   };
 
   // Open edit dialog
@@ -320,9 +435,8 @@ const ReleasesPage: React.FC = () => {
     setReleaseForm({
       name: release.name,
       version: release.version,
-      description: release.description || '',
-      status: release.status,
-      planned_date: release.planned_date || '',
+      description: release.description || "",
+      planned_date: release.planned_date || "",
       project_id: release.project_id,
     });
     setEditDialog(true);
@@ -362,10 +476,28 @@ const ReleasesPage: React.FC = () => {
       {/* Release Stats */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: 3, backgroundColor: alpha(theme.palette.info.main, 0.1) }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <Schedule sx={{ fontSize: 40, color: theme.palette.info.main, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.info.main }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: `0 2px 12px ${alpha(
+                theme.palette.common.black,
+                0.08
+              )}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              background: `linear-gradient(135deg, ${alpha(
+                theme.palette.info.main,
+                0.1
+              )} 0%, ${alpha(theme.palette.info.main, 0.05)} 100%)`,
+            }}
+          >
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <Schedule
+                sx={{ fontSize: 40, color: theme.palette.info.main, mb: 1 }}
+              />
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: theme.palette.info.main }}
+              >
                 {stats.planning}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -376,10 +508,28 @@ const ReleasesPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: 3, backgroundColor: alpha(theme.palette.warning.main, 0.1) }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <PlayArrow sx={{ fontSize: 40, color: theme.palette.warning.main, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.warning.main }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: `0 2px 12px ${alpha(
+                theme.palette.common.black,
+                0.08
+              )}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              background: `linear-gradient(135deg, ${alpha(
+                theme.palette.warning.main,
+                0.1
+              )} 0%, ${alpha(theme.palette.warning.main, 0.05)} 100%)`,
+            }}
+          >
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <PlayArrow
+                sx={{ fontSize: 40, color: theme.palette.warning.main, mb: 1 }}
+              />
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: theme.palette.warning.main }}
+              >
                 {stats.in_progress}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -390,10 +540,32 @@ const ReleasesPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: 3, backgroundColor: alpha(theme.palette.secondary.main, 0.1) }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <BugReport sx={{ fontSize: 40, color: theme.palette.secondary.main, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.secondary.main }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: `0 2px 12px ${alpha(
+                theme.palette.common.black,
+                0.08
+              )}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              background: `linear-gradient(135deg, ${alpha(
+                theme.palette.secondary.main,
+                0.1
+              )} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+            }}
+          >
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <BugReport
+                sx={{
+                  fontSize: 40,
+                  color: theme.palette.secondary.main,
+                  mb: 1,
+                }}
+              />
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: theme.palette.secondary.main }}
+              >
                 {stats.testing}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -404,10 +576,28 @@ const ReleasesPage: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ borderRadius: 3, backgroundColor: alpha(theme.palette.success.main, 0.1) }}>
-            <CardContent sx={{ textAlign: 'center' }}>
-              <RocketLaunch sx={{ fontSize: 40, color: theme.palette.success.main, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 700, color: theme.palette.success.main }}>
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: `0 2px 12px ${alpha(
+                theme.palette.common.black,
+                0.08
+              )}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              background: `linear-gradient(135deg, ${alpha(
+                theme.palette.success.main,
+                0.1
+              )} 0%, ${alpha(theme.palette.success.main, 0.05)} 100%)`,
+            }}
+          >
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <RocketLaunch
+                sx={{ fontSize: 40, color: theme.palette.success.main, mb: 1 }}
+              />
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: 700, color: theme.palette.success.main }}
+              >
                 {stats.released}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -425,26 +615,31 @@ const ReleasesPage: React.FC = () => {
           onChange={handleTabChange}
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ borderBottom: 1, borderColor: 'divider' }}
+          sx={{ borderBottom: 1, borderColor: "divider" }}
         >
           <Tab icon={<Timeline />} label="Overview" />
           <Tab icon={<CalendarToday />} label="Timeline" />
-          <Tab 
+          <Tab
             icon={
               <Badge badgeContent={stats.overdue} color="error">
                 <Assignment />
               </Badge>
-            } 
-            label="Planning" 
+            }
+            label="Planning"
           />
         </Tabs>
       </Paper>
 
       {/* Tab Panels */}
-      
+
       {/* Overview Tab */}
       <TabPanel value={activeTab} index={0}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+        >
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             All Releases
           </Typography>
@@ -477,7 +672,9 @@ const ReleasesPage: React.FC = () => {
               size="small"
               label="Search releases..."
               value={filters.search}
-              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, search: e.target.value })
+              }
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -486,11 +683,15 @@ const ReleasesPage: React.FC = () => {
               <Select
                 value={filters.status}
                 label="Status"
-                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, status: e.target.value })
+                }
               >
                 <MenuItem value="">All Statuses</MenuItem>
                 <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
-                <MenuItem value={ReleaseStatus.IN_PROGRESS}>In Progress</MenuItem>
+                <MenuItem value={ReleaseStatus.IN_PROGRESS}>
+                  In Progress
+                </MenuItem>
                 <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
                 <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
                 <MenuItem value={ReleaseStatus.RELEASED}>Released</MenuItem>
@@ -504,7 +705,9 @@ const ReleasesPage: React.FC = () => {
               size="small"
               label="Project ID"
               value={filters.project_id}
-              onChange={(e) => setFilters({ ...filters, project_id: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, project_id: e.target.value })
+              }
             />
           </Grid>
         </Grid>
@@ -548,12 +751,15 @@ const ReleasesPage: React.FC = () => {
                       <Box display="flex" alignItems="center" gap={1}>
                         {getStatusIcon(release.status)}
                         <Chip
-                          label={release.status.replace('_', ' ')}
+                          label={release.status.replace("_", " ")}
                           size="small"
-                          sx={{ 
-                            backgroundColor: alpha(getStatusColor(release.status), 0.1),
+                          sx={{
+                            backgroundColor: alpha(
+                              getStatusColor(release.status),
+                              0.1
+                            ),
                             color: getStatusColor(release.status),
-                            textTransform: 'capitalize'
+                            textTransform: "capitalize",
                           }}
                         />
                         {isOverdue(release) && (
@@ -570,16 +776,21 @@ const ReleasesPage: React.FC = () => {
                       {release.project_name || `Project #${release.project_id}`}
                     </TableCell>
                     <TableCell>
-                      {release.planned_date ? new Date(release.planned_date).toLocaleDateString() : 'Not set'}
+                      {release.planned_date
+                        ? new Date(release.planned_date).toLocaleDateString()
+                        : "Not set"}
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ width: '100px' }}>
+                      <Box sx={{ width: "100px" }}>
                         <LinearProgress
                           variant="determinate"
                           value={release.completion_percentage || 0}
                           sx={{
-                            backgroundColor: alpha(getStatusColor(release.status), 0.3),
-                            '& .MuiLinearProgress-bar': {
+                            backgroundColor: alpha(
+                              getStatusColor(release.status),
+                              0.3
+                            ),
+                            "& .MuiLinearProgress-bar": {
                               backgroundColor: getStatusColor(release.status),
                             },
                           }}
@@ -639,28 +850,44 @@ const ReleasesPage: React.FC = () => {
         ) : (
           <Box>
             {releases
-              .sort((a, b) => new Date(a.planned_date || '').getTime() - new Date(b.planned_date || '').getTime())
+              .sort(
+                (a, b) =>
+                  new Date(a.planned_date || "").getTime() -
+                  new Date(b.planned_date || "").getTime()
+              )
               .map((release, index) => (
                 <Accordion key={release.id} defaultExpanded={index < 3}>
                   <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Box display="flex" alignItems="center" gap={2} width="100%">
+                    <Box
+                      display="flex"
+                      alignItems="center"
+                      gap={2}
+                      width="100%"
+                    >
                       {getStatusIcon(release.status)}
                       <Box>
                         <Typography variant="h6">
                           {release.name} v{release.version}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {release.planned_date ? `Planned: ${new Date(release.planned_date).toLocaleDateString()}` : 'No date set'}
+                          {release.planned_date
+                            ? `Planned: ${new Date(
+                                release.planned_date
+                              ).toLocaleDateString()}`
+                            : "No date set"}
                         </Typography>
                       </Box>
-                      <Box sx={{ ml: 'auto' }}>
+                      <Box sx={{ ml: "auto" }}>
                         <Chip
-                          label={release.status.replace('_', ' ')}
+                          label={release.status.replace("_", " ")}
                           size="small"
-                          sx={{ 
-                            backgroundColor: alpha(getStatusColor(release.status), 0.1),
+                          sx={{
+                            backgroundColor: alpha(
+                              getStatusColor(release.status),
+                              0.1
+                            ),
                             color: getStatusColor(release.status),
-                            textTransform: 'capitalize'
+                            textTransform: "capitalize",
                           }}
                         />
                       </Box>
@@ -669,31 +896,51 @@ const ReleasesPage: React.FC = () => {
                   <AccordionDetails>
                     <Grid container spacing={3}>
                       <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, mb: 1 }}
+                        >
                           Release Information
                         </Typography>
                         <Typography variant="body2" paragraph>
-                          {release.description || 'No description provided'}
+                          {release.description || "No description provided"}
                         </Typography>
                         <Box display="flex" gap={2} mb={2}>
-                          <Chip label={`Project #${release.project_id}`} size="small" variant="outlined" />
-                          <Chip label={`${release.completion_percentage || 0}% Complete`} size="small" />
+                          <Chip
+                            label={`Project #${release.project_id}`}
+                            size="small"
+                            variant="outlined"
+                          />
+                          <Chip
+                            label={`${
+                              release.completion_percentage || 0
+                            }% Complete`}
+                            size="small"
+                          />
                         </Box>
                       </Grid>
                       <Grid item xs={12} md={6}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, mb: 1 }}
+                        >
                           Key Dates
                         </Typography>
                         <Box display="flex" flexDirection="column" gap={1}>
                           <Typography variant="body2">
-                            <strong>Created:</strong> {new Date(release.created_at).toLocaleDateString()}
+                            <strong>Created:</strong>{" "}
+                            {new Date(release.created_at).toLocaleDateString()}
                           </Typography>
                           <Typography variant="body2">
-                            <strong>Last Updated:</strong> {new Date(release.updated_at).toLocaleDateString()}
+                            <strong>Last Updated:</strong>{" "}
+                            {new Date(release.updated_at).toLocaleDateString()}
                           </Typography>
                           {release.planned_date && (
                             <Typography variant="body2">
-                              <strong>Planned Release:</strong> {new Date(release.planned_date).toLocaleDateString()}
+                              <strong>Planned Release:</strong>{" "}
+                              {new Date(
+                                release.planned_date
+                              ).toLocaleDateString()}
                             </Typography>
                           )}
                         </Box>
@@ -714,7 +961,8 @@ const ReleasesPage: React.FC = () => {
 
         {stats.overdue > 0 && (
           <Alert severity="warning" sx={{ mb: 3 }}>
-            You have {stats.overdue} overdue release{stats.overdue > 1 ? 's' : ''} that need attention.
+            You have {stats.overdue} overdue release
+            {stats.overdue > 1 ? "s" : ""} that need attention.
           </Alert>
         )}
 
@@ -727,19 +975,43 @@ const ReleasesPage: React.FC = () => {
                   Planning Status
                 </Typography>
                 <Box display="flex" flexDirection="column" gap={2}>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">Ready for Release</Typography>
                     <Chip label={stats.ready} color="primary" size="small" />
                   </Box>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">In Testing</Typography>
-                    <Chip label={stats.testing} color="secondary" size="small" />
+                    <Chip
+                      label={stats.testing}
+                      color="secondary"
+                      size="small"
+                    />
                   </Box>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">In Development</Typography>
-                    <Chip label={stats.in_progress} color="warning" size="small" />
+                    <Chip
+                      label={stats.in_progress}
+                      color="warning"
+                      size="small"
+                    />
                   </Box>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">Planning</Typography>
                     <Chip label={stats.planning} color="info" size="small" />
                   </Box>
@@ -756,36 +1028,48 @@ const ReleasesPage: React.FC = () => {
                   Release Health
                 </Typography>
                 <Box display="flex" flexDirection="column" gap={2}>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">On Track</Typography>
-                    <Chip 
-                      label={stats.total - stats.overdue} 
-                      color="success" 
-                      size="small" 
+                    <Chip
+                      label={stats.total - stats.overdue}
+                      color="success"
+                      size="small"
                     />
                   </Box>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">Overdue</Typography>
-                    <Chip 
-                      label={stats.overdue} 
-                      color="error" 
-                      size="small" 
-                    />
+                    <Chip label={stats.overdue} color="error" size="small" />
                   </Box>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">Cancelled</Typography>
-                    <Chip 
-                      label={stats.cancelled} 
-                      color="default" 
-                      size="small" 
+                    <Chip
+                      label={stats.cancelled}
+                      color="default"
+                      size="small"
                     />
                   </Box>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="body2">Total Active</Typography>
-                    <Chip 
-                      label={stats.total - stats.released - stats.cancelled} 
-                      color="primary" 
-                      size="small" 
+                    <Chip
+                      label={stats.total - stats.released - stats.cancelled}
+                      color="primary"
+                      size="small"
                     />
                   </Box>
                 </Box>
@@ -826,11 +1110,7 @@ const ReleasesPage: React.FC = () => {
                   >
                     Release Reports
                   </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<GetApp />}
-                    fullWidth
-                  >
+                  <Button variant="outlined" startIcon={<GetApp />} fullWidth>
                     Export Data
                   </Button>
                 </Box>
@@ -841,7 +1121,12 @@ const ReleasesPage: React.FC = () => {
       </TabPanel>
 
       {/* Create Release Dialog */}
-      <Dialog open={createDialog} onClose={() => setCreateDialog(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={createDialog}
+        onClose={() => setCreateDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Create New Release</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -850,7 +1135,9 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 label="Release Name"
                 value={releaseForm.name}
-                onChange={(e) => setReleaseForm({ ...releaseForm, name: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({ ...releaseForm, name: e.target.value })
+                }
                 required
               />
             </Grid>
@@ -859,7 +1146,9 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 label="Version"
                 value={releaseForm.version}
-                onChange={(e) => setReleaseForm({ ...releaseForm, version: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({ ...releaseForm, version: e.target.value })
+                }
                 required
               />
             </Grid>
@@ -870,23 +1159,13 @@ const ReleasesPage: React.FC = () => {
                 multiline
                 rows={3}
                 value={releaseForm.description}
-                onChange={(e) => setReleaseForm({ ...releaseForm, description: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({
+                    ...releaseForm,
+                    description: e.target.value,
+                  })
+                }
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={releaseForm.status}
-                  label="Status"
-                  onChange={(e) => setReleaseForm({ ...releaseForm, status: e.target.value as ReleaseStatus })}
-                >
-                  <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
-                  <MenuItem value={ReleaseStatus.IN_PROGRESS}>In Progress</MenuItem>
-                  <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
-                  <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
-                </Select>
-              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -895,28 +1174,45 @@ const ReleasesPage: React.FC = () => {
                 type="date"
                 InputLabelProps={{ shrink: true }}
                 value={releaseForm.planned_date}
-                onChange={(e) => setReleaseForm({ ...releaseForm, planned_date: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({
+                    ...releaseForm,
+                    planned_date: e.target.value,
+                  })
+                }
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 label="Project ID"
                 type="number"
-                value={releaseForm.project_id || ''}
-                onChange={(e) => setReleaseForm({ ...releaseForm, project_id: parseInt(e.target.value) || undefined })}
+                value={releaseForm.project_id || ""}
+                onChange={(e) =>
+                  setReleaseForm({
+                    ...releaseForm,
+                    project_id: parseInt(e.target.value) || undefined,
+                  })
+                }
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateDialog(false)}>Cancel</Button>
-          <Button onClick={handleCreateRelease} variant="contained">Create Release</Button>
+          <Button onClick={handleCreateRelease} variant="contained">
+            Create Release
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* Edit Release Dialog */}
-      <Dialog open={editDialog} onClose={() => setEditDialog(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={editDialog}
+        onClose={() => setEditDialog(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Edit Release</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -925,7 +1221,9 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 label="Release Name"
                 value={releaseForm.name}
-                onChange={(e) => setReleaseForm({ ...releaseForm, name: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({ ...releaseForm, name: e.target.value })
+                }
                 required
               />
             </Grid>
@@ -934,7 +1232,9 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 label="Version"
                 value={releaseForm.version}
-                onChange={(e) => setReleaseForm({ ...releaseForm, version: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({ ...releaseForm, version: e.target.value })
+                }
                 required
               />
             </Grid>
@@ -945,25 +1245,13 @@ const ReleasesPage: React.FC = () => {
                 multiline
                 rows={3}
                 value={releaseForm.description}
-                onChange={(e) => setReleaseForm({ ...releaseForm, description: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({
+                    ...releaseForm,
+                    description: e.target.value,
+                  })
+                }
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={releaseForm.status}
-                  label="Status"
-                  onChange={(e) => setReleaseForm({ ...releaseForm, status: e.target.value as ReleaseStatus })}
-                >
-                  <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
-                  <MenuItem value={ReleaseStatus.IN_PROGRESS}>In Progress</MenuItem>
-                  <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
-                  <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
-                  <MenuItem value={ReleaseStatus.RELEASED}>Released</MenuItem>
-                  <MenuItem value={ReleaseStatus.CANCELLED}>Cancelled</MenuItem>
-                </Select>
-              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -972,14 +1260,21 @@ const ReleasesPage: React.FC = () => {
                 type="date"
                 InputLabelProps={{ shrink: true }}
                 value={releaseForm.planned_date}
-                onChange={(e) => setReleaseForm({ ...releaseForm, planned_date: e.target.value })}
+                onChange={(e) =>
+                  setReleaseForm({
+                    ...releaseForm,
+                    planned_date: e.target.value,
+                  })
+                }
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditDialog(false)}>Cancel</Button>
-          <Button onClick={handleEditRelease} variant="contained">Update Release</Button>
+          <Button onClick={handleEditRelease} variant="contained">
+            Update Release
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -1002,4 +1297,4 @@ const ReleasesPage: React.FC = () => {
   );
 };
 
-export default ReleasesPage; 
+export default ReleasesPage;

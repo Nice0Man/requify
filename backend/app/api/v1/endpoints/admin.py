@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
-from app.api.deps import get_db, get_admin_user
+from app.api.deps import get_db, get_admin_user, get_dashboard_admin_user
 from app.core.config import settings
 from app.models.user import User
 from app.schemas.auth import UserProfile
@@ -29,7 +29,7 @@ async def get_admin_users(
     skip: int = 0,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить список всех пользователей для администрирования.
@@ -49,7 +49,7 @@ async def get_admin_users(
 
 @router.get("/system-info", response_model=Dict[str, Any])
 async def get_system_info(
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить информацию о системе.
@@ -101,7 +101,7 @@ async def get_system_info(
 @router.get("/health", response_model=Dict[str, Any])
 async def health_check(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Проверить здоровье системы.
@@ -192,7 +192,7 @@ async def health_check(
 @router.get("/metrics", response_model=Dict[str, Any])
 async def get_metrics(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить метрики системы.
@@ -255,7 +255,7 @@ async def get_metrics(
 async def get_system_logs(
     level: str = "info",
     limit: int = 100,
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить системные логи.
@@ -337,7 +337,7 @@ async def get_system_logs(
 @router.get("/users-stats", response_model=Dict[str, Any])
 async def get_users_statistics(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить статистику пользователей.
@@ -408,7 +408,7 @@ async def get_users_statistics(
 @router.get("/projects-stats", response_model=Dict[str, Any])
 async def get_projects_statistics(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить статистику проектов.
@@ -586,7 +586,7 @@ async def create_backup(
 
 @router.get("/backups", response_model=List[Dict[str, Any]])
 async def get_backups(
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить список резервных копий.
@@ -741,7 +741,7 @@ async def get_audit_log(
     action: str = None,
     limit: int = 100,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(get_dashboard_admin_user),
 ):
     """
     Получить журнал аудита.

@@ -253,7 +253,7 @@ async def get_superuser(
     if not current_user.is_superuser:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="The user doesn't have enough privileges",
+            detail="Superuser privileges required",
         )
     return current_user
 
@@ -421,31 +421,93 @@ async def get_admin_write_user(
     return current_user
 
 
-# === Role-based Dependencies ===
+# === Additional Permission-Based Dependencies ===
+
+
+async def get_dashboard_read_user(
+    current_user: User = Security(get_current_user, scopes=["me"]),
+) -> User:
+    """
+    Зависимость для чтения данных дашборда.
+    Базовый доступ для всех авторизованных пользователей.
+    
+    Args:
+        current_user: Текущий пользователь
+        
+    Returns:
+        User: Пользователь с правами на чтение дашборда
+    """
+    return current_user
+
+
+async def get_dashboard_admin_user(
+    current_user: User = Security(get_current_user, scopes=["admin:read"]),
+) -> User:
+    """
+    Зависимость для доступа к административным данным дашборда.
+    
+    Args:
+        current_user: Текущий пользователь
+        
+    Returns:
+        User: Пользователь с правами на чтение админ данных
+    """
+    return current_user
+
+
+async def get_stats_read_user(
+    current_user: User = Security(get_current_user, scopes=["projects:read"]),
+) -> User:
+    """
+    Зависимость для чтения статистических данных.
+    
+    Args:
+        current_user: Текущий пользователь
+        
+    Returns:
+        User: Пользователь с правами на чтение статистики
+    """
+    return current_user
+
+
+async def get_export_user(
+    current_user: User = Security(get_current_user, scopes=["admin:read"]),
+) -> User:
+    """
+    Зависимость для экспорта данных.
+    
+    Args:
+        current_user: Текущий пользователь
+        
+    Returns:
+        User: Пользователь с правами на экспорт данных
+    """
+    return current_user
+
+
+# === Improved Admin User Validation ===
 
 
 async def get_admin_user(
     current_user: User = Security(get_current_user, scopes=["admin:write"]),
 ) -> User:
     """
-    Зависимость для администраторов и выше.
-    
-    Администраторы имеют широкие права управления системой.
+    Зависимость для проверки прав администратора с записью.
     
     Args:
-        current_user: Текущий пользователь
+        current_user: Текущий активный пользователь
         
     Returns:
-        User: Пользователь с ролью администратора или выше
+        User: Объект пользователя с правами администратора
         
     Raises:
-        HTTPException: Если у пользователя недостаточно прав
+        HTTPException: Если пользователь не является администратором
     """
-    allowed_roles = ["admin"]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    # Дополнительная проверка роли для критических операций
+    if not (current_user.is_superuser or current_user.role in ["admin", "manager"]):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Admin role or higher required.",
+            detail="Administrator privileges required for this operation",
         )
     return current_user
 

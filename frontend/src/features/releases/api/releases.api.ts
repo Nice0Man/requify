@@ -1,6 +1,13 @@
 import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
 
 export interface Release {
+  type: string;
+  requirements: never[];
+  change_log: never[];
+  dependencies: never[];
+  completion_percentage: number;
+  project_name: string;
+  created_by_name: string;
   id: number;
   name: string;
   version: string;
@@ -88,6 +95,8 @@ export enum ReleaseStatus {
   READY = "ready",
   PUBLISHED = "published",
   CANCELLED = "cancelled",
+  PLANNING = "PLANNING",
+  RELEASED = "RELEASED",
 }
 
 export class ReleasesApi {

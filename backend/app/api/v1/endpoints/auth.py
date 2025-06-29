@@ -807,20 +807,22 @@ def _get_user_scopes(user: User) -> list[str]:
             ]
         )
     elif user.role == "manager":
-        # Менеджер может управлять проектами и требованиями
+        # Менеджер может управлять проектами и требованиями, имеет доступ к админ панели для мониторинга
         scopes.extend(
             [
                 "users:read",
                 "projects:read",
                 "projects:write",
+                "projects:delete",  # Менеджеры могут удалять проекты
                 "requirements:read",
                 "requirements:write",
                 "requirements:delete",
                 "releases:read",
                 "releases:write",
+                "releases:delete",  # Менеджеры могут удалять релизы
                 "testing:read",
                 "testing:write",
-                "admin:read",
+                "admin:read",  # Менеджеры могут читать админ данные для мониторинга
             ]
         )
     elif user.role == "analyst":
@@ -836,7 +838,7 @@ def _get_user_scopes(user: User) -> list[str]:
             ]
         )
     elif user.role == "developer":
-        # Разработчик читает требования и работает с релизами
+        # Разработчик читает требования и работает с релизами, имеет доступ к админ панели для мониторинга
         scopes.extend(
             [
                 "projects:read",
@@ -844,6 +846,7 @@ def _get_user_scopes(user: User) -> list[str]:
                 "releases:read",
                 "releases:write",
                 "testing:read",
+                "admin:read",  # Разработчики могут читать админ данные для мониторинга системы
             ]
         )
     elif user.role == "tester":
@@ -858,10 +861,25 @@ def _get_user_scopes(user: User) -> list[str]:
                 "testing:execute",
             ]
         )
-    else:
-        # Пользователь по умолчанию (роль "user") имеет только права чтения
+    elif user.role == "viewer" or user.role == "user":
+        # Пользователь по умолчанию имеет только права чтения
         scopes.extend(
-            ["projects:read", "requirements:read", "releases:read", "testing:read"]
+            [
+                "projects:read", 
+                "requirements:read", 
+                "releases:read", 
+                "testing:read"
+            ]
+        )
+    else:
+        # Fallback для неизвестных ролей - только базовые права чтения
+        scopes.extend(
+            [
+                "projects:read", 
+                "requirements:read", 
+                "releases:read", 
+                "testing:read"
+            ]
         )
 
     return scopes
