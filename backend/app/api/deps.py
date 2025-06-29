@@ -512,13 +512,39 @@ async def get_admin_user(
     return current_user
 
 
+async def get_product_manager_user(
+    current_user: User = Security(get_current_user, scopes=["requirements:write", "projects:write"]),
+) -> User:
+    """
+    Зависимость для продуктовых менеджеров и выше.
+    
+    Продуктовые менеджеры управляют требованиями, проектами и релизами согласно ТЗ.
+    
+    Args:
+        current_user: Текущий пользователь
+        
+    Returns:
+        User: Пользователь с ролью продуктового менеджера или выше
+        
+    Raises:
+        HTTPException: Если у пользователя недостаточно прав
+    """
+    allowed_roles = ["product_manager", "admin"]
+    if not (current_user.is_superuser or current_user.role in allowed_roles):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Product Manager role or higher required.",
+        )
+    return current_user
+
+
 async def get_manager_user(
-    current_user: User = Security(get_current_user, scopes=["admin:read"]),
+    current_user: User = Security(get_current_user, scopes=["projects:write"]),
 ) -> User:
     """
     Зависимость для менеджеров и выше.
     
-    Менеджеры могут управлять проектами и требованиями.
+    Менеджеры управляют проектами и требованиями.
     
     Args:
         current_user: Текущий пользователь
@@ -529,7 +555,7 @@ async def get_manager_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["manager", "admin"]
+    allowed_roles = ["manager", "product_manager", "admin"]
     if not (current_user.is_superuser or current_user.role in allowed_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -538,13 +564,39 @@ async def get_manager_user(
     return current_user
 
 
+async def get_senior_developer_user(
+    current_user: User = Security(get_current_user, scopes=["releases:write"]),
+) -> User:
+    """
+    Зависимость для старших разработчиков и выше.
+    
+    Старшие разработчики имеют расширенные права по работе с релизами.
+    
+    Args:
+        current_user: Текущий пользователь
+        
+    Returns:
+        User: Пользователь с ролью старшего разработчика или выше
+        
+    Raises:
+        HTTPException: Если у пользователя недостаточно прав
+    """
+    allowed_roles = ["senior_developer", "product_manager", "manager", "admin"]
+    if not (current_user.is_superuser or current_user.role in allowed_roles):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Senior Developer role or higher required.",
+        )
+    return current_user
+
+
 async def get_analyst_user(
-    current_user: User = Security(get_current_user, scopes=["requirements:write"]),
+    current_user: User = Security(get_current_user, scopes=["me"]),
 ) -> User:
     """
     Зависимость для аналитиков и выше.
     
-    Аналитики работают с требованиями и создают спецификации.
+    Аналитики имеют только права чтения согласно ТЗ.
     
     Args:
         current_user: Текущий пользователь
@@ -555,7 +607,7 @@ async def get_analyst_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["analyst", "manager", "admin"]
+    allowed_roles = ["analyst", "developer", "senior_developer", "tester", "product_manager", "manager", "admin"]
     if not (current_user.is_superuser or current_user.role in allowed_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -581,7 +633,7 @@ async def get_developer_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["developer", "analyst", "manager", "admin"]
+    allowed_roles = ["developer", "senior_developer", "product_manager", "manager", "admin"]
     if not (current_user.is_superuser or current_user.role in allowed_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -607,7 +659,7 @@ async def get_tester_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["tester", "developer", "analyst", "manager", "admin"]
+    allowed_roles = ["tester", "developer", "senior_developer", "product_manager", "manager", "admin"]
     if not (current_user.is_superuser or current_user.role in allowed_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

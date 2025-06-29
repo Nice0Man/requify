@@ -158,12 +158,13 @@ export interface RevokeSessionRequest {
 
 export enum UserRole {
   ADMIN = 'admin',
+  PRODUCT_MANAGER = 'product_manager',
   MANAGER = 'manager',
-  ANALYST = 'analyst',
+  SENIOR_DEVELOPER = 'senior_developer',
   DEVELOPER = 'developer',
+  ANALYST = 'analyst',
   TESTER = 'tester',
-  VIEWER = 'viewer',
-  GUEST = 'guest'
+  VIEWER = 'viewer'
 }
 
 export interface NotificationPreferences {

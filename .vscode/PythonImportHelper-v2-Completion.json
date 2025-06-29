@@ -11308,7 +11308,7 @@
         "kind": 6,
         "importPath": "backend.app.models.constants",
         "description": "backend.app.models.constants",
-        "peekOfCode": "class Priority(str, Enum):\n    \"\"\"Priority levels\"\"\"\n    LOW = \"low\"\n    MEDIUM = \"medium\"\n    HIGH = \"high\"\n    CRITICAL = \"critical\"\nclass UserRole(str, Enum):\n    \"\"\"User role options\"\"\"\n    ADMIN = \"admin\"\n    MANAGER = \"manager\"",
+        "peekOfCode": "class Priority(str, Enum):\n    \"\"\"Priority levels\"\"\"\n    LOW = \"low\"\n    MEDIUM = \"medium\"\n    HIGH = \"high\"\n    CRITICAL = \"critical\"\nclass UserRole(str, Enum):\n    \"\"\"User role options\"\"\"\n    ADMIN = \"admin\"\n    PRODUCT_MANAGER = \"product_manager\"",
         "detail": "backend.app.models.constants",
         "documentation": {}
     },
@@ -11317,7 +11317,7 @@
         "kind": 6,
         "importPath": "backend.app.models.constants",
         "description": "backend.app.models.constants",
-        "peekOfCode": "class UserRole(str, Enum):\n    \"\"\"User role options\"\"\"\n    ADMIN = \"admin\"\n    MANAGER = \"manager\"\n    ANALYST = \"analyst\"\n    DEVELOPER = \"developer\"\n    TESTER = \"tester\"\n    USER = \"user\"\nclass NotificationType(str, Enum):\n    \"\"\"Notification types\"\"\"",
+        "peekOfCode": "class UserRole(str, Enum):\n    \"\"\"User role options\"\"\"\n    ADMIN = \"admin\"\n    PRODUCT_MANAGER = \"product_manager\"\n    MANAGER = \"manager\"\n    SENIOR_DEVELOPER = \"senior_developer\"\n    ANALYST = \"analyst\"\n    DEVELOPER = \"developer\"\n    TESTER = \"tester\"\n    USER = \"user\"",
         "detail": "backend.app.models.constants",
         "documentation": {}
     },

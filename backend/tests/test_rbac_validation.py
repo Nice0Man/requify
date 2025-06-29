@@ -32,6 +32,13 @@ USER_ROLES_TEST_DATA = {
         "role": "admin",
         "is_superuser": False,
     },
+    "product_manager": {
+        "email": "product_manager@test.com",
+        "username": "product_manager", 
+        "password": "pm123",
+        "role": "product_manager",
+        "is_superuser": False,
+    },
     "manager": {
         "email": "manager@test.com",
         "username": "manager", 
@@ -39,11 +46,11 @@ USER_ROLES_TEST_DATA = {
         "role": "manager",
         "is_superuser": False,
     },
-    "analyst": {
-        "email": "analyst@test.com",
-        "username": "analyst",
-        "password": "analyst123", 
-        "role": "analyst",
+    "senior_developer": {
+        "email": "senior_developer@test.com",
+        "username": "senior_developer",
+        "password": "senior_dev123",
+        "role": "senior_developer", 
         "is_superuser": False,
     },
     "developer": {
@@ -51,6 +58,13 @@ USER_ROLES_TEST_DATA = {
         "username": "developer",
         "password": "developer123",
         "role": "developer", 
+        "is_superuser": False,
+    },
+    "analyst": {
+        "email": "analyst@test.com",
+        "username": "analyst",
+        "password": "analyst123", 
+        "role": "analyst",
         "is_superuser": False,
     },
     "tester": {
@@ -88,20 +102,31 @@ EXPECTED_SCOPES_BY_ROLE = {
         "testing:read", "testing:write", "testing:execute",
         "admin:read", "admin:write"
     ],
+    "product_manager": [
+        "me", "users:read", 
+        "projects:read", "projects:write", "projects:delete",
+        "requirements:read", "requirements:write", "requirements:delete",
+        "releases:read", "releases:write", "releases:delete",
+        "testing:read", "admin:read"
+    ],
     "manager": [
-        "me", "users:read", "projects:read", "projects:write", "projects:delete",
+        "me", "users:read", 
+        "projects:read", "projects:write", "projects:delete",
         "requirements:read", "requirements:write", "requirements:delete",
         "releases:read", "releases:write", "releases:delete",
         "testing:read", "testing:write", "admin:read"
     ],
-    "analyst": [
-        "me", "projects:read", "projects:write", 
-        "requirements:read", "requirements:write",
-        "releases:read", "testing:read"
+    "senior_developer": [
+        "me", "projects:read", "requirements:read",
+        "releases:read", "releases:write", "releases:delete",
+        "testing:read", "testing:write", "admin:read"
     ],
     "developer": [
         "me", "projects:read", "requirements:read",
         "releases:read", "releases:write", "testing:read", "admin:read"
+    ],
+    "analyst": [
+        "me", "projects:read", "requirements:read", "releases:read", "testing:read"
     ],
     "tester": [
         "me", "projects:read", "requirements:read", "releases:read",
@@ -231,7 +256,7 @@ class TestRBACPermissions:
         """Test admin panel access permissions."""
         
         # Test users who SHOULD have admin access
-        admin_users = ["superuser", "admin", "manager", "developer"]
+        admin_users = ["superuser", "admin", "product_manager", "manager", "senior_developer", "developer"]
         for role in admin_users:
             user = test_users[role]
             headers = auth_headers(user)
@@ -258,8 +283,8 @@ class TestRBACPermissions:
             response = await client.get("/api/v1/projects/", headers=headers)
             assert response.status_code in [200, 404], f"Role {role_name} should have projects:read"
 
-        # Test write permissions - only certain roles should have this
-        write_roles = ["superuser", "admin", "manager", "analyst"]
+        # Test write permissions - только PM, Manager и Admin согласно ТЗ
+        write_roles = ["superuser", "admin", "product_manager", "manager"]
         for role in write_roles:
             user = test_users[role]
             headers = auth_headers(user)
@@ -271,9 +296,9 @@ class TestRBACPermissions:
             })
             assert response.status_code in [201, 422, 400], f"Role {role} should have projects:write"
 
-        # Test delete permissions - only admin roles should have this  
-        delete_roles = ["superuser", "admin", "manager"]
-        non_delete_roles = ["analyst", "developer", "tester", "viewer"]
+        # Test delete permissions - только PM, Manager и Admin
+        delete_roles = ["superuser", "admin", "product_manager", "manager"]
+        non_delete_roles = ["senior_developer", "developer", "analyst", "tester", "viewer"]
         
         for role in non_delete_roles:
             user = test_users[role]
@@ -286,8 +311,8 @@ class TestRBACPermissions:
     async def test_requirements_permissions(self, client: AsyncClient, test_users, auth_headers):
         """Test requirements-related permissions."""
         
-        # Test write permissions
-        write_roles = ["superuser", "admin", "manager", "analyst"]
+        # Test write permissions - только PM, Manager и Admin согласно ТЗ
+        write_roles = ["superuser", "admin", "product_manager", "manager"]
         for role in write_roles:
             user = test_users[role]
             headers = auth_headers(user)
@@ -299,8 +324,8 @@ class TestRBACPermissions:
             })
             assert response.status_code in [201, 422, 400], f"Role {role} should have requirements:write"
 
-        # Test roles that should NOT have write access
-        no_write_roles = ["developer", "tester", "viewer"]
+        # Test roles that should NOT have write access - analyst теперь только читает
+        no_write_roles = ["senior_developer", "developer", "analyst", "tester", "viewer"]
         for role in no_write_roles:
             user = test_users[role]
             headers = auth_headers(user)
@@ -316,8 +341,8 @@ class TestRBACPermissions:
     async def test_releases_permissions(self, client: AsyncClient, test_users, auth_headers):
         """Test releases-related permissions."""
         
-        # Test write permissions
-        write_roles = ["superuser", "admin", "manager", "developer"]
+        # Test write permissions - PM, Manager, Senior Developer, Developer
+        write_roles = ["superuser", "admin", "product_manager", "manager", "senior_developer", "developer"]
         for role in write_roles:
             user = test_users[role]
             headers = auth_headers(user)
@@ -447,6 +472,62 @@ class TestRBACPermissions:
         response = await client.get("/api/v1/admin/users", headers=headers)
         assert response.status_code == 401, "Viewer should not have admin:read permission"
 
+    @pytest.mark.asyncio
+    async def test_product_manager_permissions(self, client: AsyncClient, test_users, auth_headers):
+        """Test Product Manager permissions according to TZ."""
+        
+        pm_user = test_users["product_manager"]
+        headers = auth_headers(pm_user)
+        
+        # PM should be able to create projects (function 13 from TZ)
+        response = await client.post("/api/v1/projects/", headers=headers, json={
+            "name": "PM Test Project",
+            "code": "PMTEST001"
+        })
+        assert response.status_code in [201, 422, 400], "PM should create projects"
+        
+        # PM should be able to create requirements (function 1 from TZ)
+        response = await client.post("/api/v1/requirements/", headers=headers, json={
+            "title": "PM Test Requirement",
+            "description": "Test requirement from PM",
+            "project_id": 1
+        })
+        assert response.status_code in [201, 422, 400], "PM should create requirements"
+        
+        # PM should be able to create releases (function 9 from TZ)
+        response = await client.post("/api/v1/releases/", headers=headers, json={
+            "name": "PM Test Release",
+            "version": "1.0.0",
+            "project_id": 1
+        })
+        assert response.status_code in [201, 422, 400], "PM should create releases"
+
+    @pytest.mark.asyncio
+    async def test_analyst_read_only_permissions(self, client: AsyncClient, test_users, auth_headers):
+        """Test that Analyst only has read permissions according to TZ."""
+        
+        analyst_user = test_users["analyst"]
+        headers = auth_headers(analyst_user)
+        
+        # Analyst should NOT be able to create projects
+        response = await client.post("/api/v1/projects/", headers=headers, json={
+            "name": "Analyst Test Project",
+            "code": "ANALTEST001"
+        })
+        assert response.status_code == 401, "Analyst should NOT create projects"
+        
+        # Analyst should NOT be able to create requirements  
+        response = await client.post("/api/v1/requirements/", headers=headers, json={
+            "title": "Analyst Test Requirement",
+            "description": "Test requirement from analyst",
+            "project_id": 1
+        })
+        assert response.status_code == 401, "Analyst should NOT create requirements"
+        
+        # But should be able to read
+        response = await client.get("/api/v1/projects/", headers=headers)
+        assert response.status_code in [200, 404], "Analyst should read projects"
+
 
 @pytest.mark.asyncio
 async def test_permission_hierarchy():
@@ -457,28 +538,60 @@ async def test_permission_hierarchy():
     # Create mock users
     superuser = User(email="super@test.com", role="admin", is_superuser=True)
     admin = User(email="admin@test.com", role="admin", is_superuser=False)
+    product_manager = User(email="pm@test.com", role="product_manager", is_superuser=False)
     manager = User(email="manager@test.com", role="manager", is_superuser=False)
+    senior_developer = User(email="senior_dev@test.com", role="senior_developer", is_superuser=False)
+    developer = User(email="dev@test.com", role="developer", is_superuser=False)
+    analyst = User(email="analyst@test.com", role="analyst", is_superuser=False)
     viewer = User(email="viewer@test.com", role="viewer", is_superuser=False)
     
-    # Test hierarchy: superuser > admin > manager > viewer
+    # Test hierarchy: superuser > admin > product_manager > manager > senior_developer > developer > analyst/tester > viewer
     superuser_scopes = set(_get_user_scopes(superuser))
     admin_scopes = set(_get_user_scopes(admin))
+    pm_scopes = set(_get_user_scopes(product_manager))
     manager_scopes = set(_get_user_scopes(manager))
+    senior_dev_scopes = set(_get_user_scopes(senior_developer))
+    developer_scopes = set(_get_user_scopes(developer))
+    analyst_scopes = set(_get_user_scopes(analyst))
     viewer_scopes = set(_get_user_scopes(viewer))
     
     # Superuser should have all permissions
     assert "system:admin" in superuser_scopes
     assert admin_scopes.issubset(superuser_scopes)
     
-    # Admin should have more permissions than manager
+    # Admin should have more permissions than product manager
     assert "admin:write" in admin_scopes
-    assert "admin:write" not in manager_scopes
-    assert manager_scopes.issubset(admin_scopes | {"admin:write"})  # Allow for missing admin:write
+    assert "admin:write" not in pm_scopes
     
-    # Manager should have more permissions than viewer
-    assert "projects:write" in manager_scopes
-    assert "projects:write" not in viewer_scopes
-    assert viewer_scopes.issubset(manager_scopes)
+    # Product Manager should have core management permissions
+    assert "requirements:write" in pm_scopes
+    assert "projects:write" in pm_scopes
+    assert "releases:write" in pm_scopes
+    
+    # Manager should have similar permissions to PM but with testing:write
+    assert "testing:write" in manager_scopes
+    assert "testing:write" not in pm_scopes
+    
+    # Senior Developer should have more permissions than regular developer
+    assert "releases:delete" in senior_dev_scopes
+    assert "releases:delete" not in developer_scopes
+    assert "testing:write" in senior_dev_scopes
+    assert "testing:write" not in developer_scopes
+    
+    # Developer should have releases:write but not delete
+    assert "releases:write" in developer_scopes
+    assert "releases:delete" not in developer_scopes
+    
+    # Analyst should only have read permissions (per TZ)
+    assert "projects:write" not in analyst_scopes
+    assert "requirements:write" not in analyst_scopes
+    assert "projects:read" in analyst_scopes
+    assert "requirements:read" in analyst_scopes
+    
+    # Viewer should have minimal permissions
+    assert viewer_scopes.issubset(analyst_scopes)
+    assert "projects:read" in viewer_scopes
+    assert "requirements:read" in viewer_scopes
 
 
 if __name__ == "__main__":

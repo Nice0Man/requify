@@ -71,9 +71,11 @@ export const TEST_STATUSES = {
 
 export const USER_ROLES = {
   ADMIN: 'admin',
-  PROJECT_MANAGER: 'project_manager',
-  BUSINESS_ANALYST: 'business_analyst',
+  PRODUCT_MANAGER: 'product_manager',
+  MANAGER: 'manager',
+  SENIOR_DEVELOPER: 'senior_developer',
   DEVELOPER: 'developer',
+  ANALYST: 'analyst',
   TESTER: 'tester',
   VIEWER: 'viewer',
 } as const;

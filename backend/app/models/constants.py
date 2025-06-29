@@ -49,7 +49,9 @@ class UserRole(str, Enum):
     """User role options"""
 
     ADMIN = "admin"
+    PRODUCT_MANAGER = "product_manager"
     MANAGER = "manager"
+    SENIOR_DEVELOPER = "senior_developer"
     ANALYST = "analyst"
     DEVELOPER = "developer"
     TESTER = "tester"

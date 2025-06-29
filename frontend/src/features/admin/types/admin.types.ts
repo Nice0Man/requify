@@ -112,11 +112,14 @@ export interface UserUpdate {
 }
 
 export enum UserRole {
-  ANALYST = 'analyst',
+  ADMIN = 'admin',
+  PRODUCT_MANAGER = 'product_manager',
+  MANAGER = 'manager',
+  SENIOR_DEVELOPER = 'senior_developer',
   DEVELOPER = 'developer',
+  ANALYST = 'analyst',
   TESTER = 'tester',
-  VIEWER = 'viewer',
-  GUEST = 'guest'
+  VIEWER = 'viewer'
 }
 
 export interface UserActivity {

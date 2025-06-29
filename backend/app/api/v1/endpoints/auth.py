@@ -806,6 +806,24 @@ def _get_user_scopes(user: User) -> list[str]:
                 "admin:write",
             ]
         )
+    elif user.role == "product_manager":
+        # Продуктовый менеджер - ключевая роль по ТЗ для управления требованиями и релизами
+        scopes.extend(
+            [
+                "users:read",
+                "projects:read",
+                "projects:write", 
+                "projects:delete",  # PM создает и удаляет проекты по ТЗ
+                "requirements:read",
+                "requirements:write",
+                "requirements:delete",  # PM управляет требованиями по ТЗ
+                "releases:read",
+                "releases:write", 
+                "releases:delete",  # PM формирует релизы по ТЗ
+                "testing:read",
+                "admin:read",  # Доступ к мониторингу
+            ]
+        )
     elif user.role == "manager":
         # Менеджер может управлять проектами и требованиями, имеет доступ к админ панели для мониторинга
         scopes.extend(
@@ -825,16 +843,18 @@ def _get_user_scopes(user: User) -> list[str]:
                 "admin:read",  # Менеджеры могут читать админ данные для мониторинга
             ]
         )
-    elif user.role == "analyst":
-        # Аналитик работает с требованиями и может создавать проекты
+    elif user.role == "senior_developer":
+        # Старший разработчик - расширенные права по сравнению с обычным разработчиком
         scopes.extend(
             [
                 "projects:read",
-                "projects:write",
                 "requirements:read",
-                "requirements:write",
                 "releases:read",
+                "releases:write",
+                "releases:delete",  # Старший разработчик может удалять релизы
                 "testing:read",
+                "testing:write",  # Может участвовать в планировании тестирования
+                "admin:read",  # Доступ к мониторингу системы
             ]
         )
     elif user.role == "developer":
@@ -847,6 +867,16 @@ def _get_user_scopes(user: User) -> list[str]:
                 "releases:write",
                 "testing:read",
                 "admin:read",  # Разработчики могут читать админ данные для мониторинга системы
+            ]
+        )
+    elif user.role == "analyst":
+        # Аналитик только читает данные согласно ТЗ (убираем write права)
+        scopes.extend(
+            [
+                "projects:read",     # Только чтение проектов
+                "requirements:read", # Только чтение требований
+                "releases:read",
+                "testing:read",
             ]
         )
     elif user.role == "tester":
