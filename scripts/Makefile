@@ -25,6 +25,8 @@ help:	## Show this help message
 	@echo "  dev-stop           - Stop development environment"
 	@echo "  dev-clean          - Stop and remove development containers with volumes"
 	@echo "  dev-logs           - Show development logs"
+	@echo "  restart-frontend   - Restart frontend service"
+	@echo "  restart-backend    - Restart backend service"
 	@echo ""
 	@echo "DATABASE:"
 	@echo "  db-migrate         - Run database migrations"
@@ -141,6 +143,16 @@ dev-stop:	## Stop development environment
 dev-clean:	## Stop and remove development containers with volumes
 	@echo "Cleaning development environment..."
 	cd ../deploy/docker && docker compose -f docker-compose.dev.yml down -v --remove-orphans
+
+restart-frontend:	## Restart frontend service
+	@echo "Restarting frontend service..."
+	cd ../deploy/docker && docker compose -f docker-compose.dev.yml restart frontend
+	@echo "Frontend service restarted!"
+
+restart-backend:	## Restart backend service
+	@echo "Restarting backend service..."
+	cd ../deploy/docker && docker compose -f docker-compose.dev.yml restart backend
+	@echo "Backend service restarted!"
 
 # =============================================================================
 # Docker Production

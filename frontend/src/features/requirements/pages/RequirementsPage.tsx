@@ -153,9 +153,12 @@ const RequirementsPage: React.FC = () => {
       };
 
       const response = await requirementsApi.getRequirements(params);
-      setRequirements(response.data.items);
-      setTotalCount(response.data.total);
+      setRequirements(response.data?.items || []);
+      setTotalCount(response.data?.total || 0);
     } catch (error: any) {
+      console.error('Failed to load requirements:', error);
+      setRequirements([]); // Ensure array is never undefined
+      setTotalCount(0);
       toast.error(error.message || 'Failed to load requirements');
     } finally {
       setLoading(false);
@@ -808,7 +811,7 @@ const RequirementsPage: React.FC = () => {
       {/* Data Grid */}
       <Paper sx={{ height: 600 }}>
         <DataGrid
-          rows={requirements}
+          rows={requirements || []}
           columns={columns}
           loading={loading}
           pagination

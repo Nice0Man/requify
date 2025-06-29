@@ -190,9 +190,12 @@ const TestingPage: React.FC = () => {
       };
 
       const response = await testingApi.getTestPlans(params);
-      setTestPlans(response.data.items);
-      setTestPlanCount(response.data.total);
+      setTestPlans(response.data?.items || []);
+      setTestPlanCount(response.data?.total || 0);
     } catch (error: any) {
+      console.error('Failed to load test plans:', error);
+      setTestPlans([]); // Ensure array is never undefined
+      setTestPlanCount(0);
       toast.error(error.message || 'Failed to load test plans');
     } finally {
       setTestPlanLoading(false);
@@ -214,9 +217,12 @@ const TestingPage: React.FC = () => {
       };
 
       const response = await testingApi.getTestCases(params);
-      setTestCases(response.data.items);
-      setTestCaseCount(response.data.total);
+      setTestCases(response.data?.items || []);
+      setTestCaseCount(response.data?.total || 0);
     } catch (error: any) {
+      console.error('Failed to load test cases:', error);
+      setTestCases([]); // Ensure array is never undefined
+      setTestCaseCount(0);
       toast.error(error.message || 'Failed to load test cases');
     } finally {
       setTestCaseLoading(false);
@@ -237,9 +243,12 @@ const TestingPage: React.FC = () => {
       };
 
       const response = await testingApi.getTestExecutions(params);
-      setTestExecutions(response.data.items);
-      setTestExecutionCount(response.data.total);
+      setTestExecutions(response.data?.items || []);
+      setTestExecutionCount(response.data?.total || 0);
     } catch (error: any) {
+      console.error('Failed to load test executions:', error);
+      setTestExecutions([]); // Ensure array is never undefined
+      setTestExecutionCount(0);
       toast.error(error.message || 'Failed to load test executions');
     } finally {
       setTestExecutionLoading(false);
@@ -940,7 +949,7 @@ const TestingPage: React.FC = () => {
       <TabPanel value={tabValue} index={0}>
         <Paper sx={{ height: 600 }}>
           <DataGrid
-            rows={testPlans}
+            rows={testPlans || []}
             columns={testPlanColumns}
             loading={testPlanLoading}
             pagination
@@ -966,7 +975,7 @@ const TestingPage: React.FC = () => {
       <TabPanel value={tabValue} index={1}>
         <Paper sx={{ height: 600 }}>
           <DataGrid
-            rows={testCases}
+            rows={testCases || []}
             columns={testCaseColumns}
             loading={testCaseLoading}
             pagination
@@ -992,7 +1001,7 @@ const TestingPage: React.FC = () => {
       <TabPanel value={tabValue} index={2}>
         <Paper sx={{ height: 600 }}>
           <DataGrid
-            rows={testExecutions}
+            rows={testExecutions || []}
             columns={testExecutionColumns}
             loading={testExecutionLoading}
             pagination

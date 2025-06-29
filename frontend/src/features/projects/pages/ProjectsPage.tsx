@@ -82,6 +82,7 @@ const ProjectsPage: React.FC = () => {
   // State
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(25);
@@ -119,6 +120,8 @@ const ProjectsPage: React.FC = () => {
   const loadProjects = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const params: ProjectListParams = {
         skip: page * pageSize,
         limit: pageSize,
@@ -134,9 +137,18 @@ const ProjectsPage: React.FC = () => {
       };
 
       const response = await projectsApi.getProjects(params);
-      setProjects(response.data.items);
-      setTotalCount(response.data.total);
+      
+      // Ensure we always set an array, never undefined
+      const items = response.data?.items || [];
+      const total = response.data?.total || 0;
+      
+      setProjects(items);
+      setTotalCount(total);
     } catch (error: any) {
+      console.error('Failed to load projects:', error);
+      setError(error.message || 'Failed to load projects');
+      setProjects([]); // Ensure projects is always an array
+      setTotalCount(0);
       toast.error(error.message || 'Failed to load projects');
     } finally {
       setLoading(false);
@@ -589,7 +601,7 @@ const ProjectsPage: React.FC = () => {
                     Active Projects
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {projects?.filter(p => p.status === 'active').length || 0}
+                    {(projects || []).filter(p => p.status === 'active').length}
                   </Typography>
                 </Box>
                 <CheckCircleIcon color="success" sx={{ fontSize: 40 }} />
@@ -606,7 +618,7 @@ const ProjectsPage: React.FC = () => {
                     Completed
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {projects?.filter(p => p.status === 'completed').length || 0}
+                    {(projects || []).filter(p => p.status === 'completed').length}
                   </Typography>
                 </Box>
                 <CheckCircleIcon color="primary" sx={{ fontSize: 40 }} />
@@ -623,7 +635,7 @@ const ProjectsPage: React.FC = () => {
                     At Risk
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {projects?.filter(p => getProjectHealth(p) === 'warning' || getProjectHealth(p) === 'error').length || 0}
+                    {(projects || []).filter(p => getProjectHealth(p) === 'warning' || getProjectHealth(p) === 'error').length}
                   </Typography>
                 </Box>
                 <ScheduleIcon color="warning" sx={{ fontSize: 40 }} />
@@ -762,10 +774,23 @@ const ProjectsPage: React.FC = () => {
         </Paper>
       )}
 
+      {/* Error State */}
+      {error && !loading && (
+        <Paper sx={{ p: 3, mb: 2 }}>
+          <Alert severity="error" action={
+            <Button size="small" onClick={loadProjects}>
+              Retry
+            </Button>
+          }>
+            {error}
+          </Alert>
+        </Paper>
+      )}
+
       {/* Data Grid */}
       <Paper sx={{ height: 600 }}>
         <DataGrid
-          rows={projects}
+          rows={projects || []} // Ensure always an array
           columns={columns}
           loading={loading}
           pagination
@@ -795,6 +820,40 @@ const ProjectsPage: React.FC = () => {
               backgroundColor: 'action.hover',
             },
           }}
+          // Add error handling for empty state
+          noRowsOverlay={() => (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              height="100%"
+              p={3}
+            >
+              <ProjectIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary" gutterBottom>
+                {error ? 'Failed to load projects' : loading ? 'Loading projects...' : 'No projects found'}
+              </Typography>
+              {!loading && !error && (
+                <Typography variant="body2" color="text.secondary" align="center">
+                  {filters.search || activeFiltersCount > 0 
+                    ? 'Try adjusting your filters or search terms.'
+                    : 'Get started by creating your first project.'
+                  }
+                </Typography>
+              )}
+              {!loading && !error && !filters.search && activeFiltersCount === 0 && (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => navigate('/projects/create')}
+                  sx={{ mt: 2 }}
+                >
+                  Create Project
+                </Button>
+              )}
+            </Box>
+          )}
         />
       </Paper>
 
