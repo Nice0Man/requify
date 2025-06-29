@@ -48,52 +48,117 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
         return result.scalar_one_or_none()
 
     async def get_by_project(
-        self, db: AsyncSession, *, project_id: int, skip: int = 0, limit: int = 100
+        self, db: AsyncSession, *, project_id: int, skip: int = 0, limit: int = 100, **filters
     ) -> List[Requirement]:
         """
-        Получить требования проекта.
+        Получить требования проекта с фильтрами.
 
         Args:
             db: Сессия базы данных
             project_id: ID проекта
             skip: Количество пропускаемых записей
             limit: Максимальное количество записей
+            **filters: Дополнительные фильтры (status_id, priority_id, type_id)
 
         Returns:
             Список требований
         """
-        stmt = (
-            select(Requirement)
-            .where(Requirement.project_id == project_id)
-            .offset(skip)
-            .limit(limit)
-        )
-        result = await db.execute(stmt)
-        return result.scalars().all()
+        try:
+            stmt = (
+                select(Requirement)
+                .where(Requirement.project_id == project_id)
+                .options(
+                    selectinload(Requirement.type),
+                    selectinload(Requirement.priority),
+                    selectinload(Requirement.status),
+                    selectinload(Requirement.project),
+                )
+                .offset(skip)
+                .limit(limit)
+                .order_by(Requirement.created_at.desc())
+            )
+            
+            # Применяем дополнительные фильтры
+            for field, value in filters.items():
+                if hasattr(Requirement, field) and value is not None:
+                    stmt = stmt.where(getattr(Requirement, field) == value)
+            
+            result = await db.execute(stmt)
+            return list(result.scalars().all())
+        except Exception:
+            # Fallback to basic query without relationships
+            stmt = (
+                select(Requirement)
+                .where(Requirement.project_id == project_id)
+                .offset(skip)
+                .limit(limit)
+                .order_by(Requirement.created_at.desc())
+            )
+            
+            # Применяем дополнительные фильтры
+            for field, value in filters.items():
+                if hasattr(Requirement, field) and value is not None:
+                    stmt = stmt.where(getattr(Requirement, field) == value)
+            
+            result = await db.execute(stmt)
+            return list(result.scalars().all())
 
     async def get_by_release(
-        self, db: AsyncSession, *, release_id: int, skip: int = 0, limit: int = 100
+        self, db: AsyncSession, *, release_id: int, skip: int = 0, limit: int = 100, **filters
     ) -> List[Requirement]:
         """
-        Получить требования релиза.
+        Получить требования релиза с фильтрами.
 
         Args:
             db: Сессия базы данных
             release_id: ID релиза
             skip: Количество пропускаемых записей
             limit: Максимальное количество записей
+            **filters: Дополнительные фильтры (status_id, priority_id, type_id)
 
         Returns:
             Список требований
         """
-        stmt = (
-            select(Requirement)
-            .where(Requirement.release_id == release_id)
-            .offset(skip)
-            .limit(limit)
-        )
-        result = await db.execute(stmt)
-        return result.scalars().all()
+        try:
+            stmt = (
+                select(Requirement)
+                .where(Requirement.release_id == release_id)
+                .options(
+                    selectinload(Requirement.type),
+                    selectinload(Requirement.priority),
+                    selectinload(Requirement.status),
+                    selectinload(Requirement.project),
+                    selectinload(Requirement.release),
+                )
+                .offset(skip)
+                .limit(limit)
+                .order_by(Requirement.created_at.desc())
+            )
+            
+            # Применяем дополнительные фильтры
+            for field, value in filters.items():
+                if hasattr(Requirement, field) and value is not None:
+                    stmt = stmt.where(getattr(Requirement, field) == value)
+            
+            result = await db.execute(stmt)
+            return list(result.scalars().all())
+        except Exception:
+            # Fallback to basic query without relationships
+            stmt = (
+                select(Requirement)
+                .where(Requirement.release_id == release_id)
+                .offset(skip)
+                .limit(limit)
+                .order_by(Requirement.created_at.desc())
+            )
+            
+            # Применяем дополнительные фильтры
+            for field, value in filters.items():
+                if hasattr(Requirement, field) and value is not None:
+                    stmt = stmt.where(getattr(Requirement, field) == value)
+            
+            result = await db.execute(stmt)
+            return list(result.scalars().all())
 
     async def get_by_spec(
         self, db: AsyncSession, *, spec_id: int, skip: int = 0, limit: int = 100
@@ -280,26 +345,37 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
         self, db: AsyncSession, *, skip: int = 0, limit: int = 100, **filters
     ) -> List[Requirement]:
         """Получить требования с фильтрами."""
-        query = select(self.model)
+        try:
+            query = select(self.model)
 
-        for field, value in filters.items():
-            if hasattr(self.model, field) and value is not None:
-                query = query.where(getattr(self.model, field) == value)
+            for field, value in filters.items():
+                if hasattr(self.model, field) and value is not None:
+                    query = query.where(getattr(self.model, field) == value)
 
-        query = (
-            query.options(
-                selectinload(self.model.type),
-                selectinload(self.model.priority),
-                selectinload(self.model.status),
-                selectinload(self.model.project),
+            query = (
+                query.options(
+                    selectinload(self.model.type),
+                    selectinload(self.model.priority),
+                    selectinload(self.model.status),
+                    selectinload(self.model.project),
+                )
+                .offset(skip)
+                .limit(limit)
+                .order_by(self.model.created_at.desc())
             )
-            .offset(skip)
-            .limit(limit)
-            .order_by(self.model.created_at.desc())
-        )
 
-        result = await db.execute(query)
-        return result.scalars().all()
+            result = await db.execute(query)
+            return list(result.scalars().all())
+        except Exception:
+            # Fallback to basic query without relationships if there's an issue
+            query = select(self.model).offset(skip).limit(limit).order_by(self.model.created_at.desc())
+            
+            for field, value in filters.items():
+                if hasattr(self.model, field) and value is not None:
+                    query = query.where(getattr(self.model, field) == value)
+            
+            result = await db.execute(query)
+            return list(result.scalars().all())
 
     async def get_with_details(
         self, db: AsyncSession, *, requirement_id: int

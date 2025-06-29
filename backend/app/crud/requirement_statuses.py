@@ -27,7 +27,15 @@ class CRUDRequirementStatus(
         """Get all active requirement statuses"""
         query = select(self.model).offset(skip).limit(limit).order_by(self.model.name)
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
+
+    async def get_multi(
+        self, db: AsyncSession, *, skip: int = 0, limit: int = 100
+    ) -> List[RequirementStatus]:
+        """Get multiple requirement statuses"""
+        query = select(self.model).offset(skip).limit(limit).order_by(self.model.name)
+        result = await db.execute(query)
+        return list(result.scalars().all())
 
 
 requirement_status = CRUDRequirementStatus(RequirementStatus)

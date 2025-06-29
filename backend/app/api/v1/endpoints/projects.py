@@ -4,7 +4,7 @@ API эндпоинты для работы с проектами.
 Включает операции CRUD для проектов и управление их жизненным циклом.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -196,22 +196,22 @@ async def get_project_requirements(
     project_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    status_id: Optional[int] = Query(None, description="Фильтр по статусу"),
-    type_id: Optional[int] = Query(None, description="Фильтр по типу"),
-    priority_id: Optional[int] = Query(None, description="Фильтр по приоритету"),
+    status_id: Optional[int] = Query(None, description="Фильтр по ID статуса"),
+    priority_id: Optional[int] = Query(None, description="Фильтр по ID приоритета"),
+    type_id: Optional[int] = Query(None, description="Фильтр по ID типа"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_projects_read_user),
 ):
     """
-    Получить требования проекта с фильтрацией.
+    Получить все требования проекта.
 
     Args:
         project_id: ID проекта
         skip: Количество пропускаемых записей
         limit: Максимальное количество возвращаемых записей
         status_id: Фильтр по ID статуса
-        type_id: Фильтр по ID типа
         priority_id: Фильтр по ID приоритета
+        type_id: Фильтр по ID типа
         db: Сессия базы данных
         current_user: Текущий пользователь
 
@@ -228,19 +228,108 @@ async def get_project_requirements(
             status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
-    # Фильтры для требований
+    # Формируем фильтры
     filters = {}
     if status_id:
         filters["status_id"] = status_id
-    if type_id:
-        filters["type_id"] = type_id
     if priority_id:
         filters["priority_id"] = priority_id
+    if type_id:
+        filters["type_id"] = type_id
 
+    # Получаем требования проекта
     requirements = await crud.requirement.get_by_project(
         db, project_id=project_id, skip=skip, limit=limit, **filters
     )
+
     return requirements
+
+
+@router.post("/{project_id}/sync-to-release", response_model=Dict[str, Any])
+async def sync_project_requirements_to_release(
+    project_id: int,
+    release_id: int,
+    requirement_ids: Optional[List[int]] = None,
+    sync_all: bool = False,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_write_user),
+):
+    """
+    Синхронизировать требования проекта с релизом.
+    
+    Args:
+        project_id: ID проекта
+        release_id: ID релиза для синхронизации
+        requirement_ids: Список ID конкретных требований для синхронизации (опционально)
+        sync_all: Синхронизировать все требования проекта (по умолчанию False)
+        db: Сессия базы данных
+        current_user: Текущий пользователь
+        
+    Returns:
+        Dict[str, Any]: Результат синхронизации
+        
+    Raises:
+        HTTPException: Если проект или релиз не найдены
+    """
+    # Проверяем существование проекта
+    project = await crud.project.get(db, id=project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+        )
+
+    # Проверяем существование релиза
+    release = await crud.release.get(db, id=release_id)
+    if not release:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Релиз не найден"
+        )
+
+    try:
+        synced_count = 0
+        
+        if sync_all:
+            # Синхронизируем все требования проекта
+            project_requirements = await crud.requirement.get_by_project(
+                db, project_id=project_id, skip=0, limit=10000
+            )
+            
+            for req in project_requirements:
+                if req.release_id != release_id:
+                    req.release_id = release_id
+                    db.add(req)
+                    synced_count += 1
+                    
+        elif requirement_ids:
+            # Синхронизируем конкретные требования
+            for req_id in requirement_ids:
+                requirement = await crud.requirement.get(db, id=req_id)
+                if requirement and requirement.project_id == project_id:
+                    if requirement.release_id != release_id:
+                        requirement.release_id = release_id
+                        db.add(requirement)
+                        synced_count += 1
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Необходимо указать либо requirement_ids, либо установить sync_all=true"
+            )
+        
+        await db.commit()
+        
+        return {
+            "message": f"Синхронизировано {synced_count} требований проекта с релизом",
+            "project_id": project_id,
+            "release_id": release_id,
+            "synced_requirements": synced_count,
+        }
+        
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка синхронизации: {str(e)}"
+        )
 
 
 @router.get("/{project_id}/releases", response_model=List[schemas.Release])
@@ -252,7 +341,7 @@ async def get_project_releases(
     current_user: User = Depends(get_projects_read_user),
 ):
     """
-    Получить релизы проекта.
+    Получить все релизы проекта.
 
     Args:
         project_id: ID проекта
@@ -274,9 +363,11 @@ async def get_project_releases(
             status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
         )
 
+    # Получаем релизы проекта
     releases = await crud.release.get_by_project(
         db, project_id=project_id, skip=skip, limit=limit
     )
+
     return releases
 
 

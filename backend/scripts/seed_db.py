@@ -203,40 +203,63 @@ async def create_sample_users(db: AsyncSession):
         {
             "username": "adminuser",
             "email": "admin@example.com",
+            "first_name": "Админ",
+            "last_name": "Системный",
             "name": "Администратор",
+            "department": "ИТ-отдел",
+            "phone": "+79001234567",
             "role": "admin",
             "password": "SecurePass123!",
             "is_active": True,
             "is_superuser": True,
             "email_verified": True,
             "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
+            "last_login": datetime.now(UTC).replace(tzinfo=None),
         },
         {
             "username": "manager",
             "email": "manager@example.com",
+            "first_name": "Анна",
+            "last_name": "Менеджерова",
             "name": "Менеджер проекта",
+            "department": "Управление проектами",
+            "phone": "+79001234568",
             "role": "manager",
             "password": "ProjectLead456#",
             "is_active": True,
             "is_superuser": False,
+            "email_verified": True,
+            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
         },
         {
             "username": "developer",
             "email": "developer@example.com",
+            "first_name": "Иван",
+            "last_name": "Разработчиков",
             "name": "Разработчик",
+            "department": "Разработка",
+            "phone": "+79001234569",
             "role": "developer",
             "password": "CodeMaster789$",
             "is_active": True,
             "is_superuser": False,
+            "email_verified": True,
+            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
         },
         {
             "username": "tester",
             "email": "tester@example.com",
+            "first_name": "Мария",
+            "last_name": "Тестировщикова",
             "name": "Тестировщик",
+            "department": "Обеспечение качества",
+            "phone": "+79001234570",
             "role": "tester",
             "password": "QualityCheck101%",
             "is_active": True,
             "is_superuser": False,
+            "email_verified": True,
+            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
         },
     ]
 
@@ -285,15 +308,27 @@ async def create_sample_projects(db: AsyncSession, owner_user: User):
     # Создание проектов через ORM
     created_projects = []
     for project_data in projects_data:
-        # Проверяем, существует ли проект
-        existing_project = await crud_project.get_by_code(db, code=project_data["code"])
-        if not existing_project:
-            project_create = ProjectCreate(**project_data)
-            project = await crud_project.create(db, obj_in=project_create)
-            created_projects.append(project)
-        else:
-            print(f"Проект {project_data['code']} уже существует")
-            created_projects.append(existing_project)
+        try:
+            # Проверяем, существует ли проект
+            existing_project = await crud_project.get_by_code(db, code=project_data["code"])
+            if not existing_project:
+                project_create = ProjectCreate(**project_data)
+                # Используем подход как в API - добавляем owner_id к данным схемы
+                project_dict = project_create.model_dump()
+                project_dict["owner_id"] = owner_user.id
+                project = await crud_project.create(db, obj_in=project_dict)
+                created_projects.append(project)
+            else:
+                print(f"Проект {project_data['code']} уже существует")
+                created_projects.append(existing_project)
+        except Exception as e:
+            print(f"❌ Ошибка при создании проекта '{project_data.get('code', 'Unknown')}': {e}")
+            # Пытаемся сделать rollback для восстановления сессии
+            try:
+                await db.rollback()
+            except Exception as rollback_error:
+                print(f"❌ Ошибка при rollback: {rollback_error}")
+            continue
 
     print(f"✅ Создано {len(created_projects)} проектов")
     return created_projects
@@ -307,23 +342,24 @@ async def create_sample_specs(db: AsyncSession, projects: list[Project]):
         print("❌ Нет проектов для создания спецификаций")
         return []
 
-    main_project = projects[0]  # Используем первый проект
+    # Получаем ID главного проекта напрямую вместо обращения к объекту
+    main_project_id = projects[0].id  # Используем первый проект
 
     specs_data = [
         {
             "name": "Функциональные требования v1.0",
             "description": "Основная спецификация функциональных требований",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
         },
         {
             "name": "Интерфейс пользователя",
             "description": "Спецификация требований к пользовательскому интерфейсу",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
         },
         {
             "name": "API спецификация",
             "description": "Техническая спецификация программного интерфейса",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
         },
     ]
 
@@ -354,20 +390,21 @@ async def create_sample_requirement_groups(db: AsyncSession, projects: list[Proj
         print("❌ Нет проектов для создания групп требований")
         return []
 
-    main_project = projects[0]  # Используем первый проект
+    # Получаем ID главного проекта напрямую вместо обращения к объекту
+    main_project_id = projects[0].id  # Используем первый проект
 
     groups_data = [
         {
             "name": "Аутентификация и авторизация",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
         },
         {
             "name": "Управление проектами",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
         },
         {
             "name": "Отчетность",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
         },
     ]
 
@@ -408,7 +445,8 @@ async def create_sample_requirements(
         print("❌ Нет справочных данных для создания требований")
         return []
 
-    main_project = projects[0]  # Используем первый проект
+    # Получаем ID главного проекта напрямую вместо обращения к объекту
+    main_project_id = projects[0].id  # Используем первый проект
 
     # Получаем ID для разных типов требований
     functional_type = next(
@@ -440,7 +478,7 @@ async def create_sample_requirements(
         {
             "title": "Аутентификация пользователей",
             "description": "Система должна поддерживать аутентификацию через email и пароль",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
             "type_id": functional_type.id,
             "priority_id": high_priority.id,
             "status_id": draft_status.id,
@@ -448,7 +486,7 @@ async def create_sample_requirements(
         {
             "title": "Управление проектами",
             "description": "Пользователи должны иметь возможность создавать и управлять проектами",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
             "type_id": functional_type.id,
             "priority_id": high_priority.id,
             "status_id": draft_status.id,
@@ -456,7 +494,7 @@ async def create_sample_requirements(
         {
             "title": "Система отчетности",
             "description": "Система должна генерировать отчеты по проектам и требованиям",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
             "type_id": functional_type.id,
             "priority_id": medium_priority.id,
             "status_id": draft_status.id,
@@ -464,7 +502,7 @@ async def create_sample_requirements(
         {
             "title": "Производительность",
             "description": "Система должна обрабатывать запросы за время не более 2 секунд",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
             "type_id": nonfunctional_type.id,
             "priority_id": high_priority.id,
             "status_id": draft_status.id,
@@ -474,25 +512,34 @@ async def create_sample_requirements(
     # Создание требований через ORM
     created_requirements = []
     for req_data in requirements_data:
-        # Проверяем, существует ли требование (простая проверка по количеству)
-        existing_reqs = await crud_requirement.get_by_project(
-            db, project_id=req_data["project_id"]
-        )
-        existing_titles = [req.title for req in existing_reqs]
+        try:
+            # Проверяем, существует ли требование (простая проверка по количеству)
+            existing_reqs = await crud_requirement.get_by_project(
+                db, project_id=req_data["project_id"]
+            )
+            existing_titles = [req.title for req in existing_reqs]
 
-        if req_data["title"] not in existing_titles:
-            requirement_create = RequirementCreate(**req_data)
-            requirement = await crud_requirement.create(
-                db, obj_in=requirement_create, author_id=author.id
-            )
-            created_requirements.append(requirement)
-        else:
-            print(f"Требование '{req_data['title']}' уже существует")
-            # Находим существующее требование
-            existing_req = next(
-                req for req in existing_reqs if req.title == req_data["title"]
-            )
-            created_requirements.append(existing_req)
+            if req_data["title"] not in existing_titles:
+                requirement_create = RequirementCreate(**req_data)
+                requirement = await crud_requirement.create(
+                    db, obj_in=requirement_create, author_id=author.id
+                )
+                created_requirements.append(requirement)
+            else:
+                print(f"Требование '{req_data['title']}' уже существует")
+                # Находим существующее требование
+                existing_req = next(
+                    req for req in existing_reqs if req.title == req_data["title"]
+                )
+                created_requirements.append(existing_req)
+        except Exception as e:
+            print(f"❌ Ошибка при создании требования '{req_data.get('title', 'Unknown')}': {e}")
+            # Пытаемся сделать rollback для восстановления сессии
+            try:
+                await db.rollback()
+            except Exception as rollback_error:
+                print(f"❌ Ошибка при rollback: {rollback_error}")
+            continue
 
     print(f"✅ Создано {len(created_requirements)} требований")
     return created_requirements
@@ -506,20 +553,25 @@ async def create_sample_releases(db: AsyncSession, projects: list[Project]):
         print("❌ Нет проектов для создания релизов")
         return []
 
-    main_project = projects[0]  # Используем первый проект
+    # Получаем ID главного проекта напрямую вместо обращения к объекту
+    main_project_id = projects[0].id  # Используем первый проект
 
     releases_data = [
         {
             "name": "Релиз 1.0.0",
             "version": "1.0.0",
             "description": "Первый стабильный релиз с базовой функциональностью",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
+            "status": "planned",
+            "planned_date": datetime.now(UTC).replace(tzinfo=None),
         },
         {
             "name": "Релиз 1.1.0",
             "version": "1.1.0",
             "description": "Релиз с улучшениями UI и новыми функциями",
-            "project_id": main_project.id,
+            "project_id": main_project_id,
+            "status": "in_progress",
+            "planned_date": datetime.now(UTC).replace(tzinfo=None),
         },
     ]
 
@@ -560,26 +612,41 @@ async def create_sample_test_results(
         print("❌ Нет требований для создания результатов тестирования")
         return []
 
+    # Импортируем TestStatus для правильного использования enum
+    from app.models.test_result import TestStatus
+
+    # Создаем тестировщика для назначения
+    tester_user = author  # Используем автора как тестировщика для простоты
+
     test_results_data = [
         {
             "requirement_id": requirements[0].id,
-            "status": "passed",
+            "status": TestStatus.PASSED,
             "notes": "Тест входа в систему - позитивный сценарий. Все проверки пройдены успешно",
             "external_id": "TC_001",
+            "tester_id": tester_user.id,
+            "started_at": datetime.now(UTC).replace(tzinfo=None),
+            "completed_at": datetime.now(UTC).replace(tzinfo=None),
         },
         {
             "requirement_id": requirements[0].id,
-            "status": "failed",
+            "status": TestStatus.FAILED,
             "notes": "Тест входа в систему - негативный сценарий. Ошибка валидации учетных данных",
             "external_id": "TC_002",
+            "tester_id": tester_user.id,
+            "started_at": datetime.now(UTC).replace(tzinfo=None),
+            "completed_at": datetime.now(UTC).replace(tzinfo=None),
         },
         {
             "requirement_id": (
                 requirements[1].id if len(requirements) > 1 else requirements[0].id
             ),
-            "status": "passed",
+            "status": TestStatus.PASSED,
             "notes": "Тест создания проекта. Проект создан успешно",
             "external_id": "TC_003",
+            "tester_id": tester_user.id,
+            "started_at": datetime.now(UTC).replace(tzinfo=None),
+            "completed_at": datetime.now(UTC).replace(tzinfo=None),
         },
     ]
 

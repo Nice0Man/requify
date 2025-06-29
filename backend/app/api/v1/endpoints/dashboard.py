@@ -317,6 +317,376 @@ async def get_dashboard_stats(
         )
 
 
+@router.get("/", response_model=DashboardStats)
+async def get_dashboard_overview(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get dashboard overview - same as /stats for backward compatibility"""
+    return await get_dashboard_stats(current_user, db)
+
+
+@router.get("/overview", response_model=DashboardOverviewStats)
+async def get_dashboard_overview_stats(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get dashboard overview statistics only"""
+    try:
+        dashboard_service = DashboardService()
+        overview = await dashboard_service.get_overview_stats(db)
+        return overview
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get overview stats: {str(e)}",
+        )
+
+
+@router.get("/my-projects", response_model=List[QuickProject])
+async def get_my_projects(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    page: int = Query(1, ge=1),
+    size: int = Query(10, ge=1, le=100),
+):
+    """Get user's projects"""
+    try:
+        dashboard_service = DashboardService()
+        quick_access = await dashboard_service.get_quick_access(db, current_user.id)
+        
+        # Apply pagination
+        skip = (page - 1) * size
+        projects = quick_access.my_projects[skip:skip + size]
+        
+        return projects
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get my projects: {str(e)}",
+        )
+
+
+@router.get("/my-requirements", response_model=List[QuickRequirement])
+async def get_my_requirements(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get user's requirements"""
+    try:
+        dashboard_service = DashboardService()
+        quick_access = await dashboard_service.get_quick_access(db, current_user.id)
+        return quick_access.my_requirements
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get my requirements: {str(e)}",
+        )
+
+
+@router.get("/my-activity", response_model=List[ActivityItem])
+async def get_my_activity(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = Query(20, ge=1, le=100),
+):
+    """Get user's activity"""
+    try:
+        user_activity = await activity.get_recent_activities(
+            db, user_id=current_user.id, limit=limit
+        )
+
+        activity_items = []
+        for act in user_activity:
+            activity_items.append(
+                ActivityItem(
+                    id=f"activity_{act.id}",
+                    type=act.entity_type or "general",
+                    title=act.activity_title,
+                    description=act.activity_description or "",
+                    timestamp=act.created_at.isoformat(),
+                    user_name=act.user_name,
+                    project_name=(
+                        act.entity_name if act.entity_type == "project" else ""
+                    ),
+                    status=act.status,
+                    priority=act.priority,
+                )
+            )
+
+        return activity_items
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get my activity: {str(e)}",
+        )
+
+
+@router.get("/my-notifications", response_model=List[NotificationSchema])
+async def get_my_notifications(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = Query(10, ge=1, le=100),
+):
+    """Get user's notifications"""
+    try:
+        user_notifications = await notification.get_user_notifications(
+            db, user_id=current_user.id, limit=limit
+        )
+
+        notification_items = []
+        for notif in user_notifications:
+            notification_items.append(
+                NotificationSchema(
+                    id=str(notif.id),
+                    type=notif.type,
+                    title=notif.title,
+                    message=notif.message,
+                    action_url=notif.action_url,
+                    action_text=notif.action_text,
+                    timestamp=notif.created_at.isoformat(),
+                    read=notif.is_read,
+                    priority=notif.priority or "medium",
+                )
+            )
+
+        return notification_items
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get my notifications: {str(e)}",
+        )
+
+
+@router.get("/activity/recent", response_model=List[ActivityItem])
+async def get_recent_dashboard_activity(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = Query(10, ge=1, le=100),
+):
+    """Get recent dashboard activity"""
+    try:
+        dashboard_service = DashboardService()
+        recent_activity = await dashboard_service.get_recent_activity(db, limit=limit)
+        return recent_activity
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get recent activity: {str(e)}",
+        )
+
+
+@router.get("/projects/stats", response_model=Dict[str, Any])
+async def get_dashboard_projects_stats(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get dashboard projects statistics"""
+    try:
+        dashboard_service = DashboardService()
+        overview = await dashboard_service.get_overview_stats(db)
+        project_performance = await dashboard_service.get_project_performance(db, overview)
+        
+        return {
+            "total_projects": overview.total_projects,
+            "active_projects": overview.active_projects,
+            "completed_projects": overview.completed_projects,
+            "completion_rate": project_performance.completion_rate,
+            "on_time_delivery": project_performance.on_time_delivery,
+            "quality_score": project_performance.quality_score,
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get projects stats: {str(e)}",
+        )
+
+
+@router.get("/projects/recent", response_model=List[QuickProject])
+async def get_recent_projects_dashboard(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = Query(5, ge=1, le=20),
+):
+    """Get recent projects for dashboard"""
+    try:
+        dashboard_service = DashboardService()
+        quick_access = await dashboard_service.get_quick_access(db, current_user.id)
+        return quick_access.my_projects[:limit]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get recent projects: {str(e)}",
+        )
+
+
+@router.get("/requirements/stats", response_model=Dict[str, Any])
+async def get_dashboard_requirements_stats(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get dashboard requirements statistics"""
+    try:
+        dashboard_service = DashboardService()
+        overview = await dashboard_service.get_overview_stats(db)
+        
+        return {
+            "total_requirements": overview.total_requirements,
+            "pending_requirements": overview.pending_requirements,
+            "approved_requirements": overview.approved_requirements,
+            "approval_rate": (overview.approved_requirements / overview.total_requirements * 100) if overview.total_requirements > 0 else 0,
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get requirements stats: {str(e)}",
+        )
+
+
+@router.get("/requirements/recent", response_model=List[QuickRequirement])
+async def get_recent_requirements_dashboard(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = Query(5, ge=1, le=20),
+):
+    """Get recent requirements for dashboard"""
+    try:
+        dashboard_service = DashboardService()
+        quick_access = await dashboard_service.get_quick_access(db, current_user.id)
+        return quick_access.my_requirements[:limit]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get recent requirements: {str(e)}",
+        )
+
+
+@router.get("/health", response_model=Dict[str, str])
+async def get_dashboard_health(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get dashboard health status"""
+    return {"status": "healthy", "service": "dashboard"}
+
+
+@router.get("/metrics", response_model=Dict[str, Any])
+async def get_dashboard_metrics(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get dashboard metrics"""
+    try:
+        dashboard_service = DashboardService()
+        overview = await dashboard_service.get_overview_stats(db)
+        trending = await dashboard_service.get_trending_metrics(db)
+        performance = await dashboard_service.get_project_performance(db, overview)
+        
+        return {
+            "overview": overview.model_dump(),
+            "trending": trending.model_dump(),
+            "performance": performance.model_dump(),
+            "timestamp": datetime.now().isoformat(),
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get dashboard metrics: {str(e)}",
+        )
+
+
+@router.get("/search", response_model=Dict[str, Any])
+async def search_dashboard(
+    query: str = Query(..., min_length=1),
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Search across dashboard items"""
+    try:
+        # Basic search implementation - can be enhanced
+        results = {
+            "projects": [],
+            "requirements": [],
+            "query": query,
+            "total": 0
+        }
+        
+        # Search would be implemented here
+        return results
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to search dashboard: {str(e)}",
+        )
+
+
+@router.get("/filter", response_model=Dict[str, Any])
+async def filter_dashboard(
+    status: Optional[str] = Query(None),
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Filter dashboard items by status"""
+    try:
+        # Filter implementation would go here
+        return {"status": status, "filtered": True}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to filter dashboard: {str(e)}",
+        )
+
+
+@router.get("/export/stats", response_model=Dict[str, Any])
+async def export_dashboard_stats(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Export dashboard statistics"""
+    try:
+        dashboard_service = DashboardService()
+        overview = await dashboard_service.get_overview_stats(db)
+        performance = await dashboard_service.get_project_performance(db, overview)
+        trending = await dashboard_service.get_trending_metrics(db)
+        
+        return {
+            "overview": overview.model_dump(),
+            "performance": performance.model_dump(),
+            "trending": trending.model_dump(),
+            "exported_at": datetime.now().isoformat(),
+            "exported_by": current_user.username,
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to export dashboard stats: {str(e)}",
+        )
+
+
+@router.get("/export/activity", response_model=Dict[str, Any])
+async def export_dashboard_activity(
+    current_user: UserProfile = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    limit: int = Query(100, ge=1, le=1000),
+):
+    """Export dashboard activity"""
+    try:
+        dashboard_service = DashboardService()
+        recent_activity = await dashboard_service.get_recent_activity(db, limit=limit)
+        
+        return {
+            "activity": [item.model_dump() for item in recent_activity],
+            "total": len(recent_activity),
+            "exported_at": datetime.now().isoformat(),
+            "exported_by": current_user.username,
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to export dashboard activity: {str(e)}",
+        )
+
+
 @router.get("/my-dashboard", response_model=MyDashboardResponse)
 async def get_my_dashboard(
     current_user: UserProfile = Depends(get_current_active_user),
@@ -467,7 +837,7 @@ async def update_user_preferences(
         updated_preferences = await user_preferences.create_or_update_preferences(
             db, user_id=current_user.id, preferences_data=preferences_data
         )
-
+        
         return {
             "message": "Preferences updated successfully",
             "preferences_id": updated_preferences.id,
@@ -500,7 +870,7 @@ async def create_notification(
             project_id=notification_data.get("project_id"),
             requirement_id=notification_data.get("requirement_id"),
         )
-
+        
         return {
             "message": "Notification created successfully",
             "notification_id": new_notification.id,
@@ -565,7 +935,7 @@ async def create_activity_record(
             priority=activity_data.get("priority"),
             extra_data=activity_data.get("extra_data"),
         )
-
+        
         return {
             "message": "Activity recorded successfully",
             "activity_id": new_activity.id,

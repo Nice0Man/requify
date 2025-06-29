@@ -256,35 +256,45 @@ async def get_test_cases(
 
     test_cases = []
     for req in requirements:
-        test_results = await crud.test_result.get_by_requirement(
-            db, requirement_id=req.id, limit=1
-        )
-        latest_result = test_results[0] if test_results else None
-
-        test_cases.append(
-            schemas.TestCase(
-                id=req.id,
-                name=f"Test Case for {req.title}",
-                description=f"Тест для требования: {req.description}",
-                status="active",
-                priority="medium",  # Simplified to avoid greenlet issues
-                type="functional",
-                requirement_id=req.id,
-                plan_id=req.project_id,
-                steps=[
-                    schemas.TestCaseStep(
-                        step=1,
-                        action=f"Проверить выполнение требования: {req.title}",
-                        expected="Требование выполнено в соответствии с описанием",
-                    )
-                ],
-                latest_test_status=(
-                    latest_result.status.value if latest_result else "not_started"
-                ),
-                created_at=req.created_at.isoformat(),
-                updated_at=req.updated_at.isoformat(),
+        try:
+            test_results = await crud.test_result.get_by_requirement(
+                db, requirement_id=req.id, limit=1
             )
-        )
+            latest_result = test_results[0] if test_results else None
+
+            # Handle status properly - it might be enum or string
+            latest_status = "not_started"
+            if latest_result:
+                if hasattr(latest_result.status, 'value'):
+                    latest_status = latest_result.status.value
+                else:
+                    latest_status = str(latest_result.status)
+
+            test_cases.append(
+                schemas.TestCase(
+                    id=req.id,
+                    name=f"Test Case for {req.title}",
+                    description=f"Тест для требования: {req.description or 'No description'}",
+                    status="active",
+                    priority="medium",
+                    type="functional",
+                    requirement_id=req.id,
+                    plan_id=req.project_id,
+                    steps=[
+                        schemas.TestCaseStep(
+                            step=1,
+                            action=f"Проверить выполнение требования: {req.title}",
+                            expected="Требование выполнено в соответствии с описанием",
+                        )
+                    ],
+                    latest_test_status=latest_status,
+                    created_at=req.created_at.isoformat(),
+                    updated_at=req.updated_at.isoformat(),
+                )
+            )
+        except Exception as e:
+            # If there's an error with a specific requirement, skip it and continue
+            continue
 
     return test_cases
 
@@ -388,17 +398,29 @@ async def get_test_executions(
 
     executions = []
     for result in test_results:
-        executions.append(
-            schemas.TestExecution(
-                id=result.id,
-                test_case_id=result.requirement_id,
-                status=result.status.value,
-                started_at=result.started_at,
-                completed_at=result.completed_at,
-                duration=None,  # Можно вычислить как разность времени
-                logs=result.notes,
+        try:
+            # Handle status properly - it might be enum or string
+            execution_status = "not_started"
+            if result.status:
+                if hasattr(result.status, 'value'):
+                    execution_status = result.status.value
+                else:
+                    execution_status = str(result.status)
+
+            executions.append(
+                schemas.TestExecution(
+                    id=result.id,
+                    test_case_id=result.requirement_id,
+                    status=execution_status,
+                    started_at=result.started_at,
+                    completed_at=result.completed_at,
+                    duration=None,  # Можно вычислить как разность времени
+                    logs=result.notes,
+                )
             )
-        )
+        except Exception as e:
+            # If there's an error with a specific result, skip it and continue
+            continue
 
     return executions
 

@@ -4,8 +4,8 @@ API эндпоинты для работы с релизами.
 Включает операции CRUD для релизов и управление их жизненным циклом.
 """
 
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import (
@@ -433,14 +433,24 @@ async def publish_release(
 @router.get("/{release_id}/requirements", response_model=List[schemas.Requirement])
 async def get_release_requirements(
     release_id: int,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    status_id: Optional[int] = Query(None, description="Фильтр по ID статуса"),
+    priority_id: Optional[int] = Query(None, description="Фильтр по ID приоритета"),
+    type_id: Optional[int] = Query(None, description="Фильтр по ID типа"),
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_releases_read_user),
 ):
     """
-    Получить требования релиза.
+    Получить все требования релиза.
 
     Args:
         release_id: ID релиза
+        skip: Количество пропускаемых записей
+        limit: Максимальное количество записей
+        status_id: Фильтр по ID статуса
+        priority_id: Фильтр по ID приоритета
+        type_id: Фильтр по ID типа
         db: Сессия базы данных
         current_user: Текущий пользователь
 
@@ -450,13 +460,27 @@ async def get_release_requirements(
     Raises:
         HTTPException: Если релиз не найден
     """
+    # Проверяем существование релиза
     release = await crud.release.get(db, id=release_id)
     if not release:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Release not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Релиз не найден"
         )
 
-    requirements = await crud.requirement.get_by_release(db, release_id=release_id)
+    # Формируем фильтры
+    filters = {}
+    if status_id:
+        filters["status_id"] = status_id
+    if priority_id:
+        filters["priority_id"] = priority_id
+    if type_id:
+        filters["type_id"] = type_id
+
+    # Получаем требования релиза
+    requirements = await crud.requirement.get_by_release(
+        db, release_id=release_id, skip=skip, limit=limit, **filters
+    )
+
     return requirements
 
 
@@ -560,3 +584,79 @@ async def get_release_changelog(
         )
 
     return changelog
+
+
+@router.post("/{release_id}/sync-project-requirements", response_model=Dict[str, Any])
+async def sync_project_requirements_to_release(
+    release_id: int,
+    project_id: Optional[int] = None,
+    requirement_ids: Optional[List[int]] = None,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_releases_write_user),
+):
+    """
+    Синхронизировать требования проекта с релизом.
+    
+    Args:
+        release_id: ID релиза
+        project_id: ID проекта для синхронизации всех требований (опционально)
+        requirement_ids: Список ID конкретных требований для синхронизации (опционально)
+        db: Сессия базы данных
+        current_user: Текущий пользователь
+        
+    Returns:
+        Dict[str, Any]: Результат синхронизации
+        
+    Raises:
+        HTTPException: Если релиз не найден или данные некорректны
+    """
+    # Проверяем существование релиза
+    release = await crud.release.get(db, id=release_id)
+    if not release:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Релиз не найден"
+        )
+
+    try:
+        synced_count = 0
+        
+        if project_id:
+            # Синхронизируем все требования проекта
+            project_requirements = await crud.requirement.get_by_project(
+                db, project_id=project_id, skip=0, limit=10000
+            )
+            
+            for req in project_requirements:
+                if req.release_id != release_id:
+                    req.release_id = release_id
+                    db.add(req)
+                    synced_count += 1
+                    
+        elif requirement_ids:
+            # Синхронизируем конкретные требования
+            for req_id in requirement_ids:
+                requirement = await crud.requirement.get(db, id=req_id)
+                if requirement and requirement.release_id != release_id:
+                    requirement.release_id = release_id
+                    db.add(requirement)
+                    synced_count += 1
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Необходимо указать либо project_id, либо requirement_ids"
+            )
+        
+        await db.commit()
+        
+        return {
+            "message": f"Синхронизировано {synced_count} требований с релизом",
+            "release_id": release_id,
+            "synced_requirements": synced_count,
+        }
+        
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка синхронизации: {str(e)}"
+        )

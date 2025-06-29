@@ -20,11 +20,13 @@ class CRUDRelease(CRUDBase[Release, ReleaseCreate, ReleaseUpdate]):
         stmt = (
             select(Release)
             .where(Release.project_id == project_id)
+            .options(selectinload(Release.project))
             .offset(skip)
             .limit(limit)
+            .order_by(Release.created_at.desc())
         )
         result = await db.execute(stmt)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def get_by_version(
         self, db: AsyncSession, *, project_id: int, version: str
