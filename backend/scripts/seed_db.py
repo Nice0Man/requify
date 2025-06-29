@@ -310,7 +310,9 @@ async def create_sample_projects(db: AsyncSession, owner_user: User):
     for project_data in projects_data:
         try:
             # Проверяем, существует ли проект
-            existing_project = await crud_project.get_by_code(db, code=project_data["code"])
+            existing_project = await crud_project.get_by_code(
+                db, code=project_data["code"]
+            )
             if not existing_project:
                 project_create = ProjectCreate(**project_data)
                 # Используем подход как в API - добавляем owner_id к данным схемы
@@ -322,7 +324,9 @@ async def create_sample_projects(db: AsyncSession, owner_user: User):
                 print(f"Проект {project_data['code']} уже существует")
                 created_projects.append(existing_project)
         except Exception as e:
-            print(f"❌ Ошибка при создании проекта '{project_data.get('code', 'Unknown')}': {e}")
+            print(
+                f"❌ Ошибка при создании проекта '{project_data.get('code', 'Unknown')}': {e}"
+            )
             # Пытаемся сделать rollback для восстановления сессии
             try:
                 await db.rollback()
@@ -533,7 +537,9 @@ async def create_sample_requirements(
                 )
                 created_requirements.append(existing_req)
         except Exception as e:
-            print(f"❌ Ошибка при создании требования '{req_data.get('title', 'Unknown')}': {e}")
+            print(
+                f"❌ Ошибка при создании требования '{req_data.get('title', 'Unknown')}': {e}"
+            )
             # Пытаемся сделать rollback для восстановления сессии
             try:
                 await db.rollback()

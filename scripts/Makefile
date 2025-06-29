@@ -147,12 +147,10 @@ dev-clean:	## Stop and remove development containers with volumes
 restart-frontend:	## Restart frontend service
 	@echo "Restarting frontend service..."
 	cd ../deploy/docker && docker compose -f docker-compose.dev.yml restart frontend
-	@echo "Frontend service restarted!"
 
 restart-backend:	## Restart backend service
 	@echo "Restarting backend service..."
 	cd ../deploy/docker && docker compose -f docker-compose.dev.yml restart backend
-	@echo "Backend service restarted!"
 
 # =============================================================================
 # Docker Production

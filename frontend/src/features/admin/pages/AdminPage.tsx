@@ -229,8 +229,8 @@ const AdminPage: React.FC = () => {
       };
 
       const response = await adminApi.getAdminUsers(params);
-      setUsers(response.data.items);
-      setUsersTotal(response.data.total);
+      setUsers(response.data.items || []);
+      setUsersTotal(response.data.total || 0);
       setUsersPage(page);
     } catch (err: any) {
       toast.error("Failed to load users");
@@ -250,8 +250,8 @@ const AdminPage: React.FC = () => {
       };
 
       const response = await adminApi.getLogs(params);
-      setLogs(response.data.items);
-      setLogsTotal(response.data.total);
+      setLogs(response.data.items || []);
+      setLogsTotal(response.data.total || 0);
     } catch (err: any) {
       toast.error("Failed to load logs");
     } finally {
@@ -270,7 +270,7 @@ const AdminPage: React.FC = () => {
       };
 
       const response = await adminApi.getBackups(params);
-      setBackups(response.data.items);
+      setBackups(response.data.items || []);
     } catch (err: any) {
       toast.error("Failed to load backups");
     } finally {
@@ -283,7 +283,7 @@ const AdminPage: React.FC = () => {
     try {
       setSettingsLoading(true);
       const response = await adminApi.getSystemSettings();
-      setSettings(response.data);
+      setSettings(response.data || []);
     } catch (err: any) {
       toast.error("Failed to load settings");
     } finally {
@@ -813,7 +813,7 @@ const AdminPage: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user) => (
+                (users || []).map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <Box>
@@ -912,7 +912,7 @@ const AdminPage: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                logs.map((log) => (
+                (logs || []).map((log) => (
                   <TableRow key={log.id}>
                     <TableCell>
                       <Box display="flex" alignItems="center" gap={1}>
@@ -979,7 +979,7 @@ const AdminPage: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                backups.map((backup) => (
+                (backups || []).map((backup) => (
                   <TableRow key={backup.id}>
                     <TableCell>
                       <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -1042,7 +1042,7 @@ const AdminPage: React.FC = () => {
           <LinearProgress />
         ) : (
           <Grid container spacing={3}>
-            {settings.map((setting) => (
+            {(settings || []).map((setting) => (
               <Grid item xs={12} md={6} key={setting.id}>
                 <Card sx={{ borderRadius: 3 }}>
                   <CardContent>

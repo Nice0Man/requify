@@ -62,13 +62,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
 import { UserRole } from "@/features/auth/types/auth.types";
-import { 
+import {
   releasesApi,
   ReleaseListParams as ApiReleaseListParams,
   Release as ApiRelease,
   ReleaseStatus as ApiReleaseStatus,
   ReleaseCreate as ApiReleaseCreate,
-  ReleaseUpdate as ApiReleaseUpdate
+  ReleaseUpdate as ApiReleaseUpdate,
 } from "../api/releases.api";
 import {
   Release,
@@ -118,14 +118,17 @@ const convertApiReleaseToRelease = (apiRelease: ApiRelease): Release => {
     artifacts: apiRelease.artifacts || [],
     approvals: apiRelease.approvals || [],
     completion_percentage: apiRelease.completion_percentage || 0,
-    project_name: apiRelease.project_name || `Project #${apiRelease.project_id}`,
+    project_name:
+      apiRelease.project_name || `Project #${apiRelease.project_id}`,
     created_by_name: apiRelease.created_by_name || "Unknown",
     updated_by_name: apiRelease.updated_by_name || "Unknown",
     status: convertApiStatusToStatus(apiRelease.status),
   };
 };
 // Convert API status to local status
-const convertApiStatusToStatus = (apiStatus: ApiReleaseStatus): ReleaseStatus => {
+const convertApiStatusToStatus = (
+  apiStatus: ApiReleaseStatus
+): ReleaseStatus => {
   switch (apiStatus) {
     case ApiReleaseStatus.PLANNING:
       return ReleaseStatus.PLANNING;
@@ -232,7 +235,9 @@ const ReleasesPage: React.FC = () => {
       const params: ApiReleaseListParams = {
         skip: page * pageSize,
         limit: pageSize,
-        status: filters.status ? convertStatusToApiStatus(filters.status as ReleaseStatus) : undefined,
+        status: filters.status
+          ? convertStatusToApiStatus(filters.status as ReleaseStatus)
+          : undefined,
         project_id: filters.project_id
           ? parseInt(filters.project_id)
           : undefined,
@@ -241,42 +246,38 @@ const ReleasesPage: React.FC = () => {
       };
 
       const response = await releasesApi.getReleases(params);
-      const convertedReleases = (response.data.items || []).map(convertApiReleaseToRelease);
+      const convertedReleases = (response.data.items || []).map(
+        convertApiReleaseToRelease
+      );
       setReleases(convertedReleases);
       setTotalCount(response.data.total || 0);
 
       // Calculate stats
       const releaseStats: ReleaseStats = {
         total: convertedReleases.length,
-        planning:
-          convertedReleases.filter(
-            (r) => r.status === ReleaseStatus.PLANNING
-          ).length,
-        in_progress:
-          convertedReleases.filter(
-            (r) => r.status === ReleaseStatus.IN_PROGRESS
-          ).length,
-        testing:
-          convertedReleases.filter((r) => r.status === ReleaseStatus.TESTING)
-            .length,
-        ready:
-          convertedReleases.filter((r) => r.status === ReleaseStatus.READY)
-            .length,
-        released:
-          convertedReleases.filter(
-            (r) => r.status === ReleaseStatus.RELEASED
-          ).length,
-        cancelled:
-          convertedReleases.filter(
-            (r) => r.status === ReleaseStatus.CANCELLED
-          ).length,
-        overdue:
-          convertedReleases.filter((r) => {
-            const plannedDate = new Date(r.planned_date || "");
-            return (
-              plannedDate < new Date() && r.status !== ReleaseStatus.RELEASED
-            );
-          }).length,
+        planning: convertedReleases.filter(
+          (r) => r.status === ReleaseStatus.PLANNING
+        ).length,
+        in_progress: convertedReleases.filter(
+          (r) => r.status === ReleaseStatus.IN_PROGRESS
+        ).length,
+        testing: convertedReleases.filter(
+          (r) => r.status === ReleaseStatus.TESTING
+        ).length,
+        ready: convertedReleases.filter((r) => r.status === ReleaseStatus.READY)
+          .length,
+        released: convertedReleases.filter(
+          (r) => r.status === ReleaseStatus.RELEASED
+        ).length,
+        cancelled: convertedReleases.filter(
+          (r) => r.status === ReleaseStatus.CANCELLED
+        ).length,
+        overdue: convertedReleases.filter((r) => {
+          const plannedDate = new Date(r.planned_date || "");
+          return (
+            plannedDate < new Date() && r.status !== ReleaseStatus.RELEASED
+          );
+        }).length,
       };
       setStats(releaseStats);
     } catch (err: any) {
