@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
+import { useAuth } from "@/features/auth/context/auth.context";
+import { usePermissions } from "@/shared/hooks/usePermissions";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   fallback,
 }) => {
   const { isAuthenticated, isLoading } = useAuth();
-  const { hasPermissions } = usePermissions();
+  const { hasAnyPermission } = usePermissions();
   const location = useLocation();
 
   // Show loading while checking authentication
@@ -34,7 +35,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({
   }
 
   // Check permissions if required
-  if (requiredPermissions.length > 0 && !hasPermissions(requiredPermissions)) {
+  if (requiredPermissions.length > 0 && !hasAnyPermission(requiredPermissions)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

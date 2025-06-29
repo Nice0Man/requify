@@ -4,4 +4,5 @@ export { default as useLocalStorage } from './useLocalStorage';
 
 // New hooks
 export { useApi, useCrudApi } from './useApi';
-export { usePagination, useServerPagination } from './usePagination'; 
+export { usePagination, useServerPagination } from './usePagination';
+export { usePermissions } from './usePermissions'; 

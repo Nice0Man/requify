@@ -13963,7 +13963,7 @@
         "kind": 5,
         "importPath": "backend.tests.test_rbac_validation",
         "description": "backend.tests.test_rbac_validation",
-        "peekOfCode": "USER_ROLES_TEST_DATA = {\n    \"superuser\": {\n        \"email\": \"superuser@test.com\",\n        \"username\": \"superuser\",\n        \"password\": \"superuser123\",\n        \"role\": \"admin\",\n        \"is_superuser\": True,\n    },\n    \"admin\": {\n        \"email\": \"admin@test.com\", ",
+        "peekOfCode": "USER_ROLES_TEST_DATA = {\n    \"superuser\": {\n        \"email\": \"superuser@test.com\",\n        \"username\": \"superuser\",\n        \"password\": \"SecurePass123!\",\n        \"role\": \"admin\",\n        \"is_superuser\": True,\n    },\n    \"admin\": {\n        \"email\": \"admin@test.com\", ",
         "detail": "backend.tests.test_rbac_validation",
         "documentation": {}
     },

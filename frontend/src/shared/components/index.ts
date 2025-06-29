@@ -20,4 +20,16 @@ export {
   FormCheckboxField,
   FormRadioField,
   FormAutocompleteField,
-} from './Form/FormField'; 
+} from './Form/FormField';
+
+// Permission components
+export {
+  PermissionGuard,
+  AdminOnly,
+  SuperuserOnly,
+  ProjectsWrite,
+  RequirementsWrite,
+  ReleasesWrite,
+  TestingExecute,
+  usePermissionGuard,
+} from './PermissionGuard/PermissionGuard'; 

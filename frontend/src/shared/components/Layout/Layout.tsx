@@ -33,7 +33,8 @@ import {
   Settings,
   Home
 } from '@mui/icons-material';
-import { useAuth, usePermissions } from '@/features/auth/context/auth.context';
+import { useAuth } from '@/features/auth/context/auth.context';
+import { usePermissions } from '@/shared/hooks/usePermissions';
 
 interface NavigationItem {
   title: string;
@@ -91,7 +92,7 @@ export const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { hasPermissions } = usePermissions();
+  const { canAccessRoute, hasAnyPermission } = usePermissions();
   
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -129,7 +130,7 @@ export const Layout: React.FC = () => {
 
   const filteredNavigationItems = navigationItems.filter(item => {
     if (!item.requiredPermissions) return true;
-    return hasPermissions(item.requiredPermissions);
+    return hasAnyPermission(item.requiredPermissions);
   });
 
   const drawer = (
