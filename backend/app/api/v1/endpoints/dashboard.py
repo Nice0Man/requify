@@ -700,7 +700,7 @@ async def get_my_dashboard(
         preferences = await user_preferences.get_by_user_id(db, user_id=current_user.id)
         if not preferences:
             # Create default preferences
-            default_prefs = await user_preferences.get_default_preferences(
+            default_prefs = user_preferences.get_default_preferences(
                 current_user.id
             )
             preferences = await user_preferences.create_or_update_preferences(

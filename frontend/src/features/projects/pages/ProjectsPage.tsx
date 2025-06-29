@@ -589,7 +589,7 @@ const ProjectsPage: React.FC = () => {
                     Active Projects
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {projects.filter(p => p.status === 'active').length}
+                    {projects?.filter(p => p.status === 'active').length || 0}
                   </Typography>
                 </Box>
                 <CheckCircleIcon color="success" sx={{ fontSize: 40 }} />
@@ -606,7 +606,7 @@ const ProjectsPage: React.FC = () => {
                     Completed
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {projects.filter(p => p.status === 'completed').length}
+                    {projects?.filter(p => p.status === 'completed').length || 0}
                   </Typography>
                 </Box>
                 <CheckCircleIcon color="primary" sx={{ fontSize: 40 }} />
@@ -623,7 +623,7 @@ const ProjectsPage: React.FC = () => {
                     At Risk
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {projects.filter(p => getProjectHealth(p) === 'warning' || getProjectHealth(p) === 'error').length}
+                    {projects?.filter(p => getProjectHealth(p) === 'warning' || getProjectHealth(p) === 'error').length || 0}
                   </Typography>
                 </Box>
                 <ScheduleIcon color="warning" sx={{ fontSize: 40 }} />

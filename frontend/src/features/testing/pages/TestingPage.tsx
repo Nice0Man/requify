@@ -702,20 +702,20 @@ const TestingPage: React.FC = () => {
 
   // Statistics calculations
   const stats = useMemo(() => {
-    const totalTestCases = testCases.length;
-    const automatedCases = testCases.filter(tc => tc.automation_level === 'automated').length;
-    const passedExecutions = testExecutions.filter(te => te.status === 'passed').length;
-    const totalExecutions = testExecutions.length;
+    const totalTestCases = testCases?.length || 0;
+    const automatedCases = testCases?.filter(tc => tc.automation_level === 'automated').length || 0;
+    const passedExecutions = testExecutions?.filter(te => te.status === 'passed').length || 0;
+    const totalExecutions = testExecutions?.length || 0;
 
     return {
-      totalTestPlans: testPlans.length,
+      totalTestPlans: testPlans?.length || 0,
       totalTestCases,
       totalExecutions,
       automationCoverage: totalTestCases > 0 ? Math.round((automatedCases / totalTestCases) * 100) : 0,
       passRate: totalExecutions > 0 ? Math.round((passedExecutions / totalExecutions) * 100) : 0,
-      executionsToday: testExecutions.filter(te => 
+      executionsToday: testExecutions?.filter(te => 
         format(parseISO(te.execution_date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
-      ).length
+      ).length || 0
     };
   }, [testPlans, testCases, testExecutions]);
 
