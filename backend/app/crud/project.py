@@ -73,6 +73,27 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
         result = await db.execute(stmt)
         return result.scalars().all()
 
+    async def get_by_user(
+        self, db: AsyncSession, *, user_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Project]:
+        """
+        Получить проекты по пользователю.
+
+        Args:
+            db: Сессия базы данных
+            user_id: ID пользователя
+            skip: Количество пропускаемых записей
+            limit: Максимальное количество записей
+
+        Returns:
+            Список проектов
+        """
+        stmt = (
+            select(Project).where(Project.owner_id == user_id).offset(skip).limit(limit)
+        )
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
     async def count_by_status(self, db: AsyncSession, *, status: str) -> int:
         """
         Подсчитать количество проектов по статусу.

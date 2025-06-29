@@ -25,8 +25,15 @@ def upgrade() -> None:
     op.create_table(
         "projects",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("code", sa.String(length=50), nullable=False, comment="Уникальный код проекта"),
-        sa.Column("name", sa.String(length=100), nullable=False, comment="Название проекта"),
+        sa.Column(
+            "code",
+            sa.String(length=50),
+            nullable=False,
+            comment="Уникальный код проекта",
+        ),
+        sa.Column(
+            "name", sa.String(length=100), nullable=False, comment="Название проекта"
+        ),
         sa.Column("description", sa.Text(), nullable=True, comment="Описание проекта"),
         sa.Column(
             "status",
@@ -34,7 +41,9 @@ def upgrade() -> None:
             nullable=False,
             comment="Статус проекта (active, completed, archived)",
         ),
-        sa.Column("created_at", sa.DateTime(), nullable=False, comment="Время создания записи"),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, comment="Время создания записи"
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(),
@@ -81,22 +90,38 @@ def upgrade() -> None:
         "users",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "username", sa.String(length=50), nullable=False, comment="Уникальное имя пользователя"
+            "username",
+            sa.String(length=50),
+            nullable=False,
+            comment="Уникальное имя пользователя",
         ),
         sa.Column(
-            "email", sa.String(length=100), nullable=False, comment="Email адрес пользователя"
+            "email",
+            sa.String(length=100),
+            nullable=False,
+            comment="Email адрес пользователя",
         ),
         sa.Column(
-            "hashed_password", sa.String(length=128), nullable=False, comment="Хэшированный пароль"
+            "hashed_password",
+            sa.String(length=128),
+            nullable=False,
+            comment="Хэшированный пароль",
         ),
-        sa.Column("name", sa.String(length=100), nullable=True, comment="Полное имя пользователя"),
+        sa.Column(
+            "name",
+            sa.String(length=100),
+            nullable=True,
+            comment="Полное имя пользователя",
+        ),
         sa.Column(
             "role",
             sa.String(length=20),
             nullable=False,
             comment="Роль пользователя (admin, manager, analyst, developer, tester, user)",
         ),
-        sa.Column("is_active", sa.Boolean(), nullable=False, comment="Активен ли пользователь"),
+        sa.Column(
+            "is_active", sa.Boolean(), nullable=False, comment="Активен ли пользователь"
+        ),
         sa.Column(
             "is_superuser",
             sa.Boolean(),
@@ -104,9 +129,14 @@ def upgrade() -> None:
             comment="Является ли пользователь суперпользователем",
         ),
         sa.Column(
-            "last_login", sa.DateTime(), nullable=True, comment="Время последнего входа в систему"
+            "last_login",
+            sa.DateTime(),
+            nullable=True,
+            comment="Время последнего входа в систему",
         ),
-        sa.Column("created_at", sa.DateTime(), nullable=False, comment="Время создания записи"),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, comment="Время создания записи"
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(),
@@ -120,29 +150,53 @@ def upgrade() -> None:
     op.create_index("ix_users_email_unique", "users", ["email"], unique=True)
     op.create_index("ix_users_is_active", "users", ["is_active"], unique=False)
     op.create_index("ix_users_last_login", "users", ["last_login"], unique=False)
-    op.create_index("ix_users_role_created", "users", ["role", "created_at"], unique=False)
+    op.create_index(
+        "ix_users_role_created", "users", ["role", "created_at"], unique=False
+    )
     op.create_index("ix_users_username_unique", "users", ["username"], unique=True)
     op.create_table(
         "refresh_tokens",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
-            "token", sa.String(length=255), nullable=False, comment="Уникальный токен обновления"
+            "token",
+            sa.String(length=255),
+            nullable=False,
+            comment="Уникальный токен обновления",
         ),
         sa.Column("user_id", sa.Integer(), nullable=False, comment="ID пользователя"),
-        sa.Column("created_at", sa.DateTime(), nullable=False, comment="Время создания токена"),
-        sa.Column("expires_at", sa.DateTime(), nullable=False, comment="Время истечения токена"),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, comment="Время создания токена"
+        ),
+        sa.Column(
+            "expires_at",
+            sa.DateTime(),
+            nullable=False,
+            comment="Время истечения токена",
+        ),
         sa.Column(
             "last_used_at",
             sa.DateTime(),
             nullable=True,
             comment="Время последнего использования токена",
         ),
-        sa.Column("is_active", sa.Boolean(), nullable=False, comment="Активен ли токен"),
-        sa.Column("user_agent", sa.Text(), nullable=True, comment="User-Agent клиента"),
-        sa.Column("ip_address", sa.String(length=45), nullable=True, comment="IP адрес клиента"),
-        sa.Column("revoked_at", sa.DateTime(), nullable=True, comment="Время отзыва токена"),
         sa.Column(
-            "revoked_by", sa.String(length=50), nullable=True, comment="Причина отзыва токена"
+            "is_active", sa.Boolean(), nullable=False, comment="Активен ли токен"
+        ),
+        sa.Column("user_agent", sa.Text(), nullable=True, comment="User-Agent клиента"),
+        sa.Column(
+            "ip_address",
+            sa.String(length=45),
+            nullable=True,
+            comment="IP адрес клиента",
+        ),
+        sa.Column(
+            "revoked_at", sa.DateTime(), nullable=True, comment="Время отзыва токена"
+        ),
+        sa.Column(
+            "revoked_by",
+            sa.String(length=50),
+            nullable=True,
+            comment="Причина отзыва токена",
         ),
         sa.ForeignKeyConstraint(
             ["user_id"],
@@ -153,27 +207,56 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_refresh_tokens")),
         sa.UniqueConstraint("token", name=op.f("uq_refresh_tokens_token")),
     )
-    op.create_index("ix_refresh_tokens_expires_at", "refresh_tokens", ["expires_at"], unique=False)
-    op.create_index("ix_refresh_tokens_is_active", "refresh_tokens", ["is_active"], unique=False)
-    op.create_index("ix_refresh_tokens_token_unique", "refresh_tokens", ["token"], unique=True)
     op.create_index(
-        "ix_refresh_tokens_user_active", "refresh_tokens", ["user_id", "is_active"], unique=False
+        "ix_refresh_tokens_expires_at", "refresh_tokens", ["expires_at"], unique=False
     )
-    op.create_index("ix_refresh_tokens_user_id", "refresh_tokens", ["user_id"], unique=False)
+    op.create_index(
+        "ix_refresh_tokens_is_active", "refresh_tokens", ["is_active"], unique=False
+    )
+    op.create_index(
+        "ix_refresh_tokens_token_unique", "refresh_tokens", ["token"], unique=True
+    )
+    op.create_index(
+        "ix_refresh_tokens_user_active",
+        "refresh_tokens",
+        ["user_id", "is_active"],
+        unique=False,
+    )
+    op.create_index(
+        "ix_refresh_tokens_user_id", "refresh_tokens", ["user_id"], unique=False
+    )
     op.create_table(
         "releases",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("project_id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(length=100), nullable=False, comment="Название релиза"),
-        sa.Column("version", sa.String(length=50), nullable=False, comment="SemVer format"),
+        sa.Column(
+            "name", sa.String(length=100), nullable=False, comment="Название релиза"
+        ),
+        sa.Column(
+            "version", sa.String(length=50), nullable=False, comment="SemVer format"
+        ),
         sa.Column("description", sa.Text(), nullable=True, comment="Описание релиза"),
-        sa.Column("status", sa.String(length=20), nullable=False, comment="Статус релиза"),
-        sa.Column("planned_date", sa.DateTime(), nullable=True, comment="Планируемая дата релиза"),
-        sa.Column("release_date", sa.DateTime(), nullable=True, comment="Фактическая дата релиза"),
+        sa.Column(
+            "status", sa.String(length=20), nullable=False, comment="Статус релиза"
+        ),
+        sa.Column(
+            "planned_date",
+            sa.DateTime(),
+            nullable=True,
+            comment="Планируемая дата релиза",
+        ),
+        sa.Column(
+            "release_date",
+            sa.DateTime(),
+            nullable=True,
+            comment="Фактическая дата релиза",
+        ),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["project_id"], ["projects.id"], name=op.f("fk_releases_project_id_projects")
+            ["project_id"],
+            ["projects.id"],
+            name=op.f("fk_releases_project_id_projects"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_releases")),
     )
@@ -184,7 +267,9 @@ def upgrade() -> None:
         sa.Column("project_id", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["project_id"], ["projects.id"], name=op.f("fk_requirement_groups_project_id_projects")
+            ["project_id"],
+            ["projects.id"],
+            name=op.f("fk_requirement_groups_project_id_projects"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_requirement_groups")),
     )
@@ -193,7 +278,9 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("project_id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(length=100), nullable=False),
-        sa.Column("template_id", sa.Integer(), nullable=True, comment="Шаблон спецификации"),
+        sa.Column(
+            "template_id", sa.Integer(), nullable=True, comment="Шаблон спецификации"
+        ),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["project_id"], ["projects.id"], name=op.f("fk_specs_project_id_projects")
@@ -206,7 +293,10 @@ def upgrade() -> None:
         sa.Column("group_id", sa.Integer(), nullable=False),
         sa.Column("version", sa.Integer(), nullable=False),
         sa.Column(
-            "snapshot_data", sa.JSON(), nullable=False, comment="Снимок группы требований и связей"
+            "snapshot_data",
+            sa.JSON(),
+            nullable=False,
+            comment="Снимок группы требований и связей",
         ),
         sa.Column("created_by", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
@@ -225,18 +315,34 @@ def upgrade() -> None:
     op.create_table(
         "requirements",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("title", sa.String(length=200), nullable=False, comment="Заголовок требования"),
-        sa.Column("description", sa.Text(), nullable=True, comment="Подробное описание требования"),
+        sa.Column(
+            "title",
+            sa.String(length=200),
+            nullable=False,
+            comment="Заголовок требования",
+        ),
+        sa.Column(
+            "description",
+            sa.Text(),
+            nullable=True,
+            comment="Подробное описание требования",
+        ),
         sa.Column("type_id", sa.Integer(), nullable=False, comment="Тип требования"),
-        sa.Column("priority_id", sa.Integer(), nullable=False, comment="Приоритет требования"),
-        sa.Column("status_id", sa.Integer(), nullable=False, comment="Статус требования"),
+        sa.Column(
+            "priority_id", sa.Integer(), nullable=False, comment="Приоритет требования"
+        ),
+        sa.Column(
+            "status_id", sa.Integer(), nullable=False, comment="Статус требования"
+        ),
         sa.Column(
             "project_id",
             sa.Integer(),
             nullable=False,
             comment="Проект, к которому относится требование",
         ),
-        sa.Column("author_id", sa.Integer(), nullable=False, comment="Автор требования"),
+        sa.Column(
+            "author_id", sa.Integer(), nullable=False, comment="Автор требования"
+        ),
         sa.Column(
             "last_modified_by",
             sa.Integer(),
@@ -255,7 +361,9 @@ def upgrade() -> None:
             nullable=True,
             comment="Спецификация, к которой относится требование",
         ),
-        sa.Column("created_at", sa.DateTime(), nullable=False, comment="Время создания записи"),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, comment="Время создания записи"
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(),
@@ -313,10 +421,16 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_requirements")),
     )
     op.create_index(
-        "ix_requirements_author_created", "requirements", ["author_id", "created_at"], unique=False
+        "ix_requirements_author_created",
+        "requirements",
+        ["author_id", "created_at"],
+        unique=False,
     )
     op.create_index(
-        "ix_requirements_project_status", "requirements", ["project_id", "status_id"], unique=False
+        "ix_requirements_project_status",
+        "requirements",
+        ["project_id", "status_id"],
+        unique=False,
     )
     op.create_table(
         "comments",
@@ -342,24 +456,37 @@ def upgrade() -> None:
         sa.Column("type_id", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["source_id"], ["requirements.id"], name=op.f("fk_relationships_source_id_requirements")
+            ["source_id"],
+            ["requirements.id"],
+            name=op.f("fk_relationships_source_id_requirements"),
         ),
         sa.ForeignKeyConstraint(
-            ["target_id"], ["requirements.id"], name=op.f("fk_relationships_target_id_requirements")
+            ["target_id"],
+            ["requirements.id"],
+            name=op.f("fk_relationships_target_id_requirements"),
         ),
         sa.ForeignKeyConstraint(
             ["type_id"],
             ["relationship_types.id"],
             name=op.f("fk_relationships_type_id_relationship_types"),
         ),
-        sa.PrimaryKeyConstraint("source_id", "target_id", "type_id", name=op.f("pk_relationships")),
+        sa.PrimaryKeyConstraint(
+            "source_id", "target_id", "type_id", name=op.f("pk_relationships")
+        ),
     )
     op.create_table(
         "test_results",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column(
             "status",
-            sa.Enum("NOT_STARTED", "IN_PROGRESS", "PASSED", "FAILED", "BLOCKED", name="teststatus"),
+            sa.Enum(
+                "NOT_STARTED",
+                "IN_PROGRESS",
+                "PASSED",
+                "FAILED",
+                "BLOCKED",
+                name="teststatus",
+            ),
             nullable=False,
         ),
         sa.Column("notes", sa.Text(), nullable=True),

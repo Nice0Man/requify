@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
 
 export interface Comment {
   id: number;
@@ -96,7 +96,7 @@ export enum ReactionType {
 }
 
 export class CommentsApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Get Comments
   async getComments(
@@ -378,4 +378,4 @@ export class CommentsApi {
 }
 
 // Export singleton instance
-export const commentsApi = new CommentsApi(new ApiClient());
+export const commentsApi = new CommentsApi();

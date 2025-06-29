@@ -6,6 +6,7 @@
 """
 
 import asyncio
+from datetime import UTC, datetime
 import sys
 from pathlib import Path
 
@@ -24,14 +25,29 @@ from app.models.release import Release
 from app.models.requirement_types import RequirementType
 from app.models.requirement_priorities import RequirementPriority
 from app.models.requirement_statuses import RequirementStatus
+from app.models.relationship_types import RelationshipType
+from app.models.spec import Spec
+from app.models.requirement_group import RequirementGroup
+from app.models.test_result import TestResult
+from app.models.comment import Comment
 from app.crud import user as crud_user
 from app.crud import project as crud_project
 from app.crud import requirement as crud_requirement
 from app.crud import release as crud_release
+from app.crud import relationship_type as crud_relationship_type
+from app.crud import spec as crud_spec
+from app.crud import requirement_group as crud_requirement_group
+from app.crud import test_result as crud_test_result
+from app.crud import comment as crud_comment
 from app.schemas.user import UserCreate
 from app.schemas.project import ProjectCreate
 from app.schemas.requirement import RequirementCreate
 from app.schemas.release import ReleaseCreate
+from app.schemas.relationship_types import RelationshipTypeCreate
+from app.schemas.spec import SpecCreate
+from app.schemas.requirement_group import RequirementGroupCreate
+from app.schemas.test_result import TestResultCreate
+from app.schemas.comment import CommentCreate
 
 
 async def create_reference_data(db: AsyncSession):
@@ -41,7 +57,10 @@ async def create_reference_data(db: AsyncSession):
     # Типы требований
     types_data = [
         {"name": "Функциональное", "description": "Функциональные требования системы"},
-        {"name": "Нефункциональное", "description": "Требования к производительности, безопасности, удобству использования"},
+        {
+            "name": "Нефункциональное",
+            "description": "Требования к производительности, безопасности, удобству использования",
+        },
         {"name": "Бизнес-требование", "description": "Бизнес-правила и процессы"},
         {"name": "Техническое", "description": "Технические ограничения и требования"},
     ]
@@ -51,7 +70,7 @@ async def create_reference_data(db: AsyncSession):
         # Проверяем, существует ли тип
         existing_type = await db.execute(
             text("SELECT * FROM requirement_types WHERE name = :name"),
-            {"name": type_data["name"]}
+            {"name": type_data["name"]},
         )
         if not existing_type.first():
             req_type = RequirementType(**type_data)
@@ -62,7 +81,7 @@ async def create_reference_data(db: AsyncSession):
             # Получаем существующий тип
             result = await db.execute(
                 text("SELECT * FROM requirement_types WHERE name = :name"),
-                {"name": type_data["name"]}
+                {"name": type_data["name"]},
             )
             row = result.first()
             existing_type = RequirementType(id=row[0], name=row[1], description=row[2])
@@ -81,7 +100,7 @@ async def create_reference_data(db: AsyncSession):
         # Проверяем, существует ли приоритет
         existing_priority = await db.execute(
             text("SELECT * FROM requirement_priorities WHERE name = :name"),
-            {"name": priority_data["name"]}
+            {"name": priority_data["name"]},
         )
         if not existing_priority.first():
             req_priority = RequirementPriority(name=priority_data["name"])
@@ -92,7 +111,7 @@ async def create_reference_data(db: AsyncSession):
             # Получаем существующий приоритет
             result = await db.execute(
                 text("SELECT * FROM requirement_priorities WHERE name = :name"),
-                {"name": priority_data["name"]}
+                {"name": priority_data["name"]},
             )
             row = result.first()
             existing_priority = RequirementPriority(id=row[0], name=row[1])
@@ -115,7 +134,7 @@ async def create_reference_data(db: AsyncSession):
         # Проверяем, существует ли статус
         existing_status = await db.execute(
             text("SELECT * FROM requirement_statuses WHERE name = :name"),
-            {"name": status_data["name"]}
+            {"name": status_data["name"]},
         )
         if not existing_status.first():
             req_status = RequirementStatus(name=status_data["name"])
@@ -126,17 +145,53 @@ async def create_reference_data(db: AsyncSession):
             # Получаем существующий статус
             result = await db.execute(
                 text("SELECT * FROM requirement_statuses WHERE name = :name"),
-                {"name": status_data["name"]}
+                {"name": status_data["name"]},
             )
             row = result.first()
             existing_status = RequirementStatus(id=row[0], name=row[1])
             created_statuses.append(existing_status)
 
-    print(f"✅ Создано {len(created_types)} типов, {len(created_priorities)} приоритетов, {len(created_statuses)} статусов")
+    # Типы связей
+    relationship_types_data = [
+        {"name": "depends_on"},
+        {"name": "derived_from"},
+        {"name": "refines"},
+        {"name": "conflicts_with"},
+        {"name": "implements"},
+        {"name": "validates"},
+    ]
+
+    created_relationship_types = []
+    for rel_type_data in relationship_types_data:
+        # Проверяем, существует ли тип связи
+        existing_rel_type = await db.execute(
+            text("SELECT * FROM relationship_types WHERE name = :name"),
+            {"name": rel_type_data["name"]},
+        )
+        if not existing_rel_type.first():
+            rel_type = RelationshipType(**rel_type_data)
+            db.add(rel_type)
+            await db.flush()
+            created_relationship_types.append(rel_type)
+        else:
+            # Получаем существующий тип
+            result = await db.execute(
+                text("SELECT * FROM relationship_types WHERE name = :name"),
+                {"name": rel_type_data["name"]},
+            )
+            row = result.first()
+            existing_rel_type = RelationshipType(id=row[0], name=row[1])
+            created_relationship_types.append(existing_rel_type)
+
+    print(
+        f"✅ Создано {len(created_types)} типов, {len(created_priorities)} приоритетов, "
+        f"{len(created_statuses)} статусов, {len(created_relationship_types)} типов связей"
+    )
     return {
         "types": created_types,
         "priorities": created_priorities,
-        "statuses": created_statuses
+        "statuses": created_statuses,
+        "relationship_types": created_relationship_types,
     }
 
 
@@ -146,13 +201,15 @@ async def create_sample_users(db: AsyncSession):
 
     users_data = [
         {
-            "username": "admin",
+            "username": "adminuser",
             "email": "admin@example.com",
             "name": "Администратор",
             "role": "admin",
             "password": "SecurePass123!",
             "is_active": True,
             "is_superuser": True,
+            "email_verified": True,
+            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
         },
         {
             "username": "manager",
@@ -242,6 +299,97 @@ async def create_sample_projects(db: AsyncSession, owner_user: User):
     return created_projects
 
 
+async def create_sample_specs(db: AsyncSession, projects: list[Project]):
+    """Создать примеры спецификаций."""
+    print("🔄 Создание спецификаций...")
+
+    if not projects:
+        print("❌ Нет проектов для создания спецификаций")
+        return []
+
+    main_project = projects[0]  # Используем первый проект
+
+    specs_data = [
+        {
+            "name": "Функциональные требования v1.0",
+            "description": "Основная спецификация функциональных требований",
+            "project_id": main_project.id,
+        },
+        {
+            "name": "Интерфейс пользователя",
+            "description": "Спецификация требований к пользовательскому интерфейсу",
+            "project_id": main_project.id,
+        },
+        {
+            "name": "API спецификация",
+            "description": "Техническая спецификация программного интерфейса",
+            "project_id": main_project.id,
+        },
+    ]
+
+    # Создание спецификаций через ORM
+    created_specs = []
+    for spec_data in specs_data:
+        # Проверяем, существует ли спецификация
+        existing_spec = await crud_spec.get_by_name(
+            db, name=spec_data["name"], project_id=spec_data["project_id"]
+        )
+        if not existing_spec:
+            spec_create = SpecCreate(**spec_data)
+            spec = await crud_spec.create(db, obj_in=spec_create)
+            created_specs.append(spec)
+        else:
+            print(f"Спецификация '{spec_data['name']}' уже существует")
+            created_specs.append(existing_spec)
+
+    print(f"✅ Создано {len(created_specs)} спецификаций")
+    return created_specs
+
+
+async def create_sample_requirement_groups(db: AsyncSession, projects: list[Project]):
+    """Создать примеры групп требований."""
+    print("🔄 Создание групп требований...")
+
+    if not projects:
+        print("❌ Нет проектов для создания групп требований")
+        return []
+
+    main_project = projects[0]  # Используем первый проект
+
+    groups_data = [
+        {
+            "name": "Аутентификация и авторизация",
+            "project_id": main_project.id,
+        },
+        {
+            "name": "Управление проектами",
+            "project_id": main_project.id,
+        },
+        {
+            "name": "Отчетность",
+            "project_id": main_project.id,
+        },
+    ]
+
+    # Создание групп требований через ORM
+    created_groups = []
+    for group_data in groups_data:
+        # Проверяем, существует ли группа
+        existing_group = await crud_requirement_group.get_by_name(
+            db, name=group_data["name"], project_id=group_data["project_id"]
+        )
+        if not existing_group:
+            group_create = RequirementGroupCreate(**group_data)
+            group = await crud_requirement_group.create(db, obj_in=group_create)
+            created_groups.append(group)
+        else:
+            print(f"Группа требований '{group_data['name']}' уже существует")
+            created_groups.append(existing_group)
+
+    print(f"✅ Создано {len(created_groups)} групп требований")
+    return created_groups
+
+
 async def create_sample_requirements(
     db: AsyncSession, projects: list[Project], author: User, reference_data: dict
 ):
@@ -252,22 +400,41 @@ async def create_sample_requirements(
         print("❌ Нет проектов для создания требований")
         return []
 
-    if not reference_data.get("types") or not reference_data.get("priorities") or not reference_data.get("statuses"):
+    if (
+        not reference_data.get("types")
+        or not reference_data.get("priorities")
+        or not reference_data.get("statuses")
+    ):
         print("❌ Нет справочных данных для создания требований")
         return []
 
     main_project = projects[0]  # Используем первый проект
 
     # Получаем ID для разных типов требований
-    functional_type = next((t for t in reference_data["types"] if t.name == "Функциональное"), reference_data["types"][0])
-    nonfunctional_type = next((t for t in reference_data["types"] if t.name == "Нефункциональное"), reference_data["types"][0])
-    
+    functional_type = next(
+        (t for t in reference_data["types"] if t.name == "Функциональное"),
+        reference_data["types"][0],
+    )
+    nonfunctional_type = next(
+        (t for t in reference_data["types"] if t.name == "Нефункциональное"),
+        reference_data["types"][0],
+    )
+
     # Получаем ID для разных приоритетов
-    high_priority = next((p for p in reference_data["priorities"] if p.name == "Высокий"), reference_data["priorities"][0])
-    medium_priority = next((p for p in reference_data["priorities"] if p.name == "Средний"), reference_data["priorities"][0])
-    
+    high_priority = next(
+        (p for p in reference_data["priorities"] if p.name == "Высокий"),
+        reference_data["priorities"][0],
+    )
+    medium_priority = next(
+        (p for p in reference_data["priorities"] if p.name == "Средний"),
+        reference_data["priorities"][0],
+    )
+
     # Получаем ID для статуса "Черновик"
-    draft_status = next((s for s in reference_data["statuses"] if s.name == "Черновик"), reference_data["statuses"][0])
+    draft_status = next(
+        (s for s in reference_data["statuses"] if s.name == "Черновик"),
+        reference_data["statuses"][0],
+    )
 
     requirements_data = [
         {
@@ -383,44 +550,115 @@ async def create_sample_releases(db: AsyncSession, projects: list[Project]):
     return created_releases
 
 
-async def create_sample_test_data(db: AsyncSession, projects: list[Project]):
-    """Создать примеры тестовых данных."""
-    print("🔄 Создание тестовых данных...")
+async def create_sample_test_results(
+    db: AsyncSession, requirements: list[Requirement], author: User
+):
+    """Создать примеры результатов тестирования."""
+    print("🔄 Создание результатов тестирования...")
 
-    if not projects:
-        print("❌ Нет проектов для создания тестовых данных")
+    if not requirements:
+        print("❌ Нет требований для создания результатов тестирования")
         return []
 
-    main_project = projects[0]  # Используем первый проект
-
-    # Примечание: пока что создаем фиктивные данные, так как тестовые планы и кейсы
-    # могут потребовать отдельных моделей и CRUD операций
-    test_plans_data = [
+    test_results_data = [
         {
-            "name": "Основной тестовый план",
-            "description": "Полное функциональное тестирование системы",
-            "project_id": main_project.id,
-        }
-    ]
-
-    test_cases_data = [
-        {
-            "name": "Тест входа в систему",
-            "description": "Проверка аутентификации пользователя",
+            "requirement_id": requirements[0].id,
+            "status": "passed",
+            "notes": "Тест входа в систему - позитивный сценарий. Все проверки пройдены успешно",
+            "external_id": "TC_001",
         },
         {
-            "name": "Тест создания проекта",
-            "description": "Проверка создания нового проекта",
+            "requirement_id": requirements[0].id,
+            "status": "failed",
+            "notes": "Тест входа в систему - негативный сценарий. Ошибка валидации учетных данных",
+            "external_id": "TC_002",
+        },
+        {
+            "requirement_id": (
+                requirements[1].id if len(requirements) > 1 else requirements[0].id
+            ),
+            "status": "passed",
+            "notes": "Тест создания проекта. Проект создан успешно",
+            "external_id": "TC_003",
         },
     ]
 
-    # Создание тестовых данных через ORM
-    # В реальной реализации здесь будут использоваться соответствующие CRUD операции
-    # для создания тестовых планов и кейсов
-    print(
-        f"✅ Подготовлено {len(test_plans_data)} тестовых планов и {len(test_cases_data)} тест-кейсов"
-    )
-    return test_plans_data + test_cases_data
+    # Создание результатов тестирования через ORM
+    created_test_results = []
+    for test_data in test_results_data:
+        # Проверяем, существует ли результат теста (простая проверка по external_id)
+        existing_results = await crud_test_result.get_by_requirement(
+            db, requirement_id=test_data["requirement_id"]
+        )
+        existing_external_ids = [
+            res.external_id for res in existing_results if res.external_id
+        ]
+
+        if test_data["external_id"] not in existing_external_ids:
+            test_create = TestResultCreate(**test_data)
+            test_result = await crud_test_result.create(db, obj_in=test_create)
+            created_test_results.append(test_result)
+        else:
+            print(f"Результат теста '{test_data['external_id']}' уже существует")
+
+    print(f"✅ Создано {len(created_test_results)} результатов тестирования")
+    return created_test_results
+
+
+async def create_sample_comments(
+    db: AsyncSession, requirements: list[Requirement], users: list[User]
+):
+    """Создать примеры комментариев."""
+    print("🔄 Создание комментариев...")
+
+    if not requirements or not users:
+        print("❌ Нет требований или пользователей для создания комментариев")
+        return []
+
+    # Используем разных пользователей для комментариев
+    admin_user = users[0]
+    manager_user = users[1] if len(users) > 1 else users[0]
+
+    comments_data = [
+        {
+            "content": "Требование нуждается в дополнительной детализации",
+            "requirement_id": requirements[0].id,
+        },
+        {
+            "content": "Согласовано с архитектурой системы",
+            "requirement_id": requirements[0].id,
+        },
+        {
+            "content": "Необходимо учесть требования безопасности",
+            "requirement_id": (
+                requirements[1].id if len(requirements) > 1 else requirements[0].id
+            ),
+        },
+    ]
+
+    # Создание комментариев через ORM
+    created_comments = []
+    for i, comment_data in enumerate(comments_data):
+        # Используем разных авторов
+        author = admin_user if i % 2 == 0 else manager_user
+
+        # Проверяем, существует ли комментарий (простая проверка по тексту)
+        existing_comments = await crud_comment.get_by_requirement(
+            db, requirement_id=comment_data["requirement_id"]
+        )
+        existing_texts = [comment.content for comment in existing_comments]
+
+        if comment_data["content"] not in existing_texts:
+            comment_create = CommentCreate(**comment_data)
+            comment = await crud_comment.create(
+                db, obj_in=comment_create, author_id=author.id
+            )
+            created_comments.append(comment)
+        else:
+            print(f"Комментарий уже существует")
+
+    print(f"✅ Создано {len(created_comments)} комментариев")
+    return created_comments
 
 
 async def seed_database():
@@ -447,6 +685,14 @@ async def seed_database():
             # Создаем проекты
             projects = await create_sample_projects(session, admin_user)
 
+            # Создаем спецификации
+            specs = await create_sample_specs(session, projects)
+
+            # Создаем группы требований
+            requirement_groups = await create_sample_requirement_groups(
+                session, projects
+            )
+
             # Создаем требования
             requirements = await create_sample_requirements(
                 session, projects, admin_user, reference_data
@@ -455,8 +701,13 @@ async def seed_database():
             # Создаем релизы
             releases = await create_sample_releases(session, projects)
 
-            # Создаем тестовые данные
-            test_data = await create_sample_test_data(session, projects)
+            # Создаем результаты тестирования
+            test_results = await create_sample_test_results(
+                session, requirements, admin_user
+            )
+
+            # Создаем комментарии
+            comments = await create_sample_comments(session, requirements, users)
 
             # Коммитим все изменения
             await session.commit()
@@ -502,19 +753,26 @@ async def clear_database():
             from app.models.comment import Comment
             from app.models.test_result import TestResult
             from app.models.refresh_token import RefreshToken
+            from app.models.relationship import Relationship
+            from app.models.spec import Spec
+            from app.models.requirement_group import RequirementGroup
 
             print("🔄 Удаление связанных данных...")
 
             # Удаляем в правильном порядке (сначала зависимые таблицы)
             await session.execute(text("DELETE FROM comments"))
             await session.execute(text("DELETE FROM test_results"))
+            await session.execute(text("DELETE FROM relationships"))
             await session.execute(text("DELETE FROM requirements"))
+            await session.execute(text("DELETE FROM requirement_groups"))
+            await session.execute(text("DELETE FROM specs"))
             await session.execute(text("DELETE FROM releases"))
             await session.execute(text("DELETE FROM projects"))
             await session.execute(text("DELETE FROM refresh_tokens"))
             await session.execute(text("DELETE FROM users"))
-            
+
             # Удаляем справочные данные
+            await session.execute(text("DELETE FROM relationship_types"))
             await session.execute(text("DELETE FROM requirement_types"))
             await session.execute(text("DELETE FROM requirement_priorities"))
             await session.execute(text("DELETE FROM requirement_statuses"))

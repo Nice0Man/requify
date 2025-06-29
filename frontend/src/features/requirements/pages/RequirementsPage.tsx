@@ -554,7 +554,7 @@ const RequirementsPage: React.FC = () => {
                     In Progress
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {requirements.filter(r => !r.status?.is_final).length}
+                    {requirements?.filter(r => r && r.status && !r.status.is_final).length || 0}
                   </Typography>
                 </Box>
                 <ScheduleIcon color="warning" sx={{ fontSize: 40 }} />
@@ -571,7 +571,7 @@ const RequirementsPage: React.FC = () => {
                     Completed
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {requirements.filter(r => r.status?.is_final).length}
+                    {requirements?.filter(r => r && r.status && r.status.is_final).length || 0}
                   </Typography>
                 </Box>
                 <CheckCircleIcon color="success" sx={{ fontSize: 40 }} />
@@ -588,7 +588,7 @@ const RequirementsPage: React.FC = () => {
                     High Risk
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {requirements.filter(r => r.risk_level === 'high' || r.risk_level === 'critical').length}
+                    {requirements?.filter(r => r && (r.risk_level === 'high' || r.risk_level === 'critical')).length || 0}
                   </Typography>
                 </Box>
                 <BugIcon color="error" sx={{ fontSize: 40 }} />

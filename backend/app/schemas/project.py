@@ -96,6 +96,9 @@ class ProjectBase(BaseModel):
 class ProjectCreate(ProjectBase):
     """Схема для создания проекта."""
 
+    # owner_id will be set automatically by the API endpoint
+    # from the current user, so it's not required in the request body
+
     @model_validator(mode="before")
     @classmethod
     def validate_project_creation(cls, data):
@@ -218,6 +221,7 @@ class ProjectInDBBase(ProjectBase):
     """Базовая схема проекта с данными из БД."""
 
     id: int
+    owner_id: int
     created_at: datetime
 
     class Config:

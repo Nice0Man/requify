@@ -1,9 +1,11 @@
 from datetime import UTC, datetime
+from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import DateTime, Integer, String, Text, Index
+from sqlalchemy import DateTime, Integer, String, Text, Index, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from .constants import ProjectStatus
 from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
@@ -11,6 +13,8 @@ if TYPE_CHECKING:
     from .release import Release
     from .spec import Spec
     from .requirement_group import RequirementGroup
+    from .user import User
+    from .dashboard import DashboardNotification, DashboardActivity
 
 
 class Project(Base, TimestampedMixin):
@@ -39,11 +43,22 @@ class Project(Base, TimestampedMixin):
     )
     status: Mapped[str] = mapped_column(
         String(50),
+        default=ProjectStatus.DRAFT,
+        comment="Статус проекта",
         nullable=False,
-        comment="Статус проекта (active, completed, archived)",
+    )
+    owner_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="RESTRICT"),
+        nullable=False,
+        comment="Владелец проекта",
     )
 
     # Отношения
+    owner: Mapped["User"] = relationship(
+        "User", back_populates="owned_projects", lazy="select"
+    )
+
     requirements: Mapped[List["Requirement"]] = relationship(
         "Requirement",
         back_populates="project",
@@ -64,4 +79,19 @@ class Project(Base, TimestampedMixin):
         back_populates="project",
         cascade="all, delete-orphan",
         lazy="select",
+    )
+
+    # Dashboard relationships
+    notifications: Mapped[List["DashboardNotification"]] = relationship(
+        "DashboardNotification",
+        back_populates="project",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    activities: Mapped[List["DashboardActivity"]] = relationship(
+        "DashboardActivity",
+        back_populates="project",
+        lazy="select",
+        cascade="all, delete-orphan",
     )

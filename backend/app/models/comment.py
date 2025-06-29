@@ -19,7 +19,7 @@ class Comment(Base):
     __tablename__ = "comments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    text: Mapped[str] = mapped_column(Text, nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
     requirement_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("requirements.id"), nullable=False
     )

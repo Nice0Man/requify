@@ -426,4 +426,32 @@ export enum TestStatus {
   FAILED = 'failed',
   SKIPPED = 'skipped',
   BLOCKED = 'blocked'
+}
+
+// Add this new interface to match the backend RequirementWithDetails schema
+export interface RequirementDetails {
+  id: number;
+  title: string;
+  description?: string;
+  deadline?: string;
+  type_id: number;
+  priority_id: number;
+  status_id: number;
+  project_id: number;
+  author_id: number;
+  last_modified_by: number;
+  release_id?: number;
+  spec_id?: number;
+  created_at: string;
+  updated_at: string;
+  // Additional detail fields from backend
+  type_name?: string;
+  priority_name?: string;
+  status_name?: string;
+  project_name?: string;
+  author_name?: string;
+  last_modifier_name?: string;
+  release_version?: string;
+  spec_name?: string;
+  tags?: string[];
 } 

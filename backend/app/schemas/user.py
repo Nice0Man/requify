@@ -97,22 +97,22 @@ class UserBase(BaseModel):
             v = v.strip()
             if not v:
                 return None
-            
+
             # Удаляем все символы кроме цифр и +
-            phone_digits = re.sub(r'[^\d+]', '', v)
-            
+            phone_digits = re.sub(r"[^\d+]", "", v)
+
             # Проверяем формат телефона (международный или российский)
-            if not re.match(r'^(\+7|8|7)?[0-9]{10}$', phone_digits):
+            if not re.match(r"^(\+7|8|7)?[0-9]{10}$", phone_digits):
                 raise ValueError("Invalid phone number format")
-            
+
             # Нормализуем к формату +7XXXXXXXXXX
-            if phone_digits.startswith('8'):
-                phone_digits = '+7' + phone_digits[1:]
-            elif phone_digits.startswith('7') and not phone_digits.startswith('+7'):
-                phone_digits = '+' + phone_digits
-            elif not phone_digits.startswith('+7'):
-                phone_digits = '+7' + phone_digits
-                
+            if phone_digits.startswith("8"):
+                phone_digits = "+7" + phone_digits[1:]
+            elif phone_digits.startswith("7") and not phone_digits.startswith("+7"):
+                phone_digits = "+" + phone_digits
+            elif not phone_digits.startswith("+7"):
+                phone_digits = "+7" + phone_digits
+
             return phone_digits
         return v
 
@@ -123,15 +123,15 @@ class UserBase(BaseModel):
             v = v.strip()
             if not v:
                 return None
-            
+
             # Проверяем, что содержит только буквы, пробелы и дефисы
-            if not re.match(r'^[a-zA-Zа-яА-ЯёЁ\s\-]+$', v):
+            if not re.match(r"^[a-zA-Zа-яА-ЯёЁ\s\-]+$", v):
                 raise ValueError("Name can only contain letters, spaces and hyphens")
-            
+
             # Проверяем длину
             if len(v) > 50:
                 raise ValueError("Name cannot exceed 50 characters")
-                
+
             return v.title()  # Приводим к правильному регистру
         return v
 
@@ -142,11 +142,11 @@ class UserBase(BaseModel):
             v = v.strip()
             if not v:
                 return None
-            
+
             # Проверяем длину
             if len(v) > 100:
                 raise ValueError("Department name cannot exceed 100 characters")
-                
+
             return v
         return v
 
@@ -369,22 +369,22 @@ class UserUpdate(BaseModel):
             v = v.strip()
             if not v:
                 return None
-            
+
             # Удаляем все символы кроме цифр и +
-            phone_digits = re.sub(r'[^\d+]', '', v)
-            
+            phone_digits = re.sub(r"[^\d+]", "", v)
+
             # Проверяем формат телефона (международный или российский)
-            if not re.match(r'^(\+7|8|7)?[0-9]{10}$', phone_digits):
+            if not re.match(r"^(\+7|8|7)?[0-9]{10}$", phone_digits):
                 raise ValueError("Invalid phone number format")
-            
+
             # Нормализуем к формату +7XXXXXXXXXX
-            if phone_digits.startswith('8'):
-                phone_digits = '+7' + phone_digits[1:]
-            elif phone_digits.startswith('7') and not phone_digits.startswith('+7'):
-                phone_digits = '+' + phone_digits
-            elif not phone_digits.startswith('+7'):
-                phone_digits = '+7' + phone_digits
-                
+            if phone_digits.startswith("8"):
+                phone_digits = "+7" + phone_digits[1:]
+            elif phone_digits.startswith("7") and not phone_digits.startswith("+7"):
+                phone_digits = "+" + phone_digits
+            elif not phone_digits.startswith("+7"):
+                phone_digits = "+7" + phone_digits
+
             return phone_digits
         return v
 
@@ -395,15 +395,15 @@ class UserUpdate(BaseModel):
             v = v.strip()
             if not v:
                 return None
-            
+
             # Проверяем, что содержит только буквы, пробелы и дефисы
-            if not re.match(r'^[a-zA-Zа-яА-ЯёЁ\s\-]+$', v):
+            if not re.match(r"^[a-zA-Zа-яА-ЯёЁ\s\-]+$", v):
                 raise ValueError("Name can only contain letters, spaces and hyphens")
-            
+
             # Проверяем длину
             if len(v) > 50:
                 raise ValueError("Name cannot exceed 50 characters")
-                
+
             return v.title()  # Приводим к правильному регистру
         return v
 
@@ -414,11 +414,11 @@ class UserUpdate(BaseModel):
             v = v.strip()
             if not v:
                 return None
-            
+
             # Проверяем длину
             if len(v) > 100:
                 raise ValueError("Department name cannot exceed 100 characters")
-                
+
             return v
         return v
 
@@ -505,7 +505,7 @@ class UserInDB(UserInDBBase):
 
 class UserLogin(BaseModel):
     """Схема для входа пользователя."""
-    
+
     username: str = Field(..., description="Имя пользователя или email")
     password: str = Field(..., description="Пароль пользователя")
 
@@ -514,7 +514,7 @@ class UserLogin(BaseModel):
         """Валидация имени пользователя или email для входа"""
         if not v or not v.strip():
             raise ValueError("Username or email cannot be empty")
-        
+
         return v.strip().lower()
 
     @field_validator("password")
@@ -522,13 +522,13 @@ class UserLogin(BaseModel):
         """Валидация пароля для входа"""
         if not v:
             raise ValueError("Password cannot be empty")
-        
+
         return v
 
 
 class UserProfile(BaseModel):
     """Схема профиля пользователя для публичного просмотра."""
-    
+
     id: int
     username: str
     first_name: Optional[str] = None
@@ -536,7 +536,7 @@ class UserProfile(BaseModel):
     department: Optional[str] = None
     role: str
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -553,7 +553,7 @@ class UserProfile(BaseModel):
 
 class UserPasswordChange(BaseModel):
     """Схема для смены пароля."""
-    
+
     current_password: str = Field(..., description="Текущий пароль")
     new_password: str = Field(..., min_length=8, description="Новый пароль")
     confirm_password: str = Field(..., description="Подтверждение нового пароля")
@@ -586,16 +586,16 @@ class UserPasswordChange(BaseModel):
         """Проверка совпадения паролей"""
         if self.new_password != self.confirm_password:
             raise ValueError("New password and confirmation do not match")
-        
+
         if self.current_password == self.new_password:
             raise ValueError("New password must be different from current password")
-        
+
         return self
 
 
 class UserPasswordReset(BaseModel):
     """Схема для сброса пароля."""
-    
+
     email: EmailStr = Field(..., description="Email пользователя")
 
     @field_validator("email")
@@ -606,7 +606,7 @@ class UserPasswordReset(BaseModel):
 
 class UserPasswordResetConfirm(BaseModel):
     """Схема для подтверждения сброса пароля."""
-    
+
     token: str = Field(..., description="Токен сброса пароля")
     new_password: str = Field(..., min_length=8, description="Новый пароль")
     confirm_password: str = Field(..., description="Подтверждение нового пароля")
@@ -639,13 +639,13 @@ class UserPasswordResetConfirm(BaseModel):
         """Проверка совпадения паролей"""
         if self.new_password != self.confirm_password:
             raise ValueError("New password and confirmation do not match")
-        
+
         return self
 
 
 class EmailVerificationRequest(BaseModel):
     """Схема для запроса верификации email."""
-    
+
     email: EmailStr = Field(..., description="Email для верификации")
 
     @field_validator("email")
@@ -656,7 +656,7 @@ class EmailVerificationRequest(BaseModel):
 
 class EmailVerificationConfirm(BaseModel):
     """Схема для подтверждения верификации email."""
-    
+
     token: str = Field(..., description="Токен верификации email")
 
     @field_validator("token")

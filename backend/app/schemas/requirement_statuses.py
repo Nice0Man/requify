@@ -20,26 +20,13 @@ class RequirementStatusBase(BaseModel):
         if not v or not v.strip():
             raise ValueError("Requirement status name cannot be empty")
 
-        v = v.strip().lower()  # Приводим к нижнему регистру для стандартизации
+        # Allow any reasonable status name (remove strict validation)
+        v = v.strip()
 
-        # Предопределенные статусы требований
-        valid_statuses = [
-            "draft",
-            "under_review",
-            "approved",
-            "rejected",
-            "in_development",
-            "in_testing",
-            "completed",
-            "cancelled",
-            "on_hold",
-            "archived",
-        ]
-
-        if v not in valid_statuses:
-            raise ValueError(
-                f"Invalid requirement status. Must be one of: {valid_statuses}"
-            )
+        # Basic validation for security
+        forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "script"]
+        if any(char in v.lower() for char in forbidden_chars):
+            raise ValueError("Status name contains forbidden characters")
 
         return v
 
@@ -75,25 +62,13 @@ class RequirementStatusUpdate(BaseModel):
             if not v or not v.strip():
                 raise ValueError("Requirement status name cannot be empty")
 
-            v = v.strip().lower()
+            # Allow any reasonable status name (remove strict validation)
+            v = v.strip()
 
-            valid_statuses = [
-                "draft",
-                "under_review",
-                "approved",
-                "rejected",
-                "in_development",
-                "in_testing",
-                "completed",
-                "cancelled",
-                "on_hold",
-                "archived",
-            ]
-
-            if v not in valid_statuses:
-                raise ValueError(
-                    f"Invalid requirement status. Must be one of: {valid_statuses}"
-                )
+            # Basic validation for security
+            forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "script"]
+            if any(char in v.lower() for char in forbidden_chars):
+                raise ValueError("Status name contains forbidden characters")
 
             return v
         return v

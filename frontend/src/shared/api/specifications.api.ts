@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from '@/shared/api/client';
+import { apiClient, ApiClient, ApiResponse } from '@/shared/api/client';
 
 export interface Specification {
   id: number;
@@ -117,7 +117,7 @@ export enum DocumentFormat {
 }
 
 export class SpecificationsApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Get Specifications
   async getSpecifications(params?: SpecificationListParams): Promise<ApiResponse<SpecificationListResponse>> {
@@ -189,4 +189,4 @@ export class SpecificationsApi {
 }
 
 // Export singleton instance
-export const specificationsApi = new SpecificationsApi(new ApiClient()); 
+export const specificationsApi = new SpecificationsApi(); 

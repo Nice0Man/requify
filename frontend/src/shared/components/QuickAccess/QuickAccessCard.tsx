@@ -12,6 +12,9 @@ import {
   Skeleton,
   useTheme,
   alpha,
+  Button,
+  Fade,
+  Stack,
 } from "@mui/material";
 import {
   MoreVert,
@@ -22,6 +25,10 @@ import {
   Warning,
   CheckCircle,
   Error,
+  TrendingUp,
+  Person,
+  ArrowForward,
+  Circle,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import {
@@ -100,23 +107,43 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
     }
   };
 
+  const cardStyle = {
+    borderRadius: 4,
+    boxShadow: `0 8px 32px -8px ${alpha(theme.palette.common.black, 0.12)}`,
+    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+    background: theme.palette.background.paper,
+    backdropFilter: "blur(20px)",
+    WebkitBackdropFilter: "blur(20px)",
+    height: "100%",
+    overflow: "hidden",
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      height: "1px",
+      background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.8)}, transparent)`,
+      zIndex: 1,
+    },
+  };
+
   if (loading) {
     return (
       <Grid container spacing={3}>
         {Array.from({ length: 3 }).map((_, index) => (
           <Grid item xs={12} md={4} key={index}>
-            <Card
-              sx={{
-                borderRadius: 3,
-                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-              }}
-            >
-              <CardHeader title={<Skeleton variant="text" width="60%" />} />
-              <CardContent>
+            <Card sx={cardStyle}>
+              <CardHeader 
+                title={<Skeleton variant="text" width="60%" height={28} />} 
+                sx={{ pb: 2 }}
+              />
+              <CardContent sx={{ pt: 0 }}>
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <Box key={i} sx={{ mb: 2 }}>
-                    <Skeleton variant="text" width="80%" />
-                    <Skeleton variant="text" width="60%" />
+                  <Box key={i} sx={{ mb: 3 }}>
+                    <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 2, mb: 1 }} />
+                    <Skeleton variant="text" width="80%" height={20} />
+                    <Skeleton variant="text" width="60%" height={16} />
                   </Box>
                 ))}
               </CardContent>
@@ -131,166 +158,231 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
     <Grid container spacing={3}>
       {/* My Projects */}
       <Grid item xs={12} md={4}>
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
-            border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-            height: "100%",
-          }}
-        >
+        <Card sx={cardStyle}>
           <CardHeader
             title={
-              <Box display="flex" alignItems="center" gap={1}>
-                <FolderOpen color="primary" fontSize="small" />
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 2,
+                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.primary.main, 0.05)})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                  }}
+                >
+                  <FolderOpen color="primary" fontSize="small" />
+                </Box>
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                  sx={{ 
+                    fontWeight: 600, 
+                    fontSize: "1.1rem",
+                    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                    letterSpacing: "-0.01em",
+                  }}
                 >
                   My Projects
                 </Typography>
               </Box>
             }
             action={
-              <IconButton size="small" onClick={() => navigate("/projects")}>
+              <IconButton 
+                size="small" 
+                onClick={() => navigate("/projects")}
+                sx={{
+                  color: theme.palette.action.active,
+                  opacity: 0.6,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: alpha(theme.palette.action.active, 0.08),
+                  },
+                }}
+              >
                 <MoreVert />
               </IconButton>
             }
-            sx={{ pb: 1 }}
+            sx={{ pb: 2 }}
           />
-          <CardContent sx={{ pt: 0 }}>
+          <CardContent sx={{ pt: 0, pb: 3 }}>
             {projects.length === 0 ? (
               <Box
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
-                py={3}
+                py={4}
               >
-                <FolderOpen
-                  sx={{ fontSize: 48, color: theme.palette.grey[400], mb: 1 }}
-                />
+                <Box
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 3,
+                    background: `linear-gradient(135deg, ${alpha(theme.palette.grey[400], 0.1)}, ${alpha(theme.palette.grey[400], 0.05)})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 2,
+                  }}
+                >
+                  <FolderOpen
+                    sx={{ fontSize: 24, color: theme.palette.grey[400] }}
+                  />
+                </Box>
                 <Typography
                   color="text.secondary"
                   variant="body2"
                   align="center"
+                  sx={{ fontWeight: 500 }}
                 >
                   No projects assigned
                 </Typography>
               </Box>
             ) : (
-              <Box display="flex" flexDirection="column" gap={2}>
-                {projects.slice(0, 3).map((project) => (
-                  <Card
+              <Stack spacing={2}>
+                {projects.slice(0, 3).map((project, index) => (
+                  <Fade
                     key={project.id}
-                    variant="outlined"
-                    sx={{
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      "&:hover": {
-                        backgroundColor: alpha(
-                          theme.palette.primary.main,
-                          0.04
-                        ),
-                        borderColor: theme.palette.primary.main,
-                      },
-                    }}
-                    onClick={() => navigate(`/projects/${project.id}`)}
+                    in={true}
+                    timeout={300 + index * 100}
+                    style={{ transitionDelay: `${index * 50}ms` }}
                   >
-                    <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="flex-start"
-                        mb={1}
-                      >
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ fontWeight: 600 }}
-                        >
-                          {project.name}
-                        </Typography>
-                        <Box display="flex" alignItems="center" gap={0.5}>
-                          {getHealthIcon(project.health_score)}
-                          <Typography
-                            variant="caption"
-                            sx={{ color: getHealthColor(project.health_score) }}
-                          >
-                            {project.health_score}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mb: 1, display: "block" }}
-                      >
-                        {project.code}
-                      </Typography>
-
-                      <Box mb={1}>
+                    <Card
+                      variant="outlined"
+                      sx={{
+                        cursor: "pointer",
+                        transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                        borderRadius: 3,
+                        "&:hover": {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.02),
+                          borderColor: alpha(theme.palette.primary.main, 0.3),
+                          transform: "translateY(-2px)",
+                          boxShadow: `0 8px 25px -8px ${alpha(theme.palette.primary.main, 0.25)}`,
+                        },
+                      }}
+                      onClick={() => navigate(`/projects/${project.id}`)}
+                    >
+                      <CardContent sx={{ p: 3 }}>
                         <Box
                           display="flex"
                           justifyContent="space-between"
-                          alignItems="center"
-                          mb={0.5}
+                          alignItems="flex-start"
+                          mb={2}
                         >
-                          <Typography variant="caption" color="text.secondary">
-                            Progress
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            sx={{ fontWeight: 600 }}
-                          >
-                            {project.completion_percentage}%
-                          </Typography>
+                          <Box flex={1}>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{
+                                fontWeight: 600,
+                                mb: 0.5,
+                                fontSize: "0.95rem",
+                                lineHeight: 1.3,
+                              }}
+                            >
+                              {project.name}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: theme.palette.text.secondary,
+                                fontSize: "0.75rem",
+                                fontWeight: 500,
+                                letterSpacing: "0.5px",
+                                textTransform: "uppercase",
+                              }}
+                            >
+                              {project.code}
+                            </Typography>
+                          </Box>
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            {getHealthIcon(project.health_score)}
+                            <Circle
+                              sx={{
+                                fontSize: 8,
+                                color: getHealthColor(project.health_score),
+                              }}
+                            />
+                          </Box>
                         </Box>
-                        <LinearProgress
-                          variant="determinate"
-                          value={project.completion_percentage}
-                          sx={{
-                            height: 6,
-                            borderRadius: 3,
-                            backgroundColor: alpha(
-                              theme.palette.primary.main,
-                              0.1
-                            ),
-                            "& .MuiLinearProgress-bar": {
-                              borderRadius: 3,
-                            },
-                          }}
-                        />
-                      </Box>
 
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Group fontSize="small" color="action" />
-                          <Typography variant="caption">
-                            {project.team_size}
-                          </Typography>
-                          <Assignment fontSize="small" color="action" />
-                          <Typography variant="caption">
-                            {project.requirements_count}
-                          </Typography>
+                        {/* Progress Bar */}
+                        <Box mb={2}>
+                          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                              Progress
+                            </Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 600, fontSize: "0.75rem" }}>
+                              {project.completion_percentage}%
+                            </Typography>
+                          </Box>
+                          <LinearProgress
+                            variant="determinate"
+                            value={project.completion_percentage}
+                            sx={{
+                              height: 6,
+                              borderRadius: 3,
+                              backgroundColor: alpha(theme.palette.divider, 0.1),
+                              "& .MuiLinearProgress-bar": {
+                                borderRadius: 3,
+                                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                              },
+                            }}
+                          />
                         </Box>
-                        <Chip
-                          label={project.status}
-                          size="small"
-                          sx={{
-                            height: 20,
-                            fontSize: "0.7rem",
-                            fontWeight: 600,
-                          }}
-                        />
-                      </Box>
-                    </CardContent>
-                  </Card>
+
+                        {/* Stats */}
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Group sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                              {project.team_size} members
+                            </Typography>
+                          </Box>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Assignment sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                              {project.requirements_count} requirements
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        {project.next_milestone && (
+                          <Box mt={2} pt={2} borderTop={`1px solid ${alpha(theme.palette.divider, 0.06)}`}>
+                            <Typography variant="caption" color="primary.main" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                              Next: {project.next_milestone}
+                            </Typography>
+                          </Box>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </Fade>
                 ))}
-              </Box>
+                
+                {projects.length > 3 && (
+                  <Button
+                    variant="text"
+                    onClick={() => navigate("/projects")}
+                    endIcon={<ArrowForward />}
+                    sx={{
+                      color: theme.palette.primary.main,
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      textTransform: "none",
+                      justifyContent: "center",
+                      py: 1.5,
+                      "&:hover": {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                      },
+                    }}
+                  >
+                    View All Projects
+                  </Button>
+                )}
+              </Stack>
             )}
           </CardContent>
         </Card>
@@ -298,144 +390,231 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
 
       {/* My Requirements */}
       <Grid item xs={12} md={4}>
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
-            border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-            height: "100%",
-          }}
-        >
+        <Card sx={cardStyle}>
           <CardHeader
             title={
-              <Box display="flex" alignItems="center" gap={1}>
-                <Assignment color="secondary" fontSize="small" />
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 2,
+                    background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.1)}, ${alpha(theme.palette.secondary.main, 0.05)})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
+                  }}
+                >
+                  <Assignment color="secondary" fontSize="small" />
+                </Box>
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                  sx={{ 
+                    fontWeight: 600, 
+                    fontSize: "1.1rem",
+                    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                    letterSpacing: "-0.01em",
+                  }}
                 >
                   My Requirements
                 </Typography>
               </Box>
             }
             action={
-              <IconButton
-                size="small"
+              <IconButton 
+                size="small" 
                 onClick={() => navigate("/requirements")}
+                sx={{
+                  color: theme.palette.action.active,
+                  opacity: 0.6,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: alpha(theme.palette.action.active, 0.08),
+                  },
+                }}
               >
                 <MoreVert />
               </IconButton>
             }
-            sx={{ pb: 1 }}
+            sx={{ pb: 2 }}
           />
-          <CardContent sx={{ pt: 0 }}>
+          <CardContent sx={{ pt: 0, pb: 3 }}>
             {requirements.length === 0 ? (
               <Box
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
-                py={3}
+                py={4}
               >
-                <Assignment
-                  sx={{ fontSize: 48, color: theme.palette.grey[400], mb: 1 }}
-                />
+                <Box
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 3,
+                    background: `linear-gradient(135deg, ${alpha(theme.palette.grey[400], 0.1)}, ${alpha(theme.palette.grey[400], 0.05)})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 2,
+                  }}
+                >
+                  <Assignment
+                    sx={{ fontSize: 24, color: theme.palette.grey[400] }}
+                  />
+                </Box>
                 <Typography
                   color="text.secondary"
                   variant="body2"
                   align="center"
+                  sx={{ fontWeight: 500 }}
                 >
                   No requirements assigned
                 </Typography>
               </Box>
             ) : (
-              <Box display="flex" flexDirection="column" gap={2}>
-                {requirements.slice(0, 4).map((requirement) => (
-                  <Card
+              <Stack spacing={2}>
+                {requirements.slice(0, 3).map((requirement, index) => (
+                  <Fade
                     key={requirement.id}
-                    variant="outlined"
-                    sx={{
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      "&:hover": {
-                        backgroundColor: alpha(
-                          theme.palette.secondary.main,
-                          0.04
-                        ),
-                        borderColor: theme.palette.secondary.main,
-                      },
-                    }}
-                    onClick={() => navigate(`/requirements/${requirement.id}`)}
+                    in={true}
+                    timeout={300 + index * 100}
+                    style={{ transitionDelay: `${index * 50}ms` }}
                   >
-                    <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="flex-start"
-                        mb={1}
-                      >
+                    <Card
+                      variant="outlined"
+                      sx={{
+                        cursor: "pointer",
+                        transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                        borderRadius: 3,
+                        "&:hover": {
+                          backgroundColor: alpha(theme.palette.secondary.main, 0.02),
+                          borderColor: alpha(theme.palette.secondary.main, 0.3),
+                          transform: "translateY(-2px)",
+                          boxShadow: `0 8px 25px -8px ${alpha(theme.palette.secondary.main, 0.25)}`,
+                        },
+                      }}
+                      onClick={() => navigate(`/requirements/${requirement.id}`)}
+                    >
+                      <CardContent sx={{ p: 3 }}>
+                        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 600,
+                              flex: 1,
+                              fontSize: "0.875rem",
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {requirement.title}
+                          </Typography>
+                          <Chip
+                            label={requirement.priority}
+                            size="small"
+                            sx={{
+                              height: 22,
+                              fontSize: "0.7rem",
+                              fontWeight: 600,
+                              backgroundColor: alpha(getPriorityColor(requirement.priority), 0.12),
+                              color: getPriorityColor(requirement.priority),
+                              border: `1px solid ${alpha(getPriorityColor(requirement.priority), 0.2)}`,
+                              textTransform: "capitalize",
+                              ml: 1,
+                            }}
+                          />
+                        </Box>
+
                         <Typography
-                          variant="subtitle2"
-                          sx={{ fontWeight: 600, flex: 1, mr: 1 }}
-                        >
-                          {requirement.title}
-                        </Typography>
-                        <Chip
-                          label={requirement.priority}
-                          size="small"
+                          variant="caption"
                           sx={{
-                            height: 18,
-                            fontSize: "0.65rem",
+                            color: theme.palette.primary.main,
+                            fontSize: "0.75rem",
                             fontWeight: 600,
-                            backgroundColor: alpha(
-                              getPriorityColor(requirement.priority),
-                              0.1
-                            ),
-                            color: getPriorityColor(requirement.priority),
-                            border: `1px solid ${alpha(
-                              getPriorityColor(requirement.priority),
-                              0.2
-                            )}`,
+                            mb: 2,
+                            display: "block",
                           }}
-                        />
-                      </Box>
+                        >
+                          {requirement.project_name}
+                        </Typography>
 
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mb: 1, display: "block" }}
-                      >
-                        {requirement.project_name}
-                      </Typography>
-
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Chip
-                          label={requirement.status}
-                          size="small"
-                          variant="outlined"
-                          sx={{ height: 20, fontSize: "0.7rem" }}
-                        />
-                        {requirement.due_date && (
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                            <Schedule fontSize="small" color="action" />
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {new Date(
-                                requirement.due_date
-                              ).toLocaleDateString()}
+                        {/* Progress */}
+                        <Box mb={2}>
+                          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                              Progress
+                            </Typography>
+                            <Typography variant="caption" sx={{ fontWeight: 600, fontSize: "0.75rem" }}>
+                              {requirement.progress}%
                             </Typography>
                           </Box>
-                        )}
-                      </Box>
-                    </CardContent>
-                  </Card>
+                          <LinearProgress
+                            variant="determinate"
+                            value={requirement.progress}
+                            sx={{
+                              height: 6,
+                              borderRadius: 3,
+                              backgroundColor: alpha(theme.palette.divider, 0.1),
+                              "& .MuiLinearProgress-bar": {
+                                borderRadius: 3,
+                                background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.light})`,
+                              },
+                            }}
+                          />
+                        </Box>
+
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Chip
+                            label={requirement.status.replace("_", " ")}
+                            size="small"
+                            sx={{
+                              height: 24,
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              backgroundColor: alpha(theme.palette.info.main, 0.12),
+                              color: theme.palette.info.main,
+                              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                              textTransform: "capitalize",
+                            }}
+                          />
+                          
+                          {requirement.due_date && (
+                            <Box display="flex" alignItems="center" gap={0.5}>
+                              <Schedule sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                                {new Date(requirement.due_date).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Fade>
                 ))}
-              </Box>
+                
+                {requirements.length > 3 && (
+                  <Button
+                    variant="text"
+                    onClick={() => navigate("/requirements")}
+                    endIcon={<ArrowForward />}
+                    sx={{
+                      color: theme.palette.secondary.main,
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      textTransform: "none",
+                      justifyContent: "center",
+                      py: 1.5,
+                      "&:hover": {
+                        backgroundColor: alpha(theme.palette.secondary.main, 0.08),
+                      },
+                    }}
+                  >
+                    View All Requirements
+                  </Button>
+                )}
+              </Stack>
             )}
           </CardContent>
         </Card>
@@ -443,129 +622,192 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
 
       {/* Pending Approvals */}
       <Grid item xs={12} md={4}>
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
-            border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-            height: "100%",
-          }}
-        >
+        <Card sx={cardStyle}>
           <CardHeader
             title={
-              <Box display="flex" alignItems="center" gap={1}>
-                <Schedule color="warning" fontSize="small" />
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 2,
+                    background: `linear-gradient(135deg, ${alpha(theme.palette.warning.main, 0.1)}, ${alpha(theme.palette.warning.main, 0.05)})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
+                  }}
+                >
+                  <Schedule color="warning" fontSize="small" />
+                </Box>
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                  sx={{ 
+                    fontWeight: 600, 
+                    fontSize: "1.1rem",
+                    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                    letterSpacing: "-0.01em",
+                  }}
                 >
                   Pending Approvals
                 </Typography>
               </Box>
             }
             action={
-              <IconButton size="small">
+              <IconButton 
+                size="small"
+                sx={{
+                  color: theme.palette.action.active,
+                  opacity: 0.6,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: alpha(theme.palette.action.active, 0.08),
+                  },
+                }}
+              >
                 <MoreVert />
               </IconButton>
             }
-            sx={{ pb: 1 }}
+            sx={{ pb: 2 }}
           />
-          <CardContent sx={{ pt: 0 }}>
+          <CardContent sx={{ pt: 0, pb: 3 }}>
             {approvals.length === 0 ? (
               <Box
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
-                py={3}
+                py={4}
               >
-                <CheckCircle
+                <Box
                   sx={{
-                    fontSize: 48,
-                    color: theme.palette.success.main,
-                    mb: 1,
+                    width: 56,
+                    height: 56,
+                    borderRadius: 3,
+                    background: `linear-gradient(135deg, ${alpha(theme.palette.grey[400], 0.1)}, ${alpha(theme.palette.grey[400], 0.05)})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 2,
                   }}
-                />
+                >
+                  <CheckCircle
+                    sx={{ fontSize: 24, color: theme.palette.grey[400] }}
+                  />
+                </Box>
                 <Typography
                   color="text.secondary"
                   variant="body2"
                   align="center"
-                >
-                  All caught up!
-                </Typography>
-                <Typography
-                  color="text.secondary"
-                  variant="caption"
-                  align="center"
+                  sx={{ fontWeight: 500 }}
                 >
                   No pending approvals
                 </Typography>
               </Box>
             ) : (
-              <Box display="flex" flexDirection="column" gap={2}>
-                {approvals.slice(0, 4).map((approval) => (
-                  <Card
+              <Stack spacing={2}>
+                {approvals.slice(0, 3).map((approval, index) => (
+                  <Fade
                     key={approval.id}
-                    variant="outlined"
+                    in={true}
+                    timeout={300 + index * 100}
+                    style={{ transitionDelay: `${index * 50}ms` }}
+                  >
+                    <Card
+                      variant="outlined"
+                      sx={{
+                        cursor: "pointer",
+                        transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                        borderRadius: 3,
+                        "&:hover": {
+                          backgroundColor: alpha(theme.palette.warning.main, 0.02),
+                          borderColor: alpha(theme.palette.warning.main, 0.3),
+                          transform: "translateY(-2px)",
+                          boxShadow: `0 8px 25px -8px ${alpha(theme.palette.warning.main, 0.25)}`,
+                        },
+                      }}
+                    >
+                      <CardContent sx={{ p: 3 }}>
+                        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 600,
+                              flex: 1,
+                              fontSize: "0.875rem",
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {approval.title}
+                          </Typography>
+                          <Chip
+                            label={approval.urgency}
+                            size="small"
+                            sx={{
+                              height: 22,
+                              fontSize: "0.7rem",
+                              fontWeight: 600,
+                              backgroundColor: alpha(getUrgencyColor(approval.urgency), 0.12),
+                              color: getUrgencyColor(approval.urgency),
+                              border: `1px solid ${alpha(getUrgencyColor(approval.urgency), 0.2)}`,
+                              textTransform: "capitalize",
+                              ml: 1,
+                            }}
+                          />
+                        </Box>
+
+                        <Box display="flex" alignItems="center" gap={1} mb={2}>
+                          <Person sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                            Requested by {approval.requested_by}
+                          </Typography>
+                        </Box>
+
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Chip
+                            label={approval.type}
+                            size="small"
+                            sx={{
+                              height: 24,
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              backgroundColor: alpha(theme.palette.info.main, 0.12),
+                              color: theme.palette.info.main,
+                              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                              textTransform: "capitalize",
+                            }}
+                          />
+                          
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                            {new Date(approval.requested_at).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Fade>
+                ))}
+                
+                {approvals.length > 3 && (
+                  <Button
+                    variant="text"
+                    endIcon={<ArrowForward />}
                     sx={{
-                      cursor: "pointer",
-                      transition: "all 0.2s",
+                      color: theme.palette.warning.main,
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      textTransform: "none",
+                      justifyContent: "center",
+                      py: 1.5,
                       "&:hover": {
-                        backgroundColor: alpha(
-                          theme.palette.warning.main,
-                          0.04
-                        ),
-                        borderColor: theme.palette.warning.main,
+                        backgroundColor: alpha(theme.palette.warning.main, 0.08),
                       },
                     }}
                   >
-                    <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                      <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="flex-start"
-                        mb={1}
-                      >
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ fontWeight: 600, flex: 1, mr: 1 }}
-                        >
-                          {approval.title}
-                        </Typography>
-                        <Chip
-                          label={approval.urgency}
-                          size="small"
-                          sx={{
-                            height: 18,
-                            fontSize: "0.65rem",
-                            fontWeight: 600,
-                            backgroundColor: alpha(
-                              getUrgencyColor(approval.urgency),
-                              0.1
-                            ),
-                            color: getUrgencyColor(approval.urgency),
-                            border: `1px solid ${alpha(
-                              getUrgencyColor(approval.urgency),
-                              0.2
-                            )}`,
-                          }}
-                        />
-                      </Box>
-
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ mb: 1, display: "block" }}
-                      >
-                        {approval.type} • {approval.requested_by}
-                      </Typography>
-
-                      <Typography variant="caption" color="text.secondary">
-                        {new Date(approval.requested_at).toLocaleDateString()}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Box>
+                    View All Approvals
+                  </Button>
+                )}
+              </Stack>
             )}
           </CardContent>
         </Card>

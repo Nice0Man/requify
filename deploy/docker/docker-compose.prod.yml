@@ -102,6 +102,7 @@ services:
       - APP_CONFIG__REDIS__HOST=redis
       - APP_CONFIG__REDIS__PORT=6379
       - APP_CONFIG__REDIS__DB=0
+      - APP_CONFIG__LOGGING__FILE=/app/logs/requify.log
     ports:
       - "127.0.0.1:8000:8000"
     volumes:

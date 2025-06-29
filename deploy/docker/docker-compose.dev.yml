@@ -76,10 +76,12 @@ services:
       - FASTAPI_ENV=development
       - DATABASE_URL=postgresql://requify_user:requify_password@postgres:5432/requify_dev
       - REDIS_URL=redis://redis:6379/0
+      - APP_CONFIG__LOGGING__FILE=/app/logs/requify.log
     volumes:
       - "../../backend:/app"
       - "static_volume:/app/static"
       - "uploads_volume:/app/uploads"
+      - "backend_logs:/app/logs"
     depends_on:
       - postgres
       - redis

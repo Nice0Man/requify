@@ -16,8 +16,11 @@ class RequirementPriorityBase(BaseModel):
     description: Optional[str] = Field(
         None, description="Описание приоритета требования"
     )
-    level: int = Field(
-        ..., ge=1, le=10, description="Уровень приоритета (1-10, где 1 - самый высокий)"
+    level: Optional[int] = Field(
+        None,
+        ge=1,
+        le=10,
+        description="Уровень приоритета (1-10, где 1 - самый высокий)",
     )
 
     @field_validator("name")
@@ -26,15 +29,13 @@ class RequirementPriorityBase(BaseModel):
         if not v or not v.strip():
             raise ValueError("Requirement priority name cannot be empty")
 
-        v = v.strip().lower()  # Приводим к нижнему регистру для стандартизации
+        # Allow any reasonable priority name (remove strict validation)
+        v = v.strip()
 
-        # Предопределенные приоритеты требований
-        valid_priorities = ["critical", "high", "medium", "low", "minimal"]
-
-        if v not in valid_priorities:
-            raise ValueError(
-                f"Invalid requirement priority. Must be one of: {valid_priorities}"
-            )
+        # Basic validation for security
+        forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "script"]
+        if any(char in v.lower() for char in forbidden_chars):
+            raise ValueError("Priority name contains forbidden characters")
 
         return v
 
@@ -51,6 +52,10 @@ class RequirementPriorityBase(BaseModel):
     @model_validator(mode="after")
     def validate_level(self):
         """Валидация уровня приоритета в соответствии с названием"""
+        # Skip validation if level is not provided
+        if self.level is None:
+            return self
+
         name = self.name.lower()
 
         # Соответствие названий и уровней приоритета
@@ -98,14 +103,13 @@ class RequirementPriorityUpdate(BaseModel):
             if not v or not v.strip():
                 raise ValueError("Requirement priority name cannot be empty")
 
-            v = v.strip().lower()
+            # Allow any reasonable priority name (remove strict validation)
+            v = v.strip()
 
-            valid_priorities = ["critical", "high", "medium", "low", "minimal"]
-
-            if v not in valid_priorities:
-                raise ValueError(
-                    f"Invalid requirement priority. Must be one of: {valid_priorities}"
-                )
+            # Basic validation for security
+            forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "script"]
+            if any(char in v.lower() for char in forbidden_chars):
+                raise ValueError("Priority name contains forbidden characters")
 
             return v
         return v

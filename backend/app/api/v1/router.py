@@ -18,6 +18,7 @@ from .endpoints import (
     specifications_router,
     relationships_router,
     comments_router,
+    dashboard_router,
 )
 
 # Создаем основной роутер для API v1
@@ -50,6 +51,8 @@ api_router.include_router(
 )
 
 api_router.include_router(comments_router, prefix="/comments", tags=["comments"])
+
+api_router.include_router(dashboard_router, prefix="/dashboard", tags=["dashboard"])
 
 
 @api_router.get("/")

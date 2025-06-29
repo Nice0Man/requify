@@ -2,6 +2,7 @@
 CRUD операции для модели Requirement.
 """
 
+from datetime import datetime, UTC
 from typing import List, Optional
 from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -260,17 +261,14 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
         Returns:
             Созданное требование
         """
+        # Создаем требование, исключая deadline из схемы
+        requirement_data = obj_in.model_dump(exclude={"deadline"})
         db_obj = Requirement(
-            title=obj_in.title,
-            description=obj_in.description,
-            type_id=obj_in.type_id,
-            priority_id=obj_in.priority_id,
-            status_id=obj_in.status_id,
-            project_id=obj_in.project_id,
+            **requirement_data,
             author_id=author_id,
             last_modified_by=author_id,
-            release_id=obj_in.release_id,
-            spec_id=obj_in.spec_id,
+            created_at=datetime.now(UTC).replace(tzinfo=None),
+            updated_at=datetime.now(UTC).replace(tzinfo=None),
         )
 
         db.add(db_obj)

@@ -3,7 +3,9 @@
 {% block title %}Уведомление безопасности - Requify{% endblock %}
 
 {% block content %}
-<h1 class="email-title">🔒 Уведомление безопасности</h1>
+<h1 class="email-title">
+    <span class="icon">🔒</span>Уведомление безопасности
+</h1>
 
 <p class="email-text">
     Здравствуйте, <strong>{{ user_name | default(user_email) }}</strong>!
@@ -13,23 +15,34 @@
     Мы обнаружили новую активность в вашей учетной записи Requify и хотим убедиться, что это были вы.
 </p>
 
-<div class="alert">
+{% set alert_type_class = "alert" %}
+{% if alert_type == 'password_change' %}
+    {% set alert_type_class = "alert alert-success" %}
+{% elif alert_type == 'login_new_device' %}
+    {% set alert_type_class = "alert alert-info" %}
+{% elif alert_type == 'suspicious_activity' %}
+    {% set alert_type_class = "alert alert-error" %}
+{% elif alert_type == 'account_locked' %}
+    {% set alert_type_class = "alert alert-warning" %}
+{% endif %}
+
+<div class="{{ alert_type_class }}">
     <div class="alert-title">
         {% if alert_type == 'password_change' %}
-            🔑 Пароль изменен
+            <span class="icon">🔑</span>Пароль изменен
         {% elif alert_type == 'login_new_device' %}
-            📱 Вход с нового устройства
+            <span class="icon">📱</span>Вход с нового устройства
         {% elif alert_type == 'suspicious_activity' %}
-            ⚠️ Подозрительная активность
+            <span class="icon">⚠️</span>Подозрительная активность
         {% elif alert_type == 'account_locked' %}
-            🚫 Аккаунт заблокирован
+            <span class="icon">🚫</span>Аккаунт заблокирован
         {% else %}
-            🔔 {{ alert_type }}
+            <span class="icon">🔔</span>{{ alert_type }}
         {% endif %}
     </div>
     <div class="alert-text">
         <strong>Время:</strong> {{ details.timestamp | default(now()) | strftime('%d.%m.%Y в %H:%M') }}<br>
-        <strong>IP-адрес:</strong> {{ details.ip_address | default('Неизвестно') }}<br>
+        <strong>IP-адрес:</strong> <span class="code">{{ details.ip_address | default('Неизвестно') }}</span><br>
         {% if details.user_agent %}
         <strong>Устройство:</strong> {{ details.user_agent }}<br>
         {% endif %}
@@ -41,14 +54,18 @@
 
 {% if alert_type == 'password_change' %}
 <div class="alert alert-success">
-    <div class="alert-title">✅ Пароль успешно изменен</div>
+    <div class="alert-title">
+        <span class="icon">✅</span>Пароль успешно изменен
+    </div>
     <div class="alert-text">
         Ваш пароль был успешно изменен. Если это были вы, никаких дополнительных действий не требуется.
     </div>
 </div>
 {% elif alert_type == 'login_new_device' %}
 <div class="alert alert-info">
-    <div class="alert-title">📱 Новое устройство</div>
+    <div class="alert-title">
+        <span class="icon">📱</span>Новое устройство
+    </div>
     <div class="alert-text">
         Обнаружен вход в вашу учетную запись с нового устройства. Если это были вы, 
         рекомендуем добавить это устройство в список доверенных в настройках безопасности.
@@ -56,24 +73,28 @@
 </div>
 {% elif alert_type == 'account_locked' %}
 <div class="alert alert-warning">
-    <div class="alert-title">🚫 Аккаунт временно заблокирован</div>
+    <div class="alert-title">
+        <span class="icon">🚫</span>Аккаунт временно заблокирован
+    </div>
     <div class="alert-text">
         Ваш аккаунт был временно заблокирован из-за подозрительной активности или 
-        множественных неудачных попыток входа. Блокировка будет снята автоматически через 30 минут.
+        множественных неудачных попыток входа. Блокировка будет снята автоматически через <strong>30 минут</strong>.
     </div>
 </div>
 {% endif %}
 
 <div class="spacer"></div>
 
-<div class="alert alert-warning">
-    <div class="alert-title">🛡️ Если это были не вы</div>
+<div class="alert alert-error">
+    <div class="alert-title">
+        <span class="icon">🛡️</span>Если это были не вы
+    </div>
     <div class="alert-text">
         <strong>Немедленно выполните следующие действия:</strong><br><br>
-        1. Смените пароль от вашей учетной записи<br>
-        2. Проверьте активные сессии и завершите подозрительные<br>
-        3. Включите двухфакторную аутентификацию<br>
-        4. Обратитесь в службу поддержки
+        <strong>1. Смените пароль</strong> от вашей учетной записи<br>
+        <strong>2. Проверьте активные сессии</strong> и завершите подозрительные<br>
+        <strong>3. Включите двухфакторную аутентификацию</strong><br>
+        <strong>4. Обратитесь в службу поддержки</strong>
     </div>
 </div>
 

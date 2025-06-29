@@ -110,6 +110,9 @@ class LoginResponse(BaseModel):
 
     # Информация о пользователе
     user: "UserProfile" = Field(..., description="Информация о пользователе")
+    permissions: list[str] = Field(
+        default_factory=list, description="Права доступа пользователя"
+    )
 
     class Config:
         from_attributes = True
@@ -163,7 +166,9 @@ class UserProfile(BaseModel):
     is_active: bool = Field(..., description="Активен ли пользователь")
     is_superuser: bool = Field(..., description="Является ли суперпользователем")
     email_verified: bool = Field(default=False, description="Подтвержден ли email")
-    email_verified_at: Optional[datetime] = Field(None, description="Время подтверждения email")
+    email_verified_at: Optional[datetime] = Field(
+        None, description="Время подтверждения email"
+    )
     last_login: Optional[datetime] = Field(None, description="Время последнего входа")
 
     class Config:
@@ -276,7 +281,7 @@ class AuthError(BaseModel):
 
 class EmailVerificationRequest(BaseModel):
     """Схема для запроса верификации email."""
-    
+
     email: EmailStr = Field(..., description="Email для верификации")
 
     @field_validator("email")
@@ -287,7 +292,7 @@ class EmailVerificationRequest(BaseModel):
 
 class EmailVerificationConfirm(BaseModel):
     """Схема для подтверждения верификации email."""
-    
+
     token: str = Field(..., description="Токен верификации email")
 
     @field_validator("token")
@@ -300,7 +305,7 @@ class EmailVerificationConfirm(BaseModel):
 
 class EmailVerificationResponse(BaseModel):
     """Схема для ответа после верификации email."""
-    
+
     message: str = Field(..., description="Сообщение о результате")
     verified: bool = Field(..., description="Успешно ли подтвержден email")
 

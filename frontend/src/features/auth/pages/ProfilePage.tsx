@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -31,6 +31,7 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   Switch,
+  Skeleton,
 } from "@mui/material";
 import {
   Person,
@@ -49,7 +50,7 @@ import {
   NotificationsActive,
   Schedule,
   Info,
-  Key
+  Key,
 } from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -57,6 +58,7 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/auth.context";
 import { UserUpdate, UserRole, UserProfile } from "../types/auth.types";
+import { usersApi } from "../api/users.api";
 
 // Validation schema
 const profileSchema = yup.object({
@@ -97,6 +99,8 @@ const profileSchema = yup.object({
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, updateProfile, logout } = useAuth();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,15 +129,47 @@ const ProfilePage: React.FC = () => {
   } = useForm<UserUpdate>({
     resolver: yupResolver(profileSchema),
     defaultValues: {
-      first_name: user?.first_name || "",
-      last_name: user?.last_name || "",
-      email: user?.email || "",
-      username: user?.username || "",
-      department: user?.department || "",
-      phone: user?.phone || "",
-      role: user?.role || UserRole.GUEST,
+      first_name: userProfile?.first_name || "",
+      last_name: userProfile?.last_name || "",
+      email: userProfile?.email || "",
+      username: userProfile?.username || "",
+      department: userProfile?.department || "",
+      phone: userProfile?.phone || "",
+      role: userProfile?.role || UserRole.GUEST,
     },
   });
+
+  // Fetch user profile data on component mount
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        setProfileLoading(true);
+        setError(null);
+
+        const response = await usersApi.getCurrentUser();
+        setUserProfile(response.data);
+
+        // Update form with fetched data
+        reset({
+          first_name: response.data.first_name || "",
+          last_name: response.data.last_name || "",
+          email: response.data.email || "",
+          username: response.data.username || "",
+          department: response.data.department || "",
+          phone: response.data.phone || "",
+          role: response.data.role || UserRole.GUEST,
+        });
+      } catch (error: any) {
+        console.error("Failed to fetch user profile:", error);
+        setError("Failed to load profile data. Please try again.");
+        toast.error("Failed to load profile data");
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [reset]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -162,13 +198,13 @@ const ProfilePage: React.FC = () => {
     if (isEditing) {
       // Cancel editing - reset form
       reset({
-        first_name: user?.first_name || "",
-        last_name: user?.last_name || "",
-        email: user?.email || "",
-        username: user?.username || "",
-        department: user?.department || "",
-        phone: user?.phone || "",
-        role: user?.role || UserRole.GUEST,
+        first_name: userProfile?.first_name || "",
+        last_name: userProfile?.last_name || "",
+        email: userProfile?.email || "",
+        username: userProfile?.username || "",
+        department: userProfile?.department || "",
+        phone: userProfile?.phone || "",
+        role: userProfile?.role || UserRole.GUEST,
       });
       setAvatarFile(null);
       setAvatarPreview(null);
@@ -214,31 +250,33 @@ const ProfilePage: React.FC = () => {
       toast.success("Profile updated successfully");
     } catch (error: any) {
       let errorMessage = "Failed to update profile. Please try again.";
-      
+
       if (error.response?.data?.detail) {
         const detail = error.response.data.detail;
-        
+
         // Handle validation errors (array of error objects)
         if (Array.isArray(detail)) {
-          errorMessage = detail.map((err: any) => {
-            if (typeof err === 'string') return err;
-            if (err.msg) return err.msg;
-            if (err.message) return err.message;
-            return 'Validation error';
-          }).join(', ');
-        } 
+          errorMessage = detail
+            .map((err: any) => {
+              if (typeof err === "string") return err;
+              if (err.msg) return err.msg;
+              if (err.message) return err.message;
+              return "Validation error";
+            })
+            .join(", ");
+        }
         // Handle single validation error object
-        else if (typeof detail === 'object' && detail.msg) {
+        else if (typeof detail === "object" && detail.msg) {
           errorMessage = detail.msg;
         }
         // Handle string detail
-        else if (typeof detail === 'string') {
+        else if (typeof detail === "string") {
           errorMessage = detail;
         }
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -397,9 +435,12 @@ const ProfilePage: React.FC = () => {
                         background:
                           "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
                       }}
-                      src={avatarPreview || user?.avatar}
+                      src={avatarPreview || userProfile?.avatar}
                     >
-                      {getInitials(user?.first_name, user?.last_name)}
+                      {getInitials(
+                        userProfile?.first_name,
+                        userProfile?.last_name
+                      )}
                     </Avatar>
                     {isEditing && (
                       <IconButton
@@ -425,22 +466,46 @@ const ProfilePage: React.FC = () => {
                     )}
                   </Box>
                   <Box sx={{ ml: 3 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {user?.first_name} {user?.last_name}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
-                    >
-                      @{user?.username}
-                    </Typography>
-                    <Chip
-                      label={getRoleLabel(user?.role || UserRole.GUEST)}
-                      color={getRoleColor(user?.role || UserRole.GUEST)}
-                      size="small"
-                      icon={<Shield />}
-                    />
+                    {profileLoading ? (
+                      <>
+                        <Skeleton variant="text" width={200} height={32} />
+                        <Skeleton
+                          variant="text"
+                          width={120}
+                          height={20}
+                          sx={{ mb: 1 }}
+                        />
+                        <Skeleton
+                          variant="rectangular"
+                          width={80}
+                          height={24}
+                          sx={{ borderRadius: 3 }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                          {userProfile?.first_name} {userProfile?.last_name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ mb: 1 }}
+                        >
+                          @{userProfile?.username}
+                        </Typography>
+                        <Chip
+                          label={getRoleLabel(
+                            userProfile?.role || UserRole.GUEST
+                          )}
+                          color={getRoleColor(
+                            userProfile?.role || UserRole.GUEST
+                          )}
+                          size="small"
+                          icon={<Shield />}
+                        />
+                      </>
+                    )}
                   </Box>
                 </Box>
 
@@ -555,7 +620,7 @@ const ProfilePage: React.FC = () => {
                         {...register("phone")}
                       />
                     </Grid>
-                    {user?.role === UserRole.ADMIN && (
+                    {userProfile?.role === UserRole.ADMIN && (
                       <Grid item xs={12}>
                         <FormControl
                           fullWidth
@@ -568,11 +633,21 @@ const ProfilePage: React.FC = () => {
                             control={control}
                             render={({ field }) => (
                               <Select label="Role" {...field}>
-                                <MenuItem value={UserRole.GUEST}>Guest</MenuItem>
-                                <MenuItem value={UserRole.VIEWER}>Viewer</MenuItem>
-                                <MenuItem value={UserRole.ANALYST}>Analyst</MenuItem>
-                                <MenuItem value={UserRole.TESTER}>Tester</MenuItem>
-                                <MenuItem value={UserRole.DEVELOPER}>Developer</MenuItem>
+                                <MenuItem value={UserRole.GUEST}>
+                                  Guest
+                                </MenuItem>
+                                <MenuItem value={UserRole.VIEWER}>
+                                  Viewer
+                                </MenuItem>
+                                <MenuItem value={UserRole.ANALYST}>
+                                  Analyst
+                                </MenuItem>
+                                <MenuItem value={UserRole.TESTER}>
+                                  Tester
+                                </MenuItem>
+                                <MenuItem value={UserRole.DEVELOPER}>
+                                  Developer
+                                </MenuItem>
                               </Select>
                             )}
                           />

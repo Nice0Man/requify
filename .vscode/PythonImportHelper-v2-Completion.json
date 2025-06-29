@@ -64,6 +64,38 @@
         "documentation": {}
     },
     {
+        "label": "Sequence",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Sequence",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Dict",
         "importPath": "typing",
         "description": "typing",
@@ -121,6 +153,38 @@
     },
     {
         "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -1480,6 +1544,22 @@
         "documentation": {}
     },
     {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
+        "documentation": {}
+    },
+    {
         "label": "context",
         "importPath": "alembic",
         "description": "alembic",
@@ -1522,6 +1602,30 @@
     },
     {
         "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "desc",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -3294,6 +3398,22 @@
         "documentation": {}
     },
     {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "UTC",
         "importPath": "datetime",
         "description": "datetime",
@@ -3398,6 +3518,14 @@
         "documentation": {}
     },
     {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -3454,6 +3582,22 @@
         "documentation": {}
     },
     {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -3863,6 +4007,22 @@
     },
     {
         "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4023,6 +4183,38 @@
     },
     {
         "label": "Query",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
         "importPath": "fastapi",
         "description": "fastapi",
         "isExtraImport": true,
@@ -4535,6 +4727,22 @@
     },
     {
         "label": "get_requirements_write_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
         "isExtraImport": true,
@@ -5486,6 +5694,46 @@
         "documentation": {}
     },
     {
+        "label": "relationship_type",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "spec",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "requirement_group",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "test_result",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "comment",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
         "label": "user",
         "importPath": "app.crud",
         "description": "app.crud",
@@ -5582,6 +5830,14 @@
         "documentation": {}
     },
     {
+        "label": "UserProfile",
+        "importPath": "app.schemas.user",
+        "description": "app.schemas.user",
+        "isExtraImport": true,
+        "detail": "app.schemas.user",
+        "documentation": {}
+    },
+    {
         "label": "UserCreate",
         "importPath": "app.schemas.user",
         "description": "app.schemas.user",
@@ -5638,6 +5894,646 @@
         "documentation": {}
     },
     {
+        "label": "Session",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "sessionmaker",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Session",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Session",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "sessionmaker",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Session",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "DeclarativeBase",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "declared_attr",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "security",
+        "importPath": "app.core",
+        "description": "app.core",
+        "isExtraImport": true,
+        "detail": "app.core",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Release",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementStatus",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.schemas.project",
+        "description": "app.schemas.project",
+        "isExtraImport": true,
+        "detail": "app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectCreate",
+        "importPath": "app.schemas.project",
+        "description": "app.schemas.project",
+        "isExtraImport": true,
+        "detail": "app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectUpdate",
+        "importPath": "app.schemas.project",
+        "description": "app.schemas.project",
+        "isExtraImport": true,
+        "detail": "app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectCreate",
+        "importPath": "app.schemas.project",
+        "description": "app.schemas.project",
+        "isExtraImport": true,
+        "detail": "app.schemas.project",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.schemas.requirement",
+        "description": "app.schemas.requirement",
+        "isExtraImport": true,
+        "detail": "app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementCreate",
+        "importPath": "app.schemas.requirement",
+        "description": "app.schemas.requirement",
+        "isExtraImport": true,
+        "detail": "app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementUpdate",
+        "importPath": "app.schemas.requirement",
+        "description": "app.schemas.requirement",
+        "isExtraImport": true,
+        "detail": "app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementCreate",
+        "importPath": "app.schemas.requirement",
+        "description": "app.schemas.requirement",
+        "isExtraImport": true,
+        "detail": "app.schemas.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Release",
+        "importPath": "app.schemas.release",
+        "description": "app.schemas.release",
+        "isExtraImport": true,
+        "detail": "app.schemas.release",
+        "documentation": {}
+    },
+    {
         "label": "ReleaseCreate",
         "importPath": "app.schemas.release",
         "description": "app.schemas.release",
@@ -5675,6 +6571,46 @@
         "description": "app.schemas.release",
         "isExtraImport": true,
         "detail": "app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectStatus",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
         "documentation": {}
     },
     {
@@ -5735,6 +6671,14 @@
     },
     {
         "label": "TestResultUpdate",
+        "importPath": "app.schemas.test_result",
+        "description": "app.schemas.test_result",
+        "isExtraImport": true,
+        "detail": "app.schemas.test_result",
+        "documentation": {}
+    },
+    {
+        "label": "TestResultCreate",
         "importPath": "app.schemas.test_result",
         "description": "app.schemas.test_result",
         "isExtraImport": true,
@@ -6426,6 +7370,14 @@
         "documentation": {}
     },
     {
+        "label": "Enum",
+        "importPath": "enum",
+        "description": "enum",
+        "isExtraImport": true,
+        "detail": "enum",
+        "documentation": {}
+    },
+    {
         "label": "jwt",
         "importPath": "jose",
         "description": "jose",
@@ -6495,526 +7447,6 @@
         "description": "abc",
         "isExtraImport": true,
         "detail": "abc",
-        "documentation": {}
-    },
-    {
-        "label": "jsonable_encoder",
-        "importPath": "fastapi.encoders",
-        "description": "fastapi.encoders",
-        "isExtraImport": true,
-        "detail": "fastapi.encoders",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "selectinload",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "sessionmaker",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "sessionmaker",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "DeclarativeBase",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "declared_attr",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Mapped",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "mapped_column",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "relationship",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
         "documentation": {}
     },
     {
@@ -7146,6 +7578,14 @@
         "documentation": {}
     },
     {
+        "label": "Comment",
+        "importPath": "app.models.comment",
+        "description": "app.models.comment",
+        "isExtraImport": true,
+        "detail": "app.models.comment",
+        "documentation": {}
+    },
+    {
         "label": "CommentCreate",
         "importPath": "app.schemas.comment",
         "description": "app.schemas.comment",
@@ -7162,59 +7602,11 @@
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "CommentCreate",
+        "importPath": "app.schemas.comment",
+        "description": "app.schemas.comment",
         "isExtraImport": true,
-        "detail": "app.models.project",
-        "documentation": {}
-    },
-    {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
-        "isExtraImport": true,
-        "detail": "app.models.project",
-        "documentation": {}
-    },
-    {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
-        "isExtraImport": true,
-        "detail": "app.models.project",
-        "documentation": {}
-    },
-    {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
-        "isExtraImport": true,
-        "detail": "app.models.project",
-        "documentation": {}
-    },
-    {
-        "label": "ProjectCreate",
-        "importPath": "app.schemas.project",
-        "description": "app.schemas.project",
-        "isExtraImport": true,
-        "detail": "app.schemas.project",
-        "documentation": {}
-    },
-    {
-        "label": "ProjectUpdate",
-        "importPath": "app.schemas.project",
-        "description": "app.schemas.project",
-        "isExtraImport": true,
-        "detail": "app.schemas.project",
-        "documentation": {}
-    },
-    {
-        "label": "ProjectCreate",
-        "importPath": "app.schemas.project",
-        "description": "app.schemas.project",
-        "isExtraImport": true,
-        "detail": "app.schemas.project",
+        "detail": "app.schemas.comment",
         "documentation": {}
     },
     {
@@ -7307,6 +7699,14 @@
         "documentation": {}
     },
     {
+        "label": "RelationshipType",
+        "importPath": "app.models.relationship_types",
+        "description": "app.models.relationship_types",
+        "isExtraImport": true,
+        "detail": "app.models.relationship_types",
+        "documentation": {}
+    },
+    {
         "label": "RelationshipTypeCreate",
         "importPath": "app.schemas.relationship_types",
         "description": "app.schemas.relationship_types",
@@ -7323,11 +7723,11 @@
         "documentation": {}
     },
     {
-        "label": "Release",
-        "importPath": "app.models.release",
-        "description": "app.models.release",
+        "label": "RelationshipTypeCreate",
+        "importPath": "app.schemas.relationship_types",
+        "description": "app.schemas.relationship_types",
         "isExtraImport": true,
-        "detail": "app.models.release",
+        "detail": "app.schemas.relationship_types",
         "documentation": {}
     },
     {
@@ -7339,11 +7739,11 @@
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "Release",
+        "importPath": "app.models.release",
+        "description": "app.models.release",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.models.release",
         "documentation": {}
     },
     {
@@ -7371,27 +7771,19 @@
         "documentation": {}
     },
     {
-        "label": "RequirementCreate",
-        "importPath": "app.schemas.requirement",
-        "description": "app.schemas.requirement",
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
         "isExtraImport": true,
-        "detail": "app.schemas.requirement",
+        "detail": "app.models.requirement",
         "documentation": {}
     },
     {
-        "label": "RequirementUpdate",
-        "importPath": "app.schemas.requirement",
-        "description": "app.schemas.requirement",
+        "label": "RequirementGroup",
+        "importPath": "app.models.requirement_group",
+        "description": "app.models.requirement_group",
         "isExtraImport": true,
-        "detail": "app.schemas.requirement",
-        "documentation": {}
-    },
-    {
-        "label": "RequirementCreate",
-        "importPath": "app.schemas.requirement",
-        "description": "app.schemas.requirement",
-        "isExtraImport": true,
-        "detail": "app.schemas.requirement",
+        "detail": "app.models.requirement_group",
         "documentation": {}
     },
     {
@@ -7412,6 +7804,14 @@
     },
     {
         "label": "RequirementGroupUpdate",
+        "importPath": "app.schemas.requirement_group",
+        "description": "app.schemas.requirement_group",
+        "isExtraImport": true,
+        "detail": "app.schemas.requirement_group",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementGroupCreate",
         "importPath": "app.schemas.requirement_group",
         "description": "app.schemas.requirement_group",
         "isExtraImport": true,
@@ -7547,6 +7947,14 @@
         "documentation": {}
     },
     {
+        "label": "Spec",
+        "importPath": "app.models.spec",
+        "description": "app.models.spec",
+        "isExtraImport": true,
+        "detail": "app.models.spec",
+        "documentation": {}
+    },
+    {
         "label": "SpecCreate",
         "importPath": "app.schemas.spec",
         "description": "app.schemas.spec",
@@ -7560,6 +7968,22 @@
         "description": "app.schemas.spec",
         "isExtraImport": true,
         "detail": "app.schemas.spec",
+        "documentation": {}
+    },
+    {
+        "label": "SpecCreate",
+        "importPath": "app.schemas.spec",
+        "description": "app.schemas.spec",
+        "isExtraImport": true,
+        "detail": "app.schemas.spec",
+        "documentation": {}
+    },
+    {
+        "label": "TestResult",
+        "importPath": "app.models.test_result",
+        "description": "app.models.test_result",
+        "isExtraImport": true,
+        "detail": "app.models.test_result",
         "documentation": {}
     },
     {
@@ -8035,7 +8459,7 @@
         "kind": 2,
         "importPath": "backend.alembic.versions.2025_06_28_1059-895ffd89f75f_initial_migration",
         "description": "backend.alembic.versions.2025_06_28_1059-895ffd89f75f_initial_migration",
-        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.create_table(\n        \"projects\",\n        sa.Column(\"id\", sa.Integer(), nullable=False),\n        sa.Column(\"code\", sa.String(length=50), nullable=False, comment=\"Уникальный код проекта\"),\n        sa.Column(\"name\", sa.String(length=100), nullable=False, comment=\"Название проекта\"),\n        sa.Column(\"description\", sa.Text(), nullable=True, comment=\"Описание проекта\"),\n        sa.Column(",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.create_table(\n        \"projects\",\n        sa.Column(\"id\", sa.Integer(), nullable=False),\n        sa.Column(\n            \"code\",\n            sa.String(length=50),\n            nullable=False,",
         "detail": "backend.alembic.versions.2025_06_28_1059-895ffd89f75f_initial_migration",
         "documentation": {}
     },
@@ -8071,7 +8495,7 @@
         "kind": 2,
         "importPath": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
         "description": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
-        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.add_column(\n        \"users\",\n        sa.Column(\"first_name\", sa.String(length=100), nullable=True, comment=\"Имя пользователя\"),\n    )\n    op.add_column(\n        \"users\",\n        sa.Column(",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.add_column(\n        \"users\",\n        sa.Column(\n            \"first_name\",\n            sa.String(length=100),\n            nullable=True,\n            comment=\"Имя пользователя\",",
         "detail": "backend.alembic.versions.2025_06_28_1647-fd1c524c6d82_",
         "documentation": {}
     },
@@ -8100,6 +8524,42 @@
         "description": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
         "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_index(\"ix_users_email_verified\", table_name=\"users\")\n    op.drop_column(\"users\", \"email_verified_at\")\n    op.drop_column(\"users\", \"email_verified\")\n    # ### end Alembic commands ###",
         "detail": "backend.alembic.versions.2025_06_28_1747-ed81715576d0_add_email_verification_fields",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_28_2142-f82c77bee2f7_replace_comment_filed_text_on",
+        "description": "backend.alembic.versions.2025_06_28_2142-f82c77bee2f7_replace_comment_filed_text_on",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.add_column(\"comments\", sa.Column(\"content\", sa.Text(), nullable=False))\n    op.drop_column(\"comments\", \"text\")\n    # ### end Alembic commands ###\ndef downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.add_column(",
+        "detail": "backend.alembic.versions.2025_06_28_2142-f82c77bee2f7_replace_comment_filed_text_on",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_28_2142-f82c77bee2f7_replace_comment_filed_text_on",
+        "description": "backend.alembic.versions.2025_06_28_2142-f82c77bee2f7_replace_comment_filed_text_on",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.add_column(\n        \"comments\", sa.Column(\"text\", sa.TEXT(), autoincrement=False, nullable=False)\n    )\n    op.drop_column(\"comments\", \"content\")\n    # ### end Alembic commands ###",
+        "detail": "backend.alembic.versions.2025_06_28_2142-f82c77bee2f7_replace_comment_filed_text_on",
+        "documentation": {}
+    },
+    {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_29_0130-c8a2e1c8e3d0_add_projectstatus",
+        "description": "backend.alembic.versions.2025_06_29_0130-c8a2e1c8e3d0_add_projectstatus",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.alter_column(\n        \"projects\",\n        \"status\",\n        existing_type=sa.VARCHAR(length=50),\n        comment=\"Статус проекта\",\n        existing_comment=\"Статус проекта (active, completed, archived)\",\n        existing_nullable=False,",
+        "detail": "backend.alembic.versions.2025_06_29_0130-c8a2e1c8e3d0_add_projectstatus",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_06_29_0130-c8a2e1c8e3d0_add_projectstatus",
+        "description": "backend.alembic.versions.2025_06_29_0130-c8a2e1c8e3d0_add_projectstatus",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.alter_column(\n        \"projects\",\n        \"status\",\n        existing_type=sa.VARCHAR(length=50),\n        comment=\"Статус проекта (active, completed, archived)\",\n        existing_comment=\"Статус проекта\",\n        existing_nullable=False,",
+        "detail": "backend.alembic.versions.2025_06_29_0130-c8a2e1c8e3d0_add_projectstatus",
         "documentation": {}
     },
     {
@@ -8177,6 +8637,24 @@
     {
         "label": "router",
         "kind": 5,
+        "importPath": "backend.app.api.v1.endpoints.dashboard",
+        "description": "backend.app.api.v1.endpoints.dashboard",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/stats\")\nasync def get_dashboard_stats(\n    current_user: UserProfile = Depends(get_current_user),\n    db: Session = Depends(get_db),\n):\n    \"\"\"\n    Get dashboard statistics.\n    Returns:\n        dict: Dashboard statistics including overview, performance metrics, etc.",
+        "detail": "backend.app.api.v1.endpoints.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "dashboard_router",
+        "kind": 5,
+        "importPath": "backend.app.api.v1.endpoints.dashboard",
+        "description": "backend.app.api.v1.endpoints.dashboard",
+        "peekOfCode": "dashboard_router = router",
+        "detail": "backend.app.api.v1.endpoints.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.projects",
         "description": "backend.app.api.v1.endpoints.projects",
         "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Project])\nasync def get_projects(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    status: Optional[str] = Query(None, description=\"Фильтр по статусу\"),\n    search: Optional[str] = Query(None, description=\"Поиск по названию или описанию\"),\n    db: AsyncSession = Depends(get_db),",
@@ -8242,7 +8720,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.users",
         "description": "backend.app.api.v1.endpoints.users",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.User])\nasync def get_users(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    is_active: Optional[bool] = Query(None, description=\"Фильтр по статусу активности\"),\n    role: Optional[str] = Query(None, description=\"Фильтр по роли\"),\n    search: Optional[str] = Query(None, description=\"Поиск по username, email, first_name, last_name, department, phone\"),",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.User])\nasync def get_users(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    is_active: Optional[bool] = Query(None, description=\"Фильтр по статусу активности\"),\n    role: Optional[str] = Query(None, description=\"Фильтр по роли\"),\n    search: Optional[str] = Query(",
         "detail": "backend.app.api.v1.endpoints.users",
         "documentation": {}
     },
@@ -8782,7 +9260,7 @@
         "kind": 6,
         "importPath": "backend.app.crud.comment",
         "description": "backend.app.crud.comment",
-        "peekOfCode": "class CRUDComment(CRUDBase[Comment, CommentCreate, CommentUpdate]):\n    \"\"\"CRUD операции для модели Comment.\"\"\"\n    async def get_by_requirement(\n        self, \n        db: AsyncSession, \n        *, \n        requirement_id: int, \n        skip: int = 0, \n        limit: int = 100,\n        order_by: str = \"created_at\",",
+        "peekOfCode": "class CRUDComment(CRUDBase[Comment, CommentCreate, CommentUpdate]):\n    \"\"\"CRUD операции для модели Comment.\"\"\"\n    async def get_by_requirement(\n        self,\n        db: AsyncSession,\n        *,\n        requirement_id: int,\n        skip: int = 0,\n        limit: int = 100,\n        order_by: str = \"created_at\",",
         "detail": "backend.app.crud.comment",
         "documentation": {}
     },
@@ -9403,8 +9881,17 @@
         "kind": 6,
         "importPath": "backend.app.models.comment",
         "description": "backend.app.models.comment",
-        "peekOfCode": "class Comment(Base):\n    \"\"\"\n    Модель комментария к требованию.\n    \"\"\"\n    __tablename__ = \"comments\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    text: Mapped[str] = mapped_column(Text, nullable=False)\n    requirement_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirements.id\"), nullable=False\n    )",
+        "peekOfCode": "class Comment(Base):\n    \"\"\"\n    Модель комментария к требованию.\n    \"\"\"\n    __tablename__ = \"comments\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    content: Mapped[str] = mapped_column(Text, nullable=False)\n    requirement_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"requirements.id\"), nullable=False\n    )",
         "detail": "backend.app.models.comment",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectStatus",
+        "kind": 6,
+        "importPath": "backend.app.models.project",
+        "description": "backend.app.models.project",
+        "peekOfCode": "class ProjectStatus(Enum):\n    ACTIVE = \"active\"\n    COMPLETED = \"completed\"\n    ARCHIVED = \"archived\"\n    DRAFT = \"draft\"\nclass Project(Base, TimestampedMixin):\n    \"\"\"\n    Модель проекта.\n    Представляет отдельный проект с его требованиями, релизами,\n    спецификациями и группами требований.",
+        "detail": "backend.app.models.project",
         "documentation": {}
     },
     {
@@ -10708,7 +11195,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.test_case",
         "description": "backend.app.schemas.test_case",
-        "peekOfCode": "class TestingSummary(BaseModel):\n    \"\"\"Схема сводных данных по тестированию.\"\"\"\n    total_tests: int = Field(default=0, description=\"Общее количество тестов\")\n    passed_tests: int = Field(default=0, description=\"Количество пройденных тестов\")\n    failed_tests: int = Field(default=0, description=\"Количество проваленных тестов\")\n    skipped_tests: Optional[int] = Field(default=0, description=\"Количество пропущенных тестов\")\n    pass_rate: Optional[float] = Field(default=0.0, description=\"Процент успешности\")\n    # Поля для группировки по проектам\n    project_id: Optional[int] = Field(None, description=\"ID проекта\")\n    project_name: Optional[str] = Field(None, description=\"Название проекта\")",
+        "peekOfCode": "class TestingSummary(BaseModel):\n    \"\"\"Схема сводных данных по тестированию.\"\"\"\n    total_tests: int = Field(default=0, description=\"Общее количество тестов\")\n    passed_tests: int = Field(default=0, description=\"Количество пройденных тестов\")\n    failed_tests: int = Field(default=0, description=\"Количество проваленных тестов\")\n    skipped_tests: Optional[int] = Field(\n        default=0, description=\"Количество пропущенных тестов\"\n    )\n    pass_rate: Optional[float] = Field(default=0.0, description=\"Процент успешности\")\n    # Поля для группировки по проектам",
         "detail": "backend.app.schemas.test_case",
         "documentation": {}
     },
@@ -10861,7 +11348,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.trace_matrix",
         "description": "backend.app.schemas.trace_matrix",
-        "peekOfCode": "class TraceNode(BaseModel):\n    \"\"\"Узел в матрице трассируемости.\"\"\"\n    requirement_id: int = Field(..., description=\"ID требования\")\n    requirement_title: str = Field(..., description=\"Заголовок требования\")\n    requirement_type: str = Field(..., description=\"Тип требования\")\n    level: int = Field(..., ge=0, description=\"Уровень в иерархии\")\n    children: List['TraceNode'] = Field(default_factory=list, description=\"Дочерние требования\")\n    parents: List['TraceNode'] = Field(default_factory=list, description=\"Родительские требования\")\nclass TraceLink(BaseModel):\n    \"\"\"Связь в матрице трассируемости.\"\"\"",
+        "peekOfCode": "class TraceNode(BaseModel):\n    \"\"\"Узел в матрице трассируемости.\"\"\"\n    requirement_id: int = Field(..., description=\"ID требования\")\n    requirement_title: str = Field(..., description=\"Заголовок требования\")\n    requirement_type: str = Field(..., description=\"Тип требования\")\n    level: int = Field(..., ge=0, description=\"Уровень в иерархии\")\n    children: List[\"TraceNode\"] = Field(\n        default_factory=list, description=\"Дочерние требования\"\n    )\n    parents: List[\"TraceNode\"] = Field(",
         "detail": "backend.app.schemas.trace_matrix",
         "documentation": {}
     },
@@ -10879,7 +11366,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.trace_matrix",
         "description": "backend.app.schemas.trace_matrix",
-        "peekOfCode": "class TraceMatrix(BaseModel):\n    \"\"\"Матрица трассируемости требований.\"\"\"\n    requirement_id: int = Field(..., description=\"ID центрального требования\")\n    requirement_title: str = Field(..., description=\"Заголовок центрального требования\")\n    depth: int = Field(..., ge=1, le=10, description=\"Глубина трассировки\")\n    matrix: List[List[TraceNode]] = Field(default_factory=list, description=\"Матрица узлов по уровням\")\n    links: List[TraceLink] = Field(default_factory=list, description=\"Связи между требованиями\")\n    statistics: Dict[str, Any] = Field(default_factory=dict, description=\"Статистика матрицы\")\n    generated_at: str = Field(..., description=\"Время генерации\")\n    class Config:",
+        "peekOfCode": "class TraceMatrix(BaseModel):\n    \"\"\"Матрица трассируемости требований.\"\"\"\n    requirement_id: int = Field(..., description=\"ID центрального требования\")\n    requirement_title: str = Field(..., description=\"Заголовок центрального требования\")\n    depth: int = Field(..., ge=1, le=10, description=\"Глубина трассировки\")\n    matrix: List[List[TraceNode]] = Field(\n        default_factory=list, description=\"Матрица узлов по уровням\"\n    )\n    links: List[TraceLink] = Field(\n        default_factory=list, description=\"Связи между требованиями\"",
         "detail": "backend.app.schemas.trace_matrix",
         "documentation": {}
     },
@@ -10888,7 +11375,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.trace_matrix",
         "description": "backend.app.schemas.trace_matrix",
-        "peekOfCode": "class TraceMatrixConfig(BaseModel):\n    \"\"\"Конфигурация для генерации матрицы трассируемости.\"\"\"\n    include_forward: bool = Field(default=True, description=\"Включать прямые связи\")\n    include_backward: bool = Field(default=True, description=\"Включать обратные связи\")\n    relationship_types: Optional[List[str]] = Field(None, description=\"Типы связей для включения\")\n    exclude_types: Optional[List[str]] = Field(None, description=\"Типы связей для исключения\")\n    max_depth: int = Field(default=3, ge=1, le=10, description=\"Максимальная глубина\")\n    include_orphans: bool = Field(default=False, description=\"Включать требования без связей\")\nclass TraceMatrixSummary(BaseModel):\n    \"\"\"Сводка по матрице трассируемости.\"\"\"",
+        "peekOfCode": "class TraceMatrixConfig(BaseModel):\n    \"\"\"Конфигурация для генерации матрицы трассируемости.\"\"\"\n    include_forward: bool = Field(default=True, description=\"Включать прямые связи\")\n    include_backward: bool = Field(default=True, description=\"Включать обратные связи\")\n    relationship_types: Optional[List[str]] = Field(\n        None, description=\"Типы связей для включения\"\n    )\n    exclude_types: Optional[List[str]] = Field(\n        None, description=\"Типы связей для исключения\"\n    )",
         "detail": "backend.app.schemas.trace_matrix",
         "documentation": {}
     },
@@ -10897,7 +11384,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.trace_matrix",
         "description": "backend.app.schemas.trace_matrix",
-        "peekOfCode": "class TraceMatrixSummary(BaseModel):\n    \"\"\"Сводка по матрице трассируемости.\"\"\"\n    total_requirements: int = Field(..., ge=0, description=\"Общее количество требований\")\n    total_links: int = Field(..., ge=0, description=\"Общее количество связей\")\n    max_depth_reached: int = Field(..., ge=0, description=\"Максимальная достигнутая глубина\")\n    coverage_percentage: float = Field(..., ge=0, le=100, description=\"Процент покрытия\")\n    orphan_requirements: int = Field(..., ge=0, description=\"Количество требований без связей\")\n    circular_dependencies: int = Field(..., ge=0, description=\"Количество циклических зависимостей\")\nclass TraceMatrixExport(BaseModel):\n    \"\"\"Экспорт матрицы трассируемости.\"\"\"",
+        "peekOfCode": "class TraceMatrixSummary(BaseModel):\n    \"\"\"Сводка по матрице трассируемости.\"\"\"\n    total_requirements: int = Field(\n        ..., ge=0, description=\"Общее количество требований\"\n    )\n    total_links: int = Field(..., ge=0, description=\"Общее количество связей\")\n    max_depth_reached: int = Field(\n        ..., ge=0, description=\"Максимальная достигнутая глубина\"\n    )\n    coverage_percentage: float = Field(",
         "detail": "backend.app.schemas.trace_matrix",
         "documentation": {}
     },

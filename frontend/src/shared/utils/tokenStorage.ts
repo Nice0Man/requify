@@ -87,9 +87,11 @@ class TokenStorage {
   /**
    * Store user permissions
    */
-  setPermissions(permissions: string[]): void {
+  setPermissions(permissions: string[] | undefined | null): void {
     try {
-      const permissionsStr = JSON.stringify(permissions);
+      // Handle undefined or null permissions
+      const validPermissions = permissions || [];
+      const permissionsStr = JSON.stringify(validPermissions);
       localStorage.setItem(PERMISSIONS_KEY, permissionsStr);
       // Store in cookie with truncation if too large
       if (permissionsStr.length < 4000) {
@@ -106,17 +108,39 @@ class TokenStorage {
   }
 
   /**
+   * Clear permissions data
+   */
+  clearPermissions(): void {
+    try {
+      localStorage.removeItem(PERMISSIONS_KEY);
+      Cookies.remove(PERMISSIONS_KEY);
+    } catch (error) {
+      console.error("Failed to clear permissions:", error);
+    }
+  }
+
+  /**
    * Get user permissions
    */
   getPermissions(): string[] {
     try {
       const permissionsStr =
-        localStorage.getItem(PERMISSIONS_KEY) ||
-        Cookies.get(PERMISSIONS_KEY) ||
-        "[]";
+        localStorage.getItem(PERMISSIONS_KEY) || Cookies.get(PERMISSIONS_KEY);
+
+      // Handle cases where the stored value is invalid
+      if (
+        !permissionsStr ||
+        permissionsStr === "undefined" ||
+        permissionsStr === "null"
+      ) {
+        return [];
+      }
+
       return JSON.parse(permissionsStr);
     } catch (error) {
       console.error("Failed to retrieve permissions:", error);
+      // Clear corrupted data
+      this.clearPermissions();
       return [];
     }
   }
@@ -143,14 +167,34 @@ class TokenStorage {
   }
 
   /**
+   * Clear user data
+   */
+  clearUser(): void {
+    try {
+      localStorage.removeItem(USER_KEY);
+      Cookies.remove(USER_KEY);
+    } catch (error) {
+      console.error("Failed to clear user data:", error);
+    }
+  }
+
+  /**
    * Get user data
    */
   getUser(): any | null {
     try {
       const userStr = localStorage.getItem(USER_KEY) || Cookies.get(USER_KEY);
-      return userStr ? JSON.parse(userStr) : null;
+
+      // Handle cases where the stored value is invalid
+      if (!userStr || userStr === "undefined" || userStr === "null") {
+        return null;
+      }
+
+      return JSON.parse(userStr);
     } catch (error) {
       console.error("Failed to retrieve user data:", error);
+      // Clear corrupted user data
+      this.clearUser();
       return null;
     }
   }
@@ -193,10 +237,47 @@ class TokenStorage {
   }
 
   /**
+   * Clear any corrupted data
+   */
+  clearCorruptedData(): void {
+    try {
+      // Check and clear corrupted permissions
+      const permissionsStr = localStorage.getItem(PERMISSIONS_KEY);
+      if (permissionsStr === "undefined" || permissionsStr === "null") {
+        this.clearPermissions();
+      }
+
+      // Check and clear corrupted user data
+      const userStr = localStorage.getItem(USER_KEY);
+      if (userStr === "undefined" || userStr === "null") {
+        this.clearUser();
+      }
+
+      // Check and clear corrupted tokens
+      const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+      if (accessToken === "undefined" || accessToken === "null") {
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        Cookies.remove(ACCESS_TOKEN_KEY);
+      }
+
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+      if (refreshToken === "undefined" || refreshToken === "null") {
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        Cookies.remove(REFRESH_TOKEN_KEY);
+      }
+    } catch (error) {
+      console.error("Failed to clear corrupted data:", error);
+    }
+  }
+
+  /**
    * Migrate from old localStorage keys to new storage system
    */
   migrateFromLegacyStorage(): void {
     try {
+      // First clear any corrupted data
+      this.clearCorruptedData();
+
       // Check for old tokens
       const oldAccessToken = localStorage.getItem("accessToken");
       const oldRefreshToken = localStorage.getItem("refreshToken");

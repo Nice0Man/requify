@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
 
 export interface Relationship {
   id: number;
@@ -84,7 +84,7 @@ export interface TraceMatrix {
 }
 
 export class RelationshipsApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Get Relationships
   async getRelationships(
@@ -305,4 +305,4 @@ export class RelationshipsApi {
 }
 
 // Export singleton instance
-export const relationshipsApi = new RelationshipsApi(new ApiClient());
+export const relationshipsApi = new RelationshipsApi();

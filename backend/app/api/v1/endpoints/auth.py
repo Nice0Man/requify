@@ -47,6 +47,7 @@ from app.schemas.auth import (
     TokenValidationResponse,
     SessionListResponse,
     RevokeSessionRequest,
+    ActiveSession,
     UserProfile,
     AuthError,
     EmailVerificationRequest,
@@ -209,6 +210,7 @@ async def login_for_access_token(
         expires_in=settings.security.access_token_expire_minutes * 60,
         refresh_expires_in=settings.security.refresh_token_expire_days * 24 * 60 * 60,
         user=user_profile,
+        permissions=_get_user_scopes(user),
     )
 
 
@@ -567,9 +569,11 @@ async def request_email_verification(
     if user and user.is_active:
         if user.email_verified:
             return {"message": "Email is already verified"}
-        
+
         try:
-            verification_token = JWTTokenManager.create_email_verification_token(user.email)
+            verification_token = JWTTokenManager.create_email_verification_token(
+                user.email
+            )
             await email_service.send_email_verification(
                 user_email=user.email,
                 verification_token=verification_token,
@@ -579,7 +583,9 @@ async def request_email_verification(
         except Exception as e:
             logger.error(f"Failed to send verification email to {user.email}: {e}")
 
-    return {"message": "If the email exists and is not verified, a verification link has been sent"}
+    return {
+        "message": "If the email exists and is not verified, a verification link has been sent"
+    }
 
 
 @router.post("/verify-email/confirm", response_model=EmailVerificationResponse)
@@ -611,26 +617,25 @@ async def confirm_email_verification(
 
     if user.email_verified:
         return EmailVerificationResponse(
-            message="Email is already verified",
-            verified=True
+            message="Email is already verified", verified=True
         )
 
     # Помечаем email как подтвержденный
     from datetime import datetime, timezone
+
     await crud_user.update(
-        db, 
-        db_obj=user, 
+        db,
+        db_obj=user,
         obj_in={
-            "email_verified": True, 
-            "email_verified_at": datetime.now(timezone.utc).replace(tzinfo=None)
-        }
+            "email_verified": True,
+            "email_verified_at": datetime.now(timezone.utc).replace(tzinfo=None),
+        },
     )
 
     logger.info(f"Email verified for user {user.email}")
 
     return EmailVerificationResponse(
-        message="Email verified successfully",
-        verified=True
+        message="Email verified successfully", verified=True
     )
 
 
@@ -665,26 +670,30 @@ async def get_user_sessions(
     sessions = []
     for token in tokens:
         # Определяем текущую сессию по IP и User-Agent
-        is_current = (
+        is_current = False
+        if (
             token.ip_address == current_ip
             and token.user_agent == current_user_agent
             and token.last_used_at
-            and (
-                datetime.now(UTC).replace(tzinfo=None) - token.last_used_at
-            ).total_seconds()
-            < 300  # активность в последние 5 минут
-        )
+        ):
+            try:
+                time_since_last_use = (
+                    datetime.now(UTC).replace(tzinfo=None) - token.last_used_at
+                ).total_seconds()
+                is_current = time_since_last_use < 300  # активность в последние 5 минут
+            except Exception:
+                is_current = False
 
         sessions.append(
-            {
-                "id": token.id,
-                "created_at": token.created_at,
-                "last_used_at": token.last_used_at,
-                "expires_at": token.expires_at,
-                "ip_address": token.ip_address,
-                "user_agent": token.user_agent,
-                "is_current": is_current,
-            }
+            ActiveSession(
+                id=token.id,
+                created_at=token.created_at,
+                last_used_at=token.last_used_at,
+                expires_at=token.expires_at,
+                ip_address=token.ip_address,
+                user_agent=token.user_agent,
+                is_current=bool(is_current),
+            )
         )
 
     return SessionListResponse(sessions=sessions, total=len(sessions))

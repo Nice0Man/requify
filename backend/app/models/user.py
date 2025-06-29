@@ -7,11 +7,18 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
+    from .project import Project
     from .requirement import Requirement
     from .comment import Comment
     from .requirement_group_version import RequirementGroupVersion
     from .test_result import TestResult
     from .refresh_token import RefreshToken
+    from .dashboard import (
+        UserDashboardPreferences,
+        DashboardNotification,
+        DashboardActivity,
+        DashboardWidget,
+    )
 
 
 class User(Base, TimestampedMixin):
@@ -92,6 +99,10 @@ class User(Base, TimestampedMixin):
     )
 
     # Отношения
+    owned_projects: Mapped[List["Project"]] = relationship(
+        "Project", back_populates="owner", lazy="select"
+    )
+
     authored_requirements: Mapped[List["Requirement"]] = relationship(
         "Requirement",
         foreign_keys="Requirement.author_id",
@@ -123,6 +134,36 @@ class User(Base, TimestampedMixin):
 
     refresh_tokens: Mapped[List["RefreshToken"]] = relationship(
         "RefreshToken",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    # Dashboard relationships
+    dashboard_preferences: Mapped[Optional["UserDashboardPreferences"]] = relationship(
+        "UserDashboardPreferences",
+        back_populates="user",
+        lazy="select",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+    notifications: Mapped[List["DashboardNotification"]] = relationship(
+        "DashboardNotification",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    activities: Mapped[List["DashboardActivity"]] = relationship(
+        "DashboardActivity",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    dashboard_widgets: Mapped[List["DashboardWidget"]] = relationship(
+        "DashboardWidget",
         back_populates="user",
         lazy="select",
         cascade="all, delete-orphan",

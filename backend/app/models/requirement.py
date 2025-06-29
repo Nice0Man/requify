@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from .comment import Comment
     from .relationship import Relationship
     from .test_result import TestResult
+    from .dashboard import DashboardNotification, DashboardActivity
 
 
 class Requirement(Base, TimestampedMixin):
@@ -158,4 +159,19 @@ class Requirement(Base, TimestampedMixin):
         back_populates="requirement",
         cascade="all, delete-orphan",
         lazy="select",
+    )
+
+    # Dashboard relationships
+    notifications: Mapped[List["DashboardNotification"]] = relationship(
+        "DashboardNotification",
+        back_populates="requirement",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    activities: Mapped[List["DashboardActivity"]] = relationship(
+        "DashboardActivity",
+        back_populates="requirement",
+        lazy="select",
+        cascade="all, delete-orphan",
     )

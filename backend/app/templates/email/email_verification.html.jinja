@@ -3,7 +3,9 @@
 {% block title %}Подтверждение email - Requify{% endblock %}
 
 {% block content %}
-<h1 class="email-title">✉️ Подтверждение email адреса</h1>
+<h1 class="email-title">
+    <span class="icon">✉️</span>Подтверждение email адреса
+</h1>
 
 <p class="email-text">
     Здравствуйте, <strong>{{ user_name | default(user_email) }}</strong>!
@@ -21,14 +23,15 @@
 </div>
 
 <div class="alert alert-success">
-    <div class="alert-title">🎉 Почти готово!</div>
+    <div class="alert-title">
+        <span class="icon">🎉</span>Почти готово!
+    </div>
     <div class="alert-text">
-        После подтверждения email вы получите полный доступ ко всем функциям системы:
-        <br><br>
-        • Создание и управление проектами<br>
-        • Работа с требованиями<br>
-        • Совместная работа в команде<br>
-        • Аналитика и отчеты
+        После подтверждения email вы получите полный доступ ко всем функциям системы:<br><br>
+        <strong>• Создание и управление проектами</strong><br>
+        <strong>• Работа с требованиями</strong><br>
+        <strong>• Совместная работа в команде</strong><br>
+        <strong>• Аналитика и отчеты</strong>
     </div>
 </div>
 
@@ -43,7 +46,9 @@
 <div class="spacer"></div>
 
 <div class="alert alert-info">
-    <div class="alert-title">⏰ Срок действия</div>
+    <div class="alert-title">
+        <span class="icon">⏰</span>Срок действия
+    </div>
     <div class="alert-text">
         Ссылка для подтверждения действительна в течение <strong>24 часов</strong>. 
         Если срок истек, вы можете запросить новое письмо для подтверждения в личном кабинете.
@@ -51,7 +56,9 @@
 </div>
 
 <div class="alert alert-warning">
-    <div class="alert-title">🔒 Безопасность</div>
+    <div class="alert-title">
+        <span class="icon">🔒</span>Безопасность
+    </div>
     <div class="alert-text">
         Если вы не регистрировались в системе Requify, просто проигнорируйте это письмо. 
         Никакой учетной записи создано не будет.
@@ -60,6 +67,6 @@
 
 <p class="email-text text-small text-muted">
     Регистрация выполнена {{ timestamp | default(now()) | strftime('%d.%m.%Y в %H:%M') }}
-    {% if ip_address %}с IP-адреса {{ ip_address }}{% endif %}.
+    {% if ip_address %}с IP-адреса <span class="code">{{ ip_address }}</span>{% endif %}.
 </p>
 {% endblock %} 

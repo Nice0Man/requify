@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from '@/shared/api/client';
+import { apiClient, ApiResponse } from '@/shared/api/client';
 import { User, UserProfile, UserCreate } from '../types/auth.types';
 
 export interface UserListParams {
@@ -33,7 +33,7 @@ export interface UserUpdateRequest {
 }
 
 export class UsersApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Get Users (with pagination, filtering, searching)
   async getUsers(params?: UserListParams): Promise<ApiResponse<UserListResponse>> {
@@ -94,4 +94,4 @@ export class UsersApi {
 }
 
 // Export singleton instance
-export const usersApi = new UsersApi(new ApiClient()); 
+export const usersApi = new UsersApi(); 

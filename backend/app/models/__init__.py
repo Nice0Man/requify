@@ -15,6 +15,14 @@ from .relationship import Relationship
 from .comment import Comment
 from .test_result import TestResult
 
+# Dashboard models
+from .dashboard import (
+    UserDashboardPreferences,
+    DashboardNotification,
+    DashboardActivity,
+    DashboardWidget,
+)
+
 # Импортируем энумы
 from .requirement_statuses import RequirementStatus
 from .requirement_priorities import RequirementPriority
@@ -33,6 +41,12 @@ __all__ = [
     "Relationship",
     "Comment",
     "TestResult",
+    # Dashboard models
+    "UserDashboardPreferences",
+    "DashboardNotification",
+    "DashboardActivity",
+    "DashboardWidget",
+    # Enums
     "RequirementStatus",
     "RequirementPriority",
     "RequirementType",

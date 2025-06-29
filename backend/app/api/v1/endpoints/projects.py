@@ -88,7 +88,11 @@ async def create_project(
             detail="Проект с таким кодом уже существует",
         )
 
-    project = await crud.project.create(db, obj_in=project_in)
+    # Автоматически устанавливаем текущего пользователя как владельца
+    project_data = project_in.model_dump()
+    project_data["owner_id"] = current_user.id
+    
+    project = await crud.project.create(db, obj_in=project_data)
     return project
 
 

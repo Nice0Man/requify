@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiResponse } from "@/shared/api/client";
 
 export interface RequirementType {
   id: number;
@@ -85,7 +85,7 @@ export interface RelationshipTypeCreate {
 }
 
 export class ReferenceApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // Requirement Types
   // 1. Get Requirement Types
@@ -187,4 +187,4 @@ export class ReferenceApi {
 }
 
 // Export singleton instance
-export const referenceApi = new ReferenceApi(new ApiClient());
+export const referenceApi = new ReferenceApi();

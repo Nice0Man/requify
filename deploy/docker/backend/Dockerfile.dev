@@ -28,12 +28,14 @@ RUN poetry config virtualenvs.create false && \
     poetry install --with dev && \
     rm -rf $POETRY_CACHE_DIR
 
-# Создаем необходимые директории
-RUN mkdir -p logs uploads static
-
-# Пользователь для разработки
+# Создаем пользователя и группу раньше
 RUN groupadd -r requify && useradd -r -g requify -s /bin/bash requify
-RUN chown -R requify:requify /app
+
+# Создаем необходимые директории с правильными правами
+RUN mkdir -p logs uploads static backups && \
+    chown -R requify:requify /app && \
+    chmod -R 755 /app
+
 USER requify
 
 EXPOSE 8000

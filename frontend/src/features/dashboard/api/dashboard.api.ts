@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
 
 // Dashboard Data Interfaces
 export interface DashboardStats {
@@ -106,7 +106,7 @@ export interface DashboardNotification {
 }
 
 export class DashboardApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // Get comprehensive dashboard data
   async getDashboardData(): Promise<ApiResponse<DashboardStats>> {
@@ -243,7 +243,12 @@ export class DashboardApi {
       user_activity: Array<{ date: string; active_users: number }>;
     }>(`/dashboard/analytics?timeframe=${timeframe}`);
   }
+
+  // Validate API token
+  async validateToken(token: string): Promise<ApiResponse<{ valid: boolean }>> {
+    return this.client.post<{ valid: boolean }>(`/dashboard/validate-token`, { token });
+  }
 }
 
 // Export singleton instance
-export const dashboardApi = new DashboardApi(new ApiClient());
+export const dashboardApi = new DashboardApi();

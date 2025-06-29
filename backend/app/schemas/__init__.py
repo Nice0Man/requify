@@ -227,6 +227,20 @@ from .trace_matrix import (
 # Token schemas
 from .token import Token, TokenPayload
 
+# Dashboard schemas
+from .dashboard import (
+    DashboardStats,
+    DashboardOverview,
+    ProjectPerformance,
+    TrendingMetrics,
+    ActivityItem,
+    MyDashboard,
+    MyProject,
+    MyRequirement,
+    Notification,
+    UserPreferences,
+)
+
 __all__ = [
     # User
     "User",
@@ -315,6 +329,17 @@ __all__ = [
     "TestCaseInDBBase",
     "TestExecution",
     "TestingSummary",
+    # Dashboard
+    "DashboardStats",
+    "DashboardOverview",
+    "ProjectPerformance",
+    "TrendingMetrics",
+    "ActivityItem",
+    "MyDashboard",
+    "MyProject",
+    "MyRequirement",
+    "Notification",
+    "UserPreferences",
     # Comment
     "Comment",
     "CommentCreate",

@@ -267,7 +267,7 @@ async def get_test_cases(
                 name=f"Test Case for {req.title}",
                 description=f"Тест для требования: {req.description}",
                 status="active",
-                priority=req.priority.name if req.priority else "medium",
+                priority="medium",  # Simplified to avoid greenlet issues
                 type="functional",
                 requirement_id=req.id,
                 plan_id=req.project_id,
@@ -391,19 +391,12 @@ async def get_test_executions(
         executions.append(
             schemas.TestExecution(
                 id=result.id,
-                case_id=result.requirement_id,
-                tester_id=result.tester_id,
+                test_case_id=result.requirement_id,
                 status=result.status.value,
-                started_at=(
-                    result.started_at.isoformat() if result.started_at else None
-                ),
-                completed_at=(
-                    result.completed_at.isoformat() if result.completed_at else None
-                ),
+                started_at=result.started_at,
+                completed_at=result.completed_at,
                 duration=None,  # Можно вычислить как разность времени
-                notes=result.notes,
-                created_at=result.created_at.isoformat(),
-                updated_at=result.updated_at.isoformat(),
+                logs=result.notes,
             )
         )
 

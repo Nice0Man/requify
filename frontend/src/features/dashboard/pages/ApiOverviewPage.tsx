@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -29,6 +29,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Snackbar,
+  Skeleton,
 } from "@mui/material";
 import {
   ExpandMore,
@@ -53,6 +55,7 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/features/auth/context/auth.context";
 import { useNavigate } from "react-router-dom";
+import { dashboardApi } from "../api/dashboard.api";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -85,6 +88,13 @@ const ApiOverviewPage: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [openTokenDialog, setOpenTokenDialog] = useState(false);
   const [testToken, setTestToken] = useState("");
+  const [tokenValidationResult, setTokenValidationResult] = useState<any>(null);
+  const [isValidatingToken, setIsValidatingToken] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -828,6 +838,31 @@ const ApiOverviewPage: React.FC = () => {
 
   const handleCopyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    setSnackbarMessage("Copied to clipboard!");
+    setSnackbarSeverity("success");
+    setSnackbarOpen(true);
+  };
+
+  const handleValidateToken = async () => {
+    if (!testToken.trim()) return;
+
+    setIsValidatingToken(true);
+    try {
+      const response = await dashboardApi.validateToken(testToken);
+      setTokenValidationResult(response);
+      setSnackbarMessage("Token validated successfully!");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+    } catch (error: any) {
+      setTokenValidationResult({
+        error: error.message || "Token validation failed",
+      });
+      setSnackbarMessage("Token validation failed!");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    } finally {
+      setIsValidatingToken(false);
+    }
   };
 
   const authExample = `// OAuth2 Authentication Example
@@ -1441,25 +1476,66 @@ curl -X POST "http://localhost/api/v1/auth/refresh" \\
               placeholder="Paste your access token here..."
               sx={{ mb: 2 }}
             />
-            <Alert severity="info">
+            <Alert severity="info" sx={{ mb: 2 }}>
               You can get an access token by logging in through the
               /api/v1/auth/login endpoint.
             </Alert>
+
+            {tokenValidationResult && (
+              <Box sx={{ mt: 2 }}>
+                {tokenValidationResult.error ? (
+                  <Alert severity="error">
+                    <AlertTitle>Token Validation Failed</AlertTitle>
+                    {tokenValidationResult.error}
+                  </Alert>
+                ) : (
+                  <Alert severity="success">
+                    <AlertTitle>Token Valid</AlertTitle>
+                    <Box sx={{ mt: 1 }}>
+                      <Typography variant="body2">
+                        <strong>User:</strong>{" "}
+                        {tokenValidationResult.username || "N/A"}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Expires:</strong>{" "}
+                        {tokenValidationResult.expires_at || "N/A"}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Scopes:</strong>{" "}
+                        {tokenValidationResult.scopes?.join(", ") || "N/A"}
+                      </Typography>
+                    </Box>
+                  </Alert>
+                )}
+              </Box>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenTokenDialog(false)}>Cancel</Button>
             <Button
               variant="contained"
-              onClick={() => {
-                // Here you would implement token validation
-                console.log("Testing token:", testToken);
-              }}
-              disabled={!testToken.trim()}
+              onClick={handleValidateToken}
+              disabled={!testToken.trim() || isValidatingToken}
             >
-              Validate Token
+              {isValidatingToken ? "Validating..." : "Validate Token"}
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarSeverity}
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Box>
     </Box>
   );

@@ -62,11 +62,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         # Хэшируем пароль
         hashed_password = get_password_hash(obj_in.password)
 
-        # Создаем пользователя
+        # Создаем пользователя, исключая password из схемы
+        user_data = obj_in.model_dump(exclude={"password"})
         db_obj = User(
-            username=obj_in.username,
-            email=obj_in.email,
-            role=obj_in.role,
+            **user_data,
             hashed_password=hashed_password,
         )
 

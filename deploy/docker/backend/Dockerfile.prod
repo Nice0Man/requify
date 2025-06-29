@@ -18,7 +18,7 @@ ENV POETRY_NO_INTERACTION=1 \
 WORKDIR /app
 
 # Копируем зависимости и устанавливаем их
-COPY pyproject.toml poetry.lock ./
+COPY config/pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create true && \
     poetry install --only=main && \
     rm -rf $POETRY_CACHE_DIR
@@ -29,9 +29,10 @@ FROM python:3.13-slim as production
 # Минимальные системные зависимости
 RUN apt-get update && apt-get install -y \
     libpq-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Создаем пользователя
+# Создаем пользователя раньше
 RUN groupadd -r requify && useradd -r -g requify requify
 
 WORKDIR /app
@@ -43,12 +44,13 @@ COPY --from=builder /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Копируем код приложения
-COPY requify/ ./requify/
-COPY alembic.ini .env* ./
+COPY app/ ./app/
+COPY config/alembic.ini .env* ./
 
-# Создаем директории и устанавливаем права
-RUN mkdir -p logs uploads static && \
-    chown -R requify:requify /app
+# Создаем директории с правильными правами и устанавливаем права
+RUN mkdir -p logs uploads static backups && \
+    chown -R requify:requify /app && \
+    chmod -R 755 /app
 
 USER requify
 
@@ -59,4 +61,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Production команда с Gunicorn
-CMD ["gunicorn", "requify.app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"] 
+CMD ["gunicorn", "app.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"] 

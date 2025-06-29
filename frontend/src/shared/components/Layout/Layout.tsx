@@ -31,7 +31,6 @@ import {
   Notifications,
   Logout,
   Settings,
-  Api,
   Home
 } from '@mui/icons-material';
 import { useAuth, usePermissions } from '@/features/auth/context/auth.context';
@@ -45,7 +44,7 @@ interface NavigationItem {
 
 const navigationItems: NavigationItem[] = [
   {
-    title: 'Start',
+    title: 'Home',
     path: '/start',
     icon: <Home />
   },
@@ -53,11 +52,6 @@ const navigationItems: NavigationItem[] = [
     title: 'Dashboard',
     path: '/dashboard',
     icon: <Dashboard />
-  },
-  {
-    title: 'API Overview',
-    path: '/api-overview',
-    icon: <Api />
   },
   {
     title: 'Projects',

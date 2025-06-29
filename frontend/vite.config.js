@@ -17,6 +17,7 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
     cors: true,
+    allowedHosts: ['localhost', '127.0.0.1', 'requify_frontend', 'requify-frontend-dev'],
     proxy: {
       '/api': {
         target: 'http://backend:8000',

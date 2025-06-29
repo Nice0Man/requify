@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiResponse } from "@/shared/api/client";
 import {
   LoginRequest,
   LoginResponse,
@@ -21,7 +21,7 @@ import {
 } from "../types/auth.types";
 
 export class AuthApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Register User
   async register(userData: UserCreate): Promise<ApiResponse<UserProfile>> {
@@ -131,4 +131,4 @@ export class AuthApi {
 }
 
 // Export singleton instance
-export const authApi = new AuthApi(new ApiClient());
+export const authApi = new AuthApi();

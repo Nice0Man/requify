@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from '@/shared/api/client';
+import { apiClient, ApiClient, ApiResponse } from '@/shared/api/client';
 
 export interface Project {
   id: number;
@@ -72,7 +72,7 @@ export enum ProjectStatus {
 }
 
 export class ProjectsApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Get Projects
   async getProjects(params?: ProjectListParams): Promise<ApiResponse<ProjectListResponse>> {
@@ -142,4 +142,4 @@ export class ProjectsApi {
 }
 
 // Export singleton instance
-export const projectsApi = new ProjectsApi(new ApiClient()); 
+export const projectsApi = new ProjectsApi(); 

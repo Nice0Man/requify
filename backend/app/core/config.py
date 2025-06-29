@@ -52,6 +52,7 @@ class SMTP(BaseModel):
     from_email: str = "noreply@requify.local"
     from_name: str = "Requify"
 
+
 class ApiConfig(BaseModel):
     prefix: str = "/api"
     v1: ApiV1Prefix = ApiV1Prefix()
@@ -71,13 +72,18 @@ class DatabaseConfig(BaseModel):
     host: str = "localhost"
     port: int = 5432
 
-    # Connection pool settings
-    pool_size: int = 20
-    max_overflow: int = 10
+    # Connection pool settings - optimized for stability
+    pool_size: int = 5  # Reduced from 20 to be more conservative
+    max_overflow: int = 5  # Reduced from 10
     pool_pre_ping: bool = True
     pool_recycle: int = 3600
     echo: bool = False
     echo_pool: bool = False
+
+    # Additional connection parameters for stability
+    connect_timeout: int = 10
+    command_timeout: int = 60
+    pool_timeout: int = 30
 
     @property
     def sync_url(self) -> str:
@@ -85,11 +91,11 @@ class DatabaseConfig(BaseModel):
 
     @property
     def async_url(self) -> str:
-        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}?command_timeout={self.command_timeout}"
 
     naming_convention: dict[str, str] = {
         "ix": "ix_%(column_0_label)s",
-        "uq": "uq_%(table_name)s_%(column_0_N_name)s",
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
         "ck": "ck_%(table_name)s_%(constraint_name)s",
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
@@ -101,15 +107,20 @@ class TestDatabaseConfig(BaseModel):
     password: str = "postgres"
     user: str = "postgres"
     host: str = "localhost"
-    port: int = 5433
+    port: int = 5432  # Use same port as main DB for testing
 
-    # Connection pool settings
-    pool_size: int = 20
-    max_overflow: int = 10
+    # Connection pool settings - smaller for testing
+    pool_size: int = 3
+    max_overflow: int = 2
     pool_pre_ping: bool = True
     pool_recycle: int = 3600
     echo: bool = False
     echo_pool: bool = False
+
+    # Additional connection parameters for stability
+    connect_timeout: int = 10
+    command_timeout: int = 60
+    pool_timeout: int = 30
 
     @property
     def sync_url(self) -> str:
@@ -117,7 +128,7 @@ class TestDatabaseConfig(BaseModel):
 
     @property
     def async_url(self) -> str:
-        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}?command_timeout={self.command_timeout}"
 
 
 class SecurityConfig(BaseModel):
@@ -170,7 +181,7 @@ class SecurityConfig(BaseModel):
     # CORS настройки
     cors_allow_credentials: bool = True
     cors_allow_origins: list[str] = [
-        "http://localhost:3000", 
+        "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost",  # Added for Nginx reverse proxy
         "http://127.0.0.1",  # Added for Nginx reverse proxy
@@ -424,9 +435,19 @@ class Settings(BaseSettings):
                     )
 
             # Allow standard SMTP ports and common development/testing ports
-            allowed_ports = [25, 465, 587, 2525, 1025, 1587, 2526]  # Added development ports
+            allowed_ports = [
+                25,
+                465,
+                587,
+                2525,
+                1025,
+                1587,
+                2526,
+            ]  # Added development ports
             if self.email.smtp_port not in allowed_ports:
-                raise ValueError(f"SMTP port should be one of: {', '.join(map(str, allowed_ports))}")
+                raise ValueError(
+                    f"SMTP port should be one of: {', '.join(map(str, allowed_ports))}"
+                )
 
             # Validate email format
             import re

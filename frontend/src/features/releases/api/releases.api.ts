@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
 
 export interface Release {
   id: number;
@@ -91,7 +91,7 @@ export enum ReleaseStatus {
 }
 
 export class ReleasesApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Get Releases
   async getReleases(
@@ -201,4 +201,4 @@ export class ReleasesApi {
 }
 
 // Export singleton instance
-export const releasesApi = new ReleasesApi(new ApiClient());
+export const releasesApi = new ReleasesApi();

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
   Card,
   CardContent,
+  CardHeader,
   Grid,
   Chip,
+  Avatar,
   Button,
   IconButton,
   Tabs,
@@ -13,29 +16,31 @@ import {
   List,
   ListItem,
   ListItemText,
-  Alert,
-  CircularProgress,
-  Avatar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  ListItemAvatar,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Alert,
+  Skeleton,
+  useTheme,
+  alpha,
+  CircularProgress,
 } from "@mui/material";
 import {
+  ArrowBack,
   Edit,
   Delete,
-  Link as LinkIcon,
-  BugReport,
-  History,
-  Comment,
   Share,
+  Comment,
+  Assignment,
+  Person,
+  Schedule,
+  Flag,
+  CheckCircle,
+  Error,
+  Warning,
+  Info,
 } from "@mui/icons-material";
-import { useParams, useNavigate } from "react-router-dom";
+import { requirementsApi } from "../api/requirements.api";
+import { RequirementDetails } from "../types/requirements.types";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,135 +61,45 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
   );
 };
 
-// Mock data for demonstration
-const mockRequirement = {
-  id: 1,
-  title: "User Authentication System",
-  description:
-    "The system shall provide secure user authentication using email/username and password credentials. It should include password complexity requirements, account lockout after failed attempts, and session management.",
-  status: "In Progress",
-  priority: "High",
-  type: "Functional",
-  project: {
-    id: 1,
-    name: "Requify Core System",
-    code: "REQ-CORE",
-  },
-  assignee: {
-    id: 2,
-    first_name: "Jane",
-    last_name: "Smith",
-    email: "jane.smith@company.com",
-  },
-  reporter: {
-    id: 1,
-    first_name: "John",
-    last_name: "Doe",
-    email: "john.doe@company.com",
-  },
-  created_at: "2024-03-10T00:00:00Z",
-  updated_at: "2024-03-15T00:00:00Z",
-  acceptance_criteria: [
-    "User can log in with valid email/username and password",
-    "User account is locked after 5 failed login attempts",
-    "Password must meet complexity requirements (8+ chars, special chars)",
-    "User session expires after 30 minutes of inactivity",
-    "User can reset password via email verification",
-  ],
-  related_requirements: [
-    { id: 2, title: "Password Reset Functionality", type: "depends_on" },
-    { id: 3, title: "User Profile Management", type: "relates_to" },
-    { id: 4, title: "Session Management", type: "blocks" },
-  ],
-  test_cases: [
-    {
-      id: 1,
-      title: "Valid Login Test",
-      status: "Passed",
-      last_run: "2024-03-14",
-    },
-    {
-      id: 2,
-      title: "Invalid Password Test",
-      status: "Passed",
-      last_run: "2024-03-14",
-    },
-    {
-      id: 3,
-      title: "Account Lockout Test",
-      status: "Failed",
-      last_run: "2024-03-13",
-    },
-    { id: 4, title: "Session Timeout Test", status: "Pending", last_run: null },
-  ],
-  comments: [
-    {
-      id: 1,
-      author: "Jane Smith",
-      content:
-        "Updated the password complexity requirements based on security review.",
-      created_at: "2024-03-15T10:30:00Z",
-    },
-    {
-      id: 2,
-      author: "Mike Johnson",
-      content:
-        "Account lockout test is failing due to timing issue in the test script.",
-      created_at: "2024-03-13T14:20:00Z",
-    },
-  ],
-  history: [
-    {
-      id: 1,
-      action: "Status changed",
-      details: "From 'New' to 'In Progress'",
-      user: "Jane Smith",
-      date: "2024-03-12",
-    },
-    {
-      id: 2,
-      action: "Assignee changed",
-      details: "Assigned to Jane Smith",
-      user: "John Doe",
-      date: "2024-03-11",
-    },
-    {
-      id: 3,
-      action: "Requirement created",
-      details: "Initial creation",
-      user: "John Doe",
-      date: "2024-03-10",
-    },
-  ],
-};
-
 const RequirementDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const theme = useTheme();
+  
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [requirement, setRequirement] = useState<any>(null);
+  const [requirement, setRequirement] = useState<RequirementDetails | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  useEffect(() => {
-    // Simulate API call
-    const fetchRequirement = async () => {
+  // Load requirement data
+  const loadRequirement = async () => {
+    if (!id) return;
+    
+    try {
       setLoading(true);
-      // In real app: const response = await requirementsApi.getRequirement(id);
-      setTimeout(() => {
-        setRequirement(mockRequirement);
-        setLoading(false);
-      }, 1000);
-    };
+      setError(null);
+      
+      const response = await requirementsApi.getRequirement(parseInt(id));
+      setRequirement(response.data as unknown as RequirementDetails);
+    } catch (err: any) {
+      console.error("Failed to load requirement:", err);
+      setError(err.message || "Failed to load requirement details");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchRequirement();
+  useEffect(() => {
+    loadRequirement();
   }, [id]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status?: string) => {
+    if (!status) return "default";
     switch (status.toLowerCase()) {
       case "new":
         return "default";
@@ -201,7 +116,8 @@ const RequirementDetailsPage: React.FC = () => {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority?: string) => {
+    if (!priority) return "default";
     switch (priority.toLowerCase()) {
       case "low":
         return "success";
@@ -216,325 +132,340 @@ const RequirementDetailsPage: React.FC = () => {
     }
   };
 
-  const getTestStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "passed":
-        return "success";
-      case "failed":
-        return "error";
-      case "pending":
-        return "warning";
-      default:
-        return "default";
-    }
-  };
-
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="50vh"
-      >
-        <CircularProgress />
+      <Box sx={{ p: 3 }}>
+        <Box sx={{ mb: 4 }}>
+          <Skeleton variant="text" width="40%" height={40} sx={{ mb: 1 }} />
+          <Skeleton variant="text" width="60%" height={24} />
+        </Box>
+        
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={8}>
+            <Card sx={{ borderRadius: 3 }}>
+              <CardContent>
+                <Skeleton variant="rectangular" height={400} />
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ borderRadius: 3 }}>
+              <CardContent>
+                <Skeleton variant="rectangular" height={300} />
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </Box>
     );
   }
 
-  if (!requirement) {
+  if (error || !requirement) {
     return (
-      <Alert severity="error">
-        Requirement not found. Please check the requirement ID and try again.
-      </Alert>
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error || "Requirement not found. Please check the requirement ID and try again."}
+        </Alert>
+        <Button
+          variant="outlined"
+          startIcon={<ArrowBack />}
+          onClick={() => navigate("/requirements")}
+        >
+          Back to Requirements
+        </Button>
+      </Box>
     );
   }
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            {requirement.title}
-          </Typography>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="body2" color="text.secondary">
-              REQ-{requirement.id} • {requirement.project.name}
-            </Typography>
-            <Chip
-              label={requirement.status}
-              color={getStatusColor(requirement.status)}
-              size="small"
-            />
-            <Chip
-              label={requirement.priority}
-              color={getPriorityColor(requirement.priority)}
-              size="small"
-              variant="outlined"
-            />
-          </Box>
-        </Box>
-        <Box>
-          <Button
-            variant="outlined"
-            startIcon={<Edit />}
-            sx={{ mr: 1 }}
-            onClick={() => setEditDialogOpen(true)}
+      <Box sx={{ mb: 4 }}>
+        <Box display="flex" alignItems="center" gap={2} mb={2}>
+          <IconButton
+            onClick={() => navigate("/requirements")}
+            sx={{
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.2),
+              },
+            }}
           >
-            Edit
-          </Button>
-          <IconButton color="error">
-            <Delete />
+            <ArrowBack />
           </IconButton>
-          <IconButton>
-            <Share />
-          </IconButton>
+          
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                mb: 1,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {requirement.title}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {requirement.project_name} • REQ-{requirement.id}
+            </Typography>
+          </Box>
+
+          <Box display="flex" gap={1}>
+            <Button
+              variant="outlined"
+              startIcon={<Share />}
+              size="small"
+            >
+              Share
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Edit />}
+              onClick={() => setEditDialogOpen(true)}
+              size="small"
+            >
+              Edit
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<Delete />}
+              size="small"
+            >
+              Delete
+            </Button>
+          </Box>
         </Box>
       </Box>
 
-      {/* Main Content */}
-      <Grid container spacing={3} mb={3}>
+      <Grid container spacing={3}>
+        {/* Main Content */}
         <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Description
-              </Typography>
-              <Typography variant="body1" color="text.secondary" paragraph>
-                {requirement.description}
-              </Typography>
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+            }}
+          >
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                aria-label="requirement details tabs"
+                sx={{ px: 3 }}
+              >
+                <Tab label="Details" />
+                <Tab label="Comments" />
+                <Tab label="History" />
+                <Tab label="Tests" />
+              </Tabs>
+            </Box>
 
-              <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                Acceptance Criteria
-              </Typography>
-              <List dense>
-                {requirement.acceptance_criteria.map(
-                  (criteria: string, index: number) => (
-                    <ListItem key={index}>
-                      <ListItemText primary={`${index + 1}. ${criteria}`} />
-                    </ListItem>
-                  )
-                )}
-              </List>
-            </CardContent>
+            <TabPanel value={tabValue} index={0}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                  Description
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                  {requirement.description || "No description provided."}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                  Additional Information
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Deadline: {requirement.deadline ? new Date(requirement.deadline).toLocaleDateString() : "Not set"}
+                </Typography>
+              </Box>
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={1}>
+              <Box>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                  Comments
+                </Typography>
+                
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={3}
+                  placeholder="Add a comment..."
+                  variant="outlined"
+                  sx={{ mb: 3 }}
+                />
+                
+                <Button variant="contained" sx={{ mb: 3 }}>
+                  Add Comment
+                </Button>
+
+                <Typography variant="body2" color="text.secondary" align="center">
+                  No comments yet. Be the first to comment!
+                </Typography>
+              </Box>
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={2}>
+              <Box>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                  History
+                </Typography>
+                <Typography variant="body2" color="text.secondary" align="center">
+                  History will be loaded from the API.
+                </Typography>
+              </Box>
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={3}>
+              <Box>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                  Test Cases
+                </Typography>
+                <Typography variant="body2" color="text.secondary" align="center">
+                  Test cases will be loaded from the API.
+                </Typography>
+              </Box>
+            </TabPanel>
           </Card>
         </Grid>
 
+        {/* Sidebar */}
         <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Details
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="text.secondary">
-                    Type
+          <Card
+            sx={{
+              borderRadius: 3,
+              boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              mb: 3,
+            }}
+          >
+            <CardHeader
+              title={
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Assignment color="primary" fontSize="small" />
+                  <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                    Details
                   </Typography>
-                  <Typography variant="body1">{requirement.type}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="text.secondary">
-                    Assignee
-                  </Typography>
-                  <Box display="flex" alignItems="center" gap={1} mt={1}>
-                    <Avatar sx={{ width: 24, height: 24, fontSize: "0.8rem" }}>
-                      {requirement.assignee.first_name[0]}
-                      {requirement.assignee.last_name[0]}
-                    </Avatar>
-                    <Typography variant="body1">
-                      {requirement.assignee.first_name}{" "}
-                      {requirement.assignee.last_name}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="text.secondary">
-                    Reporter
-                  </Typography>
-                  <Box display="flex" alignItems="center" gap={1} mt={1}>
-                    <Avatar sx={{ width: 24, height: 24, fontSize: "0.8rem" }}>
-                      {requirement.reporter.first_name[0]}
-                      {requirement.reporter.last_name[0]}
-                    </Avatar>
-                    <Typography variant="body1">
-                      {requirement.reporter.first_name}{" "}
-                      {requirement.reporter.last_name}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Created
-                  </Typography>
-                  <Typography variant="body1">
-                    {new Date(requirement.created_at).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">
-                    Updated
-                  </Typography>
-                  <Typography variant="body1">
-                    {new Date(requirement.updated_at).toLocaleDateString()}
-                  </Typography>
-                </Grid>
-              </Grid>
+                </Box>
+              }
+            />
+            <CardContent sx={{ pt: 0 }}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Status
+                </Typography>
+                <Chip
+                  label={requirement.status_name || "Unknown"}
+                  color={getStatusColor(requirement.status_name) as any}
+                  size="medium"
+                />
+              </Box>
+
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Priority
+                </Typography>
+                <Chip
+                  label={requirement.priority_name || "Unknown"}
+                  color={getPriorityColor(requirement.priority_name) as any}
+                  size="medium"
+                />
+              </Box>
+
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Type
+                </Typography>
+                <Typography variant="body1">
+                  {requirement.type_name || "Unknown"}
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Created By
+                </Typography>
+                <Typography variant="body2">
+                  {requirement.author_name || "Unknown"}
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Last Modified By
+                </Typography>
+                <Typography variant="body2">
+                  {requirement.last_modifier_name || "Unknown"}
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Created
+                </Typography>
+                <Typography variant="body2">
+                  {new Date(requirement.created_at).toLocaleDateString()}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  Last Updated
+                </Typography>
+                <Typography variant="body2">
+                  {new Date(requirement.updated_at).toLocaleDateString()}
+                </Typography>
+              </Box>
             </CardContent>
           </Card>
+
+          {/* Release and Spec info if available */}
+          {(requirement.release_version || requirement.spec_name) && (
+            <Card
+              sx={{
+                borderRadius: 3,
+                boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+              }}
+            >
+              <CardHeader
+                title={
+                  <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                    Project Information
+                  </Typography>
+                }
+              />
+              <CardContent sx={{ pt: 0 }}>
+                {requirement.release_version && (
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      Release
+                    </Typography>
+                    <Typography variant="body2">
+                      {requirement.release_version}
+                    </Typography>
+                  </Box>
+                )}
+                {requirement.spec_name && (
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      Specification
+                    </Typography>
+                    <Typography variant="body2">
+                      {requirement.spec_name}
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </Grid>
       </Grid>
-
-      {/* Detailed Tabs */}
-      <Card>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={tabValue} onChange={handleTabChange}>
-            <Tab label="Related" icon={<LinkIcon />} />
-            <Tab label="Tests" icon={<BugReport />} />
-            <Tab label="Comments" icon={<Comment />} />
-            <Tab label="History" icon={<History />} />
-          </Tabs>
-        </Box>
-
-        <TabPanel value={tabValue} index={0}>
-          <Typography variant="h6" gutterBottom>
-            Related Requirements
-          </Typography>
-          <List>
-            {requirement.related_requirements.map((related: any) => (
-              <ListItem key={related.id}>
-                <ListItemText
-                  primary={related.title}
-                  secondary={`REQ-${related.id}`}
-                />
-                <Chip label={related.type} size="small" variant="outlined" />
-              </ListItem>
-            ))}
-          </List>
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={1}>
-          <Typography variant="h6" gutterBottom>
-            Test Cases
-          </Typography>
-          <List>
-            {requirement.test_cases.map((test: any) => (
-              <ListItem key={test.id}>
-                <ListItemText
-                  primary={test.title}
-                  secondary={
-                    test.last_run ? `Last run: ${test.last_run}` : "Never run"
-                  }
-                />
-                <Chip
-                  label={test.status}
-                  color={getTestStatusColor(test.status)}
-                  size="small"
-                />
-              </ListItem>
-            ))}
-          </List>
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={2}>
-          <Typography variant="h6" gutterBottom>
-            Comments
-          </Typography>
-          <List>
-            {requirement.comments.map((comment: any) => (
-              <ListItem key={comment.id} alignItems="flex-start">
-                <ListItemText
-                  primary={comment.content}
-                  secondary={`${comment.author} • ${new Date(
-                    comment.created_at
-                  ).toLocaleDateString()}`}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </TabPanel>
-
-        <TabPanel value={tabValue} index={3}>
-          <Typography variant="h6" gutterBottom>
-            Change History
-          </Typography>
-          <List>
-            {requirement.history.map((entry: any) => (
-              <ListItem key={entry.id}>
-                <ListItemText
-                  primary={entry.action}
-                  secondary={`${entry.details} • ${entry.user} • ${entry.date}`}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </TabPanel>
-      </Card>
-
-      {/* Edit Dialog */}
-      <Dialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Edit Requirement</DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 1 }}>
-            <TextField
-              fullWidth
-              label="Title"
-              defaultValue={requirement.title}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              label="Description"
-              defaultValue={requirement.description}
-              multiline
-              rows={4}
-              margin="normal"
-            />
-            <Grid container spacing={2} sx={{ mt: 1 }}>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Status</InputLabel>
-                  <Select defaultValue={requirement.status} label="Status">
-                    <MenuItem value="New">New</MenuItem>
-                    <MenuItem value="In Progress">In Progress</MenuItem>
-                    <MenuItem value="Completed">Completed</MenuItem>
-                    <MenuItem value="Blocked">Blocked</MenuItem>
-                    <MenuItem value="On Hold">On Hold</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Priority</InputLabel>
-                  <Select defaultValue={requirement.priority} label="Priority">
-                    <MenuItem value="Low">Low</MenuItem>
-                    <MenuItem value="Medium">Medium</MenuItem>
-                    <MenuItem value="High">High</MenuItem>
-                    <MenuItem value="Critical">Critical</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => setEditDialogOpen(false)}>
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

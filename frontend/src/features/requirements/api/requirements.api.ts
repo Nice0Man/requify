@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from '@/shared/api/client';
+import { apiClient, ApiClient, ApiResponse } from '@/shared/api/client';
 import {
   Requirement,
   RequirementCreate,
@@ -20,7 +20,7 @@ import {
 
 
 export class RequirementsApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Search Requirements
   async searchRequirements(params: RequirementSearchParams): Promise<ApiResponse<RequirementListResponse>> {
@@ -220,4 +220,4 @@ export class RequirementsApi {
 }
 
 // Export singleton instance
-export const requirementsApi = new RequirementsApi(new ApiClient()); 
+export const requirementsApi = new RequirementsApi(); 

@@ -292,16 +292,16 @@ const DashboardPage: React.FC = () => {
           <StatCard
             title="Completion Rate"
             value={`${
-              dashboardData?.project_performance.completion_rate || 0
+              dashboardData?.project_performance.completion_rate.toFixed(2) || 0
             }%`}
             subtitle="Project success"
             trend={{
               value:
-                dashboardData?.project_performance.completion_rate || 0 > 85
+                dashboardData?.project_performance.completion_rate.toFixed(2) || 0 > 85
                   ? 3
                   : -2,
               direction:
-                dashboardData?.project_performance.completion_rate || 0 > 85
+                dashboardData?.project_performance.completion_rate.toFixed(2) || 0 > 85
                   ? "up"
                   : "down",
               label: "vs last period",

@@ -17,7 +17,6 @@ from typing import (
 )
 from abc import ABC, abstractmethod
 
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select, func, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
@@ -128,8 +127,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Returns:
             Созданный объект
         """
-        obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data)
+        db_obj = self.model(**obj_in.model_dump())
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)
@@ -153,15 +151,13 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Returns:
             Обновленный объект
         """
-        obj_data = jsonable_encoder(db_obj)
-
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
-            update_data = obj_in.dict(exclude_unset=True)
+            update_data = obj_in.model_dump(exclude_unset=True)
 
-        for field in obj_data:
-            if field in update_data:
+        for field in update_data:
+            if hasattr(db_obj, field):
                 setattr(db_obj, field, update_data[field])
 
         db.add(db_obj)
@@ -273,8 +269,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         db_objects = []
         for obj_in in objects_in:
-            obj_in_data = jsonable_encoder(obj_in)
-            db_obj = self.model(**obj_in_data)
+            db_obj = self.model(**obj_in.model_dump())
             db_objects.append(db_obj)
 
         db.add_all(db_objects)

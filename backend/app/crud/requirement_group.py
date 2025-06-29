@@ -22,7 +22,7 @@ class CRUDRequirementGroup(
             select(self.model)
             .where(self.model.project_id == project_id)
             .options(
-                selectinload(self.model.project), selectinload(self.model.requirements)
+                selectinload(self.model.project), selectinload(self.model.versions)
             )
             .offset(skip)
             .limit(limit)
@@ -39,24 +39,22 @@ class CRUDRequirementGroup(
             select(self.model)
             .where(and_(self.model.name == name, self.model.project_id == project_id))
             .options(
-                selectinload(self.model.project), selectinload(self.model.requirements)
+                selectinload(self.model.project), selectinload(self.model.versions)
             )
         )
         result = await db.execute(query)
         return result.scalars().first()
 
-    async def get_with_requirements(
+    async def get_with_versions(
         self, db: AsyncSession, *, group_id: int
     ) -> Optional[RequirementGroup]:
-        """Get requirement group with all its requirements loaded"""
+        """Get requirement group with all its versions loaded"""
         query = (
             select(self.model)
             .where(self.model.id == group_id)
             .options(
                 selectinload(self.model.project),
-                selectinload(self.model.requirements).selectinload("type"),
-                selectinload(self.model.requirements).selectinload("priority"),
-                selectinload(self.model.requirements).selectinload("status"),
+                selectinload(self.model.versions),
             )
         )
         result = await db.execute(query)

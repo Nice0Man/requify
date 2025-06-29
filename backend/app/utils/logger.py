@@ -4,6 +4,7 @@
 
 import logging
 import sys
+import os
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from typing import Optional
@@ -47,19 +48,39 @@ def setup_logger(
 
     # Файловый обработчик, если указан файл
     if log_file:
-        # Создаем директорию для логов, если её нет
-        log_path = Path(log_file)
-        log_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            # Создаем директорию для логов, если её нет
+            log_path = Path(log_file)
+            log_path.parent.mkdir(parents=True, exist_ok=True)
 
-        file_handler = RotatingFileHandler(
-            log_file,
-            maxBytes=settings.logging.max_size,
-            backupCount=settings.logging.backup_count,
-            encoding="utf-8",
-        )
-        file_handler.setLevel(getattr(logging, level.upper()))
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+            # Проверяем права на запись в директорию
+            log_dir = log_path.parent
+            if not os.access(log_dir, os.W_OK):
+                logger.warning(
+                    f"No write permission for log directory {log_dir}, using console logging only"
+                )
+                return logger
+
+            file_handler = RotatingFileHandler(
+                log_file,
+                maxBytes=settings.logging.max_size,
+                backupCount=settings.logging.backup_count,
+                encoding="utf-8",
+            )
+            file_handler.setLevel(getattr(logging, level.upper()))
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+
+            logger.info(f"File logging enabled: {log_file}")
+
+        except (OSError, PermissionError) as e:
+            logger.warning(
+                f"Failed to setup file logging for {log_file}: {e}. Using console logging only."
+            )
+        except Exception as e:
+            logger.error(
+                f"Unexpected error setting up file logging: {e}. Using console logging only."
+            )
 
     return logger
 
@@ -95,7 +116,7 @@ integration_logger = get_logger("integrations")
 testing_logger = get_logger("testing")
 admin_logger = get_logger("admin")
 email_logger = get_logger("email")
-    
+
 
 # Контекстный менеджер для логирования операций
 class LoggedOperation:

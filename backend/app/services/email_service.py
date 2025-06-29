@@ -57,20 +57,31 @@ class EmailConfig:
         config = cls()
 
         # Загружаем из настроек email конфигурации
-        if hasattr(settings, 'email'):
+        if hasattr(settings, "email"):
             email_config = settings.email
             config.SMTP_HOST = email_config.smtp_host or config.SMTP_HOST
             config.SMTP_PORT = email_config.smtp_port or config.SMTP_PORT
             config.SMTP_USERNAME = email_config.smtp_user or config.SMTP_USERNAME
             config.SMTP_PASSWORD = email_config.smtp_password or config.SMTP_PASSWORD
-            config.SMTP_USE_TLS = email_config.smtp_tls if hasattr(email_config, 'smtp_tls') else config.SMTP_USE_TLS
-            config.SMTP_USE_SSL = email_config.smtp_ssl if hasattr(email_config, 'smtp_ssl') else config.SMTP_USE_SSL
+            config.SMTP_USE_TLS = (
+                email_config.smtp_tls
+                if hasattr(email_config, "smtp_tls")
+                else config.SMTP_USE_TLS
+            )
+            config.SMTP_USE_SSL = (
+                email_config.smtp_ssl
+                if hasattr(email_config, "smtp_ssl")
+                else config.SMTP_USE_SSL
+            )
             config.FROM_EMAIL = email_config.from_email or config.FROM_EMAIL
             config.FROM_NAME = email_config.from_name or config.FROM_NAME
 
         # Определяем режим работы
-        config.DEVELOPMENT_MODE = getattr(settings, "app_config", {}) and getattr(settings.app_config, "env", "development") == "development"
-        
+        config.DEVELOPMENT_MODE = (
+            getattr(settings, "app_config", {})
+            and getattr(settings.app_config, "env", "development") == "development"
+        )
+
         # Если SMTP настройки заданы, используем SMTP (включая MailHog)
         # Только если SMTP_HOST пустой или явно не задан, используем консольный бэкенд
         if config.SMTP_HOST and config.SMTP_HOST not in ("", "localhost"):
@@ -117,16 +128,16 @@ class EmailTemplates:
         """Добавить кастомные фильтры для Jinja2."""
         if self.env:
             # Добавляем фильтр strftime для форматирования даты
-            def strftime_filter(datetime_obj, format_string='%Y-%m-%d %H:%M:%S'):
+            def strftime_filter(datetime_obj, format_string="%Y-%m-%d %H:%M:%S"):
                 """Фильтр для форматирования datetime объектов."""
                 if datetime_obj is None:
-                    return ''
+                    return ""
                 try:
                     return datetime_obj.strftime(format_string)
                 except (AttributeError, ValueError):
                     return str(datetime_obj)
-            
-            self.env.filters['strftime'] = strftime_filter
+
+            self.env.filters["strftime"] = strftime_filter
 
     def get_template(self, template_name: str) -> Optional[Template]:
         """
@@ -146,8 +157,12 @@ class EmailTemplates:
         return None
 
     def render_password_reset_html(
-        self, user_email: str, reset_token: str, user_name: Optional[str] = None, 
-        ip_address: Optional[str] = None, timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        reset_token: str,
+        user_name: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> str:
         """
         Рендер HTML шаблона для сброса пароля.
@@ -165,7 +180,9 @@ class EmailTemplates:
         template = self.get_template("password_reset.html.jinja")
 
         if template:
-            reset_url = f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+            reset_url = (
+                f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+            )
             return template.render(
                 user_email=user_email,
                 user_name=user_name or user_email,
@@ -173,14 +190,20 @@ class EmailTemplates:
                 reset_token=reset_token,
                 app_name="Requify",
                 app_url=settings.security.frontend_url,
-                support_email=self.config.FROM_EMAIL if hasattr(self, 'config') else EmailConfig.FROM_EMAIL,
+                support_email=(
+                    self.config.FROM_EMAIL
+                    if hasattr(self, "config")
+                    else EmailConfig.FROM_EMAIL
+                ),
                 ip_address=ip_address,
                 timestamp=timestamp or datetime.now(),
                 now=datetime.now,
             )
 
         # Fallback HTML шаблон
-        reset_url = f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+        reset_url = (
+            f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+        )
         return f"""
         <!DOCTYPE html>
         <html>
@@ -228,8 +251,12 @@ class EmailTemplates:
         """
 
     def render_password_reset_text(
-        self, user_email: str, reset_token: str, user_name: Optional[str] = None,
-        ip_address: Optional[str] = None, timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        reset_token: str,
+        user_name: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> str:
         """
         Рендер текстового шаблона для сброса пароля.
@@ -247,21 +274,29 @@ class EmailTemplates:
         template = self.get_template("password_reset.txt.jinja")
 
         if template:
-            reset_url = f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+            reset_url = (
+                f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+            )
             return template.render(
                 user_email=user_email,
                 user_name=user_name or user_email,
                 reset_url=reset_url,
                 reset_token=reset_token,
                 app_name="Requify",
-                support_email=self.config.FROM_EMAIL if hasattr(self, 'config') else EmailConfig.FROM_EMAIL,
+                support_email=(
+                    self.config.FROM_EMAIL
+                    if hasattr(self, "config")
+                    else EmailConfig.FROM_EMAIL
+                ),
                 ip_address=ip_address,
                 timestamp=timestamp or datetime.now(),
                 now=datetime.now,
             )
 
         # Fallback текстовый шаблон
-        reset_url = f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+        reset_url = (
+            f"{settings.security.frontend_url}/reset-password?token={reset_token}"
+        )
         return f"""
 Сброс пароля - Requify
 
@@ -282,8 +317,12 @@ class EmailTemplates:
         """
 
     def render_email_verification_html(
-        self, user_email: str, verification_token: str, user_name: Optional[str] = None,
-        ip_address: Optional[str] = None, timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        verification_token: str,
+        user_name: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> str:
         """
         Рендер HTML шаблона для верификации email.
@@ -309,14 +348,20 @@ class EmailTemplates:
                 verification_token=verification_token,
                 app_name="Requify",
                 app_url=settings.security.frontend_url,
-                support_email=self.config.FROM_EMAIL if hasattr(self, 'config') else EmailConfig.FROM_EMAIL,
+                support_email=(
+                    self.config.FROM_EMAIL
+                    if hasattr(self, "config")
+                    else EmailConfig.FROM_EMAIL
+                ),
                 ip_address=ip_address,
                 timestamp=timestamp or datetime.now(),
                 now=datetime.now,
             )
 
         # Fallback если шаблон не найден
-        verification_url = f"{settings.security.frontend_url}/verify-email?token={verification_token}"
+        verification_url = (
+            f"{settings.security.frontend_url}/verify-email?token={verification_token}"
+        )
         return f"""
         <!DOCTYPE html>
         <html>
@@ -334,8 +379,12 @@ class EmailTemplates:
         """
 
     def render_email_verification_text(
-        self, user_email: str, verification_token: str, user_name: Optional[str] = None,
-        ip_address: Optional[str] = None, timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        verification_token: str,
+        user_name: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> str:
         """
         Рендер текстового шаблона для верификации email.
@@ -360,14 +409,20 @@ class EmailTemplates:
                 verification_url=verification_url,
                 verification_token=verification_token,
                 app_name="Requify",
-                support_email=self.config.FROM_EMAIL if hasattr(self, 'config') else EmailConfig.FROM_EMAIL,
+                support_email=(
+                    self.config.FROM_EMAIL
+                    if hasattr(self, "config")
+                    else EmailConfig.FROM_EMAIL
+                ),
                 ip_address=ip_address,
                 timestamp=timestamp or datetime.now(),
                 now=datetime.now,
             )
 
         # Fallback если шаблон не найден
-        verification_url = f"{settings.security.frontend_url}/verify-email?token={verification_token}"
+        verification_url = (
+            f"{settings.security.frontend_url}/verify-email?token={verification_token}"
+        )
         return f"""
         Подтверждение email адреса - Requify
         
@@ -381,8 +436,10 @@ class EmailTemplates:
         """
 
     def render_welcome_html(
-        self, user_email: str, user_name: Optional[str] = None,
-        timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        user_name: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> str:
         """
         Рендер HTML шаблона приветственного письма.
@@ -403,7 +460,11 @@ class EmailTemplates:
                 user_name=user_name or user_email,
                 app_name="Requify",
                 app_url=settings.security.frontend_url,
-                support_email=self.config.FROM_EMAIL if hasattr(self, 'config') else EmailConfig.FROM_EMAIL,
+                support_email=(
+                    self.config.FROM_EMAIL
+                    if hasattr(self, "config")
+                    else EmailConfig.FROM_EMAIL
+                ),
                 timestamp=timestamp or datetime.now(),
                 now=datetime.now,
             )
@@ -425,8 +486,11 @@ class EmailTemplates:
         """
 
     def render_security_alert_html(
-        self, user_email: str, alert_type: str, details: Dict[str, Any],
-        user_name: Optional[str] = None
+        self,
+        user_email: str,
+        alert_type: str,
+        details: Dict[str, Any],
+        user_name: Optional[str] = None,
     ) -> str:
         """
         Рендер HTML шаблона уведомления безопасности.
@@ -450,7 +514,11 @@ class EmailTemplates:
                 details=details,
                 app_name="Requify",
                 app_url=settings.security.frontend_url,
-                support_email=self.config.FROM_EMAIL if hasattr(self, 'config') else EmailConfig.FROM_EMAIL,
+                support_email=(
+                    self.config.FROM_EMAIL
+                    if hasattr(self, "config")
+                    else EmailConfig.FROM_EMAIL
+                ),
                 now=datetime.now,
             )
 
@@ -498,11 +566,13 @@ class EmailService:
         self.config = config or EmailConfig.from_settings()
         self.templates = EmailTemplates()
         self.executor = ThreadPoolExecutor(max_workers=3)
-        
+
         # Логируем конфигурацию при инициализации
-        logger.info(f"Email service initialized with SMTP_HOST: {self.config.SMTP_HOST}, "
-                   f"CONSOLE_BACKEND: {self.config.CONSOLE_BACKEND}, "
-                   f"DEVELOPMENT_MODE: {self.config.DEVELOPMENT_MODE}")
+        logger.info(
+            f"Email service initialized with SMTP_HOST: {self.config.SMTP_HOST}, "
+            f"CONSOLE_BACKEND: {self.config.CONSOLE_BACKEND}, "
+            f"DEVELOPMENT_MODE: {self.config.DEVELOPMENT_MODE}"
+        )
 
     async def send_email(
         self,
@@ -527,7 +597,9 @@ class EmailService:
         """
         if self.config.CONSOLE_BACKEND:
             # В режиме разработки выводим в консоль
-            logger.info(f"Email service in console mode - email will be printed to console instead of sent via SMTP")
+            logger.info(
+                f"Email service in console mode - email will be printed to console instead of sent via SMTP"
+            )
             return await self._send_to_console(
                 to_email, subject, html_content, text_content
             )
@@ -578,7 +650,9 @@ class EmailService:
         print(f"From: {self.config.FROM_NAME} <{self.config.FROM_EMAIL}>")
         print(f"Subject: {subject}")
         print(f"Date: {datetime.now().isoformat()}")
-        print(f"SMTP Config: Host={self.config.SMTP_HOST}, Port={self.config.SMTP_PORT}")
+        print(
+            f"SMTP Config: Host={self.config.SMTP_HOST}, Port={self.config.SMTP_PORT}"
+        )
         print(f"Console Backend: {self.config.CONSOLE_BACKEND}")
         print("-" * 80)
 
@@ -672,8 +746,12 @@ class EmailService:
     # === Специализированные методы для аутентификации ===
 
     async def send_password_reset_email(
-        self, user_email: str, reset_token: str, user_name: Optional[str] = None,
-        ip_address: Optional[str] = None, timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        reset_token: str,
+        user_name: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> bool:
         """
         Отправить email для сброса пароля.
@@ -705,8 +783,12 @@ class EmailService:
         )
 
     async def send_email_verification(
-        self, user_email: str, verification_token: str, user_name: Optional[str] = None,
-        ip_address: Optional[str] = None, timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        verification_token: str,
+        user_name: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> bool:
         """
         Отправить email для верификации email адреса.
@@ -774,8 +856,10 @@ class EmailService:
         )
 
     async def send_welcome_email(
-        self, user_email: str, user_name: Optional[str] = None,
-        timestamp: Optional[datetime] = None
+        self,
+        user_email: str,
+        user_name: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
     ) -> bool:
         """
         Отправить приветственное письмо новому пользователю.

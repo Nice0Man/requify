@@ -35,10 +35,15 @@ def upgrade() -> None:
     op.add_column(
         "users",
         sa.Column(
-            "email_verified_at", sa.DateTime(), nullable=True, comment="Время подтверждения email"
+            "email_verified_at",
+            sa.DateTime(),
+            nullable=True,
+            comment="Время подтверждения email",
         ),
     )
-    op.create_index("ix_users_email_verified", "users", ["email_verified"], unique=False)
+    op.create_index(
+        "ix_users_email_verified", "users", ["email_verified"], unique=False
+    )
     # ### end Alembic commands ###
 
 

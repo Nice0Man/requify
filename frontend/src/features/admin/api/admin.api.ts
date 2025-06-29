@@ -1,4 +1,4 @@
-import { ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
 import {
   SystemInfo,
   SystemMetrics,
@@ -63,7 +63,7 @@ export interface SystemSettingsUpdate {
 }
 
 export class AdminApi {
-  constructor(private client: ApiClient) {}
+  constructor(private client = apiClient) {}
 
   // 1. Get Admin Users
   async getAdminUsers(
@@ -300,4 +300,4 @@ export class AdminApi {
 }
 
 // Export singleton instance
-export const adminApi = new AdminApi(new ApiClient());
+export const adminApi = new AdminApi();

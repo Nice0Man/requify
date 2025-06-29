@@ -22,6 +22,9 @@ from .requirement_types import requirement_type
 from .spec import spec
 from .test_result import test_result
 
+# Dashboard CRUD operations
+from .dashboard import user_preferences, notification, activity, widget
+
 __all__ = [
     "CRUDBase",
     "user",
@@ -39,4 +42,9 @@ __all__ = [
     "requirement_type",
     "spec",
     "test_result",
+    # Dashboard CRUD
+    "user_preferences",
+    "notification",
+    "activity",
+    "widget",
 ]
