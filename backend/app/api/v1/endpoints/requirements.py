@@ -488,7 +488,7 @@ async def create_requirement_relationship(
 
     # Check target requirement existence
     target_requirement = await crud.requirement.get(
-        db, id=relationship_in.target_requirement_id
+        db, id=relationship_in.target_id
     )
     if not target_requirement:
         raise HTTPException(
@@ -498,7 +498,7 @@ async def create_requirement_relationship(
 
     # Check relationship type existence
     relationship_type = await crud.relationship_type.get(
-        db, id=relationship_in.relationship_type_id
+        db, id=relationship_in.type_id
     )
     if not relationship_type:
         raise HTTPException(
@@ -508,8 +508,8 @@ async def create_requirement_relationship(
     # Create relationship with correct field names for the model
     relationship_data = {
         "source_id": requirement_id,
-        "target_id": relationship_in.target_requirement_id,
-        "type_id": relationship_in.relationship_type_id,
+        "target_id": relationship_in.target_id,
+        "type_id": relationship_in.type_id,
     }
 
     relationship = await crud.relationship.create(db, obj_in=relationship_data)

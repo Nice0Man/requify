@@ -10085,7 +10085,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.relationships",
         "description": "backend.app.api.v1.endpoints.relationships",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Relationship])\nasync def get_relationships(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    source_requirement_id: Optional[int] = Query(\n        None, description=\"Фильтр по исходному требованию\"\n    ),",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Relationship])\nasync def get_relationships(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    source_id: Optional[int] = Query(\n        None, description=\"Фильтр по исходному требованию\"\n    ),",
         "detail": "backend.app.api.v1.endpoints.relationships",
         "documentation": {}
     },
@@ -12191,7 +12191,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.relationship",
         "description": "backend.app.schemas.relationship",
-        "peekOfCode": "class RelationshipBase(BaseModel):\n    \"\"\"Базовая схема связи между требованиями.\"\"\"\n    source_requirement_id: int = Field(..., gt=0, description=\"ID исходного требования\")\n    target_requirement_id: int = Field(..., gt=0, description=\"ID целевого требования\")\n    relationship_type_id: int = Field(..., gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipCreate(RelationshipBase):\n    \"\"\"Схема для создания связи между требованиями.\"\"\"\n    pass\nclass RelationshipCreateForRequirement(BaseModel):",
+        "peekOfCode": "class RelationshipBase(BaseModel):\n    \"\"\"Базовая схема связи между требованиями.\"\"\"\n    source_id: int = Field(..., gt=0, description=\"ID исходного требования\")\n    target_id: int = Field(..., gt=0, description=\"ID целевого требования\")\n    type_id: int = Field(..., gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipCreate(RelationshipBase):\n    \"\"\"Схема для создания связи между требованиями.\"\"\"\n    pass\nclass RelationshipCreateForRequirement(BaseModel):",
         "detail": "backend.app.schemas.relationship",
         "documentation": {}
     },
@@ -12200,7 +12200,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.relationship",
         "description": "backend.app.schemas.relationship",
-        "peekOfCode": "class RelationshipCreate(RelationshipBase):\n    \"\"\"Схема для создания связи между требованиями.\"\"\"\n    pass\nclass RelationshipCreateForRequirement(BaseModel):\n    \"\"\"Схема для создания связи для конкретного требования (без source_requirement_id).\"\"\"\n    target_requirement_id: int = Field(..., gt=0, description=\"ID целевого требования\")\n    relationship_type_id: int = Field(..., gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipUpdate(BaseModel):\n    \"\"\"Схема для обновления связи между требованиями.\"\"\"",
+        "peekOfCode": "class RelationshipCreate(RelationshipBase):\n    \"\"\"Схема для создания связи между требованиями.\"\"\"\n    pass\nclass RelationshipCreateForRequirement(BaseModel):\n    \"\"\"Схема для создания связи для конкретного требования (без source_id).\"\"\"\n    target_id: int = Field(..., gt=0, description=\"ID целевого требования\")\n    type_id: int = Field(..., gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipUpdate(BaseModel):\n    \"\"\"Схема для обновления связи между требованиями.\"\"\"",
         "detail": "backend.app.schemas.relationship",
         "documentation": {}
     },
@@ -12209,7 +12209,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.relationship",
         "description": "backend.app.schemas.relationship",
-        "peekOfCode": "class RelationshipCreateForRequirement(BaseModel):\n    \"\"\"Схема для создания связи для конкретного требования (без source_requirement_id).\"\"\"\n    target_requirement_id: int = Field(..., gt=0, description=\"ID целевого требования\")\n    relationship_type_id: int = Field(..., gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipUpdate(BaseModel):\n    \"\"\"Схема для обновления связи между требованиями.\"\"\"\n    relationship_type_id: Optional[int] = Field(None, gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipInDBBase(RelationshipBase):",
+        "peekOfCode": "class RelationshipCreateForRequirement(BaseModel):\n    \"\"\"Схема для создания связи для конкретного требования (без source_id).\"\"\"\n    target_id: int = Field(..., gt=0, description=\"ID целевого требования\")\n    type_id: int = Field(..., gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipUpdate(BaseModel):\n    \"\"\"Схема для обновления связи между требованиями.\"\"\"\n    type_id: Optional[int] = Field(None, gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipInDBBase(RelationshipBase):",
         "detail": "backend.app.schemas.relationship",
         "documentation": {}
     },
@@ -12218,7 +12218,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.relationship",
         "description": "backend.app.schemas.relationship",
-        "peekOfCode": "class RelationshipUpdate(BaseModel):\n    \"\"\"Схема для обновления связи между требованиями.\"\"\"\n    relationship_type_id: Optional[int] = Field(None, gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipInDBBase(RelationshipBase):\n    \"\"\"Базовая схема связи с данными из БД.\"\"\"\n    created_at: datetime\n    class Config:\n        from_attributes = True\nclass Relationship(RelationshipInDBBase):",
+        "peekOfCode": "class RelationshipUpdate(BaseModel):\n    \"\"\"Схема для обновления связи между требованиями.\"\"\"\n    type_id: Optional[int] = Field(None, gt=0, description=\"ID типа связи\")\n    description: Optional[str] = Field(None, description=\"Описание связи\")\nclass RelationshipInDBBase(RelationshipBase):\n    \"\"\"Базовая схема связи с данными из БД.\"\"\"\n    created_at: datetime\n    class Config:\n        from_attributes = True\nclass Relationship(RelationshipInDBBase):",
         "detail": "backend.app.schemas.relationship",
         "documentation": {}
     },

@@ -29,13 +29,13 @@ async def get_relationships(
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
     ),
-    source_requirement_id: Optional[int] = Query(
+    source_id: Optional[int] = Query(
         None, description="Фильтр по исходному требованию"
     ),
-    target_requirement_id: Optional[int] = Query(
+    target_id: Optional[int] = Query(
         None, description="Фильтр по целевому требованию"
     ),
-    relationship_type_id: Optional[int] = Query(
+    type_id: Optional[int] = Query(
         None, description="Фильтр по типу связи"
     ),
     db: AsyncSession = Depends(get_db),
@@ -47,23 +47,23 @@ async def get_relationships(
     Args:
         skip: Количество пропускаемых записей
         limit: Максимальное количество возвращаемых записей
-        source_requirement_id: Фильтр по исходному требованию
-        target_requirement_id: Фильтр по целевому требованию
-        relationship_type_id: Фильтр по типу связи
+        source_id: Фильтр по исходному требованию
+        target_id: Фильтр по целевому требованию
+        type_id: Фильтр по типу связи
         db: Сессия базы данных
         current_user: Текущий пользователь
 
     Returns:
         List[schemas.Relationship]: Список связей
     """
-    # Map schema field names to model field names for filtering
+    # Build filters using the model field names
     filters = {}
-    if source_requirement_id:
-        filters["source_id"] = source_requirement_id
-    if target_requirement_id:
-        filters["target_id"] = target_requirement_id
-    if relationship_type_id:
-        filters["type_id"] = relationship_type_id
+    if source_id:
+        filters["source_id"] = source_id
+    if target_id:
+        filters["target_id"] = target_id
+    if type_id:
+        filters["type_id"] = type_id
 
     relationships = await crud.relationship.get_multi(
         db, skip=skip, limit=limit, filters=filters
@@ -95,7 +95,7 @@ async def create_relationship(
     """
     # Проверяем существование исходного требования
     source_req = await crud.requirement.get(
-        db, id=relationship_in.source_requirement_id
+        db, id=relationship_in.source_id
     )
     if not source_req:
         raise HTTPException(
@@ -105,7 +105,7 @@ async def create_relationship(
 
     # Проверяем существование целевого требования
     target_req = await crud.requirement.get(
-        db, id=relationship_in.target_requirement_id
+        db, id=relationship_in.target_id
     )
     if not target_req:
         raise HTTPException(
@@ -114,7 +114,7 @@ async def create_relationship(
         )
 
     # Проверяем, что требования не одинаковые
-    if relationship_in.source_requirement_id == relationship_in.target_requirement_id:
+    if relationship_in.source_id == relationship_in.target_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Нельзя создать связь требования с самим собой",
@@ -122,7 +122,7 @@ async def create_relationship(
 
     # Проверяем существование типа связи
     rel_type = await crud.relationship_type.get(
-        db, id=relationship_in.relationship_type_id
+        db, id=relationship_in.type_id
     )
     if not rel_type:
         raise HTTPException(
@@ -132,9 +132,9 @@ async def create_relationship(
 
     # Create relationship with correct field names for the model
     relationship_data = {
-        "source_id": relationship_in.source_requirement_id,
-        "target_id": relationship_in.target_requirement_id,
-        "type_id": relationship_in.relationship_type_id,
+        "source_id": relationship_in.source_id,
+        "target_id": relationship_in.target_id,
+        "type_id": relationship_in.type_id,
     }
 
     relationship = await crud.relationship.create(db, obj_in=relationship_data)
@@ -200,9 +200,9 @@ async def update_relationship(
         )
 
     # Если меняется тип связи, проверяем его существование
-    if relationship_in.relationship_type_id:
+    if relationship_in.type_id:
         rel_type = await crud.relationship_type.get(
-            db, id=relationship_in.relationship_type_id
+            db, id=relationship_in.type_id
         )
         if not rel_type:
             raise HTTPException(
@@ -324,9 +324,9 @@ async def create_requirement_relationship(
     """
     # Создаем полную схему связи
     full_relationship = schemas.RelationshipCreate(
-        source_requirement_id=requirement_id,
-        target_requirement_id=relationship_in.target_requirement_id,
-        relationship_type_id=relationship_in.relationship_type_id,
+        source_id=requirement_id,
+        target_id=relationship_in.target_id,
+        type_id=relationship_in.type_id,
         description=relationship_in.description,
     )
 
