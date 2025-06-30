@@ -193,11 +193,11 @@ export interface RequirementApiError {
   detail:
     | string
     | Array<{
-        loc: (string | number)[];
-        msg: string;
-        type: string;
-        input?: any;
-      }>;
+    loc: (string | number)[];
+    msg: string;
+    type: string;
+    input?: any;
+  }>;
   error?: string;
   error_description?: string;
 }

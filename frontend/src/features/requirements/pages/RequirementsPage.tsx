@@ -59,9 +59,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { format, isAfter, parseISO } from "date-fns";
-import {
+import { 
   RequirementWithDetails,
-  RequirementFilters,
+  RequirementFilters, 
   RequirementListParams,
   RequirementType,
   RequirementPriority,
@@ -75,7 +75,7 @@ import { useAuth } from "../../auth/context/auth.context";
 const RequirementsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-
+  
   // State
   const [requirements, setRequirements] = useState<RequirementWithDetails[]>(
     []
@@ -87,7 +87,7 @@ const RequirementsPage: React.FC = () => {
   const [sortModel, setSortModel] = useState([
     { field: "updated_at", sort: "desc" as const },
   ]);
-
+  
   // Filters
   const [filters, setFilters] = useState<RequirementFilters>({
     search: "",
@@ -101,14 +101,14 @@ const RequirementsPage: React.FC = () => {
     isOverdue: null,
     dateRange: { start: null, end: null },
   });
-
+  
   // Reference data
   const [projects, setProjects] = useState<any[]>([]);
   const [types, setTypes] = useState<RequirementType[]>([]);
   const [priorities, setPriorities] = useState<RequirementPriority[]>([]);
   const [statuses, setStatuses] = useState<RequirementStatus[]>([]);
   const [users, setUsers] = useState([]);
-
+  
   // UI State
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -175,11 +175,11 @@ const RequirementsPage: React.FC = () => {
     try {
       const [projectsRes, typesRes, prioritiesRes, statusesRes] =
         await Promise.all([
-          projectsApi.getProjects({ limit: 1000 }),
-          referenceApi.getRequirementTypes(),
-          referenceApi.getRequirementPriorities(),
-          referenceApi.getRequirementStatuses(),
-        ]);
+        projectsApi.getProjects({ limit: 1000 }),
+        referenceApi.getRequirementTypes(),
+        referenceApi.getRequirementPriorities(),
+        referenceApi.getRequirementStatuses(),
+      ]);
 
       setProjects(projectsRes.data.items || []);
       setTypes(typesRes.data || []);
@@ -268,7 +268,7 @@ const RequirementsPage: React.FC = () => {
         include_comments: false,
         format: "excel" as const,
       };
-
+      
       await requirementsApi.exportRequirements(params);
       setSnackbar({
         open: true,
@@ -280,7 +280,7 @@ const RequirementsPage: React.FC = () => {
     }
   };
 
-  // Priority level color mapping
+  // Priority level color mapping  
   const getPriorityColor = (priority: RequirementPriority) => {
     if (priority.level && priority.level >= 90) return "error";
     if (priority.level && priority.level >= 70) return "warning";
@@ -291,55 +291,55 @@ const RequirementsPage: React.FC = () => {
   // Column definitions
   const columns: GridColDef[] = useMemo(
     () => [
-      {
+    {
         field: "id",
         headerName: "ID",
-        width: 80,
-        filterable: false,
-      },
-      {
+      width: 80,
+      filterable: false,
+    },
+    {
         field: "title",
         headerName: "Title",
-        flex: 1,
-        minWidth: 200,
-        renderCell: (params) => (
-          <Box>
-            <Typography variant="body2" fontWeight={600} noWrap>
-              {params.value}
-            </Typography>
-          </Box>
-        ),
-      },
-      {
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params) => (
+        <Box>
+          <Typography variant="body2" fontWeight={600} noWrap>
+            {params.value}
+          </Typography>
+        </Box>
+      ),
+    },
+    {
         field: "project_name",
         headerName: "Project",
-        width: 150,
-        renderCell: (params) => (
-          <Chip
-            size="small"
+      width: 150,
+      renderCell: (params) => (
+        <Chip
+          size="small"
             label={params.value || "N/A"}
-            variant="outlined"
-            color="primary"
-          />
-        ),
-      },
-      {
+          variant="outlined"
+          color="primary"
+        />
+      ),
+    },
+    {
         field: "type_name",
         headerName: "Type",
-        width: 120,
-        renderCell: (params) => (
+      width: 120,
+      renderCell: (params) => (
           <Chip size="small" label={params.value || "N/A"} />
-        ),
-      },
-      {
+      ),
+    },
+    {
         field: "priority_name",
         headerName: "Priority",
-        width: 120,
+      width: 120,
         renderCell: (params) => {
           const priority = priorities.find((p) => p.name === params.value);
           return (
-            <Chip
-              size="small"
+        <Chip
+          size="small"
               label={params.value || "N/A"}
               color={priority ? getPriorityColor(priority) : "default"}
               icon={
@@ -347,95 +347,95 @@ const RequirementsPage: React.FC = () => {
                   <HighPriorityIcon />
                 ) : undefined
               }
-            />
+        />
           );
         },
-      },
-      {
+    },
+    {
         field: "status_name",
         headerName: "Status",
-        width: 120,
-        renderCell: (params) => (
-          <Chip
-            size="small"
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          size="small"
             label={params.value || "N/A"}
             icon={<CheckCircleIcon />}
-          />
-        ),
-      },
-      {
+        />
+      ),
+    },
+    {
         field: "author_name",
         headerName: "Author",
-        width: 150,
+      width: 150,
         renderCell: (params) =>
           params.value ? (
-            <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" alignItems="center" gap={1}>
               <Avatar sx={{ width: 24, height: 24, fontSize: "0.75rem" }}>
                 {params.value.charAt(0)}
-              </Avatar>
-              <Typography variant="body2" noWrap>
+            </Avatar>
+            <Typography variant="body2" noWrap>
                 {params.value}
-              </Typography>
-            </Box>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              Unknown
             </Typography>
-          ),
-      },
-      {
+          </Box>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+              Unknown
+          </Typography>
+      ),
+    },
+    {
         field: "deadline",
         headerName: "Due Date",
-        width: 120,
+      width: 120,
         valueFormatter: (params) =>
           params.value ? format(parseISO(params.value), "MMM dd, yyyy") : "",
-        renderCell: (params) => {
-          if (!params.value) return null;
-          const isOverdue = isAfter(new Date(), parseISO(params.value));
-          return (
-            <Typography
-              variant="body2"
+      renderCell: (params) => {
+        if (!params.value) return null;
+        const isOverdue = isAfter(new Date(), parseISO(params.value));
+        return (
+          <Typography
+            variant="body2"
               color={isOverdue ? "error" : "text.primary"}
-              fontWeight={isOverdue ? 600 : 400}
-            >
+            fontWeight={isOverdue ? 600 : 400}
+          >
               {format(parseISO(params.value), "MMM dd, yyyy")}
-            </Typography>
-          );
-        },
+          </Typography>
+        );
       },
-      {
+    },
+    {
         field: "updated_at",
         headerName: "Updated",
-        width: 120,
+      width: 120,
         valueFormatter: (params) =>
           format(parseISO(params.value), "MMM dd, yyyy"),
-      },
-      {
+    },
+    {
         field: "actions",
         type: "actions",
         headerName: "Actions",
-        width: 120,
-        getActions: (params: GridRowParams) => [
-          <GridActionsCellItem
-            icon={<ViewIcon />}
-            label="View"
-            onClick={() => navigate(`/requirements/${params.id}`)}
-          />,
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            onClick={() => navigate(`/requirements/${params.id}/edit`)}
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={() => {
-              setItemToDelete(params.id as number);
-              setDeleteDialogOpen(true);
-            }}
-          />,
-        ],
-      },
+      width: 120,
+      getActions: (params: GridRowParams) => [
+        <GridActionsCellItem
+          icon={<ViewIcon />}
+          label="View"
+          onClick={() => navigate(`/requirements/${params.id}`)}
+        />,
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={() => navigate(`/requirements/${params.id}/edit`)}
+        />,
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={() => {
+            setItemToDelete(params.id as number);
+            setDeleteDialogOpen(true);
+          }}
+        />,
+      ],
+    },
     ],
     [navigate, priorities]
   );
@@ -645,7 +645,7 @@ const RequirementsPage: React.FC = () => {
             }}
             sx={{ minWidth: 300 }}
           />
-
+          
           <Badge badgeContent={activeFiltersCount} color="primary">
             <Button
               variant={showFilters ? "contained" : "outlined"}
@@ -655,13 +655,13 @@ const RequirementsPage: React.FC = () => {
               Filters
             </Button>
           </Badge>
-
+          
           {activeFiltersCount > 0 && (
             <Button variant="outlined" onClick={handleClearFilters}>
               Clear Filters
             </Button>
           )}
-
+          
           <IconButton onClick={loadRequirements}>
             <RefreshIcon />
           </IconButton>
@@ -688,7 +688,7 @@ const RequirementsPage: React.FC = () => {
                 </Select>
               </FormControl>
             </Grid>
-
+            
             <Grid item xs={12} sm={6} md={3}>
               <Autocomplete
                 multiple
@@ -905,8 +905,8 @@ const RequirementsPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={() => itemToDelete && handleDelete(itemToDelete)}
+          <Button 
+            onClick={() => itemToDelete && handleDelete(itemToDelete)} 
             color="error"
             variant="contained"
           >
@@ -942,4 +942,4 @@ const RequirementsPage: React.FC = () => {
   );
 };
 
-export default RequirementsPage;
+export default RequirementsPage; 

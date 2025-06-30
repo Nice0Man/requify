@@ -24,11 +24,11 @@ export class RequirementsApi {
     params: RequirementSearchParams
   ): Promise<ApiResponse<RequirementListResponse>> {
     const queryParams = new URLSearchParams();
-
+    
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        queryParams.append(key, value.toString());
-      }
+          queryParams.append(key, value.toString());
+        }
     });
 
     // Backend returns simple array, transform to expected format
@@ -163,7 +163,7 @@ export class RequirementsApi {
     const url = queryString
       ? `/requirements/${requirementId}/tests?${queryString}`
       : `/requirements/${requirementId}/tests`;
-
+    
     return this.client.get<any>(url);
   }
 
@@ -180,7 +180,7 @@ export class RequirementsApi {
     const url = queryString
       ? `/requirements/${requirementId}/relationships?${queryString}`
       : `/requirements/${requirementId}/relationships`;
-
+    
     return this.client.get<any>(url);
   }
 
@@ -203,7 +203,7 @@ export class RequirementsApi {
     return this.client.patch<{ updated_count: number }>(
       "/requirements/bulk/status",
       {
-        requirement_ids: ids,
+      requirement_ids: ids,
         status_id,
       }
     );
@@ -226,7 +226,7 @@ export class RequirementsApi {
     return this.client.patch<{ updated_count: number }>(
       "/requirements/bulk/assign",
       {
-        requirement_ids: ids,
+      requirement_ids: ids,
         assigned_to: assignedTo,
       }
     );
@@ -333,7 +333,7 @@ export class RequirementsApi {
     return this.client.patch<{ message: string }>(
       "/requirements/groups/reorder",
       {
-        project_id: projectId,
+      project_id: projectId,
         group_orders: groupOrders,
       }
     );
@@ -384,7 +384,7 @@ export class RequirementsApi {
     } catch (error) {
       console.error("Export failed:", error);
       throw error;
-    }
+      }
   }
 
   // Helper method to convert requirements to CSV
@@ -436,4 +436,4 @@ export class RequirementsApi {
 }
 
 // Export singleton instance
-export const requirementsApi = new RequirementsApi();
+export const requirementsApi = new RequirementsApi(); 

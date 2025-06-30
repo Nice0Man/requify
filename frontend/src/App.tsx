@@ -83,6 +83,9 @@ const ReleaseCreatePage = React.lazy(
 const ReleaseDetailsPage = React.lazy(
   () => import("@/features/releases/pages/ReleaseDetailsPage")
 );
+const ReleaseEditPage = React.lazy(
+  () => import("@/features/releases/pages/ReleaseEditPage")
+);
 const AdminPage = React.lazy(() => import("@/features/admin/pages/AdminPage"));
 const ProfilePage = React.lazy(
   () => import("@/features/auth/pages/ProfilePage")
@@ -425,6 +428,14 @@ const AppRoutes: React.FC = () => {
           element={
             <React.Suspense fallback={<LoadingFallback />}>
               <ReleaseDetailsPage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="releases/:id/edit"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ReleaseEditPage />
             </React.Suspense>
           }
         />

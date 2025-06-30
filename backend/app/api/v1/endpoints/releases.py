@@ -682,26 +682,26 @@ async def generate_release_specification(
 
     # Подготавливаем содержимое спецификации
     from datetime import datetime, UTC
-    
+
     content_data = {
-        "release_info": {
-            "name": release.name,
-            "version": release.version,
-            "description": release.description,
+            "release_info": {
+                "name": release.name,
+                "version": release.version,
+                "description": release.description,
             "status": release.status,
             "planned_date": release.planned_date.isoformat() if release.planned_date else None,
             "release_date": release.release_date.isoformat() if release.release_date else None,
-        },
-        "requirements": [
-            {
-                "id": req.id,
+            },
+            "requirements": [
+                {
+                    "id": req.id,
                 "title": req.title,
-                "description": req.description,
-                "type": req.type.name if req.type else None,
-                "priority": req.priority.name if req.priority else None,
-                "status": req.status.name if req.status else None,
-            }
-            for req in requirements
+                    "description": req.description,
+                    "type": req.type.name if req.type else None,
+                    "priority": req.priority.name if req.priority else None,
+                    "status": req.status.name if req.status else None,
+                }
+                for req in requirements
         ] if spec_options.include_requirements else [],
         "relationships": relationships_data if spec_options.include_relationships else [],
         "sections": sections,
@@ -723,8 +723,8 @@ async def generate_release_specification(
             "requirements_by_status": {},
             "requirements_by_priority": {},
         },
-        "generated_at": datetime.now(UTC).isoformat(),
-        "generated_by": current_user.id if hasattr(current_user, "id") else None,
+            "generated_at": datetime.now(UTC).isoformat(),
+            "generated_by": current_user.id if hasattr(current_user, "id") else None,
     }
 
     # Собираем статистику по типам, статусам и приоритетам

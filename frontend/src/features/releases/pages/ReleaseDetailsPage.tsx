@@ -190,7 +190,7 @@ const ReleaseDetailsPage: React.FC = () => {
   // Handle tab change and load data as needed
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-    
+
     // Load data for specific tabs
     if (newValue === 2 && changelog === "") {
       loadChangelog();
@@ -202,7 +202,7 @@ const ReleaseDetailsPage: React.FC = () => {
   // Handle edit action
   const handleEdit = async () => {
     if (!release) return;
-    
+
     try {
       // Navigate to edit page or open edit dialog
       navigate(`/releases/edit/${release.id}`);
@@ -263,8 +263,13 @@ const ReleaseDetailsPage: React.FC = () => {
       const syncData = {
         project_id: release.project_id,
       };
-      const response = await releasesApi.syncProjectRequirementsToRelease(release.id, syncData);
-      toast.success(`Synced ${response.data.synced_requirements} requirements successfully`);
+      const response = await releasesApi.syncProjectRequirementsToRelease(
+        release.id,
+        syncData
+      );
+      toast.success(
+        `Synced ${response.data.synced_requirements} requirements successfully`
+      );
       loadRequirements(); // Reload requirements
     } catch (error) {
       toast.error("Failed to sync requirements");
@@ -287,14 +292,17 @@ const ReleaseDetailsPage: React.FC = () => {
         template_style: "standard" as const,
         auto_numbering: true,
       };
-      const response = await releasesApi.generateReleaseSpecification(release.id, specData);
+      const response = await releasesApi.generateReleaseSpecification(
+        release.id,
+        specData
+      );
       toast.success("Specification generated successfully");
-      
+
       // Open download URL if available
       if (response.data.download_url) {
-        window.open(response.data.download_url, '_blank');
+        window.open(response.data.download_url, "_blank");
       }
-      
+
       // Reload specifications
       loadSpecifications();
     } catch (error) {
@@ -605,10 +613,7 @@ const ReleaseDetailsPage: React.FC = () => {
                     Release Changelog
                   </Typography>
                   <Paper sx={{ p: 2, bgcolor: "grey.50" }}>
-                    <Typography
-                      variant="body2"
-                      sx={{ whiteSpace: "pre-line" }}
-                    >
+                    <Typography variant="body2" sx={{ whiteSpace: "pre-line" }}>
                       {changelog}
                     </Typography>
                   </Paper>
@@ -639,74 +644,98 @@ const ReleaseDetailsPage: React.FC = () => {
               </Box>
             </TabPanel>
 
-                            <TabPanel value={tabValue} index={3}>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    Documentation
-                  </Typography>
-                  {loadingSpecs ? (
-                    <LinearProgress sx={{ my: 2 }} />
-                  ) : (
-                    <Box>
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                        <Typography variant="body1">
-                          Specifications & Documentation
-                        </Typography>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={handleGenerateSpecification}
-                          disabled={loadingSpecs}
-                        >
-                          Generate New Specification
-                        </Button>
-                      </Box>
-                      
-                      {specifications.length > 0 ? (
-                        <Grid container spacing={2}>
-                          {specifications.map((spec) => (
-                            <Grid item xs={12} md={6} key={spec.id}>
-                              <Card>
-                                <CardContent>
-                                  <Typography variant="h6" sx={{ mb: 1 }}>
-                                    {spec.name}
-                                  </Typography>
-                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                    Format: {spec.format}
-                                  </Typography>
-                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                    Generated: {new Date(spec.generated_at).toLocaleString()}
-                                  </Typography>
-                                  <Box display="flex" gap={1}>
-                                    <Button
-                                      size="small"
-                                      variant="outlined"
-                                      onClick={() => window.open(spec.download_url, '_blank')}
-                                    >
-                                      Download
-                                    </Button>
-                                    <Button
-                                      size="small"
-                                      variant="text"
-                                      onClick={() => window.open(spec.preview_url || spec.download_url, '_blank')}
-                                    >
-                                      Preview
-                                    </Button>
-                                  </Box>
-                                </CardContent>
-                              </Card>
-                            </Grid>
-                          ))}
+            <TabPanel value={tabValue} index={3}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Documentation
+              </Typography>
+              {loadingSpecs ? (
+                <LinearProgress sx={{ my: 2 }} />
+              ) : (
+                <Box>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mb={2}
+                  >
+                    <Typography variant="body1">
+                      Specifications & Documentation
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleGenerateSpecification}
+                      disabled={loadingSpecs}
+                    >
+                      Generate New Specification
+                    </Button>
+                  </Box>
+
+                  {specifications.length > 0 ? (
+                    <Grid container spacing={2}>
+                      {specifications.map((spec) => (
+                        <Grid item xs={12} md={6} key={spec.id}>
+                          <Card>
+                            <CardContent>
+                              <Typography variant="h6" sx={{ mb: 1 }}>
+                                {spec.name}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mb: 1 }}
+                              >
+                                Format: {spec.format}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mb: 2 }}
+                              >
+                                Generated:{" "}
+                                {new Date(spec.generated_at).toLocaleString()}
+                              </Typography>
+                              <Box display="flex" gap={1}>
+                                <Button
+                                  size="small"
+                                  variant="outlined"
+                                  onClick={() =>
+                                    window.open(spec.download_url, "_blank")
+                                  }
+                                >
+                                  Download
+                                </Button>
+                                <Button
+                                  size="small"
+                                  variant="text"
+                                  onClick={() =>
+                                    window.open(
+                                      spec.preview_url || spec.download_url,
+                                      "_blank"
+                                    )
+                                  }
+                                >
+                                  Preview
+                                </Button>
+                              </Box>
+                            </CardContent>
+                          </Card>
                         </Grid>
-                      ) : (
-                        <Paper sx={{ p: 3, textAlign: "center", bgcolor: "grey.50" }}>
-                          <Typography variant="body2" color="text.secondary">
-                            No specifications generated yet. Click "Generate New Specification" to create one.
-                          </Typography>
-                        </Paper>
-                      )}
-                    </Box>
+                      ))}
+                    </Grid>
+                  ) : (
+                    <Paper
+                      sx={{ p: 3, textAlign: "center", bgcolor: "grey.50" }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        No specifications generated yet. Click "Generate New
+                        Specification" to create one.
+                      </Typography>
+                    </Paper>
                   )}
-                </TabPanel>
+                </Box>
+              )}
+            </TabPanel>
           </Card>
         </Grid>
 
@@ -815,7 +844,11 @@ const ReleaseDetailsPage: React.FC = () => {
                     color="success"
                     startIcon={<PublishIcon />}
                     fullWidth
-                    disabled={release.status === "released"}
+                    disabled={
+                      release.status === "ready" ||
+                      release.status === "released" ||
+                      release.status === "archived"
+                    }
                     onClick={handlePublish}
                   >
                     Publish Release

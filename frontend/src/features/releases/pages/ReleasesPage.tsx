@@ -833,15 +833,15 @@ const ReleasesPage: React.FC = () => {
 
                           {release.status !== ReleaseStatus.DELETED ? (
                             <>
-                              <Tooltip title="Edit Release">
-                                <IconButton
-                                  size="small"
-                                  color="primary"
-                                  onClick={() => openEditDialog(release)}
-                                >
-                                  <Edit fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
+                          <Tooltip title="Edit Release">
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={() => openEditDialog(release)}
+                            >
+                              <Edit fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
 
                               {release.status === ReleaseStatus.READY && (
                                 <Tooltip title="Publish Release">
@@ -881,15 +881,15 @@ const ReleasesPage: React.FC = () => {
                                 </IconButton>
                               </Tooltip>
 
-                              <Tooltip title="Delete Release">
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  onClick={() => handleDeleteRelease(release)}
-                                >
-                                  <Delete fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
+                          <Tooltip title="Delete Release">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDeleteRelease(release)}
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
                             </>
                           ) : (
                             <Tooltip title="Restore Release">
