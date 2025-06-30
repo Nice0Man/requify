@@ -57,34 +57,34 @@ export class ReferenceApi {
 
   // Requirement Types
   async getRequirementTypes(): Promise<ApiResponse<RequirementType[]>> {
-    return this.client.get<RequirementType[]>("/requirement-types/");
+    return this.client.get<RequirementType[]>("/reference/requirement-types");
   }
 
   async createRequirementType(data: {
     name: string;
     description?: string;
   }): Promise<ApiResponse<RequirementType>> {
-    return this.client.post<RequirementType>("/requirement-types/", data);
+    return this.client.post<RequirementType>("/reference/requirement-types", data);
   }
 
   async updateRequirementType(
     id: number,
     data: { name: string; description?: string }
   ): Promise<ApiResponse<RequirementType>> {
-    return this.client.put<RequirementType>(`/requirement-types/${id}`, data);
+    return this.client.put<RequirementType>(`/reference/requirement-types/${id}`, data);
   }
 
   async deleteRequirementType(
     id: number
   ): Promise<ApiResponse<{ message: string }>> {
-    return this.client.delete<{ message: string }>(`/requirement-types/${id}`);
+    return this.client.delete<{ message: string }>(`/reference/requirement-types/${id}`);
   }
 
   // Requirement Priorities
   async getRequirementPriorities(): Promise<
     ApiResponse<RequirementPriority[]>
   > {
-    return this.client.get<RequirementPriority[]>("/requirement-priorities/");
+    return this.client.get<RequirementPriority[]>("/reference/requirement-priorities");
   }
 
   async createRequirementPriority(data: {
@@ -93,7 +93,7 @@ export class ReferenceApi {
     level?: number;
   }): Promise<ApiResponse<RequirementPriority>> {
     return this.client.post<RequirementPriority>(
-      "/requirement-priorities/",
+      "/reference/requirement-priorities",
       data
     );
   }
@@ -103,7 +103,7 @@ export class ReferenceApi {
     data: { name: string; description?: string; level?: number }
   ): Promise<ApiResponse<RequirementPriority>> {
     return this.client.put<RequirementPriority>(
-      `/requirement-priorities/${id}`,
+      `/reference/requirement-priorities/${id}`,
       data
     );
   }
@@ -112,20 +112,20 @@ export class ReferenceApi {
     id: number
   ): Promise<ApiResponse<{ message: string }>> {
     return this.client.delete<{ message: string }>(
-      `/requirement-priorities/${id}`
+      `/reference/requirement-priorities/${id}`
     );
   }
 
   // Requirement Statuses
   async getRequirementStatuses(): Promise<ApiResponse<RequirementStatus[]>> {
-    return this.client.get<RequirementStatus[]>("/requirement-statuses/");
+    return this.client.get<RequirementStatus[]>("/reference/requirement-statuses");
   }
 
   async createRequirementStatus(data: {
     name: string;
     description?: string;
   }): Promise<ApiResponse<RequirementStatus>> {
-    return this.client.post<RequirementStatus>("/requirement-statuses/", data);
+    return this.client.post<RequirementStatus>("/reference/requirement-statuses", data);
   }
 
   async updateRequirementStatus(
@@ -133,7 +133,7 @@ export class ReferenceApi {
     data: { name: string; description?: string }
   ): Promise<ApiResponse<RequirementStatus>> {
     return this.client.put<RequirementStatus>(
-      `/requirement-statuses/${id}`,
+      `/reference/requirement-statuses/${id}`,
       data
     );
   }
@@ -142,7 +142,7 @@ export class ReferenceApi {
     id: number
   ): Promise<ApiResponse<{ message: string }>> {
     return this.client.delete<{ message: string }>(
-      `/requirement-statuses/${id}`
+      `/reference/requirement-statuses/${id}`
     );
   }
 
