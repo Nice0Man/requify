@@ -621,26 +621,28 @@ const SettingsPage: React.FC = () => {
             sx={{ width: { xs: "100%", md: "auto" } }}
           >
             <Tooltip title="Refresh Settings" arrow>
-              <IconButton
-                onClick={handleRefresh}
-                disabled={refreshing}
-                sx={{
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                  color: theme.palette.primary.main,
-                  "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                    transform: refreshing ? "none" : "rotate(180deg)",
-                    borderColor: theme.palette.primary.main,
-                  },
-                  "&:disabled": {
-                    backgroundColor: alpha(theme.palette.action.disabled, 0.1),
-                  },
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                }}
-              >
-                {refreshing ? <CircularProgress size={24} /> : <Refresh />}
-              </IconButton>
+              <span>
+                <IconButton
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  sx={{
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                    color: theme.palette.primary.main,
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                      transform: refreshing ? "none" : "rotate(180deg)",
+                      borderColor: theme.palette.primary.main,
+                    },
+                    "&:disabled": {
+                      backgroundColor: alpha(theme.palette.action.disabled, 0.1),
+                    },
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  {refreshing ? <CircularProgress size={24} /> : <Refresh />}
+                </IconButton>
+              </span>
             </Tooltip>
             <Button
               variant="contained"

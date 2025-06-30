@@ -28,6 +28,7 @@ import {
   Container,
   InputAdornment,
   Fab,
+  TableContainer,
 } from "@mui/material";
 import {
   RocketLaunch,
@@ -73,7 +74,6 @@ interface TabPanelProps {
   index: number;
   value: number;
 }
-
 
 interface ReleaseStats {
   total: number;
@@ -428,20 +428,22 @@ const ReleasesPage: React.FC = () => {
 
           <Stack direction="row" spacing={2}>
             <Tooltip title="Refresh Releases">
-              <IconButton
-                onClick={loadReleases}
-                disabled={loading}
-                sx={{
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                    transform: "rotate(180deg)",
-                  },
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <Refresh />
-              </IconButton>
+              <span>
+                <IconButton
+                  onClick={loadReleases}
+                  disabled={loading}
+                  sx={{
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                      transform: "rotate(180deg)",
+                    },
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <Refresh />
+                </IconButton>
+              </span>
             </Tooltip>
             <Button
               variant="outlined"

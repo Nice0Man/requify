@@ -57,15 +57,47 @@ const ProjectDetailsPage: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const [project, setProject] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProject = async () => {
+      // Validate project ID parameter
+      if (!id || id.trim() === '') {
+        setError('Project ID is required');
+        setLoading(false);
+        return;
+      }
+
+      const projectId = parseInt(id, 10);
+      if (isNaN(projectId) || projectId <= 0) {
+        setError('Invalid project ID. Please provide a valid project number.');
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
+      setError(null);
       try {
-        const response = await projectsApi.getProject(Number(id));
+        const response = await projectsApi.getProject(projectId);
         setProject(response.data);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to fetch project:", error);
+        
+        // Extract error message properly
+        let errorMessage = 'Failed to load project. Please try again.';
+        if (error?.message) {
+          if (Array.isArray(error.message)) {
+            errorMessage = error.message.join(', ');
+          } else if (typeof error.message === 'string') {
+            errorMessage = error.message;
+          } else {
+            errorMessage = String(error.message);
+          }
+        } else if (error?.response?.data?.detail) {
+          errorMessage = error.response.data.detail;
+        }
+        
+        setError(errorMessage);
         setProject(null);
       } finally {
         setLoading(false);
@@ -111,11 +143,37 @@ const ProjectDetailsPage: React.FC = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+        <Button
+          variant="outlined"
+          onClick={() => navigate('/projects')}
+          sx={{ mt: 2 }}
+        >
+          Back to Projects
+        </Button>
+      </Box>
+    );
+  }
+
   if (!project) {
     return (
-      <Alert severity="error">
-        Project not found. Please check the project ID and try again.
-      </Alert>
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Project not found. Please check the project ID and try again.
+        </Alert>
+        <Button
+          variant="outlined"
+          onClick={() => navigate('/projects')}
+          sx={{ mt: 2 }}
+        >
+          Back to Projects
+        </Button>
+      </Box>
     );
   }
 

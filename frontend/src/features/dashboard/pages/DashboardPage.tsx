@@ -417,20 +417,22 @@ const DashboardPage: React.FC = () => {
 
           <Stack direction="row" spacing={2}>
             <Tooltip title="Refresh Dashboard">
-              <IconButton
-                onClick={handleRefresh}
-                disabled={refreshing}
-                sx={{
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                    transform: "rotate(180deg)",
-                  },
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <Refresh />
-              </IconButton>
+              <span>
+                <IconButton
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  sx={{
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                      transform: "rotate(180deg)",
+                    },
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  <Refresh />
+                </IconButton>
+              </span>
             </Tooltip>
             <Button
               variant="outlined"
