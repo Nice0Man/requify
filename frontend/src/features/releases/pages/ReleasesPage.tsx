@@ -419,9 +419,9 @@ const ReleasesPage: React.FC = () => {
                 color: "transparent",
               }}
             >
-              Releases
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
+        Releases
+      </Typography>
+      <Typography variant="body1" color="text.secondary">
               Manage product releases, versions, and deployment schedules.
             </Typography>
           </Stack>
@@ -926,7 +926,7 @@ const ReleasesPage: React.FC = () => {
                       <TableCell>
                         <Typography variant="body2">
                           {release.project_id || "N/A"}
-                        </Typography>
+      </Typography>
                       </TableCell>
                       <TableCell align="right">
                         <Stack
@@ -964,7 +964,7 @@ const ReleasesPage: React.FC = () => {
                 )}
               </TableBody>
             </Table>
-          </Box>
+    </Box>
         </Card>
       </Stack>
 
@@ -1147,4 +1147,4 @@ const ReleasesPage: React.FC = () => {
   );
 };
 
-export default ReleasesPage;
+export default ReleasesPage; 

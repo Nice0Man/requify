@@ -405,37 +405,37 @@ const StartPage: React.FC = () => {
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#fafafa" }}>
       {/* Navigation */}
-      <Box
-        sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1000,
           backgroundColor: alpha("#ffffff", 0.95),
           backdropFilter: "blur(20px)",
           borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-        }}
-      >
-        <Container maxWidth="lg">
+          }}
+        >
+          <Container maxWidth="lg">
           <Stack
             direction="row"
             justifyContent="space-between"
             alignItems="center"
             sx={{ py: 2, height: 64 }}
-          >
-            <Typography
-              variant="h5"
-              sx={{
+            >
+              <Typography
+                variant="h5"
+                sx={{
                 fontWeight: 600,
                 background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 color: "transparent",
-                cursor: "pointer",
-              }}
+                  cursor: "pointer",
+                }}
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            >
-              Requify
-            </Typography>
+              >
+                Requify
+              </Typography>
             
             {/* Navigation Buttons */}
             {!isAuthenticated ? (
@@ -456,13 +456,13 @@ const StartPage: React.FC = () => {
                 >
                   Sign In
                 </Button>
-                <Button
-                  variant="contained"
+                  <Button
+                    variant="contained"
                   onClick={handleGetStarted}
-                  sx={{
+                    sx={{
                     borderRadius: 2,
-                    textTransform: "none",
-                    fontWeight: 500,
+                      textTransform: "none",
+                      fontWeight: 500,
                     px: 3,
                     background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
@@ -473,18 +473,18 @@ const StartPage: React.FC = () => {
                   }}
                 >
                   Get Started
-                </Button>
+                  </Button>
               </Stack>
-            ) : (
+                ) : (
               <Stack direction="row" spacing={1} alignItems="center">
-                <Button
+                    <Button
                   variant="outlined"
                   startIcon={<Dashboard />}
                   onClick={handleDashboard}
-                  sx={{
+                      sx={{
                     borderRadius: 2,
-                    textTransform: "none",
-                    fontWeight: 500,
+                        textTransform: "none",
+                        fontWeight: 500,
                     px: 2,
                     borderColor: alpha(theme.palette.primary.main, 0.3),
                     "&:hover": {
@@ -494,14 +494,14 @@ const StartPage: React.FC = () => {
                   }}
                 >
                   Dashboard
-                </Button>
-                <Button
+                    </Button>
+                    <Button
                   variant="text"
                   endIcon={<ExpandMore />}
                   onClick={handleUserMenuOpen}
-                  sx={{
+                      sx={{
                     color: "text.primary",
-                    fontWeight: 500,
+                        fontWeight: 500,
                     textTransform: "none",
                     borderRadius: 2,
                     px: 2,
@@ -517,7 +517,7 @@ const StartPage: React.FC = () => {
                       {user?.first_name || user?.username || "User"}
                     </Typography>
                   </Stack>
-                </Button>
+                    </Button>
                 
                 {/* User Menu */}
                 <Menu
@@ -546,93 +546,93 @@ const StartPage: React.FC = () => {
                   </MenuItem>
                 </Menu>
               </Stack>
-            )}
-          </Stack>
-        </Container>
-      </Box>
+                )}
+              </Stack>
+          </Container>
+        </Box>
 
       {/* Hero Section */}
       <Container
         maxWidth="lg"
         sx={{ pt: { xs: 6, md: 8 }, pb: { xs: 8, md: 12 } }}
       >
-        <Grid container spacing={6} alignItems="center">
+          <Grid container spacing={6} alignItems="center">
           {/* Left Content */}
-          <Grid item xs={12} md={6}>
-            <Stack spacing={4}>
+            <Grid item xs={12} md={6}>
+              <Stack spacing={4}>
               <Fade in={animationTrigger} timeout={800}>
-                <Chip
-                  label="Requirements Management Platform"
-                  sx={{
+                  <Chip
+                    label="Requirements Management Platform"
+                    sx={{
                     alignSelf: "flex-start",
-                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                    color: "primary.main",
-                    fontWeight: 500,
+                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                      color: "primary.main",
+                      fontWeight: 500,
                     borderRadius: 3,
                     border: `1px solid ${alpha(
                       theme.palette.primary.main,
                       0.2
                     )}`,
-                  }}
-                />
-              </Fade>
+                    }}
+                  />
+                </Fade>
 
               <Slide direction="up" in={animationTrigger} timeout={1000}>
-                <Typography
+                  <Typography
                   variant="h1"
-                  sx={{
+                    sx={{
                     fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
-                    fontWeight: 700,
+                      fontWeight: 700,
                     lineHeight: 1.1,
                     letterSpacing: "-0.02em",
-                    color: "text.primary",
+                      color: "text.primary",
                     mb: 2,
-                  }}
-                >
+                    }}
+                  >
                   Build Better
                   <br />
-                  <Box
-                    component="span"
-                    sx={{
+                    <Box
+                      component="span"
+                      sx={{
                       background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                       backgroundClip: "text",
                       WebkitBackgroundClip: "text",
                       color: "transparent",
-                    }}
-                  >
-                    Requirements
+                      }}
+                    >
+                      Requirements
                   </Box>
-                </Typography>
-              </Slide>
+                  </Typography>
+                </Slide>
 
               <Slide direction="up" in={animationTrigger} timeout={1200}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: "text.secondary",
-                    fontWeight: 400,
-                    lineHeight: 1.6,
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "text.secondary",
+                      fontWeight: 400,
+                      lineHeight: 1.6,
                     maxWidth: 500,
-                  }}
-                >
+                    }}
+                  >
                   The modern requirements management platform that helps teams
                   build better products faster with intelligent automation and
                   seamless collaboration.
-                </Typography>
-              </Slide>
+                  </Typography>
+                </Slide>
 
               <Slide direction="up" in={animationTrigger} timeout={1400}>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    endIcon={<ArrowForward />}
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      endIcon={<ArrowForward />}
                     onClick={handleGetStarted}
-                    sx={{
-                      py: 1.5,
+                      sx={{
+                        py: 1.5,
                       px: 4,
                       borderRadius: 3,
-                      textTransform: "none",
+                        textTransform: "none",
                       fontWeight: 600,
                       background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                       boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
@@ -643,17 +643,17 @@ const StartPage: React.FC = () => {
                     }}
                   >
                     {isAuthenticated ? "Go to Dashboard" : "Start Free Trial"}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="large"
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="large"
                     startIcon={<PlayArrow />}
                     onClick={handleWatchDemo}
-                    sx={{
-                      py: 1.5,
+                      sx={{
+                        py: 1.5,
                       px: 4,
                       borderRadius: 3,
-                      textTransform: "none",
+                        textTransform: "none",
                       fontWeight: 500,
                       borderColor: alpha(theme.palette.primary.main, 0.3),
                       "&:hover": {
@@ -666,14 +666,14 @@ const StartPage: React.FC = () => {
                     }}
                   >
                     Watch Demo
-                  </Button>
-                </Stack>
-              </Slide>
-            </Stack>
-          </Grid>
+                    </Button>
+                  </Stack>
+                </Slide>
+              </Stack>
+            </Grid>
 
           {/* Right Content - Hero Image */}
-          <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={6}>
             <Zoom in={animationTrigger} timeout={1600}>
               <Box
                 sx={{
@@ -730,10 +730,10 @@ const StartPage: React.FC = () => {
                   />
                 </Paper>
               </Box>
-            </Zoom>
+              </Zoom>
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+        </Container>
 
       {/* Stats Section */}
       <Box
@@ -810,7 +810,7 @@ const StartPage: React.FC = () => {
                 productivity
               </Typography>
             </Stack>
-          </Slide>
+            </Slide>
 
           <Grid container spacing={3}>
             {features.map((feature, index) => (
@@ -834,35 +834,35 @@ const StartPage: React.FC = () => {
                     }}
                     onClick={() => handleFeatureClick(feature.link)}
                   >
-                    <Stack spacing={2}>
-                      <Box
-                        sx={{
-                          width: 48,
-                          height: 48,
+                      <Stack spacing={2}>
+                        <Box
+                          sx={{
+                            width: 48,
+                            height: 48,
                           borderRadius: 2,
-                          backgroundColor: alpha(feature.color, 0.1),
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: feature.color,
-                        }}
-                      >
-                        {feature.icon}
-                      </Box>
-                      <Typography
-                        variant="h6"
+                            backgroundColor: alpha(feature.color, 0.1),
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: feature.color,
+                          }}
+                        >
+                          {feature.icon}
+                        </Box>
+                        <Typography
+                          variant="h6"
                         fontWeight={600}
                         color="text.primary"
-                      >
-                        {feature.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
+                        >
+                          {feature.title}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
                         lineHeight={1.6}
-                      >
-                        {feature.description}
-                      </Typography>
+                        >
+                          {feature.description}
+                        </Typography>
                       <Button
                         size="small"
                         endIcon={<ArrowForward fontSize="small" />}
@@ -878,14 +878,14 @@ const StartPage: React.FC = () => {
                       >
                         Learn More
                       </Button>
-                    </Stack>
+                      </Stack>
                   </Card>
                 </Fade>
               </Grid>
             ))}
           </Grid>
         </Stack>
-      </Container>
+        </Container>
 
       {/* Testimonials Section */}
       <Box
@@ -898,38 +898,38 @@ const StartPage: React.FC = () => {
           <Stack alignItems="center" spacing={6}>
             <Slide direction="up" in={animationTrigger} timeout={1000}>
               <Stack alignItems="center" spacing={2}>
-                <Typography
+              <Typography
                   variant="h2"
-                  sx={{
+                sx={{
                     fontSize: { xs: "2rem", md: "2.5rem" },
-                    fontWeight: 700,
+                  fontWeight: 700,
                     textAlign: "center",
-                    color: "text.primary",
-                  }}
-                >
+                  color: "text.primary",
+                }}
+              >
                   Loved by teams worldwide
-                </Typography>
-                <Typography
-                  variant="h6"
-                  color="text.secondary"
+              </Typography>
+              <Typography
+                variant="h6"
+                color="text.secondary"
                   textAlign="center"
                   sx={{ maxWidth: 600, fontWeight: 400 }}
-                >
+              >
                   See how Requify is transforming the way teams manage
                   requirements
-                </Typography>
+              </Typography>
               </Stack>
             </Slide>
 
-            <Grid container spacing={4}>
-              {testimonials.map((testimonial, index) => (
-                <Grid item xs={12} md={4} key={index}>
+          <Grid container spacing={4}>
+            {testimonials.map((testimonial, index) => (
+              <Grid item xs={12} md={4} key={index}>
                   <Fade in={animationTrigger} timeout={1200 + index * 200}>
-                    <Card
+                  <Card
                       elevation={0}
-                      sx={{
+                    sx={{
                         p: 4,
-                        height: "100%",
+                      height: "100%",
                         borderRadius: 3,
                         backgroundColor: "white",
                         border: `1px solid ${alpha(
@@ -941,53 +941,53 @@ const StartPage: React.FC = () => {
                           transform: "translateY(-2px)",
                           boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
                         },
-                      }}
-                    >
-                      <Stack spacing={3}>
+                    }}
+                  >
+                    <Stack spacing={3}>
                         <Stack direction="row" spacing={0.5}>
-                          {[...Array(testimonial.rating)].map((_, i) => (
-                            <Star
-                              key={i}
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star
+                            key={i}
                               sx={{ color: "warning.main", fontSize: 18 }}
-                            />
-                          ))}
-                        </Stack>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontStyle: "italic",
-                            lineHeight: 1.6,
-                            color: "text.secondary",
-                          }}
-                        >
+                          />
+                        ))}
+                      </Stack>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontStyle: "italic",
+                          lineHeight: 1.6,
+                          color: "text.secondary",
+                        }}
+                      >
                           "{testimonial.testimonial}"
-                        </Typography>
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Avatar
-                            sx={{
-                              width: 40,
-                              height: 40,
-                              backgroundColor: "primary.main",
+                      </Typography>
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            backgroundColor: "primary.main",
                               fontSize: "0.875rem",
                               fontWeight: 600,
                               cursor: "pointer",
-                            }}
+                          }}
                             onClick={() =>
                               handleTestimonialLinkedIn(testimonial.linkedIn)
                             }
-                          >
+                        >
                             {testimonial.avatar}
-                          </Avatar>
+                        </Avatar>
                           <Stack spacing={0} flex={1}>
-                            <Typography variant="subtitle2" fontWeight={600}>
-                              {testimonial.name}
-                            </Typography>
+                          <Typography variant="subtitle2" fontWeight={600}>
+                            {testimonial.name}
+                          </Typography>
                             <Typography
                               variant="caption"
                               color="text.secondary"
                             >
-                              {testimonial.role} at {testimonial.company}
-                            </Typography>
+                            {testimonial.role} at {testimonial.company}
+                          </Typography>
                           </Stack>
                           <IconButton
                             size="small"
@@ -1001,13 +1001,13 @@ const StartPage: React.FC = () => {
                           >
                             <LinkedIn fontSize="small" />
                           </IconButton>
-                        </Stack>
                       </Stack>
-                    </Card>
+                    </Stack>
+                  </Card>
                   </Fade>
-                </Grid>
-              ))}
-            </Grid>
+              </Grid>
+            ))}
+          </Grid>
           </Stack>
         </Container>
       </Box>
@@ -1125,9 +1125,9 @@ const StartPage: React.FC = () => {
           borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         }}
       >
-        <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
+          <Container maxWidth="lg">
+            <Grid container spacing={4} alignItems="center">
+              <Grid item xs={12} md={6}>
               <Stack spacing={2}>
                 <Typography
                   variant="h6"
@@ -1166,43 +1166,43 @@ const StartPage: React.FC = () => {
                   </Typography>
                 </Stack>
               </Stack>
-            </Grid>
-            <Grid item xs={12} md={6}>
+              </Grid>
+              <Grid item xs={12} md={6}>
               <Stack
                 direction="row"
                 spacing={1}
                 justifyContent={{ xs: "flex-start", md: "flex-end" }}
               >
-                <IconButton
+                  <IconButton
                   onClick={() => handleSocialClick("twitter")}
-                  sx={{
+                    sx={{
                     color: "text.secondary",
                     "&:hover": { color: "#1DA1F2" },
-                  }}
-                >
-                  <Twitter />
-                </IconButton>
-                <IconButton
+                    }}
+                  >
+                    <Twitter />
+                  </IconButton>
+                  <IconButton
                   onClick={() => handleSocialClick("linkedin")}
-                  sx={{
+                    sx={{
                     color: "text.secondary",
                     "&:hover": { color: "#0A66C2" },
-                  }}
-                >
-                  <LinkedIn />
-                </IconButton>
-                <IconButton
+                    }}
+                  >
+                    <LinkedIn />
+                  </IconButton>
+                  <IconButton
                   onClick={() => handleSocialClick("github")}
-                  sx={{
+                    sx={{
                     color: "text.secondary",
                     "&:hover": { color: "#333" },
-                  }}
-                >
-                  <GitHub />
-                </IconButton>
-              </Stack>
+                    }}
+                  >
+                    <GitHub />
+                  </IconButton>
+                </Stack>
+              </Grid>
             </Grid>
-          </Grid>
           <Divider
             sx={{ my: 4, borderColor: alpha(theme.palette.divider, 0.1) }}
           />
@@ -1242,8 +1242,8 @@ const StartPage: React.FC = () => {
               </Typography>
             </Stack>
           </Stack>
-        </Container>
-      </Box>
+          </Container>
+        </Box>
 
       {/* Watch Demo Dialog */}
       <Dialog

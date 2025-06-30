@@ -816,7 +816,7 @@ const AdminPage: React.FC = () => {
                 (users || []).map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      <Box>
+    <Box>
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
                           {user.first_name} {user.last_name}
                         </Typography>
@@ -1057,7 +1057,7 @@ const AdminPage: React.FC = () => {
                       sx={{ mb: 2 }}
                     >
                       {setting.description || "No description available"}
-                    </Typography>
+      </Typography>
 
                     {setting.data_type === "boolean" ? (
                       <FormControlLabel
@@ -1208,7 +1208,7 @@ const AdminPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             This will create a full system backup including database and
             uploaded files.
-          </Typography>
+      </Typography>
           <Alert severity="info">
             The backup process may take several minutes to complete. You will be
             notified when it's ready.
@@ -1225,4 +1225,4 @@ const AdminPage: React.FC = () => {
   );
 };
 
-export default AdminPage;
+export default AdminPage; 
