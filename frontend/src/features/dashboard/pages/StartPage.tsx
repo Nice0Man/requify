@@ -116,12 +116,8 @@ const StartPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Redirect to dashboard if already authenticated
-  React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/dashboard");
-    }
-  }, [isAuthenticated, navigate]);
+  // Allow authenticated users to view the StartPage
+  // Removed automatic redirect to dashboard
 
   // Clear auth errors when dialogs close
   React.useEffect(() => {
@@ -221,11 +217,19 @@ const StartPage: React.FC = () => {
 
   // Handler functions
   const handleGetStarted = () => {
-    setRegisterDialogOpen(true);
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      setRegisterDialogOpen(true);
+    }
   };
 
   const handleSignIn = () => {
-    setSignInDialogOpen(true);
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      setSignInDialogOpen(true);
+    }
   };
 
   // Validation functions
@@ -417,7 +421,7 @@ const StartPage: React.FC = () => {
                   },
                 }}
               >
-                Sign In
+                {isAuthenticated ? "Dashboard" : "Sign In"}
               </Button>
               <Button
                 variant="contained"
@@ -435,7 +439,7 @@ const StartPage: React.FC = () => {
                   },
                 }}
               >
-                Get Started
+                {isAuthenticated ? "Go to Dashboard" : "Get Started"}
               </Button>
             </Stack>
           </Stack>
@@ -533,7 +537,7 @@ const StartPage: React.FC = () => {
                       },
                     }}
                   >
-                    Start Free Trial
+                    {isAuthenticated ? "Go to Dashboard" : "Start Free Trial"}
                   </Button>
                   <Button
                     variant="outlined"
@@ -979,7 +983,7 @@ const StartPage: React.FC = () => {
                     },
                   }}
                 >
-                  Start Free Trial
+                  {isAuthenticated ? "Go to Dashboard" : "Start Free Trial"}
                 </Button>
                 <Button
                   variant="outlined"
