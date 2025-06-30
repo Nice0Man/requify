@@ -3,10 +3,16 @@ import { apiClient, ApiResponse } from "@/shared/api/client";
 export interface Comment {
   id: number;
   content: string;
+  requirement_id: number;
   author_id: number;
-  author_name: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+}
+
+export interface CommentWithAuthor extends Comment {
+  author_name?: string;
+  author_email?: string;
+  requirement_title?: string;
 }
 
 export interface CommentCreate {
@@ -35,7 +41,7 @@ export class CommentsApi {
   async getRequirementComments(
     requirementId: number,
     params?: CommentListParams
-  ): Promise<ApiResponse<CommentListResponse>> {
+  ): Promise<ApiResponse<CommentWithAuthor[]>> {
     const queryParams = new URLSearchParams();
     if (params?.skip) queryParams.append("skip", params.skip.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
@@ -44,10 +50,10 @@ export class CommentsApi {
 
     const queryString = queryParams.toString();
     const url = queryString
-      ? `/requirements/${requirementId}/comments?${queryString}`
-      : `/requirements/${requirementId}/comments`;
+      ? `/comments/requirements/${requirementId}/comments?${queryString}`
+      : `/comments/requirements/${requirementId}/comments`;
 
-    return this.client.get<CommentListResponse>(url);
+    return this.client.get<CommentWithAuthor[]>(url);
   }
 
   // Create comment for a requirement
@@ -56,7 +62,7 @@ export class CommentsApi {
     data: CommentCreate
   ): Promise<ApiResponse<Comment>> {
     return this.client.post<Comment>(
-      `/requirements/${requirementId}/comments`,
+      `/comments/requirements/${requirementId}/comments`,
       data
     );
   }
@@ -68,7 +74,7 @@ export class CommentsApi {
     data: CommentUpdate
   ): Promise<ApiResponse<Comment>> {
     return this.client.put<Comment>(
-      `/requirements/${requirementId}/comments/${commentId}`,
+      `/comments/${commentId}`,
       data
     );
   }
@@ -79,7 +85,7 @@ export class CommentsApi {
     commentId: number
   ): Promise<ApiResponse<{ message: string }>> {
     return this.client.delete<{ message: string }>(
-      `/requirements/${requirementId}/comments/${commentId}`
+      `/comments/${commentId}`
     );
   }
 

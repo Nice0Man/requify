@@ -23,23 +23,37 @@ import {
   useTheme,
   alpha,
   CircularProgress,
+  ListItemSecondaryAction,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Divider,
 } from "@mui/material";
 import {
-  ArrowBack,
-  Edit,
-  Delete,
+  ArrowBack as ArrowBackIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
   Share,
-  Comment,
-  Assignment,
-  Person,
-  Schedule,
+  Comment as CommentIcon,
+  Assignment as AssignmentIcon,
+  Person as PersonIcon,
+  Schedule as ScheduleIcon,
   Flag,
   CheckCircle,
   Error,
   Warning,
   Info,
+  Send as SendIcon,
 } from "@mui/icons-material";
 import { requirementsApi, RequirementWithDetails } from "../api/requirements.api";
+import { CommentsApi, CommentWithAuthor, CommentCreate } from "@/shared/api/comments.api";
+import { formatDistanceToNow } from "date-fns";
+import { LoadingSpinner } from "@/shared/components";
+
+const commentsApi = new CommentsApi();
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -70,6 +84,14 @@ const RequirementDetailsPage: React.FC = () => {
   const [requirement, setRequirement] = useState<RequirementWithDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [comments, setComments] = useState<CommentWithAuthor[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const [commentContent, setCommentContent] = useState("");
+  const [selectedComment, setSelectedComment] = useState<CommentWithAuthor | null>(null);
+  const [newCommentContent, setNewCommentContent] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Load requirement data
   const loadRequirement = async () => {
@@ -119,8 +141,105 @@ const RequirementDetailsPage: React.FC = () => {
     }
   };
 
+  // Load comments for the requirement
+  const loadComments = async () => {
+    if (!id) return;
+    
+    const requirementId = parseInt(id);
+    if (isNaN(requirementId)) return;
+
+    try {
+      setCommentsLoading(true);
+      const response = await commentsApi.getRequirementComments(requirementId);
+      setComments(response.data || []);
+    } catch (err: any) {
+      console.error("Failed to load comments:", err);
+      setSnackbarMessage("Failed to load comments");
+      setSnackbarOpen(true);
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
+  // Create new comment
+  const handleAddComment = async () => {
+    if (!newCommentContent.trim() || !id) return;
+    
+    const requirementId = parseInt(id);
+    if (isNaN(requirementId)) return;
+
+    try {
+      const commentData: CommentCreate = {
+        content: newCommentContent.trim(),
+      };
+      
+      await commentsApi.createRequirementComment(requirementId, commentData);
+      setNewCommentContent("");
+      setSnackbarMessage("Comment added successfully");
+      setSnackbarOpen(true);
+      loadComments(); // Reload comments
+    } catch (err: any) {
+      console.error("Failed to create comment:", err);
+      setSnackbarMessage("Failed to add comment");
+      setSnackbarOpen(true);
+    }
+  };
+
+  // Edit comment
+  const handleEditComment = (comment: CommentWithAuthor) => {
+    setSelectedComment(comment);
+    setCommentContent(comment.content);
+    setCommentDialogOpen(true);
+  };
+
+  // Update comment
+  const handleUpdateComment = async () => {
+    if (!selectedComment || !commentContent.trim() || !id) return;
+    
+    const requirementId = parseInt(id);
+    if (isNaN(requirementId)) return;
+
+    try {
+      const updateData = {
+        content: commentContent.trim(),
+      };
+      
+      await commentsApi.updateRequirementComment(requirementId, selectedComment.id, updateData);
+      setCommentDialogOpen(false);
+      setCommentContent("");
+      setSelectedComment(null);
+      setSnackbarMessage("Comment updated successfully");
+      setSnackbarOpen(true);
+      loadComments(); // Reload comments
+    } catch (err: any) {
+      console.error("Failed to update comment:", err);
+      setSnackbarMessage("Failed to update comment");
+      setSnackbarOpen(true);
+    }
+  };
+
+  // Delete comment
+  const handleDeleteComment = async (commentId: number) => {
+    if (!id) return;
+    
+    const requirementId = parseInt(id);
+    if (isNaN(requirementId)) return;
+
+    try {
+      await commentsApi.deleteRequirementComment(requirementId, commentId);
+      setSnackbarMessage("Comment deleted successfully");
+      setSnackbarOpen(true);
+      loadComments(); // Reload comments
+    } catch (err: any) {
+      console.error("Failed to delete comment:", err);
+      setSnackbarMessage("Failed to delete comment");
+      setSnackbarOpen(true);
+    }
+  };
+
   useEffect(() => {
     loadRequirement();
+    loadComments();
   }, [id]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -163,28 +282,8 @@ const RequirementDetailsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Box sx={{ mb: 4 }}>
-          <Skeleton variant="text" width="40%" height={40} sx={{ mb: 1 }} />
-          <Skeleton variant="text" width="60%" height={24} />
-        </Box>
-        
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={8}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Skeleton variant="rectangular" height={400} />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Skeleton variant="rectangular" height={300} />
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <LoadingSpinner />
       </Box>
     );
   }
@@ -197,7 +296,7 @@ const RequirementDetailsPage: React.FC = () => {
         </Alert>
         <Button
           variant="outlined"
-          startIcon={<ArrowBack />}
+          startIcon={<ArrowBackIcon />}
           onClick={() => navigate("/requirements")}
         >
           Back to Requirements
@@ -220,7 +319,7 @@ const RequirementDetailsPage: React.FC = () => {
               },
             }}
           >
-            <ArrowBack />
+            <ArrowBackIcon />
           </IconButton>
           
           <Box sx={{ flex: 1 }}>
@@ -252,7 +351,7 @@ const RequirementDetailsPage: React.FC = () => {
             </Button>
             <Button
               variant="outlined"
-              startIcon={<Edit />}
+              startIcon={<EditIcon />}
               onClick={() => setEditDialogOpen(true)}
               size="small"
             >
@@ -261,7 +360,7 @@ const RequirementDetailsPage: React.FC = () => {
             <Button
               variant="outlined"
               color="error"
-              startIcon={<Delete />}
+              startIcon={<DeleteIcon />}
               size="small"
             >
               Delete
@@ -317,25 +416,55 @@ const RequirementDetailsPage: React.FC = () => {
             <TabPanel value={tabValue} index={1}>
               <Box>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  Comments
+                  Comments ({comments.length})
                 </Typography>
                 
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  placeholder="Add a comment..."
-                  variant="outlined"
-                  sx={{ mb: 3 }}
-                />
-                
-                <Button variant="contained" sx={{ mb: 3 }}>
-                  Add Comment
-                </Button>
+                {/* Add new comment form */}
+                <Box sx={{ mb: 3 }}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    placeholder="Add a comment..."
+                    variant="outlined"
+                    value={newCommentContent}
+                    onChange={(e) => setNewCommentContent(e.target.value)}
+                    sx={{ mb: 2 }}
+                  />
+                  
+                  <Button 
+                    variant="contained" 
+                    startIcon={<SendIcon />}
+                    onClick={handleAddComment}
+                    disabled={!newCommentContent.trim()}
+                  >
+                    Add Comment
+                  </Button>
+                </Box>
 
-                <Typography variant="body2" color="text.secondary" align="center">
-                  No comments yet. Be the first to comment!
-                </Typography>
+                <Divider sx={{ mb: 3 }} />
+
+                {/* Comments list */}
+                {commentsLoading ? (
+                  <Box display="flex" justifyContent="center" py={4}>
+                    <LoadingSpinner />
+                  </Box>
+                ) : comments.length > 0 ? (
+                  <Box>
+                    {comments.map((comment) => (
+                      <CommentItem
+                        key={comment.id}
+                        comment={comment}
+                        onEdit={handleEditComment}
+                        onDelete={handleDeleteComment}
+                      />
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" align="center" py={4}>
+                    No comments yet. Be the first to comment!
+                  </Typography>
+                )}
               </Box>
             </TabPanel>
 
@@ -376,7 +505,7 @@ const RequirementDetailsPage: React.FC = () => {
             <CardHeader
               title={
                 <Box display="flex" alignItems="center" gap={1}>
-                  <Assignment color="primary" fontSize="small" />
+                  <AssignmentIcon color="primary" fontSize="small" />
                   <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
                     Details
                   </Typography>
@@ -495,7 +624,77 @@ const RequirementDetailsPage: React.FC = () => {
           )}
         </Grid>
       </Grid>
+
+      {/* Edit Comment Dialog */}
+      <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Edit Comment</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            placeholder="Enter your comment..."
+            value={commentContent}
+            onChange={(e) => setCommentContent(e.target.value)}
+            sx={{ mt: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCommentDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleUpdateComment} variant="contained">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Success/Error Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity="info" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
+  );
+};
+
+interface CommentItemProps {
+  comment: CommentWithAuthor;
+  onEdit: (comment: CommentWithAuthor) => void;
+  onDelete: (commentId: number) => void;
+}
+
+const CommentItem: React.FC<CommentItemProps> = ({ comment, onEdit, onDelete }) => {
+  return (
+    <Paper sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
+        <Avatar sx={{ bgcolor: "primary.main" }}>
+          <PersonIcon />
+        </Avatar>
+        <Box sx={{ flex: 1 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+            <Typography variant="subtitle2" fontWeight="600">
+              {comment.author_name || `User #${comment.author_id}`}
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Typography variant="caption" color="text.secondary">
+                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+              </Typography>
+              <IconButton size="small" onClick={() => onEdit(comment)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton size="small" onClick={() => onDelete(comment.id)} color="error">
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          </Box>
+          <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+            {comment.content}
+          </Typography>
+        </Box>
+      </Box>
+    </Paper>
   );
 };
 
