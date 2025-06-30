@@ -21,7 +21,7 @@ export interface SystemInfo {
   environment: string;
   uptime?: number;
   error?: string;
-  
+
   // Legacy fields for compatibility
   version?: string;
   database?: DatabaseInfo;
@@ -31,7 +31,7 @@ export interface SystemInfo {
 }
 
 export interface DatabaseInfo {
-  status: 'healthy' | 'degraded' | 'down';
+  status: "healthy" | "degraded" | "down";
   connection_count: number;
   max_connections: number;
   query_performance: {
@@ -43,7 +43,7 @@ export interface DatabaseInfo {
 }
 
 export interface CacheInfo {
-  status: 'healthy' | 'degraded' | 'down';
+  status: "healthy" | "degraded" | "down";
   hit_rate: number;
   memory_usage: number;
   max_memory: number;
@@ -51,7 +51,7 @@ export interface CacheInfo {
 }
 
 export interface StorageInfo {
-  status: 'healthy' | 'degraded' | 'down';
+  status: "healthy" | "degraded" | "down";
   used_space: number;
   total_space: number;
   available_space: number;
@@ -59,7 +59,7 @@ export interface StorageInfo {
 }
 
 export interface ApiHealthInfo {
-  status: 'healthy' | 'degraded' | 'down';
+  status: "healthy" | "degraded" | "down";
   response_time: number;
   error_rate: number;
   requests_per_minute: number;
@@ -112,7 +112,7 @@ export interface UserManagement {
   requirements_count?: number;
   department?: string;
   phone?: string;
-  
+
   // Additional computed fields
   authored_requirements_count?: number;
   modified_requirements_count?: number;
@@ -145,14 +145,14 @@ export interface UserUpdate {
 }
 
 export enum UserRole {
-  ADMIN = 'admin',
-  PRODUCT_MANAGER = 'product_manager',
-  MANAGER = 'manager',
-  SENIOR_DEVELOPER = 'senior_developer',
-  DEVELOPER = 'developer',
-  ANALYST = 'analyst',
-  TESTER = 'tester',
-  VIEWER = 'viewer'
+  ADMIN = "admin",
+  PRODUCT_MANAGER = "product_manager",
+  MANAGER = "manager",
+  SENIOR_DEVELOPER = "senior_developer",
+  DEVELOPER = "developer",
+  ANALYST = "analyst",
+  TESTER = "tester",
+  VIEWER = "viewer",
 }
 
 export interface UserActivity {
@@ -181,22 +181,22 @@ export interface SystemSettings {
 }
 
 export enum SettingCategory {
-  GENERAL = 'general',
-  SECURITY = 'security',
-  EMAIL = 'email',
-  NOTIFICATIONS = 'notifications',
-  INTEGRATIONS = 'integrations',
-  APPEARANCE = 'appearance',
-  BACKUP = 'backup'
+  GENERAL = "general",
+  SECURITY = "security",
+  EMAIL = "email",
+  NOTIFICATIONS = "notifications",
+  INTEGRATIONS = "integrations",
+  APPEARANCE = "appearance",
+  BACKUP = "backup",
 }
 
 export enum SettingDataType {
-  STRING = 'string',
-  INTEGER = 'integer',
-  FLOAT = 'float',
-  BOOLEAN = 'boolean',
-  JSON = 'json',
-  PASSWORD = 'password'
+  STRING = "string",
+  INTEGER = "integer",
+  FLOAT = "float",
+  BOOLEAN = "boolean",
+  JSON = "json",
+  PASSWORD = "password",
 }
 
 // Backup types matching backend response
@@ -217,17 +217,17 @@ export interface SystemBackup {
 }
 
 export enum BackupType {
-  FULL = 'full',
-  INCREMENTAL = 'incremental',
-  DIFFERENTIAL = 'differential'
+  FULL = "full",
+  INCREMENTAL = "incremental",
+  DIFFERENTIAL = "differential",
 }
 
 export enum BackupStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled'
+  PENDING = "pending",
+  IN_PROGRESS = "in_progress",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  CANCELLED = "cancelled",
 }
 
 export interface BackupIncludes {
@@ -250,18 +250,18 @@ export interface SystemLog {
   request_id?: string;
   metadata?: Record<string, any>;
   timestamp: string;
-  
+
   // Additional fields that might be returned
   logger?: string;
   created_at?: string;
 }
 
 export enum LogLevel {
-  DEBUG = 'debug',
-  INFO = 'info',
-  WARNING = 'warning',
-  ERROR = 'error',
-  CRITICAL = 'critical'
+  DEBUG = "debug",
+  INFO = "info",
+  WARNING = "warning",
+  ERROR = "error",
+  CRITICAL = "critical",
 }
 
 export interface SecurityEvent {
@@ -281,20 +281,20 @@ export interface SecurityEvent {
 }
 
 export enum SecurityEventType {
-  FAILED_LOGIN = 'failed_login',
-  ACCOUNT_LOCKED = 'account_locked',
-  PERMISSION_DENIED = 'permission_denied',
-  SUSPICIOUS_ACTIVITY = 'suspicious_activity',
-  DATA_BREACH_ATTEMPT = 'data_breach_attempt',
-  MALICIOUS_REQUEST = 'malicious_request',
-  UNAUTHORIZED_ACCESS = 'unauthorized_access'
+  FAILED_LOGIN = "failed_login",
+  ACCOUNT_LOCKED = "account_locked",
+  PERMISSION_DENIED = "permission_denied",
+  SUSPICIOUS_ACTIVITY = "suspicious_activity",
+  DATA_BREACH_ATTEMPT = "data_breach_attempt",
+  MALICIOUS_REQUEST = "malicious_request",
+  UNAUTHORIZED_ACCESS = "unauthorized_access",
 }
 
 export enum SecuritySeverity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  CRITICAL = "critical",
 }
 
 export interface Integration {
@@ -312,26 +312,26 @@ export interface Integration {
 }
 
 export enum IntegrationType {
-  PROJECT_MANAGEMENT = 'project_management',
-  VERSION_CONTROL = 'version_control',
-  CI_CD = 'ci_cd',
-  TESTING_TOOLS = 'testing_tools',
-  NOTIFICATION = 'notification',
-  SSO = 'sso',
-  DATABASE = 'database',
-  FILE_STORAGE = 'file_storage'
+  PROJECT_MANAGEMENT = "project_management",
+  VERSION_CONTROL = "version_control",
+  CI_CD = "ci_cd",
+  TESTING_TOOLS = "testing_tools",
+  NOTIFICATION = "notification",
+  SSO = "sso",
+  DATABASE = "database",
+  FILE_STORAGE = "file_storage",
 }
 
 export enum IntegrationStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  ERROR = 'error',
-  PENDING = 'pending'
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  ERROR = "error",
+  PENDING = "pending",
 }
 
 export interface AdminFilters {
   user_role?: UserRole[];
-  user_status?: ('active' | 'inactive')[];
+  user_status?: ("active" | "inactive")[];
   date_from?: string;
   date_to?: string;
   search?: string;
@@ -345,7 +345,7 @@ export interface AdminListParams {
   limit?: number;
   filters?: AdminFilters;
   sort_by?: string;
-  sort_order?: 'asc' | 'desc';
+  sort_order?: "asc" | "desc";
 }
 
 export interface UserListResponse {
@@ -432,25 +432,25 @@ export interface AdminState {
 
 // Health check response type matching backend
 export interface HealthCheckResponse {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   components: {
     database?: {
-      status: 'healthy' | 'unhealthy';
+      status: "healthy" | "unhealthy";
       response_time?: string;
       error?: string;
     };
     filesystem?: {
-      status: 'healthy' | 'warning' | 'critical' | 'unknown';
+      status: "healthy" | "warning" | "critical" | "unknown";
       disk_usage: string;
       free_space: string;
       error?: string;
     };
     memory?: {
-      status: 'healthy' | 'warning' | 'critical' | 'unknown';
+      status: "healthy" | "warning" | "critical" | "unknown";
       usage: string;
       available: string;
       error?: string;
     };
   };
   timestamp: string;
-} 
+}

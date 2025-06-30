@@ -90,7 +90,7 @@ async def create_reference_data(db: AsyncSession):
     # Приоритеты требований
     priorities_data = [
         {"name": "Критический"},
-        {"name": "Высокий"},
+        {"name": "Высокий"},    
         {"name": "Средний"},
         {"name": "Низкий"},
     ]

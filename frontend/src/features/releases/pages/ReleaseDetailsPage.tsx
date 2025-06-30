@@ -37,6 +37,8 @@ import {
   Schedule as ScheduleIcon,
   PlayArrow as PlayArrowIcon,
   Publish as PublishIcon,
+  Sync,
+  Description as DescriptionIcon,
 } from "@mui/icons-material";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -70,85 +72,235 @@ const ReleaseDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // State
   const [release, setRelease] = useState<Release | null>(null);
+  const [requirements, setRequirements] = useState<any[]>([]);
+  const [changelog, setChangelog] = useState<string>("");
+  const [specifications, setSpecifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [requirements, setRequirements] = useState<any[]>([]);
-  const [loadingRequirements, setLoadingRequirements] = useState(false);
+  const [loadingChangelog, setLoadingChangelog] = useState(false);
+  const [loadingSpecs, setLoadingSpecs] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      loadRelease();
+      loadRequirements();
+    }
+  }, [id]);
 
   // Load release data
-  useEffect(() => {
-    const loadRelease = async () => {
-      if (!id) {
-        setError("Release ID is required");
+  const loadRelease = async () => {
+    if (!id) {
+      setError("Release ID is required");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const releaseId = parseInt(id, 10);
+      if (isNaN(releaseId) || releaseId <= 0) {
+        setError(
+          `Invalid release ID: "${id}". Please check the URL and try again.`
+        );
         setLoading(false);
         return;
       }
 
-      try {
-        setLoading(true);
-        setError(null);
+      const response = await releasesApi.getRelease(releaseId);
+      setRelease(response.data);
+    } catch (err: any) {
+      console.error("Failed to load release:", err);
+      let errorMessage = "Failed to load release details";
 
-        const releaseId = parseInt(id, 10);
-        if (isNaN(releaseId) || releaseId <= 0) {
-          setError(
-            `Invalid release ID: "${id}". Please check the URL and try again.`
-          );
-          setLoading(false);
-          return;
-        }
-
-        const response = await releasesApi.getRelease(releaseId);
-        setRelease(response.data);
-      } catch (err: any) {
-        console.error("Failed to load release:", err);
-        let errorMessage = "Failed to load release details";
-
-        if (err?.response?.status === 404) {
-          errorMessage = "Release not found";
-        } else if (err?.message) {
-          errorMessage = String(err.message);
-        } else if (typeof err === "string") {
-          errorMessage = err;
-        }
-
-        setError(errorMessage);
-        setRelease(null);
-      } finally {
-        setLoading(false);
+      if (err?.response?.status === 404) {
+        errorMessage = "Release not found";
+      } else if (err?.message) {
+        errorMessage = String(err.message);
+      } else if (typeof err === "string") {
+        errorMessage = err;
       }
-    };
 
-    loadRelease();
-  }, [id]);
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load release requirements
-  useEffect(() => {
-    const loadRequirements = async () => {
-      if (!release) return;
+  const loadRequirements = async () => {
+    if (!id) return;
 
-      try {
-        setLoadingRequirements(true);
-        const response = await releasesApi.getReleaseRequirements(release.id, {
-          limit: 100,
-        });
-        setRequirements(response.data || []);
-      } catch (err: any) {
-        console.error("Failed to load release requirements:", err);
-        setRequirements([]);
-      } finally {
-        setLoadingRequirements(false);
-      }
-    };
+    try {
+      const releaseId = parseInt(id, 10);
+      const response = await releasesApi.getReleaseRequirements(releaseId);
+      setRequirements(response.data || []);
+    } catch (err: any) {
+      console.error("Failed to load release requirements:", err);
+      setRequirements([]);
+    }
+  };
 
-    loadRequirements();
-  }, [release]);
+  // Load changelog data
+  const loadChangelog = async () => {
+    if (!id || !release) return;
 
-  // Handle tab change
+    try {
+      setLoadingChangelog(true);
+      const releaseId = parseInt(id, 10);
+      const response = await releasesApi.getReleaseChangelog(releaseId);
+      setChangelog(response.data.changelog || "No changelog available.");
+    } catch (err: any) {
+      console.error("Failed to load changelog:", err);
+      setChangelog("Failed to load changelog data.");
+    } finally {
+      setLoadingChangelog(false);
+    }
+  };
+
+  // Generate and load specifications
+  const loadSpecifications = async () => {
+    if (!id || !release) return;
+
+    try {
+      setLoadingSpecs(true);
+      // For now, we'll simulate specifications data
+      // In a real implementation, you might have a separate endpoint for listing specs
+      setSpecifications([
+        {
+          id: 1,
+          name: `${release.name} v${release.version} Specification`,
+          format: "PDF",
+          status: "generated",
+          generated_at: new Date().toISOString(),
+          download_url: "#",
+        },
+      ]);
+    } catch (err: any) {
+      console.error("Failed to load specifications:", err);
+      setSpecifications([]);
+    } finally {
+      setLoadingSpecs(false);
+    }
+  };
+
+  // Handle tab change and load data as needed
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
+    
+    // Load data for specific tabs
+    if (newValue === 2 && changelog === "") {
+      loadChangelog();
+    } else if (newValue === 3 && specifications.length === 0) {
+      loadSpecifications();
+    }
+  };
+
+  // Handle edit action
+  const handleEdit = async () => {
+    if (!release) return;
+    
+    try {
+      // Navigate to edit page or open edit dialog
+      navigate(`/releases/edit/${release.id}`);
+    } catch (error) {
+      console.error("Failed to navigate to edit:", error);
+    }
+  };
+
+  // Handle delete action (soft delete)
+  const handleDelete = async () => {
+    if (!release) return;
+
+    if (
+      window.confirm(
+        `Are you sure you want to delete release "${release.name}"? This will mark it as deleted but not permanently remove it.`
+      )
+    ) {
+      try {
+        await releasesApi.deleteRelease(release.id);
+        toast.success("Release marked as deleted successfully");
+        navigate("/releases");
+      } catch (error) {
+        toast.error("Failed to delete release");
+        console.error("Failed to delete release:", error);
+      }
+    }
+  };
+
+  // Handle publish action
+  const handlePublish = async () => {
+    if (!release) return;
+
+    if (
+      window.confirm(
+        `Are you sure you want to publish release "${release.name}" v${release.version}?`
+      )
+    ) {
+      try {
+        const publishData = {
+          changelog: `Release ${release.version} published`,
+          notification_recipients: [],
+        };
+        await releasesApi.publishRelease(release.id, publishData);
+        toast.success("Release published successfully");
+        loadRelease(); // Reload to get updated status
+      } catch (error) {
+        toast.error("Failed to publish release");
+        console.error("Failed to publish release:", error);
+      }
+    }
+  };
+
+  // Handle sync requirements
+  const handleSyncRequirements = async () => {
+    if (!release) return;
+
+    try {
+      const syncData = {
+        project_id: release.project_id,
+      };
+      const response = await releasesApi.syncProjectRequirementsToRelease(release.id, syncData);
+      toast.success(`Synced ${response.data.synced_requirements} requirements successfully`);
+      loadRequirements(); // Reload requirements
+    } catch (error) {
+      toast.error("Failed to sync requirements");
+      console.error("Failed to sync requirements:", error);
+    }
+  };
+
+  // Handle generate specification
+  const handleGenerateSpecification = async () => {
+    if (!release) return;
+
+    try {
+      const specData = {
+        format: "pdf" as const,
+        language: "ru" as const,
+        include_requirements: true,
+        include_relationships: true,
+        include_changelog: true,
+        include_statistics: true,
+        template_style: "standard" as const,
+        auto_numbering: true,
+      };
+      const response = await releasesApi.generateReleaseSpecification(release.id, specData);
+      toast.success("Specification generated successfully");
+      
+      // Open download URL if available
+      if (response.data.download_url) {
+        window.open(response.data.download_url, '_blank');
+      }
+      
+      // Reload specifications
+      loadSpecifications();
+    } catch (error) {
+      toast.error("Failed to generate specification");
+      console.error("Failed to generate specification:", error);
+    }
   };
 
   // Get status color and icon
@@ -195,31 +347,6 @@ const ReleaseDetailsPage: React.FC = () => {
   // Handle navigation back
   const handleBack = () => {
     navigate("/releases");
-  };
-
-  // Handle edit
-  const handleEdit = () => {
-    navigate(`/releases/${release?.id}/edit`);
-  };
-
-  // Handle delete
-  const handleDelete = async () => {
-    if (!release) return;
-
-    if (
-      window.confirm(
-        `Are you sure you want to delete release "${release.name}"?`
-      )
-    ) {
-      try {
-        await releasesApi.deleteRelease(release.id);
-        toast.success("Release deleted successfully");
-        navigate("/releases");
-      } catch (error) {
-        toast.error("Failed to delete release");
-        console.error("Failed to delete release:", error);
-      }
-    }
   };
 
   // Loading state
@@ -405,7 +532,7 @@ const ReleaseDetailsPage: React.FC = () => {
                   Requirements ({requirements.length})
                 </Typography>
 
-                {loadingRequirements ? (
+                {loadingChangelog ? (
                   <LinearProgress sx={{ my: 2 }} />
                 ) : requirements.length > 0 ? (
                   <Table>
@@ -467,6 +594,37 @@ const ReleaseDetailsPage: React.FC = () => {
             </TabPanel>
 
             <TabPanel value={tabValue} index={2}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Timeline
+              </Typography>
+              {loadingChangelog ? (
+                <LinearProgress sx={{ my: 2 }} />
+              ) : (
+                <Box>
+                  <Typography variant="body1" sx={{ mb: 2 }}>
+                    Release Changelog
+                  </Typography>
+                  <Paper sx={{ p: 2, bgcolor: "grey.50" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ whiteSpace: "pre-line" }}
+                    >
+                      {changelog}
+                    </Typography>
+                  </Paper>
+                  <Button
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                    onClick={loadChangelog}
+                    disabled={loadingChangelog}
+                  >
+                    Refresh Timeline
+                  </Button>
+                </Box>
+              )}
+            </TabPanel>
+
+            <TabPanel value={tabValue} index={3}>
               <Box>
                 <Typography variant="h6" fontWeight={600} gutterBottom>
                   Timeline
@@ -476,25 +634,79 @@ const ReleaseDetailsPage: React.FC = () => {
                   color="text.secondary"
                   align="center"
                 >
-                  Timeline data will be loaded from the API.
+                  {loadingChangelog ? "Loading changelog..." : changelog}
                 </Typography>
               </Box>
             </TabPanel>
 
-            <TabPanel value={tabValue} index={3}>
-              <Box>
-                <Typography variant="h6" fontWeight={600} gutterBottom>
-                  Documentation
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  Documentation will be loaded from the API.
-                </Typography>
-              </Box>
-            </TabPanel>
+                            <TabPanel value={tabValue} index={3}>
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Documentation
+                  </Typography>
+                  {loadingSpecs ? (
+                    <LinearProgress sx={{ my: 2 }} />
+                  ) : (
+                    <Box>
+                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                        <Typography variant="body1">
+                          Specifications & Documentation
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={handleGenerateSpecification}
+                          disabled={loadingSpecs}
+                        >
+                          Generate New Specification
+                        </Button>
+                      </Box>
+                      
+                      {specifications.length > 0 ? (
+                        <Grid container spacing={2}>
+                          {specifications.map((spec) => (
+                            <Grid item xs={12} md={6} key={spec.id}>
+                              <Card>
+                                <CardContent>
+                                  <Typography variant="h6" sx={{ mb: 1 }}>
+                                    {spec.name}
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                    Format: {spec.format}
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                    Generated: {new Date(spec.generated_at).toLocaleString()}
+                                  </Typography>
+                                  <Box display="flex" gap={1}>
+                                    <Button
+                                      size="small"
+                                      variant="outlined"
+                                      onClick={() => window.open(spec.download_url, '_blank')}
+                                    >
+                                      Download
+                                    </Button>
+                                    <Button
+                                      size="small"
+                                      variant="text"
+                                      onClick={() => window.open(spec.preview_url || spec.download_url, '_blank')}
+                                    >
+                                      Preview
+                                    </Button>
+                                  </Box>
+                                </CardContent>
+                              </Card>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      ) : (
+                        <Paper sx={{ p: 3, textAlign: "center", bgcolor: "grey.50" }}>
+                          <Typography variant="body2" color="text.secondary">
+                            No specifications generated yet. Click "Generate New Specification" to create one.
+                          </Typography>
+                        </Paper>
+                      )}
+                    </Box>
+                  )}
+                </TabPanel>
           </Card>
         </Grid>
 
@@ -589,26 +801,62 @@ const ReleaseDetailsPage: React.FC = () => {
 
               <Stack spacing={2}>
                 <Button
-                  variant="outlined"
-                  startIcon={<PublishIcon />}
+                  variant="contained"
+                  startIcon={<EditIcon />}
                   fullWidth
-                  disabled={release.status === ReleaseStatus.RELEASED}
+                  onClick={handleEdit}
                 >
-                  Publish Release
+                  Edit Release
                 </Button>
+
+                {release.status === "ready" && (
+                  <Button
+                    variant="contained"
+                    color="success"
+                    startIcon={<PublishIcon />}
+                    fullWidth
+                    disabled={release.status === "released"}
+                    onClick={handlePublish}
+                  >
+                    Publish Release
+                  </Button>
+                )}
+
+                <Button
+                  variant="outlined"
+                  startIcon={<Sync />}
+                  fullWidth
+                  onClick={handleSyncRequirements}
+                >
+                  Sync Requirements
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  startIcon={<DescriptionIcon />}
+                  fullWidth
+                  onClick={handleGenerateSpecification}
+                >
+                  Generate Specification
+                </Button>
+
                 <Button
                   variant="outlined"
                   startIcon={<TimelineIcon />}
                   fullWidth
+                  onClick={loadChangelog}
                 >
-                  Generate Specification
+                  Refresh Changelog
                 </Button>
+
                 <Button
                   variant="outlined"
-                  startIcon={<CalendarTodayIcon />}
+                  color="error"
+                  startIcon={<DeleteIcon />}
                   fullWidth
+                  onClick={handleDelete}
                 >
-                  View Changelog
+                  Delete Release
                 </Button>
               </Stack>
             </CardContent>

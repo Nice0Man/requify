@@ -106,8 +106,7 @@ const AdminPage: React.FC = () => {
   const { hasPermission, hasAnyPermission } = usePermissions();
   // Check admin permissions
   const isAdmin =
-    user?.role === "admin" ||
-    hasAnyPermission(["admin:read", "admin:write"]);
+    user?.role === "admin" || hasAnyPermission(["admin:read", "admin:write"]);
   const canWrite = hasAnyPermission(["admin:write"]);
 
   // State management
@@ -338,7 +337,9 @@ const AdminPage: React.FC = () => {
       loadUsers();
     } catch (err: any) {
       console.error("Failed to create user:", err);
-      toast.error("Failed to create user: " + (err.response?.data?.detail || err.message));
+      toast.error(
+        "Failed to create user: " + (err.response?.data?.detail || err.message)
+      );
     }
   };
 
@@ -477,7 +478,7 @@ const AdminPage: React.FC = () => {
                 <Speed
                   sx={{
                     fontSize: 48,
-                    color: systemInfo?.error 
+                    color: systemInfo?.error
                       ? theme.palette.error.main
                       : theme.palette.success.main,
                     mb: 1,
@@ -489,7 +490,7 @@ const AdminPage: React.FC = () => {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: systemInfo?.error 
+                    color: systemInfo?.error
                       ? theme.palette.error.main
                       : theme.palette.success.main,
                     textTransform: "capitalize",
@@ -521,7 +522,9 @@ const AdminPage: React.FC = () => {
                   sx={{
                     fontSize: 48,
                     color: systemInfo?.disk
-                      ? getStatusColor(systemInfo.disk.percent > 80 ? "warning" : "healthy")
+                      ? getStatusColor(
+                          systemInfo.disk.percent > 80 ? "warning" : "healthy"
+                        )
                       : theme.palette.grey[500],
                     mb: 1,
                   }}
@@ -533,16 +536,22 @@ const AdminPage: React.FC = () => {
                   variant="body1"
                   sx={{
                     color: systemInfo?.disk
-                      ? getStatusColor(systemInfo.disk.percent > 80 ? "warning" : "healthy")
+                      ? getStatusColor(
+                          systemInfo.disk.percent > 80 ? "warning" : "healthy"
+                        )
                       : theme.palette.grey[500],
                     textTransform: "capitalize",
                     fontWeight: 500,
                   }}
                 >
-                  {systemInfo?.disk ? `${systemInfo.disk.percent}% Used` : "Unknown"}
+                  {systemInfo?.disk
+                    ? `${systemInfo.disk.percent}% Used`
+                    : "Unknown"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {systemInfo?.disk ? `${systemInfo.disk.free} GB free` : "No data"}
+                  {systemInfo?.disk
+                    ? `${systemInfo.disk.free} GB free`
+                    : "No data"}
                 </Typography>
               </CardContent>
             </Card>

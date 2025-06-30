@@ -106,6 +106,33 @@ export interface PublishReleaseRequest {
   notification_recipients?: string[];
 }
 
+export interface PublishReleaseResponse {
+  release_id: number;
+  status: string;
+  published_at: string;
+  published_by?: number;
+  changelog?: string;
+  notification_sent: boolean;
+  recipients_count: number;
+}
+
+export interface ReleaseChangelogResponse {
+  changelog: string;
+  generated_at: string;
+}
+
+export interface SyncProjectRequirementsRequest {
+  project_id?: number;
+  requirement_ids?: number[];
+}
+
+export interface SyncProjectRequirementsResponse {
+  synced_requirements: number;
+  skipped_requirements: number;
+  errors: string[];
+  operation_summary: Record<string, any>;
+}
+
 // Release status constants (backend uses strings)
 export const ReleaseStatus = {
   DRAFT: "draft",
@@ -117,6 +144,7 @@ export const ReleaseStatus = {
   RELEASED: "released",
   CANCELLED: "cancelled",
   PLANNING: "planning",
+  DELETED: "deleted", // For soft deletion
 } as const;
 
 export type ReleaseStatusType =
@@ -186,8 +214,16 @@ export class ReleasesApi {
     return this.client.put<Release>(`/releases/${releaseId}`, releaseData);
   }
 
-  // 5. Delete Release
+  // 5. Soft Delete Release (mark as deleted instead of hard delete)
   async deleteRelease(
+    releaseId: number
+  ): Promise<ApiResponse<Release>> {
+    // Instead of hard deletion, update status to "deleted"
+    return this.updateRelease(releaseId, { status: ReleaseStatus.DELETED });
+  }
+
+  // 5b. Hard Delete Release (if needed for admin functions)
+  async hardDeleteRelease(
     releaseId: number
   ): Promise<ApiResponse<{ message: string }>> {
     return this.client.delete<{ message: string }>(`/releases/${releaseId}`);
@@ -218,8 +254,8 @@ export class ReleasesApi {
   async publishRelease(
     releaseId: number,
     requestData?: PublishReleaseRequest
-  ): Promise<ApiResponse<Record<string, any>>> {
-    return this.client.post<Record<string, any>>(
+  ): Promise<ApiResponse<PublishReleaseResponse>> {
+    return this.client.post<PublishReleaseResponse>(
       `/releases/${releaseId}/publish`,
       requestData || {}
     );
@@ -257,8 +293,8 @@ export class ReleasesApi {
   // 10. Get Release Changelog
   async getReleaseChangelog(
     releaseId: number
-  ): Promise<ApiResponse<{ changelog: string; generated_at: string }>> {
-    return this.client.get<{ changelog: string; generated_at: string }>(
+  ): Promise<ApiResponse<ReleaseChangelogResponse>> {
+    return this.client.get<ReleaseChangelogResponse>(
       `/releases/${releaseId}/changelog`
     );
   }
@@ -266,12 +302,20 @@ export class ReleasesApi {
   // 11. Sync Project Requirements to Release
   async syncProjectRequirementsToRelease(
     releaseId: number,
-    params?: { project_id?: number; requirement_ids?: number[] }
-  ): Promise<ApiResponse<Record<string, any>>> {
-    return this.client.post<Record<string, any>>(
+    params?: SyncProjectRequirementsRequest
+  ): Promise<ApiResponse<SyncProjectRequirementsResponse>> {
+    return this.client.post<SyncProjectRequirementsResponse>(
       `/releases/${releaseId}/sync-project-requirements`,
       params || {}
     );
+  }
+
+  // 12. Restore Release (change status from deleted back to previous status)
+  async restoreRelease(
+    releaseId: number,
+    newStatus: string = ReleaseStatus.DRAFT
+  ): Promise<ApiResponse<Release>> {
+    return this.updateRelease(releaseId, { status: newStatus });
   }
 }
 
