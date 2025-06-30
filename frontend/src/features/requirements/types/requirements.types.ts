@@ -1,40 +1,71 @@
-// Requirements types based on backend contracts
+// Requirements types that exactly match backend schemas
+
+// ===== Reference Data Types =====
 
 export interface RequirementType {
   id: number;
   name: string;
   description?: string;
-  color?: string;
-  icon?: string;
-  created_at: string;
-  updated_at: string;
+}
+
+export interface RequirementTypeCreate {
+  name: string;
+  description?: string;
 }
 
 export interface RequirementPriority {
   id: number;
   name: string;
   description?: string;
-  level: number;
-  color?: string;
-  created_at: string;
-  updated_at: string;
+  level?: number;
+}
+
+export interface RequirementPriorityCreate {
+  name: string;
+  description?: string;
+  level?: number;
 }
 
 export interface RequirementStatus {
   id: number;
   name: string;
   description?: string;
-  color?: string;
-  is_final: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Requirement {
-  id: number;
+export interface RequirementStatusCreate {
+  name: string;
+  description?: string;
+}
+
+// ===== Requirement Types =====
+
+export interface RequirementBase {
   title: string;
   description?: string;
-  deadline?: string;
+  deadline?: string; // ISO datetime string
+}
+
+export interface RequirementCreate extends RequirementBase {
+  type_id: number;
+  priority_id: number;
+  status_id: number;
+  project_id: number;
+  release_id?: number;
+  spec_id?: number;
+}
+
+export interface RequirementUpdate {
+  title?: string;
+  description?: string;
+  type_id?: number;
+  priority_id?: number;
+  status_id?: number;
+  release_id?: number;
+  spec_id?: number;
+}
+
+export interface Requirement extends RequirementBase {
+  id: number;
   type_id: number;
   priority_id: number;
   status_id: number;
@@ -45,93 +76,26 @@ export interface Requirement {
   spec_id?: number;
   created_at: string;
   updated_at: string;
-  // Relations
-  project?: {
-    id: number;
-    name: string;
-    code: string;
-  };
-  type?: RequirementType;
-  priority?: RequirementPriority;
-  status?: RequirementStatus;
-  author?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-  };
-  last_modifier?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-  };
-  // Extended fields for compatibility
-  assignee_id?: number;
-  parent_id?: number;
-  version?: number;
-  tags?: string[];
-  acceptance_criteria?: string;
-  business_value?: string;
-  technical_notes?: string;
-  estimated_effort?: number;
-  actual_effort?: number;
-  risk_level?: 'low' | 'medium' | 'high' | 'critical';
-  complexity?: 'low' | 'medium' | 'high';
-  source?: string;
-  external_id?: string;
-  custom_fields?: Record<string, any>;
-  due_date?: string;
-  assignee?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-  };
-  parent?: {
-    id: number;
-    title: string;
-  };
-  children?: Requirement[];
-  relationships?: Relationship[];
-  test_results?: TestResult[];
-  comments?: Comment[];
 }
 
 export interface RequirementWithDetails extends Requirement {
-  relationships: Relationship[];
-  test_results: TestResult[];
-  comments: Comment[];
-  change_history: RequirementChangeHistory[];
-  attachments: Attachment[];
+  type_name?: string;
+  priority_name?: string;
+  status_name?: string;
+  project_name?: string;
+  author_name?: string;
+  last_modifier_name?: string;
+  release_version?: string;
+  spec_name?: string;
 }
 
-export interface RequirementCreate {
-  title: string;
-  description?: string;
-  deadline?: string; // ISO datetime string
-  type_id: number;
-  priority_id: number;
-  status_id: number;
-  project_id: number;
-  release_id?: number;
-  spec_id?: number;
-  tags?: string[];
-  acceptance_criteria?: string;
-  business_value?: string;
-  effort_estimate?: number;
+export interface RequirementWithTestResults extends Requirement {
+  latest_test_status?: string;
+  test_count: number;
+  tests_passed: number;
 }
 
-export interface RequirementUpdate {
-  title?: string;
-  description?: string;
-  deadline?: string;
-  type_id?: number;
-  priority_id?: number;
-  status_id?: number;
-  release_id?: number;
-  spec_id?: number;
-}
+// ===== API Response Types =====
 
 export interface RequirementListParams {
   skip?: number;
@@ -140,235 +104,62 @@ export interface RequirementListParams {
   status_id?: number;
   priority_id?: number;
   type_id?: number;
-  assignee_id?: number;
-  author_id?: number;
-  parent_id?: number;
-  search?: string;
-  tags?: string[];
-  risk_level?: string;
-  complexity?: string;
-  has_parent?: boolean;
-  is_overdue?: boolean;
+  assigned_to?: number;
   sort_by?: string;
-  sort_order?: 'asc' | 'desc';
+  sort_order?: "asc" | "desc";
 }
 
 export interface RequirementListResponse {
   items: Requirement[];
   total: number;
-  page: number;
-  size: number;
-  pages: number;
-  has_next: boolean;
-  has_prev: boolean;
 }
 
 export interface RequirementSearchParams {
-  query: string;
   project_id?: number;
   status_id?: number;
-  priority_id?: number;
   type_id?: number;
-  skip?: number;
-  limit?: number;
+  priority_id?: number;
+  search?: string;
 }
 
-export interface Relationship {
+// ===== Status Change =====
+
+export interface RequirementStatusChange {
+  status_id: number;
+  reason?: string;
+}
+
+// ===== Relationship Types =====
+
+export interface RequirementRelationship {
   id: number;
   source_requirement_id: number;
   target_requirement_id: number;
-  relationship_type_id: number;
+  relationship_type: string;
   description?: string;
   created_by: number;
   created_at: string;
-  updated_at: string;
-  // Relations
-  source_requirement?: {
-    id: number;
-    title: string;
-  };
-  target_requirement?: {
-    id: number;
-    title: string;
-  };
-  relationship_type?: {
-    id: number;
-    name: string;
-    description?: string;
-    is_bidirectional: boolean;
-  };
-  created_by_user?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-  };
 }
 
-export interface RelationshipCreate {
-  source_requirement_id: number;
+export interface RequirementRelationshipCreate {
   target_requirement_id: number;
-  relationship_type_id: number;
-  description?: string;
+  relationship_type: string;
 }
 
-export interface RelationshipType {
-  id: number;
-  name: string;
-  description?: string;
-  is_bidirectional: boolean;
-  created_at: string;
-  updated_at: string;
-}
+// ===== Comment Types =====
 
-export interface TestResult {
+export interface RequirementComment {
   id: number;
   requirement_id: number;
-  test_case_id?: number;
-  test_plan_id?: number;
-  status: 'passed' | 'failed' | 'skipped' | 'blocked';
-  executed_by: number;
-  executed_at: string;
-  notes?: string;
-  attachments?: string[];
-  // Relations
-  test_case?: {
-    id: number;
-    name: string;
-    description?: string;
-  };
-  test_plan?: {
-    id: number;
-    name: string;
-    version: string;
-  };
-  executed_by_user?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-  };
-}
-
-export interface Comment {
-  id: number;
-  requirement_id: number;
+  content: string;
   author_id: number;
-  content: string;
-  parent_id?: number;
-  is_resolution?: boolean;
+  author_name: string;
   created_at: string;
   updated_at: string;
-  // Relations
-  author?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    avatar?: string;
-  };
-  parent?: Comment;
-  replies?: Comment[];
 }
 
-export interface CommentCreate {
-  requirement_id: number;
-  content: string;
-  parent_id?: number;
-  is_resolution?: boolean;
-}
+// ===== UI State Types =====
 
-export interface RequirementChangeHistory {
-  id: number;
-  requirement_id: number;
-  changed_by: number;
-  change_type: 'created' | 'updated' | 'status_changed' | 'assigned' | 'deleted';
-  field_name?: string;
-  old_value?: string;
-  new_value?: string;
-  description?: string;
-  created_at: string;
-  // Relations
-  changed_by_user?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-  };
-}
-
-export interface Attachment {
-  id: number;
-  requirement_id: number;
-  filename: string;
-  original_filename: string;
-  file_size: number;
-  mime_type: string;
-  uploaded_by: number;
-  uploaded_at: string;
-  description?: string;
-  // Relations
-  uploaded_by_user?: {
-    id: number;
-    first_name: string;
-    last_name: string;
-  };
-}
-
-export interface RequirementStats {
-  total_count: number;
-  by_status: Record<string, number>;
-  by_priority: Record<string, number>;
-  by_type: Record<string, number>;
-  by_assignee: Record<string, number>;
-  overdue_count: number;
-  completion_rate: number;
-  average_effort: number;
-  risk_distribution: Record<string, number>;
-}
-
-export interface TraceabilityMatrix {
-  requirement_id: number;
-  requirement_title: string;
-  forward_links: {
-    relationship_type: string;
-    target_id: number;
-    target_title: string;
-  }[];
-  backward_links: {
-    relationship_type: string;
-    source_id: number;
-    source_title: string;
-  }[];
-  test_coverage: {
-    test_count: number;
-    passed_tests: number;
-    failed_tests: number;
-    coverage_percentage: number;
-  };
-}
-
-export interface RequirementImportResult {
-  total_processed: number;
-  successful_imports: number;
-  failed_imports: number;
-  errors: {
-    row: number;
-    error: string;
-    data?: any;
-  }[];
-  created_requirements: number[];
-}
-
-export interface RequirementExportParams {
-  project_id?: number;
-  status_ids?: number[];
-  priority_ids?: number[];
-  type_ids?: number[];
-  include_relationships?: boolean;
-  include_test_results?: boolean;
-  include_comments?: boolean;
-  format: 'excel' | 'csv' | 'pdf' | 'word';
-}
-
-// UI-specific types
 export interface RequirementFilters {
   search: string;
   projectId: number | null;
@@ -377,9 +168,6 @@ export interface RequirementFilters {
   typeIds: number[];
   assigneeIds: number[];
   authorIds: number[];
-  riskLevels: string[];
-  complexities: string[];
-  tags: string[];
   hasParent: boolean | null;
   isOverdue: boolean | null;
   dateRange: {
@@ -389,84 +177,57 @@ export interface RequirementFilters {
 }
 
 export interface RequirementFormData extends RequirementCreate {
-  // Additional UI-specific fields
-  attachments?: File[];
-  newTags?: string[];
+  // Additional UI-specific fields if needed
 }
 
-export enum RequirementRiskLevel {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
+// ===== Error Types =====
+
+export interface RequirementValidationError {
+  [field: string]: string;
 }
 
-export enum RequirementComplexity {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high'
-}
-
-export enum RequirementChangeType {
-  CREATED = 'created',
-  UPDATED = 'updated',
-  STATUS_CHANGED = 'status_changed',
-  ASSIGNED = 'assigned',
-  DELETED = 'deleted'
-}
-
-export enum TestStatus {
-  PASSED = 'passed',
-  FAILED = 'failed',
-  SKIPPED = 'skipped',
-  BLOCKED = 'blocked'
-}
-
-// Add this new interface to match the backend RequirementWithDetails schema
-export interface RequirementDetails {
-  id: number;
-  title: string;
-  description?: string;
-  deadline?: string;
-  type_id: number;
-  priority_id: number;
-  status_id: number;
-  project_id: number;
-  author_id: number;
-  last_modified_by: number;
-  release_id?: number;
-  spec_id?: number;
-  created_at: string;
-  updated_at: string;
-  // Additional detail fields from backend
-  type_name?: string;
-  priority_name?: string;
-  status_name?: string;
-  project_name?: string;
-  author_name?: string;
-  last_modifier_name?: string;
-  release_version?: string;
-  spec_name?: string;
-  tags?: string[];
-}
-
-// Error handling types
-export interface ApiError {
-  detail: string | Array<{
-    loc: (string | number)[];
-    msg: string;
-    type: string;
-    input?: any;
-  }>;
+export interface RequirementApiError {
+  detail:
+    | string
+    | Array<{
+        loc: (string | number)[];
+        msg: string;
+        type: string;
+        input?: any;
+      }>;
   error?: string;
   error_description?: string;
 }
 
-export interface FieldError {
-  field: string;
-  message: string;
+// ===== Requirement Stats =====
+
+export interface RequirementStats {
+  total: number;
+  completed: number;
+  in_progress: number;
+  pending: number;
 }
 
-export interface ValidationError {
-  [field: string]: string;
-} 
+// ===== Requirement Group =====
+
+export interface RequirementGroup {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface RequirementGroupCreate {
+  name: string;
+  description?: string;
+}
+
+export interface RequirementGroupUpdate {
+  name?: string;
+  description?: string;
+}
+
+// ===== Requirement Group Order =====
+export interface RequirementGroupOrder {
+  id: number;
+  order_index: number;
+}

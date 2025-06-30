@@ -380,19 +380,19 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                           {requirement.title}
                         </Typography>
                         <Chip
-                          label={requirement.priority}
+                          label={requirement.priority_name}
                           size="small"
                           sx={{
                             height: 18,
                             fontSize: "0.65rem",
                             fontWeight: 600,
                             backgroundColor: alpha(
-                              getPriorityColor(requirement.priority),
+                              getPriorityColor(requirement.priority_name),
                               0.1
                             ),
-                            color: getPriorityColor(requirement.priority),
+                            color: getPriorityColor(requirement.priority_name),
                             border: `1px solid ${alpha(
-                              getPriorityColor(requirement.priority),
+                              getPriorityColor(requirement.priority_name),
                               0.2
                             )}`,
                           }}
@@ -413,12 +413,12 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                         alignItems="center"
                       >
                         <Chip
-                          label={requirement.status}
+                          label={requirement.status_name}
                           size="small"
                           variant="outlined"
                           sx={{ height: 20, fontSize: "0.7rem" }}
                         />
-                        {requirement.due_date && (
+                        {requirement.deadline && (
                           <Box display="flex" alignItems="center" gap={0.5}>
                             <Schedule fontSize="small" color="action" />
                             <Typography
@@ -426,7 +426,7 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                               color="text.secondary"
                             >
                               {new Date(
-                                requirement.due_date
+                                requirement.deadline
                               ).toLocaleDateString()}
                             </Typography>
                           </Box>

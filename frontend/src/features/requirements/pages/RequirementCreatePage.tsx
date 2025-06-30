@@ -11,19 +11,20 @@ import {
   Stack,
   useTheme,
   alpha,
-  Chip,
-  IconButton,
 } from "@mui/material";
 import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   Assignment as RequirementIcon,
-  Add as AddIcon,
-  Close as CloseIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { requirementsApi, RequirementCreate } from "../api/requirements.api";
+import {
+  RequirementCreate,
+  RequirementStatus,
+  RequirementType,
+  RequirementPriority,
+} from "../types/requirements.types";
 import { projectsApi } from "../../projects/api/projects.api";
 import { referenceApi } from "../../../shared/api/reference.api";
 import {
@@ -31,13 +32,9 @@ import {
   extractFieldErrors,
   FormErrors,
 } from "../../../shared/utils/errorHandler";
+import { requirementsApi } from "../api/requirements.api";
 
 interface Project {
-  id: number;
-  name: string;
-}
-
-interface ReferenceOption {
   id: number;
   name: string;
 }
@@ -46,7 +43,7 @@ const RequirementCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // Form state matching backend schema
+  // Form state matching backend schema exactly
   const [formData, setFormData] = useState<RequirementCreate>({
     title: "",
     description: "",
@@ -62,33 +59,36 @@ const RequirementCreatePage: React.FC = () => {
 
   // Data loading state
   const [projects, setProjects] = useState<Project[]>([]);
-  const [typeOptions, setTypeOptions] = useState<ReferenceOption[]>([]);
-  const [priorityOptions, setPriorityOptions] = useState<ReferenceOption[]>([]);
-  const [statusOptions, setStatusOptions] = useState<ReferenceOption[]>([]);
+  const [typeOptions, setTypeOptions] = useState<RequirementType[]>([]);
+  const [priorityOptions, setPriorityOptions] = useState<RequirementPriority[]>(
+    []
+  );
+  const [statusOptions, setStatusOptions] = useState<RequirementStatus[]>([]);
 
   // Load reference data on component mount
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [projectsRes, typesRes, prioritiesRes, statusesRes] = await Promise.all([
-          projectsApi.getProjects({ limit: 100 }),
-          referenceApi.getRequirementTypes(),
-          referenceApi.getRequirementPriorities(),
-          referenceApi.getRequirementStatuses(),
-        ]);
+        const [projectsRes, typesRes, prioritiesRes, statusesRes] =
+          await Promise.all([
+            projectsApi.getProjects({ limit: 100 }),
+            referenceApi.getRequirementTypes(),
+            referenceApi.getRequirementPriorities(),
+            referenceApi.getRequirementStatuses(),
+          ]);
 
         setProjects(projectsRes.data.items);
         setTypeOptions(typesRes.data);
         setPriorityOptions(prioritiesRes.data);
         setStatusOptions(statusesRes.data);
 
-        // Set default status to 'Draft' if available
-        const draftStatus = statusesRes.data.find(
-          (status) => status.name.toLowerCase() === "draft"
-        );
-        if (draftStatus) {
-          setFormData((prev) => ({ ...prev, status_id: draftStatus.id }));
+        // Set default status to first one available
+        if (statusesRes.data.length > 0) {
+          setFormData((prev) => ({
+            ...prev,
+            status_id: statusesRes.data[0].id,
+          }));
         }
       } catch (error) {
         toast.error("Failed to load form data");

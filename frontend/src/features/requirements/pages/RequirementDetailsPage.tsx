@@ -39,8 +39,7 @@ import {
   Warning,
   Info,
 } from "@mui/icons-material";
-import { requirementsApi } from "../api/requirements.api";
-import { RequirementDetails } from "../types/requirements.types";
+import { requirementsApi, RequirementWithDetails } from "../api/requirements.api";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -68,7 +67,7 @@ const RequirementDetailsPage: React.FC = () => {
   
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [requirement, setRequirement] = useState<RequirementDetails | null>(null);
+  const [requirement, setRequirement] = useState<RequirementWithDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -93,7 +92,7 @@ const RequirementDetailsPage: React.FC = () => {
       setError(null);
       
       const response = await requirementsApi.getRequirement(requirementId);
-      setRequirement(response.data as unknown as RequirementDetails);
+      setRequirement(response.data);
     } catch (err: any) {
       console.error("Failed to load requirement:", err);
       

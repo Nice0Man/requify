@@ -71,9 +71,7 @@ import {
   RequirementListParams,
   RequirementType,
   RequirementPriority,
-  RequirementStatus,
-  RequirementRiskLevel,
-  RequirementComplexity
+  RequirementStatus
 } from '../types/requirements.types';
 import { requirementsApi } from '../api/requirements.api';
 import { projectsApi } from '../../projects/api/projects.api';
@@ -101,9 +99,6 @@ const RequirementsPage: React.FC = () => {
     typeIds: [],
     assigneeIds: [],
     authorIds: [],
-    riskLevels: [],
-    complexities: [],
-    tags: [],
     hasParent: null,
     isOverdue: null,
     dateRange: { start: null, end: null }
@@ -138,18 +133,10 @@ const RequirementsPage: React.FC = () => {
         limit: pageSize,
         sort_by: sortModel[0]?.field,
         sort_order: sortModel[0]?.sort,
-        search: filters.search || undefined,
         project_id: filters.projectId || undefined,
         status_id: filters.statusIds.length === 1 ? filters.statusIds[0] : undefined,
         priority_id: filters.priorityIds.length === 1 ? filters.priorityIds[0] : undefined,
         type_id: filters.typeIds.length === 1 ? filters.typeIds[0] : undefined,
-        assignee_id: filters.assigneeIds.length === 1 ? filters.assigneeIds[0] : undefined,
-        author_id: filters.authorIds.length === 1 ? filters.authorIds[0] : undefined,
-        risk_level: filters.riskLevels.length === 1 ? filters.riskLevels[0] : undefined,
-        complexity: filters.complexities.length === 1 ? filters.complexities[0] : undefined,
-        has_parent: filters.hasParent,
-        is_overdue: filters.isOverdue,
-        tags: filters.tags.length > 0 ? filters.tags : undefined,
       };
 
       const response = await requirementsApi.getRequirements(params);
@@ -157,7 +144,7 @@ const RequirementsPage: React.FC = () => {
       setTotalCount(response.data?.total || 0);
     } catch (error: any) {
       console.error('Failed to load requirements:', error);
-      setRequirements([]); // Ensure array is never undefined
+      setRequirements([]);
       setTotalCount(0);
       toast.error(error.message || 'Failed to load requirements');
     } finally {
@@ -206,9 +193,6 @@ const RequirementsPage: React.FC = () => {
       typeIds: [],
       assigneeIds: [],
       authorIds: [],
-      riskLevels: [],
-      complexities: [],
-      tags: [],
       hasParent: null,
       isOverdue: null,
       dateRange: { start: null, end: null }
@@ -260,22 +244,11 @@ const RequirementsPage: React.FC = () => {
     }
   };
 
-  // Risk level color mapping
-  const getRiskColor = (level: string) => {
-    switch (level) {
-      case 'critical': return 'error';
-      case 'high': return 'warning';
-      case 'medium': return 'info';
-      case 'low': return 'success';
-      default: return 'default';
-    }
-  };
-
   // Priority level color mapping  
   const getPriorityColor = (priority: RequirementPriority) => {
-    if (priority.level >= 90) return 'error';
-    if (priority.level >= 70) return 'warning';
-    if (priority.level >= 40) return 'info';
+    if (priority.level && priority.level >= 90) return 'error';
+    if (priority.level && priority.level >= 70) return 'warning';
+    if (priority.level && priority.level >= 40) return 'info';
     return 'success';
   };
 
@@ -297,133 +270,84 @@ const RequirementsPage: React.FC = () => {
           <Typography variant="body2" fontWeight={600} noWrap>
             {params.value}
           </Typography>
-          {params.row.external_id && (
-            <Typography variant="caption" color="text.secondary">
-              {params.row.external_id}
-            </Typography>
-          )}
         </Box>
       ),
     },
     {
-      field: 'project',
+      field: 'project_name',
       headerName: 'Project',
       width: 150,
-      valueGetter: (params) => params.row.project?.name || '',
       renderCell: (params) => (
         <Chip
           size="small"
-          label={params.row.project?.name}
+          label={params.value || 'N/A'}
           variant="outlined"
           color="primary"
         />
       ),
     },
     {
-      field: 'type',
+      field: 'type_name',
       headerName: 'Type',
       width: 120,
-      valueGetter: (params) => params.row.type?.name || '',
       renderCell: (params) => (
         <Chip
           size="small"
-          label={params.row.type?.name}
-          style={{ backgroundColor: params.row.type?.color }}
+          label={params.value || 'N/A'}
         />
       ),
     },
     {
-      field: 'priority',
+      field: 'priority_name',
       headerName: 'Priority',
       width: 120,
-      valueGetter: (params) => params.row.priority?.name || '',
-      renderCell: (params) => (
-        <Chip
-          size="small"
-          label={params.row.priority?.name}
-          color={getPriorityColor(params.row.priority)}
-          icon={params.row.priority?.level >= 70 ? <HighPriorityIcon /> : undefined}
-        />
-      ),
+      renderCell: (params) => {
+        const priority = priorities.find(p => p.name === params.value);
+        return (
+          <Chip
+            size="small"
+            label={params.value || 'N/A'}
+            color={priority ? getPriorityColor(priority) : 'default'}
+            icon={priority?.level && priority.level >= 70 ? <HighPriorityIcon /> : undefined}
+          />
+        );
+      },
     },
     {
-      field: 'status',
+      field: 'status_name',
       headerName: 'Status',
       width: 120,
-      valueGetter: (params) => params.row.status?.name || '',
       renderCell: (params) => (
         <Chip
           size="small"
-          label={params.row.status?.name}
-          style={{ backgroundColor: params.row.status?.color }}
-          icon={params.row.status?.is_final ? <CheckCircleIcon /> : <ScheduleIcon />}
+          label={params.value || 'N/A'}
+          icon={<CheckCircleIcon />}
         />
       ),
     },
     {
-      field: 'assignee',
-      headerName: 'Assignee',
+      field: 'author_name',
+      headerName: 'Author',
       width: 150,
-      valueGetter: (params) => params.row.assignee ? `${params.row.assignee.first_name} ${params.row.assignee.last_name}` : 'Unassigned',
       renderCell: (params) => (
-        params.row.assignee ? (
+        params.value ? (
           <Box display="flex" alignItems="center" gap={1}>
             <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
-              {params.row.assignee.first_name[0]}{params.row.assignee.last_name[0]}
+              {params.value.charAt(0)}
             </Avatar>
             <Typography variant="body2" noWrap>
-              {params.row.assignee.first_name} {params.row.assignee.last_name}
+              {params.value}
             </Typography>
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary">
-            Unassigned
+            Unknown
           </Typography>
         )
       ),
     },
     {
-      field: 'risk_level',
-      headerName: 'Risk',
-      width: 100,
-      renderCell: (params) => (
-        params.value && (
-          <Chip
-            size="small"
-            label={params.value.toUpperCase()}
-            color={getRiskColor(params.value)}
-          />
-        )
-      ),
-    },
-    {
-      field: 'tags',
-      headerName: 'Tags',
-      width: 200,
-      renderCell: (params) => (
-        <Box display="flex" gap={0.5} flexWrap="wrap">
-          {params.value?.slice(0, 3).map((tag: string, index: number) => (
-            <Chip
-              key={index}
-              size="small"
-              label={tag}
-              variant="outlined"
-              sx={{ height: 20, fontSize: '0.7rem' }}
-            />
-          ))}
-          {params.value?.length > 3 && (
-            <Chip
-              size="small"
-              label={`+${params.value.length - 3}`}
-              variant="outlined"
-              sx={{ height: 20, fontSize: '0.7rem' }}
-            />
-          )}
-        </Box>
-      ),
-    },
-    {
-      field: 'due_date',
+      field: 'deadline',
       headerName: 'Due Date',
       width: 120,
       valueFormatter: (params) => params.value ? format(parseISO(params.value), 'MMM dd, yyyy') : '',
@@ -473,7 +397,7 @@ const RequirementsPage: React.FC = () => {
         />,
       ],
     },
-  ], [navigate]);
+  ], [navigate, priorities]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -484,13 +408,25 @@ const RequirementsPage: React.FC = () => {
     if (filters.typeIds.length > 0) count++;
     if (filters.assigneeIds.length > 0) count++;
     if (filters.authorIds.length > 0) count++;
-    if (filters.riskLevels.length > 0) count++;
-    if (filters.complexities.length > 0) count++;
-    if (filters.tags.length > 0) count++;
     if (filters.hasParent !== null) count++;
     if (filters.isOverdue !== null) count++;
     return count;
   }, [filters]);
+
+  // Calculate stats from current requirements data
+  const requirementsStats = useMemo(() => {
+    const total = requirements.length;
+    const inProgress = requirements.filter(r => r.status_name && !r.status_name.toLowerCase().includes('completed')).length;
+    const completed = requirements.filter(r => r.status_name && r.status_name.toLowerCase().includes('completed')).length;
+    const highRisk = requirements.filter(r => r.priority_name && (r.priority_name.toLowerCase().includes('high') || r.priority_name.toLowerCase().includes('critical'))).length;
+    
+    return {
+      total,
+      inProgress,
+      completed,
+      highRisk
+    };
+  }, [requirements]);
 
   return (
     <Box>
@@ -540,7 +476,7 @@ const RequirementsPage: React.FC = () => {
                     Total Requirements
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {totalCount}
+                    {requirementsStats.total}
                   </Typography>
                 </Box>
                 <AssignmentIcon color="primary" sx={{ fontSize: 40 }} />
@@ -557,7 +493,7 @@ const RequirementsPage: React.FC = () => {
                     In Progress
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {requirements?.filter(r => r && r.status && !r.status.is_final).length || 0}
+                    {requirementsStats.inProgress}
                   </Typography>
                 </Box>
                 <ScheduleIcon color="warning" sx={{ fontSize: 40 }} />
@@ -574,7 +510,7 @@ const RequirementsPage: React.FC = () => {
                     Completed
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {requirements?.filter(r => r && r.status && r.status.is_final).length || 0}
+                    {requirementsStats.completed}
                   </Typography>
                 </Box>
                 <CheckCircleIcon color="success" sx={{ fontSize: 40 }} />
@@ -588,10 +524,10 @@ const RequirementsPage: React.FC = () => {
               <Box display="flex" alignItems="center" justifyContent="space-between">
                 <Box>
                   <Typography color="text.secondary" variant="body2">
-                    High Risk
+                    High Priority
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
-                    {requirements?.filter(r => r && (r.risk_level === 'high' || r.risk_level === 'critical')).length || 0}
+                    {requirementsStats.highRisk}
                   </Typography>
                 </Box>
                 <BugIcon color="error" sx={{ fontSize: 40 }} />
@@ -682,7 +618,6 @@ const RequirementsPage: React.FC = () => {
                     <Chip
                       size="small"
                       label={option.name}
-                      style={{ backgroundColor: option.color }}
                       {...getTagProps({ index })}
                     />
                   ))
@@ -718,18 +653,18 @@ const RequirementsPage: React.FC = () => {
               <Autocomplete
                 multiple
                 size="small"
-                options={Object.values(RequirementRiskLevel)}
-                value={filters.riskLevels}
-                onChange={(_, value) => handleFilterChange('riskLevels', value)}
+                options={types}
+                getOptionLabel={(option) => option.name}
+                value={types.filter(t => filters.typeIds.includes(t.id))}
+                onChange={(_, value) => handleFilterChange('typeIds', value.map(v => v.id))}
                 renderInput={(params) => (
-                  <TextField {...params} label="Risk Level" />
+                  <TextField {...params} label="Type" />
                 )}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
                     <Chip
                       size="small"
-                      label={option.toUpperCase()}
-                      color={getRiskColor(option)}
+                      label={option.name}
                       {...getTagProps({ index })}
                     />
                   ))
@@ -746,18 +681,6 @@ const RequirementsPage: React.FC = () => {
                   />
                 }
                 label="Overdue Only"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={3}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={filters.hasParent === false}
-                    onChange={(e) => handleFilterChange('hasParent', e.target.checked ? false : null)}
-                  />
-                }
-                label="Top Level Only"
               />
             </Grid>
           </Grid>

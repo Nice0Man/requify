@@ -123,7 +123,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
       left: 0,
       right: 0,
       height: "1px",
-      background: `linear-gradient(90deg, transparent, ${alpha(theme.palette.common.white, 0.8)}, transparent)`,
+      background: `linear-gradient(90deg, transparent, ${alpha(
+        theme.palette.common.white,
+        0.8
+      )}, transparent)`,
       zIndex: 1,
     },
   };
@@ -134,14 +137,18 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
         {Array.from({ length: 3 }).map((_, index) => (
           <Grid item xs={12} md={4} key={index}>
             <Card sx={cardStyle}>
-              <CardHeader 
-                title={<Skeleton variant="text" width="60%" height={28} />} 
+              <CardHeader
+                title={<Skeleton variant="text" width="60%" height={28} />}
                 sx={{ pb: 2 }}
               />
               <CardContent sx={{ pt: 0 }}>
                 {Array.from({ length: 3 }).map((_, i) => (
                   <Box key={i} sx={{ mb: 3 }}>
-                    <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 2, mb: 1 }} />
+                    <Skeleton
+                      variant="rectangular"
+                      height={80}
+                      sx={{ borderRadius: 2, mb: 1 }}
+                    />
                     <Skeleton variant="text" width="80%" height={20} />
                     <Skeleton variant="text" width="60%" height={16} />
                   </Box>
@@ -167,21 +174,28 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     width: 36,
                     height: 36,
                     borderRadius: 2,
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.primary.main, 0.05)})`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.primary.main,
+                      0.1
+                    )}, ${alpha(theme.palette.primary.main, 0.05)})`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                    border: `1px solid ${alpha(
+                      theme.palette.primary.main,
+                      0.2
+                    )}`,
                   }}
                 >
                   <FolderOpen color="primary" fontSize="small" />
                 </Box>
                 <Typography
                   variant="h6"
-                  sx={{ 
-                    fontWeight: 600, 
+                  sx={{
+                    fontWeight: 600,
                     fontSize: "1.1rem",
-                    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                    fontFamily:
+                      "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
                     letterSpacing: "-0.01em",
                   }}
                 >
@@ -190,8 +204,8 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
               </Box>
             }
             action={
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => navigate("/projects")}
                 sx={{
                   color: theme.palette.action.active,
@@ -221,7 +235,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     width: 56,
                     height: 56,
                     borderRadius: 3,
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.grey[400], 0.1)}, ${alpha(theme.palette.grey[400], 0.05)})`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.grey[400],
+                      0.1
+                    )}, ${alpha(theme.palette.grey[400], 0.05)})`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -254,14 +271,24 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                       variant="outlined"
                       sx={{
                         cursor: "pointer",
-                        transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                        transition:
+                          "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                        border: `1px solid ${alpha(
+                          theme.palette.divider,
+                          0.06
+                        )}`,
                         borderRadius: 3,
                         "&:hover": {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.02),
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.02
+                          ),
                           borderColor: alpha(theme.palette.primary.main, 0.3),
                           transform: "translateY(-2px)",
-                          boxShadow: `0 8px 25px -8px ${alpha(theme.palette.primary.main, 0.25)}`,
+                          boxShadow: `0 8px 25px -8px ${alpha(
+                            theme.palette.primary.main,
+                            0.25
+                          )}`,
                         },
                       }}
                       onClick={() => navigate(`/projects/${project.id}`)}
@@ -311,11 +338,23 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
 
                         {/* Progress Bar */}
                         <Box mb={2}>
-                          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            mb={1}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontSize: "0.75rem" }}
+                            >
                               Progress
                             </Typography>
-                            <Typography variant="caption" sx={{ fontWeight: 600, fontSize: "0.75rem" }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 600, fontSize: "0.75rem" }}
+                            >
                               {project.completion_percentage}%
                             </Typography>
                           </Box>
@@ -325,7 +364,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                             sx={{
                               height: 6,
                               borderRadius: 3,
-                              backgroundColor: alpha(theme.palette.divider, 0.1),
+                              backgroundColor: alpha(
+                                theme.palette.divider,
+                                0.1
+                              ),
                               "& .MuiLinearProgress-bar": {
                                 borderRadius: 3,
                                 background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
@@ -335,24 +377,57 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                         </Box>
 
                         {/* Stats */}
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
                           <Box display="flex" alignItems="center" gap={1}>
-                            <Group sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                            <Group
+                              sx={{
+                                fontSize: 14,
+                                color: theme.palette.text.secondary,
+                              }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontSize: "0.75rem" }}
+                            >
                               {project.team_size} members
                             </Typography>
                           </Box>
                           <Box display="flex" alignItems="center" gap={1}>
-                            <Assignment sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                            <Assignment
+                              sx={{
+                                fontSize: 14,
+                                color: theme.palette.text.secondary,
+                              }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontSize: "0.75rem" }}
+                            >
                               {project.requirements_count} requirements
                             </Typography>
                           </Box>
                         </Box>
 
                         {project.next_milestone && (
-                          <Box mt={2} pt={2} borderTop={`1px solid ${alpha(theme.palette.divider, 0.06)}`}>
-                            <Typography variant="caption" color="primary.main" sx={{ fontSize: "0.75rem", fontWeight: 600 }}>
+                          <Box
+                            mt={2}
+                            pt={2}
+                            borderTop={`1px solid ${alpha(
+                              theme.palette.divider,
+                              0.06
+                            )}`}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="primary.main"
+                              sx={{ fontSize: "0.75rem", fontWeight: 600 }}
+                            >
                               Next: {project.next_milestone}
                             </Typography>
                           </Box>
@@ -361,7 +436,7 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     </Card>
                   </Fade>
                 ))}
-                
+
                 {projects.length > 3 && (
                   <Button
                     variant="text"
@@ -375,7 +450,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                       justifyContent: "center",
                       py: 1.5,
                       "&:hover": {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.08
+                        ),
                       },
                     }}
                   >
@@ -399,21 +477,28 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     width: 36,
                     height: 36,
                     borderRadius: 2,
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.1)}, ${alpha(theme.palette.secondary.main, 0.05)})`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.secondary.main,
+                      0.1
+                    )}, ${alpha(theme.palette.secondary.main, 0.05)})`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    border: `1px solid ${alpha(theme.palette.secondary.main, 0.2)}`,
+                    border: `1px solid ${alpha(
+                      theme.palette.secondary.main,
+                      0.2
+                    )}`,
                   }}
                 >
                   <Assignment color="secondary" fontSize="small" />
                 </Box>
                 <Typography
                   variant="h6"
-                  sx={{ 
-                    fontWeight: 600, 
+                  sx={{
+                    fontWeight: 600,
                     fontSize: "1.1rem",
-                    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                    fontFamily:
+                      "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
                     letterSpacing: "-0.01em",
                   }}
                 >
@@ -422,8 +507,8 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
               </Box>
             }
             action={
-              <IconButton 
-                size="small" 
+              <IconButton
+                size="small"
                 onClick={() => navigate("/requirements")}
                 sx={{
                   color: theme.palette.action.active,
@@ -453,7 +538,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     width: 56,
                     height: 56,
                     borderRadius: 3,
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.grey[400], 0.1)}, ${alpha(theme.palette.grey[400], 0.05)})`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.grey[400],
+                      0.1
+                    )}, ${alpha(theme.palette.grey[400], 0.05)})`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -486,20 +574,37 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                       variant="outlined"
                       sx={{
                         cursor: "pointer",
-                        transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                        transition:
+                          "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                        border: `1px solid ${alpha(
+                          theme.palette.divider,
+                          0.06
+                        )}`,
                         borderRadius: 3,
                         "&:hover": {
-                          backgroundColor: alpha(theme.palette.secondary.main, 0.02),
+                          backgroundColor: alpha(
+                            theme.palette.secondary.main,
+                            0.02
+                          ),
                           borderColor: alpha(theme.palette.secondary.main, 0.3),
                           transform: "translateY(-2px)",
-                          boxShadow: `0 8px 25px -8px ${alpha(theme.palette.secondary.main, 0.25)}`,
+                          boxShadow: `0 8px 25px -8px ${alpha(
+                            theme.palette.secondary.main,
+                            0.25
+                          )}`,
                         },
                       }}
-                      onClick={() => navigate(`/requirements/${requirement.id}`)}
+                      onClick={() =>
+                        navigate(`/requirements/${requirement.id}`)
+                      }
                     >
                       <CardContent sx={{ p: 3 }}>
-                        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="flex-start"
+                          mb={2}
+                        >
                           <Typography
                             variant="subtitle2"
                             sx={{
@@ -512,15 +617,23 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                             {requirement.title}
                           </Typography>
                           <Chip
-                            label={requirement.priority}
+                            label={requirement.priority_name}
                             size="small"
                             sx={{
                               height: 22,
                               fontSize: "0.7rem",
                               fontWeight: 600,
-                              backgroundColor: alpha(getPriorityColor(requirement.priority), 0.12),
-                              color: getPriorityColor(requirement.priority),
-                              border: `1px solid ${alpha(getPriorityColor(requirement.priority), 0.2)}`,
+                              backgroundColor: alpha(
+                                getPriorityColor(requirement.priority_name),
+                                0.12
+                              ),
+                              color: getPriorityColor(
+                                requirement.priority_name
+                              ),
+                              border: `1px solid ${alpha(
+                                getPriorityColor(requirement.priority_name),
+                                0.2
+                              )}`,
                               textTransform: "capitalize",
                               ml: 1,
                             }}
@@ -542,11 +655,23 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
 
                         {/* Progress */}
                         <Box mb={2}>
-                          <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            mb={1}
+                          >
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontSize: "0.75rem" }}
+                            >
                               Progress
                             </Typography>
-                            <Typography variant="caption" sx={{ fontWeight: 600, fontSize: "0.75rem" }}>
+                            <Typography
+                              variant="caption"
+                              sx={{ fontWeight: 600, fontSize: "0.75rem" }}
+                            >
                               {requirement.progress}%
                             </Typography>
                           </Box>
@@ -556,7 +681,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                             sx={{
                               height: 6,
                               borderRadius: 3,
-                              backgroundColor: alpha(theme.palette.divider, 0.1),
+                              backgroundColor: alpha(
+                                theme.palette.divider,
+                                0.1
+                              ),
                               "& .MuiLinearProgress-bar": {
                                 borderRadius: 3,
                                 background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.light})`,
@@ -565,26 +693,47 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                           />
                         </Box>
 
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
                           <Chip
-                            label={requirement.status.replace("_", " ")}
+                            label={requirement.status_name.replace("_", " ")}
                             size="small"
                             sx={{
                               height: 24,
                               fontSize: "0.75rem",
                               fontWeight: 600,
-                              backgroundColor: alpha(theme.palette.info.main, 0.12),
+                              backgroundColor: alpha(
+                                theme.palette.info.main,
+                                0.12
+                              ),
                               color: theme.palette.info.main,
-                              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                              border: `1px solid ${alpha(
+                                theme.palette.info.main,
+                                0.2
+                              )}`,
                               textTransform: "capitalize",
                             }}
                           />
-                          
-                          {requirement.due_date && (
+
+                          {requirement.deadline && (
                             <Box display="flex" alignItems="center" gap={0.5}>
-                              <Schedule sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
-                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
-                                {new Date(requirement.due_date).toLocaleDateString()}
+                              <Schedule
+                                sx={{
+                                  fontSize: 14,
+                                  color: theme.palette.text.secondary,
+                                }}
+                              />
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ fontSize: "0.75rem" }}
+                              >
+                                {new Date(
+                                  requirement.deadline
+                                ).toLocaleDateString()}
                               </Typography>
                             </Box>
                           )}
@@ -593,7 +742,7 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     </Card>
                   </Fade>
                 ))}
-                
+
                 {requirements.length > 3 && (
                   <Button
                     variant="text"
@@ -607,7 +756,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                       justifyContent: "center",
                       py: 1.5,
                       "&:hover": {
-                        backgroundColor: alpha(theme.palette.secondary.main, 0.08),
+                        backgroundColor: alpha(
+                          theme.palette.secondary.main,
+                          0.08
+                        ),
                       },
                     }}
                   >
@@ -631,21 +783,28 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     width: 36,
                     height: 36,
                     borderRadius: 2,
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.warning.main, 0.1)}, ${alpha(theme.palette.warning.main, 0.05)})`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.warning.main,
+                      0.1
+                    )}, ${alpha(theme.palette.warning.main, 0.05)})`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    border: `1px solid ${alpha(theme.palette.warning.main, 0.2)}`,
+                    border: `1px solid ${alpha(
+                      theme.palette.warning.main,
+                      0.2
+                    )}`,
                   }}
                 >
                   <Schedule color="warning" fontSize="small" />
                 </Box>
                 <Typography
                   variant="h6"
-                  sx={{ 
-                    fontWeight: 600, 
+                  sx={{
+                    fontWeight: 600,
                     fontSize: "1.1rem",
-                    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
+                    fontFamily:
+                      "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif",
                     letterSpacing: "-0.01em",
                   }}
                 >
@@ -654,7 +813,7 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
               </Box>
             }
             action={
-              <IconButton 
+              <IconButton
                 size="small"
                 sx={{
                   color: theme.palette.action.active,
@@ -684,7 +843,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                     width: 56,
                     height: 56,
                     borderRadius: 3,
-                    background: `linear-gradient(135deg, ${alpha(theme.palette.grey[400], 0.1)}, ${alpha(theme.palette.grey[400], 0.05)})`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.grey[400],
+                      0.1
+                    )}, ${alpha(theme.palette.grey[400], 0.05)})`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -717,19 +879,34 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                       variant="outlined"
                       sx={{
                         cursor: "pointer",
-                        transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                        transition:
+                          "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                        border: `1px solid ${alpha(
+                          theme.palette.divider,
+                          0.06
+                        )}`,
                         borderRadius: 3,
                         "&:hover": {
-                          backgroundColor: alpha(theme.palette.warning.main, 0.02),
+                          backgroundColor: alpha(
+                            theme.palette.warning.main,
+                            0.02
+                          ),
                           borderColor: alpha(theme.palette.warning.main, 0.3),
                           transform: "translateY(-2px)",
-                          boxShadow: `0 8px 25px -8px ${alpha(theme.palette.warning.main, 0.25)}`,
+                          boxShadow: `0 8px 25px -8px ${alpha(
+                            theme.palette.warning.main,
+                            0.25
+                          )}`,
                         },
                       }}
                     >
                       <CardContent sx={{ p: 3 }}>
-                        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="flex-start"
+                          mb={2}
+                        >
                           <Typography
                             variant="subtitle2"
                             sx={{
@@ -748,9 +925,15 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                               height: 22,
                               fontSize: "0.7rem",
                               fontWeight: 600,
-                              backgroundColor: alpha(getUrgencyColor(approval.urgency), 0.12),
+                              backgroundColor: alpha(
+                                getUrgencyColor(approval.urgency),
+                                0.12
+                              ),
                               color: getUrgencyColor(approval.urgency),
-                              border: `1px solid ${alpha(getUrgencyColor(approval.urgency), 0.2)}`,
+                              border: `1px solid ${alpha(
+                                getUrgencyColor(approval.urgency),
+                                0.2
+                              )}`,
                               textTransform: "capitalize",
                               ml: 1,
                             }}
@@ -758,13 +941,26 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                         </Box>
 
                         <Box display="flex" alignItems="center" gap={1} mb={2}>
-                          <Person sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
+                          <Person
+                            sx={{
+                              fontSize: 14,
+                              color: theme.palette.text.secondary,
+                            }}
+                          />
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
                             Requested by {approval.requested_by}
                           </Typography>
                         </Box>
 
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
                           <Chip
                             label={approval.type}
                             size="small"
@@ -772,22 +968,34 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                               height: 24,
                               fontSize: "0.75rem",
                               fontWeight: 600,
-                              backgroundColor: alpha(theme.palette.info.main, 0.12),
+                              backgroundColor: alpha(
+                                theme.palette.info.main,
+                                0.12
+                              ),
                               color: theme.palette.info.main,
-                              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
+                              border: `1px solid ${alpha(
+                                theme.palette.info.main,
+                                0.2
+                              )}`,
                               textTransform: "capitalize",
                             }}
                           />
-                          
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: "0.75rem" }}>
-                            {new Date(approval.requested_at).toLocaleDateString()}
+
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontSize: "0.75rem" }}
+                          >
+                            {new Date(
+                              approval.requested_at
+                            ).toLocaleDateString()}
                           </Typography>
                         </Box>
                       </CardContent>
                     </Card>
                   </Fade>
                 ))}
-                
+
                 {approvals.length > 3 && (
                   <Button
                     variant="text"
@@ -800,7 +1008,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                       justifyContent: "center",
                       py: 1.5,
                       "&:hover": {
-                        backgroundColor: alpha(theme.palette.warning.main, 0.08),
+                        backgroundColor: alpha(
+                          theme.palette.warning.main,
+                          0.08
+                        ),
                       },
                     }}
                   >

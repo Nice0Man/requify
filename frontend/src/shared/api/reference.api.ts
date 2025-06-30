@@ -1,4 +1,5 @@
 import { apiClient, ApiResponse } from "@/shared/api/client";
+import { RequirementType, RequirementPriority, RequirementStatus } from '../../features/requirements/types/requirements.types';
 
 export interface RequirementType {
   id: number;
@@ -88,57 +89,54 @@ export class ReferenceApi {
   constructor(private client = apiClient) {}
 
   // Requirement Types
-  // 1. Get Requirement Types
   async getRequirementTypes(): Promise<ApiResponse<RequirementType[]>> {
-    return this.client.get<RequirementType[]>("/reference/requirement-types");
+    return this.client.get<RequirementType[]>('/requirement-types/');
   }
 
-  // 2. Create Requirement Type
-  async createRequirementType(
-    typeData: RequirementTypeCreate
-  ): Promise<ApiResponse<RequirementType>> {
-    return this.client.post<RequirementType>(
-      "/reference/requirement-types",
-      typeData
-    );
+  async createRequirementType(data: { name: string; description?: string }): Promise<ApiResponse<RequirementType>> {
+    return this.client.post<RequirementType>('/requirement-types/', data);
+  }
+
+  async updateRequirementType(id: number, data: { name: string; description?: string }): Promise<ApiResponse<RequirementType>> {
+    return this.client.put<RequirementType>(`/requirement-types/${id}`, data);
+  }
+
+  async deleteRequirementType(id: number): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(`/requirement-types/${id}`);
   }
 
   // Requirement Priorities
-  // 3. Get Requirement Priorities
-  async getRequirementPriorities(): Promise<
-    ApiResponse<RequirementPriority[]>
-  > {
-    return this.client.get<RequirementPriority[]>(
-      "/reference/requirement-priorities"
-    );
+  async getRequirementPriorities(): Promise<ApiResponse<RequirementPriority[]>> {
+    return this.client.get<RequirementPriority[]>('/requirement-priorities/');
   }
 
-  // 4. Create Requirement Priority
-  async createRequirementPriority(
-    priorityData: RequirementPriorityCreate
-  ): Promise<ApiResponse<RequirementPriority>> {
-    return this.client.post<RequirementPriority>(
-      "/reference/requirement-priorities",
-      priorityData
-    );
+  async createRequirementPriority(data: { name: string; description?: string; level?: number }): Promise<ApiResponse<RequirementPriority>> {
+    return this.client.post<RequirementPriority>('/requirement-priorities/', data);
+  }
+
+  async updateRequirementPriority(id: number, data: { name: string; description?: string; level?: number }): Promise<ApiResponse<RequirementPriority>> {
+    return this.client.put<RequirementPriority>(`/requirement-priorities/${id}`, data);
+  }
+
+  async deleteRequirementPriority(id: number): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(`/requirement-priorities/${id}`);
   }
 
   // Requirement Statuses
-  // 5. Get Requirement Statuses
   async getRequirementStatuses(): Promise<ApiResponse<RequirementStatus[]>> {
-    return this.client.get<RequirementStatus[]>(
-      "/reference/requirement-statuses"
-    );
+    return this.client.get<RequirementStatus[]>('/requirement-statuses/');
   }
 
-  // 6. Create Requirement Status
-  async createRequirementStatus(
-    statusData: RequirementStatusCreate
-  ): Promise<ApiResponse<RequirementStatus>> {
-    return this.client.post<RequirementStatus>(
-      "/reference/requirement-statuses",
-      statusData
-    );
+  async createRequirementStatus(data: { name: string; description?: string }): Promise<ApiResponse<RequirementStatus>> {
+    return this.client.post<RequirementStatus>('/requirement-statuses/', data);
+  }
+
+  async updateRequirementStatus(id: number, data: { name: string; description?: string }): Promise<ApiResponse<RequirementStatus>> {
+    return this.client.put<RequirementStatus>(`/requirement-statuses/${id}`, data);
+  }
+
+  async deleteRequirementStatus(id: number): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(`/requirement-statuses/${id}`);
   }
 
   // Relationship Types

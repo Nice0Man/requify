@@ -51,7 +51,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
       id={`project-tabpanel-${index}`}
       aria-labelledby={`project-tab-${index}`}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
   );
 };
@@ -84,16 +84,16 @@ const ProjectDetailsPage: React.FC = () => {
       setError(null);
       try {
         let projectData: ProjectWithStats;
-        
+
         // The backend's GET /{project_id} endpoint already returns ProjectWithStats
         const response = await projectsApi.getProject(projectId);
-        console.log('Project API response:', response.data); // Debug logging
+        console.log("Project API response:", response.data); // Debug logging
         projectData = response.data;
-        
+
         // Ensure all required fields have default values if missing
         const safeProjectData: ProjectWithStats = {
           ...projectData,
-          status: projectData.status || 'inactive', // Default status if missing
+          status: projectData.status || "inactive", // Default status if missing
           total_requirements: projectData.total_requirements || 0,
           requirements_completed: projectData.requirements_completed || 0,
           active_releases: projectData.active_releases || 0,
@@ -102,7 +102,7 @@ const ProjectDetailsPage: React.FC = () => {
           completion_percentage: projectData.completion_percentage || 0,
           is_completed: projectData.is_completed || false,
         };
-        
+
         setProject(safeProjectData);
       } catch (error: any) {
         console.error("Failed to fetch project:", error);
@@ -151,6 +151,7 @@ const ProjectDetailsPage: React.FC = () => {
         justifyContent="center"
         alignItems="center"
         minHeight="50vh"
+        sx={{ p: 3 }}
       >
         <CircularProgress />
       </Box>
@@ -192,7 +193,7 @@ const ProjectDetailsPage: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box
         display="flex"
@@ -234,7 +235,7 @@ const ProjectDetailsPage: React.FC = () => {
       <Grid container spacing={3} mb={3}>
         <Grid item xs={12} md={8}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Project Description
               </Typography>
@@ -263,7 +264,7 @@ const ProjectDetailsPage: React.FC = () => {
         </Grid>
         <Grid item xs={12} md={4}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Project Status
               </Typography>
@@ -291,7 +292,7 @@ const ProjectDetailsPage: React.FC = () => {
       <Grid container spacing={3} mb={3}>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={2}>
                 <Assignment color="primary" />
                 <Box flex={1}>
@@ -316,7 +317,7 @@ const ProjectDetailsPage: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={2}>
                 <BugReport color="success" />
                 <Box flex={1}>
@@ -333,7 +334,7 @@ const ProjectDetailsPage: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={2}>
                 <People color="info" />
                 <Box flex={1}>
@@ -348,7 +349,7 @@ const ProjectDetailsPage: React.FC = () => {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 3 }}>
               <Box display="flex" alignItems="center" gap={2}>
                 <TrendingUp color="warning" />
                 <Box flex={1}>
@@ -368,7 +369,7 @@ const ProjectDetailsPage: React.FC = () => {
       {/* Detailed Tabs */}
       <Card>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs value={tabValue} onChange={handleTabChange}>
+          <Tabs value={tabValue} onChange={handleTabChange} sx={{ px: 3 }}>
             <Tab label="Requirements" icon={<Assignment />} />
             <Tab label="Releases" icon={<BugReport />} />
             <Tab label="Activity" icon={<CalendarToday />} />
@@ -376,72 +377,79 @@ const ProjectDetailsPage: React.FC = () => {
         </Box>
 
         <TabPanel value={tabValue} index={0}>
-          <Typography variant="h6" gutterBottom>
-            Requirements Overview
-          </Typography>
-          <Grid container spacing={2} mb={3}>
-            <Grid item xs={3}>
-              <Paper sx={{ p: 2, textAlign: "center" }}>
-                <Typography variant="h5" color="success.main">
-                  {project.requirements_completed}
-                </Typography>
-                <Typography variant="body2">Completed</Typography>
-              </Paper>
+          <Box sx={{ px: 3, pb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Requirements Overview
+            </Typography>
+            <Grid container spacing={2} mb={3}>
+              <Grid item xs={3}>
+                <Paper sx={{ p: 2, textAlign: "center" }}>
+                  <Typography variant="h5" color="success.main">
+                    {project.requirements_completed}
+                  </Typography>
+                  <Typography variant="body2">Completed</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={3}>
+                <Paper sx={{ p: 2, textAlign: "center" }}>
+                  <Typography variant="h5" color="warning.main">
+                    {project.total_requirements -
+                      project.requirements_completed}
+                  </Typography>
+                  <Typography variant="body2">Remaining</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={3}>
+                <Paper sx={{ p: 2, textAlign: "center" }}>
+                  <Typography variant="h5" color="info.main">
+                    {project.completion_percentage}%
+                  </Typography>
+                  <Typography variant="body2">Progress</Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={3}>
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{ height: "100%" }}
+                  onClick={() => navigate(`/projects/${id}/requirements`)}
+                >
+                  View All Requirements
+                </Button>
+              </Grid>
             </Grid>
-            <Grid item xs={3}>
-              <Paper sx={{ p: 2, textAlign: "center" }}>
-                <Typography variant="h5" color="warning.main">
-                  {project.total_requirements - project.requirements_completed}
-                </Typography>
-                <Typography variant="body2">Remaining</Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={3}>
-              <Paper sx={{ p: 2, textAlign: "center" }}>
-                <Typography variant="h5" color="info.main">
-                  {project.completion_percentage}%
-                </Typography>
-                <Typography variant="body2">Progress</Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={3}>
-              <Button
-                variant="contained"
-                fullWidth
-                sx={{ height: "100%" }}
-                onClick={() => navigate(`/projects/${id}/requirements`)}
-              >
-                View All Requirements
-              </Button>
-            </Grid>
-          </Grid>
+          </Box>
         </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
-          <Typography variant="h6" gutterBottom>
-            Releases Overview
-          </Typography>
-          <Box display="flex" alignItems="center" gap={2} mb={2}>
-            <Typography variant="h4" color="primary.main">
-              {project.active_releases}
+          <Box sx={{ px: 3, pb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Releases Overview
             </Typography>
-            <Typography variant="body1">Active Releases</Typography>
+            <Box display="flex" alignItems="center" gap={2} mb={2}>
+              <Typography variant="h4" color="primary.main">
+                {project.active_releases}
+              </Typography>
+              <Typography variant="body1">Active Releases</Typography>
+            </Box>
+            <Button
+              variant="contained"
+              onClick={() => navigate(`/projects/${id}/releases`)}
+            >
+              View All Releases
+            </Button>
           </Box>
-          <Button
-            variant="contained"
-            onClick={() => navigate(`/projects/${id}/releases`)}
-          >
-            View All Releases
-          </Button>
         </TabPanel>
 
         <TabPanel value={tabValue} index={2}>
-          <Typography variant="h6" gutterBottom>
-            Recent Activity
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Activity tracking is not yet implemented.
-          </Typography>
+          <Box sx={{ px: 3, pb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Recent Activity
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Activity tracking is not yet implemented.
+            </Typography>
+          </Box>
         </TabPanel>
       </Card>
     </Box>

@@ -67,10 +67,10 @@ export interface QuickRequirement {
   id: number;
   title: string;
   project_name: string;
-  status: string;
-  priority: string;
-  assigned_to?: string;
-  due_date?: string;
+  status_name: string;
+  priority_name: string;
+  author_name?: string;
+  deadline?: string;
   progress: number;
 }
 
