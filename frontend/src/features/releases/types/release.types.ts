@@ -26,13 +26,20 @@ export interface Release {
   custom_fields?: Record<string, any>;
 }
 
+// CORRECTED: Match exact backend schema
 export interface ReleaseCreate {
   name: string;
   version: string;
   description?: string;
-  type: ReleaseType;
-  project_id: number;
   planned_date?: string;
+  release_date?: string;
+  project_id: number;
+  status?: string;
+}
+
+// Extended interface for UI forms with additional fields
+export interface ReleaseCreateExtended extends ReleaseCreate {
+  type?: ReleaseType;
   requirement_ids?: number[];
   custom_fields?: Record<string, any>;
 }
@@ -322,4 +329,25 @@ export interface ReleaseState {
     total: number;
     pages: number;
   };
+}
+
+// Error handling types
+export interface ApiError {
+  detail: string | Array<{
+    loc: (string | number)[];
+    msg: string;
+    type: string;
+    input?: any;
+  }>;
+  error?: string;
+  error_description?: string;
+}
+
+export interface FieldError {
+  field: string;
+  message: string;
+}
+
+export interface ValidationError {
+  [field: string]: string;
 } 

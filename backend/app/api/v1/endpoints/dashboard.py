@@ -361,11 +361,11 @@ async def get_my_projects(
     try:
         dashboard_service = DashboardService()
         quick_access = await dashboard_service.get_quick_access(db, current_user.id)
-        
+
         # Apply pagination
         skip = (page - 1) * size
-        projects = quick_access.my_projects[skip:skip + size]
-        
+        projects = quick_access.my_projects[skip : skip + size]
+
         return projects
     except Exception as e:
         raise HTTPException(
@@ -492,8 +492,10 @@ async def get_dashboard_projects_stats(
     try:
         dashboard_service = DashboardService()
         overview = await dashboard_service.get_overview_stats(db)
-        project_performance = await dashboard_service.get_project_performance(db, overview)
-        
+        project_performance = await dashboard_service.get_project_performance(
+            db, overview
+        )
+
         return {
             "total_projects": overview.total_projects,
             "active_projects": overview.active_projects,
@@ -536,12 +538,16 @@ async def get_dashboard_requirements_stats(
     try:
         dashboard_service = DashboardService()
         overview = await dashboard_service.get_overview_stats(db)
-        
+
         return {
             "total_requirements": overview.total_requirements,
             "pending_requirements": overview.pending_requirements,
             "approved_requirements": overview.approved_requirements,
-            "approval_rate": (overview.approved_requirements / overview.total_requirements * 100) if overview.total_requirements > 0 else 0,
+            "approval_rate": (
+                (overview.approved_requirements / overview.total_requirements * 100)
+                if overview.total_requirements > 0
+                else 0
+            ),
         }
     except Exception as e:
         raise HTTPException(
@@ -588,7 +594,7 @@ async def get_dashboard_metrics(
         overview = await dashboard_service.get_overview_stats(db)
         trending = await dashboard_service.get_trending_metrics(db)
         performance = await dashboard_service.get_project_performance(db, overview)
-        
+
         return {
             "overview": overview.model_dump(),
             "trending": trending.model_dump(),
@@ -611,13 +617,8 @@ async def search_dashboard(
     """Search across dashboard items"""
     try:
         # Basic search implementation - can be enhanced
-        results = {
-            "projects": [],
-            "requirements": [],
-            "query": query,
-            "total": 0
-        }
-        
+        results = {"projects": [], "requirements": [], "query": query, "total": 0}
+
         # Search would be implemented here
         return results
     except Exception as e:
@@ -655,7 +656,7 @@ async def export_dashboard_stats(
         overview = await dashboard_service.get_overview_stats(db)
         performance = await dashboard_service.get_project_performance(db, overview)
         trending = await dashboard_service.get_trending_metrics(db)
-        
+
         return {
             "overview": overview.model_dump(),
             "performance": performance.model_dump(),
@@ -680,7 +681,7 @@ async def export_dashboard_activity(
     try:
         dashboard_service = DashboardService()
         recent_activity = await dashboard_service.get_recent_activity(db, limit=limit)
-        
+
         return {
             "activity": [item.model_dump() for item in recent_activity],
             "total": len(recent_activity),
@@ -707,9 +708,7 @@ async def get_my_dashboard(
         preferences = await user_preferences.get_by_user_id(db, user_id=current_user.id)
         if not preferences:
             # Create default preferences
-            default_prefs = user_preferences.get_default_preferences(
-                current_user.id
-            )
+            default_prefs = user_preferences.get_default_preferences(current_user.id)
             preferences = await user_preferences.create_or_update_preferences(
                 db, user_id=current_user.id, preferences_data=default_prefs
             )
@@ -844,7 +843,7 @@ async def update_user_preferences(
         updated_preferences = await user_preferences.create_or_update_preferences(
             db, user_id=current_user.id, preferences_data=preferences_data
         )
-        
+
         return {
             "message": "Preferences updated successfully",
             "preferences_id": updated_preferences.id,
@@ -877,7 +876,7 @@ async def create_notification(
             project_id=notification_data.get("project_id"),
             requirement_id=notification_data.get("requirement_id"),
         )
-        
+
         return {
             "message": "Notification created successfully",
             "notification_id": new_notification.id,
@@ -942,7 +941,7 @@ async def create_activity_record(
             priority=activity_data.get("priority"),
             extra_data=activity_data.get("extra_data"),
         )
-        
+
         return {
             "message": "Activity recorded successfully",
             "activity_id": new_activity.id,

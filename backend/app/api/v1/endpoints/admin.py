@@ -619,7 +619,7 @@ async def get_backups(
                             # Если метаданные повреждены, создаем базовую запись
                             stat = os.stat(item_path)
                             # Use st_birthtime if available (creation time), fall back to st_mtime
-                            creation_time = getattr(stat, 'st_birthtime', stat.st_mtime)
+                            creation_time = getattr(stat, "st_birthtime", stat.st_mtime)
                             backups.append(
                                 {
                                     "backup_id": item,
@@ -634,7 +634,7 @@ async def get_backups(
                     else:
                         # Создаем запись без метаданных
                         stat = os.stat(item_path)
-                        creation_time = getattr(stat, 'st_birthtime', stat.st_mtime)
+                        creation_time = getattr(stat, "st_birthtime", stat.st_mtime)
                         backups.append(
                             {
                                 "backup_id": item,

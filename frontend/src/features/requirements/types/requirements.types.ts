@@ -33,29 +33,18 @@ export interface RequirementStatus {
 export interface Requirement {
   id: number;
   title: string;
-  description: string;
-  project_id: number;
+  description?: string;
+  deadline?: string;
   type_id: number;
   priority_id: number;
   status_id: number;
+  project_id: number;
   author_id: number;
-  assignee_id?: number;
-  parent_id?: number;
-  version: number;
-  tags?: string[];
-  acceptance_criteria?: string;
-  business_value?: string;
-  technical_notes?: string;
-  estimated_effort?: number;
-  actual_effort?: number;
-  risk_level?: 'low' | 'medium' | 'high' | 'critical';
-  complexity?: 'low' | 'medium' | 'high';
-  source?: string;
-  external_id?: string;
-  custom_fields?: Record<string, any>;
+  last_modified_by: number;
+  release_id?: number;
+  spec_id?: number;
   created_at: string;
   updated_at: string;
-  due_date?: string;
   // Relations
   project?: {
     id: number;
@@ -71,6 +60,28 @@ export interface Requirement {
     last_name: string;
     email: string;
   };
+  last_modifier?: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+  };
+  // Extended fields for compatibility
+  assignee_id?: number;
+  parent_id?: number;
+  version?: number;
+  tags?: string[];
+  acceptance_criteria?: string;
+  business_value?: string;
+  technical_notes?: string;
+  estimated_effort?: number;
+  actual_effort?: number;
+  risk_level?: 'low' | 'medium' | 'high' | 'critical';
+  complexity?: 'low' | 'medium' | 'high';
+  source?: string;
+  external_id?: string;
+  custom_fields?: Record<string, any>;
+  due_date?: string;
   assignee?: {
     id: number;
     first_name: string;
@@ -97,46 +108,29 @@ export interface RequirementWithDetails extends Requirement {
 
 export interface RequirementCreate {
   title: string;
-  description: string;
-  project_id: number;
+  description?: string;
+  deadline?: string; // ISO datetime string
   type_id: number;
   priority_id: number;
   status_id: number;
-  assignee_id?: number;
-  parent_id?: number;
+  project_id: number;
+  release_id?: number;
+  spec_id?: number;
   tags?: string[];
   acceptance_criteria?: string;
   business_value?: string;
-  technical_notes?: string;
-  estimated_effort?: number;
-  risk_level?: 'low' | 'medium' | 'high' | 'critical';
-  complexity?: 'low' | 'medium' | 'high';
-  source?: string;
-  external_id?: string;
-  custom_fields?: Record<string, any>;
-  due_date?: string;
+  effort_estimate?: number;
 }
 
 export interface RequirementUpdate {
   title?: string;
   description?: string;
+  deadline?: string;
   type_id?: number;
   priority_id?: number;
   status_id?: number;
-  assignee_id?: number;
-  parent_id?: number;
-  tags?: string[];
-  acceptance_criteria?: string;
-  business_value?: string;
-  technical_notes?: string;
-  estimated_effort?: number;
-  actual_effort?: number;
-  risk_level?: 'low' | 'medium' | 'high' | 'critical';
-  complexity?: 'low' | 'medium' | 'high';
-  source?: string;
-  external_id?: string;
-  custom_fields?: Record<string, any>;
-  due_date?: string;
+  release_id?: number;
+  spec_id?: number;
 }
 
 export interface RequirementListParams {
@@ -454,4 +448,25 @@ export interface RequirementDetails {
   release_version?: string;
   spec_name?: string;
   tags?: string[];
+}
+
+// Error handling types
+export interface ApiError {
+  detail: string | Array<{
+    loc: (string | number)[];
+    msg: string;
+    type: string;
+    input?: any;
+  }>;
+  error?: string;
+  error_description?: string;
+}
+
+export interface FieldError {
+  field: string;
+  message: string;
+}
+
+export interface ValidationError {
+  [field: string]: string;
 } 

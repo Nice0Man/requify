@@ -91,7 +91,7 @@ async def create_project(
     # Автоматически устанавливаем текущего пользователя как владельца
     project_data = project_in.model_dump()
     project_data["owner_id"] = current_user.id
-    
+
     project = await crud.project.create(db, obj_in=project_data)
     return project
 
@@ -256,7 +256,7 @@ async def sync_project_requirements_to_release(
 ):
     """
     Синхронизировать требования проекта с релизом.
-    
+
     Args:
         project_id: ID проекта
         release_id: ID релиза для синхронизации
@@ -264,10 +264,10 @@ async def sync_project_requirements_to_release(
         sync_all: Синхронизировать все требования проекта (по умолчанию False)
         db: Сессия базы данных
         current_user: Текущий пользователь
-        
+
     Returns:
         Dict[str, Any]: Результат синхронизации
-        
+
     Raises:
         HTTPException: Если проект или релиз не найдены
     """
@@ -287,19 +287,19 @@ async def sync_project_requirements_to_release(
 
     try:
         synced_count = 0
-        
+
         if sync_all:
             # Синхронизируем все требования проекта
             project_requirements = await crud.requirement.get_by_project(
                 db, project_id=project_id, skip=0, limit=10000
             )
-            
+
             for req in project_requirements:
                 if req.release_id != release_id:
                     req.release_id = release_id
                     db.add(req)
                     synced_count += 1
-                    
+
         elif requirement_ids:
             # Синхронизируем конкретные требования
             for req_id in requirement_ids:
@@ -312,23 +312,23 @@ async def sync_project_requirements_to_release(
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Необходимо указать либо requirement_ids, либо установить sync_all=true"
+                detail="Необходимо указать либо requirement_ids, либо установить sync_all=true",
             )
-        
+
         await db.commit()
-        
+
         return {
             "message": f"Синхронизировано {synced_count} требований проекта с релизом",
             "project_id": project_id,
             "release_id": release_id,
             "synced_requirements": synced_count,
         }
-        
+
     except Exception as e:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Ошибка синхронизации: {str(e)}"
+            detail=f"Ошибка синхронизации: {str(e)}",
         )
 
 

@@ -596,17 +596,17 @@ async def sync_project_requirements_to_release(
 ):
     """
     Синхронизировать требования проекта с релизом.
-    
+
     Args:
         release_id: ID релиза
         project_id: ID проекта для синхронизации всех требований (опционально)
         requirement_ids: Список ID конкретных требований для синхронизации (опционально)
         db: Сессия базы данных
         current_user: Текущий пользователь
-        
+
     Returns:
         Dict[str, Any]: Результат синхронизации
-        
+
     Raises:
         HTTPException: Если релиз не найден или данные некорректны
     """
@@ -619,19 +619,19 @@ async def sync_project_requirements_to_release(
 
     try:
         synced_count = 0
-        
+
         if project_id:
             # Синхронизируем все требования проекта
             project_requirements = await crud.requirement.get_by_project(
                 db, project_id=project_id, skip=0, limit=10000
             )
-            
+
             for req in project_requirements:
                 if req.release_id != release_id:
                     req.release_id = release_id
                     db.add(req)
                     synced_count += 1
-                    
+
         elif requirement_ids:
             # Синхронизируем конкретные требования
             for req_id in requirement_ids:
@@ -643,20 +643,20 @@ async def sync_project_requirements_to_release(
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Необходимо указать либо project_id, либо requirement_ids"
+                detail="Необходимо указать либо project_id, либо requirement_ids",
             )
-        
+
         await db.commit()
-        
+
         return {
             "message": f"Синхронизировано {synced_count} требований с релизом",
             "release_id": release_id,
             "synced_requirements": synced_count,
         }
-        
+
     except Exception as e:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Ошибка синхронизации: {str(e)}"
+            detail=f"Ошибка синхронизации: {str(e)}",
         )

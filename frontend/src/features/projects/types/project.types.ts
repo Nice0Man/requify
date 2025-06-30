@@ -20,11 +20,16 @@ export interface Project {
   updated_by: number;
 }
 
+// CORRECTED: Match exact backend schema
 export interface ProjectCreate {
-  name: string;
   code: string;
+  name: string;
   description?: string;
-  status?: ProjectStatus;
+  status: string;
+}
+
+// Extended interface for UI forms with additional fields
+export interface ProjectCreateExtended extends ProjectCreate {
   start_date?: string;
   end_date?: string;
   budget?: number;
@@ -182,4 +187,25 @@ export interface ProjectState {
     total: number;
     pages: number;
   };
+}
+
+// Error handling types
+export interface ApiError {
+  detail: string | Array<{
+    loc: (string | number)[];
+    msg: string;
+    type: string;
+    input?: any;
+  }>;
+  error?: string;
+  error_description?: string;
+}
+
+export interface FieldError {
+  field: string;
+  message: string;
+}
+
+export interface ValidationError {
+  [field: string]: string;
 } 

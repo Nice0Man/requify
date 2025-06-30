@@ -1,23 +1,148 @@
-import { apiClient, ApiClient, ApiResponse } from '@/shared/api/client';
-import {
-  Requirement,
-  RequirementCreate,
-  RequirementUpdate,
-  RequirementListParams,
-  RequirementListResponse,
-  RequirementGroup,
-  RequirementGroupCreate,
-  RequirementGroupUpdate,
-  RequirementRelationship,
-  RequirementComment,
-  RequirementHistory,
-  RequirementStats,
-  RequirementSearchParams,
-  RequirementStatusChange,
-  RequirementRelationshipCreate
-} from '../types/requirement.types';
+import { apiClient, ApiResponse } from '@/shared/api/client';
 
+// Define correct types based on backend schema
+export interface RequirementCreate {
+  title: string;
+  description?: string;
+  type_id: number;
+  priority_id: number;
+  status_id: number;
+  project_id: number;
+  release_id?: number;
+  spec_id?: number;
+  deadline?: string;
+}
 
+export interface RequirementUpdate {
+  title?: string;
+  description?: string;
+  type_id?: number;
+  priority_id?: number;
+  status_id?: number;
+  release_id?: number;
+  spec_id?: number;
+  deadline?: string;
+}
+
+export interface Requirement {
+  id: number;
+  title: string;
+  description?: string;
+  type_id: number;
+  priority_id: number;
+  status_id: number;
+  project_id: number;
+  author_id: number;
+  last_modified_by: number;
+  release_id?: number;
+  spec_id?: number;
+  deadline?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RequirementListParams {
+  skip?: number;
+  limit?: number;
+  project_id?: number;
+  status_id?: number;
+  type_id?: number;
+  priority_id?: number;
+  assigned_to?: number;
+  sort_by?: string;
+  sort_order?: 'asc' | 'desc';
+}
+
+export interface RequirementListResponse {
+  items: Requirement[];
+  total: number;
+}
+
+export interface RequirementSearchParams {
+  project_id?: number;
+  status_id?: number;
+  type_id?: number;
+  priority_id?: number;
+  search?: string;
+}
+
+export interface RequirementStatusChange {
+  status_id: number;
+  reason?: string;
+}
+
+export interface RequirementRelationshipCreate {
+  target_requirement_id: number;
+  relationship_type: string;
+}
+
+export interface RequirementRelationship {
+  id: number;
+  source_requirement_id: number;
+  target_requirement_id: number;
+  relationship_type: string;
+  description?: string;
+  created_by: number;
+  created_at: string;
+}
+
+export interface RequirementComment {
+  id: number;
+  requirement_id: number;
+  content: string;
+  author_id: number;
+  author_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RequirementHistory {
+  id: number;
+  requirement_id: number;
+  field_name: string;
+  old_value?: string;
+  new_value?: string;
+  changed_by: number;
+  changed_by_name: string;
+  changed_at: string;
+}
+
+export interface RequirementGroup {
+  id: number;
+  name: string;
+  description?: string;
+  project_id: number;
+  color?: string;
+  order_index: number;
+  requirements_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RequirementGroupCreate {
+  name: string;
+  description?: string;
+  project_id: number;
+  color?: string;
+  order_index?: number;
+}
+
+export interface RequirementGroupUpdate {
+  name?: string;
+  description?: string;
+  color?: string;
+  order_index?: number;
+}
+
+export interface RequirementStats {
+  total: number;
+  by_status: Record<string, number>;
+  by_priority: Record<string, number>;
+  by_type: Record<string, number>;
+  by_assignee: Record<string, number>;
+  completion_rate: number;
+  avg_effort: number;
+}
 
 export class RequirementsApi {
   constructor(private client = apiClient) {}
@@ -113,10 +238,10 @@ export class RequirementsApi {
   }
 
   // Status operations
-  async bulkChangeStatus(ids: number[], status: string): Promise<ApiResponse<{ updated_count: number }>> {
+  async bulkChangeStatus(ids: number[], status_id: number): Promise<ApiResponse<{ updated_count: number }>> {
     return this.client.patch<{ updated_count: number }>('/requirements/bulk/status', {
       requirement_ids: ids,
-      status
+      status_id
     });
   }
 
@@ -193,8 +318,20 @@ export class RequirementsApi {
   }
 
   // Import/Export
-  async exportRequirements(projectId: number, format: 'csv' | 'excel' | 'pdf' = 'excel'): Promise<ApiResponse<Blob>> {
-    return this.client.get<Blob>(`/requirements/export?project_id=${projectId}&format=${format}`, {
+  async exportRequirements(params: { project_id?: number; status_ids?: number[]; priority_ids?: number[]; type_ids?: number[]; include_relationships?: boolean; include_test_results?: boolean; include_comments?: boolean; format?: 'csv' | 'excel' | 'pdf' }): Promise<ApiResponse<Blob>> {
+    const queryParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (Array.isArray(value)) {
+          value.forEach(item => queryParams.append(`${key}[]`, item.toString()));
+        } else {
+          queryParams.append(key, value.toString());
+        }
+      }
+    });
+    
+    return this.client.get<Blob>(`/requirements/export?${queryParams.toString()}`, {
       responseType: 'blob'
     });
   }
@@ -203,10 +340,11 @@ export class RequirementsApi {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('project_id', projectId.toString());
+    
     if (mappings) {
       formData.append('mappings', JSON.stringify(mappings));
     }
-
+    
     return this.client.post<{ imported_count: number; errors: string[] }>('/requirements/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -215,7 +353,7 @@ export class RequirementsApi {
   }
 
   async getRequirementsByProject(projectId: number): Promise<ApiResponse<Requirement[]>> {
-    return this.client.get<Requirement[]>(`/requirements?project_id=${projectId}`);
+    return this.client.get<Requirement[]>(`/requirements/by-project/${projectId}`);
   }
 }
 

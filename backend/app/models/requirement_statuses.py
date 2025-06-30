@@ -23,7 +23,9 @@ class RequirementStatus(Base):
     is_final: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    workflow_transitions: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=True, default=list)
+    workflow_transitions: Mapped[list[int]] = mapped_column(
+        ARRAY(Integer), nullable=True, default=list
+    )
 
     # Отношения
     requirements: Mapped[list["Requirement"]] = relationship(

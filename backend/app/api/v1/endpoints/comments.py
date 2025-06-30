@@ -99,12 +99,10 @@ async def create_comment(
             detail="Требование не найдено",
         )
 
-    # Устанавливаем автора комментария
-    comment_data = comment_in.model_copy()
-    comment_data.author_id = current_user.id
-
-    # Создаем комментарий
-    comment = await crud.comment.create(db, obj_in=comment_data)
+    # Создаем комментарий с автором
+    comment = await crud.comment.create(
+        db, obj_in=comment_in, author_id=current_user.id
+    )
 
     # Отправляем уведомления заинтересованным пользователям
     try:

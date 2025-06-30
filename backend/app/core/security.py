@@ -102,7 +102,7 @@ class PasswordManager:
             # Проверяем, что хэш не пустой и имеет минимальную длину
             if not hashed_password or len(hashed_password) < 10:
                 return False
-            
+
             return pwd_context.verify(plain_password, hashed_password)
         except Exception as e:
             # Логируем ошибку для отладки, но не падаем

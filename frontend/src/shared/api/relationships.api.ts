@@ -1,4 +1,4 @@
-import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiResponse } from "@/shared/api/client";
 
 export interface Relationship {
   id: number;

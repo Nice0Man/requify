@@ -173,7 +173,10 @@ async def create_requirement(
                 detail="Статус требования не найден",
             )
 
-    requirement = await crud.requirement.create(db, obj_in=requirement_in)
+    # Создаем требование с author_id
+    requirement = await crud.requirement.create(
+        db, obj_in=requirement_in, author_id=current_user.id
+    )
     return requirement
 
 

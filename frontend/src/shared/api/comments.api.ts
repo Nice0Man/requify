@@ -1,381 +1,373 @@
-import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
+import { apiClient, ApiResponse } from "@/shared/api/client";
 
 export interface Comment {
   id: number;
   content: string;
-  entity_type: CommentEntityType;
-  entity_id: number;
-  parent_id?: number;
   author_id: number;
   author_name: string;
-  author_email: string;
-  is_edited: boolean;
-  is_deleted: boolean;
-  edit_count: number;
-  last_edited_at?: string;
-  attachments: string[];
-  mentions: number[];
-  reactions: CommentReaction[];
-  replies_count: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface CommentCreate {
   content: string;
-  entity_type: CommentEntityType;
-  entity_id: number;
-  parent_id?: number;
-  attachments?: string[];
-  mentions?: number[];
 }
 
 export interface CommentUpdate {
   content: string;
-  attachments?: string[];
-  mentions?: number[];
 }
 
 export interface CommentListParams {
   skip?: number;
   limit?: number;
-  entity_type?: CommentEntityType;
-  entity_id?: number;
   author_id?: number;
-  parent_id?: number;
-  include_deleted?: boolean;
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
 }
 
 export interface CommentListResponse {
   items: Comment[];
   total: number;
-  page: number;
-  size: number;
-  pages: number;
-}
-
-export interface CommentReaction {
-  id: number;
-  comment_id: number;
-  user_id: number;
-  user_name: string;
-  reaction_type: ReactionType;
-  created_at: string;
-}
-
-export interface CommentReactionCreate {
-  reaction_type: ReactionType;
-}
-
-export interface CommentThread {
-  parent_comment: Comment;
-  replies: Comment[];
-  total_replies: number;
-  has_more_replies: boolean;
-}
-
-export enum CommentEntityType {
-  REQUIREMENT = "requirement",
-  PROJECT = "project",
-  RELEASE = "release",
-  TEST_CASE = "test_case",
-  TEST_RESULT = "test_result",
-  SPECIFICATION = "specification",
-  USER = "user",
-}
-
-export enum ReactionType {
-  LIKE = "like",
-  DISLIKE = "dislike",
-  LOVE = "love",
-  LAUGH = "laugh",
-  CONFUSED = "confused",
-  CELEBRATE = "celebrate",
 }
 
 export class CommentsApi {
   constructor(private client = apiClient) {}
 
-  // 1. Get Comments
-  async getComments(
+  // Get comments for a requirement
+  async getRequirementComments(
+    requirementId: number,
     params?: CommentListParams
   ): Promise<ApiResponse<CommentListResponse>> {
     const queryParams = new URLSearchParams();
     if (params?.skip) queryParams.append("skip", params.skip.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
-    if (params?.entity_type)
-      queryParams.append("entity_type", params.entity_type);
-    if (params?.entity_id)
-      queryParams.append("entity_id", params.entity_id.toString());
     if (params?.author_id)
       queryParams.append("author_id", params.author_id.toString());
-    if (params?.parent_id)
-      queryParams.append("parent_id", params.parent_id.toString());
-    if (params?.include_deleted !== undefined)
-      queryParams.append("include_deleted", params.include_deleted.toString());
-    if (params?.sort_by) queryParams.append("sort_by", params.sort_by);
-    if (params?.sort_order) queryParams.append("sort_order", params.sort_order);
 
     const queryString = queryParams.toString();
-    const url = queryString ? `/comments/?${queryString}` : "/comments/";
+    const url = queryString
+      ? `/requirements/${requirementId}/comments?${queryString}`
+      : `/requirements/${requirementId}/comments`;
 
     return this.client.get<CommentListResponse>(url);
   }
 
-  // 2. Create Comment
-  async createComment(
-    commentData: CommentCreate
+  // Create comment for a requirement
+  async createRequirementComment(
+    requirementId: number,
+    data: CommentCreate
   ): Promise<ApiResponse<Comment>> {
-    return this.client.post<Comment>("/comments/", commentData);
+    return this.client.post<Comment>(
+      `/requirements/${requirementId}/comments`,
+      data
+    );
   }
 
-  // 3. Get Comment
-  async getComment(commentId: number): Promise<ApiResponse<Comment>> {
-    return this.client.get<Comment>(`/comments/${commentId}`);
-  }
-
-  // 4. Update Comment
-  async updateComment(
+  // Update requirement comment
+  async updateRequirementComment(
+    requirementId: number,
     commentId: number,
-    commentData: CommentUpdate
+    data: CommentUpdate
   ): Promise<ApiResponse<Comment>> {
-    return this.client.put<Comment>(`/comments/${commentId}`, commentData);
+    return this.client.put<Comment>(
+      `/requirements/${requirementId}/comments/${commentId}`,
+      data
+    );
   }
 
-  // 5. Delete Comment
-  async deleteComment(
-    commentId: number,
-    hard_delete: boolean = false
+  // Delete requirement comment
+  async deleteRequirementComment(
+    requirementId: number,
+    commentId: number
   ): Promise<ApiResponse<{ message: string }>> {
-    const queryParams = new URLSearchParams();
-    if (hard_delete) queryParams.append("hard_delete", "true");
-
-    const url = queryParams.toString()
-      ? `/comments/${commentId}?${queryParams.toString()}`
-      : `/comments/${commentId}`;
-    return this.client.delete<{ message: string }>(url);
+    return this.client.delete<{ message: string }>(
+      `/requirements/${requirementId}/comments/${commentId}`
+    );
   }
 
-  // 6. Get Comment Replies
-  async getCommentReplies(
-    commentId: number,
-    params?: { skip?: number; limit?: number }
+  // Get comments for a project
+  async getProjectComments(
+    projectId: number,
+    params?: CommentListParams
   ): Promise<ApiResponse<CommentListResponse>> {
     const queryParams = new URLSearchParams();
     if (params?.skip) queryParams.append("skip", params.skip.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.author_id)
+      queryParams.append("author_id", params.author_id.toString());
 
     const queryString = queryParams.toString();
     const url = queryString
-      ? `/comments/${commentId}/replies?${queryString}`
-      : `/comments/${commentId}/replies`;
+      ? `/projects/${projectId}/comments?${queryString}`
+      : `/projects/${projectId}/comments`;
 
     return this.client.get<CommentListResponse>(url);
   }
 
-  // Entity-specific comment methods
-  async getEntityComments(
-    entityType: CommentEntityType,
-    entityId: number,
-    params?: Omit<CommentListParams, "entity_type" | "entity_id">
-  ): Promise<ApiResponse<CommentListResponse>> {
-    return this.getComments({
-      ...params,
-      entity_type: entityType,
-      entity_id: entityId,
-    });
-  }
-
-  async createEntityComment(
-    entityType: CommentEntityType,
-    entityId: number,
-    commentData: Omit<CommentCreate, "entity_type" | "entity_id">
+  // Create comment for a project
+  async createProjectComment(
+    projectId: number,
+    data: CommentCreate
   ): Promise<ApiResponse<Comment>> {
-    return this.createComment({
-      ...commentData,
-      entity_type: entityType,
-      entity_id: entityId,
-    });
+    return this.client.post<Comment>(`/projects/${projectId}/comments`, data);
   }
 
-  // Comment reactions
-  async addReaction(
+  // Update project comment
+  async updateProjectComment(
+    projectId: number,
     commentId: number,
-    reactionData: CommentReactionCreate
-  ): Promise<ApiResponse<CommentReaction>> {
-    return this.client.post<CommentReaction>(
-      `/comments/${commentId}/reactions`,
-      reactionData
+    data: CommentUpdate
+  ): Promise<ApiResponse<Comment>> {
+    return this.client.put<Comment>(
+      `/projects/${projectId}/comments/${commentId}`,
+      data
     );
   }
 
-  async removeReaction(
-    commentId: number,
-    reactionType: ReactionType
+  // Delete project comment
+  async deleteProjectComment(
+    projectId: number,
+    commentId: number
   ): Promise<ApiResponse<{ message: string }>> {
     return this.client.delete<{ message: string }>(
-      `/comments/${commentId}/reactions/${reactionType}`
+      `/projects/${projectId}/comments/${commentId}`
     );
   }
 
-  async getCommentReactions(
-    commentId: number
-  ): Promise<ApiResponse<CommentReaction[]>> {
-    return this.client.get<CommentReaction[]>(
-      `/comments/${commentId}/reactions`
-    );
-  }
-
-  // Comment threads
-  async getCommentThread(
-    commentId: number,
-    params?: { max_depth?: number; limit?: number }
-  ): Promise<ApiResponse<CommentThread>> {
+  // Get comments for a test case
+  async getTestCaseComments(
+    testCaseId: number,
+    params?: CommentListParams
+  ): Promise<ApiResponse<CommentListResponse>> {
     const queryParams = new URLSearchParams();
-    if (params?.max_depth)
-      queryParams.append("max_depth", params.max_depth.toString());
+    if (params?.skip) queryParams.append("skip", params.skip.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.author_id)
+      queryParams.append("author_id", params.author_id.toString());
 
     const queryString = queryParams.toString();
     const url = queryString
-      ? `/comments/${commentId}/thread?${queryString}`
-      : `/comments/${commentId}/thread`;
+      ? `/test-cases/${testCaseId}/comments?${queryString}`
+      : `/test-cases/${testCaseId}/comments`;
 
-    return this.client.get<CommentThread>(url);
+    return this.client.get<CommentListResponse>(url);
   }
 
-  // Convenience methods for specific entities
-  async getRequirementComments(
-    requirementId: number,
-    params?: Omit<CommentListParams, "entity_type" | "entity_id">
-  ): Promise<ApiResponse<CommentListResponse>> {
-    return this.getEntityComments(
-      CommentEntityType.REQUIREMENT,
-      requirementId,
-      params
-    );
-  }
-
-  async createRequirementComment(
-    requirementId: number,
-    content: string,
-    parentId?: number
-  ): Promise<ApiResponse<Comment>> {
-    return this.createEntityComment(
-      CommentEntityType.REQUIREMENT,
-      requirementId,
-      {
-        content,
-        parent_id: parentId,
-      }
-    );
-  }
-
-  async getProjectComments(
-    projectId: number,
-    params?: Omit<CommentListParams, "entity_type" | "entity_id">
-  ): Promise<ApiResponse<CommentListResponse>> {
-    return this.getEntityComments(CommentEntityType.PROJECT, projectId, params);
-  }
-
-  async createProjectComment(
-    projectId: number,
-    content: string,
-    parentId?: number
-  ): Promise<ApiResponse<Comment>> {
-    return this.createEntityComment(CommentEntityType.PROJECT, projectId, {
-      content,
-      parent_id: parentId,
-    });
-  }
-
-  async getReleaseComments(
-    releaseId: number,
-    params?: Omit<CommentListParams, "entity_type" | "entity_id">
-  ): Promise<ApiResponse<CommentListResponse>> {
-    return this.getEntityComments(CommentEntityType.RELEASE, releaseId, params);
-  }
-
-  async createReleaseComment(
-    releaseId: number,
-    content: string,
-    parentId?: number
-  ): Promise<ApiResponse<Comment>> {
-    return this.createEntityComment(CommentEntityType.RELEASE, releaseId, {
-      content,
-      parent_id: parentId,
-    });
-  }
-
-  async getTestCaseComments(
-    testCaseId: number,
-    params?: Omit<CommentListParams, "entity_type" | "entity_id">
-  ): Promise<ApiResponse<CommentListResponse>> {
-    return this.getEntityComments(
-      CommentEntityType.TEST_CASE,
-      testCaseId,
-      params
-    );
-  }
-
+  // Create comment for a test case
   async createTestCaseComment(
     testCaseId: number,
-    content: string,
-    parentId?: number
+    data: CommentCreate
   ): Promise<ApiResponse<Comment>> {
-    return this.createEntityComment(CommentEntityType.TEST_CASE, testCaseId, {
-      content,
-      parent_id: parentId,
-    });
-  }
-
-  // Bulk operations
-  async bulkDeleteComments(
-    commentIds: number[],
-    hardDelete: boolean = false
-  ): Promise<ApiResponse<{ deleted: number; errors: any[] }>> {
-    return this.client.delete<{ deleted: number; errors: any[] }>(
-      "/comments/bulk",
-      {
-        data: { comment_ids: commentIds, hard_delete: hardDelete },
-      }
+    return this.client.post<Comment>(
+      `/test-cases/${testCaseId}/comments`,
+      data
     );
   }
 
-  // Search and filtering
-  async searchComments(
-    query: string,
-    entityType?: CommentEntityType,
-    entityId?: number
+  // Update test case comment
+  async updateTestCaseComment(
+    testCaseId: number,
+    commentId: number,
+    data: CommentUpdate
+  ): Promise<ApiResponse<Comment>> {
+    return this.client.put<Comment>(
+      `/test-cases/${testCaseId}/comments/${commentId}`,
+      data
+    );
+  }
+
+  // Delete test case comment
+  async deleteTestCaseComment(
+    testCaseId: number,
+    commentId: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(
+      `/test-cases/${testCaseId}/comments/${commentId}`
+    );
+  }
+
+  // Get comments for a release
+  async getReleaseComments(
+    releaseId: number,
+    params?: CommentListParams
   ): Promise<ApiResponse<CommentListResponse>> {
-    const queryParams = new URLSearchParams({ search: query });
-    if (entityType) queryParams.append("entity_type", entityType);
-    if (entityId) queryParams.append("entity_id", entityId.toString());
+    const queryParams = new URLSearchParams();
+    if (params?.skip) queryParams.append("skip", params.skip.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.author_id)
+      queryParams.append("author_id", params.author_id.toString());
+
+    const queryString = queryParams.toString();
+    const url = queryString
+      ? `/releases/${releaseId}/comments?${queryString}`
+      : `/releases/${releaseId}/comments`;
+
+    return this.client.get<CommentListResponse>(url);
+  }
+
+  // Create comment for a release
+  async createReleaseComment(
+    releaseId: number,
+    data: CommentCreate
+  ): Promise<ApiResponse<Comment>> {
+    return this.client.post<Comment>(`/releases/${releaseId}/comments`, data);
+  }
+
+  // Update release comment
+  async updateReleaseComment(
+    releaseId: number,
+    commentId: number,
+    data: CommentUpdate
+  ): Promise<ApiResponse<Comment>> {
+    return this.client.put<Comment>(
+      `/releases/${releaseId}/comments/${commentId}`,
+      data
+    );
+  }
+
+  // Delete release comment
+  async deleteReleaseComment(
+    releaseId: number,
+    commentId: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(
+      `/releases/${releaseId}/comments/${commentId}`
+    );
+  }
+
+  // Get comments for a specification
+  async getSpecComments(
+    specId: number,
+    params?: CommentListParams
+  ): Promise<ApiResponse<CommentListResponse>> {
+    const queryParams = new URLSearchParams();
+    if (params?.skip) queryParams.append("skip", params.skip.toString());
+    if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.author_id)
+      queryParams.append("author_id", params.author_id.toString());
+
+    const queryString = queryParams.toString();
+    const url = queryString
+      ? `/specs/${specId}/comments?${queryString}`
+      : `/specs/${specId}/comments`;
+
+    return this.client.get<CommentListResponse>(url);
+  }
+
+  // Create comment for a specification
+  async createSpecComment(
+    specId: number,
+    data: CommentCreate
+  ): Promise<ApiResponse<Comment>> {
+    return this.client.post<Comment>(`/specs/${specId}/comments`, data);
+  }
+
+  // Update specification comment
+  async updateSpecComment(
+    specId: number,
+    commentId: number,
+    data: CommentUpdate
+  ): Promise<ApiResponse<Comment>> {
+    return this.client.put<Comment>(
+      `/specs/${specId}/comments/${commentId}`,
+      data
+    );
+  }
+
+  // Delete specification comment
+  async deleteSpecComment(
+    specId: number,
+    commentId: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(
+      `/specs/${specId}/comments/${commentId}`
+    );
+  }
+
+  // Generic comment operations
+  async getComment(commentId: number): Promise<ApiResponse<Comment>> {
+    return this.client.get<Comment>(`/comments/${commentId}`);
+  }
+
+  async updateComment(
+    commentId: number,
+    data: CommentUpdate
+  ): Promise<ApiResponse<Comment>> {
+    return this.client.put<Comment>(`/comments/${commentId}`, data);
+  }
+
+  async deleteComment(
+    commentId: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(`/comments/${commentId}`);
+  }
+
+  // Get all comments by author
+  async getCommentsByAuthor(
+    authorId: number
+  ): Promise<ApiResponse<CommentListResponse>> {
+    return this.client.get<CommentListResponse>(
+      `/comments/by-author/${authorId}`
+    );
+  }
+
+  // Search comments
+  async searchComments(
+    query: string
+  ): Promise<ApiResponse<CommentListResponse>> {
+    const queryParams = new URLSearchParams();
+    queryParams.append("q", query);
 
     return this.client.get<CommentListResponse>(
       `/comments/search?${queryParams.toString()}`
     );
   }
 
-  // User's own comments
-  async getUserComments(
-    userId: number,
-    params?: Omit<CommentListParams, "author_id">
-  ): Promise<ApiResponse<CommentListResponse>> {
-    return this.getComments({
-      ...params,
-      author_id: userId,
+  // Get comment statistics
+  async getCommentStats(): Promise<
+    ApiResponse<{
+      total_comments: number;
+      comments_today: number;
+      top_authors: Array<{ author_name: string; comment_count: number }>;
+    }>
+  > {
+    return this.client.get<{
+      total_comments: number;
+      comments_today: number;
+      top_authors: Array<{ author_name: string; comment_count: number }>;
+    }>("/comments/stats");
+  }
+
+  // Bulk operations
+  async bulkDeleteComments(
+    commentIds: number[]
+  ): Promise<ApiResponse<{ deleted_count: number }>> {
+    return this.client.delete<{ deleted_count: number }>("/comments/bulk", {
+      data: { comment_ids: commentIds },
     });
   }
 
-  async getCurrentUserComments(
-    params?: Omit<CommentListParams, "author_id">
+  // Get comment thread (replies and mentions)
+  async getCommentThread(commentId: number): Promise<
+    ApiResponse<{
+      comment: Comment;
+      replies: Comment[];
+      mentions: Comment[];
+    }>
+  > {
+    return this.client.get<{
+      comment: Comment;
+      replies: Comment[];
+      mentions: Comment[];
+    }>(`/comments/${commentId}/thread`);
+  }
+
+  // Get recent comments for dashboard
+  async getRecentComments(
+    limit: number = 10
   ): Promise<ApiResponse<CommentListResponse>> {
-    return this.client.get<CommentListResponse>("/comments/me");
+    return this.client.get<CommentListResponse>(
+      `/comments/recent?limit=${limit}`
+    );
   }
 }
 
-// Export singleton instance
 export const commentsApi = new CommentsApi();

@@ -28,7 +28,6 @@ import {
   Container,
   InputAdornment,
   Fab,
-  TableContainer,
 } from "@mui/material";
 import {
   RocketLaunch,
@@ -53,7 +52,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
-import { UserRole } from "@/features/auth/types/auth.types";
 import {
   releasesApi,
   ReleaseListParams as ApiReleaseListParams,
@@ -308,7 +306,6 @@ const ReleasesPage: React.FC = () => {
         version: releaseForm.version,
         description: releaseForm.description || "",
         planned_date: releaseForm.planned_date || "",
-        requirements_ids: releaseForm.requirement_ids || [],
       };
 
       await releasesApi.updateRelease(selectedRelease.id, updateData);
@@ -396,8 +393,8 @@ const ReleasesPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Stack spacing={4}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 } }}>
+      <Stack spacing={{ xs: 3, md: 4 }}>
         {/* Header */}
         <Box
           sx={{
@@ -419,9 +416,9 @@ const ReleasesPage: React.FC = () => {
                 color: "transparent",
               }}
             >
-        Releases
-      </Typography>
-      <Typography variant="body1" color="text.secondary">
+              Releases
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
               Manage product releases, versions, and deployment schedules.
             </Typography>
           </Stack>
@@ -928,7 +925,7 @@ const ReleasesPage: React.FC = () => {
                       <TableCell>
                         <Typography variant="body2">
                           {release.project_id || "N/A"}
-      </Typography>
+                        </Typography>
                       </TableCell>
                       <TableCell align="right">
                         <Stack
@@ -966,7 +963,7 @@ const ReleasesPage: React.FC = () => {
                 )}
               </TableBody>
             </Table>
-    </Box>
+          </Box>
         </Card>
       </Stack>
 
@@ -1149,4 +1146,4 @@ const ReleasesPage: React.FC = () => {
   );
 };
 
-export default ReleasesPage; 
+export default ReleasesPage;

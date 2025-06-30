@@ -817,20 +817,21 @@ const RequirementsPage: React.FC = () => {
           pagination
           paginationMode="server"
           rowCount={totalCount}
-          page={page}
-          pageSize={pageSize}
-          onPageChange={setPage}
-          onPageSizeChange={setPageSize}
-          rowsPerPageOptions={[10, 25, 50, 100]}
+          paginationModel={{ page, pageSize }}
+          onPaginationModelChange={(newModel) => {
+            setPage(newModel.page);
+            setPageSize(newModel.pageSize);
+          }}
+          pageSizeOptions={[10, 25, 50, 100]}
           sortingMode="server"
           sortModel={sortModel}
-          onSortModelChange={setSortModel}
+          onSortModelChange={(newModel) => setSortModel(newModel as any)}
           checkboxSelection
-          disableSelectionOnClick
-          onSelectionModelChange={setSelectedRows}
-          selectionModel={selectedRows}
-          components={{ Toolbar: GridToolbar }}
-          componentsProps={{
+          disableRowSelectionOnClick
+          onRowSelectionModelChange={(newSelection) => setSelectedRows(newSelection as number[])}
+          rowSelectionModel={selectedRows}
+          slots={{ toolbar: GridToolbar }}
+          slotProps={{
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },

@@ -430,10 +430,10 @@ async def get_dashboard_read_user(
     """
     Зависимость для чтения данных дашборда.
     Базовый доступ для всех авторизованных пользователей.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с правами на чтение дашборда
     """
@@ -445,10 +445,10 @@ async def get_dashboard_admin_user(
 ) -> User:
     """
     Зависимость для доступа к административным данным дашборда.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с правами на чтение админ данных
     """
@@ -460,10 +460,10 @@ async def get_stats_read_user(
 ) -> User:
     """
     Зависимость для чтения статистических данных.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с правами на чтение статистики
     """
@@ -475,10 +475,10 @@ async def get_export_user(
 ) -> User:
     """
     Зависимость для экспорта данных.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с правами на экспорт данных
     """
@@ -493,13 +493,13 @@ async def get_admin_user(
 ) -> User:
     """
     Зависимость для проверки прав администратора с записью.
-    
+
     Args:
         current_user: Текущий активный пользователь
-        
+
     Returns:
         User: Объект пользователя с правами администратора
-        
+
     Raises:
         HTTPException: Если пользователь не является администратором
     """
@@ -513,19 +513,21 @@ async def get_admin_user(
 
 
 async def get_product_manager_user(
-    current_user: User = Security(get_current_user, scopes=["requirements:write", "projects:write"]),
+    current_user: User = Security(
+        get_current_user, scopes=["requirements:write", "projects:write"]
+    ),
 ) -> User:
     """
     Зависимость для продуктовых менеджеров и выше.
-    
+
     Продуктовые менеджеры управляют требованиями, проектами и релизами согласно ТЗ.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с ролью продуктового менеджера или выше
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
@@ -543,15 +545,15 @@ async def get_manager_user(
 ) -> User:
     """
     Зависимость для менеджеров и выше.
-    
+
     Менеджеры управляют проектами и требованиями.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с ролью менеджера или выше
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
@@ -569,15 +571,15 @@ async def get_senior_developer_user(
 ) -> User:
     """
     Зависимость для старших разработчиков и выше.
-    
+
     Старшие разработчики имеют расширенные права по работе с релизами.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с ролью старшего разработчика или выше
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
@@ -595,19 +597,27 @@ async def get_analyst_user(
 ) -> User:
     """
     Зависимость для аналитиков и выше.
-    
+
     Аналитики имеют только права чтения согласно ТЗ.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с ролью аналитика или выше
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["analyst", "developer", "senior_developer", "tester", "product_manager", "manager", "admin"]
+    allowed_roles = [
+        "analyst",
+        "developer",
+        "senior_developer",
+        "tester",
+        "product_manager",
+        "manager",
+        "admin",
+    ]
     if not (current_user.is_superuser or current_user.role in allowed_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -621,19 +631,25 @@ async def get_developer_user(
 ) -> User:
     """
     Зависимость для разработчиков и выше.
-    
+
     Разработчики работают с релизами и читают требования.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с ролью разработчика или выше
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["developer", "senior_developer", "product_manager", "manager", "admin"]
+    allowed_roles = [
+        "developer",
+        "senior_developer",
+        "product_manager",
+        "manager",
+        "admin",
+    ]
     if not (current_user.is_superuser or current_user.role in allowed_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -647,19 +663,26 @@ async def get_tester_user(
 ) -> User:
     """
     Зависимость для тестировщиков и выше.
-    
+
     Тестировщики выполняют тестирование и читают требования.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с ролью тестировщика или выше
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["tester", "developer", "senior_developer", "product_manager", "manager", "admin"]
+    allowed_roles = [
+        "tester",
+        "developer",
+        "senior_developer",
+        "product_manager",
+        "manager",
+        "admin",
+    ]
     if not (current_user.is_superuser or current_user.role in allowed_roles):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -673,15 +696,15 @@ async def get_spec_creator_user(
 ) -> User:
     """
     Зависимость для создания спецификаций.
-    
+
     Создавать спецификации могут аналитики и выше.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с правами создания спецификаций
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
@@ -699,15 +722,15 @@ async def get_release_manager_user(
 ) -> User:
     """
     Зависимость для управления релизами.
-    
+
     Управлять релизами могут менеджеры и выше.
-    
+
     Args:
         current_user: Текущий пользователь
-        
+
     Returns:
         User: Пользователь с правами управления релизами
-        
+
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """

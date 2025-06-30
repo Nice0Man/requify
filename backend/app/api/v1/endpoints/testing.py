@@ -265,7 +265,7 @@ async def get_test_cases(
             # Handle status properly - it might be enum or string
             latest_status = "not_started"
             if latest_result:
-                if hasattr(latest_result.status, 'value'):
+                if hasattr(latest_result.status, "value"):
                     latest_status = latest_result.status.value
                 else:
                     latest_status = str(latest_result.status)
@@ -402,7 +402,7 @@ async def get_test_executions(
             # Handle status properly - it might be enum or string
             execution_status = "not_started"
             if result.status:
-                if hasattr(result.status, 'value'):
+                if hasattr(result.status, "value"):
                     execution_status = result.status.value
                 else:
                     execution_status = str(result.status)

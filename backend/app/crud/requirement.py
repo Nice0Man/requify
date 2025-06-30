@@ -48,7 +48,13 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
         return result.scalar_one_or_none()
 
     async def get_by_project(
-        self, db: AsyncSession, *, project_id: int, skip: int = 0, limit: int = 100, **filters
+        self,
+        db: AsyncSession,
+        *,
+        project_id: int,
+        skip: int = 0,
+        limit: int = 100,
+        **filters,
     ) -> List[Requirement]:
         """
         Получить требования проекта с фильтрами.
@@ -77,12 +83,12 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
                 .limit(limit)
                 .order_by(Requirement.created_at.desc())
             )
-            
+
             # Применяем дополнительные фильтры
             for field, value in filters.items():
                 if hasattr(Requirement, field) and value is not None:
                     stmt = stmt.where(getattr(Requirement, field) == value)
-            
+
             result = await db.execute(stmt)
             return list(result.scalars().all())
         except Exception:
@@ -94,17 +100,23 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
                 .limit(limit)
                 .order_by(Requirement.created_at.desc())
             )
-            
+
             # Применяем дополнительные фильтры
             for field, value in filters.items():
                 if hasattr(Requirement, field) and value is not None:
                     stmt = stmt.where(getattr(Requirement, field) == value)
-            
+
             result = await db.execute(stmt)
             return list(result.scalars().all())
 
     async def get_by_release(
-        self, db: AsyncSession, *, release_id: int, skip: int = 0, limit: int = 100, **filters
+        self,
+        db: AsyncSession,
+        *,
+        release_id: int,
+        skip: int = 0,
+        limit: int = 100,
+        **filters,
     ) -> List[Requirement]:
         """
         Получить требования релиза с фильтрами.
@@ -134,12 +146,12 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
                 .limit(limit)
                 .order_by(Requirement.created_at.desc())
             )
-            
+
             # Применяем дополнительные фильтры
             for field, value in filters.items():
                 if hasattr(Requirement, field) and value is not None:
                     stmt = stmt.where(getattr(Requirement, field) == value)
-            
+
             result = await db.execute(stmt)
             return list(result.scalars().all())
         except Exception:
@@ -151,12 +163,12 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
                 .limit(limit)
                 .order_by(Requirement.created_at.desc())
             )
-            
+
             # Применяем дополнительные фильтры
             for field, value in filters.items():
                 if hasattr(Requirement, field) and value is not None:
                     stmt = stmt.where(getattr(Requirement, field) == value)
-            
+
             result = await db.execute(stmt)
             return list(result.scalars().all())
 
@@ -285,33 +297,6 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
         result = await db.execute(stmt)
         return result.scalar() or 0
 
-    async def update_status(
-        self, db: AsyncSession, *, requirement_id: int, status_id: int, modifier_id: int
-    ) -> Optional[Requirement]:
-        """
-        Обновить статус требования.
-
-        Args:
-            db: Сессия базы данных
-            requirement_id: ID требования
-            status_id: Новый ID статуса
-            modifier_id: ID пользователя, изменившего статус
-
-        Returns:
-            Обновленное требование или None если не найдено
-        """
-        requirement = await self.get(db, id=requirement_id)
-        if not requirement:
-            return None
-
-        requirement.status_id = status_id
-        requirement.last_modified_by = modifier_id
-
-        db.add(requirement)
-        await db.commit()
-        await db.refresh(requirement)
-        return requirement
-
     async def create(
         self, db: AsyncSession, *, obj_in: RequirementCreate, author_id: int
     ) -> Requirement:
@@ -341,6 +326,23 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
         await db.refresh(db_obj)
         return db_obj
 
+    async def create_with_author(
+        self, db: AsyncSession, *, obj_in: RequirementCreate, author_id: int
+    ) -> Requirement:
+        """
+        Создать новое требование с указанием автора.
+        Это переопределение метода create из базового класса.
+
+        Args:
+            db: Сессия базы данных
+            obj_in: Схема для создания требования
+            author_id: ID автора требования
+
+        Returns:
+            Созданное требование
+        """
+        return await self.create(db, obj_in=obj_in, author_id=author_id)
+
     async def get_multi_with_filters(
         self, db: AsyncSession, *, skip: int = 0, limit: int = 100, **filters
     ) -> List[Requirement]:
@@ -368,16 +370,21 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
             return list(result.scalars().all())
         except Exception:
             # Fallback to basic query without relationships if there's an issue
-            query = select(self.model).offset(skip).limit(limit).order_by(self.model.created_at.desc())
-            
+            query = (
+                select(self.model)
+                .offset(skip)
+                .limit(limit)
+                .order_by(self.model.created_at.desc())
+            )
+
             for field, value in filters.items():
                 if hasattr(self.model, field) and value is not None:
                     query = query.where(getattr(self.model, field) == value)
-            
+
             result = await db.execute(query)
             return list(result.scalars().all())
 
-    async def get_with_details(
+    async def get_requirement_with_details(
         self, db: AsyncSession, *, requirement_id: int
     ) -> Optional[Requirement]:
         """Получить требование с подробной информацией."""
@@ -410,7 +417,7 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
             db, query=search_term, skip=skip, limit=limit, **filters
         )
 
-    async def update_status(
+    async def update_status_only(
         self, db: AsyncSession, *, requirement_id: int, status_id: int
     ) -> Optional[Requirement]:
         """Обновить статус требования."""

@@ -812,13 +812,13 @@ def _get_user_scopes(user: User) -> list[str]:
             [
                 "users:read",
                 "projects:read",
-                "projects:write", 
+                "projects:write",
                 "projects:delete",  # PM создает и удаляет проекты по ТЗ
                 "requirements:read",
                 "requirements:write",
                 "requirements:delete",  # PM управляет требованиями по ТЗ
                 "releases:read",
-                "releases:write", 
+                "releases:write",
                 "releases:delete",  # PM формирует релизы по ТЗ
                 "testing:read",
                 "admin:read",  # Доступ к мониторингу
@@ -873,8 +873,8 @@ def _get_user_scopes(user: User) -> list[str]:
         # Аналитик только читает данные согласно ТЗ (убираем write права)
         scopes.extend(
             [
-                "projects:read",     # Только чтение проектов
-                "requirements:read", # Только чтение требований
+                "projects:read",  # Только чтение проектов
+                "requirements:read",  # Только чтение требований
                 "releases:read",
                 "testing:read",
             ]
@@ -894,22 +894,12 @@ def _get_user_scopes(user: User) -> list[str]:
     elif user.role == "viewer" or user.role == "user":
         # Пользователь по умолчанию имеет только права чтения
         scopes.extend(
-            [
-                "projects:read", 
-                "requirements:read", 
-                "releases:read", 
-                "testing:read"
-            ]
+            ["projects:read", "requirements:read", "releases:read", "testing:read"]
         )
     else:
         # Fallback для неизвестных ролей - только базовые права чтения
         scopes.extend(
-            [
-                "projects:read", 
-                "requirements:read", 
-                "releases:read", 
-                "testing:read"
-            ]
+            ["projects:read", "requirements:read", "releases:read", "testing:read"]
         )
 
     return scopes

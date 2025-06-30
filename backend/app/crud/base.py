@@ -116,18 +116,25 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         result = await db.execute(stmt)
         return result.scalar() or 0
 
-    async def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
+    async def create(
+        self, db: AsyncSession, *, obj_in: Union[CreateSchemaType, Dict[str, Any]]
+    ) -> ModelType:
         """
         Создать новый объект.
 
         Args:
             db: Сессия базы данных
-            obj_in: Схема для создания объекта
+            obj_in: Схема для создания объекта или словарь с данными
 
         Returns:
             Созданный объект
         """
-        db_obj = self.model(**obj_in.model_dump())
+        if isinstance(obj_in, dict):
+            obj_data = obj_in
+        else:
+            obj_data = obj_in.model_dump()
+
+        db_obj = self.model(**obj_data)
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)
@@ -256,21 +263,29 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return result.scalars().all()
 
     async def bulk_create(
-        self, db: AsyncSession, *, objects_in: List[CreateSchemaType]
+        self,
+        db: AsyncSession,
+        *,
+        objects_in: List[Union[CreateSchemaType, Dict[str, Any]]],
     ) -> List[ModelType]:
         """
         Массовое создание объектов.
 
         Args:
             db: Сессия базы данных
-            objects_in: Список схем для создания объектов
+            objects_in: Список схем для создания объектов или словарей с данными
 
         Returns:
             Список созданных объектов
         """
         db_objects = []
         for obj_in in objects_in:
-            db_obj = self.model(**obj_in.model_dump())
+            if isinstance(obj_in, dict):
+                obj_data = obj_in
+            else:
+                obj_data = obj_in.model_dump()
+
+            db_obj = self.model(**obj_data)
             db_objects.append(db_obj)
 
         db.add_all(db_objects)

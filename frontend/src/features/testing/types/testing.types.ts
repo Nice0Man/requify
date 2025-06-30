@@ -51,16 +51,21 @@ export interface TestCaseWithDetails extends TestCase {
   execution_history: TestExecutionHistory[];
 }
 
+// CORRECTED: Match exact backend schema
 export interface TestCaseCreate {
   name: string;
   description?: string;
-  test_plan_id?: number;
+  test_plan_id: number;
+  status?: string;
+}
+
+// Extended interface for UI forms with additional fields
+export interface TestCaseCreateExtended extends TestCaseCreate {
   requirement_id?: number;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  type: 'functional' | 'non-functional' | 'integration' | 'regression' | 'smoke' | 'acceptance';
-  status?: 'draft' | 'review' | 'approved' | 'deprecated';
+  priority?: 'low' | 'medium' | 'high' | 'critical';
+  type?: 'functional' | 'non-functional' | 'integration' | 'regression' | 'smoke' | 'acceptance';
   preconditions?: string;
-  test_steps: TestStepCreate[];
+  test_steps?: TestStepCreate[];
   expected_result?: string;
   automation_level?: 'manual' | 'semi-automated' | 'automated';
   automation_script?: string;
@@ -609,12 +614,17 @@ export interface TestPlanWithDetails extends TestPlan {
   stats: TestPlanStats;
 }
 
+// CORRECTED: Match exact backend schema
 export interface TestPlanCreate {
   name: string;
   description?: string;
-  version: string;
-  status?: 'draft' | 'active' | 'completed' | 'archived';
   project_id: number;
+  status?: string;
+}
+
+// Extended interface for UI forms with additional fields
+export interface TestPlanCreateExtended extends TestPlanCreate {
+  version?: string;
   assigned_to?: number;
   start_date?: string;
   end_date?: string;
@@ -632,18 +642,26 @@ export interface TestPlanCreate {
 export interface TestPlanUpdate {
   name?: string;
   description?: string;
-  version?: string;
-  status?: 'draft' | 'active' | 'completed' | 'archived';
-  assigned_to?: number;
-  start_date?: string;
-  end_date?: string;
-  environment?: string;
-  test_objectives?: string;
-  entry_criteria?: string;
-  exit_criteria?: string;
-  risk_assessment?: string;
-  test_approach?: string;
-  deliverables?: string[];
-  tags?: string[];
-  custom_fields?: Record<string, any>;
+  status?: string;
+}
+
+// Error handling types
+export interface ApiError {
+  detail: string | Array<{
+    loc: (string | number)[];
+    msg: string;
+    type: string;
+    input?: any;
+  }>;
+  error?: string;
+  error_description?: string;
+}
+
+export interface FieldError {
+  field: string;
+  message: string;
+}
+
+export interface ValidationError {
+  [field: string]: string;
 } 

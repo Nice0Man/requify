@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Paper,
   Typography,
   Button,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Chip,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -21,35 +16,27 @@ import {
   CardContent,
   Grid,
   Fab,
-  Menu,
-  ListItemIcon,
-  ListItemText,
   Badge,
-  Autocomplete,
   InputAdornment,
-  Switch,
-  FormControlLabel,
-  CircularProgress,
   Avatar,
-  LinearProgress,
-  Tooltip,
   Tabs,
   Tab,
-  Divider,
-} from '@mui/material';
-import { DataGrid, GridColDef, GridRowParams, GridToolbar, GridActionsCellItem } from '@mui/x-data-grid';
+} from "@mui/material";
+import {
+  DataGrid,
+  GridColDef,
+  GridRowParams,
+  GridToolbar,
+  GridActionsCellItem,
+} from "@mui/x-data-grid";
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
   Search as SearchIcon,
-  FilterList as FilterIcon,
   Download as DownloadIcon,
-  Upload as UploadIcon,
   Refresh as RefreshIcon,
-  MoreVert as MoreVertIcon,
-  BugReport as TestingIcon,
   Assignment as TestPlanIcon,
   CheckBox as TestCaseIcon,
   PlayArrow as ExecuteIcon,
@@ -61,33 +48,23 @@ import {
   PlayCircle as NotRunIcon,
   AutoMode as AutomatedIcon,
   PanTool as ManualIcon,
-  Clear as ClearIcon,
   Assessment as ReportsIcon,
   Timeline as TrendsIcon,
-  Speed as PerformanceIcon,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { format, parseISO, differenceInDays } from 'date-fns';
-import { 
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { format, parseISO, differenceInDays } from "date-fns";
+import {
   TestPlan,
   TestCase,
   TestExecution,
   TestFilters,
   TestExecutionFilters,
-  TestPlanStatus,
-  TestCaseStatus,
-  TestCasePriority,
-  TestCaseType,
-  TestExecutionStatus,
-  AutomationLevel
-} from '../types/testing.types';
-import { testingApi } from '../api/testing.api';
-import { projectsApi } from '../../projects/api/projects.api';
-import { useAuth } from '../../auth/context/auth.context';
-
+} from "../types/testing.types";
+import { testingApi } from "../api/testing.api";
+import { projectsApi } from "../../projects/api/projects.api";
+import { useAuth } from "../../auth/context/auth.context";
+import { Project } from "../../projects/api/projects.api";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -113,10 +90,10 @@ function TabPanel(props: TabPanelProps) {
 const TestingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   // Main state
   const [tabValue, setTabValue] = useState(0);
-  
+
   // Test Plans
   const [testPlans, setTestPlans] = useState<TestPlan[]>([]);
   const [testPlanLoading, setTestPlanLoading] = useState(true);
@@ -140,7 +117,7 @@ const TestingPage: React.FC = () => {
 
   // Filters
   const [testFilters, setTestFilters] = useState<TestFilters>({
-    search: '',
+    search: "",
     projectId: null,
     testPlanId: null,
     status: [],
@@ -149,33 +126,41 @@ const TestingPage: React.FC = () => {
     automationLevel: [],
     assignedTo: null,
     tags: [],
-    executionDateRange: { start: null, end: null }
+    executionDateRange: { start: null, end: null },
   });
 
-  const [executionFilters, setExecutionFilters] = useState<TestExecutionFilters>({
-    search: '',
-    testPlanId: null,
-    testCaseId: null,
-    status: [],
-    executedBy: null,
-    environment: [],
-    dateRange: { start: null, end: null }
-  });
+  const [executionFilters, setExecutionFilters] =
+    useState<TestExecutionFilters>({
+      search: "",
+      testPlanId: null,
+      testCaseId: null,
+      status: [],
+      executedBy: null,
+      environment: [],
+      dateRange: { start: null, end: null },
+    });
 
   // Reference data
-  const [projects, setProjects] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
 
   // UI State
   const [showFilters, setShowFilters] = useState(false);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<{ id: number; type: string } | null>(null);
-  const [bulkActionsAnchor, setBulkActionsAnchor] = useState<null | HTMLElement>(null);
-  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: number;
+    type: string;
+  } | null>(null);
+  const [bulkActionsAnchor, setBulkActionsAnchor] =
+    useState<null | HTMLElement>(null);
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info";
+  }>({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
 
   // Load data functions
@@ -193,10 +178,10 @@ const TestingPage: React.FC = () => {
       setTestPlans(response.data?.items || []);
       setTestPlanCount(response.data?.total || 0);
     } catch (error: any) {
-      console.error('Failed to load test plans:', error);
+      console.error("Failed to load test plans:", error);
       setTestPlans([]); // Ensure array is never undefined
       setTestPlanCount(0);
-      toast.error(error.message || 'Failed to load test plans');
+      toast.error(error.message || "Failed to load test plans");
     } finally {
       setTestPlanLoading(false);
     }
@@ -209,10 +194,17 @@ const TestingPage: React.FC = () => {
         skip: testCasePage * testCasePageSize,
         limit: testCasePageSize,
         test_plan_id: testFilters.testPlanId || undefined,
-        priority: testFilters.priority.length === 1 ? testFilters.priority[0] : undefined,
+        priority:
+          testFilters.priority.length === 1
+            ? testFilters.priority[0]
+            : undefined,
         type: testFilters.type.length === 1 ? testFilters.type[0] : undefined,
-        status: testFilters.status.length === 1 ? testFilters.status[0] : undefined,
-        automation_level: testFilters.automationLevel.length === 1 ? testFilters.automationLevel[0] : undefined,
+        status:
+          testFilters.status.length === 1 ? testFilters.status[0] : undefined,
+        automation_level:
+          testFilters.automationLevel.length === 1
+            ? testFilters.automationLevel[0]
+            : undefined,
         search: testFilters.search || undefined,
       };
 
@@ -220,10 +212,10 @@ const TestingPage: React.FC = () => {
       setTestCases(response.data?.items || []);
       setTestCaseCount(response.data?.total || 0);
     } catch (error: any) {
-      console.error('Failed to load test cases:', error);
+      console.error("Failed to load test cases:", error);
       setTestCases([]); // Ensure array is never undefined
       setTestCaseCount(0);
-      toast.error(error.message || 'Failed to load test cases');
+      toast.error(error.message || "Failed to load test cases");
     } finally {
       setTestCaseLoading(false);
     }
@@ -237,19 +229,25 @@ const TestingPage: React.FC = () => {
         limit: testExecutionPageSize,
         test_plan_id: executionFilters.testPlanId || undefined,
         test_case_id: executionFilters.testCaseId || undefined,
-        status: executionFilters.status.length === 1 ? executionFilters.status[0] : undefined,
+        status:
+          executionFilters.status.length === 1
+            ? executionFilters.status[0]
+            : undefined,
         executed_by: executionFilters.executedBy || undefined,
-        environment: executionFilters.environment.length === 1 ? executionFilters.environment[0] : undefined,
+        environment:
+          executionFilters.environment.length === 1
+            ? executionFilters.environment[0]
+            : undefined,
       };
 
       const response = await testingApi.getTestExecutions(params);
       setTestExecutions(response.data?.items || []);
       setTestExecutionCount(response.data?.total || 0);
     } catch (error: any) {
-      console.error('Failed to load test executions:', error);
+      console.error("Failed to load test executions:", error);
       setTestExecutions([]); // Ensure array is never undefined
       setTestExecutionCount(0);
-      toast.error(error.message || 'Failed to load test executions');
+      toast.error(error.message || "Failed to load test executions");
     } finally {
       setTestExecutionLoading(false);
     }
@@ -258,12 +256,12 @@ const TestingPage: React.FC = () => {
   const loadReferenceData = useCallback(async () => {
     try {
       const [projectsRes] = await Promise.all([
-        projectsApi.getProjects({ limit: 1000 })
+        projectsApi.getProjects({ limit: 1000 }),
       ]);
 
-      setProjects(projectsRes.data.items || []);
+      setProjects(projectsRes.data?.items || []);
     } catch (error: any) {
-      toast.error('Failed to load reference data');
+      toast.error("Failed to load reference data");
     }
   }, []);
 
@@ -280,430 +278,497 @@ const TestingPage: React.FC = () => {
   // Helper functions
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'passed': return 'success';
-      case 'failed': return 'error';
-      case 'blocked': return 'warning';
-      case 'skipped': return 'info';
-      case 'not_run': return 'default';
-      case 'active': return 'primary';
-      case 'draft': return 'default';
-      case 'completed': return 'success';
-      case 'archived': return 'default';
-      default: return 'default';
+      case "passed":
+        return "success";
+      case "failed":
+        return "error";
+      case "blocked":
+        return "warning";
+      case "skipped":
+        return "info";
+      case "not_run":
+        return "default";
+      case "active":
+        return "primary";
+      case "draft":
+        return "default";
+      case "completed":
+        return "success";
+      case "archived":
+        return "default";
+      default:
+        return "default";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'passed': return <PassedIcon />;
-      case 'failed': return <FailedIcon />;
-      case 'blocked': return <BlockedIcon />;
-      case 'skipped': return <SkippedIcon />;
-      case 'not_run': return <NotRunIcon />;
-      default: return <ScheduleIcon />;
+      case "passed":
+        return <PassedIcon />;
+      case "failed":
+        return <FailedIcon />;
+      case "blocked":
+        return <BlockedIcon />;
+      case "skipped":
+        return <SkippedIcon />;
+      case "not_run":
+        return <NotRunIcon />;
+      default:
+        return <ScheduleIcon />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'error';
-      case 'high': return 'warning';
-      case 'medium': return 'info';
-      case 'low': return 'success';
-      default: return 'default';
+      case "critical":
+        return "error";
+      case "high":
+        return "warning";
+      case "medium":
+        return "info";
+      case "low":
+        return "success";
+      default:
+        return "default";
     }
   };
 
   const getAutomationIcon = (level: string) => {
     switch (level) {
-      case 'automated': return <AutomatedIcon />;
-      case 'semi-automated': return <AutomatedIcon />;
-      case 'manual': return <ManualIcon />;
-      default: return <ManualIcon />;
+      case "automated":
+        return <AutomatedIcon />;
+      case "semi-automated":
+        return <AutomatedIcon />;
+      case "manual":
+        return <ManualIcon />;
+      default:
+        return <ManualIcon />;
     }
   };
 
   // Test Plans columns
-  const testPlanColumns: GridColDef[] = useMemo(() => [
-    {
-      field: 'name',
-      headerName: 'Test Plan',
-      flex: 1,
-      minWidth: 200,
-      renderCell: (params) => (
-        <Box>
-          <Typography variant="body2" fontWeight={600} noWrap>
-            {params.value}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap>
-            v{params.row.version} • {params.row.project?.name}
-          </Typography>
-        </Box>
-      ),
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          size="small"
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          color={getStatusColor(params.value)}
-        />
-      ),
-    },
-    {
-      field: 'assigned_to_user',
-      headerName: 'Assigned To',
-      width: 150,
-      valueGetter: (params) => params.row.assigned_to_user ? 
-        `${params.row.assigned_to_user.first_name} ${params.row.assigned_to_user.last_name}` : 'Unassigned',
-      renderCell: (params) => (
-        params.row.assigned_to_user ? (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
-              {params.row.assigned_to_user.first_name[0]}{params.row.assigned_to_user.last_name[0]}
-            </Avatar>
-            <Typography variant="body2" noWrap>
-              {params.row.assigned_to_user.first_name} {params.row.assigned_to_user.last_name}
+  const testPlanColumns: GridColDef[] = useMemo(
+    () => [
+      {
+        field: "name",
+        headerName: "Test Plan",
+        flex: 1,
+        minWidth: 200,
+        renderCell: (params) => (
+          <Box>
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {params.value}
             </Typography>
-          </Box>
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            Unassigned
-          </Typography>
-        )
-      ),
-    },
-    {
-      field: 'test_cases_count',
-      headerName: 'Test Cases',
-      width: 120,
-      valueGetter: (params) => params.row.test_cases?.length || 0,
-      renderCell: (params) => (
-        <Box display="flex" alignItems="center" gap={1}>
-          <TestCaseIcon fontSize="small" color="action" />
-          <Typography variant="body2">
-            {params.row.test_cases?.length || 0}
-          </Typography>
-        </Box>
-      ),
-    },
-    {
-      field: 'end_date',
-      headerName: 'Due Date',
-      width: 120,
-      valueFormatter: (params) => params.value ? format(parseISO(params.value), 'MMM dd, yyyy') : '',
-      renderCell: (params) => {
-        if (!params.value) return <Typography variant="body2" color="text.secondary">No due date</Typography>;
-        const isOverdue = differenceInDays(parseISO(params.value), new Date()) < 0;
-        return (
-          <Typography
-            variant="body2"
-            color={isOverdue ? 'error' : 'text.primary'}
-            fontWeight={isOverdue ? 600 : 400}
-          >
-            {format(parseISO(params.value), 'MMM dd, yyyy')}
-          </Typography>
-        );
-      },
-    },
-    {
-      field: 'updated_at',
-      headerName: 'Updated',
-      width: 120,
-      valueFormatter: (params) => format(parseISO(params.value), 'MMM dd, yyyy'),
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      getActions: (params: GridRowParams) => [
-        <GridActionsCellItem
-          icon={<ViewIcon />}
-          label="View"
-          onClick={() => navigate(`/testing/plans/${params.id}`)}
-        />,
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={() => navigate(`/testing/plans/${params.id}/edit`)}
-        />,
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={() => {
-            setItemToDelete({ id: params.id as number, type: 'plan' });
-            setDeleteDialogOpen(true);
-          }}
-        />,
-      ],
-    },
-  ], [navigate]);
-
-  // Test Cases columns
-  const testCaseColumns: GridColDef[] = useMemo(() => [
-    {
-      field: 'name',
-      headerName: 'Test Case',
-      flex: 1,
-      minWidth: 200,
-      renderCell: (params) => (
-        <Box>
-          <Typography variant="body2" fontWeight={600} noWrap>
-            {params.value}
-          </Typography>
-          {params.row.test_plan && (
             <Typography variant="caption" color="text.secondary" noWrap>
-              {params.row.test_plan.name}
-            </Typography>
-          )}
-        </Box>
-      ),
-    },
-    {
-      field: 'type',
-      headerName: 'Type',
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          size="small"
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          variant="outlined"
-        />
-      ),
-    },
-    {
-      field: 'priority',
-      headerName: 'Priority',
-      width: 100,
-      renderCell: (params) => (
-        <Chip
-          size="small"
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          color={getPriorityColor(params.value)}
-        />
-      ),
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          size="small"
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          color={getStatusColor(params.value)}
-        />
-      ),
-    },
-    {
-      field: 'automation_level',
-      headerName: 'Automation',
-      width: 120,
-      renderCell: (params) => (
-        <Box display="flex" alignItems="center" gap={1}>
-          {getAutomationIcon(params.value)}
-          <Typography variant="body2" textTransform="capitalize">
-            {params.value.replace('_', ' ')}
-          </Typography>
-        </Box>
-      ),
-    },
-    {
-      field: 'assigned_to_user',
-      headerName: 'Assigned To',
-      width: 150,
-      valueGetter: (params) => params.row.assigned_to_user ? 
-        `${params.row.assigned_to_user.first_name} ${params.row.assigned_to_user.last_name}` : 'Unassigned',
-      renderCell: (params) => (
-        params.row.assigned_to_user ? (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
-              {params.row.assigned_to_user.first_name[0]}{params.row.assigned_to_user.last_name[0]}
-            </Avatar>
-            <Typography variant="body2" noWrap>
-              {params.row.assigned_to_user.first_name} {params.row.assigned_to_user.last_name}
+              v{params.row.version} • {params.row.project?.name}
             </Typography>
           </Box>
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            Unassigned
-          </Typography>
-        )
-      ),
-    },
-    {
-      field: 'last_execution',
-      headerName: 'Last Execution',
-      width: 120,
-      valueGetter: (params) => {
-        const executions = params.row.executions || [];
-        if (executions.length === 0) return 'Never';
-        const latest = executions.sort((a: any, b: any) => 
-          new Date(b.execution_date).getTime() - new Date(a.execution_date).getTime()
-        )[0];
-        return latest.status;
+        ),
       },
-      renderCell: (params) => {
-        const executions = params.row.executions || [];
-        if (executions.length === 0) {
-          return <Typography variant="body2" color="text.secondary">Never</Typography>;
-        }
-        const latest = executions.sort((a: any, b: any) => 
-          new Date(b.execution_date).getTime() - new Date(a.execution_date).getTime()
-        )[0];
-        return (
+      {
+        field: "status",
+        headerName: "Status",
+        width: 120,
+        renderCell: (params) => (
           <Chip
             size="small"
-            label={latest.status.charAt(0).toUpperCase() + latest.status.slice(1)}
-            color={getStatusColor(latest.status)}
-            icon={getStatusIcon(latest.status)}
+            label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+            color={getStatusColor(params.value)}
           />
-        );
+        ),
       },
-    },
-    {
-      field: 'updated_at',
-      headerName: 'Updated',
-      width: 120,
-      valueFormatter: (params) => format(parseISO(params.value), 'MMM dd, yyyy'),
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      getActions: (params: GridRowParams) => [
-        <GridActionsCellItem
-          icon={<ViewIcon />}
-          label="View"
-          onClick={() => navigate(`/testing/cases/${params.id}`)}
-        />,
-        <GridActionsCellItem
-          icon={<ExecuteIcon />}
-          label="Execute"
-          onClick={() => navigate(`/testing/cases/${params.id}/execute`)}
-        />,
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={() => navigate(`/testing/cases/${params.id}/edit`)}
-        />,
-      ],
-    },
-  ], [navigate]);
+      {
+        field: "assigned_to_user",
+        headerName: "Assigned To",
+        width: 150,
+        valueGetter: (params) =>
+          params.row.assigned_to_user
+            ? `${params.row.assigned_to_user.first_name} ${params.row.assigned_to_user.last_name}`
+            : "Unassigned",
+        renderCell: (params) =>
+          params.row.assigned_to_user ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <Avatar sx={{ width: 24, height: 24, fontSize: "0.75rem" }}>
+                {params.row.assigned_to_user.first_name[0]}
+                {params.row.assigned_to_user.last_name[0]}
+              </Avatar>
+              <Typography variant="body2" noWrap>
+                {params.row.assigned_to_user.first_name}{" "}
+                {params.row.assigned_to_user.last_name}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Unassigned
+            </Typography>
+          ),
+      },
+      {
+        field: "test_cases_count",
+        headerName: "Test Cases",
+        width: 120,
+        valueGetter: (params) => params.row.test_cases?.length || 0,
+        renderCell: (params) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <TestCaseIcon fontSize="small" color="action" />
+            <Typography variant="body2">
+              {params.row.test_cases?.length || 0}
+            </Typography>
+          </Box>
+        ),
+      },
+      {
+        field: "end_date",
+        headerName: "Due Date",
+        width: 120,
+        valueFormatter: (params) =>
+          params.value ? format(parseISO(params.value), "MMM dd, yyyy") : "",
+        renderCell: (params) => {
+          if (!params.value)
+            return (
+              <Typography variant="body2" color="text.secondary">
+                No due date
+              </Typography>
+            );
+          const isOverdue =
+            differenceInDays(parseISO(params.value), new Date()) < 0;
+          return (
+            <Typography
+              variant="body2"
+              color={isOverdue ? "error" : "text.primary"}
+              fontWeight={isOverdue ? 600 : 400}
+            >
+              {format(parseISO(params.value), "MMM dd, yyyy")}
+            </Typography>
+          );
+        },
+      },
+      {
+        field: "updated_at",
+        headerName: "Updated",
+        width: 120,
+        valueFormatter: (params) =>
+          format(parseISO(params.value), "MMM dd, yyyy"),
+      },
+      {
+        field: "actions",
+        type: "actions",
+        headerName: "Actions",
+        width: 120,
+        getActions: (params: GridRowParams) => [
+          <GridActionsCellItem
+            icon={<ViewIcon />}
+            label="View"
+            onClick={() => navigate(`/testing/plans/${params.id}`)}
+          />,
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => navigate(`/testing/plans/${params.id}/edit`)}
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={() => {
+              setItemToDelete({ id: params.id as number, type: "plan" });
+              setDeleteDialogOpen(true);
+            }}
+          />,
+        ],
+      },
+    ],
+    [navigate]
+  );
+
+  // Test Cases columns
+  const testCaseColumns: GridColDef[] = useMemo(
+    () => [
+      {
+        field: "name",
+        headerName: "Test Case",
+        flex: 1,
+        minWidth: 200,
+        renderCell: (params) => (
+          <Box>
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {params.value}
+            </Typography>
+            {params.row.test_plan && (
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {params.row.test_plan.name}
+              </Typography>
+            )}
+          </Box>
+        ),
+      },
+      {
+        field: "type",
+        headerName: "Type",
+        width: 120,
+        renderCell: (params) => (
+          <Chip
+            size="small"
+            label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+            variant="outlined"
+          />
+        ),
+      },
+      {
+        field: "priority",
+        headerName: "Priority",
+        width: 100,
+        renderCell: (params) => (
+          <Chip
+            size="small"
+            label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+            color={getPriorityColor(params.value)}
+          />
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 120,
+        renderCell: (params) => (
+          <Chip
+            size="small"
+            label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+            color={getStatusColor(params.value)}
+          />
+        ),
+      },
+      {
+        field: "automation_level",
+        headerName: "Automation",
+        width: 120,
+        renderCell: (params) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            {getAutomationIcon(params.value)}
+            <Typography variant="body2" textTransform="capitalize">
+              {params.value.replace("_", " ")}
+            </Typography>
+          </Box>
+        ),
+      },
+      {
+        field: "assigned_to_user",
+        headerName: "Assigned To",
+        width: 150,
+        valueGetter: (params) =>
+          params.row.assigned_to_user
+            ? `${params.row.assigned_to_user.first_name} ${params.row.assigned_to_user.last_name}`
+            : "Unassigned",
+        renderCell: (params) =>
+          params.row.assigned_to_user ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <Avatar sx={{ width: 24, height: 24, fontSize: "0.75rem" }}>
+                {params.row.assigned_to_user.first_name[0]}
+                {params.row.assigned_to_user.last_name[0]}
+              </Avatar>
+              <Typography variant="body2" noWrap>
+                {params.row.assigned_to_user.first_name}{" "}
+                {params.row.assigned_to_user.last_name}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Unassigned
+            </Typography>
+          ),
+      },
+      {
+        field: "last_execution",
+        headerName: "Last Execution",
+        width: 120,
+        valueGetter: (params) => {
+          const executions = params.row.executions || [];
+          if (executions.length === 0) return "Never";
+          const latest = executions.sort(
+            (a: any, b: any) =>
+              new Date(b.execution_date).getTime() -
+              new Date(a.execution_date).getTime()
+          )[0];
+          return latest.status;
+        },
+        renderCell: (params) => {
+          const executions = params.row.executions || [];
+          if (executions.length === 0) {
+            return (
+              <Typography variant="body2" color="text.secondary">
+                Never
+              </Typography>
+            );
+          }
+          const latest = executions.sort(
+            (a: any, b: any) =>
+              new Date(b.execution_date).getTime() -
+              new Date(a.execution_date).getTime()
+          )[0];
+          return (
+            <Chip
+              size="small"
+              label={
+                latest.status.charAt(0).toUpperCase() + latest.status.slice(1)
+              }
+              color={getStatusColor(latest.status)}
+              icon={getStatusIcon(latest.status)}
+            />
+          );
+        },
+      },
+      {
+        field: "updated_at",
+        headerName: "Updated",
+        width: 120,
+        valueFormatter: (params) =>
+          format(parseISO(params.value), "MMM dd, yyyy"),
+      },
+      {
+        field: "actions",
+        type: "actions",
+        headerName: "Actions",
+        width: 120,
+        getActions: (params: GridRowParams) => [
+          <GridActionsCellItem
+            icon={<ViewIcon />}
+            label="View"
+            onClick={() => navigate(`/testing/cases/${params.id}`)}
+          />,
+          <GridActionsCellItem
+            icon={<ExecuteIcon />}
+            label="Execute"
+            onClick={() => navigate(`/testing/cases/${params.id}/execute`)}
+          />,
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => navigate(`/testing/cases/${params.id}/edit`)}
+          />,
+        ],
+      },
+    ],
+    [navigate]
+  );
 
   // Test Executions columns
-  const testExecutionColumns: GridColDef[] = useMemo(() => [
-    {
-      field: 'test_case',
-      headerName: 'Test Case',
-      flex: 1,
-      minWidth: 200,
-      valueGetter: (params) => params.row.test_case?.name || '',
-      renderCell: (params) => (
-        <Box>
-          <Typography variant="body2" fontWeight={600} noWrap>
-            {params.row.test_case?.name}
-          </Typography>
-          {params.row.test_plan && (
-            <Typography variant="caption" color="text.secondary" noWrap>
-              {params.row.test_plan.name}
+  const testExecutionColumns: GridColDef[] = useMemo(
+    () => [
+      {
+        field: "test_case",
+        headerName: "Test Case",
+        flex: 1,
+        minWidth: 200,
+        valueGetter: (params) => params.row.test_case?.name || "",
+        renderCell: (params) => (
+          <Box>
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {params.row.test_case?.name}
             </Typography>
-          )}
-        </Box>
-      ),
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 120,
-      renderCell: (params) => (
-        <Chip
-          size="small"
-          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-          color={getStatusColor(params.value)}
-          icon={getStatusIcon(params.value)}
-        />
-      ),
-    },
-    {
-      field: 'executed_by_user',
-      headerName: 'Executed By',
-      width: 150,
-      valueGetter: (params) => params.row.executed_by_user ? 
-        `${params.row.executed_by_user.first_name} ${params.row.executed_by_user.last_name}` : '',
-      renderCell: (params) => (
-        <Box display="flex" alignItems="center" gap={1}>
-          <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem' }}>
-            {params.row.executed_by_user.first_name[0]}{params.row.executed_by_user.last_name[0]}
-          </Avatar>
-          <Typography variant="body2" noWrap>
-            {params.row.executed_by_user.first_name} {params.row.executed_by_user.last_name}
-          </Typography>
-        </Box>
-      ),
-    },
-    {
-      field: 'execution_date',
-      headerName: 'Execution Date',
-      width: 140,
-      valueFormatter: (params) => format(parseISO(params.value), 'MMM dd, yyyy HH:mm'),
-    },
-    {
-      field: 'duration',
-      headerName: 'Duration',
-      width: 100,
-      valueFormatter: (params) => params.value ? `${params.value} min` : 'N/A',
-    },
-    {
-      field: 'environment',
-      headerName: 'Environment',
-      width: 120,
-      renderCell: (params) => (
-        params.value ? (
-          <Chip size="small" label={params.value} variant="outlined" />
-        ) : (
-          <Typography variant="body2" color="text.secondary">N/A</Typography>
-        )
-      ),
-    },
-    {
-      field: 'build_version',
-      headerName: 'Build',
-      width: 100,
-      renderCell: (params) => (
-        params.value ? (
-          <Typography variant="body2" fontFamily="monospace">
-            {params.value}
-          </Typography>
-        ) : (
-          <Typography variant="body2" color="text.secondary">N/A</Typography>
-        )
-      ),
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      getActions: (params: GridRowParams) => [
-        <GridActionsCellItem
-          icon={<ViewIcon />}
-          label="View"
-          onClick={() => navigate(`/testing/executions/${params.id}`)}
-        />,
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={() => navigate(`/testing/executions/${params.id}/edit`)}
-        />,
-      ],
-    },
-  ], [navigate]);
+            {params.row.test_plan && (
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {params.row.test_plan.name}
+              </Typography>
+            )}
+          </Box>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        width: 120,
+        renderCell: (params) => (
+          <Chip
+            size="small"
+            label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+            color={getStatusColor(params.value)}
+            icon={getStatusIcon(params.value)}
+          />
+        ),
+      },
+      {
+        field: "executed_by_user",
+        headerName: "Executed By",
+        width: 150,
+        valueGetter: (params) =>
+          params.row.executed_by_user
+            ? `${params.row.executed_by_user.first_name} ${params.row.executed_by_user.last_name}`
+            : "",
+        renderCell: (params) => (
+          <Box display="flex" alignItems="center" gap={1}>
+            <Avatar sx={{ width: 24, height: 24, fontSize: "0.75rem" }}>
+              {params.row.executed_by_user.first_name[0]}
+              {params.row.executed_by_user.last_name[0]}
+            </Avatar>
+            <Typography variant="body2" noWrap>
+              {params.row.executed_by_user.first_name}{" "}
+              {params.row.executed_by_user.last_name}
+            </Typography>
+          </Box>
+        ),
+      },
+      {
+        field: "execution_date",
+        headerName: "Execution Date",
+        width: 140,
+        valueFormatter: (params) =>
+          format(parseISO(params.value), "MMM dd, yyyy HH:mm"),
+      },
+      {
+        field: "duration",
+        headerName: "Duration",
+        width: 100,
+        valueFormatter: (params) =>
+          params.value ? `${params.value} min` : "N/A",
+      },
+      {
+        field: "environment",
+        headerName: "Environment",
+        width: 120,
+        renderCell: (params) =>
+          params.value ? (
+            <Chip size="small" label={params.value} variant="outlined" />
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              N/A
+            </Typography>
+          ),
+      },
+      {
+        field: "build_version",
+        headerName: "Build",
+        width: 100,
+        renderCell: (params) =>
+          params.value ? (
+            <Typography variant="body2" fontFamily="monospace">
+              {params.value}
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              N/A
+            </Typography>
+          ),
+      },
+      {
+        field: "actions",
+        type: "actions",
+        headerName: "Actions",
+        width: 100,
+        getActions: (params: GridRowParams) => [
+          <GridActionsCellItem
+            icon={<ViewIcon />}
+            label="View"
+            onClick={() => navigate(`/testing/executions/${params.id}`)}
+          />,
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => navigate(`/testing/executions/${params.id}/edit`)}
+          />,
+        ],
+      },
+    ],
+    [navigate]
+  );
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -712,26 +777,43 @@ const TestingPage: React.FC = () => {
   // Statistics calculations
   const stats = useMemo(() => {
     const totalTestCases = testCases?.length || 0;
-    const automatedCases = testCases?.filter(tc => tc.automation_level === 'automated').length || 0;
-    const passedExecutions = testExecutions?.filter(te => te.status === 'passed').length || 0;
+    const automatedCases =
+      testCases?.filter((tc) => tc.automation_level === "automated").length ||
+      0;
+    const passedExecutions =
+      testExecutions?.filter((te) => te.status === "passed").length || 0;
     const totalExecutions = testExecutions?.length || 0;
 
     return {
       totalTestPlans: testPlans?.length || 0,
       totalTestCases,
       totalExecutions,
-      automationCoverage: totalTestCases > 0 ? Math.round((automatedCases / totalTestCases) * 100) : 0,
-      passRate: totalExecutions > 0 ? Math.round((passedExecutions / totalExecutions) * 100) : 0,
-      executionsToday: testExecutions?.filter(te => 
-        format(parseISO(te.execution_date), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
-      ).length || 0
+      automationCoverage:
+        totalTestCases > 0
+          ? Math.round((automatedCases / totalTestCases) * 100)
+          : 0,
+      passRate:
+        totalExecutions > 0
+          ? Math.round((passedExecutions / totalExecutions) * 100)
+          : 0,
+      executionsToday:
+        testExecutions?.filter(
+          (te) =>
+            format(parseISO(te.execution_date), "yyyy-MM-dd") ===
+            format(new Date(), "yyyy-MM-dd")
+        ).length || 0,
     };
   }, [testPlans, testCases, testExecutions]);
 
   return (
     <Box>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Box>
           <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
             Testing
@@ -744,14 +826,16 @@ const TestingPage: React.FC = () => {
           <Button
             variant="outlined"
             startIcon={<ReportsIcon />}
-            onClick={() => navigate('/testing/reports')}
+            onClick={() => navigate("/testing/reports")}
           >
             Reports
           </Button>
           <Button
             variant="outlined"
             startIcon={<DownloadIcon />}
-            onClick={() => {/* TODO: Export functionality */}}
+            onClick={() => {
+              /* TODO: Export functionality */
+            }}
           >
             Export
           </Button>
@@ -759,12 +843,16 @@ const TestingPage: React.FC = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => {
-              if (tabValue === 0) navigate('/testing/plans/create');
-              else if (tabValue === 1) navigate('/testing/cases/create');
-              else navigate('/testing/execute');
+              if (tabValue === 0) navigate("/testing/plans/create");
+              else if (tabValue === 1) navigate("/testing/cases/create");
+              else navigate("/testing/execute");
             }}
           >
-            {tabValue === 0 ? 'Create Plan' : tabValue === 1 ? 'Create Case' : 'Execute Tests'}
+            {tabValue === 0
+              ? "Create Plan"
+              : tabValue === 1
+              ? "Create Case"
+              : "Execute Tests"}
           </Button>
         </Box>
       </Box>
@@ -774,7 +862,11 @@ const TestingPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
                   <Typography color="text.secondary" variant="body2">
                     Test Plans
@@ -791,7 +883,11 @@ const TestingPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
                   <Typography color="text.secondary" variant="body2">
                     Test Cases
@@ -808,7 +904,11 @@ const TestingPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
                   <Typography color="text.secondary" variant="body2">
                     Executions
@@ -825,7 +925,11 @@ const TestingPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
                   <Typography color="text.secondary" variant="body2">
                     Automation
@@ -842,7 +946,11 @@ const TestingPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
                   <Typography color="text.secondary" variant="body2">
                     Pass Rate
@@ -859,7 +967,11 @@ const TestingPage: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <Card>
             <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box>
                   <Typography color="text.secondary" variant="body2">
                     Today
@@ -877,33 +989,37 @@ const TestingPage: React.FC = () => {
 
       {/* Tabs */}
       <Paper sx={{ mb: 2 }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="testing tabs">
-          <Tab 
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="testing tabs"
+        >
+          <Tab
             label={
               <Box display="flex" alignItems="center" gap={1}>
                 <TestPlanIcon />
                 Test Plans
                 <Badge badgeContent={testPlanCount} color="primary" />
               </Box>
-            } 
+            }
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center" gap={1}>
                 <TestCaseIcon />
                 Test Cases
                 <Badge badgeContent={testCaseCount} color="primary" />
               </Box>
-            } 
+            }
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center" gap={1}>
                 <ExecuteIcon />
                 Executions
                 <Badge badgeContent={testExecutionCount} color="primary" />
               </Box>
-            } 
+            }
           />
         </Tabs>
       </Paper>
@@ -912,13 +1028,22 @@ const TestingPage: React.FC = () => {
       <Paper sx={{ p: 2, mb: 2 }}>
         <Box display="flex" gap={2} alignItems="center">
           <TextField
-            placeholder={`Search ${tabValue === 0 ? 'test plans' : tabValue === 1 ? 'test cases' : 'executions'}...`}
+            placeholder={`Search ${
+              tabValue === 0
+                ? "test plans"
+                : tabValue === 1
+                ? "test cases"
+                : "executions"
+            }...`}
             value={tabValue < 2 ? testFilters.search : executionFilters.search}
             onChange={(e) => {
               if (tabValue < 2) {
-                setTestFilters(prev => ({ ...prev, search: e.target.value }));
+                setTestFilters((prev) => ({ ...prev, search: e.target.value }));
               } else {
-                setExecutionFilters(prev => ({ ...prev, search: e.target.value }));
+                setExecutionFilters((prev) => ({
+                  ...prev,
+                  search: e.target.value,
+                }));
               }
             }}
             InputProps={{
@@ -930,7 +1055,7 @@ const TestingPage: React.FC = () => {
             }}
             sx={{ minWidth: 300 }}
           />
-          
+
           <Button
             variant="outlined"
             startIcon={<RefreshIcon />}
@@ -955,17 +1080,18 @@ const TestingPage: React.FC = () => {
             pagination
             paginationMode="server"
             rowCount={testPlanCount}
-            page={testPlanPage}
-            pageSize={testPlanPageSize}
-            onPageChange={setTestPlanPage}
-            onPageSizeChange={setTestPlanPageSize}
-            rowsPerPageOptions={[10, 25, 50, 100]}
+            paginationModel={{ page: testPlanPage, pageSize: testPlanPageSize }}
+            onPaginationModelChange={(newModel) => {
+              setTestPlanPage(newModel.page);
+              setTestPlanPageSize(newModel.pageSize);
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
             checkboxSelection
-            disableSelectionOnClick
-            components={{ Toolbar: GridToolbar }}
+            disableRowSelectionOnClick
+            slots={{ toolbar: GridToolbar }}
             sx={{
-              '& .MuiDataGrid-row:hover': {
-                backgroundColor: 'action.hover',
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "action.hover",
               },
             }}
           />
@@ -981,17 +1107,18 @@ const TestingPage: React.FC = () => {
             pagination
             paginationMode="server"
             rowCount={testCaseCount}
-            page={testCasePage}
-            pageSize={testCasePageSize}
-            onPageChange={setTestCasePage}
-            onPageSizeChange={setTestCasePageSize}
-            rowsPerPageOptions={[10, 25, 50, 100]}
+            paginationModel={{ page: testCasePage, pageSize: testCasePageSize }}
+            onPaginationModelChange={(newModel) => {
+              setTestCasePage(newModel.page);
+              setTestCasePageSize(newModel.pageSize);
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
             checkboxSelection
-            disableSelectionOnClick
-            components={{ Toolbar: GridToolbar }}
+            disableRowSelectionOnClick
+            slots={{ toolbar: GridToolbar }}
             sx={{
-              '& .MuiDataGrid-row:hover': {
-                backgroundColor: 'action.hover',
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "action.hover",
               },
             }}
           />
@@ -1007,17 +1134,21 @@ const TestingPage: React.FC = () => {
             pagination
             paginationMode="server"
             rowCount={testExecutionCount}
-            page={testExecutionPage}
-            pageSize={testExecutionPageSize}
-            onPageChange={setTestExecutionPage}
-            onPageSizeChange={setTestExecutionPageSize}
-            rowsPerPageOptions={[10, 25, 50, 100]}
+            paginationModel={{
+              page: testExecutionPage,
+              pageSize: testExecutionPageSize,
+            }}
+            onPaginationModelChange={(newModel) => {
+              setTestExecutionPage(newModel.page);
+              setTestExecutionPageSize(newModel.pageSize);
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
             checkboxSelection
-            disableSelectionOnClick
-            components={{ Toolbar: GridToolbar }}
+            disableRowSelectionOnClick
+            slots={{ toolbar: GridToolbar }}
             sx={{
-              '& .MuiDataGrid-row:hover': {
-                backgroundColor: 'action.hover',
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "action.hover",
               },
             }}
           />
@@ -1032,22 +1163,23 @@ const TestingPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          Delete {itemToDelete?.type === 'plan' ? 'Test Plan' : 'Test Case'}
+          Delete {itemToDelete?.type === "plan" ? "Test Plan" : "Test Case"}
         </DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete this {itemToDelete?.type === 'plan' ? 'test plan' : 'test case'}? 
-            This action cannot be undone.
+            Are you sure you want to delete this{" "}
+            {itemToDelete?.type === "plan" ? "test plan" : "test case"}? This
+            action cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button 
+          <Button
             onClick={() => {
               // TODO: Implement delete functionality
               setDeleteDialogOpen(false);
               setItemToDelete(null);
-            }} 
+            }}
             color="error"
             variant="contained"
           >
@@ -1060,9 +1192,12 @@ const TestingPage: React.FC = () => {
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
-        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       >
-        <Alert severity={snackbar.severity} onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}>
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
@@ -1071,11 +1206,11 @@ const TestingPage: React.FC = () => {
       <Fab
         color="primary"
         aria-label="add"
-        sx={{ position: 'fixed', bottom: 16, right: 16 }}
+        sx={{ position: "fixed", bottom: 16, right: 16 }}
         onClick={() => {
-          if (tabValue === 0) navigate('/testing/plans/create');
-          else if (tabValue === 1) navigate('/testing/cases/create');
-          else navigate('/testing/execute');
+          if (tabValue === 0) navigate("/testing/plans/create");
+          else if (tabValue === 1) navigate("/testing/cases/create");
+          else navigate("/testing/execute");
         }}
       >
         <AddIcon />
@@ -1084,4 +1219,4 @@ const TestingPage: React.FC = () => {
   );
 };
 
-export default TestingPage; 
+export default TestingPage;

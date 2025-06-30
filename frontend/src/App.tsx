@@ -53,17 +53,29 @@ const ProjectDetailsPage = React.lazy(
 const RequirementsPage = React.lazy(
   () => import("@/features/requirements/pages/RequirementsPage")
 );
+const RequirementCreatePage = React.lazy(
+  () => import("@/features/requirements/pages/RequirementCreatePage")
+);
 const RequirementDetailsPage = React.lazy(
   () => import("@/features/requirements/pages/RequirementDetailsPage")
 );
 const TestingPage = React.lazy(
   () => import("@/features/testing/pages/TestingPage")
 );
+const TestPlanCreatePage = React.lazy(
+  () => import("@/features/testing/pages/TestPlanCreatePage")
+);
+const TestCaseCreatePage = React.lazy(
+  () => import("@/features/testing/pages/TestCaseCreatePage")
+);
 const TestRunDetailsPage = React.lazy(
   () => import("@/features/testing/pages/TestRunDetailsPage")
 );
 const ReleasesPage = React.lazy(
   () => import("@/features/releases/pages/ReleasesPage")
+);
+const ReleaseCreatePage = React.lazy(
+  () => import("@/features/releases/pages/ReleaseCreatePage")
 );
 const ReleaseDetailsPage = React.lazy(
   () => import("@/features/releases/pages/ReleaseDetailsPage")
@@ -248,6 +260,14 @@ const AppRoutes: React.FC = () => {
           }
         />
         <Route
+          path="requirements/create"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <RequirementCreatePage />
+            </React.Suspense>
+          }
+        />
+        <Route
           path="requirements/:id"
           element={
             <React.Suspense fallback={<LoadingFallback />}>
@@ -266,6 +286,22 @@ const AppRoutes: React.FC = () => {
           }
         />
         <Route
+          path="testing/plans/create"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <TestPlanCreatePage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="testing/cases/create"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <TestCaseCreatePage />
+            </React.Suspense>
+          }
+        />
+        <Route
           path="testing/runs/:id"
           element={
             <React.Suspense fallback={<LoadingFallback />}>
@@ -280,6 +316,14 @@ const AppRoutes: React.FC = () => {
           element={
             <React.Suspense fallback={<LoadingFallback />}>
               <ReleasesPage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="releases/create"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ReleaseCreatePage />
             </React.Suspense>
           }
         />
