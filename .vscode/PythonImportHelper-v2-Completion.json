@@ -6806,6 +6806,14 @@
         "documentation": {}
     },
     {
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
+        "isExtraImport": true,
+        "detail": "app.models.requirement",
+        "documentation": {}
+    },
+    {
         "label": "DashboardStats",
         "importPath": "app.schemas.dashboard",
         "description": "app.schemas.dashboard",
@@ -10094,7 +10102,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.releases",
         "description": "backend.app.api.v1.endpoints.releases",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Release])\nasync def get_releases(\n    skip: int = 0,\n    limit: int = 100,\n    project_id: Optional[int] = None,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_releases_read_user),\n):\n    \"\"\"",
+        "peekOfCode": "router = APIRouter()\nasync def _analyze_requirement_relationships(\n    db: AsyncSession, \n    requirements: List[Requirement], \n    project_id: int\n) -> Dict[str, Any]:\n    \"\"\"\n    Analyze requirement relationships for release creation.\n    Function 11 enhancement: Considers requirement relationships when creating releases.\n    Args:",
         "detail": "backend.app.api.v1.endpoints.releases",
         "documentation": {}
     },

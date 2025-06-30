@@ -16,6 +16,7 @@ from app.api.deps import (
 )
 from app.core.config import settings
 from app import crud, schemas
+from app.models.requirement import Requirement
 from app.schemas.release import (
     ReleaseCreate,
     ReleaseUpdate,
@@ -26,6 +27,143 @@ from app.schemas.release import (
 )
 
 router = APIRouter()
+
+
+async def _analyze_requirement_relationships(
+    db: AsyncSession, 
+    requirements: List[Requirement], 
+    project_id: int
+) -> Dict[str, Any]:
+    """
+    Analyze requirement relationships for release creation.
+    
+    Function 11 enhancement: Considers requirement relationships when creating releases.
+    
+    Args:
+        db: Database session
+        requirements: List of requirements to analyze
+        project_id: Project ID for scope validation
+    
+    Returns:
+        Dict containing analysis results:
+        - missing_dependencies: List of required dependencies not in the requirements list
+        - circular_dependencies: List of circular dependency chains detected
+        - dependency_graph: Complete dependency mapping
+        - suggested_requirements: Additional requirements that should be considered
+    """
+    requirement_ids = [req.id for req in requirements]
+    analysis_result = {
+        "missing_dependencies": [],
+        "circular_dependencies": [],
+        "dependency_graph": {},
+        "suggested_requirements": [],
+        "relationship_count": 0
+    }
+    
+    # Get all relationships for these requirements
+    all_relationships = []
+    for req in requirements:
+        # Get outgoing relationships (dependencies)
+        outgoing_rels = await crud.relationship.get_outgoing_relationships(
+            db, requirement_id=req.id
+        )
+        # Get incoming relationships (dependents)
+        incoming_rels = await crud.relationship.get_incoming_relationships(
+            db, requirement_id=req.id
+        )
+        all_relationships.extend(outgoing_rels)
+        all_relationships.extend(incoming_rels)
+    
+    analysis_result["relationship_count"] = len(all_relationships)
+    
+    # Build dependency graph
+    dependency_graph = {}
+    for req in requirements:
+        dependency_graph[req.id] = {
+            "title": req.title,
+            "dependencies": [],  # Requirements this one depends on
+            "dependents": []     # Requirements that depend on this one
+        }
+    
+    # Populate dependency graph and find missing dependencies
+    missing_deps = []
+    for relationship in all_relationships:
+        source_id = relationship.source_id
+        target_id = relationship.target_id
+        
+        # Only consider dependencies (not all relationship types)
+        # Assuming relationship type 1 is "depends on" or similar
+        if relationship.type_id == 1:  # Dependency relationship
+            if source_id in requirement_ids:
+                # This requirement depends on target_id
+                if target_id not in requirement_ids:
+                    # Missing dependency
+                    target_req = await crud.requirement.get_with_details(db, id=target_id)
+                    if target_req and target_req.project_id == project_id:
+                        missing_deps.append({
+                            "id": target_id,
+                            "title": target_req.title,
+                            "required_by": [r.title for r in requirements if r.id == source_id]
+                        })
+                else:
+                    # Valid internal dependency
+                    dependency_graph[source_id]["dependencies"].append(target_id)
+                    dependency_graph[target_id]["dependents"].append(source_id)
+    
+    analysis_result["missing_dependencies"] = missing_deps
+    analysis_result["dependency_graph"] = dependency_graph
+    
+    # Detect circular dependencies using DFS
+    visited = set()
+    rec_stack = set()
+    circular_deps = []
+    
+    def has_cycle(node_id, path):
+        if node_id in rec_stack:
+            # Found a cycle, extract the cycle path
+            cycle_start = path.index(node_id)
+            cycle = path[cycle_start:] + [node_id]
+            cycle_titles = []
+            for req_id in cycle:
+                req_title = next((req.title for req in requirements if req.id == req_id), f"ID:{req_id}")
+                cycle_titles.append(req_title)
+            return cycle_titles
+        
+        if node_id in visited:
+            return None
+        
+        visited.add(node_id)
+        rec_stack.add(node_id)
+        path.append(node_id)
+        
+        for dep_id in dependency_graph.get(node_id, {}).get("dependencies", []):
+            cycle = has_cycle(dep_id, path[:])
+            if cycle:
+                return cycle
+        
+        rec_stack.remove(node_id)
+        return None
+    
+    for req_id in requirement_ids:
+        if req_id not in visited:
+            cycle = has_cycle(req_id, [])
+            if cycle:
+                circular_deps.append(cycle)
+    
+    analysis_result["circular_dependencies"] = circular_deps
+    
+    # Suggest additional requirements based on common dependencies
+    suggested = []
+    for missing_dep in missing_deps[:3]:  # Limit suggestions
+        suggested.append({
+            "id": missing_dep["id"],
+            "title": missing_dep["title"],
+            "reason": f"Required by: {', '.join(missing_dep['required_by'])}"
+        })
+    
+    analysis_result["suggested_requirements"] = suggested
+    
+    return analysis_result
 
 
 @router.get("/", response_model=List[schemas.Release])
@@ -245,7 +383,7 @@ async def create_release_from_requirements(
     wrong_project_requirements = []
 
     for req_id in release_data.requirement_ids:
-        requirement = await crud.requirement.get(db, id=req_id)
+        requirement = await crud.requirement.get_with_details(db, id=req_id)
         if not requirement:
             invalid_requirements.append(req_id)
             continue
@@ -269,6 +407,65 @@ async def create_release_from_requirements(
             detail=f"Requirements {wrong_project_requirements} do not belong to project {release_data.project_id}",
         )
 
+    # FUNCTION 11 ENHANCEMENT: Analyze requirement relationships
+    auto_included_requirements = []
+    if release_data.analyze_dependencies:
+        relationship_analysis = await _analyze_requirement_relationships(
+            db, requirements, release_data.project_id
+        )
+        
+        # Handle missing dependencies
+        if relationship_analysis["missing_dependencies"]:
+            missing_deps = relationship_analysis["missing_dependencies"]
+            
+            if release_data.auto_include_dependencies:
+                # Automatically include missing dependencies
+                for missing_dep in missing_deps:
+                    missing_req = await crud.requirement.get_with_details(db, id=missing_dep["id"])
+                    if missing_req:
+                        requirements.append(missing_req)
+                        auto_included_requirements.append({
+                            "id": missing_req.id,
+                            "title": missing_req.title,
+                            "reason": missing_dep["required_by"]
+                        })
+                
+                # Re-analyze after including dependencies to check for new missing deps
+                relationship_analysis = await _analyze_requirement_relationships(
+                    db, requirements, release_data.project_id
+                )
+            else:
+                # Throw error if auto-include is disabled
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={
+                        "message": "Some required dependencies are missing from the release",
+                        "missing_dependencies": missing_deps,
+                        "suggestion": "Include the missing dependencies, enable auto_include_dependencies, or remove requirements that depend on them"
+                    }
+                )
+        
+        # Check for circular dependencies (always error)
+        if relationship_analysis["circular_dependencies"]:
+            circular_deps = relationship_analysis["circular_dependencies"]
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "message": "Circular dependencies detected in requirements",
+                    "circular_dependencies": circular_deps,
+                    "suggestion": "Remove or modify requirements to break circular dependencies"
+                }
+            )
+    else:
+        # If dependency analysis is disabled, create minimal analysis result
+        relationship_analysis = {
+            "missing_dependencies": [],
+            "circular_dependencies": [],
+            "dependency_graph": {},
+            "suggested_requirements": [],
+            "relationship_count": 0
+        }
+
     # Generate description if requested
     description = release_data.description
     auto_generated = False
@@ -278,7 +475,7 @@ async def create_release_from_requirements(
             auto_generated = True
             if release_data.include_requirement_details:
                 req_details = [
-                    f"- {req.name} ({req.type.name if req.type else 'Unknown Type'})"
+                    f"- {req.title} ({req.type.name if req.type else 'Unknown Type'})"
                     for req in requirements
                 ]
                 description = (
@@ -314,7 +511,7 @@ async def create_release_from_requirements(
     for req in requirements:
         req_summary = RequirementSummary(
             id=req.id,
-            title=req.name,
+            title=req.title,
             description=req.description,
             type_name=req.type.name if req.type else None,
             priority_name=req.priority.name if req.priority else None,
@@ -348,6 +545,22 @@ async def create_release_from_requirements(
             )
             for priority in set(r.priority.name for r in requirements if r.priority)
         },
+        # FUNCTION 11 ENHANCEMENT: Include relationship analysis
+        "relationship_analysis": {
+            "total_relationships": relationship_analysis["relationship_count"],
+            "dependency_graph_size": len(relationship_analysis["dependency_graph"]),
+            "missing_dependencies_resolved": len(relationship_analysis["missing_dependencies"]) == 0,
+            "circular_dependencies_detected": len(relationship_analysis["circular_dependencies"]) > 0,
+            "suggested_requirements_available": len(relationship_analysis["suggested_requirements"]) > 0,
+            "dependency_validation_passed": (
+                len(relationship_analysis["missing_dependencies"]) == 0 and 
+                len(relationship_analysis["circular_dependencies"]) == 0
+            ),
+            "auto_included_requirements": auto_included_requirements,
+            "auto_included_count": len(auto_included_requirements),
+            "analysis_enabled": release_data.analyze_dependencies,
+            "auto_include_enabled": release_data.auto_include_dependencies
+        }
     }
 
     return ReleaseCreationSummary(
@@ -409,13 +622,13 @@ async def generate_release_specification(
             "requirements": [
                 {
                     "id": req.id,
-                    "name": req.name,
+                    "title": req.title,
                     "description": req.description,
-                    "type": req.type.name if req.type else None,
-                    "priority": req.priority.name if req.priority else None,
-                    "status": req.status.name if req.status else None,
+                    "type": req.type.name if req.type else None, # type: RequirementType
+                    "priority": req.priority.name if req.priority else None, # type: RequirementPriority
+                    "status": req.status.name if req.status else None, # type: RequirementStatus
                 }
-                for req in requirements
+                for req in requirements # type: List["Requirement"]
             ],
             "sections": [
                 "Введение",

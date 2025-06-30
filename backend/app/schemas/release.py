@@ -259,6 +259,14 @@ class ReleaseFromRequirementsCreate(BaseModel):
         True, 
         description="Включать детали требований в описание релиза"
     )
+    analyze_dependencies: bool = Field(
+        True,
+        description="Анализировать зависимости между требованиями"
+    )
+    auto_include_dependencies: bool = Field(
+        False,
+        description="Автоматически включать недостающие зависимости"
+    )
     
     @field_validator("requirement_ids")
     def validate_requirement_ids(cls, v):
