@@ -48,7 +48,7 @@ async def get_projects(
     """
     if search:
         projects = await crud.project.search_projects(
-            db, search_term=search, skip=skip, limit=limit
+            db, query=search, skip=skip, limit=limit
         )
     elif status:
         projects = await crud.project.get_by_status(
