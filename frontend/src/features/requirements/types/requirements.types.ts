@@ -110,8 +110,11 @@ export interface RequirementListParams {
 }
 
 export interface RequirementListResponse {
-  items: Requirement[];
+  items: RequirementWithDetails[];
   total: number;
+  page: number;
+  size: number;
+  pages: number;
 }
 
 export interface RequirementSearchParams {

@@ -31,9 +31,27 @@ export class RequirementsApi {
       }
     });
 
-    return this.client.get<RequirementListResponse>(
+    // Backend returns simple array, transform to expected format
+    const response = await this.client.get<RequirementWithDetails[]>(
       `/requirements/search?${queryParams.toString()}`
     );
+    const requirements = response.data || [];
+    
+    // Calculate pagination info (search typically doesn't paginate, but we maintain consistency)
+    const total = requirements.length;
+    const pages = 1; // Search results typically shown on single page
+    
+    return {
+      data: {
+        items: requirements,
+        total: total,
+        page: 0,
+        size: total,
+        pages: pages,
+      },
+      status: response.status,
+      message: response.message,
+    };
   }
 
   // 2. Get Requirements
@@ -61,7 +79,28 @@ export class RequirementsApi {
       ? `/requirements/?${queryString}`
       : "/requirements/";
 
-    return this.client.get<RequirementListResponse>(url);
+    // Backend returns simple array, transform to expected format
+    const response = await this.client.get<RequirementWithDetails[]>(url);
+    const requirements = response.data || [];
+    
+    // Calculate pagination info
+    const skip = params?.skip || 0;
+    const limit = params?.limit || 100;
+    const page = Math.floor(skip / limit);
+    const total = requirements.length; // Note: This is not the real total from DB
+    const pages = Math.ceil(total / limit);
+    
+    return {
+      data: {
+        items: requirements,
+        total: total,
+        page: page,
+        size: limit,
+        pages: pages,
+      },
+      status: response.status,
+      message: response.message,
+    };
   }
 
   // 3. Create Requirement
