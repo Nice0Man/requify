@@ -50,7 +50,7 @@ import {
   Restore,
   MoreVert,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
 import {
@@ -76,6 +76,7 @@ interface ReleaseStats {
 const ReleasesPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { id: projectId } = useParams(); // Get project ID from URL if accessed via /projects/:id/releases
   const { user } = useAuth();
   const { hasAnyPermission } = usePermissions();
 
@@ -102,7 +103,7 @@ const ReleasesPage: React.FC = () => {
   const [filters, setFilters] = useState({
     status: "",
     search: "",
-    project_id: "",
+    project_id: projectId || "", // Auto-fill project ID if accessed from project page
     show_deleted: false,
   });
 
@@ -110,7 +111,9 @@ const ReleasesPage: React.FC = () => {
   const [createDialog, setCreateDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
-  const [releaseForm, setReleaseForm] = useState<Partial<ReleaseCreate & { status?: string }>>({
+  const [releaseForm, setReleaseForm] = useState<
+    Partial<ReleaseCreate & { status?: string }>
+  >({
     name: "",
     version: "",
     description: "",
@@ -143,7 +146,7 @@ const ReleasesPage: React.FC = () => {
 
       const response = await releasesApi.getReleases(params);
       let fetchedReleases = response.data.items || [];
-      
+
       // Filter based on deleted status
       if (!filters.show_deleted) {
         fetchedReleases = fetchedReleases.filter(
@@ -156,8 +159,12 @@ const ReleasesPage: React.FC = () => {
         fetchedReleases = fetchedReleases.filter(
           (release) =>
             release.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-            release.version.toLowerCase().includes(filters.search.toLowerCase()) ||
-            (release.description?.toLowerCase().includes(filters.search.toLowerCase()))
+            release.version
+              .toLowerCase()
+              .includes(filters.search.toLowerCase()) ||
+            release.description
+              ?.toLowerCase()
+              .includes(filters.search.toLowerCase())
         );
       }
 
@@ -277,7 +284,11 @@ const ReleasesPage: React.FC = () => {
 
   // Handle delete release (soft delete)
   const handleDeleteRelease = async (release: Release) => {
-    if (window.confirm(`Are you sure you want to delete "${release.name}"? This will mark it as deleted but not permanently remove it.`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete "${release.name}"? This will mark it as deleted but not permanently remove it.`
+      )
+    ) {
       try {
         await releasesApi.deleteRelease(release.id);
         toast.success("Release marked as deleted successfully");
@@ -303,7 +314,11 @@ const ReleasesPage: React.FC = () => {
 
   // Handle publish release
   const handlePublishRelease = async (release: Release) => {
-    if (window.confirm(`Are you sure you want to publish "${release.name}" v${release.version}?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to publish "${release.name}" v${release.version}?`
+      )
+    ) {
       try {
         const publishData = {
           changelog: `Release ${release.version} published`,
@@ -324,8 +339,13 @@ const ReleasesPage: React.FC = () => {
       const syncData = {
         project_id: release.project_id,
       };
-      const response = await releasesApi.syncProjectRequirementsToRelease(release.id, syncData);
-      toast.success(`Synced ${response.data.synced_requirements} requirements successfully`);
+      const response = await releasesApi.syncProjectRequirementsToRelease(
+        release.id,
+        syncData
+      );
+      toast.success(
+        `Synced ${response.data.synced_requirements} requirements successfully`
+      );
       loadReleases();
     } catch (err: any) {
       toast.error("Failed to sync requirements: " + err.message);
@@ -338,7 +358,7 @@ const ReleasesPage: React.FC = () => {
       // Create CSV content
       const headers = [
         "ID",
-        "Name", 
+        "Name",
         "Version",
         "Status",
         "Project ID",
@@ -346,38 +366,43 @@ const ReleasesPage: React.FC = () => {
         "Planned Date",
         "Release Date",
         "Created At",
-        "Updated At"
+        "Updated At",
       ];
 
       const csvContent = [
         headers.join(","),
-        ...releases.map(release => [
-          release.id,
-          `"${release.name.replace(/"/g, '""')}"`,
-          `"${release.version.replace(/"/g, '""')}"`,
-          release.status,
-          release.project_id,
-          `"${(release.description || "").replace(/"/g, '""')}"`,
-          release.planned_date || "",
-          release.release_date || "",
-          release.created_at,
-          release.updated_at
-        ].join(","))
+        ...releases.map((release) =>
+          [
+            release.id,
+            `"${release.name.replace(/"/g, '""')}"`,
+            `"${release.version.replace(/"/g, '""')}"`,
+            release.status,
+            release.project_id,
+            `"${(release.description || "").replace(/"/g, '""')}"`,
+            release.planned_date || "",
+            release.release_date || "",
+            release.created_at,
+            release.updated_at,
+          ].join(",")
+        ),
       ].join("\n");
 
       // Create and download file
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
-      
+
       if (link.download !== undefined) {
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", `releases_export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute(
+          "download",
+          `releases_export_${new Date().toISOString().split("T")[0]}.csv`
+        );
         link.style.visibility = "hidden";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         toast.success(`Exported ${releases.length} releases to CSV`);
       }
     } catch (error) {
@@ -399,11 +424,14 @@ const ReleasesPage: React.FC = () => {
         template_style: "standard" as const,
         auto_numbering: true,
       };
-      const response = await releasesApi.generateReleaseSpecification(release.id, specData);
+      const response = await releasesApi.generateReleaseSpecification(
+        release.id,
+        specData
+      );
       toast.success("Specification generated successfully");
       // You could open the download URL here
       if (response.data.download_url) {
-        window.open(response.data.download_url, '_blank');
+        window.open(response.data.download_url, "_blank");
       }
     } catch (err: any) {
       toast.error("Failed to generate specification: " + err.message);
@@ -681,7 +709,10 @@ const ReleasesPage: React.FC = () => {
                 label="Show Deleted"
                 value={filters.show_deleted}
                 onChange={(e) => {
-                  setFilters({ ...filters, show_deleted: e.target.value === "true" });
+                  setFilters({
+                    ...filters,
+                    show_deleted: e.target.value === "true",
+                  });
                   // Reset page to 0 when filter changes
                   setPage(0);
                 }}
@@ -817,7 +848,9 @@ const ReleasesPage: React.FC = () => {
                                   <IconButton
                                     size="small"
                                     color="success"
-                                    onClick={() => handlePublishRelease(release)}
+                                    onClick={() =>
+                                      handlePublishRelease(release)
+                                    }
                                   >
                                     <Publish fontSize="small" />
                                   </IconButton>
@@ -828,7 +861,9 @@ const ReleasesPage: React.FC = () => {
                                 <IconButton
                                   size="small"
                                   color="info"
-                                  onClick={() => handleSyncRequirements(release)}
+                                  onClick={() =>
+                                    handleSyncRequirements(release)
+                                  }
                                 >
                                   <Sync fontSize="small" />
                                 </IconButton>
@@ -838,7 +873,9 @@ const ReleasesPage: React.FC = () => {
                                 <IconButton
                                   size="small"
                                   color="secondary"
-                                  onClick={() => handleGenerateSpecification(release)}
+                                  onClick={() =>
+                                    handleGenerateSpecification(release)
+                                  }
                                 >
                                   <Description fontSize="small" />
                                 </IconButton>
@@ -960,7 +997,9 @@ const ReleasesPage: React.FC = () => {
                 <MenuItem value={ReleaseStatus.DRAFT}>Draft</MenuItem>
                 <MenuItem value={ReleaseStatus.PLANNED}>Planned</MenuItem>
                 <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
-                <MenuItem value={ReleaseStatus.IN_PROGRESS}>In Progress</MenuItem>
+                <MenuItem value={ReleaseStatus.IN_PROGRESS}>
+                  In Progress
+                </MenuItem>
                 <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
                 <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
                 <MenuItem value={ReleaseStatus.PUBLISHED}>Published</MenuItem>

@@ -957,7 +957,7 @@ const DashboardPage: React.FC = () => {
                   <Button
                     fullWidth
                     variant="outlined"
-                    onClick={() => navigate("/requirements")}
+                    onClick={() => navigate("/history")}
                     sx={{
                       borderRadius: 2,
                       textTransform: "none",

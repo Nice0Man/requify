@@ -383,6 +383,26 @@ const AppRoutes: React.FC = () => {
           }
         />
 
+        {/* Team */}
+        <Route
+          path="team"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <DashboardPage />
+            </React.Suspense>
+          }
+        />
+
+        {/* Activity History */}
+        <Route
+          path="history"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <DashboardPage />
+            </React.Suspense>
+          }
+        />
+
         {/* Releases */}
         <Route
           path="releases"
