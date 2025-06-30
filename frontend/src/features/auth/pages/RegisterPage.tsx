@@ -110,7 +110,7 @@ interface RegisterFormData extends Omit<UserCreate, "password"> {
   confirmPassword: string;
 }
 
-type RegistrationStatus = 'idle' | 'submitting' | 'success' | 'error';
+type RegistrationStatus = "idle" | "submitting" | "success" | "error";
 
 interface RegistrationState {
   status: RegistrationStatus;
@@ -128,16 +128,18 @@ const RegisterPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [isPending, startTransition] = useTransition();
-  
+
   // New states for confirmation
   const [confirmationChecked, setConfirmationChecked] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Replace useOptimistic with regular state
-  const [registrationState, setRegistrationState] = useState<RegistrationState>({
-    status: 'idle'
-  });
+  const [registrationState, setRegistrationState] = useState<RegistrationState>(
+    {
+      status: "idle",
+    }
+  );
 
   const {
     register,
@@ -158,7 +160,7 @@ const RegisterPage: React.FC = () => {
       last_name: "",
       department: "",
       phone: "",
-      role: UserRole.GUEST,
+      role: UserRole.VIEWER,
     },
   });
 
@@ -188,9 +190,9 @@ const RegisterPage: React.FC = () => {
     try {
       setError(null);
       setRegistrationState({
-        status: 'submitting',
+        status: "submitting",
         data,
-        message: 'Creating your account...',
+        message: "Creating your account...",
       });
 
       const userToCreate: UserCreate = {
@@ -207,18 +209,22 @@ const RegisterPage: React.FC = () => {
       const response = await authApi.register(userToCreate);
 
       setRegistrationState({
-        status: 'success',
+        status: "success",
         data,
-        message: 'Account created successfully! Please check your email for verification.',
+        message:
+          "Account created successfully! Please check your email for verification.",
       });
 
-      toast.success("Registration successful! Please check your email for verification.");
+      toast.success(
+        "Registration successful! Please check your email for verification."
+      );
 
       // Redirect to login after a delay
       setTimeout(() => {
         navigate("/login", {
           state: {
-            message: "Account created successfully! Please verify your email and then log in.",
+            message:
+              "Account created successfully! Please verify your email and then log in.",
             email: data.email,
           },
         });
@@ -231,7 +237,7 @@ const RegisterPage: React.FC = () => {
         "Registration failed. Please try again.";
 
       setRegistrationState({
-        status: 'error',
+        status: "error",
         message: errorMessage,
       });
 
@@ -265,7 +271,11 @@ const RegisterPage: React.FC = () => {
         return (
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: "primary.main", fontWeight: 600 }}
+              >
                 Account Information
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
@@ -391,7 +401,11 @@ const RegisterPage: React.FC = () => {
         return (
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: "primary.main", fontWeight: 600 }}
+              >
                 Personal Details
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
@@ -483,7 +497,7 @@ const RegisterPage: React.FC = () => {
                   control={control}
                   render={({ field }) => (
                     <Select labelId="role-label" label="Role" {...field}>
-                      <MenuItem value={UserRole.GUEST}>Guest</MenuItem>
+                      <MenuItem value={UserRole.VIEWER}>Viewer</MenuItem>
                       <MenuItem value={UserRole.VIEWER}>Viewer</MenuItem>
                       <MenuItem value={UserRole.ANALYST}>Analyst</MenuItem>
                       <MenuItem value={UserRole.TESTER}>Tester</MenuItem>
@@ -504,7 +518,11 @@ const RegisterPage: React.FC = () => {
         return (
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600 }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ color: "primary.main", fontWeight: 600 }}
+              >
                 Review & Submit
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
@@ -513,18 +531,22 @@ const RegisterPage: React.FC = () => {
             </Grid>
 
             {/* Registration Status */}
-            {registrationState.status !== 'idle' && (
+            {registrationState.status !== "idle" && (
               <Grid item xs={12}>
                 <Fade in={true}>
-                  <Alert 
+                  <Alert
                     severity={
-                      registrationState.status === 'success' ? 'success' :
-                      registrationState.status === 'error' ? 'error' : 'info'
+                      registrationState.status === "success"
+                        ? "success"
+                        : registrationState.status === "error"
+                        ? "error"
+                        : "info"
                     }
                     sx={{ mb: 2, borderRadius: 2 }}
                     icon={
-                      registrationState.status === 'submitting' ? 
-                      <CircularProgress size={20} /> : undefined
+                      registrationState.status === "submitting" ? (
+                        <CircularProgress size={20} />
+                      ) : undefined
                     }
                   >
                     {registrationState.message}
@@ -537,8 +559,8 @@ const RegisterPage: React.FC = () => {
               <Paper sx={{ p: 3, backgroundColor: "grey.50", borderRadius: 2 }}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Email sx={{ mr: 1, color: 'primary.main' }} />
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <Email sx={{ mr: 1, color: "primary.main" }} />
                       <Typography variant="h6" color="primary">
                         Account Details
                       </Typography>
@@ -548,18 +570,29 @@ const RegisterPage: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       Email Address:
                     </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>{values.email}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {values.email}
+                    </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary">
                       Username:
                     </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>{values.username}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {values.username}
+                    </Typography>
                   </Grid>
-                  
+
                   <Grid item xs={12}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 2 }}>
-                      <Person sx={{ mr: 1, color: 'primary.main' }} />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mb: 2,
+                        mt: 2,
+                      }}
+                    >
+                      <Person sx={{ mr: 1, color: "primary.main" }} />
                       <Typography variant="h6" color="primary">
                         Personal Information
                       </Typography>
@@ -569,13 +602,17 @@ const RegisterPage: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       First Name:
                     </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>{values.first_name}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {values.first_name}
+                    </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary">
                       Last Name:
                     </Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 500 }}>{values.last_name}</Typography>
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                      {values.last_name}
+                    </Typography>
                   </Grid>
                   {values.department && (
                     <Grid item xs={12} sm={6}>
@@ -592,17 +629,19 @@ const RegisterPage: React.FC = () => {
                       <Typography variant="body2" color="text.secondary">
                         Phone:
                       </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 500 }}>{values.phone}</Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {values.phone}
+                      </Typography>
                     </Grid>
                   )}
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary">
                       Role:
                     </Typography>
-                    <Chip 
-                      label={values.role} 
-                      color="primary" 
-                      variant="outlined" 
+                    <Chip
+                      label={values.role}
+                      color="primary"
+                      variant="outlined"
                       size="small"
                       sx={{ fontWeight: 500 }}
                     />
@@ -612,7 +651,7 @@ const RegisterPage: React.FC = () => {
             </Grid>
 
             {/* Confirmation Section */}
-            {registrationState.status === 'idle' && (
+            {registrationState.status === "idle" && (
               <>
                 <Grid item xs={12}>
                   <Divider sx={{ my: 2 }}>
@@ -623,21 +662,35 @@ const RegisterPage: React.FC = () => {
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Paper sx={{ p: 3, backgroundColor: "warning.main", color: "warning.contrastText", borderRadius: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                      <Info sx={{ color: 'warning.contrastText', mt: 0.5 }} />
+                  <Paper
+                    sx={{
+                      p: 3,
+                      backgroundColor: "warning.main",
+                      color: "warning.contrastText",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}
+                    >
+                      <Info sx={{ color: "warning.contrastText", mt: 0.5 }} />
                       <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 600, mb: 1 }}
+                        >
                           Important Information
                         </Typography>
                         <Typography variant="body2" paragraph>
-                          • A verification email will be sent to your email address
+                          • A verification email will be sent to your email
+                          address
                         </Typography>
                         <Typography variant="body2" paragraph>
                           • You must verify your email before you can log in
                         </Typography>
                         <Typography variant="body2">
-                          • Please check your email (including spam folder) after registration
+                          • Please check your email (including spam folder)
+                          after registration
                         </Typography>
                       </Box>
                     </Box>
@@ -667,14 +720,18 @@ const RegisterPage: React.FC = () => {
                     control={
                       <Checkbox
                         checked={confirmationChecked}
-                        onChange={(e) => setConfirmationChecked(e.target.checked)}
+                        onChange={(e) =>
+                          setConfirmationChecked(e.target.checked)
+                        }
                         name="confirmationChecked"
                         color="primary"
                       />
                     }
                     label={
                       <Typography variant="body2">
-                        I confirm that all the information provided is accurate and I understand that I will need to verify my email address
+                        I confirm that all the information provided is accurate
+                        and I understand that I will need to verify my email
+                        address
                       </Typography>
                     }
                   />
@@ -750,7 +807,7 @@ const RegisterPage: React.FC = () => {
           </Stepper>
 
           {/* Error Alert */}
-          {error && registrationState.status === 'idle' && (
+          {error && registrationState.status === "idle" && (
             <Alert
               severity="error"
               sx={{ mb: 3, borderRadius: 2 }}
@@ -761,7 +818,12 @@ const RegisterPage: React.FC = () => {
           )}
 
           {/* Form */}
-          <Box component="form" ref={formRef} onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Box
+            component="form"
+            ref={formRef}
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             {renderStepContent(activeStep)}
 
             {/* Navigation Buttons */}
@@ -769,7 +831,9 @@ const RegisterPage: React.FC = () => {
               sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}
             >
               <Button
-                disabled={activeStep === 0 || registrationState.status === 'submitting'}
+                disabled={
+                  activeStep === 0 || registrationState.status === "submitting"
+                }
                 onClick={handleBack}
                 startIcon={<ArrowBack />}
                 sx={{ mr: 1 }}
@@ -782,9 +846,9 @@ const RegisterPage: React.FC = () => {
                   type="button"
                   variant="contained"
                   disabled={
-                    isPending || 
-                    registrationState.status === 'submitting' || 
-                    registrationState.status === 'success' ||
+                    isPending ||
+                    registrationState.status === "submitting" ||
+                    registrationState.status === "success" ||
                     !termsAccepted ||
                     !confirmationChecked
                   }
@@ -807,21 +871,20 @@ const RegisterPage: React.FC = () => {
                     },
                   }}
                   startIcon={
-                    registrationState.status === 'submitting' ? (
+                    registrationState.status === "submitting" ? (
                       <CircularProgress size={20} color="inherit" />
-                    ) : registrationState.status === 'success' ? (
+                    ) : registrationState.status === "success" ? (
                       <CheckCircle />
                     ) : (
                       <Send />
                     )
                   }
                 >
-                  {registrationState.status === 'submitting' 
-                    ? "Creating Account..." 
-                    : registrationState.status === 'success'
+                  {registrationState.status === "submitting"
+                    ? "Creating Account..."
+                    : registrationState.status === "success"
                     ? "Account Created!"
-                    : "Create Account"
-                  }
+                    : "Create Account"}
                 </Button>
               ) : (
                 <Button
@@ -868,71 +931,74 @@ const RegisterPage: React.FC = () => {
         </Box>
       </Box>
 
-              {/* Confirmation Dialog */}
-        <Dialog
-          open={showConfirmDialog}
-          onClose={() => setShowConfirmDialog(false)}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle id="alert-dialog-title">
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Warning sx={{ color: 'warning.main' }} />
-              Confirm Account Creation
-            </Box>
-          </DialogTitle>
-          <DialogContent>
-            <Box sx={{ py: 2 }}>
-              <Typography variant="body1" paragraph>
-                You are about to create an account with the following email:
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="alert-dialog-title">
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Warning sx={{ color: "warning.main" }} />
+            Confirm Account Creation
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ py: 2 }}>
+            <Typography variant="body1" paragraph>
+              You are about to create an account with the following email:
+            </Typography>
+            <Paper sx={{ p: 2, backgroundColor: "grey.50", mb: 2 }}>
+              <Typography variant="h6" color="primary">
+                {getValues().email}
               </Typography>
-              <Paper sx={{ p: 2, backgroundColor: 'grey.50', mb: 2 }}>
-                <Typography variant="h6" color="primary">
-                  {getValues().email}
-                </Typography>
-              </Paper>
-              <Alert severity="info" sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  <strong>Next Steps:</strong>
-                </Typography>
-                <Typography variant="body2" component="div">
-                  1. We'll send a verification email to your address<br/>
-                  2. Check your email (including spam folder)<br/>
-                  3. Click the verification link<br/>
-                  4. Return to log in with your credentials
-                </Typography>
-              </Alert>
-              <Typography variant="body2" color="text.secondary">
-                Are you ready to proceed with account creation?
+            </Paper>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                <strong>Next Steps:</strong>
               </Typography>
-            </Box>
-          </DialogContent>
-          <DialogActions sx={{ p: 3, gap: 2 }}>
-            <Button 
-              onClick={() => setShowConfirmDialog(false)} 
-              variant="outlined"
-              size="large"
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleConfirmSubmit} 
-              variant="contained"
-              size="large"
-              startIcon={<PersonAdd />}
-              sx={{
-                background: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
-                "&:hover": {
-                  background: "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)",
-                },
-              }}
-            >
-              Yes, Create Account
-            </Button>
-          </DialogActions>
-        </Dialog>
+              <Typography variant="body2" component="div">
+                1. We'll send a verification email to your address
+                <br />
+                2. Check your email (including spam folder)
+                <br />
+                3. Click the verification link
+                <br />
+                4. Return to log in with your credentials
+              </Typography>
+            </Alert>
+            <Typography variant="body2" color="text.secondary">
+              Are you ready to proceed with account creation?
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, gap: 2 }}>
+          <Button
+            onClick={() => setShowConfirmDialog(false)}
+            variant="outlined"
+            size="large"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmSubmit}
+            variant="contained"
+            size="large"
+            startIcon={<PersonAdd />}
+            sx={{
+              background: "linear-gradient(135deg, #1976d2 0%, #1565c0 100%)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)",
+              },
+            }}
+          >
+            Yes, Create Account
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

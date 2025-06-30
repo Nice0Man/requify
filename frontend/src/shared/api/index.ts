@@ -5,29 +5,33 @@
 export { ApiClient, type ApiResponse } from './client';
 
 // Authentication & Users
-export { authApi } from '@/features/auth/api/auth.api';
-export { usersApi } from '@/features/auth/api/users.api';
-export type * from '@/features/auth/types/auth.types';
+export { authApi } from '../../features/auth/api/auth.api';
+export { usersApi } from '../../features/auth/api/users.api';
+export type * from '../../features/auth/types/auth.types';
 
 // Projects
-export { projectsApi } from '@/features/projects/api/projects.api';
-export type * from '@/features/projects/api/projects.api';
+export { projectsApi } from '../../features/projects/api/projects.api';
+export type * from '../../features/projects/api/projects.api';
 
 // Requirements
-export { requirementsApi } from '@/features/requirements/api/requirements.api';
-export type * from '@/features/requirements/api/requirements.api';
+export { requirementsApi } from '../../features/requirements/api/requirements.api';
+export type * from '../../features/requirements/api/requirements.api';
 
 // Releases
-export { releasesApi } from '@/features/releases/api/releases.api';
-export type * from '@/features/releases/api/releases.api';
+export { releasesApi } from '../../features/releases/api/releases.api';
+export type * from '../../features/releases/api/releases.api';
 
 // Testing
-export { testingApi } from '@/features/testing/api/testing.api';
-export type * from '@/features/testing/api/testing.api';
+export { testingApi } from '../../features/testing/api/testing.api';
+export type * from '../../features/testing/api/testing.api';
+
+// Reports
+export { reportsApi } from '../../features/reports/api/reports.api';
+export type * from '../../features/reports/api/reports.api';
 
 // Admin
-export { adminApi } from '@/features/admin/api/admin.api';
-export type * from '@/features/admin/api/admin.api';
+export { adminApi } from '../../features/admin/api/admin.api';
+export type * from '../../features/admin/api/admin.api';
 
 // Reference Data
 export { referenceApi } from './reference.api';
@@ -53,6 +57,7 @@ export const api = {
   requirements: requirementsApi,
   releases: releasesApi,
   testing: testingApi,
+  reports: reportsApi,
   admin: adminApi,
   reference: referenceApi,
   specifications: specificationsApi,

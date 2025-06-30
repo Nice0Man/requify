@@ -1,6 +1,6 @@
 # Makefile for Requify project - Windows Compatible
 
-.PHONY: help commands install test lint run clean build dev prod stop logs
+.PHONY: help commands install test lint run clean build dev prod stop logs check-frontend-errors check-frontend-errors-windows check-frontend-live frontend-health
 
 help:	## Show this help message
 	@echo "==============================================="
@@ -62,6 +62,12 @@ help:	## Show this help message
 	@echo "  logs-backend       - Show backend logs"
 	@echo "  logs-frontend      - Show frontend logs"
 	@echo "  status             - Show status of all containers"
+	@echo ""
+	@echo "FRONTEND ERROR MONITORING:"
+	@echo "  check-frontend-errors         - Comprehensive frontend error analysis"
+	@echo "  check-frontend-errors-windows - Windows PowerShell version of error checking"
+	@echo "  check-frontend-live           - Monitor frontend errors in real-time"
+	@echo "  frontend-health               - Quick frontend health check"
 	@echo ""
 	@echo "EMAIL & SMTP:"
 	@echo "  email-setup        - Interactive SMTP configuration setup"
@@ -216,6 +222,71 @@ status:	## Show status of all containers
 	@echo "API Docs:       http://localhost:8000/docs"
 	@echo "Database Admin: http://localhost:8080"
 	@echo "Mail Testing:   http://localhost:8025"
+
+# =============================================================================
+# Frontend Error Monitoring
+# =============================================================================
+
+check-frontend-errors:	## Comprehensive frontend error checking
+	@echo "==============================================="
+	@echo "          Frontend Error Check Report"
+	@echo "==============================================="
+	@echo ""
+	@echo "1. Checking TypeScript compilation errors..."
+	@echo "============================================="
+	@cd ../frontend && npm run build > build-output.log 2>&1 && echo " Build successful" || (echo " Build failed - check build-output.log" && type build-output.log)
+	@echo ""
+	@echo "2. Checking ESLint errors and warnings..."
+	@echo "=========================================="
+	@cd ../frontend && npx eslint . --max-warnings 0 > lint-output.log 2>&1 && echo " No linting errors" || (echo "  Linting issues found:" && type lint-output.log)
+	@echo ""
+	@echo "3. Checking for runtime errors in logs..."
+	@echo "=========================================="
+	@cd ../deploy/docker && docker compose -f docker-compose.dev.yml logs frontend 2>nul | findstr /i "error failed exception warning" > ../../frontend/runtime-errors.log 2>nul || echo "No runtime errors found in recent logs"
+	@if exist "../frontend/runtime-errors.log" (echo "  Runtime errors detected:" && type "../frontend/runtime-errors.log") else (echo " No runtime errors in recent logs")
+	@echo ""
+	@echo "4. Running frontend tests..."
+	@echo "============================="
+	@cd ../frontend && npm test -- --run --reporter=verbose > test-output.log 2>&1 && echo " All tests passed" || (echo " Test failures detected:" && type test-output.log)
+	@echo ""
+	@echo "5. Checking package vulnerabilities..."
+	@echo "======================================"
+	@cd ../frontend && npm audit --audit-level=moderate > audit-output.log 2>&1 && echo " No security vulnerabilities" || (echo "  Security vulnerabilities found:" && type audit-output.log)
+	@echo ""
+	@echo "6. Analyzing bundle size..."
+	@echo "==========================="
+	@cd ../frontend && npm run build >nul 2>&1 && powershell -Command "if (Test-Path 'dist') { $$size = (Get-ChildItem -Recurse dist | Measure-Object -Property Length -Sum).Sum; $$sizeStr = if ($$size -gt 1MB) { '{0:N1} MB' -f ($$size/1MB) } else { '{0:N0} KB' -f ($$size/1KB) }; Write-Host '📦 Bundle size:' $$sizeStr } else { Write-Host ' Could not analyze bundle size' }"
+	@echo ""
+	@echo "==============================================="
+	@echo "Frontend error check completed!"
+	@echo "Log files saved in frontend/ directory:"
+	@echo "  - build-output.log    (build errors)"
+	@echo "  - lint-output.log     (linting issues)"
+	@echo "  - runtime-errors.log  (runtime errors)"
+	@echo "  - test-output.log     (test results)"
+	@echo "  - audit-output.log    (security audit)"
+	@echo "==============================================="
+
+check-frontend-errors-windows:	## Windows PowerShell version of frontend error checking
+	@echo "Running frontend error check using PowerShell..."
+	@powershell -ExecutionPolicy Bypass -File check-frontend-errors.ps1
+
+check-frontend-live:	## Monitor frontend errors in real-time
+	@echo "Starting live frontend error monitoring..."
+	@echo "Press Ctrl+C to stop monitoring"
+	@echo "=========================================="
+	cd ../deploy/docker && docker compose -f docker-compose.dev.yml logs -f frontend
+
+frontend-health:	## Quick frontend health check
+	@echo "=== Frontend Health Check ==="
+	@echo "Frontend container status:"
+	@cd ../deploy/docker && docker compose -f docker-compose.dev.yml ps frontend 2>nul || echo "   Container not running"
+	@echo "Frontend URL response:"
+	@powershell -Command "try { $$response = Invoke-WebRequest -Uri 'http://localhost:3000' -Method Head -TimeoutSec 5 -ErrorAction SilentlyContinue; if ($$response.StatusCode -eq 200) { Write-Host '   200 OK' } else { Write-Host '   Status:' $$response.StatusCode } } catch { Write-Host '   Not responding' }"
+	@echo "Build status:"
+	@cd ../frontend && npm run build >nul 2>&1 && echo "   Builds successfully" || echo "   Build fails"
+	@echo "Recent errors:"
+	@cd ../deploy/docker && docker compose -f docker-compose.dev.yml logs frontend 2>nul | findstr /i "error" >nul && echo "    Errors detected" || echo "   No recent errors"
 
 # =============================================================================
 # Utility Commands

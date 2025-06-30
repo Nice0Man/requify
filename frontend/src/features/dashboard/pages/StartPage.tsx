@@ -28,6 +28,8 @@ import {
   InputAdornment,
   CircularProgress,
   Link,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   Assignment,
@@ -50,6 +52,10 @@ import {
   VisibilityOff,
   Visibility,
   Lock,
+  Dashboard,
+  Logout,
+  AccountCircle,
+  ExpandMore,
 } from "@mui/icons-material";
 import { useAuth } from "../../auth/context/auth.context";
 import { LoginRequest, UserCreate } from "../../auth/types/auth.types";
@@ -60,7 +66,7 @@ import illustrationImage from "@/assets/img/pannel/komp-uternaa-illustracia-3d-g
 const StartPage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { login, register, isLoading, error, clearError, isAuthenticated } =
+  const { login, register, logout, isLoading, error, clearError, isAuthenticated, user } =
     useAuth();
 
   const [animationTrigger, setAnimationTrigger] = React.useState(false);
@@ -72,6 +78,7 @@ const StartPage: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [userMenuAnchor, setUserMenuAnchor] = React.useState<null | HTMLElement>(null);
 
   // Demo request form state
   const [demoRequest, setDemoRequest] = React.useState({
@@ -232,6 +239,26 @@ const StartPage: React.FC = () => {
     }
   };
 
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setUserMenuAnchor(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    handleUserMenuClose();
+    setSnackbarMessage("You have been logged out successfully");
+    setSnackbarOpen(true);
+  };
+
+  const handleDashboard = () => {
+    navigate("/dashboard");
+    handleUserMenuClose();
+  };
+
   // Validation functions
   const validateSignInForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -322,10 +349,13 @@ const StartPage: React.FC = () => {
     setScheduleDialogOpen(true);
   };
 
-  const handleFeatureClick = (_link: string) => {
-    // For now, show message since user isn't logged in
-    setSnackbarMessage("Please sign in to access this feature");
-    setSnackbarOpen(true);
+  const handleFeatureClick = (link: string) => {
+    if (isAuthenticated) {
+      navigate(link);
+    } else {
+      setSnackbarMessage("Please sign in to access this feature");
+      setSnackbarOpen(true);
+    }
   };
 
   const handleSocialClick = (platform: string) => {
@@ -406,42 +436,117 @@ const StartPage: React.FC = () => {
             >
               Requify
             </Typography>
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="text"
-                onClick={handleSignIn}
-                sx={{
-                  color: "text.secondary",
-                  fontWeight: 500,
-                  textTransform: "none",
-                  borderRadius: 2,
-                  px: 2,
-                  "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                  },
-                }}
-              >
-                {isAuthenticated ? "Dashboard" : "Sign In"}
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleGetStarted}
-                sx={{
-                  borderRadius: 2,
-                  textTransform: "none",
-                  fontWeight: 500,
-                  px: 3,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  "&:hover": {
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
-                  },
-                }}
-              >
-                {isAuthenticated ? "Go to Dashboard" : "Get Started"}
-              </Button>
-            </Stack>
+            
+            {/* Navigation Buttons */}
+            {!isAuthenticated ? (
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="text"
+                  onClick={handleSignIn}
+                  sx={{
+                    color: "text.secondary",
+                    fontWeight: 500,
+                    textTransform: "none",
+                    borderRadius: 2,
+                    px: 2,
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                    },
+                  }}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleGetStarted}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 500,
+                    px: 3,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    "&:hover": {
+                      transform: "translateY(-1px)",
+                      boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+                    },
+                  }}
+                >
+                  Get Started
+                </Button>
+              </Stack>
+            ) : (
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Button
+                  variant="outlined"
+                  startIcon={<Dashboard />}
+                  onClick={handleDashboard}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 500,
+                    px: 2,
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                      borderColor: theme.palette.primary.main,
+                    },
+                  }}
+                >
+                  Dashboard
+                </Button>
+                <Button
+                  variant="text"
+                  endIcon={<ExpandMore />}
+                  onClick={handleUserMenuOpen}
+                  sx={{
+                    color: "text.primary",
+                    fontWeight: 500,
+                    textTransform: "none",
+                    borderRadius: 2,
+                    px: 2,
+                    minWidth: "auto",
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                    },
+                  }}
+                >
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <AccountCircle />
+                    <Typography variant="body2" sx={{ display: { xs: "none", sm: "block" } }}>
+                      {user?.first_name || user?.username || "User"}
+                    </Typography>
+                  </Stack>
+                </Button>
+                
+                {/* User Menu */}
+                <Menu
+                  anchorEl={userMenuAnchor}
+                  open={Boolean(userMenuAnchor)}
+                  onClose={handleUserMenuClose}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                  sx={{
+                    mt: 1,
+                    "& .MuiPaper-root": {
+                      borderRadius: 2,
+                      minWidth: 180,
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  <MenuItem onClick={handleDashboard} sx={{ py: 1.5 }}>
+                    <Dashboard sx={{ mr: 2 }} fontSize="small" />
+                    Dashboard
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleLogout} sx={{ py: 1.5, color: "error.main" }}>
+                    <Logout sx={{ mr: 2 }} fontSize="small" />
+                    Sign Out
+                  </MenuItem>
+                </Menu>
+              </Stack>
+            )}
           </Stack>
         </Container>
       </Box>
@@ -604,7 +709,7 @@ const StartPage: React.FC = () => {
                     border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
                     overflow: "hidden",
-                    maxWidth: 500,
+                    maxWidth: 600,
                     cursor: "pointer",
                     transition: "transform 0.3s ease",
                     "&:hover": {

@@ -24,6 +24,7 @@ export interface UserProfile {
   last_name?: string;
   role: UserRole;
   is_active: boolean;
+  is_superuser: boolean;
   department?: string;
   phone?: string;
   timezone?: string;
