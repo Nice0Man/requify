@@ -30,7 +30,12 @@ import {
   TrendingUp,
 } from "@mui/icons-material";
 import { useParams, useNavigate } from "react-router-dom";
-import { projectsApi } from "@/shared/api";
+import {
+  projectsApi,
+  ProjectWithStats,
+  ProjectStatus,
+} from "../api/projects.api";
+import { getStatusColor } from "../types/project.types";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,21 +61,21 @@ const ProjectDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [project, setProject] = useState<any>(null);
+  const [project, setProject] = useState<ProjectWithStats | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProject = async () => {
       // Validate project ID parameter
-      if (!id || id.trim() === '') {
-        setError('Project ID is required');
+      if (!id || id.trim() === "") {
+        setError("Project ID is required");
         setLoading(false);
         return;
       }
 
       const projectId = parseInt(id, 10);
       if (isNaN(projectId) || projectId <= 0) {
-        setError('Invalid project ID. Please provide a valid project number.');
+        setError("Invalid project ID. Please provide a valid project number.");
         setLoading(false);
         return;
       }
@@ -78,17 +83,18 @@ const ProjectDetailsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await projectsApi.getProject(projectId);
+        // Get project with stats for complete information
+        const response = await projectsApi.getProjectStats(projectId);
         setProject(response.data);
       } catch (error: any) {
         console.error("Failed to fetch project:", error);
-        
+
         // Extract error message properly
-        let errorMessage = 'Failed to load project. Please try again.';
+        let errorMessage = "Failed to load project. Please try again.";
         if (error?.message) {
           if (Array.isArray(error.message)) {
-            errorMessage = error.message.join(', ');
-          } else if (typeof error.message === 'string') {
+            errorMessage = error.message.join(", ");
+          } else if (typeof error.message === "string") {
             errorMessage = error.message;
           } else {
             errorMessage = String(error.message);
@@ -96,7 +102,7 @@ const ProjectDetailsPage: React.FC = () => {
         } else if (error?.response?.data?.detail) {
           errorMessage = error.response.data.detail;
         }
-        
+
         setError(errorMessage);
         setProject(null);
       } finally {
@@ -109,21 +115,6 @@ const ProjectDetailsPage: React.FC = () => {
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "active":
-        return "success";
-      case "completed":
-        return "info";
-      case "on hold":
-        return "warning";
-      case "archived":
-        return "default";
-      default:
-        return "default";
-    }
   };
 
   const getProgressPercentage = (completed: number, total: number) => {
@@ -151,7 +142,7 @@ const ProjectDetailsPage: React.FC = () => {
         </Alert>
         <Button
           variant="outlined"
-          onClick={() => navigate('/projects')}
+          onClick={() => navigate("/projects")}
           sx={{ mt: 2 }}
         >
           Back to Projects
@@ -168,7 +159,7 @@ const ProjectDetailsPage: React.FC = () => {
         </Alert>
         <Button
           variant="outlined"
-          onClick={() => navigate('/projects')}
+          onClick={() => navigate("/projects")}
           sx={{ mt: 2 }}
         >
           Back to Projects
@@ -195,7 +186,9 @@ const ProjectDetailsPage: React.FC = () => {
               {project.code}
             </Typography>
             <Chip
-              label={project.status}
+              label={
+                project.status.charAt(0).toUpperCase() + project.status.slice(1)
+              }
               color={getStatusColor(project.status)}
               size="small"
             />
@@ -225,7 +218,7 @@ const ProjectDetailsPage: React.FC = () => {
                 Project Description
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                {project.description}
+                {project.description || "No description provided"}
               </Typography>
               <Divider sx={{ my: 2 }} />
               <Grid container spacing={2}>
@@ -239,11 +232,9 @@ const ProjectDetailsPage: React.FC = () => {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography variant="body2" color="text.secondary">
-                    Last Updated
+                    Owner ID
                   </Typography>
-                  <Typography variant="body1">
-                    {new Date(project.updated_at).toLocaleDateString()}
-                  </Typography>
+                  <Typography variant="body1">{project.owner_id}</Typography>
                 </Grid>
               </Grid>
             </CardContent>
@@ -253,22 +244,26 @@ const ProjectDetailsPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Project Owner
+                Project Status
               </Typography>
-              <Box display="flex" alignItems="center" gap={2}>
-                <Avatar>
-                  {project.owner.first_name[0]}
-                  {project.owner.last_name[0]}
-                </Avatar>
-                <Box>
-                  <Typography variant="body1">
-                    {project.owner.first_name} {project.owner.last_name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {project.owner.email}
-                  </Typography>
-                </Box>
+              <Box display="flex" alignItems="center" gap={2} mb={2}>
+                <Chip
+                  label={
+                    project.status.charAt(0).toUpperCase() +
+                    project.status.slice(1)
+                  }
+                  color={getStatusColor(project.status)}
+                  size="medium"
+                />
               </Box>
+              {project.is_completed && (
+                <Typography variant="body2" color="success.main">
+                  ✓ Project Completed
+                </Typography>
+              )}
+              <Typography variant="body2" color="text.secondary">
+                Completion: {project.completion_percentage}%
+              </Typography>
             </CardContent>
           </Card>
         </Grid>
@@ -283,7 +278,7 @@ const ProjectDetailsPage: React.FC = () => {
                 <Assignment color="primary" />
                 <Box flex={1}>
                   <Typography variant="h4">
-                    {project.stats.total_requirements}
+                    {project.total_requirements}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Total Requirements
@@ -291,8 +286,8 @@ const ProjectDetailsPage: React.FC = () => {
                   <LinearProgress
                     variant="determinate"
                     value={getProgressPercentage(
-                      project.stats.completed_requirements,
-                      project.stats.total_requirements
+                      project.requirements_completed,
+                      project.total_requirements
                     )}
                     sx={{ mt: 1 }}
                   />
@@ -308,19 +303,11 @@ const ProjectDetailsPage: React.FC = () => {
                 <BugReport color="success" />
                 <Box flex={1}>
                   <Typography variant="h4">
-                    {project.stats.total_tests}
+                    {project.active_releases}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Total Tests
+                    Active Releases
                   </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={getProgressPercentage(
-                      project.stats.passed_tests,
-                      project.stats.total_tests
-                    )}
-                    sx={{ mt: 1 }}
-                  />
                 </Box>
               </Box>
             </CardContent>
@@ -332,11 +319,9 @@ const ProjectDetailsPage: React.FC = () => {
               <Box display="flex" alignItems="center" gap={2}>
                 <People color="info" />
                 <Box flex={1}>
-                  <Typography variant="h4">
-                    {project.team_members.length}
-                  </Typography>
+                  <Typography variant="h4">{project.specs_count}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Team Members
+                    Specifications
                   </Typography>
                 </Box>
               </Box>
@@ -350,14 +335,10 @@ const ProjectDetailsPage: React.FC = () => {
                 <TrendingUp color="warning" />
                 <Box flex={1}>
                   <Typography variant="h4">
-                    {getProgressPercentage(
-                      project.stats.completed_requirements,
-                      project.stats.total_requirements
-                    )}
-                    %
+                    {project.requirement_groups_count}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Completion Rate
+                    Requirement Groups
                   </Typography>
                 </Box>
               </Box>
@@ -371,7 +352,7 @@ const ProjectDetailsPage: React.FC = () => {
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={tabValue} onChange={handleTabChange}>
             <Tab label="Requirements" icon={<Assignment />} />
-            <Tab label="Team" icon={<People />} />
+            <Tab label="Releases" icon={<BugReport />} />
             <Tab label="Activity" icon={<CalendarToday />} />
           </Tabs>
         </Box>
@@ -384,7 +365,7 @@ const ProjectDetailsPage: React.FC = () => {
             <Grid item xs={3}>
               <Paper sx={{ p: 2, textAlign: "center" }}>
                 <Typography variant="h5" color="success.main">
-                  {project.stats.completed_requirements}
+                  {project.requirements_completed}
                 </Typography>
                 <Typography variant="body2">Completed</Typography>
               </Paper>
@@ -392,17 +373,17 @@ const ProjectDetailsPage: React.FC = () => {
             <Grid item xs={3}>
               <Paper sx={{ p: 2, textAlign: "center" }}>
                 <Typography variant="h5" color="warning.main">
-                  {project.stats.in_progress_requirements}
+                  {project.total_requirements - project.requirements_completed}
                 </Typography>
-                <Typography variant="body2">In Progress</Typography>
+                <Typography variant="body2">Remaining</Typography>
               </Paper>
             </Grid>
             <Grid item xs={3}>
               <Paper sx={{ p: 2, textAlign: "center" }}>
                 <Typography variant="h5" color="info.main">
-                  {project.stats.pending_requirements}
+                  {project.completion_percentage}%
                 </Typography>
-                <Typography variant="body2">Pending</Typography>
+                <Typography variant="body2">Progress</Typography>
               </Paper>
             </Grid>
             <Grid item xs={3}>
@@ -410,7 +391,7 @@ const ProjectDetailsPage: React.FC = () => {
                 variant="contained"
                 fullWidth
                 sx={{ height: "100%" }}
-                onClick={() => navigate("/requirements")}
+                onClick={() => navigate(`/projects/${id}/requirements`)}
               >
                 View All Requirements
               </Button>
@@ -420,40 +401,29 @@ const ProjectDetailsPage: React.FC = () => {
 
         <TabPanel value={tabValue} index={1}>
           <Typography variant="h6" gutterBottom>
-            Team Members
+            Releases Overview
           </Typography>
-          <List>
-            {project.team_members.map((member: any) => (
-              <ListItem key={member.id}>
-                <Box display="flex" alignItems="center" gap={2} width="100%">
-                  <Avatar>
-                    {member.name
-                      .split(" ")
-                      .map((n: string) => n[0])
-                      .join("")}
-                  </Avatar>
-                  <ListItemText primary={member.name} secondary={member.role} />
-                </Box>
-              </ListItem>
-            ))}
-          </List>
+          <Box display="flex" alignItems="center" gap={2} mb={2}>
+            <Typography variant="h4" color="primary.main">
+              {project.active_releases}
+            </Typography>
+            <Typography variant="body1">Active Releases</Typography>
+          </Box>
+          <Button
+            variant="contained"
+            onClick={() => navigate(`/projects/${id}/releases`)}
+          >
+            View All Releases
+          </Button>
         </TabPanel>
 
         <TabPanel value={tabValue} index={2}>
           <Typography variant="h6" gutterBottom>
             Recent Activity
           </Typography>
-          <List>
-            {project.recent_activity.map((activity: any) => (
-              <ListItem key={activity.id}>
-                <ListItemText
-                  primary={`${activity.action} ${activity.title}`}
-                  secondary={new Date(activity.date).toLocaleDateString()}
-                />
-                <Chip label={activity.type} size="small" variant="outlined" />
-              </ListItem>
-            ))}
-          </List>
+          <Typography variant="body2" color="text.secondary">
+            Activity tracking is not yet implemented.
+          </Typography>
         </TabPanel>
       </Card>
     </Box>

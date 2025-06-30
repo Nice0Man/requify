@@ -20,33 +20,47 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { projectsApi, ProjectCreate, ProjectStatus } from "../api/projects.api";
+import { 
+  projectsApi, 
+  ProjectCreate, 
+  ProjectStatus 
+} from "../api/projects.api";
+import { 
+  ProjectValidation, 
+  validateProjectForm,
+  ValidationErrors 
+} from "../types/project.types";
 
 const ProjectCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
-  // Form state
+  // Form state matching backend schema exactly
   const [formData, setFormData] = useState<ProjectCreate>({
+    code: "",
     name: "",
     description: "",
-    status: ProjectStatus.PLANNING,
-    start_date: "",
-    end_date: "",
-    team_members: [],
+    status: ProjectStatus.PLANNING, // Default status
   });
 
   // UI state
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
   // Handle form field changes
   const handleChange =
     (field: keyof ProjectCreate) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      let value = event.target.value;
+      
+      // Apply transformations based on field type
+      if (field === 'code') {
+        value = ProjectValidation.code.transform(value);
+      }
+      
       setFormData((prev) => ({
         ...prev,
-        [field]: event.target.value,
+        [field]: value,
       }));
 
       // Clear error for this field when user starts typing
@@ -58,29 +72,11 @@ const ProjectCreatePage: React.FC = () => {
       }
     };
 
-  // Validate form
+  // Validate form using backend validation rules
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Project name is required";
-    }
-
-    if (!formData.description?.trim()) {
-      newErrors.description = "Project description is required";
-    }
-
-    if (formData.start_date && formData.end_date) {
-      const startDate = new Date(formData.start_date);
-      const endDate = new Date(formData.end_date);
-
-      if (endDate <= startDate) {
-        newErrors.end_date = "End date must be after start date";
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const validationErrors = validateProjectForm(formData);
+    setErrors(validationErrors);
+    return Object.keys(validationErrors).length === 0;
   };
 
   // Handle form submission
@@ -103,7 +99,7 @@ const ProjectCreatePage: React.FC = () => {
       // Handle API validation errors
       if (error?.response?.data?.detail) {
         if (Array.isArray(error.response.data.detail)) {
-          const apiErrors: Record<string, string> = {};
+          const apiErrors: ValidationErrors = {};
           error.response.data.detail.forEach((err: any) => {
             if (err.loc && err.msg) {
               const field = err.loc[err.loc.length - 1];
@@ -180,7 +176,7 @@ const ProjectCreatePage: React.FC = () => {
           {/* Basic Information */}
           <Grid item xs={12}>
             <Typography variant="h6" fontWeight={600} gutterBottom>
-              Basic Information
+              Project Information
             </Typography>
             <Divider sx={{ mb: 3 }} />
           </Grid>
@@ -188,13 +184,17 @@ const ProjectCreatePage: React.FC = () => {
           <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              label="Project Name"
-              value={formData.name}
-              onChange={handleChange("name")}
-              error={!!errors.name}
-              helperText={errors.name}
+              label="Project Code"
+              value={formData.code}
+              onChange={handleChange("code")}
+              error={!!errors.code}
+              helperText={errors.code || "Unique identifier (letters, numbers, hyphens, underscores only)"}
               required
-              placeholder="Enter project name"
+              placeholder="e.g., PROJ-2024"
+              inputProps={{
+                maxLength: ProjectValidation.code.maxLength,
+                style: { textTransform: 'uppercase' }
+              }}
             />
           </Grid>
 
@@ -206,15 +206,31 @@ const ProjectCreatePage: React.FC = () => {
               value={formData.status}
               onChange={handleChange("status")}
               error={!!errors.status}
-              helperText={errors.status}
+              helperText={errors.status || "Current project status"}
+              required
             >
               {Object.values(ProjectStatus).map((status) => (
                 <MenuItem key={status} value={status}>
-                  {status.charAt(0).toUpperCase() +
-                    status.slice(1).replace("_", " ")}
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Project Name"
+              value={formData.name}
+              onChange={handleChange("name")}
+              error={!!errors.name}
+              helperText={errors.name || "Descriptive name for the project"}
+              required
+              placeholder="Enter project name"
+              inputProps={{
+                maxLength: ProjectValidation.name.maxLength,
+              }}
+            />
           </Grid>
 
           <Grid item xs={12}>
@@ -226,54 +242,39 @@ const ProjectCreatePage: React.FC = () => {
               value={formData.description}
               onChange={handleChange("description")}
               error={!!errors.description}
-              helperText={errors.description}
+              helperText={errors.description || "Describe the project goals, scope, and objectives (optional)"}
               placeholder="Describe the project goals, scope, and objectives"
-              required
-            />
-          </Grid>
-
-          {/* Timeline */}
-          <Grid item xs={12}>
-            <Typography
-              variant="h6"
-              fontWeight={600}
-              gutterBottom
-              sx={{ mt: 2 }}
-            >
-              Timeline
-            </Typography>
-            <Divider sx={{ mb: 3 }} />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              type="date"
-              label="Start Date"
-              value={formData.start_date}
-              onChange={handleChange("start_date")}
-              error={!!errors.start_date}
-              helperText={errors.start_date}
-              InputLabelProps={{
-                shrink: true,
+              inputProps={{
+                maxLength: ProjectValidation.description.maxLength,
               }}
             />
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <TextField
-              fullWidth
-              type="date"
-              label="End Date"
-              value={formData.end_date}
-              onChange={handleChange("end_date")}
-              error={!!errors.end_date}
-              helperText={errors.end_date}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
+          {/* Validation Summary */}
+          {Object.keys(errors).length > 0 && (
+            <Grid item xs={12}>
+              <Paper
+                sx={{
+                  p: 2,
+                  backgroundColor: alpha(theme.palette.error.main, 0.1),
+                  border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+                }}
+              >
+                <Typography variant="subtitle2" color="error" fontWeight={600}>
+                  Please fix the following errors:
+                </Typography>
+                <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                  {Object.entries(errors).map(([field, message]) => (
+                    <li key={field}>
+                      <Typography variant="body2" color="error">
+                        <strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong> {message}
+                      </Typography>
+                    </li>
+                  ))}
+                </ul>
+              </Paper>
+            </Grid>
+          )}
 
           {/* Actions */}
           <Grid item xs={12}>
