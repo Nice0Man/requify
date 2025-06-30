@@ -612,14 +612,18 @@ const ProjectsPage: React.FC = () => {
                   />
                 )}
                 renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      size="small"
-                      label={getStatusLabel(option)}
-                      color={getStatusColor(option)}
-                      {...getTagProps({ index })}
-                    />
-                  ))
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Chip
+                        key={key}
+                        size="small"
+                        label={getStatusLabel(option)}
+                        color={getStatusColor(option)}
+                        {...chipProps}
+                      />
+                    );
+                  })
                 }
               />
             </Grid>
