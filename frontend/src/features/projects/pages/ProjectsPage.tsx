@@ -72,11 +72,11 @@ import {
   ProjectFilters,
   ProjectStatus,
 } from "../types/projects.types";
-import { 
+import {
   projectsApi,
   ProjectListParams as ApiProjectListParams,
   Project as ApiProject,
-  ProjectStatus as ApiProjectStatus
+  ProjectStatus as ApiProjectStatus,
 } from "../api/projects.api";
 import { useAuth } from "../../auth/context/auth.context";
 
@@ -141,7 +141,10 @@ const ProjectsPage: React.FC = () => {
         sort_by: sortModel[0]?.field,
         sort_order: sortModel[0]?.sort,
         search: filters.search || undefined,
-        status: filters.status.length === 1 ? filters.status[0] as ApiProjectStatus : undefined,
+        status:
+          filters.status.length === 1
+            ? (filters.status[0] as ApiProjectStatus)
+            : undefined,
         created_by: filters.managerId || undefined,
       };
 
@@ -583,8 +586,9 @@ const ProjectsPage: React.FC = () => {
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
                     {
-                      (projects || []).filter((p) => p.status === ApiProjectStatus.ACTIVE)
-                        .length
+                      (projects || []).filter(
+                        (p) => p.status === ApiProjectStatus.ACTIVE
+                      ).length
                     }
                   </Typography>
                 </Box>
@@ -607,8 +611,9 @@ const ProjectsPage: React.FC = () => {
                   </Typography>
                   <Typography variant="h5" fontWeight={600}>
                     {
-                      (projects || []).filter((p) => p.status === ApiProjectStatus.COMPLETED)
-                        .length
+                      (projects || []).filter(
+                        (p) => p.status === ApiProjectStatus.COMPLETED
+                      ).length
                     }
                   </Typography>
                 </Box>

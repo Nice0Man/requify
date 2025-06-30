@@ -68,6 +68,12 @@ const AdminPage = React.lazy(() => import("@/features/admin/pages/AdminPage"));
 const ProfilePage = React.lazy(
   () => import("@/features/auth/pages/ProfilePage")
 );
+const SettingsPage = React.lazy(
+  () => import("@/features/settings/pages/SettingsPage")
+);
+const ReportsPage = React.lazy(
+  () => import("@/features/reports/pages/ReportsPage")
+);
 const ApiOverviewPage = React.lazy(
   () => import("@/features/dashboard/pages/ApiOverviewPage")
 );
@@ -274,6 +280,16 @@ const AppRoutes: React.FC = () => {
           }
         />
 
+        {/* Reports */}
+        <Route
+          path="reports"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ReportsPage />
+            </React.Suspense>
+          }
+        />
+
         {/* Admin */}
         <Route
           path="admin/*"
@@ -292,6 +308,16 @@ const AppRoutes: React.FC = () => {
           element={
             <React.Suspense fallback={<LoadingFallback />}>
               <ProfilePage />
+            </React.Suspense>
+          }
+        />
+
+        {/* Settings */}
+        <Route
+          path="settings"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <SettingsPage />
             </React.Suspense>
           }
         />

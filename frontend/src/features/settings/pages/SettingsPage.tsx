@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Container,
   Box,
@@ -39,9 +39,12 @@ import {
   Radio,
   Slider,
   InputAdornment,
+  Stack,
+  Tooltip,
+  Fade,
 } from "@mui/material";
 import {
-  Settings,
+  Settings as SettingsIcon,
   Person,
   Notifications,
   Security,
@@ -66,9 +69,18 @@ import {
   Warning,
   CheckCircle,
   Visibility,
+  Close,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useAuth, usePermissions } from "../../auth/context/auth.context";
-import { UserProfile, NotificationPreferences, UserRole } from "../../auth/types/auth.types";
+import {
+  UserProfile,
+  NotificationPreferences,
+  UserRole,
+} from "../../auth/types/auth.types";
+import { usersApi } from "../../auth/api/users.api";
+import { adminApi } from "../../admin/api/admin.api";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -89,11 +101,44 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
   );
 };
 
+interface SystemSettings {
+  app_name: string;
+  max_file_size: number;
+  session_timeout: number;
+  email_notifications: boolean;
+  maintenance_mode: boolean;
+}
+
+interface AppearanceSettings {
+  theme: "light" | "dark" | "auto";
+  density: "compact" | "comfortable" | "spacious";
+  sidebar_collapsed: boolean;
+  animations_enabled: boolean;
+  sound_enabled: boolean;
+  language: string;
+  timezone: string;
+}
+
+interface SecuritySettings {
+  two_factor_enabled: boolean;
+  session_timeout: number;
+  login_notifications: boolean;
+  password_expiry: number;
+}
+
+interface PrivacySettings {
+  profile_visibility: "public" | "team" | "private";
+  activity_visibility: "public" | "team" | "private";
+  email_visibility: "public" | "team" | "private";
+  analytics_consent: boolean;
+}
+
 const SettingsPage: React.FC = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const { user, updateProfile, refreshUserData, isLoading } = useAuth();
   const { hasPermission } = usePermissions();
-  
+
   // Permission checks similar to ProfilePage
   const isAdmin =
     hasPermission("admin:read") ||
@@ -125,49 +170,64 @@ const SettingsPage: React.FC = () => {
 
   // Profile editing state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileFormData, setProfileFormData] = useState<Partial<UserProfile>>({});
+  const [profileFormData, setProfileFormData] = useState<Partial<UserProfile>>(
+    {}
+  );
 
-  // Notification settings
-  const [notificationSettings, setNotificationSettings] = useState<NotificationPreferences>({
-    email_notifications: true,
-    push_notifications: false,
-    requirement_updates: true,
-    test_results: true,
-    system_alerts: true,
-  });
+  // Settings state
+  const [notificationSettings, setNotificationSettings] =
+    useState<NotificationPreferences>({
+      email_notifications: true,
+      push_notifications: false,
+      requirement_updates: true,
+      test_results: true,
+      system_alerts: true,
+    });
 
-  // Security settings
-  const [securitySettings, setSecuritySettings] = useState({
+  const [securitySettings, setSecuritySettings] = useState<SecuritySettings>({
     two_factor_enabled: false,
     session_timeout: 30,
     login_notifications: true,
     password_expiry: 90,
   });
 
-  // Appearance settings
-  const [appearanceSettings, setAppearanceSettings] = useState({
-    theme: "auto",
-    density: "comfortable",
-    sidebar_collapsed: false,
-    animations_enabled: true,
-    sound_enabled: true,
-    language: "en",
-    timezone: "UTC",
-  });
+  const [appearanceSettings, setAppearanceSettings] =
+    useState<AppearanceSettings>({
+      theme: "auto",
+      density: "comfortable",
+      sidebar_collapsed: false,
+      animations_enabled: true,
+      sound_enabled: true,
+      language: "en",
+      timezone: "UTC",
+    });
 
-  // Privacy settings
-  const [privacySettings, setPrivacySettings] = useState({
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>({
     profile_visibility: "team",
     activity_visibility: "private",
     email_visibility: "private",
     analytics_consent: true,
   });
 
-  // State management
+  const [systemSettings, setSystemSettings] = useState<SystemSettings>({
+    app_name: "Requify",
+    max_file_size: 10,
+    session_timeout: 30,
+    email_notifications: true,
+    maintenance_mode: false,
+  });
+
+  // UI State
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [changePasswordDialog, setChangePasswordDialog] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "info"
+  >("success");
 
   // Initialize form data when user data changes
   useEffect(() => {
@@ -189,7 +249,7 @@ const SettingsPage: React.FC = () => {
       }
 
       // Update appearance settings
-      setAppearanceSettings(prev => ({
+      setAppearanceSettings((prev) => ({
         ...prev,
         language: user.language || "en",
         timezone: user.timezone || "UTC",
@@ -197,94 +257,160 @@ const SettingsPage: React.FC = () => {
     }
   }, [user]);
 
-  // Handle tab change
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
+  // Handlers
+  const handleTabChange = useCallback(
+    (event: React.SyntheticEvent, newValue: number) => {
+      setActiveTab(newValue);
+    },
+    []
+  );
 
-  // Handle profile field changes
-  const handleProfileFieldChange = (field: keyof UserProfile, value: any) => {
-    setProfileFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  const handleProfileFieldChange = useCallback(
+    (field: keyof UserProfile, value: any) => {
+      setProfileFormData((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
 
-  // Handle notification setting changes
-  const handleNotificationChange = (setting: keyof NotificationPreferences, value: boolean) => {
-    setNotificationSettings((prev) => ({
-      ...prev,
-      [setting]: value,
-    }));
-  };
+  const handleNotificationChange = useCallback(
+    (setting: keyof NotificationPreferences, value: boolean) => {
+      setNotificationSettings((prev) => ({ ...prev, [setting]: value }));
+    },
+    []
+  );
 
-  // Handle security setting changes
-  const handleSecurityChange = (setting: string, value: any) => {
-    setSecuritySettings((prev) => ({
-      ...prev,
-      [setting]: value,
-    }));
-  };
+  const handleSecurityChange = useCallback((setting: string, value: any) => {
+    setSecuritySettings((prev) => ({ ...prev, [setting]: value }));
+  }, []);
 
-  // Handle appearance setting changes
-  const handleAppearanceChange = (setting: string, value: any) => {
-    setAppearanceSettings((prev) => ({
-      ...prev,
-      [setting]: value,
-    }));
-  };
+  const handleAppearanceChange = useCallback((setting: string, value: any) => {
+    setAppearanceSettings((prev) => ({ ...prev, [setting]: value }));
+  }, []);
 
-  // Handle privacy setting changes
-  const handlePrivacyChange = (setting: string, value: any) => {
-    setPrivacySettings((prev) => ({
-      ...prev,
-      [setting]: value,
-    }));
-  };
+  const handlePrivacyChange = useCallback((setting: string, value: any) => {
+    setPrivacySettings((prev) => ({ ...prev, [setting]: value }));
+  }, []);
 
-  // Save profile changes
-  const handleSaveProfile = async () => {
+  const handleSystemSettingsChange = useCallback(
+    (setting: string, value: any) => {
+      setSystemSettings((prev) => ({ ...prev, [setting]: value }));
+    },
+    []
+  );
+
+  const showSnackbar = useCallback(
+    (message: string, severity: "success" | "error" | "info" = "success") => {
+      setSnackbarMessage(message);
+      setSnackbarSeverity(severity);
+      setSnackbarOpen(true);
+    },
+    []
+  );
+
+  const handleSaveProfile = useCallback(async () => {
     try {
-      setError(null);
-      await updateProfile({
-        ...profileFormData,
-        notification_preferences: notificationSettings,
-      });
-      setIsEditingProfile(false);
-      setSuccess("Profile updated successfully");
+      setSaving(true);
+      await usersApi.updateCurrentUser(profileFormData);
       await refreshUserData();
-    } catch (err: any) {
-      setError(err.message || "Failed to update profile");
+      setIsEditingProfile(false);
+      showSnackbar("Profile updated successfully", "success");
+    } catch (error: any) {
+      console.error("Failed to update profile:", error);
+      const message =
+        error?.response?.data?.detail || "Failed to update profile";
+      showSnackbar(message, "error");
+    } finally {
+      setSaving(false);
     }
-  };
+  }, [profileFormData, refreshUserData, showSnackbar]);
 
-  // Save notification settings
-  const handleSaveNotifications = async () => {
+  const handleSaveNotifications = useCallback(async () => {
     try {
-      setError(null);
-      await updateProfile({
+      setSaving(true);
+      const updateData = {
         notification_preferences: notificationSettings,
-      });
-      setSuccess("Notification preferences updated successfully");
-    } catch (err: any) {
-      setError(err.message || "Failed to update notification preferences");
+      };
+      await usersApi.updateCurrentUser(updateData);
+      await refreshUserData();
+      showSnackbar("Notification preferences updated", "success");
+    } catch (error: any) {
+      console.error("Failed to update notifications:", error);
+      const message =
+        error?.response?.data?.detail || "Failed to update notifications";
+      showSnackbar(message, "error");
+    } finally {
+      setSaving(false);
     }
-  };
+  }, [notificationSettings, refreshUserData, showSnackbar]);
 
-  // Save all settings
-  const handleSaveAllSettings = async () => {
+  const handleSaveSystemSettings = useCallback(async () => {
+    if (!isAdmin) {
+      showSnackbar(
+        "You don't have permission to update system settings",
+        "error"
+      );
+      return;
+    }
+
     try {
-      setError(null);
-      // This would save all settings to backend
-      // For now, just show success message
-      setSuccess("All settings saved successfully");
-    } catch (err: any) {
-      setError(err.message || "Failed to save settings");
+      setSaving(true);
+      await adminApi.updateSystemSettings(systemSettings);
+      showSnackbar("System settings updated successfully", "success");
+    } catch (error: any) {
+      console.error("Failed to update system settings:", error);
+      const message =
+        error?.response?.data?.detail || "Failed to update system settings";
+      showSnackbar(message, "error");
+    } finally {
+      setSaving(false);
     }
-  };
+  }, [systemSettings, isAdmin, showSnackbar]);
 
-  // Handle cancel profile edit
-  const handleCancelProfileEdit = () => {
+  const handleSaveAllSettings = useCallback(async () => {
+    try {
+      setSaving(true);
+
+      // Save profile if editing
+      if (isEditingProfile) {
+        await usersApi.updateCurrentUser(profileFormData);
+      }
+
+      // Save notification preferences
+      const updateData = {
+        notification_preferences: notificationSettings,
+        language: appearanceSettings.language,
+        timezone: appearanceSettings.timezone,
+      };
+      await usersApi.updateCurrentUser(updateData);
+
+      // Save system settings if admin
+      if (isAdmin) {
+        await adminApi.updateSystemSettings(systemSettings);
+      }
+
+      await refreshUserData();
+      setIsEditingProfile(false);
+      showSnackbar("All settings saved successfully", "success");
+    } catch (error: any) {
+      console.error("Failed to save settings:", error);
+      const message =
+        error?.response?.data?.detail || "Failed to save settings";
+      showSnackbar(message, "error");
+    } finally {
+      setSaving(false);
+    }
+  }, [
+    isEditingProfile,
+    profileFormData,
+    notificationSettings,
+    appearanceSettings,
+    systemSettings,
+    isAdmin,
+    refreshUserData,
+    showSnackbar,
+  ]);
+
+  const handleCancelProfileEdit = useCallback(() => {
     if (user) {
       setProfileFormData({
         first_name: user.first_name || "",
@@ -299,30 +425,28 @@ const SettingsPage: React.FC = () => {
     }
     setIsEditingProfile(false);
     setError(null);
-  };
+  }, [user]);
 
-  // Handle refresh
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     try {
       setRefreshing(true);
       await refreshUserData();
-      setSuccess("Settings refreshed");
+      showSnackbar("Settings refreshed", "success");
     } catch (err: any) {
-      setError("Failed to refresh settings");
+      showSnackbar("Failed to refresh settings", "error");
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [refreshUserData, showSnackbar]);
 
-  // Get initials helper function (similar to ProfilePage)
-  const getInitials = (firstName?: string, lastName?: string) => {
+  // Helper functions
+  const getInitials = useCallback((firstName?: string, lastName?: string) => {
     return `${firstName?.charAt(0) || ""}${
       lastName?.charAt(0) || ""
     }`.toUpperCase();
-  };
+  }, []);
 
-  // Get role color helper function (similar to ProfilePage)
-  const getRoleColor = (role: UserRole) => {
+  const getRoleColor = useCallback((role: UserRole) => {
     switch (role) {
       case UserRole.ADMIN:
         return "error";
@@ -343,10 +467,9 @@ const SettingsPage: React.FC = () => {
       default:
         return "default";
     }
-  };
+  }, []);
 
-  // Get role label helper function (similar to ProfilePage)
-  const getRoleLabel = (role: UserRole) => {
+  const getRoleLabel = useCallback((role: UserRole) => {
     switch (role) {
       case UserRole.ADMIN:
         return "Administrator";
@@ -367,7 +490,7 @@ const SettingsPage: React.FC = () => {
       default:
         return "Unknown";
     }
-  };
+  }, []);
 
   // Loading state
   if (isLoading && !user) {
@@ -378,7 +501,11 @@ const SettingsPage: React.FC = () => {
             <Skeleton variant="text" width="30%" height={40} sx={{ mb: 1 }} />
             <Skeleton variant="text" width="50%" height={24} />
           </Box>
-          <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 3 }} />
+          <Skeleton
+            variant="rectangular"
+            height={400}
+            sx={{ borderRadius: 3 }}
+          />
         </Box>
       </Container>
     );
@@ -388,30 +515,36 @@ const SettingsPage: React.FC = () => {
     <Container component="main" maxWidth="lg">
       <Box sx={{ py: 4 }}>
         {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-            <Box>
-              <Box display="flex" alignItems="center" gap={2} mb={1}>
-                <Settings sx={{ fontSize: 32, color: theme.palette.primary.main }} />
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: 700,
-                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  Settings
-                </Typography>
-              </Box>
-              <Typography variant="body1" color="text.secondary" sx={{ fontSize: "1.1rem" }}>
-                Manage your account preferences and system configuration
-              </Typography>
-            </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 2,
+            mb: 4,
+          }}
+        >
+          <Stack spacing={1}>
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 700,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              Settings
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage your account preferences and system configuration.
+            </Typography>
+          </Stack>
 
-            <Box display="flex" gap={1}>
+          <Stack direction="row" spacing={2}>
+            <Tooltip title="Refresh Settings">
               <IconButton
                 onClick={handleRefresh}
                 disabled={refreshing}
@@ -419,21 +552,34 @@ const SettingsPage: React.FC = () => {
                   backgroundColor: alpha(theme.palette.primary.main, 0.1),
                   "&:hover": {
                     backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                    transform: "rotate(180deg)",
                   },
+                  transition: "all 0.3s ease",
                 }}
               >
-                <Refresh sx={{ color: theme.palette.primary.main }} />
+                <Refresh />
               </IconButton>
-              <Button
-                variant="contained"
-                startIcon={<Save />}
-                onClick={handleSaveAllSettings}
-                sx={{ ml: 2 }}
-              >
-                Save All
-              </Button>
-            </Box>
-          </Box>
+            </Tooltip>
+            <Button
+              variant="contained"
+              startIcon={<Save />}
+              onClick={handleSaveAllSettings}
+              disabled={saving}
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 500,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                "&:hover": {
+                  transform: "translateY(-1px)",
+                  boxShadow: theme.shadows[6],
+                },
+                transition: "all 0.3s ease",
+              }}
+            >
+              {saving ? "Saving..." : "Save All"}
+            </Button>
+          </Stack>
         </Box>
 
         {/* Settings Navigation Tabs */}
@@ -457,6 +603,7 @@ const SettingsPage: React.FC = () => {
             <Tab icon={<Security />} label="Security" />
             <Tab icon={<Palette />} label="Appearance" />
             <Tab icon={<Shield />} label="Privacy" />
+            {isAdmin && <Tab icon={<SettingsIcon />} label="System" />}
           </Tabs>
         </Card>
 
@@ -467,7 +614,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -475,7 +625,10 @@ const SettingsPage: React.FC = () => {
                   title={
                     <Box display="flex" alignItems="center" gap={1}>
                       <Person color="primary" fontSize="small" />
-                      <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                      >
                         Profile Summary
                       </Typography>
                     </Box>
@@ -493,7 +646,9 @@ const SettingsPage: React.FC = () => {
                       }}
                       src={user?.avatar}
                     >
-                      {getInitials(user?.first_name, user?.last_name) || user?.username?.[0] || "U"}
+                      {getInitials(user?.first_name, user?.last_name) ||
+                        user?.username?.[0] ||
+                        "U"}
                     </Avatar>
                     <IconButton
                       size="small"
@@ -504,7 +659,10 @@ const SettingsPage: React.FC = () => {
                         backgroundColor: theme.palette.background.paper,
                         border: `2px solid ${theme.palette.background.paper}`,
                         "&:hover": {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.1
+                          ),
                         },
                       }}
                     >
@@ -518,7 +676,11 @@ const SettingsPage: React.FC = () => {
                       : user?.username}
                   </Typography>
 
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 1 }}
+                  >
                     {user?.email}
                   </Typography>
 
@@ -546,7 +708,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -594,7 +759,9 @@ const SettingsPage: React.FC = () => {
                         fullWidth
                         label="First Name"
                         value={profileFormData.first_name || ""}
-                        onChange={(e) => handleProfileFieldChange("first_name", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileFieldChange("first_name", e.target.value)
+                        }
                         disabled={!isEditingProfile}
                         variant={isEditingProfile ? "outlined" : "filled"}
                       />
@@ -605,7 +772,9 @@ const SettingsPage: React.FC = () => {
                         fullWidth
                         label="Last Name"
                         value={profileFormData.last_name || ""}
-                        onChange={(e) => handleProfileFieldChange("last_name", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileFieldChange("last_name", e.target.value)
+                        }
                         disabled={!isEditingProfile}
                         variant={isEditingProfile ? "outlined" : "filled"}
                       />
@@ -617,7 +786,9 @@ const SettingsPage: React.FC = () => {
                         label="Email"
                         type="email"
                         value={profileFormData.email || ""}
-                        onChange={(e) => handleProfileFieldChange("email", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileFieldChange("email", e.target.value)
+                        }
                         disabled={!isEditingProfile}
                         variant={isEditingProfile ? "outlined" : "filled"}
                       />
@@ -628,11 +799,15 @@ const SettingsPage: React.FC = () => {
                         fullWidth
                         label="Username"
                         value={profileFormData.username || ""}
-                        onChange={(e) => handleProfileFieldChange("username", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileFieldChange("username", e.target.value)
+                        }
                         disabled={!isEditingProfile}
                         variant={isEditingProfile ? "outlined" : "filled"}
                         InputProps={{
-                          startAdornment: <InputAdornment position="start">@</InputAdornment>,
+                          startAdornment: (
+                            <InputAdornment position="start">@</InputAdornment>
+                          ),
                         }}
                       />
                     </Grid>
@@ -642,7 +817,9 @@ const SettingsPage: React.FC = () => {
                         fullWidth
                         label="Department"
                         value={profileFormData.department || ""}
-                        onChange={(e) => handleProfileFieldChange("department", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileFieldChange("department", e.target.value)
+                        }
                         disabled={!isEditingProfile}
                         variant={isEditingProfile ? "outlined" : "filled"}
                       />
@@ -653,7 +830,9 @@ const SettingsPage: React.FC = () => {
                         fullWidth
                         label="Phone"
                         value={profileFormData.phone || ""}
-                        onChange={(e) => handleProfileFieldChange("phone", e.target.value)}
+                        onChange={(e) =>
+                          handleProfileFieldChange("phone", e.target.value)
+                        }
                         disabled={!isEditingProfile}
                         variant={isEditingProfile ? "outlined" : "filled"}
                       />
@@ -664,15 +843,25 @@ const SettingsPage: React.FC = () => {
                         <InputLabel>Timezone</InputLabel>
                         <Select
                           value={profileFormData.timezone || "UTC"}
-                          onChange={(e) => handleProfileFieldChange("timezone", e.target.value)}
+                          onChange={(e) =>
+                            handleProfileFieldChange("timezone", e.target.value)
+                          }
                           label="Timezone"
                           variant={isEditingProfile ? "outlined" : "filled"}
                         >
                           <MenuItem value="UTC">UTC</MenuItem>
-                          <MenuItem value="America/New_York">Eastern Time</MenuItem>
-                          <MenuItem value="America/Chicago">Central Time</MenuItem>
-                          <MenuItem value="America/Denver">Mountain Time</MenuItem>
-                          <MenuItem value="America/Los_Angeles">Pacific Time</MenuItem>
+                          <MenuItem value="America/New_York">
+                            Eastern Time
+                          </MenuItem>
+                          <MenuItem value="America/Chicago">
+                            Central Time
+                          </MenuItem>
+                          <MenuItem value="America/Denver">
+                            Mountain Time
+                          </MenuItem>
+                          <MenuItem value="America/Los_Angeles">
+                            Pacific Time
+                          </MenuItem>
                           <MenuItem value="Europe/London">London</MenuItem>
                           <MenuItem value="Europe/Paris">Paris</MenuItem>
                           <MenuItem value="Asia/Tokyo">Tokyo</MenuItem>
@@ -693,7 +882,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -721,11 +913,19 @@ const SettingsPage: React.FC = () => {
                       <ListItemIcon>
                         <Email />
                       </ListItemIcon>
-                      <ListItemText primary="Email Notifications" secondary="Receive notifications via email" />
+                      <ListItemText
+                        primary="Email Notifications"
+                        secondary="Receive notifications via email"
+                      />
                       <ListItemSecondaryAction>
                         <Switch
                           checked={notificationSettings.email_notifications}
-                          onChange={(e) => handleNotificationChange("email_notifications", e.target.checked)}
+                          onChange={(e) =>
+                            handleNotificationChange(
+                              "email_notifications",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -734,11 +934,19 @@ const SettingsPage: React.FC = () => {
                       <ListItemIcon>
                         <NotificationsActive />
                       </ListItemIcon>
-                      <ListItemText primary="Push Notifications" secondary="Receive browser push notifications" />
+                      <ListItemText
+                        primary="Push Notifications"
+                        secondary="Receive browser push notifications"
+                      />
                       <ListItemSecondaryAction>
                         <Switch
                           checked={notificationSettings.push_notifications}
-                          onChange={(e) => handleNotificationChange("push_notifications", e.target.checked)}
+                          onChange={(e) =>
+                            handleNotificationChange(
+                              "push_notifications",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -751,7 +959,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -766,31 +977,55 @@ const SettingsPage: React.FC = () => {
                 <CardContent>
                   <List>
                     <ListItem>
-                      <ListItemText primary="Requirement Updates" secondary="Get notified when requirements change" />
+                      <ListItemText
+                        primary="Requirement Updates"
+                        secondary="Get notified when requirements change"
+                      />
                       <ListItemSecondaryAction>
                         <Switch
                           checked={notificationSettings.requirement_updates}
-                          onChange={(e) => handleNotificationChange("requirement_updates", e.target.checked)}
+                          onChange={(e) =>
+                            handleNotificationChange(
+                              "requirement_updates",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
                     <Divider />
                     <ListItem>
-                      <ListItemText primary="Test Results" secondary="Notifications for test completions" />
+                      <ListItemText
+                        primary="Test Results"
+                        secondary="Notifications for test completions"
+                      />
                       <ListItemSecondaryAction>
                         <Switch
                           checked={notificationSettings.test_results}
-                          onChange={(e) => handleNotificationChange("test_results", e.target.checked)}
+                          onChange={(e) =>
+                            handleNotificationChange(
+                              "test_results",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
                     <Divider />
                     <ListItem>
-                      <ListItemText primary="System Alerts" secondary="Important system notifications" />
+                      <ListItemText
+                        primary="System Alerts"
+                        secondary="Important system notifications"
+                      />
                       <ListItemSecondaryAction>
                         <Switch
                           checked={notificationSettings.system_alerts}
-                          onChange={(e) => handleNotificationChange("system_alerts", e.target.checked)}
+                          onChange={(e) =>
+                            handleNotificationChange(
+                              "system_alerts",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -808,7 +1043,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -844,7 +1082,12 @@ const SettingsPage: React.FC = () => {
                       <ListItemSecondaryAction>
                         <Switch
                           checked={securitySettings.two_factor_enabled}
-                          onChange={(e) => handleSecurityChange("two_factor_enabled", e.target.checked)}
+                          onChange={(e) =>
+                            handleSecurityChange(
+                              "two_factor_enabled",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -860,7 +1103,12 @@ const SettingsPage: React.FC = () => {
                       <ListItemSecondaryAction>
                         <Switch
                           checked={securitySettings.login_notifications}
-                          onChange={(e) => handleSecurityChange("login_notifications", e.target.checked)}
+                          onChange={(e) =>
+                            handleSecurityChange(
+                              "login_notifications",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -873,7 +1121,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -892,7 +1143,9 @@ const SettingsPage: React.FC = () => {
                     </Typography>
                     <Slider
                       value={securitySettings.session_timeout}
-                      onChange={(e, value) => handleSecurityChange("session_timeout", value)}
+                      onChange={(e, value) =>
+                        handleSecurityChange("session_timeout", value)
+                      }
                       min={15}
                       max={120}
                       step={15}
@@ -912,7 +1165,9 @@ const SettingsPage: React.FC = () => {
                     </Typography>
                     <Slider
                       value={securitySettings.password_expiry}
-                      onChange={(e, value) => handleSecurityChange("password_expiry", value)}
+                      onChange={(e, value) =>
+                        handleSecurityChange("password_expiry", value)
+                      }
                       min={30}
                       max={365}
                       step={30}
@@ -938,7 +1193,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -957,12 +1215,26 @@ const SettingsPage: React.FC = () => {
                     </Typography>
                     <RadioGroup
                       value={appearanceSettings.theme}
-                      onChange={(e) => handleAppearanceChange("theme", e.target.value)}
+                      onChange={(e) =>
+                        handleAppearanceChange("theme", e.target.value)
+                      }
                       row
                     >
-                      <FormControlLabel value="light" control={<Radio />} label={<LightMode />} />
-                      <FormControlLabel value="dark" control={<Radio />} label={<DarkMode />} />
-                      <FormControlLabel value="auto" control={<Radio />} label="Auto" />
+                      <FormControlLabel
+                        value="light"
+                        control={<Radio />}
+                        label={<LightMode />}
+                      />
+                      <FormControlLabel
+                        value="dark"
+                        control={<Radio />}
+                        label={<DarkMode />}
+                      />
+                      <FormControlLabel
+                        value="auto"
+                        control={<Radio />}
+                        label="Auto"
+                      />
                     </RadioGroup>
                   </Box>
 
@@ -972,7 +1244,12 @@ const SettingsPage: React.FC = () => {
                       <ListItemSecondaryAction>
                         <Switch
                           checked={appearanceSettings.animations_enabled}
-                          onChange={(e) => handleAppearanceChange("animations_enabled", e.target.checked)}
+                          onChange={(e) =>
+                            handleAppearanceChange(
+                              "animations_enabled",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -984,7 +1261,12 @@ const SettingsPage: React.FC = () => {
                       <ListItemSecondaryAction>
                         <Switch
                           checked={appearanceSettings.sound_enabled}
-                          onChange={(e) => handleAppearanceChange("sound_enabled", e.target.checked)}
+                          onChange={(e) =>
+                            handleAppearanceChange(
+                              "sound_enabled",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -997,7 +1279,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -1016,7 +1301,9 @@ const SettingsPage: React.FC = () => {
                         <InputLabel>Language</InputLabel>
                         <Select
                           value={appearanceSettings.language}
-                          onChange={(e) => handleAppearanceChange("language", e.target.value)}
+                          onChange={(e) =>
+                            handleAppearanceChange("language", e.target.value)
+                          }
                           label="Language"
                         >
                           <MenuItem value="en">English</MenuItem>
@@ -1034,14 +1321,24 @@ const SettingsPage: React.FC = () => {
                         <InputLabel>Timezone</InputLabel>
                         <Select
                           value={appearanceSettings.timezone}
-                          onChange={(e) => handleAppearanceChange("timezone", e.target.value)}
+                          onChange={(e) =>
+                            handleAppearanceChange("timezone", e.target.value)
+                          }
                           label="Timezone"
                         >
                           <MenuItem value="UTC">UTC</MenuItem>
-                          <MenuItem value="America/New_York">Eastern Time</MenuItem>
-                          <MenuItem value="America/Chicago">Central Time</MenuItem>
-                          <MenuItem value="America/Denver">Mountain Time</MenuItem>
-                          <MenuItem value="America/Los_Angeles">Pacific Time</MenuItem>
+                          <MenuItem value="America/New_York">
+                            Eastern Time
+                          </MenuItem>
+                          <MenuItem value="America/Chicago">
+                            Central Time
+                          </MenuItem>
+                          <MenuItem value="America/Denver">
+                            Mountain Time
+                          </MenuItem>
+                          <MenuItem value="America/Los_Angeles">
+                            Pacific Time
+                          </MenuItem>
                           <MenuItem value="Europe/London">London</MenuItem>
                           <MenuItem value="Europe/Paris">Paris</MenuItem>
                           <MenuItem value="Asia/Tokyo">Tokyo</MenuItem>
@@ -1062,7 +1359,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -1081,11 +1381,28 @@ const SettingsPage: React.FC = () => {
                     </Typography>
                     <RadioGroup
                       value={privacySettings.profile_visibility}
-                      onChange={(e) => handlePrivacyChange("profile_visibility", e.target.value)}
+                      onChange={(e) =>
+                        handlePrivacyChange(
+                          "profile_visibility",
+                          e.target.value
+                        )
+                      }
                     >
-                      <FormControlLabel value="public" control={<Radio />} label="Everyone" />
-                      <FormControlLabel value="team" control={<Radio />} label="Team Members" />
-                      <FormControlLabel value="private" control={<Radio />} label="Only Me" />
+                      <FormControlLabel
+                        value="public"
+                        control={<Radio />}
+                        label="Everyone"
+                      />
+                      <FormControlLabel
+                        value="team"
+                        control={<Radio />}
+                        label="Team Members"
+                      />
+                      <FormControlLabel
+                        value="private"
+                        control={<Radio />}
+                        label="Only Me"
+                      />
                     </RadioGroup>
                   </Box>
                 </CardContent>
@@ -1096,7 +1413,10 @@ const SettingsPage: React.FC = () => {
               <Card
                 sx={{
                   borderRadius: 3,
-                  boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                  boxShadow: `0 2px 12px ${alpha(
+                    theme.palette.common.black,
+                    0.08
+                  )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
                 }}
               >
@@ -1119,7 +1439,12 @@ const SettingsPage: React.FC = () => {
                         <FormControl size="small">
                           <Select
                             value={privacySettings.email_visibility}
-                            onChange={(e) => handlePrivacyChange("email_visibility", e.target.value)}
+                            onChange={(e) =>
+                              handlePrivacyChange(
+                                "email_visibility",
+                                e.target.value
+                              )
+                            }
                           >
                             <MenuItem value="public">Public</MenuItem>
                             <MenuItem value="team">Team</MenuItem>
@@ -1137,7 +1462,12 @@ const SettingsPage: React.FC = () => {
                       <ListItemSecondaryAction>
                         <Switch
                           checked={privacySettings.analytics_consent}
-                          onChange={(e) => handlePrivacyChange("analytics_consent", e.target.checked)}
+                          onChange={(e) =>
+                            handlePrivacyChange(
+                              "analytics_consent",
+                              e.target.checked
+                            )
+                          }
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
@@ -1148,28 +1478,229 @@ const SettingsPage: React.FC = () => {
           </Grid>
         </TabPanel>
 
+        {/* System Settings Tab (Admin Only) */}
+        {isAdmin && (
+          <TabPanel value={activeTab} index={5}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    boxShadow: `0 2px 12px ${alpha(
+                      theme.palette.common.black,
+                      0.08
+                    )}`,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                  }}
+                >
+                  <CardHeader
+                    title={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <SettingsIcon color="primary" fontSize="small" />
+                        Application Settings
+                      </Box>
+                    }
+                    action={
+                      <Button
+                        variant="outlined"
+                        startIcon={<Save />}
+                        onClick={handleSaveSystemSettings}
+                        size="small"
+                        disabled={saving}
+                      >
+                        Save
+                      </Button>
+                    }
+                  />
+                  <CardContent>
+                    <Grid container spacing={3}>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Application Name"
+                          value={systemSettings.app_name}
+                          onChange={(e) =>
+                            handleSystemSettingsChange(
+                              "app_name",
+                              e.target.value
+                            )
+                          }
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          label="Maximum File Size (MB)"
+                          type="number"
+                          value={systemSettings.max_file_size}
+                          onChange={(e) =>
+                            handleSystemSettingsChange(
+                              "max_file_size",
+                              parseInt(e.target.value)
+                            )
+                          }
+                          variant="outlined"
+                          inputProps={{ min: 1, max: 100 }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box sx={{ mb: 3 }}>
+                          <Typography variant="body2" gutterBottom>
+                            Default Session Timeout (minutes)
+                          </Typography>
+                          <Slider
+                            value={systemSettings.session_timeout}
+                            onChange={(e, value) =>
+                              handleSystemSettingsChange(
+                                "session_timeout",
+                                value
+                              )
+                            }
+                            min={15}
+                            max={120}
+                            step={15}
+                            marks={[
+                              { value: 15, label: "15" },
+                              { value: 30, label: "30" },
+                              { value: 60, label: "60" },
+                              { value: 120, label: "120" },
+                            ]}
+                            valueLabelDisplay="auto"
+                          />
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    boxShadow: `0 2px 12px ${alpha(
+                      theme.palette.common.black,
+                      0.08
+                    )}`,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                  }}
+                >
+                  <CardHeader
+                    title={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Shield color="primary" fontSize="small" />
+                        System Controls
+                      </Box>
+                    }
+                  />
+                  <CardContent>
+                    <List>
+                      <ListItem>
+                        <ListItemIcon>
+                          <Email />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Email Notifications"
+                          secondary="Enable system-wide email notifications"
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            checked={systemSettings.email_notifications}
+                            onChange={(e) =>
+                              handleSystemSettingsChange(
+                                "email_notifications",
+                                e.target.checked
+                              )
+                            }
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      <Divider />
+                      <ListItem>
+                        <ListItemIcon>
+                          <Warning />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Maintenance Mode"
+                          secondary="Put the system in maintenance mode"
+                        />
+                        <ListItemSecondaryAction>
+                          <Switch
+                            checked={systemSettings.maintenance_mode}
+                            onChange={(e) =>
+                              handleSystemSettingsChange(
+                                "maintenance_mode",
+                                e.target.checked
+                              )
+                            }
+                            color="warning"
+                          />
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    </List>
+                    {systemSettings.maintenance_mode && (
+                      <Alert
+                        severity="warning"
+                        sx={{ mt: 2, borderRadius: 2 }}
+                        icon={<Warning />}
+                      >
+                        Maintenance mode will prevent regular users from
+                        accessing the system.
+                      </Alert>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </TabPanel>
+        )}
+
         {/* Success/Error Messages */}
         <Snackbar
-          open={!!success}
-          autoHideDuration={4000}
-          onClose={() => setSuccess(null)}
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
-          <Alert onClose={() => setSuccess(null)} severity="success" icon={<CheckCircle />}>
-            {success}
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarSeverity}
+            icon={snackbarSeverity === "success" ? <CheckCircle /> : undefined}
+            sx={{ borderRadius: 2 }}
+          >
+            {snackbarMessage}
           </Alert>
         </Snackbar>
 
-        <Snackbar
-          open={!!error}
-          autoHideDuration={6000}
-          onClose={() => setError(null)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Alert onClose={() => setError(null)} severity="error">
-            {error}
-          </Alert>
-        </Snackbar>
+        {/* Legacy error/success states for backwards compatibility */}
+        {error && (
+          <Fade in={!!error}>
+            <Box sx={{ mb: 2 }}>
+              <Alert
+                severity="error"
+                onClose={() => setError(null)}
+                sx={{ borderRadius: 2 }}
+              >
+                {error}
+              </Alert>
+            </Box>
+          </Fade>
+        )}
+
+        {success && (
+          <Fade in={!!success}>
+            <Box sx={{ mb: 2 }}>
+              <Alert
+                severity="success"
+                onClose={() => setSuccess(null)}
+                sx={{ borderRadius: 2 }}
+              >
+                {success}
+              </Alert>
+            </Box>
+          </Fade>
+        )}
 
         {/* Change Password Dialog */}
         <Dialog
@@ -1185,7 +1716,9 @@ const SettingsPage: React.FC = () => {
             </Typography>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setChangePasswordDialog(false)}>Cancel</Button>
+            <Button onClick={() => setChangePasswordDialog(false)}>
+              Cancel
+            </Button>
             <Button
               onClick={() => {
                 setChangePasswordDialog(false);

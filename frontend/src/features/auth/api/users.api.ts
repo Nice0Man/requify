@@ -1,5 +1,5 @@
 import { apiClient, ApiResponse } from '@/shared/api/client';
-import { User, UserProfile, UserCreate } from '../types/auth.types';
+import { User, UserProfile, UserCreate, NotificationPreferences } from '../types/auth.types';
 
 export interface UserListParams {
   skip?: number;
@@ -30,6 +30,7 @@ export interface UserUpdateRequest {
   timezone?: string;
   language?: string;
   is_active?: boolean;
+  notification_preferences?: NotificationPreferences;
 }
 
 export class UsersApi {

@@ -25,6 +25,9 @@ import {
   TextField,
   Snackbar,
   Alert,
+  InputAdornment,
+  CircularProgress,
+  Link,
 } from "@mui/material";
 import {
   Assignment,
@@ -43,7 +46,13 @@ import {
   Email,
   Phone,
   CalendarToday,
+  Person,
+  VisibilityOff,
+  Visibility,
+  Lock,
 } from "@mui/icons-material";
+import { useAuth } from "../../auth/context/auth.context";
+import { LoginRequest, UserCreate } from "../../auth/types/auth.types";
 
 // Import assets
 import illustrationImage from "@/assets/img/pannel/komp-uternaa-illustracia-3d-grafika.jpg";
@@ -51,11 +60,18 @@ import illustrationImage from "@/assets/img/pannel/komp-uternaa-illustracia-3d-g
 const StartPage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const { login, register, isLoading, error, clearError, isAuthenticated } =
+    useAuth();
+
   const [animationTrigger, setAnimationTrigger] = React.useState(false);
   const [demoDialogOpen, setDemoDialogOpen] = React.useState(false);
   const [scheduleDialogOpen, setScheduleDialogOpen] = React.useState(false);
+  const [signInDialogOpen, setSignInDialogOpen] = React.useState(false);
+  const [registerDialogOpen, setRegisterDialogOpen] = React.useState(false);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   // Demo request form state
   const [demoRequest, setDemoRequest] = React.useState({
@@ -75,10 +91,45 @@ const StartPage: React.FC = () => {
     message: "",
   });
 
+  // Sign in form state
+  const [signInData, setSignInData] = React.useState<LoginRequest>({
+    username: "",
+    password: "",
+  });
+
+  // Register form state
+  const [registerData, setRegisterData] = React.useState<UserCreate>({
+    email: "",
+    username: "",
+    password: "",
+    first_name: "",
+    last_name: "",
+  });
+
+  // Form validation errors
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>(
+    {}
+  );
+
   React.useEffect(() => {
     const timer = setTimeout(() => setAnimationTrigger(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Redirect to dashboard if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Clear auth errors when dialogs close
+  React.useEffect(() => {
+    if (!signInDialogOpen && !registerDialogOpen) {
+      clearError();
+      setFormErrors({});
+    }
+  }, [signInDialogOpen, registerDialogOpen, clearError]);
 
   const features = [
     {
@@ -170,11 +221,93 @@ const StartPage: React.FC = () => {
 
   // Handler functions
   const handleGetStarted = () => {
-    navigate("auth/register");
+    setRegisterDialogOpen(true);
   };
 
   const handleSignIn = () => {
-    navigate("/login");
+    setSignInDialogOpen(true);
+  };
+
+  // Validation functions
+  const validateSignInForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!signInData.username.trim()) {
+      errors.username = "Username or email is required";
+    }
+
+    if (!signInData.password) {
+      errors.password = "Password is required";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateRegisterForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!registerData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(registerData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    if (!registerData.username.trim()) {
+      errors.username = "Username is required";
+    } else if (registerData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
+    }
+
+    if (!registerData.password) {
+      errors.password = "Password is required";
+    } else if (registerData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters";
+    }
+
+    if (!registerData.first_name?.trim()) {
+      errors.first_name = "First name is required";
+    }
+
+    if (!registerData.last_name?.trim()) {
+      errors.last_name = "Last name is required";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Authentication handlers
+  const handleSignInSubmit = async () => {
+    if (!validateSignInForm()) return;
+
+    try {
+      await login(signInData);
+      setSignInDialogOpen(false);
+      setSignInData({ username: "", password: "" });
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
+  };
+
+  const handleRegisterSubmit = async () => {
+    if (!validateRegisterForm()) return;
+
+    try {
+      await register(registerData);
+      setRegisterDialogOpen(false);
+      setRegisterData({
+        email: "",
+        username: "",
+        password: "",
+        first_name: "",
+        last_name: "",
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
   };
 
   const handleWatchDemo = () => {
@@ -467,7 +600,7 @@ const StartPage: React.FC = () => {
                     border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
                     overflow: "hidden",
-                    maxWidth: 400,
+                    maxWidth: 500,
                     cursor: "pointer",
                     transition: "transform 0.3s ease",
                     "&:hover": {
@@ -486,29 +619,6 @@ const StartPage: React.FC = () => {
                       borderRadius: 2,
                     }}
                   />
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      backgroundColor: alpha(theme.palette.primary.main, 0.9),
-                      borderRadius: "50%",
-                      width: 60,
-                      height: 60,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        backgroundColor: theme.palette.primary.main,
-                        transform: "translate(-50%, -50%) scale(1.1)",
-                      },
-                    }}
-                  >
-                    <PlayArrow sx={{ color: "white", fontSize: 30, ml: 0.5 }} />
-                  </Box>
                 </Paper>
               </Box>
             </Zoom>
@@ -1247,6 +1357,334 @@ const StartPage: React.FC = () => {
             }}
           >
             Schedule Demo
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Sign In Dialog */}
+      <Dialog
+        open={signInDialogOpen}
+        onClose={() => setSignInDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography variant="h6" fontWeight={600}>
+              Sign In to Requify
+            </Typography>
+            <IconButton onClick={() => setSignInDialogOpen(false)} size="small">
+              <Close />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Welcome back! Please sign in to continue.
+            </Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ borderRadius: 2 }}>
+                {error.error_description}
+              </Alert>
+            )}
+
+            <TextField
+              label="Username or Email"
+              value={signInData.username}
+              onChange={(e) =>
+                setSignInData({ ...signInData, username: e.target.value })
+              }
+              error={!!formErrors.username}
+              helperText={formErrors.username}
+              fullWidth
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              value={signInData.password}
+              onChange={(e) =>
+                setSignInData({ ...signInData, password: e.target.value })
+              }
+              error={!!formErrors.password}
+              helperText={formErrors.password}
+              fullWidth
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  setSignInDialogOpen(false);
+                  setSnackbarMessage(
+                    "Password reset functionality coming soon"
+                  );
+                  setSnackbarOpen(true);
+                }}
+                sx={{ textDecoration: "none" }}
+              >
+                Forgot password?
+              </Link>
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  setSignInDialogOpen(false);
+                  setRegisterDialogOpen(true);
+                }}
+                sx={{ textDecoration: "none" }}
+              >
+                Don't have an account? Sign up
+              </Link>
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button
+            onClick={() => setSignInDialogOpen(false)}
+            color="inherit"
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSignInSubmit}
+            variant="contained"
+            disabled={isLoading || !signInData.username || !signInData.password}
+            startIcon={isLoading ? <CircularProgress size={16} /> : null}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 500,
+              minWidth: 120,
+            }}
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Register Dialog */}
+      <Dialog
+        open={registerDialogOpen}
+        onClose={() => setRegisterDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography variant="h6" fontWeight={600}>
+              Create Your Account
+            </Typography>
+            <IconButton
+              onClick={() => setRegisterDialogOpen(false)}
+              size="small"
+            >
+              <Close />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Join thousands of teams who trust Requify for their requirements
+              management.
+            </Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ borderRadius: 2 }}>
+                {error.error_description}
+              </Alert>
+            )}
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="First Name"
+                  value={registerData.first_name}
+                  onChange={(e) =>
+                    setRegisterData({
+                      ...registerData,
+                      first_name: e.target.value,
+                    })
+                  }
+                  error={!!formErrors.first_name}
+                  helperText={formErrors.first_name}
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Last Name"
+                  value={registerData.last_name}
+                  onChange={(e) =>
+                    setRegisterData({
+                      ...registerData,
+                      last_name: e.target.value,
+                    })
+                  }
+                  error={!!formErrors.last_name}
+                  helperText={formErrors.last_name}
+                  fullWidth
+                  required
+                />
+              </Grid>
+            </Grid>
+
+            <TextField
+              label="Email Address"
+              type="email"
+              value={registerData.email}
+              onChange={(e) =>
+                setRegisterData({ ...registerData, email: e.target.value })
+              }
+              error={!!formErrors.email}
+              helperText={formErrors.email}
+              fullWidth
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              label="Username"
+              value={registerData.username}
+              onChange={(e) =>
+                setRegisterData({ ...registerData, username: e.target.value })
+              }
+              error={!!formErrors.username}
+              helperText={formErrors.username}
+              fullWidth
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person color="action" />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              value={registerData.password}
+              onChange={(e) =>
+                setRegisterData({ ...registerData, password: e.target.value })
+              }
+              error={!!formErrors.password}
+              helperText={formErrors.password || "Minimum 8 characters"}
+              fullWidth
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Stack alignItems="center">
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  setRegisterDialogOpen(false);
+                  setSignInDialogOpen(true);
+                }}
+                sx={{ textDecoration: "none" }}
+              >
+                Already have an account? Sign in
+              </Link>
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button
+            onClick={() => setRegisterDialogOpen(false)}
+            color="inherit"
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRegisterSubmit}
+            variant="contained"
+            disabled={
+              isLoading ||
+              !registerData.email ||
+              !registerData.username ||
+              !registerData.password ||
+              !registerData.first_name ||
+              !registerData.last_name
+            }
+            startIcon={isLoading ? <CircularProgress size={16} /> : null}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 500,
+              minWidth: 120,
+            }}
+          >
+            {isLoading ? "Creating Account..." : "Create Account"}
           </Button>
         </DialogActions>
       </Dialog>

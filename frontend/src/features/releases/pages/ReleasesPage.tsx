@@ -4,17 +4,14 @@ import {
   Typography,
   Grid,
   Card,
-  CardContent,
   Button,
   Chip,
   LinearProgress,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  Paper,
   IconButton,
   Tooltip,
   useTheme,
@@ -24,23 +21,13 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
   MenuItem,
   Alert,
-  Snackbar,
-  Tab,
-  Tabs,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Badge,
   Stack,
-  Avatar,
-  AvatarGroup,
   Fade,
   Container,
+  InputAdornment,
+  Fab,
 } from "@mui/material";
 import {
   RocketLaunch,
@@ -48,12 +35,9 @@ import {
   Edit,
   Delete,
   Schedule,
-  Launch,
   Timeline,
-  Assignment,
   BugReport,
   Refresh,
-  ExpandMore,
   GetApp,
   Visibility,
   PlayArrow,
@@ -61,13 +45,9 @@ import {
   CheckCircleOutline,
   ErrorOutline,
   CalendarToday,
-  TrendingUp,
   Search,
   FilterList,
-  Clear,
   Publish,
-  Archive,
-  Share,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -87,7 +67,6 @@ import {
   ReleaseCreate,
   ReleaseType,
 } from "../types/release.types";
-import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -95,18 +74,6 @@ interface TabPanelProps {
   value: number;
 }
 
-const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`releases-tabpanel-${index}`}
-      aria-labelledby={`releases-tab-${index}`}
-    >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  );
-};
 
 interface ReleaseStats {
   total: number;
@@ -183,17 +150,9 @@ const ReleasesPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { hasPermission, hasAnyPermission } = usePermissions();
+  const { hasAnyPermission } = usePermissions();
 
   // Check permissions
-  const canWrite =
-    hasAnyPermission(["releases:write", "project:write"]) ||
-    user?.role === UserRole.MANAGER ||
-    user?.role === UserRole.ADMIN;
-  const canApprove =
-    hasAnyPermission(["releases:approve"]) ||
-    user?.role === UserRole.MANAGER ||
-    user?.role === UserRole.ADMIN;
 
   // State management
   const [activeTab, setActiveTab] = useState(0);
@@ -303,9 +262,6 @@ const ReleasesPage: React.FC = () => {
   };
 
   // Handle tab change
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
 
   // Handle create release
   const handleCreateRelease = async () => {
@@ -558,8 +514,16 @@ const ReleasesPage: React.FC = () => {
               onClick={() => navigate("/dashboard")}
             >
               <Stack spacing={2}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="h4" fontWeight={700} color="primary.main">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    color="primary.main"
+                  >
                     {stats.total}
                   </Typography>
                   <RocketLaunch color="primary" />
@@ -590,7 +554,11 @@ const ReleasesPage: React.FC = () => {
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
                   <Typography variant="h4" fontWeight={700} color="info.main">
                     {stats.planning}
                   </Typography>
@@ -622,8 +590,16 @@ const ReleasesPage: React.FC = () => {
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="h4" fontWeight={700} color="warning.main">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    color="warning.main"
+                  >
                     {stats.in_progress}
                   </Typography>
                   <Timeline color="warning" />
@@ -654,8 +630,16 @@ const ReleasesPage: React.FC = () => {
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="h4" fontWeight={700} color="secondary.main">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    color="secondary.main"
+                  >
                     {stats.testing}
                   </Typography>
                   <BugReport color="secondary" />
@@ -686,8 +670,16 @@ const ReleasesPage: React.FC = () => {
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="h4" fontWeight={700} color="success.main">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    color="success.main"
+                  >
                     {stats.released}
                   </Typography>
                   <Publish color="success" />
@@ -718,7 +710,11 @@ const ReleasesPage: React.FC = () => {
               }}
             >
               <Stack spacing={2}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
                   <Typography variant="h4" fontWeight={700} color="error.main">
                     {stats.overdue}
                   </Typography>
@@ -753,11 +749,13 @@ const ReleasesPage: React.FC = () => {
               {(filters.search || filters.status.length > 0) && (
                 <Button
                   size="small"
-                  onClick={() => setFilters({
-                    status: "",
-                    search: "",
-                    project_id: "",
-                  })}
+                  onClick={() =>
+                    setFilters({
+                      status: "",
+                      search: "",
+                      project_id: "",
+                    })
+                  }
                   sx={{ textTransform: "none" }}
                 >
                   Clear All
@@ -771,7 +769,9 @@ const ReleasesPage: React.FC = () => {
                   fullWidth
                   placeholder="Search releases..."
                   value={filters.search}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                  onChange={(e) =>
+                    setFilters({ ...filters, search: e.target.value })
+                  }
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -792,7 +792,9 @@ const ReleasesPage: React.FC = () => {
                   fullWidth
                   label="Status"
                   value={filters.status}
-                  onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                  onChange={(e) =>
+                    setFilters({ ...filters, status: e.target.value })
+                  }
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: 2,
@@ -801,7 +803,9 @@ const ReleasesPage: React.FC = () => {
                 >
                   <MenuItem value="">All Statuses</MenuItem>
                   <MenuItem value={ReleaseStatus.PLANNING}>Planned</MenuItem>
-                  <MenuItem value={ReleaseStatus.IN_PROGRESS}>In Progress</MenuItem>
+                  <MenuItem value={ReleaseStatus.IN_PROGRESS}>
+                    In Progress
+                  </MenuItem>
                   <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
                   <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
                   <MenuItem value={ReleaseStatus.RELEASED}>Released</MenuItem>
@@ -813,7 +817,9 @@ const ReleasesPage: React.FC = () => {
                   fullWidth
                   label="Project ID"
                   value={filters.project_id}
-                  onChange={(e) => setFilters({ ...filters, project_id: e.target.value })}
+                  onChange={(e) =>
+                    setFilters({ ...filters, project_id: e.target.value })
+                  }
                 />
               </Grid>
             </Grid>
@@ -830,37 +836,134 @@ const ReleasesPage: React.FC = () => {
           }}
         >
           <Box sx={{ height: 600, width: "100%" }}>
-            <DataGrid
-              rows={releases}
-              columns={columns}
-              paginationMode="server"
-              rowCount={totalCount}
-              page={page}
-              pageSize={pageSize}
-              onPageChange={(newPage) => setPage(newPage)}
-              onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-              loading={loading}
-              disableSelectionOnClick
-              components={{ Toolbar: GridToolbar }}
-              componentsProps={{
-                toolbar: {
-                  showQuickFilter: true,
-                },
-              }}
-              sx={{
-                border: "none",
-                "& .MuiDataGrid-cell": {
-                  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  backgroundColor: alpha(theme.palette.grey[50], 0.5),
-                  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                },
-                "& .MuiDataGrid-row:hover": {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.02),
-                },
-              }}
-            />
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Version</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Planned Date</TableCell>
+                  <TableCell>Project</TableCell>
+                  <TableCell align="right">Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      <LinearProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : releases.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      <Typography color="text.secondary">
+                        No releases found
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  releases.map((release) => (
+                    <TableRow
+                      key={release.id}
+                      hover
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: alpha(
+                            theme.palette.primary.main,
+                            0.02
+                          ),
+                        },
+                      }}
+                    >
+                      <TableCell>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <Typography variant="subtitle2" fontWeight={600}>
+                            {release.name}
+                          </Typography>
+                          {isOverdue(release) && (
+                            <Chip
+                              label="Overdue"
+                              size="small"
+                              color="error"
+                              variant="outlined"
+                            />
+                          )}
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" fontFamily="monospace">
+                          {release.version}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          icon={getStatusIcon(release.status)}
+                          label={release.status.replace("_", " ")}
+                          size="small"
+                          sx={{
+                            backgroundColor: alpha(
+                              getStatusColor(release.status),
+                              0.1
+                            ),
+                            color: getStatusColor(release.status),
+                            fontWeight: 600,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <CalendarToday fontSize="small" color="action" />
+                          <Typography variant="body2">
+                            {release.planned_date
+                              ? new Date(
+                                  release.planned_date
+                                ).toLocaleDateString()
+                              : "Not set"}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {release.project_id || "N/A"}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          justifyContent="flex-end"
+                        >
+                          <Tooltip title="View Details">
+                            <IconButton size="small" color="primary">
+                              <Visibility fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Edit Release">
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={() => openEditDialog(release)}
+                            >
+                              <Edit fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Release">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => handleDeleteRelease(release)}
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </Box>
         </Card>
       </Stack>

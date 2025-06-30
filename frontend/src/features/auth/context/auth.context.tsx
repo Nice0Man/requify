@@ -13,6 +13,7 @@ import {
   AuthState,
   UserProfile,
   LoginRequest,
+  UserCreate,
   PasswordChangeRequest,
   PasswordResetRequest,
   PasswordResetConfirm,
@@ -22,6 +23,7 @@ import {
 // Auth context type
 interface AuthContextType extends AuthState {
   login: (credentials: LoginRequest) => Promise<void>;
+  register: (userData: UserCreate) => Promise<void>;
   logout: () => Promise<void>;
   refreshTokenMethod: () => Promise<string | null>;
   changePassword: (request: PasswordChangeRequest) => Promise<void>;
@@ -235,6 +237,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
+  const register = useCallback(async (userData: UserCreate) => {
+    try {
+      dispatch({ type: "AUTH_START" });
+
+      const response = await authApi.register(userData);
+
+      // After successful registration, automatically log the user in
+      const loginResponse = await authApi.login({
+        username: userData.username,
+        password: userData.password,
+      });
+
+      dispatch({
+        type: "AUTH_SUCCESS",
+        payload: {
+          user: loginResponse.data.user,
+          accessToken: loginResponse.data.access_token,
+          refreshToken: loginResponse.data.refresh_token,
+          permissions: loginResponse.data.permissions,
+        },
+      });
+
+      toast.success("Registration successful! Welcome to Requify!");
+    } catch (error: any) {
+      const authError: AuthError = {
+        error: error.code || "REGISTRATION_FAILED",
+        error_description: error.message || "Registration failed",
+        error_details: error.details,
+      };
+
+      dispatch({ type: "AUTH_FAILURE", payload: authError });
+      toast.error(authError.error_description);
+      throw error;
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       if (state.refreshToken) {
@@ -399,6 +437,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const contextValue: AuthContextType = {
     ...state,
     login,
+    register,
     logout,
     refreshTokenMethod: refreshToken,
     changePassword,
