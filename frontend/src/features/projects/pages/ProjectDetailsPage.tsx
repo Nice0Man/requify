@@ -83,9 +83,27 @@ const ProjectDetailsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        // Get project with stats for complete information
-        const response = await projectsApi.getProjectStats(projectId);
-        setProject(response.data);
+        let projectData: ProjectWithStats;
+        
+        // The backend's GET /{project_id} endpoint already returns ProjectWithStats
+        const response = await projectsApi.getProject(projectId);
+        console.log('Project API response:', response.data); // Debug logging
+        projectData = response.data;
+        
+        // Ensure all required fields have default values if missing
+        const safeProjectData: ProjectWithStats = {
+          ...projectData,
+          status: projectData.status || 'inactive', // Default status if missing
+          total_requirements: projectData.total_requirements || 0,
+          requirements_completed: projectData.requirements_completed || 0,
+          active_releases: projectData.active_releases || 0,
+          specs_count: projectData.specs_count || 0,
+          requirement_groups_count: projectData.requirement_groups_count || 0,
+          completion_percentage: projectData.completion_percentage || 0,
+          is_completed: projectData.is_completed || false,
+        };
+        
+        setProject(safeProjectData);
       } catch (error: any) {
         console.error("Failed to fetch project:", error);
 
@@ -119,6 +137,11 @@ const ProjectDetailsPage: React.FC = () => {
 
   const getProgressPercentage = (completed: number, total: number) => {
     return total > 0 ? Math.round((completed / total) * 100) : 0;
+  };
+
+  const formatStatus = (status?: string) => {
+    if (!status) return "Unknown";
+    return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
   if (loading) {
@@ -186,10 +209,8 @@ const ProjectDetailsPage: React.FC = () => {
               {project.code}
             </Typography>
             <Chip
-              label={
-                project.status.charAt(0).toUpperCase() + project.status.slice(1)
-              }
-              color={getStatusColor(project.status)}
+              label={formatStatus(project.status)}
+              color={getStatusColor(project.status || "inactive")}
               size="small"
             />
           </Box>
@@ -248,11 +269,8 @@ const ProjectDetailsPage: React.FC = () => {
               </Typography>
               <Box display="flex" alignItems="center" gap={2} mb={2}>
                 <Chip
-                  label={
-                    project.status.charAt(0).toUpperCase() +
-                    project.status.slice(1)
-                  }
-                  color={getStatusColor(project.status)}
+                  label={formatStatus(project.status)}
+                  color={getStatusColor(project.status || "inactive")}
                   size="medium"
                 />
               </Box>

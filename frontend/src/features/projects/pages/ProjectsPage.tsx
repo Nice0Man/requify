@@ -134,8 +134,10 @@ const ProjectsPage: React.FC = () => {
         search: filters.search || undefined,
         status:
           filters.status && filters.status.length === 1
-            ? filters.status[0]
-            : undefined,
+            ? filters.status[0]  // Single status selected
+            : filters.status && filters.status.length > 1
+            ? undefined          // Multiple statuses selected - let backend return all
+            : ProjectStatus.ACTIVE, // No status selected - default to active only
         owner_id: filters.owner_id || undefined,
       };
 
@@ -149,6 +151,7 @@ const ProjectsPage: React.FC = () => {
       setTotalCount(total);
     } catch (error: any) {
       console.error("Failed to load projects:", error);
+      
       setError(error.message || "Failed to load projects");
       setProjects([]); // Ensure projects is always an array
       setTotalCount(0);
@@ -179,15 +182,16 @@ const ProjectsPage: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await projectsApi.deleteProject(id);
+      // Soft delete: Change status to inactive instead of actual deletion
+      await projectsApi.updateProject(id, { status: ProjectStatus.INACTIVE });
       setSnackbar({
         open: true,
-        message: "Project deleted successfully",
+        message: "Project archived successfully",
         severity: "success",
       });
       loadProjects();
     } catch (error: any) {
-      toast.error(error.message || "Failed to delete project");
+      toast.error(error.message || "Failed to archive project");
     }
     setDeleteDialogOpen(false);
     setItemToDelete(null);
@@ -195,18 +199,21 @@ const ProjectsPage: React.FC = () => {
 
   const handleBulkDelete = async () => {
     try {
+      // Soft delete: Change status to inactive for all selected projects
       await Promise.all(
-        selectedRows.map((id) => projectsApi.deleteProject(id))
+        selectedRows.map((id) => 
+          projectsApi.updateProject(id, { status: ProjectStatus.INACTIVE })
+        )
       );
       setSnackbar({
         open: true,
-        message: `${selectedRows.length} projects deleted`,
+        message: `${selectedRows.length} projects archived`,
         severity: "success",
       });
       setSelectedRows([]);
       loadProjects();
     } catch (error: any) {
-      toast.error("Failed to delete projects");
+      toast.error("Failed to archive projects");
     }
     setBulkActionsAnchor(null);
   };
@@ -319,14 +326,14 @@ const ProjectsPage: React.FC = () => {
             label="Edit"
             onClick={() => navigate(`/projects/${params.id}/edit`)}
           />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={() => {
-              setItemToDelete(params.id as number);
-              setDeleteDialogOpen(true);
-            }}
-          />,
+                  <GridActionsCellItem
+          icon={<ArchiveIcon />}
+          label="Archive"
+          onClick={() => {
+            setItemToDelete(params.id as number);
+            setDeleteDialogOpen(true);
+          }}
+        />,
         ],
       },
     ],
@@ -598,7 +605,11 @@ const ProjectsPage: React.FC = () => {
                 value={filters.status || []}
                 onChange={(_, value) => handleFilterChange("status", value)}
                 renderInput={(params) => (
-                  <TextField {...params} label="Status" />
+                  <TextField 
+                    {...params} 
+                    label="Status" 
+                    helperText="Leave empty to show only active projects"
+                  />
                 )}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
@@ -658,9 +669,9 @@ const ProjectsPage: React.FC = () => {
               >
                 <MenuItem onClick={handleBulkDelete}>
                   <ListItemIcon>
-                    <DeleteIcon />
+                    <ArchiveIcon />
                   </ListItemIcon>
-                  <ListItemText>Delete Selected</ListItemText>
+                  <ListItemText>Archive Selected</ListItemText>
                 </MenuItem>
                 <MenuItem
                   onClick={() => {
@@ -672,16 +683,7 @@ const ProjectsPage: React.FC = () => {
                   </ListItemIcon>
                   <ListItemText>Change Status</ListItemText>
                 </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    /* TODO: Bulk archive */
-                  }}
-                >
-                  <ListItemIcon>
-                    <ArchiveIcon />
-                  </ListItemIcon>
-                  <ListItemText>Archive Selected</ListItemText>
-                </MenuItem>
+
               </Menu>
             </Box>
           </Box>
@@ -758,7 +760,7 @@ const ProjectsPage: React.FC = () => {
             justifyContent="space-between"
           >
             <Typography variant="h6" fontWeight={600}>
-              Delete Project
+              Archive Project
             </Typography>
             <IconButton onClick={() => setDeleteDialogOpen(false)} size="small">
               <ClearIcon />
@@ -781,20 +783,19 @@ const ProjectsPage: React.FC = () => {
                   <Typography
                     variant="subtitle2"
                     fontWeight={600}
-                    color="error.main"
+                    color="warning.main"
                   >
-                    This action cannot be undone
+                    Project will be archived
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    All associated requirements, releases, and project data will
-                    be permanently deleted.
+                    The project will be hidden from the list but can be restored later by changing its status.
                   </Typography>
                 </Box>
               </Stack>
             </Box>
-            <Typography>
-              Are you sure you want to delete this project?
-            </Typography>
+                      <Typography>
+              Are you sure you want to archive this project?
+          </Typography>
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
@@ -805,13 +806,13 @@ const ProjectsPage: React.FC = () => {
           >
             Cancel
           </Button>
-          <Button
-            onClick={() => itemToDelete && handleDelete(itemToDelete)}
-            color="error"
+                    <Button 
+            onClick={() => itemToDelete && handleDelete(itemToDelete)} 
+            color="warning"
             variant="contained"
             sx={{ borderRadius: 2 }}
           >
-            Delete Project
+            Archive Project
           </Button>
         </DialogActions>
       </Dialog>

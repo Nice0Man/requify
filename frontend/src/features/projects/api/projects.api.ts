@@ -92,9 +92,9 @@ export class ProjectsApi {
     return this.client.post<Project>('/projects/', projectData);
   }
 
-  // 3. Get Project
-  async getProject(projectId: number): Promise<ApiResponse<Project>> {
-    return this.client.get<Project>(`/projects/${projectId}`);
+  // 3. Get Project (returns ProjectWithStats as per backend implementation)
+  async getProject(projectId: number): Promise<ApiResponse<ProjectWithStats>> {
+    return this.client.get<ProjectWithStats>(`/projects/${projectId}`);
   }
 
   // 4. Update Project
