@@ -459,7 +459,7 @@ async def get_requirement_relationships(
 )
 async def create_requirement_relationship(
     requirement_id: int,
-    relationship_in: schemas.RelationshipCreate,
+    relationship_in: schemas.RelationshipCreateForRequirement,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_requirements_write_user),
 ):
@@ -505,8 +505,12 @@ async def create_requirement_relationship(
             status_code=status.HTTP_404_NOT_FOUND, detail="Relationship type not found"
         )
 
-    # Set source requirement
-    relationship_in.source_requirement_id = requirement_id
+    # Create relationship with correct field names for the model
+    relationship_data = {
+        "source_id": requirement_id,
+        "target_id": relationship_in.target_requirement_id,
+        "type_id": relationship_in.relationship_type_id,
+    }
 
-    relationship = await crud.relationship.create(db, obj_in=relationship_in)
+    relationship = await crud.relationship.create(db, obj_in=relationship_data)
     return relationship

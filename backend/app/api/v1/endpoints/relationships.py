@@ -56,15 +56,18 @@ async def get_relationships(
     Returns:
         List[schemas.Relationship]: Список связей
     """
+    # Map schema field names to model field names for filtering
     filters = {}
     if source_requirement_id:
-        filters["source_requirement_id"] = source_requirement_id
+        filters["source_id"] = source_requirement_id
     if target_requirement_id:
-        filters["target_requirement_id"] = target_requirement_id
+        filters["target_id"] = target_requirement_id
     if relationship_type_id:
-        filters["relationship_type_id"] = relationship_type_id
+        filters["type_id"] = relationship_type_id
 
-    relationships = await crud.relationship.get_multi(db, skip=skip, limit=limit)
+    relationships = await crud.relationship.get_multi(
+        db, skip=skip, limit=limit, filters=filters
+    )
     return relationships
 
 
@@ -127,7 +130,14 @@ async def create_relationship(
             detail="Тип связи не найден",
         )
 
-    relationship = await crud.relationship.create(db, obj_in=relationship_in)
+    # Create relationship with correct field names for the model
+    relationship_data = {
+        "source_id": relationship_in.source_requirement_id,
+        "target_id": relationship_in.target_requirement_id,
+        "type_id": relationship_in.relationship_type_id,
+    }
+
+    relationship = await crud.relationship.create(db, obj_in=relationship_data)
     return relationship
 
 
