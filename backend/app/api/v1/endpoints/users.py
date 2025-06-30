@@ -146,8 +146,16 @@ async def update_current_user(
     Raises:
         HTTPException: Если email или username уже используются
     """
+    # Получаем пользователя в текущей сессии, чтобы избежать проблем с SQLAlchemy session
+    user_in_session = await crud.user.get(db, id=current_user.id)
+    if not user_in_session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь не найден",
+        )
+
     # Проверяем уникальность email, если изменился
-    if user_in.email and user_in.email != current_user.email:
+    if user_in.email and user_in.email != user_in_session.email:
         existing_user = await crud.user.get_by_email(db, email=user_in.email)
         if existing_user:
             raise HTTPException(
@@ -156,7 +164,7 @@ async def update_current_user(
             )
 
     # Проверяем уникальность username, если изменился
-    if user_in.username and user_in.username != current_user.username:
+    if user_in.username and user_in.username != user_in_session.username:
         existing_username = await crud.user.get_by_username(
             db, username=user_in.username
         )
@@ -166,7 +174,7 @@ async def update_current_user(
                 detail="Пользователь с таким именем уже существует",
             )
 
-    user = await crud.user.update(db, db_obj=current_user, obj_in=user_in)
+    user = await crud.user.update(db, db_obj=user_in_session, obj_in=user_in)
     return user
 
 

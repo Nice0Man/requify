@@ -160,10 +160,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if hasattr(db_obj, field):
                 setattr(db_obj, field, update_data[field])
 
-        db.add(db_obj)
+        # Use merge instead of add to handle objects from different sessions
+        merged_obj = await db.merge(db_obj)
         await db.commit()
-        await db.refresh(db_obj)
-        return db_obj
+        await db.refresh(merged_obj)
+        return merged_obj
 
     async def remove(self, db: AsyncSession, *, id: int) -> ModelType:
         """
