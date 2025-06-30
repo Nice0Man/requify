@@ -620,14 +620,12 @@ async def generate_release_specification(
     relationships_data = []
     
     if spec_options.include_relationships and requirements:
-        from app.crud.relationship import relationship
-        
         # Получаем все связи для требований релиза
         requirement_ids = [req.id for req in requirements]
         all_relationships = []
         
         for req_id in requirement_ids:
-            rel_data = await relationship.get_by_requirement(db, requirement_id=req_id)
+            rel_data = await crud.relationship.get_by_requirement(db, requirement_id=req_id)
             all_relationships.extend(rel_data)
         
         relationships_count = len(all_relationships)
