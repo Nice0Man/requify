@@ -1,13 +1,33 @@
 // Admin types based on backend contracts
 
 export interface SystemInfo {
-  version: string;
+  platform: string;
+  platform_version?: string;
+  python_version: string;
+  cpu_count?: number;
+  memory?: {
+    total: number; // GB
+    available: number; // GB
+    percent: number;
+  };
+  disk?: {
+    total: number; // GB
+    free: number; // GB
+    used: number; // GB
+    percent: number;
+  };
+  app_version: string;
+  debug_mode: boolean;
   environment: string;
-  uptime: number;
-  database: DatabaseInfo;
-  cache: CacheInfo;
-  storage: StorageInfo;
-  api_health: ApiHealthInfo;
+  uptime?: number;
+  error?: string;
+  
+  // Legacy fields for compatibility
+  version?: string;
+  database?: DatabaseInfo;
+  cache?: CacheInfo;
+  storage?: StorageInfo;
+  api_health?: ApiHealthInfo;
 }
 
 export interface DatabaseInfo {
@@ -69,25 +89,34 @@ export interface SystemMetrics {
   };
 }
 
+// User management matching backend UserProfile and User schemas
 export interface UserManagement {
   id: number;
   email: string;
   username?: string;
   first_name?: string;
   last_name?: string;
-  role: UserRole;
+  role: string;
   is_active: boolean;
-  is_superuser: boolean;
+  is_superuser?: boolean;
   last_login?: string;
-  login_count: number;
-  failed_login_attempts: number;
+  login_count?: number;
+  failed_login_attempts?: number;
   account_locked_until?: string;
   email_verified: boolean;
+  email_verified_at?: string;
   created_at: string;
-  updated_at: string;
-  permissions: string[];
-  projects_count: number;
-  requirements_count: number;
+  updated_at?: string;
+  permissions?: string[];
+  projects_count?: number;
+  requirements_count?: number;
+  department?: string;
+  phone?: string;
+  
+  // Additional computed fields
+  authored_requirements_count?: number;
+  modified_requirements_count?: number;
+  comments_count?: number;
 }
 
 export interface UserCreate {
@@ -95,8 +124,10 @@ export interface UserCreate {
   username?: string;
   first_name?: string;
   last_name?: string;
-  role: UserRole;
+  role: string;
   password: string;
+  department?: string;
+  phone?: string;
   send_invite_email?: boolean;
   permissions?: string[];
 }
@@ -106,8 +137,10 @@ export interface UserUpdate {
   username?: string;
   first_name?: string;
   last_name?: string;
-  role?: UserRole;
+  role?: string;
   is_active?: boolean;
+  department?: string;
+  phone?: string;
   permissions?: string[];
 }
 
@@ -166,19 +199,21 @@ export enum SettingDataType {
   PASSWORD = 'password'
 }
 
+// Backup types matching backend response
 export interface SystemBackup {
   id: number;
   name: string;
-  type: BackupType;
+  type?: BackupType;
   status: BackupStatus;
   file_path?: string;
   file_size?: number;
-  includes: BackupIncludes;
+  includes?: BackupIncludes;
   started_at: string;
   completed_at?: string;
-  created_by: number;
+  created_by?: number;
   created_by_name?: string;
   error_message?: string;
+  description?: string;
 }
 
 export enum BackupType {
@@ -202,6 +237,7 @@ export interface BackupIncludes {
   user_data: boolean;
 }
 
+// System logs matching backend response
 export interface SystemLog {
   id: number;
   level: LogLevel;
@@ -214,6 +250,10 @@ export interface SystemLog {
   request_id?: string;
   metadata?: Record<string, any>;
   timestamp: string;
+  
+  // Additional fields that might be returned
+  logger?: string;
+  created_at?: string;
 }
 
 export enum LogLevel {
@@ -344,7 +384,7 @@ export interface AdminStats {
   users: {
     total: number;
     active: number;
-    by_role: Record<UserRole, number>;
+    by_role: Record<string, number>;
     new_this_month: number;
   };
   system: {
@@ -388,4 +428,29 @@ export interface AdminState {
     total: number;
     pages: number;
   };
+}
+
+// Health check response type matching backend
+export interface HealthCheckResponse {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  components: {
+    database?: {
+      status: 'healthy' | 'unhealthy';
+      response_time?: string;
+      error?: string;
+    };
+    filesystem?: {
+      status: 'healthy' | 'warning' | 'critical' | 'unknown';
+      disk_usage: string;
+      free_space: string;
+      error?: string;
+    };
+    memory?: {
+      status: 'healthy' | 'warning' | 'critical' | 'unknown';
+      usage: string;
+      available: string;
+      error?: string;
+    };
+  };
+  timestamp: string;
 } 

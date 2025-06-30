@@ -60,12 +60,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
-import { UserRole } from "@/features/auth/types/auth.types";
 import {
   adminApi,
   AdminUserListParams,
   BackupListParams,
   LogListParams,
+  UserCreateRequest,
 } from "../api/admin.api";
 import {
   SystemInfo,
@@ -77,6 +77,7 @@ import {
   AdminStats,
   LogLevel,
   BackupStatus,
+  UserRole,
 } from "../types/admin.types";
 
 interface TabPanelProps {
@@ -105,7 +106,7 @@ const AdminPage: React.FC = () => {
   const { hasPermission, hasAnyPermission } = usePermissions();
   // Check admin permissions
   const isAdmin =
-    user?.role === UserRole.ADMIN ||
+    user?.role === "admin" ||
     hasAnyPermission(["admin:read", "admin:write"]);
   const canWrite = hasAnyPermission(["admin:write"]);
 
@@ -143,13 +144,14 @@ const AdminPage: React.FC = () => {
   // Dialog states
   const [createUserDialog, setCreateUserDialog] = useState(false);
   const [createBackupDialog, setCreateBackupDialog] = useState(false);
-  const [newUserData, setNewUserData] = useState({
+  const [newUserData, setNewUserData] = useState<UserCreateRequest>({
     email: "",
     username: "",
     first_name: "",
     last_name: "",
     role: UserRole.VIEWER,
     password: "",
+    send_invite_email: true,
   });
 
   // Redirect if not admin
@@ -321,10 +323,7 @@ const AdminPage: React.FC = () => {
         return;
       }
 
-      await adminApi.createUser({
-        ...newUserData,
-        send_invite_email: true,
-      });
+      await adminApi.createUser(newUserData);
       toast.success("User created successfully");
       setCreateUserDialog(false);
       setNewUserData({
@@ -334,10 +333,12 @@ const AdminPage: React.FC = () => {
         last_name: "",
         role: UserRole.VIEWER,
         password: "",
+        send_invite_email: true,
       });
       loadUsers();
     } catch (err: any) {
-      toast.error("Failed to create user: " + err.message);
+      console.error("Failed to create user:", err);
+      toast.error("Failed to create user: " + (err.response?.data?.detail || err.message));
     }
   };
 
@@ -476,11 +477,9 @@ const AdminPage: React.FC = () => {
                 <Speed
                   sx={{
                     fontSize: 48,
-                    color: systemInfo
-                      ? getStatusColor(
-                          systemInfo.api_health?.status || "unknown"
-                        )
-                      : theme.palette.grey[500],
+                    color: systemInfo?.error 
+                      ? theme.palette.error.main
+                      : theme.palette.success.main,
                     mb: 1,
                   }}
                 />
@@ -490,19 +489,17 @@ const AdminPage: React.FC = () => {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: systemInfo
-                      ? getStatusColor(
-                          systemInfo.api_health?.status || "unknown"
-                        )
-                      : theme.palette.grey[500],
+                    color: systemInfo?.error 
+                      ? theme.palette.error.main
+                      : theme.palette.success.main,
                     textTransform: "capitalize",
                     fontWeight: 500,
                   }}
                 >
-                  {systemInfo?.api_health?.status || "Unknown"}
+                  {systemInfo?.error ? "Error" : "Healthy"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Uptime: {Math.floor((systemInfo?.uptime || 0) / 3600)}h
+                  Version: {systemInfo?.app_version || "Unknown"}
                 </Typography>
               </CardContent>
             </Card>
@@ -523,29 +520,29 @@ const AdminPage: React.FC = () => {
                 <Storage
                   sx={{
                     fontSize: 48,
-                    color: systemInfo
-                      ? getStatusColor(systemInfo.database?.status || "unknown")
+                    color: systemInfo?.disk
+                      ? getStatusColor(systemInfo.disk.percent > 80 ? "warning" : "healthy")
                       : theme.palette.grey[500],
                     mb: 1,
                   }}
                 />
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Database
+                  Storage
                 </Typography>
                 <Typography
                   variant="body1"
                   sx={{
-                    color: systemInfo
-                      ? getStatusColor(systemInfo.database?.status || "unknown")
+                    color: systemInfo?.disk
+                      ? getStatusColor(systemInfo.disk.percent > 80 ? "warning" : "healthy")
                       : theme.palette.grey[500],
                     textTransform: "capitalize",
                     fontWeight: 500,
                   }}
                 >
-                  {systemInfo?.database?.status || "Unknown"}
+                  {systemInfo?.disk ? `${systemInfo.disk.percent}% Used` : "Unknown"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {systemInfo?.database?.connection_count || 0} connections
+                  {systemInfo?.disk ? `${systemInfo.disk.free} GB free` : "No data"}
                 </Typography>
               </CardContent>
             </Card>
@@ -655,10 +652,10 @@ const AdminPage: React.FC = () => {
                             color: theme.palette.primary.main,
                           }}
                         >
-                          {systemMetrics.cpu_usage?.toFixed(1) || 0}%
+                          {systemInfo?.cpu_count || "N/A"}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          CPU Usage
+                          CPU Cores
                         </Typography>
                       </Box>
                     </Grid>
@@ -671,7 +668,7 @@ const AdminPage: React.FC = () => {
                             color: theme.palette.secondary.main,
                           }}
                         >
-                          {systemMetrics.memory_usage?.toFixed(1) || 0}%
+                          {systemInfo?.memory?.percent?.toFixed(1) || 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Memory Usage
@@ -687,7 +684,7 @@ const AdminPage: React.FC = () => {
                             color: theme.palette.warning.main,
                           }}
                         >
-                          {systemMetrics.disk_usage?.toFixed(1) || 0}%
+                          {systemInfo?.disk?.percent?.toFixed(1) || 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Disk Usage
@@ -703,13 +700,10 @@ const AdminPage: React.FC = () => {
                             color: theme.palette.info.main,
                           }}
                         >
-                          {systemMetrics.api_metrics?.avg_response_time?.toFixed(
-                            0
-                          ) || 0}
-                          ms
+                          {systemInfo?.platform || "Unknown"}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Avg Response
+                          Platform
                         </Typography>
                       </Box>
                     </Grid>
@@ -816,7 +810,7 @@ const AdminPage: React.FC = () => {
                 (users || []).map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
-    <Box>
+                      <Box>
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
                           {user.first_name} {user.last_name}
                         </Typography>
@@ -1057,7 +1051,7 @@ const AdminPage: React.FC = () => {
                       sx={{ mb: 2 }}
                     >
                       {setting.description || "No description available"}
-      </Typography>
+                    </Typography>
 
                     {setting.data_type === "boolean" ? (
                       <FormControlLabel
@@ -1208,7 +1202,7 @@ const AdminPage: React.FC = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             This will create a full system backup including database and
             uploaded files.
-      </Typography>
+          </Typography>
           <Alert severity="info">
             The backup process may take several minutes to complete. You will be
             notified when it's ready.
@@ -1225,4 +1219,4 @@ const AdminPage: React.FC = () => {
   );
 };
 
-export default AdminPage; 
+export default AdminPage;
