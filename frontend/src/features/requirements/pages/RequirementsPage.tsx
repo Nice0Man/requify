@@ -145,7 +145,21 @@ const RequirementsPage: React.FC = () => {
       };
 
       const response = await requirementsApi.getRequirements(params);
-      setRequirements(response.data?.items || []);
+      let fetchedRequirements = response.data?.items || [];
+
+      // Enrich requirements with reference data names if missing
+      if (fetchedRequirements.length > 0 && !fetchedRequirements[0].project_name) {
+        fetchedRequirements = fetchedRequirements.map(req => ({
+          ...req,
+          project_name: projects.find(p => p.id === req.project_id)?.name || 'Unknown Project',
+          type_name: types.find(t => t.id === req.type_id)?.name || 'Unknown Type',
+          priority_name: priorities.find(p => p.id === req.priority_id)?.name || 'Unknown Priority',
+          status_name: statuses.find(s => s.id === req.status_id)?.name || 'Unknown Status',
+          author_name: req.author_name || 'Unknown Author'
+        }));
+      }
+
+      setRequirements(fetchedRequirements);
       setTotalCount(response.data?.total || 0);
     } catch (error: any) {
       console.error("Failed to load requirements:", error);
@@ -155,7 +169,7 @@ const RequirementsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, sortModel, filters]);
+  }, [page, pageSize, sortModel, filters, projects, types, priorities, statuses]);
 
   const loadReferenceData = useCallback(async () => {
     try {
@@ -444,18 +458,23 @@ const RequirementsPage: React.FC = () => {
   const requirementsStats = useMemo(() => {
     const total = requirements.length;
     const reqsWithDetails = requirements as RequirementWithDetails[];
-    const inProgress = reqsWithDetails.filter(
-      (r) => r.status_name && !r.status_name.toLowerCase().includes("completed")
-    ).length;
-    const completed = reqsWithDetails.filter(
-      (r) => r.status_name && r.status_name.toLowerCase().includes("completed")
-    ).length;
-    const highRisk = reqsWithDetails.filter(
-      (r) =>
-        r.priority_name &&
-        (r.priority_name.toLowerCase().includes("high") ||
-          r.priority_name.toLowerCase().includes("critical"))
-    ).length;
+    
+    // For status-based calculations, check both status_name and fall back to status lookup
+    const inProgress = reqsWithDetails.filter((r) => {
+      const statusName = r.status_name || statuses.find(s => s.id === r.status_id)?.name || '';
+      return statusName && !statusName.toLowerCase().includes("completed") && !statusName.toLowerCase().includes("done");
+    }).length;
+    
+    const completed = reqsWithDetails.filter((r) => {
+      const statusName = r.status_name || statuses.find(s => s.id === r.status_id)?.name || '';
+      return statusName && (statusName.toLowerCase().includes("completed") || statusName.toLowerCase().includes("done"));
+    }).length;
+    
+    // For priority-based calculations, check both priority_name and fall back to priority lookup
+    const highRisk = reqsWithDetails.filter((r) => {
+      const priorityName = r.priority_name || priorities.find(p => p.id === r.priority_id)?.name || '';
+      return priorityName && (priorityName.toLowerCase().includes("high") || priorityName.toLowerCase().includes("critical"));
+    }).length;
 
     return {
       total,
@@ -463,7 +482,7 @@ const RequirementsPage: React.FC = () => {
       completed,
       highRisk,
     };
-  }, [requirements]);
+  }, [requirements, statuses, priorities]);
 
   return (
     <Box>
