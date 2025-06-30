@@ -279,10 +279,64 @@ const AppRoutes: React.FC = () => {
           }
         />
         <Route
+          path="requirements/:id/edit"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <RequirementCreatePage />
+            </React.Suspense>
+          }
+        />
+        <Route
           path="requirements/:id"
           element={
             <React.Suspense fallback={<LoadingFallback />}>
               <RequirementDetailsPage />
+            </React.Suspense>
+          }
+        />
+
+        {/* Activity page */}
+        <Route
+          path="activity"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <RequirementsPage />
+            </React.Suspense>
+          }
+        />
+
+        {/* Notifications */}
+        <Route
+          path="notifications"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <DashboardPage />
+            </React.Suspense>
+          }
+        />
+
+        {/* Project sub-routes */}
+        <Route
+          path="projects/:id/requirements"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <RequirementsPage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="projects/:id/releases"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ReleasesPage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="projects/:id/settings"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ProjectEditPage />
             </React.Suspense>
           }
         />
@@ -369,7 +423,7 @@ const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Profile */}
+        {/* Profile/Auth Routes */}
         <Route
           path="profile"
           element={
@@ -378,8 +432,22 @@ const AppRoutes: React.FC = () => {
             </React.Suspense>
           }
         />
-
-        {/* Settings */}
+        <Route
+          path="profile/settings"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ProfilePage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="profile/password"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <PasswordChangePage />
+            </React.Suspense>
+          }
+        />
         <Route
           path="settings"
           element={

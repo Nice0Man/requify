@@ -332,6 +332,60 @@ const ReleasesPage: React.FC = () => {
     }
   };
 
+  // Handle export releases
+  const handleExportReleases = () => {
+    try {
+      // Create CSV content
+      const headers = [
+        "ID",
+        "Name", 
+        "Version",
+        "Status",
+        "Project ID",
+        "Description",
+        "Planned Date",
+        "Release Date",
+        "Created At",
+        "Updated At"
+      ];
+
+      const csvContent = [
+        headers.join(","),
+        ...releases.map(release => [
+          release.id,
+          `"${release.name.replace(/"/g, '""')}"`,
+          `"${release.version.replace(/"/g, '""')}"`,
+          release.status,
+          release.project_id,
+          `"${(release.description || "").replace(/"/g, '""')}"`,
+          release.planned_date || "",
+          release.release_date || "",
+          release.created_at,
+          release.updated_at
+        ].join(","))
+      ].join("\n");
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      
+      if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `releases_export_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        toast.success(`Exported ${releases.length} releases to CSV`);
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast.error("Failed to export releases");
+    }
+  };
+
   // Handle generate specification
   const handleGenerateSpecification = async (release: Release) => {
     try {
@@ -450,9 +504,7 @@ const ReleasesPage: React.FC = () => {
             <Button
               variant="outlined"
               startIcon={<GetApp />}
-              onClick={() => {
-                // Implementation for exporting releases
-              }}
+              onClick={handleExportReleases}
             >
               Export
             </Button>
@@ -567,9 +619,11 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 placeholder="Search releases..."
                 value={filters.search}
-                onChange={(e) =>
-                  setFilters({ ...filters, search: e.target.value })
-                }
+                onChange={(e) => {
+                  setFilters({ ...filters, search: e.target.value });
+                  // Reset page to 0 when filter changes
+                  setPage(0);
+                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -585,11 +639,14 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 label="Status"
                 value={filters.status}
-                onChange={(e) =>
-                  setFilters({ ...filters, status: e.target.value })
-                }
+                onChange={(e) => {
+                  setFilters({ ...filters, status: e.target.value });
+                  // Reset page to 0 when filter changes
+                  setPage(0);
+                }}
               >
                 <MenuItem value="">All Statuses</MenuItem>
+                <MenuItem value={ReleaseStatus.DRAFT}>Draft</MenuItem>
                 <MenuItem value={ReleaseStatus.PLANNED}>Planned</MenuItem>
                 <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
                 <MenuItem value={ReleaseStatus.IN_PROGRESS}>
@@ -597,8 +654,12 @@ const ReleasesPage: React.FC = () => {
                 </MenuItem>
                 <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
                 <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
+                <MenuItem value={ReleaseStatus.PUBLISHED}>Published</MenuItem>
                 <MenuItem value={ReleaseStatus.RELEASED}>Released</MenuItem>
                 <MenuItem value={ReleaseStatus.CANCELLED}>Cancelled</MenuItem>
+                {filters.show_deleted && (
+                  <MenuItem value={ReleaseStatus.DELETED}>Deleted</MenuItem>
+                )}
               </TextField>
             </Grid>
             <Grid item xs={12} md={3}>
@@ -606,9 +667,11 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 label="Project ID"
                 value={filters.project_id}
-                onChange={(e) =>
-                  setFilters({ ...filters, project_id: e.target.value })
-                }
+                onChange={(e) => {
+                  setFilters({ ...filters, project_id: e.target.value });
+                  // Reset page to 0 when filter changes
+                  setPage(0);
+                }}
               />
             </Grid>
             <Grid item xs={12} md={2}>
@@ -617,9 +680,11 @@ const ReleasesPage: React.FC = () => {
                 fullWidth
                 label="Show Deleted"
                 value={filters.show_deleted}
-                onChange={(e) =>
-                  setFilters({ ...filters, show_deleted: e.target.value === "true" })
-                }
+                onChange={(e) => {
+                  setFilters({ ...filters, show_deleted: e.target.value === "true" });
+                  // Reset page to 0 when filter changes
+                  setPage(0);
+                }}
               >
                 <MenuItem value="false">Hide Deleted</MenuItem>
                 <MenuItem value="true">Show Deleted</MenuItem>

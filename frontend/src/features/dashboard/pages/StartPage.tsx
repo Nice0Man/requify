@@ -1162,7 +1162,7 @@ const StartPage: React.FC = () => {
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Phone fontSize="small" color="action" />
                   <Typography variant="body2" color="text.secondary">
-                    +1 (555) 123-4567
+                    +7 (922) 699-4742
                   </Typography>
                 </Stack>
               </Stack>
