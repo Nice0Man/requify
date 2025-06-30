@@ -125,6 +125,14 @@ class RequirementUpdate(BaseModel):
             return v if v else None
         return v
 
+    @field_validator("release_id", "spec_id")
+    def validate_optional_ids_update(cls, v):
+        """Валидация опциональных ID при обновлении"""
+        # Если передан некорректный ID (например, 0 или 1 которых нет в БД), очищаем его
+        if v is not None and v <= 0:
+            return None
+        return v
+
     @model_validator(mode="before")
     @classmethod
     def validate_at_least_one_field(cls, data):

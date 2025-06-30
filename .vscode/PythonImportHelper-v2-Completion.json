@@ -1176,6 +1176,14 @@
         "documentation": {}
     },
     {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Optional",
         "importPath": "typing",
         "description": "typing",
@@ -6942,6 +6950,38 @@
         "documentation": {}
     },
     {
+        "label": "ReleaseFromRequirementsCreate",
+        "importPath": "app.schemas.release",
+        "description": "app.schemas.release",
+        "isExtraImport": true,
+        "detail": "app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseCreationSummary",
+        "importPath": "app.schemas.release",
+        "description": "app.schemas.release",
+        "isExtraImport": true,
+        "detail": "app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseWithLinkedRequirements",
+        "importPath": "app.schemas.release",
+        "description": "app.schemas.release",
+        "isExtraImport": true,
+        "detail": "app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementSummary",
+        "importPath": "app.schemas.release",
+        "description": "app.schemas.release",
+        "isExtraImport": true,
+        "detail": "app.schemas.release",
+        "documentation": {}
+    },
+    {
         "label": "ReleaseCreate",
         "importPath": "app.schemas.release",
         "description": "app.schemas.release",
@@ -10063,7 +10103,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.requirements",
         "description": "backend.app.api.v1.endpoints.requirements",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/search\", response_model=List[schemas.Requirement])\nasync def search_requirements(\n    query: str = Query(..., description=\"Поисковый запрос\"),\n    project_id: Optional[int] = Query(None, description=\"Фильтр по ID проекта\"),\n    status_id: Optional[int] = Query(None, description=\"Фильтр по ID статуса\"),\n    priority_id: Optional[int] = Query(None, description=\"Фильтр по ID приоритета\"),\n    type_id: Optional[int] = Query(None, description=\"Фильтр по ID типа\"),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/search\", response_model=List[schemas.Requirement])\nasync def search_requirements(\n    query: str = Query(..., description=\"Search query\"),\n    project_id: Optional[int] = Query(None, description=\"Filter by project ID\"),\n    status_id: Optional[int] = Query(None, description=\"Filter by status ID\"),\n    priority_id: Optional[int] = Query(None, description=\"Filter by priority ID\"),\n    type_id: Optional[int] = Query(None, description=\"Filter by type ID\"),\n    skip: int = Query(0, ge=0, description=\"Number of records to skip\"),\n    limit: int = Query(",
         "detail": "backend.app.api.v1.endpoints.requirements",
         "documentation": {}
     },
@@ -12340,7 +12380,43 @@
         "kind": 6,
         "importPath": "backend.app.schemas.release",
         "description": "backend.app.schemas.release",
-        "peekOfCode": "class ReleaseInDB(ReleaseInDBBase):\n    \"\"\"\n    Схема релиза в БД.\n    \"\"\"\n    pass",
+        "peekOfCode": "class ReleaseInDB(ReleaseInDBBase):\n    \"\"\"\n    Схема релиза в БД.\n    \"\"\"\n    pass\nclass ReleaseFromRequirementsCreate(BaseModel):\n    \"\"\"\n    Схема для создания релиза на основе требований.\n    Функция 11 из ТЗ: Создание релиза с учетом связей требований.\n    \"\"\"",
+        "detail": "backend.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseFromRequirementsCreate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.release",
+        "description": "backend.app.schemas.release",
+        "peekOfCode": "class ReleaseFromRequirementsCreate(BaseModel):\n    \"\"\"\n    Схема для создания релиза на основе требований.\n    Функция 11 из ТЗ: Создание релиза с учетом связей требований.\n    \"\"\"\n    name: str = Field(..., min_length=2, max_length=100, description=\"Название релиза\")\n    version: str = Field(\n        ..., min_length=1, max_length=50, description=\"Версия релиза в формате SemVer\"\n    )\n    description: Optional[str] = Field(None, description=\"Описание релиза\")",
+        "detail": "backend.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementSummary",
+        "kind": 6,
+        "importPath": "backend.app.schemas.release",
+        "description": "backend.app.schemas.release",
+        "peekOfCode": "class RequirementSummary(BaseModel):\n    \"\"\"\n    Краткая информация о требовании для релиза.\n    \"\"\"\n    id: int\n    title: str\n    description: Optional[str] = None\n    type_name: Optional[str] = None\n    priority_name: Optional[str] = None\n    status_name: Optional[str] = None",
+        "detail": "backend.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseWithLinkedRequirements",
+        "kind": 6,
+        "importPath": "backend.app.schemas.release",
+        "description": "backend.app.schemas.release",
+        "peekOfCode": "class ReleaseWithLinkedRequirements(Release):\n    \"\"\"\n    Схема релиза с привязанными требованиями.\n    Расширенный ответ для создания релиза на основе требований.\n    \"\"\"\n    linked_requirements: List[RequirementSummary] = Field(\n        default_factory=list,\n        description=\"Список требований, привязанных к релизу\"\n    )\n    requirements_count: int = Field(0, description=\"Количество привязанных требований\")",
+        "detail": "backend.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "ReleaseCreationSummary",
+        "kind": 6,
+        "importPath": "backend.app.schemas.release",
+        "description": "backend.app.schemas.release",
+        "peekOfCode": "class ReleaseCreationSummary(BaseModel):\n    \"\"\"\n    Итоговая информация о создании релиза.\n    \"\"\"\n    release: ReleaseWithLinkedRequirements\n    operation_summary: dict = Field(\n        default_factory=dict,\n        description=\"Сводка операции создания релиза\"\n    )\n    @model_validator(mode=\"after\")",
         "detail": "backend.app.schemas.release",
         "documentation": {}
     },

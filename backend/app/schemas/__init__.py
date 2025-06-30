@@ -65,6 +65,10 @@ from .release import (
     ReleaseInDBBase,
     ReleaseWithRequirements,
     ReleaseWithDetails,
+    ReleaseFromRequirementsCreate,
+    ReleaseCreationSummary,
+    ReleaseWithLinkedRequirements,
+    RequirementSummary,
 )
 
 # Test Result schemas
@@ -292,6 +296,10 @@ __all__ = [
     "ReleaseInDBBase",
     "ReleaseWithRequirements",
     "ReleaseWithDetails",
+    "ReleaseFromRequirementsCreate",
+    "ReleaseCreationSummary",
+    "ReleaseWithLinkedRequirements",
+    "RequirementSummary",
     # Report
     "Report",
     "ReportCreate",

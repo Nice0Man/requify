@@ -16,7 +16,14 @@ from app.api.deps import (
 )
 from app.core.config import settings
 from app import crud, schemas
-from app.schemas.release import ReleaseCreate, ReleaseUpdate
+from app.schemas.release import (
+    ReleaseCreate,
+    ReleaseUpdate,
+    ReleaseFromRequirementsCreate,
+    ReleaseCreationSummary,
+    ReleaseWithLinkedRequirements,
+    RequirementSummary,
+)
 
 router = APIRouter()
 
@@ -190,75 +197,41 @@ async def delete_release(
 
 @router.post(
     "/create-from-requirements",
-    response_model=schemas.Release,
+    response_model=schemas.ReleaseCreationSummary,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_release_from_requirements(
-    release_data: dict,
+    release_data: ReleaseFromRequirementsCreate,
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_releases_write_user),
 ):
     """
-    Создать релиз на основе требований.
+    Create release from requirements.
 
-    Функция 11 из ТЗ: Создание релиза с учетом связей требований.
-    Роль пользователя: Менеджер проекта или вышестоящая роль.
+    Function 11 from TZ: Create release considering requirement relationships.
+    User role: Project manager or higher.
 
     Args:
-        release_data: Данные релиза с списком требований
-        db: Сессия базы данных
-        current_user: Текущий пользователь
+        release_data: Release data with list of requirements
+        db: Database session
+        current_user: Current user
 
     Returns:
-        schemas.Release: Созданный релиз с привязанными требованиями
+        schemas.ReleaseCreationSummary: Created release with linked requirements summary
 
     Raises:
-        HTTPException: Если данные некорректны
+        HTTPException: If data is invalid
     """
-    project_id = release_data.get("project_id")
-    requirement_ids = release_data.get("requirement_ids", [])
-
-    if not project_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Project ID is required"
-        )
-
-    # Проверяем существование проекта
-    project = await crud.project.get(db, id=project_id)
+    # Validate project exists
+    project = await crud.project.get(db, id=release_data.project_id)
     if not project:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    # Проверяем существование требований
-    if requirement_ids:
-        for req_id in requirement_ids:
-            requirement = await crud.requirement.get(db, id=req_id)
-            if not requirement:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Requirement with ID {req_id} not found",
-                )
-            if requirement.project_id != project_id:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Requirement {req_id} does not belong to project {project_id}",
-                )
-
-    # Создаем релиз
-    release_create_data = ReleaseCreate(
-        name=release_data.get("name", "Auto Release"),
-        version=release_data.get("version", "1.0.0"),
-        description=release_data.get(
-            "description", f"Релиз создан на основе {len(requirement_ids)} требований"
-        ),
-        project_id=project_id,
-        status=release_data.get("status", "planning"),
-    )
-
-    # Проверяем уникальность версии
+    # Check if version already exists in project
     existing_release = await crud.release.get_by_version(
-        db, project_id=project_id, version=release_create_data.version
+        db, project_id=release_data.project_id, version=release_data.version
     )
     if existing_release:
         raise HTTPException(
@@ -266,18 +239,121 @@ async def create_release_from_requirements(
             detail="Release with this version already exists in the project",
         )
 
-    release = await crud.release.create(db, obj_in=release_create_data)
+    # Validate and get requirements
+    requirements = []
+    invalid_requirements = []
+    wrong_project_requirements = []
 
-    # Привязываем требования к релизу
-    if requirement_ids:
-        for req_id in requirement_ids:
-            requirement = await crud.requirement.get(db, id=req_id)
-            if requirement:
-                await crud.requirement.update(
-                    db, db_obj=requirement, obj_in={"release_id": release.id}
+    for req_id in release_data.requirement_ids:
+        requirement = await crud.requirement.get(db, id=req_id)
+        if not requirement:
+            invalid_requirements.append(req_id)
+            continue
+
+        if requirement.project_id != release_data.project_id:
+            wrong_project_requirements.append(req_id)
+            continue
+
+        requirements.append(requirement)
+
+    # Report validation errors
+    if invalid_requirements:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Requirements not found: {invalid_requirements}",
+        )
+
+    if wrong_project_requirements:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Requirements {wrong_project_requirements} do not belong to project {release_data.project_id}",
+        )
+
+    # Generate description if requested
+    description = release_data.description
+    auto_generated = False
+
+    if release_data.auto_description:
+        if not description:
+            auto_generated = True
+            if release_data.include_requirement_details:
+                req_details = [
+                    f"- {req.name} ({req.type.name if req.type else 'Unknown Type'})"
+                    for req in requirements
+                ]
+                description = (
+                    f"Release created based on {len(requirements)} requirements:\n"
+                    + "\n".join(req_details)
+                )
+            else:
+                description = (
+                    f"Release created based on {len(requirements)} requirements"
                 )
 
-    return release
+    # Create release
+    release_create_data = ReleaseCreate(
+        name=release_data.name,
+        version=release_data.version,
+        description=description,
+        project_id=release_data.project_id,
+        status=release_data.status,
+        planned_date=release_data.planned_date,
+        release_date=release_data.release_date,
+    )
+
+    release = await crud.release.create(db, obj_in=release_create_data)
+
+    # Link requirements to release
+    for requirement in requirements:
+        await crud.requirement.update(
+            db, db_obj=requirement, obj_in={"release_id": release.id}
+        )
+
+    # Prepare response with requirement summaries
+    requirement_summaries = []
+    for req in requirements:
+        req_summary = RequirementSummary(
+            id=req.id,
+            title=req.name,
+            description=req.description,
+            type_name=req.type.name if req.type else None,
+            priority_name=req.priority.name if req.priority else None,
+            status_name=req.status.name if req.status else None,
+        )
+        requirement_summaries.append(req_summary)
+
+    # Build response
+    release_with_requirements = ReleaseWithLinkedRequirements(
+        **release.__dict__,
+        linked_requirements=requirement_summaries,
+        requirements_count=len(requirement_summaries),
+        auto_generated_description=auto_generated,
+    )
+
+    operation_summary = {
+        "created_release_id": release.id,
+        "linked_requirements_count": len(requirements),
+        "auto_generated_description": auto_generated,
+        "release_status": release.status,
+        "project_id": release.project_id,
+        "requirements_by_type": {
+            req_type: len(
+                [r for r in requirements if r.type and r.type.name == req_type]
+            )
+            for req_type in set(r.type.name for r in requirements if r.type)
+        },
+        "requirements_by_priority": {
+            priority: len(
+                [r for r in requirements if r.priority and r.priority.name == priority]
+            )
+            for priority in set(r.priority.name for r in requirements if r.priority)
+        },
+    }
+
+    return ReleaseCreationSummary(
+        release=release_with_requirements,
+        operation_summary=operation_summary,
+    )
 
 
 @router.post("/{release_id}/generate-specification", response_model=dict)

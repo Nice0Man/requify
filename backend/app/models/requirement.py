@@ -177,3 +177,48 @@ class Requirement(Base, TimestampedMixin):
         lazy="select",
         cascade="all, delete-orphan",
     )
+
+    # Computed properties for schema compatibility
+    @property
+    def type_name(self) -> Optional[str]:
+        """Название типа требования."""
+        return self.type.name if self.type else None
+
+    @property
+    def priority_name(self) -> Optional[str]:
+        """Название приоритета требования."""
+        return self.priority.name if self.priority else None
+
+    @property
+    def status_name(self) -> Optional[str]:
+        """Название статуса требования."""
+        return self.status.name if self.status else None
+
+    @property
+    def project_name(self) -> Optional[str]:
+        """Название проекта."""
+        return self.project.name if self.project else None
+
+    @property
+    def author_name(self) -> Optional[str]:
+        """Имя автора требования."""
+        if self.author:
+            return f"{self.author.first_name} {self.author.last_name}".strip()
+        return None
+
+    @property
+    def last_modifier_name(self) -> Optional[str]:
+        """Имя последнего редактора требования."""
+        if self.last_modifier:
+            return f"{self.last_modifier.first_name} {self.last_modifier.last_name}".strip()
+        return None
+
+    @property
+    def release_version(self) -> Optional[str]:
+        """Версия релиза."""
+        return self.release.version if self.release else None
+
+    @property
+    def spec_name(self) -> Optional[str]:
+        """Название спецификации."""
+        return self.spec.name if self.spec else None
