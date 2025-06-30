@@ -137,7 +137,7 @@ const ProjectsPage: React.FC = () => {
             ? filters.status[0]  // Single status selected
             : filters.status && filters.status.length > 1
             ? undefined          // Multiple statuses selected - let backend return all
-            : ProjectStatus.ACTIVE, // No status selected - default to active only
+            : undefined, // No status selected - show all projects
         owner_id: filters.owner_id || undefined,
       };
 
@@ -608,7 +608,7 @@ const ProjectsPage: React.FC = () => {
                   <TextField 
                     {...params} 
                     label="Status" 
-                    helperText="Leave empty to show only active projects"
+                    helperText="Leave empty to show all projects"
                   />
                 )}
                 renderTags={(value, getTagProps) =>
