@@ -47,12 +47,19 @@ class RequirementBase(BaseModel):
     def validate_deadline(cls, v):
         """Валидация дедлайна"""
         if v is not None:
+            # Если дата naive (без timezone), считаем её UTC
+            if v.tzinfo is None:
+                v = v.replace(tzinfo=UTC)
+            
+            # Получаем текущее время в UTC
+            now_utc = datetime.now(UTC)
+            
             # Дедлайн не может быть в прошлом
-            if v < datetime.now(UTC):
+            if v < now_utc:
                 raise ValueError("Deadline cannot be in the past")
 
             # Дедлайн не может быть слишком далеко в будущем (например, больше 10 лет)
-            max_future = datetime.now(UTC).replace(year=datetime.now(UTC).year + 10)
+            max_future = now_utc.replace(year=now_utc.year + 10)
             if v > max_future:
                 raise ValueError("Deadline cannot be more than 10 years in the future")
 
