@@ -48,9 +48,15 @@ import {
   Info,
   Send as SendIcon,
 } from "@mui/icons-material";
-import { requirementsApi, RequirementWithDetails } from "../api/requirements.api";
-import { CommentsApi, CommentWithAuthor, CommentCreate } from "@/shared/api/comments.api";
+import { requirementsApi } from "../api/requirements.api";
+import { RequirementWithDetails } from "../types/requirements.types";
+import {
+  CommentsApi,
+  CommentWithAuthor,
+  CommentCreate,
+} from "@/shared/api/comments.api";
 import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 import { LoadingSpinner } from "@/shared/components";
 
 const commentsApi = new CommentsApi();
@@ -78,17 +84,20 @@ const RequirementDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const theme = useTheme();
-  
+
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [requirement, setRequirement] = useState<RequirementWithDetails | null>(null);
+  const [requirement, setRequirement] = useState<RequirementWithDetails | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [comments, setComments] = useState<CommentWithAuthor[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [commentDialogOpen, setCommentDialogOpen] = useState(false);
   const [commentContent, setCommentContent] = useState("");
-  const [selectedComment, setSelectedComment] = useState<CommentWithAuthor | null>(null);
+  const [selectedComment, setSelectedComment] =
+    useState<CommentWithAuthor | null>(null);
   const [newCommentContent, setNewCommentContent] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -100,27 +109,29 @@ const RequirementDetailsPage: React.FC = () => {
       setLoading(false);
       return;
     }
-    
+
     // Validate that id is a valid number
     const requirementId = parseInt(id, 10);
     if (isNaN(requirementId) || requirementId <= 0) {
-      setError(`Invalid requirement ID: "${id}". Please check the URL and try again.`);
+      setError(
+        `Invalid requirement ID: "${id}". Please check the URL and try again.`
+      );
       setLoading(false);
       return;
     }
-    
+
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await requirementsApi.getRequirement(requirementId);
       setRequirement(response.data);
     } catch (err: any) {
       console.error("Failed to load requirement:", err);
-      
+
       // Properly extract error message from API response
       let errorMessage = "Failed to load requirement details";
-      
+
       if (err?.response?.data?.detail) {
         errorMessage = err.response.data.detail;
       } else if (err?.response?.data?.message) {
@@ -131,10 +142,10 @@ const RequirementDetailsPage: React.FC = () => {
         }
       } else if (err?.message) {
         errorMessage = String(err.message);
-      } else if (typeof err === 'string') {
+      } else if (typeof err === "string") {
         errorMessage = err;
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -144,7 +155,7 @@ const RequirementDetailsPage: React.FC = () => {
   // Load comments for the requirement
   const loadComments = async () => {
     if (!id) return;
-    
+
     const requirementId = parseInt(id);
     if (isNaN(requirementId)) return;
 
@@ -164,7 +175,7 @@ const RequirementDetailsPage: React.FC = () => {
   // Create new comment
   const handleAddComment = async () => {
     if (!newCommentContent.trim() || !id) return;
-    
+
     const requirementId = parseInt(id);
     if (isNaN(requirementId)) return;
 
@@ -172,7 +183,7 @@ const RequirementDetailsPage: React.FC = () => {
       const commentData: CommentCreate = {
         content: newCommentContent.trim(),
       };
-      
+
       await commentsApi.createRequirementComment(requirementId, commentData);
       setNewCommentContent("");
       setSnackbarMessage("Comment added successfully");
@@ -195,7 +206,7 @@ const RequirementDetailsPage: React.FC = () => {
   // Update comment
   const handleUpdateComment = async () => {
     if (!selectedComment || !commentContent.trim() || !id) return;
-    
+
     const requirementId = parseInt(id);
     if (isNaN(requirementId)) return;
 
@@ -203,8 +214,12 @@ const RequirementDetailsPage: React.FC = () => {
       const updateData = {
         content: commentContent.trim(),
       };
-      
-      await commentsApi.updateRequirementComment(requirementId, selectedComment.id, updateData);
+
+      await commentsApi.updateRequirementComment(
+        requirementId,
+        selectedComment.id,
+        updateData
+      );
       setCommentDialogOpen(false);
       setCommentContent("");
       setSelectedComment(null);
@@ -221,7 +236,7 @@ const RequirementDetailsPage: React.FC = () => {
   // Delete comment
   const handleDeleteComment = async (commentId: number) => {
     if (!id) return;
-    
+
     const requirementId = parseInt(id);
     if (isNaN(requirementId)) return;
 
@@ -282,7 +297,12 @@ const RequirementDetailsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
         <LoadingSpinner />
       </Box>
     );
@@ -292,7 +312,8 @@ const RequirementDetailsPage: React.FC = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Alert severity="error" sx={{ mb: 2 }}>
-          {error || "Requirement not found. Please check the requirement ID and try again."}
+          {error ||
+            "Requirement not found. Please check the requirement ID and try again."}
         </Alert>
         <Button
           variant="outlined"
@@ -321,7 +342,7 @@ const RequirementDetailsPage: React.FC = () => {
           >
             <ArrowBackIcon />
           </IconButton>
-          
+
           <Box sx={{ flex: 1 }}>
             <Typography
               variant="h4"
@@ -342,11 +363,7 @@ const RequirementDetailsPage: React.FC = () => {
           </Box>
 
           <Box display="flex" gap={1}>
-            <Button
-              variant="outlined"
-              startIcon={<Share />}
-              size="small"
-            >
+            <Button variant="outlined" startIcon={<Share />} size="small">
               Share
             </Button>
             <Button
@@ -375,7 +392,10 @@ const RequirementDetailsPage: React.FC = () => {
           <Card
             sx={{
               borderRadius: 3,
-              boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+              boxShadow: `0 2px 12px ${alpha(
+                theme.palette.common.black,
+                0.08
+              )}`,
               border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
             }}
           >
@@ -398,7 +418,11 @@ const RequirementDetailsPage: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                   Description
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ lineHeight: 1.7 }}
+                >
                   {requirement.description || "No description provided."}
                 </Typography>
               </Box>
@@ -408,7 +432,10 @@ const RequirementDetailsPage: React.FC = () => {
                   Additional Information
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Deadline: {requirement.deadline ? new Date(requirement.deadline).toLocaleDateString() : "Not set"}
+                  Deadline:{" "}
+                  {requirement.deadline
+                    ? new Date(requirement.deadline).toLocaleDateString()
+                    : "Not set"}
                 </Typography>
               </Box>
             </TabPanel>
@@ -418,7 +445,7 @@ const RequirementDetailsPage: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                   Comments ({comments.length})
                 </Typography>
-                
+
                 {/* Add new comment form */}
                 <Box sx={{ mb: 3 }}>
                   <TextField
@@ -431,9 +458,9 @@ const RequirementDetailsPage: React.FC = () => {
                     onChange={(e) => setNewCommentContent(e.target.value)}
                     sx={{ mb: 2 }}
                   />
-                  
-                  <Button 
-                    variant="contained" 
+
+                  <Button
+                    variant="contained"
                     startIcon={<SendIcon />}
                     onClick={handleAddComment}
                     disabled={!newCommentContent.trim()}
@@ -461,7 +488,12 @@ const RequirementDetailsPage: React.FC = () => {
                     ))}
                   </Box>
                 ) : (
-                  <Typography variant="body2" color="text.secondary" align="center" py={4}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    align="center"
+                    py={4}
+                  >
                     No comments yet. Be the first to comment!
                   </Typography>
                 )}
@@ -473,7 +505,11 @@ const RequirementDetailsPage: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                   History
                 </Typography>
-                <Typography variant="body2" color="text.secondary" align="center">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  align="center"
+                >
                   History will be loaded from the API.
                 </Typography>
               </Box>
@@ -484,7 +520,11 @@ const RequirementDetailsPage: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                   Test Cases
                 </Typography>
-                <Typography variant="body2" color="text.secondary" align="center">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  align="center"
+                >
                   Test cases will be loaded from the API.
                 </Typography>
               </Box>
@@ -497,7 +537,10 @@ const RequirementDetailsPage: React.FC = () => {
           <Card
             sx={{
               borderRadius: 3,
-              boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+              boxShadow: `0 2px 12px ${alpha(
+                theme.palette.common.black,
+                0.08
+              )}`,
               border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
               mb: 3,
             }}
@@ -506,7 +549,10 @@ const RequirementDetailsPage: React.FC = () => {
               title={
                 <Box display="flex" alignItems="center" gap={1}>
                   <AssignmentIcon color="primary" fontSize="small" />
-                  <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                  >
                     Details
                   </Typography>
                 </Box>
@@ -514,7 +560,11 @@ const RequirementDetailsPage: React.FC = () => {
             />
             <CardContent sx={{ pt: 0 }}>
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   Status
                 </Typography>
                 <Chip
@@ -525,7 +575,11 @@ const RequirementDetailsPage: React.FC = () => {
               </Box>
 
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   Priority
                 </Typography>
                 <Chip
@@ -536,7 +590,11 @@ const RequirementDetailsPage: React.FC = () => {
               </Box>
 
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   Type
                 </Typography>
                 <Typography variant="body1">
@@ -545,7 +603,11 @@ const RequirementDetailsPage: React.FC = () => {
               </Box>
 
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   Created By
                 </Typography>
                 <Typography variant="body2">
@@ -554,7 +616,11 @@ const RequirementDetailsPage: React.FC = () => {
               </Box>
 
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   Last Modified By
                 </Typography>
                 <Typography variant="body2">
@@ -563,7 +629,11 @@ const RequirementDetailsPage: React.FC = () => {
               </Box>
 
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   Created
                 </Typography>
                 <Typography variant="body2">
@@ -572,7 +642,11 @@ const RequirementDetailsPage: React.FC = () => {
               </Box>
 
               <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 1 }}
+                >
                   Last Updated
                 </Typography>
                 <Typography variant="body2">
@@ -587,13 +661,19 @@ const RequirementDetailsPage: React.FC = () => {
             <Card
               sx={{
                 borderRadius: 3,
-                boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
+                boxShadow: `0 2px 12px ${alpha(
+                  theme.palette.common.black,
+                  0.08
+                )}`,
                 border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
               }}
             >
               <CardHeader
                 title={
-                  <Typography variant="h6" sx={{ fontWeight: 600, fontSize: "1.1rem" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                  >
                     Project Information
                   </Typography>
                 }
@@ -601,7 +681,11 @@ const RequirementDetailsPage: React.FC = () => {
               <CardContent sx={{ pt: 0 }}>
                 {requirement.release_version && (
                   <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
                       Release
                     </Typography>
                     <Typography variant="body2">
@@ -611,7 +695,11 @@ const RequirementDetailsPage: React.FC = () => {
                 )}
                 {requirement.spec_name && (
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1 }}
+                    >
                       Specification
                     </Typography>
                     <Typography variant="body2">
@@ -626,7 +714,12 @@ const RequirementDetailsPage: React.FC = () => {
       </Grid>
 
       {/* Edit Comment Dialog */}
-      <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog
+        open={commentDialogOpen}
+        onClose={() => setCommentDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>Edit Comment</DialogTitle>
         <DialogContent>
           <TextField
@@ -641,7 +734,9 @@ const RequirementDetailsPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCommentDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleUpdateComment} variant="contained">Save</Button>
+          <Button onClick={handleUpdateComment} variant="contained">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -651,7 +746,11 @@ const RequirementDetailsPage: React.FC = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbarOpen(false)}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity="info" sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="info"
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -665,7 +764,11 @@ interface CommentItemProps {
   onDelete: (commentId: number) => void;
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment, onEdit, onDelete }) => {
+const CommentItem: React.FC<CommentItemProps> = ({
+  comment,
+  onEdit,
+  onDelete,
+}) => {
   return (
     <Paper sx={{ p: 2, mb: 2 }}>
       <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
@@ -673,18 +776,32 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, onEdit, onDelete }) 
           <PersonIcon />
         </Avatar>
         <Box sx={{ flex: 1 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 1,
+            }}
+          >
             <Typography variant="subtitle2" fontWeight="600">
               {comment.author_name || `User #${comment.author_id}`}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Typography variant="caption" color="text.secondary">
-                {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                {formatDistanceToNow(new Date(comment.created_at), {
+                  addSuffix: true,
+                  locale: ru,
+                })}
               </Typography>
               <IconButton size="small" onClick={() => onEdit(comment)}>
                 <EditIcon />
               </IconButton>
-              <IconButton size="small" onClick={() => onDelete(comment.id)} color="error">
+              <IconButton
+                size="small"
+                onClick={() => onDelete(comment.id)}
+                color="error"
+              >
                 <DeleteIcon />
               </IconButton>
             </Box>
