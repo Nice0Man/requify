@@ -74,17 +74,47 @@ const RequirementDetailsPage: React.FC = () => {
 
   // Load requirement data
   const loadRequirement = async () => {
-    if (!id) return;
+    if (!id) {
+      setError("No requirement ID provided");
+      setLoading(false);
+      return;
+    }
+    
+    // Validate that id is a valid number
+    const requirementId = parseInt(id, 10);
+    if (isNaN(requirementId) || requirementId <= 0) {
+      setError(`Invalid requirement ID: "${id}". Please check the URL and try again.`);
+      setLoading(false);
+      return;
+    }
     
     try {
       setLoading(true);
       setError(null);
       
-      const response = await requirementsApi.getRequirement(parseInt(id));
+      const response = await requirementsApi.getRequirement(requirementId);
       setRequirement(response.data as unknown as RequirementDetails);
     } catch (err: any) {
       console.error("Failed to load requirement:", err);
-      setError(err.message || "Failed to load requirement details");
+      
+      // Properly extract error message from API response
+      let errorMessage = "Failed to load requirement details";
+      
+      if (err?.response?.data?.detail) {
+        errorMessage = err.response.data.detail;
+      } else if (err?.response?.data?.message) {
+        if (Array.isArray(err.response.data.message)) {
+          errorMessage = err.response.data.message.join(", ");
+        } else {
+          errorMessage = String(err.response.data.message);
+        }
+      } else if (err?.message) {
+        errorMessage = String(err.message);
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
