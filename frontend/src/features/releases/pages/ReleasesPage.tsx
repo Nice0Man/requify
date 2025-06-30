@@ -54,18 +54,13 @@ import { toast } from "react-toastify";
 import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
 import {
   releasesApi,
-  ReleaseListParams as ApiReleaseListParams,
-  Release as ApiRelease,
-  ReleaseStatus as ApiReleaseStatus,
-  ReleaseCreate as ApiReleaseCreate,
-  ReleaseUpdate as ApiReleaseUpdate,
-} from "../api/releases.api";
-import {
+  ReleaseListParams,
   Release,
   ReleaseStatus,
+  ReleaseStatusType,
   ReleaseCreate,
-  ReleaseType,
-} from "../types/release.types";
+  ReleaseUpdate,
+} from "../api/releases.api";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -84,73 +79,11 @@ interface ReleaseStats {
   overdue: number;
 }
 
-// Convert API release to local release type
-const convertApiReleaseToRelease = (apiRelease: ApiRelease): Release => {
-  return {
-    ...apiRelease,
-    type: (apiRelease.type as ReleaseType) || ReleaseType.FEATURE,
-    requirements: apiRelease.requirements || [],
-    change_log: apiRelease.change_log || [],
-    dependencies: apiRelease.dependencies || [],
-    artifacts: apiRelease.artifacts || [],
-    approvals: apiRelease.approvals || [],
-    completion_percentage: apiRelease.completion_percentage || 0,
-    project_name:
-      apiRelease.project_name || `Project #${apiRelease.project_id}`,
-    created_by_name: apiRelease.created_by_name || "Unknown",
-    updated_by_name: apiRelease.updated_by_name || "Unknown",
-    status: convertApiStatusToStatus(apiRelease.status),
-  };
-};
-// Convert API status to local status
-const convertApiStatusToStatus = (
-  apiStatus: ApiReleaseStatus
-): ReleaseStatus => {
-  switch (apiStatus) {
-    case ApiReleaseStatus.PLANNING:
-      return ReleaseStatus.PLANNING;
-    case ApiReleaseStatus.IN_PROGRESS:
-      return ReleaseStatus.IN_PROGRESS;
-    case ApiReleaseStatus.TESTING:
-      return ReleaseStatus.TESTING;
-    case ApiReleaseStatus.READY:
-      return ReleaseStatus.READY;
-    case ApiReleaseStatus.RELEASED:
-      return ReleaseStatus.RELEASED;
-    case ApiReleaseStatus.CANCELLED:
-      return ReleaseStatus.CANCELLED;
-    default:
-      return ReleaseStatus.PLANNING;
-  }
-};
-
-// Convert local status to API status
-const convertStatusToApiStatus = (status: ReleaseStatus): ApiReleaseStatus => {
-  switch (status) {
-    case ReleaseStatus.PLANNING:
-      return ApiReleaseStatus.PLANNING;
-    case ReleaseStatus.IN_PROGRESS:
-      return ApiReleaseStatus.IN_PROGRESS;
-    case ReleaseStatus.TESTING:
-      return ApiReleaseStatus.TESTING;
-    case ReleaseStatus.READY:
-      return ApiReleaseStatus.READY;
-    case ReleaseStatus.RELEASED:
-      return ApiReleaseStatus.RELEASED;
-    case ReleaseStatus.CANCELLED:
-      return ApiReleaseStatus.CANCELLED;
-    default:
-      return ApiReleaseStatus.PLANNING;
-  }
-};
-
 const ReleasesPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { hasAnyPermission } = usePermissions();
-
-  // Check permissions
 
   // State management
   const [activeTab, setActiveTab] = useState(0);
@@ -201,12 +134,10 @@ const ReleasesPage: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const params: ApiReleaseListParams = {
+      const params: ReleaseListParams = {
         skip: page * pageSize,
         limit: pageSize,
-        status: filters.status
-          ? convertStatusToApiStatus(filters.status as ReleaseStatus)
-          : undefined,
+        status: filters.status || undefined,
         project_id: filters.project_id
           ? parseInt(filters.project_id)
           : undefined,
@@ -215,33 +146,33 @@ const ReleasesPage: React.FC = () => {
       };
 
       const response = await releasesApi.getReleases(params);
-      const convertedReleases = (response.data.items || []).map(
-        convertApiReleaseToRelease
-      );
-      setReleases(convertedReleases);
+      const fetchedReleases = response.data.items || [];
+      setReleases(fetchedReleases);
       setTotalCount(response.data.total || 0);
 
       // Calculate stats
       const releaseStats: ReleaseStats = {
-        total: convertedReleases.length,
-        planning: convertedReleases.filter(
-          (r) => r.status === ReleaseStatus.PLANNING
+        total: fetchedReleases.length,
+        planning: fetchedReleases.filter(
+          (r) =>
+            r.status === ReleaseStatus.PLANNING ||
+            r.status === ReleaseStatus.PLANNED
         ).length,
-        in_progress: convertedReleases.filter(
+        in_progress: fetchedReleases.filter(
           (r) => r.status === ReleaseStatus.IN_PROGRESS
         ).length,
-        testing: convertedReleases.filter(
+        testing: fetchedReleases.filter(
           (r) => r.status === ReleaseStatus.TESTING
         ).length,
-        ready: convertedReleases.filter((r) => r.status === ReleaseStatus.READY)
+        ready: fetchedReleases.filter((r) => r.status === ReleaseStatus.READY)
           .length,
-        released: convertedReleases.filter(
+        released: fetchedReleases.filter(
           (r) => r.status === ReleaseStatus.RELEASED
         ).length,
-        cancelled: convertedReleases.filter(
+        cancelled: fetchedReleases.filter(
           (r) => r.status === ReleaseStatus.CANCELLED
         ).length,
-        overdue: convertedReleases.filter((r) => {
+        overdue: fetchedReleases.filter((r) => {
           const plannedDate = new Date(r.planned_date || "");
           return (
             plannedDate < new Date() && r.status !== ReleaseStatus.RELEASED
@@ -259,8 +190,6 @@ const ReleasesPage: React.FC = () => {
     }
   };
 
-  // Handle tab change
-
   // Handle create release
   const handleCreateRelease = async () => {
     try {
@@ -269,12 +198,13 @@ const ReleasesPage: React.FC = () => {
         return;
       }
 
-      const createData: ApiReleaseCreate = {
+      const createData: ReleaseCreate = {
         name: releaseForm.name,
         version: releaseForm.version,
         description: releaseForm.description || "",
         planned_date: releaseForm.planned_date || "",
         project_id: releaseForm.project_id || 0,
+        status: ReleaseStatus.PLANNED,
       };
 
       await releasesApi.createRelease(createData);
@@ -301,7 +231,7 @@ const ReleasesPage: React.FC = () => {
         return;
       }
 
-      const updateData: ApiReleaseUpdate = {
+      const updateData: ReleaseUpdate = {
         name: releaseForm.name,
         version: releaseForm.version,
         description: releaseForm.description || "",
@@ -332,9 +262,10 @@ const ReleasesPage: React.FC = () => {
   };
 
   // Get status color
-  const getStatusColor = (status: ReleaseStatus) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case ReleaseStatus.PLANNING:
+      case ReleaseStatus.PLANNED:
         return theme.palette.info.main;
       case ReleaseStatus.IN_PROGRESS:
         return theme.palette.warning.main;
@@ -352,9 +283,10 @@ const ReleasesPage: React.FC = () => {
   };
 
   // Get status icon
-  const getStatusIcon = (status: ReleaseStatus) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case ReleaseStatus.PLANNING:
+      case ReleaseStatus.PLANNED:
         return <Schedule />;
       case ReleaseStatus.IN_PROGRESS:
         return <PlayArrow />;
@@ -431,7 +363,7 @@ const ReleasesPage: React.FC = () => {
             <Button
               variant="contained"
               startIcon={<Add />}
-              onClick={() => setCreateDialog(true)}
+              onClick={() => navigate("/releases/create")}
             >
               New Release
             </Button>
@@ -561,7 +493,8 @@ const ReleasesPage: React.FC = () => {
                 }
               >
                 <MenuItem value="">All Statuses</MenuItem>
-                <MenuItem value={ReleaseStatus.PLANNING}>Planned</MenuItem>
+                <MenuItem value={ReleaseStatus.PLANNED}>Planned</MenuItem>
+                <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
                 <MenuItem value={ReleaseStatus.IN_PROGRESS}>
                   In Progress
                 </MenuItem>
@@ -680,7 +613,13 @@ const ReleasesPage: React.FC = () => {
                       <TableCell align="right">
                         <Box display="flex" gap={1} justifyContent="flex-end">
                           <Tooltip title="View Details">
-                            <IconButton size="small" color="primary">
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={() =>
+                                navigate(`/releases/${release.id}`)
+                              }
+                            >
                               <Visibility fontSize="small" />
                             </IconButton>
                           </Tooltip>
@@ -717,96 +656,10 @@ const ReleasesPage: React.FC = () => {
       <Fab
         color="primary"
         sx={{ position: "fixed", bottom: 24, right: 24 }}
-        onClick={() => setCreateDialog(true)}
+        onClick={() => navigate("/releases/create")}
       >
         <Add />
       </Fab>
-
-      {/* Create Release Dialog */}
-      <Dialog
-        open={createDialog}
-        onClose={() => setCreateDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Create New Release</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Release Name"
-                value={releaseForm.name}
-                onChange={(e) =>
-                  setReleaseForm({ ...releaseForm, name: e.target.value })
-                }
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Version"
-                value={releaseForm.version}
-                onChange={(e) =>
-                  setReleaseForm({ ...releaseForm, version: e.target.value })
-                }
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Description"
-                multiline
-                rows={3}
-                value={releaseForm.description}
-                onChange={(e) =>
-                  setReleaseForm({
-                    ...releaseForm,
-                    description: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Planned Date"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={releaseForm.planned_date}
-                onChange={(e) =>
-                  setReleaseForm({
-                    ...releaseForm,
-                    planned_date: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Project ID"
-                type="number"
-                value={releaseForm.project_id || ""}
-                onChange={(e) =>
-                  setReleaseForm({
-                    ...releaseForm,
-                    project_id: parseInt(e.target.value) || undefined,
-                  })
-                }
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCreateDialog(false)}>Cancel</Button>
-          <Button onClick={handleCreateRelease} variant="contained">
-            Create Release
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       {/* Edit Release Dialog */}
       <Dialog

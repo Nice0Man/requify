@@ -1,43 +1,33 @@
-// Release types based on backend contracts
+// Release types based on backend contracts - matching /backend/app/schemas/release.py
 
 export interface Release {
-  completion_percentage: number;
   id: number;
   name: string;
   version: string;
   description?: string;
-  status: ReleaseStatus;
-  type: ReleaseType;
   project_id: number;
-  project_name?: string;
+  status: string; // Backend uses string, not enum
   planned_date?: string;
-  actual_date?: string;
-  requirements: ReleaseRequirement[];
-  change_log: ChangeLogEntry[];
-  dependencies: ReleaseDependency[];
-  artifacts: ReleaseArtifact[];
-  approvals: ReleaseApproval[];
-  created_by: number;
-  created_by_name?: string;
-  updated_by: number;
-  updated_by_name?: string;
+  release_date?: string;
   created_at: string;
   updated_at: string;
-  custom_fields?: Record<string, any>;
 }
 
-// CORRECTED: Match exact backend schema
+export interface ReleaseWithDetails extends Release {
+  project_name?: string;
+}
+
 export interface ReleaseCreate {
   name: string;
   version: string;
   description?: string;
-  planned_date?: string;
-  release_date?: string;
   project_id: number;
   status?: string;
+  planned_date?: string;
+  release_date?: string;
 }
 
-// Extended interface for UI forms with additional fields
+// Extended interface for UI forms with additional fields (legacy support)
 export interface ReleaseCreateExtended extends ReleaseCreate {
   type?: ReleaseType;
   requirement_ids?: number[];
@@ -48,34 +38,39 @@ export interface ReleaseUpdate {
   name?: string;
   version?: string;
   description?: string;
-  status?: ReleaseStatus;
-  type?: ReleaseType;
+  status?: string;
   planned_date?: string;
-  actual_date?: string;
-  requirement_ids?: number[];
-  custom_fields?: Record<string, any>;
+  release_date?: string;
 }
 
-export enum ReleaseStatus {
-  PLANNING = 'planning',
-  IN_PROGRESS = 'in_progress',
-  TESTING = 'testing',
-  READY = 'ready',
-  RELEASED = 'released',
-  CANCELLED = 'cancelled',
-  ROLLED_BACK = 'rolled_back'
-}
+// Release status constants (matching backend string values)
+export const ReleaseStatus = {
+  DRAFT: "draft",
+  PLANNED: "planned",
+  IN_PROGRESS: "in_progress",
+  TESTING: "testing",
+  READY: "ready",
+  PUBLISHED: "published",
+  RELEASED: "released",
+  CANCELLED: "cancelled",
+  PLANNING: "planning",
+} as const;
 
+export type ReleaseStatusType =
+  (typeof ReleaseStatus)[keyof typeof ReleaseStatus];
+
+// Legacy enum support for backward compatibility
 export enum ReleaseType {
-  MAJOR = 'major',
-  MINOR = 'minor',
-  PATCH = 'patch',
-  HOTFIX = 'hotfix',
-  BETA = 'beta',
-  ALPHA = 'alpha',
-  FEATURE = "FEATURE"
+  MAJOR = "major",
+  MINOR = "minor",
+  PATCH = "patch",
+  HOTFIX = "hotfix",
+  BETA = "beta",
+  ALPHA = "alpha",
+  FEATURE = "FEATURE",
 }
 
+// Legacy interfaces for UI compatibility
 export interface ReleaseRequirement {
   id: number;
   requirement_id: number;
@@ -89,19 +84,19 @@ export interface ReleaseRequirement {
 }
 
 export enum RequirementImplementationStatus {
-  NOT_STARTED = 'not_started',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-  BLOCKED = 'blocked',
-  CANCELLED = 'cancelled'
+  NOT_STARTED = "not_started",
+  IN_PROGRESS = "in_progress",
+  COMPLETED = "completed",
+  BLOCKED = "blocked",
+  CANCELLED = "cancelled",
 }
 
 export enum RequirementTestStatus {
-  NOT_TESTED = 'not_tested',
-  TESTING = 'testing',
-  PASSED = 'passed',
-  FAILED = 'failed',
-  BLOCKED = 'blocked'
+  NOT_TESTED = "not_tested",
+  TESTING = "testing",
+  PASSED = "passed",
+  FAILED = "failed",
+  BLOCKED = "blocked",
 }
 
 export interface ChangeLogEntry {
@@ -116,13 +111,13 @@ export interface ChangeLogEntry {
 }
 
 export enum ChangeType {
-  NEW_FEATURE = 'new_feature',
-  IMPROVEMENT = 'improvement',
-  BUG_FIX = 'bug_fix',
-  BREAKING_CHANGE = 'breaking_change',
-  DEPRECATED = 'deprecated',
-  REMOVED = 'removed',
-  SECURITY = 'security'
+  NEW_FEATURE = "new_feature",
+  IMPROVEMENT = "improvement",
+  BUG_FIX = "bug_fix",
+  BREAKING_CHANGE = "breaking_change",
+  DEPRECATED = "deprecated",
+  REMOVED = "removed",
+  SECURITY = "security",
 }
 
 export interface ReleaseDependency {
@@ -137,18 +132,18 @@ export interface ReleaseDependency {
 }
 
 export enum DependencyType {
-  INTERNAL = 'internal',
-  EXTERNAL = 'external',
-  INFRASTRUCTURE = 'infrastructure',
-  THIRD_PARTY = 'third_party'
+  INTERNAL = "internal",
+  EXTERNAL = "external",
+  INFRASTRUCTURE = "infrastructure",
+  THIRD_PARTY = "third_party",
 }
 
 export enum DependencyStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  RESOLVED = 'resolved',
-  BLOCKED = 'blocked',
-  CANCELLED = 'cancelled'
+  PENDING = "pending",
+  IN_PROGRESS = "in_progress",
+  RESOLVED = "resolved",
+  BLOCKED = "blocked",
+  CANCELLED = "cancelled",
 }
 
 export interface ReleaseArtifact {
@@ -166,13 +161,13 @@ export interface ReleaseArtifact {
 }
 
 export enum ArtifactType {
-  BINARY = 'binary',
-  INSTALLER = 'installer',
-  DOCUMENTATION = 'documentation',
-  SOURCE_CODE = 'source_code',
-  DATABASE_SCRIPT = 'database_script',
-  CONFIGURATION = 'configuration',
-  DEPLOYMENT_SCRIPT = 'deployment_script'
+  BINARY = "binary",
+  INSTALLER = "installer",
+  DOCUMENTATION = "documentation",
+  SOURCE_CODE = "source_code",
+  DATABASE_SCRIPT = "database_script",
+  CONFIGURATION = "configuration",
+  DEPLOYMENT_SCRIPT = "deployment_script",
 }
 
 export interface ReleaseApproval {
@@ -187,19 +182,19 @@ export interface ReleaseApproval {
 }
 
 export enum ApprovalRole {
-  TECHNICAL_LEAD = 'technical_lead',
-  BUSINESS_ANALYST = 'business_analyst',
-  QA_LEAD = 'qa_lead',
-  PROJECT_MANAGER = 'project_manager',
-  PRODUCT_OWNER = 'product_owner',
-  SECURITY_OFFICER = 'security_officer'
+  TECHNICAL_LEAD = "technical_lead",
+  BUSINESS_ANALYST = "business_analyst",
+  QA_LEAD = "qa_lead",
+  PROJECT_MANAGER = "project_manager",
+  PRODUCT_OWNER = "product_owner",
+  SECURITY_OFFICER = "security_officer",
 }
 
 export enum ApprovalStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  CANCELLED = 'cancelled'
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  CANCELLED = "cancelled",
 }
 
 export interface ReleaseEnvironment {
@@ -217,35 +212,35 @@ export interface ReleaseEnvironment {
 }
 
 export enum EnvironmentType {
-  DEVELOPMENT = 'development',
-  TESTING = 'testing',
-  STAGING = 'staging',
-  PRODUCTION = 'production',
-  UAT = 'uat',
-  DEMO = 'demo'
+  DEVELOPMENT = "development",
+  TESTING = "testing",
+  STAGING = "staging",
+  PRODUCTION = "production",
+  UAT = "uat",
+  DEMO = "demo",
 }
 
 export enum EnvironmentStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  MAINTENANCE = 'maintenance',
-  FAILED = 'failed'
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  MAINTENANCE = "maintenance",
+  FAILED = "failed",
 }
 
 export enum DeploymentStatus {
-  NOT_DEPLOYED = 'not_deployed',
-  DEPLOYING = 'deploying',
-  DEPLOYED = 'deployed',
-  FAILED = 'failed',
-  ROLLING_BACK = 'rolling_back',
-  ROLLED_BACK = 'rolled_back'
+  NOT_DEPLOYED = "not_deployed",
+  DEPLOYING = "deploying",
+  DEPLOYED = "deployed",
+  FAILED = "failed",
+  ROLLING_BACK = "rolling_back",
+  ROLLED_BACK = "rolled_back",
 }
 
 export enum HealthStatus {
-  HEALTHY = 'healthy',
-  DEGRADED = 'degraded',
-  UNHEALTHY = 'unhealthy',
-  UNKNOWN = 'unknown'
+  HEALTHY = "healthy",
+  DEGRADED = "degraded",
+  UNHEALTHY = "unhealthy",
+  UNKNOWN = "unknown",
 }
 
 export interface ReleaseMetrics {
@@ -260,7 +255,7 @@ export interface ReleaseMetrics {
 
 export interface ReleaseFilters {
   project_id?: number;
-  status?: ReleaseStatus[];
+  status?: string[];
   type?: ReleaseType[];
   planned_from?: string;
   planned_to?: string;
@@ -275,7 +270,7 @@ export interface ReleaseListParams {
   limit?: number;
   filters?: ReleaseFilters;
   sort_by?: string;
-  sort_order?: 'asc' | 'desc';
+  sort_order?: "asc" | "desc";
 }
 
 export interface ReleaseListResponse {
@@ -286,7 +281,21 @@ export interface ReleaseListResponse {
   pages: number;
 }
 
-export interface ReleaseWithDetails extends Release {
+// Legacy extended release interface for UI compatibility
+export interface ReleaseExtended extends Release {
+  type?: ReleaseType;
+  requirements: ReleaseRequirement[];
+  change_log: ChangeLogEntry[];
+  dependencies: ReleaseDependency[];
+  artifacts: ReleaseArtifact[];
+  approvals: ReleaseApproval[];
+  completion_percentage?: number;
+  project_name?: string;
+  created_by_name?: string;
+  updated_by_name?: string;
+}
+
+export interface ReleaseWithDetailsExtended extends ReleaseWithDetails {
   environments: ReleaseEnvironment[];
   metrics: ReleaseMetrics;
   test_results: {
@@ -307,7 +316,7 @@ export interface ReleaseWithDetails extends Release {
 
 export interface ReleaseStats {
   total_releases: number;
-  by_status: Record<ReleaseStatus, number>;
+  by_status: Record<string, number>;
   by_type: Record<ReleaseType, number>;
   avg_lead_time: number;
   deployment_frequency: number;
@@ -317,7 +326,7 @@ export interface ReleaseStats {
 
 export interface ReleaseState {
   releases: Release[];
-  currentRelease: ReleaseWithDetails | null;
+  currentRelease: ReleaseWithDetailsExtended | null;
   environments: ReleaseEnvironment[];
   stats: ReleaseStats | null;
   isLoading: boolean;
@@ -333,12 +342,14 @@ export interface ReleaseState {
 
 // Error handling types
 export interface ApiError {
-  detail: string | Array<{
-    loc: (string | number)[];
-    msg: string;
-    type: string;
-    input?: any;
-  }>;
+  detail:
+    | string
+    | Array<{
+        loc: (string | number)[];
+        msg: string;
+        type: string;
+        input?: any;
+      }>;
   error?: string;
   error_description?: string;
 }
@@ -350,4 +361,4 @@ export interface FieldError {
 
 export interface ValidationError {
   [field: string]: string;
-} 
+}

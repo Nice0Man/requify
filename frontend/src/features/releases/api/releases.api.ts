@@ -1,31 +1,21 @@
 import { apiClient, ApiClient, ApiResponse } from "@/shared/api/client";
 
+// Backend-compatible release interfaces matching /backend/app/schemas/release.py
 export interface Release {
-  type: string;
-  requirements: never[];
-  change_log: never[];
-  dependencies: never[];
-  completion_percentage: number;
-  project_name: string;
-  created_by_name: string;
   id: number;
   name: string;
   version: string;
   description?: string;
   project_id: number;
-  status: ReleaseStatus;
+  status: string; // Backend uses string, not enum
   planned_date?: string;
-  actual_date?: string;
-  created_by: number;
-  requirements_ids: number[];
-  changelog?: string;
-  release_notes?: string;
+  release_date?: string;
   created_at: string;
   updated_at: string;
-  updated_by: number;
-  updated_by_name: string;
-  artifacts: never[];
-  approvals: never[];
+}
+
+export interface ReleaseWithDetails extends Release {
+  project_name?: string;
 }
 
 export interface ReleaseCreate {
@@ -33,34 +23,31 @@ export interface ReleaseCreate {
   version: string;
   description?: string;
   project_id: number;
-  status?: ReleaseStatus;
+  status?: string;
   planned_date?: string;
-  requirements_ids?: number[];
-  release_notes?: string;
+  release_date?: string;
 }
 
 export interface ReleaseUpdate {
   name?: string;
   version?: string;
   description?: string;
-  status?: ReleaseStatus;
+  status?: string;
   planned_date?: string;
-  actual_date?: string;
-  requirements_ids?: number[];
-  changelog?: string;
-  release_notes?: string;
+  release_date?: string;
 }
 
 export interface ReleaseListParams {
   skip?: number;
   limit?: number;
   project_id?: number;
-  status?: ReleaseStatus;
+  status?: string;
   created_by?: number;
   sort_by?: string;
   sort_order?: "asc" | "desc";
 }
 
+// Transform backend array response to paginated format for frontend compatibility
 export interface ReleaseListResponse {
   items: Release[];
   total: number;
@@ -76,14 +63,42 @@ export interface CreateReleaseFromRequirementsRequest {
   requirement_ids: number[];
   description?: string;
   planned_date?: string;
-  release_notes?: string;
+  release_date?: string;
+  status?: string;
+  auto_description?: boolean;
+  include_requirement_details?: boolean;
+  analyze_dependencies?: boolean;
+  auto_include_dependencies?: boolean;
 }
 
 export interface GenerateSpecificationRequest {
-  format?: "pdf" | "html" | "docx";
+  format?: "pdf" | "html" | "docx" | "markdown";
+  language?: "ru" | "en";
   include_requirements?: boolean;
-  include_test_results?: boolean;
+  include_relationships?: boolean;
+  include_test_cases?: boolean;
   include_changelog?: boolean;
+  include_statistics?: boolean;
+  custom_sections?: string[];
+  template_style?: "standard" | "detailed" | "compact" | "technical";
+  auto_numbering?: boolean;
+}
+
+export interface SpecificationGenerationResponse {
+  release_id: number;
+  specification_id: number;
+  specification_name: string;
+  format: string;
+  language: string;
+  status: string;
+  generated_at: string;
+  generated_by?: number;
+  sections: string[];
+  requirements_count: number;
+  relationships_count: number;
+  download_url: string;
+  preview_url?: string;
+  generation_stats: Record<string, any>;
 }
 
 export interface PublishReleaseRequest {
@@ -91,17 +106,21 @@ export interface PublishReleaseRequest {
   notification_recipients?: string[];
 }
 
-export enum ReleaseStatus {
-  DRAFT = "draft",
-  PLANNED = "planned",
-  IN_PROGRESS = "in_progress",
-  TESTING = "testing",
-  READY = "ready",
-  PUBLISHED = "published",
-  CANCELLED = "cancelled",
-  PLANNING = "PLANNING",
-  RELEASED = "RELEASED",
-}
+// Release status constants (backend uses strings)
+export const ReleaseStatus = {
+  DRAFT: "draft",
+  PLANNED: "planned",
+  IN_PROGRESS: "in_progress",
+  TESTING: "testing",
+  READY: "ready",
+  PUBLISHED: "published",
+  RELEASED: "released",
+  CANCELLED: "cancelled",
+  PLANNING: "planning",
+} as const;
+
+export type ReleaseStatusType =
+  (typeof ReleaseStatus)[keyof typeof ReleaseStatus];
 
 export class ReleasesApi {
   constructor(private client = apiClient) {}
@@ -124,7 +143,27 @@ export class ReleasesApi {
     const queryString = queryParams.toString();
     const url = queryString ? `/releases/?${queryString}` : "/releases/";
 
-    return this.client.get<ReleaseListResponse>(url);
+    // Backend returns simple array, transform to expected format
+    const response = await this.client.get<Release[]>(url);
+    const releases = response.data || [];
+
+    // Calculate pagination info
+    const skip = params?.skip || 0;
+    const limit = params?.limit || 100;
+    const total = releases.length;
+    const page = Math.floor(skip / limit) + 1;
+    const pages = Math.ceil(total / limit);
+
+    return {
+      ...response,
+      data: {
+        items: releases,
+        total,
+        page,
+        size: limit,
+        pages,
+      },
+    };
   }
 
   // 2. Create Release
@@ -157,8 +196,8 @@ export class ReleasesApi {
   // 6. Create Release from Requirements
   async createReleaseFromRequirements(
     requestData: CreateReleaseFromRequirementsRequest
-  ): Promise<ApiResponse<Release>> {
-    return this.client.post<Release>(
+  ): Promise<ApiResponse<any>> {
+    return this.client.post<any>(
       "/releases/create-from-requirements",
       requestData
     );
@@ -168,8 +207,8 @@ export class ReleasesApi {
   async generateReleaseSpecification(
     releaseId: number,
     requestData?: GenerateSpecificationRequest
-  ): Promise<ApiResponse<{ document_url: string; format: string }>> {
-    return this.client.post<{ document_url: string; format: string }>(
+  ): Promise<ApiResponse<SpecificationGenerationResponse>> {
+    return this.client.post<SpecificationGenerationResponse>(
       `/releases/${releaseId}/generate-specification`,
       requestData || {}
     );
@@ -179,8 +218,8 @@ export class ReleasesApi {
   async publishRelease(
     releaseId: number,
     requestData?: PublishReleaseRequest
-  ): Promise<ApiResponse<Release>> {
-    return this.client.post<Release>(
+  ): Promise<ApiResponse<Record<string, any>>> {
+    return this.client.post<Record<string, any>>(
       `/releases/${releaseId}/publish`,
       requestData || {}
     );
@@ -189,18 +228,30 @@ export class ReleasesApi {
   // 9. Get Release Requirements
   async getReleaseRequirements(
     releaseId: number,
-    params?: { skip?: number; limit?: number }
-  ): Promise<ApiResponse<any>> {
+    params?: {
+      skip?: number;
+      limit?: number;
+      status_id?: number;
+      priority_id?: number;
+      type_id?: number;
+    }
+  ): Promise<ApiResponse<any[]>> {
     const queryParams = new URLSearchParams();
     if (params?.skip) queryParams.append("skip", params.skip.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
+    if (params?.status_id)
+      queryParams.append("status_id", params.status_id.toString());
+    if (params?.priority_id)
+      queryParams.append("priority_id", params.priority_id.toString());
+    if (params?.type_id)
+      queryParams.append("type_id", params.type_id.toString());
 
     const queryString = queryParams.toString();
     const url = queryString
       ? `/releases/${releaseId}/requirements?${queryString}`
       : `/releases/${releaseId}/requirements`;
 
-    return this.client.get<any>(url);
+    return this.client.get<any[]>(url);
   }
 
   // 10. Get Release Changelog
@@ -209,6 +260,17 @@ export class ReleasesApi {
   ): Promise<ApiResponse<{ changelog: string; generated_at: string }>> {
     return this.client.get<{ changelog: string; generated_at: string }>(
       `/releases/${releaseId}/changelog`
+    );
+  }
+
+  // 11. Sync Project Requirements to Release
+  async syncProjectRequirementsToRelease(
+    releaseId: number,
+    params?: { project_id?: number; requirement_ids?: number[] }
+  ): Promise<ApiResponse<Record<string, any>>> {
+    return this.client.post<Record<string, any>>(
+      `/releases/${releaseId}/sync-project-requirements`,
+      params || {}
     );
   }
 }

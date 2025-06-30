@@ -22,25 +22,17 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  releasesApi,
-  ReleaseCreate,
-  ReleaseStatus,
-} from "../api/releases.api";
+import { releasesApi, ReleaseCreate, ReleaseStatus } from "../api/releases.api";
 import { projectsApi } from "../../projects/api/projects.api";
 import { requirementsApi } from "../../requirements/api/requirements.api";
-import { extractErrorMessage, extractFieldErrors, clearFieldError, FormErrors } from '../../../shared/utils/errorHandler';
-
-interface Project {
-  id: number;
-  name: string;
-}
-
-interface Requirement {
-  id: number;
-  title: string;
-  project_id: number;
-}
+import {
+  extractErrorMessage,
+  extractFieldErrors,
+  clearFieldError,
+  FormErrors,
+} from "../../../shared/utils/errorHandler";
+import { Requirement } from "../../requirements/types/requirements.types";
+import { Project } from "../../projects/types/project.types";
 
 const ReleaseCreatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -52,10 +44,9 @@ const ReleaseCreatePage: React.FC = () => {
     version: "",
     description: "",
     project_id: 0,
-    status: ReleaseStatus.DRAFT,
+    status: ReleaseStatus.PLANNED,
     planned_date: "",
-    requirements_ids: [],
-    release_notes: "",
+    release_date: "",
   });
 
   // UI state
@@ -125,21 +116,13 @@ const ReleaseCreatePage: React.FC = () => {
     setFormData((prev) => ({
       ...prev,
       project_id: projectId,
-      requirements_ids: [], // Reset requirements when project changes
     }));
     setSelectedRequirements([]);
   };
 
   // Handle requirements selection
-  const handleRequirementsChange = (
-    _event: any,
-    newValue: Requirement[]
-  ) => {
+  const handleRequirementsChange = (_event: any, newValue: Requirement[]) => {
     setSelectedRequirements(newValue);
-    setFormData((prev) => ({
-      ...prev,
-      requirements_ids: newValue.map((req) => req.id),
-    }));
   };
 
   // Validate form
@@ -188,15 +171,18 @@ const ReleaseCreatePage: React.FC = () => {
       navigate(`/releases/${response.data.id}`);
     } catch (error) {
       // Extract error message and field errors
-      const errorMessage = extractErrorMessage(error, "Failed to create release");
+      const errorMessage = extractErrorMessage(
+        error,
+        "Failed to create release"
+      );
       const fieldErrs = extractFieldErrors(error);
-      
+
       if (Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs);
       } else {
         toast.error(errorMessage);
       }
-      
+
       console.error("Failed to create release:", error);
     } finally {
       setLoading(false);
@@ -324,11 +310,12 @@ const ReleaseCreatePage: React.FC = () => {
               error={!!errors.status}
               helperText={errors.status}
             >
-              {Object.values(ReleaseStatus).map((status) => (
-                <MenuItem key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ")}
-                </MenuItem>
-              ))}
+              <MenuItem value={ReleaseStatus.DRAFT}>Draft</MenuItem>
+              <MenuItem value={ReleaseStatus.PLANNED}>Planned</MenuItem>
+              <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
+              <MenuItem value={ReleaseStatus.IN_PROGRESS}>In Progress</MenuItem>
+              <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
+              <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
             </TextField>
           </Grid>
 
@@ -369,14 +356,17 @@ const ReleaseCreatePage: React.FC = () => {
                   value={selectedRequirements}
                   onChange={handleRequirementsChange}
                   renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        variant="outlined"
-                        label={option.title}
-                        {...getTagProps({ index })}
-                        key={option.id}
-                      />
-                    ))
+                    value.map((option, index) => {
+                      const { key, ...tagProps } = getTagProps({ index });
+                      return (
+                        <Chip
+                          key={key}
+                          variant="outlined"
+                          label={option.title}
+                          {...tagProps}
+                        />
+                      );
+                    })
                   }
                   renderInput={(params) => (
                     <TextField
@@ -419,17 +409,18 @@ const ReleaseCreatePage: React.FC = () => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={12} md={6}>
             <TextField
               fullWidth
-              multiline
-              rows={4}
-              label="Release Notes"
-              value={formData.release_notes}
-              onChange={handleChange("release_notes")}
-              error={!!errors.release_notes}
-              helperText={errors.release_notes}
-              placeholder="Enter release notes and changelog"
+              type="date"
+              label="Actual Release Date"
+              value={formData.release_date}
+              onChange={handleChange("release_date")}
+              error={!!errors.release_date}
+              helperText={errors.release_date}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </Grid>
 
@@ -488,4 +479,4 @@ const ReleaseCreatePage: React.FC = () => {
   );
 };
 
-export default ReleaseCreatePage; 
+export default ReleaseCreatePage;
