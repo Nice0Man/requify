@@ -15,6 +15,10 @@ import {
   Divider,
   Button,
   LinearProgress,
+  Container,
+  Stack,
+  Tooltip,
+  Fade,
 } from "@mui/material";
 import {
   Assignment,
@@ -34,6 +38,12 @@ import {
   BugReport,
   Speed,
   Dashboard as DashboardIcon,
+  Analytics,
+  Groups,
+  ArrowForward,
+  Add,
+  Notifications,
+  Storage,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useAuth, usePermissions } from "@/features/auth/context/auth.context";
@@ -93,6 +103,8 @@ const DashboardPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Greeting based on time of day
   const getGreeting = () => {
@@ -200,9 +212,20 @@ const DashboardPage: React.FC = () => {
       }
 
       setLastRefresh(new Date());
+      setError(null);
+      
+      if (isRefresh) {
+        setSnackbarMessage("Dashboard refreshed successfully");
+        setSnackbarOpen(true);
+      }
     } catch (err: any) {
       console.error("Failed to load dashboard data:", err);
       setError(err.message || "Failed to load dashboard data");
+      
+      if (isRefresh) {
+        setSnackbarMessage("Failed to refresh dashboard");
+        setSnackbarOpen(true);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -255,726 +278,553 @@ const DashboardPage: React.FC = () => {
   // Loading state
   if (loading && !dashboardData) {
     return (
-      <Box sx={{ p: 3 }}>
-        {/* Header skeleton */}
-        <Box sx={{ mb: 4 }}>
-          <Skeleton variant="text" width="40%" height={40} sx={{ mb: 1 }} />
-          <Skeleton variant="text" width="60%" height={24} />
-        </Box>
-
-        {/* Stats skeleton */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card sx={{ borderRadius: 3 }}>
-                <CardContent>
-                  <Skeleton variant="rectangular" height={120} />
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* Content skeleton */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={8}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Skeleton variant="rectangular" height={400} />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Skeleton variant="rectangular" height={400} />
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Box>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Stack spacing={3}>
+          <Box sx={{ textAlign: "center", py: 8 }}>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              Loading your dashboard...
+            </Typography>
+            <LinearProgress sx={{ mt: 2, maxWidth: 400, mx: "auto" }} />
+          </Box>
+        </Stack>
+      </Container>
     );
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Stack spacing={4}>
+        {/* Header Section */}
         <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="flex-start"
-          mb={2}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 2,
+          }}
         >
-          <Box>
+          <Stack spacing={1}>
             <Typography
-              variant="h4"
+              variant="h3"
               sx={{
                 fontWeight: 700,
-                mb: 1,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: "transparent",
               }}
             >
-              {getGreeting()}, {user?.first_name || user?.username}
+              {getGreeting()}, {user?.first_name || user?.username}!
             </Typography>
-            <Typography
-              variant="body1"
-              color="text.secondary"
-              sx={{ fontSize: "1.1rem" }}
-            >
-              Here's what's happening with your projects today
+            <Typography variant="body1" color="text.secondary">
+              Here's what's happening with your projects today.
             </Typography>
-          </Box>
-
-          <Box display="flex" gap={1}>
-            <IconButton
-              onClick={handleRefresh}
-              disabled={refreshing}
-              sx={{
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                "&:hover": {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                },
-              }}
-            >
-              <Refresh sx={{ color: theme.palette.primary.main }} />
-            </IconButton>
-            <IconButton
+            <Typography variant="caption" color="text.secondary">
+              Last updated: {lastRefresh.toLocaleTimeString()}
+            </Typography>
+          </Stack>
+          
+          <Stack direction="row" spacing={2}>
+            <Tooltip title="Refresh Dashboard">
+              <IconButton
+                onClick={handleRefresh}
+                sx={{
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                    transform: "rotate(180deg)",
+                  },
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <Refresh />
+              </IconButton>
+            </Tooltip>
+            <Button
+              variant="outlined"
+              startIcon={<Settings />}
               onClick={() => navigate("/settings")}
               sx={{
-                backgroundColor: alpha(theme.palette.grey[500], 0.1),
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 500,
+              }}
+            >
+              Settings
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => navigate("/projects/new")}
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 500,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
                 "&:hover": {
-                  backgroundColor: alpha(theme.palette.grey[500], 0.2),
+                  transform: "translateY(-1px)",
+                  boxShadow: theme.shadows[6],
                 },
               }}
             >
-              <Settings />
-            </IconButton>
-          </Box>
+              New Project
+            </Button>
+          </Stack>
         </Box>
 
-        {/* Last refresh indicator */}
-        <Typography variant="caption" color="text.secondary">
-          Last updated: {lastRefresh.toLocaleTimeString()}
-          {refreshing && " • Refreshing..."}
-        </Typography>
-      </Box>
-
-      {/* Key Metrics */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Active Projects"
-            value={dashboardData?.overview.active_projects || 0}
-            subtitle={`${dashboardData?.overview.total_projects || 0} total`}
-            trend={{
-              value: 12,
-              direction: "up",
-              label: "this month",
-            }}
-            icon={<FolderOpen />}
-            color="primary"
-            onClick={() => navigate("/projects")}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Requirements"
-            value={dashboardData?.overview.total_requirements || 0}
-            subtitle={`${
-              dashboardData?.overview.pending_requirements || 0
-            } pending`}
-            trend={{
-              value: 8,
-              direction: "up",
-              label: "this week",
-            }}
-            icon={<Assignment />}
-            color="secondary"
-            onClick={() => navigate("/requirements")}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Team Members"
-            value={dashboardData?.overview.active_users || 0}
-            subtitle={`${dashboardData?.overview.total_users || 0} total`}
-            trend={{
-              value: 5,
-              direction: "up",
-              label: "this month",
-            }}
-            icon={<Group />}
-            color="success"
-            onClick={() => navigate(isAdmin ? "/admin/users" : "/users")}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Completion Rate"
-            value={`${
-              dashboardData?.project_performance.completion_rate?.toFixed(1) || 0
-            }%`}
-            subtitle="Project success"
-            trend={{
-              value:
-                (dashboardData?.project_performance.completion_rate || 0) > 85
-                  ? 3
-                  : -2,
-              direction:
-                (dashboardData?.project_performance.completion_rate || 0) > 85
-                  ? "up"
-                  : "down",
-              label: "vs last period",
-            }}
-            icon={<CheckCircle />}
-            color="info"
-            variant="highlighted"
-          />
-        </Grid>
-      </Grid>
-
-      {/* Main Content Grid */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* Performance Metrics */}
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: `0 2px 12px ${alpha(
-                theme.palette.common.black,
-                0.08
-              )}`,
-              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-              background: `linear-gradient(135deg, ${alpha(
-                theme.palette.success.main,
-                0.1
-              )} 0%, ${alpha(theme.palette.success.main, 0.05)} 100%)`,
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" gap={2} mb={2}>
-                <TrendingUp color="success" />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Performance Metrics
-                </Typography>
-              </Box>
-
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Box textAlign="center">
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 700,
-                        color: theme.palette.success.main,
-                      }}
-                    >
-                      {dashboardData?.project_performance.on_time_delivery || 0}
-                      %
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      On-time Delivery
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box textAlign="center">
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: 700, color: theme.palette.info.main }}
-                    >
-                      {dashboardData?.project_performance.quality_score || 0}%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Quality Score
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box textAlign="center">
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 700,
-                        color: theme.palette.warning.main,
-                      }}
-                    >
-                      {dashboardData?.project_performance.team_productivity ||
-                        0}
-                      %
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Team Productivity
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box textAlign="center">
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 700,
-                        color: theme.palette.primary.main,
-                      }}
-                    >
-                      {dashboardData?.trending_metrics.active_teams || 0}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Active Teams
-                    </Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Releases Panel */}
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: `0 2px 12px ${alpha(
-                theme.palette.common.black,
-                0.08
-              )}`,
-              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-              background: `linear-gradient(135deg, ${alpha(
-                theme.palette.primary.main,
-                0.1
-              )} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
-              height: '100%',
-            }}
-          >
-            <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Launch color="primary" />
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Releases Overview
-                  </Typography>
-                </Box>
-                <Button
-                  size="small"
-                  onClick={() => navigate("/releases")}
-                  sx={{ textTransform: 'none' }}
-                >
-                  View All
+        {/* Error Alert */}
+        {error && (
+          <Fade in={!!error}>
+            <Alert
+              severity="error"
+              onClose={handleErrorClose}
+              action={
+                <Button color="inherit" size="small" onClick={handleRefresh}>
+                  Retry
                 </Button>
-              </Box>
+              }
+              sx={{ borderRadius: 2 }}
+            >
+              {error}
+            </Alert>
+          </Fade>
+        )}
 
-              {releasesData ? (
-                <Box sx={{ flex: 1 }}>
-                  <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={6}>
-                      <Box textAlign="center">
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 700,
-                            color: theme.palette.info.main,
-                          }}
-                        >
-                          {releasesData.upcoming_releases}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Upcoming
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box textAlign="center">
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 700,
-                            color: theme.palette.warning.main,
-                          }}
-                        >
-                          {releasesData.active_releases}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          In Progress
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box textAlign="center">
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 700,
-                            color: theme.palette.success.main,
-                          }}
-                        >
-                          {releasesData.completed_releases}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Completed
-                        </Typography>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box textAlign="center">
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 700,
-                            color: theme.palette.error.main,
-                          }}
-                        >
-                          {releasesData.overdue_releases}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Overdue
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                    Recent Releases
-                  </Typography>
-                  <Box sx={{ maxHeight: 120, overflow: 'auto' }}>
-                    {releasesData.recent_releases.map((release) => (
+        {/* Quick Actions */}
+        <Box>
+          <Typography variant="h5" fontWeight={600} gutterBottom>
+            Quick Actions
+          </Typography>
+          <Grid container spacing={3}>
+            {quickActions.map((action, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Fade in timeout={600 + index * 100}>
+                  <Card
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      height: "100%",
+                      borderRadius: 3,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
+                        borderColor: alpha(action.color, 0.3),
+                      },
+                    }}
+                    onClick={() => handleQuickAction(action.action, action.title)}
+                  >
+                    <Stack spacing={2}>
                       <Box
-                        key={release.id}
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        py={0.5}
+                        sx={{
+                          width: 48,
+                          height: 48,
+                          borderRadius: 2,
+                          backgroundColor: alpha(action.color, 0.1),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: action.color,
+                        }}
                       >
-                        <Box>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {release.name} v{release.version}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {new Date(release.planned_date).toLocaleDateString()}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          label={release.status}
-                          size="small"
-                          sx={{ textTransform: 'capitalize' }}
-                        />
+                        {action.icon}
                       </Box>
-                    ))}
-                  </Box>
-                </Box>
-              ) : (
-                <LinearProgress />
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                      <Typography variant="h6" fontWeight={600}>
+                        {action.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {action.description}
+                      </Typography>
+                      <Button
+                        size="small"
+                        endIcon={<ArrowForward fontSize="small" />}
+                        sx={{
+                          alignSelf: "flex-start",
+                          textTransform: "none",
+                          fontWeight: 500,
+                          color: action.color,
+                          "&:hover": {
+                            backgroundColor: alpha(action.color, 0.05),
+                          },
+                        }}
+                      >
+                        Get Started
+                      </Button>
+                    </Stack>
+                  </Card>
+                </Fade>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
 
-      {/* Admin Panel - Only visible to admins */}
-      {isAdmin && (
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12}>
+        {/* Overview Stats */}
+        {dashboardData && (
+          <Box>
+            <Typography variant="h5" fontWeight={600} gutterBottom>
+              Overview
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                  onClick={() => navigate("/projects")}
+                >
+                  <Stack spacing={2}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="h4" fontWeight={700} color="primary.main">
+                        {dashboardData.overview.total_projects}
+                      </Typography>
+                      <Groups color="primary" />
+                    </Stack>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      Total Projects
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {dashboardData.overview.active_projects} active projects
+                    </Typography>
+                  </Stack>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                  onClick={() => navigate("/requirements")}
+                >
+                  <Stack spacing={2}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="h4" fontWeight={700} color="success.main">
+                        {dashboardData.overview.total_requirements}
+                      </Typography>
+                      <Assignment color="success" />
+                    </Stack>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      Requirements
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {dashboardData.overview.approved_requirements} approved
+                    </Typography>
+                  </Stack>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                  onClick={() => navigate("/releases")}
+                >
+                  <Stack spacing={2}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="h4" fontWeight={700} color="warning.main">
+                        {releasesData?.active_releases || 0}
+                      </Typography>
+                      <Launch color="warning" />
+                    </Stack>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      Active Releases
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {releasesData?.upcoming_releases || 0} upcoming
+                    </Typography>
+                  </Stack>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: theme.shadows[4],
+                    },
+                  }}
+                  onClick={() => navigate("/settings")}
+                >
+                  <Stack spacing={2}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="h4" fontWeight={700} color="info.main">
+                        {dashboardData.overview.active_users}
+                      </Typography>
+                      <Analytics color="info" />
+                    </Stack>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      Active Users
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Team collaboration
+                    </Typography>
+                  </Stack>
+                </Card>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+
+        {/* Admin Panel - Only visible to admins */}
+        {isAdmin && (
+          <Box>
+            <Typography variant="h5" fontWeight={600} gutterBottom>
+              System Administration
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  }}
+                >
+                  <Stack spacing={3}>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Security color="primary" />
+                      <Typography variant="h6" fontWeight={600}>
+                        System Health
+                      </Typography>
+                      <Chip
+                        label={adminData?.system_health.overall_status}
+                        color={getStatusColor(adminData?.system_health.overall_status)}
+                        size="small"
+                        sx={{ textTransform: "capitalize" }}
+                      />
+                    </Stack>
+                    
+                    <Stack spacing={2}>
+                      {Object.entries(adminData?.system_health)
+                        .filter(([key]) => key !== "overall_status")
+                        .map(([service, status]) => (
+                          <Stack
+                            key={service}
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Typography variant="body2" sx={{ textTransform: "capitalize" }}>
+                              {service.replace("_", " ")}
+                            </Typography>
+                            <Chip
+                              label={status}
+                              color={getStatusColor(status)}
+                              size="small"
+                              variant="outlined"
+                              sx={{ textTransform: "capitalize" }}
+                            />
+                          </Stack>
+                        ))}
+                    </Stack>
+
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      onClick={() => navigate("/admin")}
+                      sx={{
+                        borderRadius: 2,
+                        textTransform: "none",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Open Admin Panel
+                    </Button>
+                  </Stack>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  }}
+                >
+                  <Stack spacing={3}>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Storage color="info" />
+                      <Typography variant="h6" fontWeight={600}>
+                        Activity & Security
+                      </Typography>
+                    </Stack>
+                    
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Stack alignItems="center" spacing={1}>
+                          <Typography variant="h4" fontWeight={700} color="success.main">
+                            {adminData?.active_users_today}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" textAlign="center">
+                            Active Users Today
+                          </Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Stack alignItems="center" spacing={1}>
+                          <Typography variant="h4" fontWeight={700} color="error.main">
+                            {adminData?.failed_logins_today}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" textAlign="center">
+                            Failed Logins
+                          </Typography>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+
+                    <Divider />
+
+                    <Stack spacing={1}>
+                      <Typography variant="body2" fontWeight={500}>
+                        Last Backup
+                      </Typography>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <Typography variant="body2" color="text.secondary">
+                          {adminData?.backup_status.last_backup}
+                        </Typography>
+                        <Chip
+                          label={adminData?.backup_status.status}
+                          color={getStatusColor(adminData?.backup_status.status)}
+                          size="small"
+                        />
+                      </Stack>
+                    </Stack>
+                  </Stack>
+                </Card>
+              </Grid>
+            </Grid>
+          </Box>
+        )}
+
+        {/* Recent Activity */}
+        {dashboardData?.recent_activity && dashboardData.recent_activity.length > 0 && (
+          <Box>
+            <Typography variant="h5" fontWeight={600} gutterBottom>
+              Recent Activity
+            </Typography>
             <Card
+              elevation={0}
               sx={{
                 borderRadius: 3,
-                boxShadow: `0 2px 12px ${alpha(
-                  theme.palette.common.black,
-                  0.08
-                )}`,
-                border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-                background: `linear-gradient(135deg, ${alpha(
-                  theme.palette.error.main,
-                  0.1
-                )} 0%, ${alpha(theme.palette.error.main, 0.05)} 100%)`,
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
               }}
             >
-              <CardContent sx={{ p: 3 }}>
-                <Box display="flex" alignItems="center" justifyContent="between" mb={3}>
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <AdminPanelSettings color="error" />
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      System Administration
-                    </Typography>
+              <Stack divider={<Divider />}>
+                {dashboardData.recent_activity.slice(0, 5).map((activity, index) => (
+                  <Box key={activity.id} sx={{ p: 3 }}>
+                    <Stack direction="row" spacing={2} alignItems="flex-start">
+                      <Box
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: "50%",
+                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Assignment fontSize="small" color="primary" />
+                      </Box>
+                      <Stack spacing={1} flex={1}>
+                        <Typography variant="subtitle1" fontWeight={500}>
+                          {activity.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {activity.description}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {new Date(activity.timestamp).toLocaleString()}
+                        </Typography>
+                      </Stack>
+                      {activity.project_name && (
+                        <Chip
+                          label={activity.project_name}
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
+                    </Stack>
                   </Box>
-                  <Button
-                    size="small"
-                    onClick={() => navigate("/admin")}
-                    sx={{ textTransform: 'none', ml: 'auto' }}
-                  >
-                    Admin Panel
-                  </Button>
-                </Box>
-
-                {adminData ? (
-                  <Grid container spacing={3}>
-                    {/* System Health */}
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box textAlign="center">
-                        <Speed sx={{ 
-                          fontSize: 32, 
-                          color: getStatusColor(adminData.system_health.overall_status),
-                          mb: 1 
-                        }} />
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          System Health
-                        </Typography>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            color: getStatusColor(adminData.system_health.overall_status),
-                            textTransform: 'capitalize',
-                            fontWeight: 500 
-                          }}
-                        >
-                          {adminData.system_health.overall_status}
-                        </Typography>
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="caption" display="block">
-                            DB: {adminData.system_health.database}
-                          </Typography>
-                          <Typography variant="caption" display="block">
-                            API: {adminData.system_health.api}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-
-                    {/* Active Users */}
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box textAlign="center">
-                        <Group sx={{ fontSize: 32, color: theme.palette.info.main, mb: 1 }} />
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          Active Users
-                        </Typography>
-                        <Typography variant="h5" sx={{ color: theme.palette.info.main, fontWeight: 700 }}>
-                          {adminData.active_users_today}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Today
-                        </Typography>
-                      </Box>
-                    </Grid>
-
-                    {/* Security Alerts */}
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box textAlign="center">
-                        <Security sx={{ 
-                          fontSize: 32, 
-                          color: adminData.security_alerts > 0 ? theme.palette.warning.main : theme.palette.success.main,
-                          mb: 1 
-                        }} />
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          Security Alerts
-                        </Typography>
-                        <Typography 
-                          variant="h5" 
-                          sx={{ 
-                            color: adminData.security_alerts > 0 ? theme.palette.warning.main : theme.palette.success.main,
-                            fontWeight: 700 
-                          }}
-                        >
-                          {adminData.security_alerts}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Open alerts
-                        </Typography>
-                      </Box>
-                    </Grid>
-
-                    {/* Backup Status */}
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Box textAlign="center">
-                        <Backup sx={{ 
-                          fontSize: 32, 
-                          color: getStatusColor(adminData.backup_status.status),
-                          mb: 1 
-                        }} />
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          Last Backup
-                        </Typography>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            color: getStatusColor(adminData.backup_status.status),
-                            textTransform: 'capitalize',
-                            fontWeight: 500 
-                          }}
-                        >
-                          {adminData.backup_status.status}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(adminData.backup_status.last_backup).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                ) : (
-                  <LinearProgress />
-                )}
-              </CardContent>
+                ))}
+              </Stack>
+              <CardActions sx={{ p: 3, pt: 0 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => navigate("/activity")}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 500,
+                  }}
+                >
+                  View All Activity
+                </Button>
+              </CardActions>
             </Card>
-          </Grid>
-        </Grid>
-      )}
+          </Box>
+        )}
+      </Stack>
 
-      {/* Trending Metrics */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              boxShadow: `0 2px 12px ${alpha(
-                theme.palette.common.black,
-                0.08
-              )}`,
-              border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-              background: `linear-gradient(135deg, ${alpha(
-                theme.palette.secondary.main,
-                0.1
-              )} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" gap={2} mb={2}>
-                <Timeline color="secondary" />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  Trending This Period
-                </Typography>
-              </Box>
-
-              <Box display="flex" flexDirection="column" gap={2}>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Requirements This Week
-                  </Typography>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                      {dashboardData?.trending_metrics.requirements_this_week ||
-                        0}
-                    </Typography>
-                    <Chip
-                      label={`+${
-                        (dashboardData?.trending_metrics
-                          .requirements_this_week || 0) -
-                        (dashboardData?.trending_metrics
-                          .requirements_last_week || 0)
-                      }`}
-                      size="small"
-                      color="success"
-                      sx={{ height: 20, fontSize: "0.7rem" }}
-                    />
-                  </Box>
-                </Box>
-
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Releases This Month
-                  </Typography>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                      {dashboardData?.trending_metrics.releases_this_month || 0}
-                    </Typography>
-                    <Chip
-                      label={`+${
-                        (dashboardData?.trending_metrics.releases_this_month ||
-                          0) -
-                        (dashboardData?.trending_metrics.releases_last_month ||
-                          0)
-                      }`}
-                      size="small"
-                      color="info"
-                      sx={{ height: 20, fontSize: "0.7rem" }}
-                    />
-                  </Box>
-                </Box>
-
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    Avg. Project Duration
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    {dashboardData?.trending_metrics.avg_project_duration || 0}{" "}
-                    days
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Quick Access */}
-        <Grid item xs={12} md={6}>
-          <QuickAccess
-            projects={dashboardData?.quick_access.my_projects || []}
-            requirements={dashboardData?.quick_access.my_requirements || []}
-            approvals={dashboardData?.quick_access.pending_approvals || []}
-          />
-        </Grid>
-      </Grid>
-
-      {/* Activity Feed */}
-      <Box sx={{ mb: 4 }}>
-        <ActivityFeed
-          activities={dashboardData?.recent_activity || []}
-          title="Recent Activity"
-          maxItems={8}
-          showMoreButton={true}
-          onShowMore={() => navigate("/activity")}
-          onActivityClick={(activity) => {
-            // Navigate based on activity type
-            switch (activity.type) {
-              case "project":
-                navigate("/projects");
-                break;
-              case "requirement":
-                navigate("/requirements");
-                break;
-              case "release":
-                navigate("/releases");
-                break;
-              default:
-                break;
-            }
-          }}
-        />
-      </Box>
-
-      {/* Error Snackbar */}
+      {/* Snackbar for notifications */}
       <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={handleErrorClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={handleErrorClose}
-          severity="error"
+          onClose={() => setSnackbarOpen(false)}
+          severity="success"
           sx={{ width: "100%" }}
         >
-          {error}
+          {snackbarMessage}
         </Alert>
       </Snackbar>
-    </Box>
+    </Container>
   );
 };
 

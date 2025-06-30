@@ -5,95 +5,126 @@ import {
   Typography,
   Grid,
   Card,
-  CardContent,
   Button,
   Container,
-  Avatar,
-  Chip,
   Stack,
   Paper,
   Divider,
-  IconButton,
   useTheme,
   alpha,
   Fade,
   Slide,
   Zoom,
-  Grow,
+  Chip,
+  Avatar,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   Assignment,
   Security,
-  Speed,
-  Groups,
   Analytics,
+  Groups,
   CloudDone,
-  CheckCircle,
+  AutoAwesome,
   ArrowForward,
+  PlayArrow,
   Star,
+  GitHub,
   LinkedIn,
   Twitter,
-  GitHub,
-  PlayArrow,
-  TrendingUp,
-  AutoAwesome,
-  Rocket,
-  KeyboardArrowDown,
+  Close,
+  Email,
+  Phone,
+  CalendarToday,
 } from "@mui/icons-material";
-import { useAuth } from "@/features/auth/context/auth.context";
+
+// Import assets
+import illustrationImage from "@/assets/img/pannel/komp-uternaa-illustracia-3d-grafika.jpg";
 
 const StartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const theme = useTheme();
   const [animationTrigger, setAnimationTrigger] = React.useState(false);
+  const [demoDialogOpen, setDemoDialogOpen] = React.useState(false);
+  const [scheduleDialogOpen, setScheduleDialogOpen] = React.useState(false);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+
+  // Demo request form state
+  const [demoRequest, setDemoRequest] = React.useState({
+    name: "",
+    email: "",
+    company: "",
+    message: "",
+  });
+
+  // Schedule demo form state
+  const [scheduleRequest, setScheduleRequest] = React.useState({
+    name: "",
+    email: "",
+    company: "",
+    preferredDate: "",
+    preferredTime: "",
+    message: "",
+  });
 
   React.useEffect(() => {
-    setAnimationTrigger(true);
+    const timer = setTimeout(() => setAnimationTrigger(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const features = [
     {
       title: "Requirements Management",
       description:
-        "Organize and track requirements with structured categorization and workflow management.",
+        "Organize and track your project requirements with precision and clarity.",
       icon: <Assignment />,
       color: theme.palette.primary.main,
+      link: "/requirements",
     },
     {
-      title: "Testing Framework",
+      title: "Advanced Analytics",
       description:
-        "Comprehensive testing suite with execution monitoring and detailed reporting.",
+        "Gain insights with powerful analytics and reporting capabilities.",
       icon: <Analytics />,
       color: theme.palette.success.main,
+      link: "/reports",
     },
     {
       title: "Team Collaboration",
-      description:
-        "Enable team collaboration with real-time updates and role-based access control.",
+      description: "Seamless collaboration tools for distributed teams.",
       icon: <Groups />,
       color: theme.palette.info.main,
+      link: "/projects",
     },
     {
-      title: "Security",
+      title: "Enterprise Security",
       description:
-        "OAuth2 authentication with audit trails and data protection compliance.",
+        "Bank-grade security with advanced encryption and compliance.",
       icon: <Security />,
-      color: theme.palette.warning.main,
-    },
-    {
-      title: "Workflow Automation",
-      description:
-        "Streamline processes with automated workflows and custom triggers.",
-      icon: <Speed />,
-      color: theme.palette.secondary.main,
+      color: theme.palette.error.main,
+      link: "/settings",
     },
     {
       title: "Cloud Infrastructure",
-      description:
-        "Scalable cloud infrastructure with high availability and automatic backups.",
+      description: "Scalable cloud solution with 99.9% uptime guarantee.",
       icon: <CloudDone />,
-      color: theme.palette.error.main,
+      color: theme.palette.warning.main,
+      link: "/dashboard",
+    },
+    {
+      title: "Smart Automation",
+      description: "AI-powered automation to streamline your workflow.",
+      icon: <AutoAwesome />,
+      color: theme.palette.secondary.main,
+      link: "/releases",
     },
   ];
 
@@ -101,286 +132,433 @@ const StartPage: React.FC = () => {
     {
       name: "Sarah Chen",
       role: "Product Manager",
-      company: "TechCorp Inc.",
-      quote:
-        "Requify improved our requirements management process and reduced project delivery time significantly.",
+      company: "TechCorp",
+      testimonial:
+        "Requify transformed our requirement management process. The intuitive interface and powerful features helped us deliver projects 40% faster.",
       rating: 5,
+      avatar: "SC",
+      linkedIn: "https://linkedin.com/in/sarahchen",
     },
     {
       name: "Michael Rodriguez",
-      role: "Software Architect",
-      company: "Innovation Labs",
-      quote:
-        "The testing framework is powerful and helped us catch critical issues early in development.",
+      role: "Engineering Lead",
+      company: "DevStart",
+      testimonial:
+        "The best requirements management tool we've used. Clean, powerful, and reliable. Our team productivity increased significantly.",
       rating: 5,
+      avatar: "MR",
+      linkedIn: "https://linkedin.com/in/michaelrodriguez",
     },
     {
       name: "Emily Johnson",
-      role: "QA Director",
-      company: "DevSolutions",
-      quote:
-        "Excellent requirements management tool with effective collaboration features for distributed teams.",
+      role: "Project Director",
+      company: "InnovateLabs",
+      testimonial:
+        "Exceptional platform with outstanding support. Requify helped us scale our operations while maintaining quality standards.",
       rating: 5,
+      avatar: "EJ",
+      linkedIn: "https://linkedin.com/in/emilyjohnson",
     },
   ];
 
   const stats = [
-    { value: "10,000+", label: "Requirements Managed" },
-    { value: "500+", label: "Projects Completed" },
-    { value: "99.9%", label: "Uptime Guarantee" },
-    { value: "24/7", label: "Support Available" },
+    { value: "99.9%", label: "Uptime", sublabel: "Guaranteed" },
+    { value: "500+", label: "Companies", sublabel: "Trust us" },
+    { value: "50K+", label: "Requirements", sublabel: "Managed daily" },
+    { value: "24/7", label: "Support", sublabel: "Always here" },
   ];
 
-  return (
-    <Box sx={{ minHeight: "100vh" }}>
-      {/* Header */}
-      <Slide direction="down" in={animationTrigger} timeout={800}>
-        <Box
-          sx={{
-            backgroundColor: "white",
-            borderBottom: `1px solid ${theme.palette.divider}`,
-            position: "sticky",
-            top: 0,
-            zIndex: 1000,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-          }}
-        >
-          <Container maxWidth="lg">
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                py: 2,
-                height: 64,
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 700,
-                  color: "primary.main",
-                  cursor: "pointer",
-                }}
-              >
-                Requify
-              </Typography>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Button
-                  variant="outlined"
-                  onClick={() => navigate("/api-overview")}
-                  sx={{
-                    borderRadius: 1,
-                    textTransform: "none",
-                    fontWeight: 500,
-                  }}
-                >
-                  API Documentation
-                </Button>
-                {user ? (
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate("/dashboard")}
-                    sx={{
-                      borderRadius: 1,
-                      textTransform: "none",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Dashboard
-                  </Button>
-                ) : (
-                  <>
-                    <Button
-                      variant="text"
-                      onClick={() => navigate("/login")}
-                      sx={{
-                        borderRadius: 1,
-                        textTransform: "none",
-                        fontWeight: 500,
-                      }}
-                    >
-                      Sign In
-                    </Button>
-                    <Button
-                      variant="contained"
-                      onClick={() => navigate("/login")}
-                      sx={{
-                        borderRadius: 1,
-                        textTransform: "none",
-                        fontWeight: 500,
-                      }}
-                    >
-                      Get Started
-                    </Button>
-                  </>
-                )}
-              </Stack>
-            </Box>
-          </Container>
-        </Box>
-      </Slide>
+  // Handler functions
+  const handleGetStarted = () => {
+    navigate("auth/register");
+  };
 
-      {/* Hero Section */}
+  const handleSignIn = () => {
+    navigate("/login");
+  };
+
+  const handleWatchDemo = () => {
+    setDemoDialogOpen(true);
+  };
+
+  const handleScheduleDemo = () => {
+    setScheduleDialogOpen(true);
+  };
+
+  const handleFeatureClick = (_link: string) => {
+    // For now, show message since user isn't logged in
+    setSnackbarMessage("Please sign in to access this feature");
+    setSnackbarOpen(true);
+  };
+
+  const handleSocialClick = (platform: string) => {
+    const urls = {
+      twitter: "https://twitter.com/requify_app",
+      linkedin: "https://linkedin.com/company/requify",
+      github: "https://github.com/requify/requify",
+    };
+    window.open(
+      urls[platform as keyof typeof urls],
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  const handleDemoRequest = async () => {
+    // Simulate API call
+    console.log("Demo request:", demoRequest);
+    setSnackbarMessage("Demo request submitted! We'll contact you soon.");
+    setSnackbarOpen(true);
+    setDemoDialogOpen(false);
+    setDemoRequest({ name: "", email: "", company: "", message: "" });
+  };
+
+  const handleScheduleRequest = async () => {
+    // Simulate API call
+    console.log("Schedule request:", scheduleRequest);
+    setSnackbarMessage(
+      "Demo scheduled! You'll receive a confirmation email shortly."
+    );
+    setSnackbarOpen(true);
+    setScheduleDialogOpen(false);
+    setScheduleRequest({
+      name: "",
+      email: "",
+      company: "",
+      preferredDate: "",
+      preferredTime: "",
+      message: "",
+    });
+  };
+
+  const handleTestimonialLinkedIn = (url: string) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  return (
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#fafafa" }}>
+      {/* Navigation */}
       <Box
         sx={{
-          backgroundColor: "grey.50",
-          py: { xs: 8, md: 12 },
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          backgroundColor: alpha("#ffffff", 0.95),
+          backdropFilter: "blur(20px)",
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={6} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Stack spacing={4}>
-                <Fade in={animationTrigger} timeout={1000}>
-                  <Chip
-                    label="Requirements Management Platform"
-                    sx={{
-                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                      color: "primary.main",
-                      alignSelf: "flex-start",
-                      fontWeight: 500,
-                    }}
-                  />
-                </Fade>
-                <Slide direction="up" in={animationTrigger} timeout={1200}>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: { xs: "2.5rem", md: "3.5rem" },
-                      lineHeight: 1.2,
-                      color: "text.primary",
-                    }}
-                  >
-                    Streamline Your{" "}
-                    <Box
-                      component="span"
-                      sx={{
-                        color: "primary.main",
-                      }}
-                    >
-                      Requirements
-                    </Box>{" "}
-                    Management
-                  </Typography>
-                </Slide>
-                <Slide direction="up" in={animationTrigger} timeout={1400}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "text.secondary",
-                      fontWeight: 400,
-                      maxWidth: 500,
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    Professional requirements tracking, automated testing, and team collaboration tools for efficient project delivery.
-                  </Typography>
-                </Slide>
-                <Slide direction="up" in={animationTrigger} timeout={1600}>
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                    <Button
-                      variant="contained"
-                      size="large"
-                      onClick={() =>
-                        user ? navigate("/dashboard") : navigate("/login")
-                      }
-                      endIcon={<ArrowForward />}
-                      sx={{
-                        py: 1.5,
-                        px: 3,
-                        borderRadius: 1,
-                        fontWeight: 500,
-                        textTransform: "none",
-                      }}
-                    >
-                      Get Started
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      size="large"
-                      onClick={() => navigate("/api-overview")}
-                      sx={{
-                        py: 1.5,
-                        px: 3,
-                        borderRadius: 1,
-                        fontWeight: 500,
-                        textTransform: "none",
-                      }}
-                    >
-                      View Documentation
-                    </Button>
-                  </Stack>
-                </Slide>
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Zoom in={animationTrigger} timeout={1800}>
-                <Paper
-                  sx={{
-                    p: 4,
-                    borderRadius: 2,
-                    backgroundColor: "white",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
-                    border: `1px solid ${theme.palette.divider}`,
-                  }}
-                >
-                  <Stack spacing={3}>
-                    <Typography variant="h6" fontWeight={600}>
-                      Platform Overview
-                    </Typography>
-                    <Stack spacing={2}>
-                      {[
-                        "Requirements Management",
-                        "Testing Framework",
-                        "Team Collaboration",
-                        "API Integration",
-                      ].map((item, index) => (
-                        <Stack
-                          key={index}
-                          direction="row"
-                          spacing={2}
-                          alignItems="center"
-                        >
-                          <CheckCircle
-                            sx={{ color: "success.main", fontSize: 20 }}
-                          />
-                          <Typography variant="body2">{item}</Typography>
-                        </Stack>
-                      ))}
-                    </Stack>
-                  </Stack>
-                </Paper>
-              </Zoom>
-            </Grid>
-          </Grid>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ py: 2, height: 64 }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 600,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+                cursor: "pointer",
+              }}
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            >
+              Requify
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="text"
+                onClick={handleSignIn}
+                sx={{
+                  color: "text.secondary",
+                  fontWeight: 500,
+                  textTransform: "none",
+                  borderRadius: 2,
+                  px: 2,
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                  },
+                }}
+              >
+                Sign In
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleGetStarted}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 500,
+                  px: 3,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  "&:hover": {
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.2)",
+                  },
+                }}
+              >
+                Get Started
+              </Button>
+            </Stack>
+          </Stack>
         </Container>
       </Box>
 
+      {/* Hero Section */}
+      <Container
+        maxWidth="lg"
+        sx={{ pt: { xs: 6, md: 8 }, pb: { xs: 8, md: 12 } }}
+      >
+        <Grid container spacing={6} alignItems="center">
+          {/* Left Content */}
+          <Grid item xs={12} md={6}>
+            <Stack spacing={4}>
+              <Fade in={animationTrigger} timeout={800}>
+                <Chip
+                  label="Requirements Management Platform"
+                  sx={{
+                    alignSelf: "flex-start",
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    color: "primary.main",
+                    fontWeight: 500,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(
+                      theme.palette.primary.main,
+                      0.2
+                    )}`,
+                  }}
+                />
+              </Fade>
+
+              <Slide direction="up" in={animationTrigger} timeout={1000}>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontSize: { xs: "2.5rem", sm: "3rem", md: "3.5rem" },
+                    fontWeight: 700,
+                    lineHeight: 1.1,
+                    letterSpacing: "-0.02em",
+                    color: "text.primary",
+                    mb: 2,
+                  }}
+                >
+                  Build Better
+                  <br />
+                  <Box
+                    component="span"
+                    sx={{
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      color: "transparent",
+                    }}
+                  >
+                    Requirements
+                  </Box>
+                </Typography>
+              </Slide>
+
+              <Slide direction="up" in={animationTrigger} timeout={1200}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: "text.secondary",
+                    fontWeight: 400,
+                    lineHeight: 1.6,
+                    maxWidth: 500,
+                  }}
+                >
+                  The modern requirements management platform that helps teams
+                  build better products faster with intelligent automation and
+                  seamless collaboration.
+                </Typography>
+              </Slide>
+
+              <Slide direction="up" in={animationTrigger} timeout={1400}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    endIcon={<ArrowForward />}
+                    onClick={handleGetStarted}
+                    sx={{
+                      py: 1.5,
+                      px: 4,
+                      borderRadius: 3,
+                      textTransform: "none",
+                      fontWeight: 600,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
+                      },
+                    }}
+                  >
+                    Start Free Trial
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    startIcon={<PlayArrow />}
+                    onClick={handleWatchDemo}
+                    sx={{
+                      py: 1.5,
+                      px: 4,
+                      borderRadius: 3,
+                      textTransform: "none",
+                      fontWeight: 500,
+                      borderColor: alpha(theme.palette.primary.main, 0.3),
+                      "&:hover": {
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.05
+                        ),
+                        borderColor: theme.palette.primary.main,
+                      },
+                    }}
+                  >
+                    Watch Demo
+                  </Button>
+                </Stack>
+              </Slide>
+            </Stack>
+          </Grid>
+
+          {/* Right Content - Hero Image */}
+          <Grid item xs={12} md={6}>
+            <Zoom in={animationTrigger} timeout={1600}>
+              <Box
+                sx={{
+                  position: "relative",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {/* Background accent */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: -20,
+                    right: -20,
+                    width: 200,
+                    height: 200,
+                    background: `linear-gradient(135deg, ${alpha(
+                      theme.palette.primary.main,
+                      0.1
+                    )}, ${alpha(theme.palette.secondary.main, 0.1)})`,
+                    borderRadius: "50%",
+                    filter: "blur(40px)",
+                    zIndex: -1,
+                  }}
+                />
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    borderRadius: 4,
+                    backgroundColor: "white",
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+                    overflow: "hidden",
+                    maxWidth: 400,
+                    cursor: "pointer",
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      transform: "scale(1.02)",
+                    },
+                  }}
+                  onClick={handleWatchDemo}
+                >
+                  <Box
+                    component="img"
+                    src={illustrationImage}
+                    alt="Requify Platform"
+                    sx={{
+                      width: "100%",
+                      height: "auto",
+                      borderRadius: 2,
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      backgroundColor: alpha(theme.palette.primary.main, 0.9),
+                      borderRadius: "50%",
+                      width: 60,
+                      height: 60,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: theme.palette.primary.main,
+                        transform: "translate(-50%, -50%) scale(1.1)",
+                      },
+                    }}
+                  >
+                    <PlayArrow sx={{ color: "white", fontSize: 30, ml: 0.5 }} />
+                  </Box>
+                </Paper>
+              </Box>
+            </Zoom>
+          </Grid>
+        </Grid>
+      </Container>
+
       {/* Stats Section */}
-      <Box sx={{ py: 6, backgroundColor: "white" }}>
+      <Box
+        sx={{
+          backgroundColor: "white",
+          py: 6,
+          borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        }}
+      >
         <Container maxWidth="lg">
           <Grid container spacing={4}>
             {stats.map((stat, index) => (
               <Grid item xs={6} md={3} key={index}>
-                <Grow in={animationTrigger} timeout={1000 + index * 200}>
-                  <Box sx={{ textAlign: "center" }}>
+                <Fade in={animationTrigger} timeout={1000 + index * 200}>
+                  <Stack alignItems="center" spacing={0.5}>
                     <Typography
                       variant="h3"
                       sx={{
                         fontWeight: 700,
-                        color: "primary.main",
-                        mb: 1,
+                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        color: "transparent",
                       }}
                     >
                       {stat.value}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                      variant="subtitle1"
+                      color="text.primary"
+                      fontWeight={600}
+                    >
                       {stat.label}
                     </Typography>
-                  </Box>
-                </Grow>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      fontSize="0.875rem"
+                    >
+                      {stat.sublabel}
+                    </Typography>
+                  </Stack>
+                </Fade>
               </Grid>
             ))}
           </Grid>
@@ -388,276 +566,272 @@ const StartPage: React.FC = () => {
       </Box>
 
       {/* Features Section */}
-      <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: "grey.50" }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 8 }}>
-            <Slide direction="up" in={animationTrigger} timeout={1200}>
+      <Container maxWidth="lg" sx={{ py: { xs: 8, md: 12 } }}>
+        <Stack alignItems="center" spacing={6}>
+          <Slide direction="up" in={animationTrigger} timeout={1000}>
+            <Stack alignItems="center" spacing={2}>
               <Typography
-                variant="h3"
+                variant="h2"
                 sx={{
+                  fontSize: { xs: "2rem", md: "2.5rem" },
                   fontWeight: 700,
-                  mb: 3,
+                  textAlign: "center",
                   color: "text.primary",
                 }}
               >
-                Core Features
+                Everything you need to manage requirements
               </Typography>
-            </Slide>
-            <Slide direction="up" in={animationTrigger} timeout={1400}>
               <Typography
                 variant="h6"
                 color="text.secondary"
-                sx={{ maxWidth: 600, mx: "auto", fontWeight: 400 }}
+                textAlign="center"
+                sx={{ maxWidth: 600, fontWeight: 400 }}
               >
-                Comprehensive tools designed to streamline your requirements management process.
+                Powerful features designed to streamline your workflow and boost
+                productivity
               </Typography>
-            </Slide>
-          </Box>
-          <Grid container spacing={4}>
+            </Stack>
+          </Slide>
+
+          <Grid container spacing={3}>
             {features.map((feature, index) => (
-              <Grid item xs={12} md={6} key={index}>
-                <Grow in={animationTrigger} timeout={1000 + index * 200}>
+              <Grid item xs={12} md={6} lg={4} key={index}>
+                <Fade in={animationTrigger} timeout={1200 + index * 150}>
                   <Card
+                    elevation={0}
                     sx={{
                       height: "100%",
-                      border: `1px solid ${theme.palette.divider}`,
-                      boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
-                      borderRadius: 2,
-                    }}
-                  >
-                    <CardContent sx={{ p: 3 }}>
-                      <Stack spacing={2}>
-                        <Box
-                          sx={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 1,
-                            backgroundColor: alpha(feature.color, 0.1),
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: feature.color,
-                          }}
-                        >
-                          {feature.icon}
-                        </Box>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 600,
-                            color: "text.primary",
-                          }}
-                        >
-                          {feature.title}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ lineHeight: 1.6 }}
-                        >
-                          {feature.description}
-                        </Typography>
-                      </Stack>
-                    </CardContent>
-                  </Card>
-                </Grow>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* How It Works Section */}
-      <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: "white" }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 8 }}>
-            <Slide direction="up" in={animationTrigger} timeout={1000}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 700,
-                  mb: 3,
-                  color: "text.primary",
-                }}
-              >
-                Getting Started
-              </Typography>
-            </Slide>
-            <Slide direction="up" in={animationTrigger} timeout={1200}>
-              <Typography
-                variant="h6"
-                color="text.secondary"
-                sx={{ maxWidth: 600, mx: "auto", fontWeight: 400 }}
-              >
-                Simple setup process to get your team productive quickly
-              </Typography>
-            </Slide>
-          </Box>
-          <Grid container spacing={4} sx={{ mt: 4 }}>
-            {[
-              {
-                step: "01",
-                title: "Create Your Project",
-                description: "Set up your project workspace and configure settings",
-              },
-              {
-                step: "02",
-                title: "Add Requirements",
-                description: "Import existing documents or create requirements from scratch",
-              },
-              {
-                step: "03",
-                title: "Collaborate & Track",
-                description: "Invite team members and start tracking progress",
-              },
-            ].map((step, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <Zoom in={animationTrigger} timeout={1000 + index * 300}>
-                  <Paper
-                    sx={{
                       p: 3,
-                      textAlign: "center",
-                      border: `1px solid ${theme.palette.divider}`,
-                      borderRadius: 2,
+                      borderRadius: 3,
+                      backgroundColor: "white",
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      transition: "all 0.3s ease",
+                      cursor: "pointer",
+                      "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
+                        borderColor: alpha(feature.color, 0.3),
+                      },
                     }}
+                    onClick={() => handleFeatureClick(feature.link)}
                   >
-                    <Box
-                      sx={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: "50%",
-                        mx: "auto",
-                        mb: 3,
-                        backgroundColor: "primary.main",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Typography
-                        variant="h5"
+                    <Stack spacing={2}>
+                      <Box
                         sx={{
-                          color: "white",
-                          fontWeight: 700,
+                          width: 48,
+                          height: 48,
+                          borderRadius: 2,
+                          backgroundColor: alpha(feature.color, 0.1),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: feature.color,
                         }}
                       >
-                        {step.step}
-                      </Typography>
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                      {step.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {step.description}
-                    </Typography>
-                  </Paper>
-                </Zoom>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* Testimonials Section */}
-      <Box sx={{ py: { xs: 8, md: 12 }, backgroundColor: "grey.50" }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: 8 }}>
-            <Slide direction="up" in={animationTrigger} timeout={1000}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 700,
-                  mb: 3,
-                  color: "text.primary",
-                }}
-              >
-                Customer Testimonials
-              </Typography>
-            </Slide>
-          </Box>
-          <Grid container spacing={4}>
-            {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <Grow in={animationTrigger} timeout={1200 + index * 200}>
-                  <Card
-                    sx={{
-                      p: 3,
-                      height: "100%",
-                      border: `1px solid ${theme.palette.divider}`,
-                      boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
-                      borderRadius: 2,
-                    }}
-                  >
-                    <Stack spacing={3}>
-                      <Stack direction="row" spacing={1}>
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star
-                            key={i}
-                            sx={{
-                              color: "warning.main",
-                              fontSize: 20,
-                            }}
-                          />
-                        ))}
-                      </Stack>
+                        {feature.icon}
+                      </Box>
                       <Typography
-                        variant="body1"
+                        variant="h6"
+                        fontWeight={600}
+                        color="text.primary"
+                      >
+                        {feature.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        lineHeight={1.6}
+                      >
+                        {feature.description}
+                      </Typography>
+                      <Button
+                        size="small"
+                        endIcon={<ArrowForward fontSize="small" />}
                         sx={{
-                          fontStyle: "italic",
-                          lineHeight: 1.6,
-                          color: "text.secondary",
+                          alignSelf: "flex-start",
+                          textTransform: "none",
+                          fontWeight: 500,
+                          color: feature.color,
+                          "&:hover": {
+                            backgroundColor: alpha(feature.color, 0.05),
+                          },
                         }}
                       >
-                        "{testimonial.quote}"
-                      </Typography>
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Avatar
-                          sx={{
-                            width: 40,
-                            height: 40,
-                            backgroundColor: "primary.main",
-                          }}
-                        >
-                          {testimonial.name.charAt(0)}
-                        </Avatar>
-                        <Box>
-                          <Typography variant="subtitle2" fontWeight={600}>
-                            {testimonial.name}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {testimonial.role} at {testimonial.company}
-                          </Typography>
-                        </Box>
-                      </Stack>
+                        Learn More
+                      </Button>
                     </Stack>
                   </Card>
-                </Grow>
+                </Fade>
               </Grid>
             ))}
           </Grid>
+        </Stack>
+      </Container>
+
+      {/* Testimonials Section */}
+      <Box
+        sx={{
+          backgroundColor: alpha(theme.palette.grey[50], 0.5),
+          py: { xs: 8, md: 12 },
+        }}
+      >
+        <Container maxWidth="lg">
+          <Stack alignItems="center" spacing={6}>
+            <Slide direction="up" in={animationTrigger} timeout={1000}>
+              <Stack alignItems="center" spacing={2}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontSize: { xs: "2rem", md: "2.5rem" },
+                    fontWeight: 700,
+                    textAlign: "center",
+                    color: "text.primary",
+                  }}
+                >
+                  Loved by teams worldwide
+                </Typography>
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  textAlign="center"
+                  sx={{ maxWidth: 600, fontWeight: 400 }}
+                >
+                  See how Requify is transforming the way teams manage
+                  requirements
+                </Typography>
+              </Stack>
+            </Slide>
+
+            <Grid container spacing={4}>
+              {testimonials.map((testimonial, index) => (
+                <Grid item xs={12} md={4} key={index}>
+                  <Fade in={animationTrigger} timeout={1200 + index * 200}>
+                    <Card
+                      elevation={0}
+                      sx={{
+                        p: 4,
+                        height: "100%",
+                        borderRadius: 3,
+                        backgroundColor: "white",
+                        border: `1px solid ${alpha(
+                          theme.palette.divider,
+                          0.1
+                        )}`,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                        },
+                      }}
+                    >
+                      <Stack spacing={3}>
+                        <Stack direction="row" spacing={0.5}>
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <Star
+                              key={i}
+                              sx={{ color: "warning.main", fontSize: 18 }}
+                            />
+                          ))}
+                        </Stack>
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            fontStyle: "italic",
+                            lineHeight: 1.6,
+                            color: "text.secondary",
+                          }}
+                        >
+                          "{testimonial.testimonial}"
+                        </Typography>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Avatar
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              backgroundColor: "primary.main",
+                              fontSize: "0.875rem",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                            onClick={() =>
+                              handleTestimonialLinkedIn(testimonial.linkedIn)
+                            }
+                          >
+                            {testimonial.avatar}
+                          </Avatar>
+                          <Stack spacing={0} flex={1}>
+                            <Typography variant="subtitle2" fontWeight={600}>
+                              {testimonial.name}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {testimonial.role} at {testimonial.company}
+                            </Typography>
+                          </Stack>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              handleTestimonialLinkedIn(testimonial.linkedIn)
+                            }
+                            sx={{
+                              color: "text.secondary",
+                              "&:hover": { color: "#0A66C2" },
+                            }}
+                          >
+                            <LinkedIn fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      </Stack>
+                    </Card>
+                  </Fade>
+                </Grid>
+              ))}
+            </Grid>
+          </Stack>
         </Container>
       </Box>
 
       {/* CTA Section */}
       <Box
         sx={{
+          position: "relative",
           py: { xs: 8, md: 12 },
-          backgroundColor: "primary.main",
+          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
           color: "white",
-          textAlign: "center",
+          overflow: "hidden",
         }}
       >
-        <Container maxWidth="md">
+        {/* Background pattern */}
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            opacity: 0.1,
+            backgroundImage: `radial-gradient(circle at 50% 50%, white 1px, transparent 1px)`,
+            backgroundSize: "20px 20px",
+          }}
+        />
+
+        <Container
+          maxWidth="md"
+          sx={{ position: "relative", textAlign: "center" }}
+        >
           <Stack spacing={4} alignItems="center">
             <Slide direction="up" in={animationTrigger} timeout={1000}>
               <Typography
-                variant="h3"
+                variant="h2"
                 sx={{
+                  fontSize: { xs: "2rem", md: "2.5rem" },
                   fontWeight: 700,
                   mb: 2,
                 }}
               >
-                Ready to Get Started?
+                Ready to transform your workflow?
               </Typography>
             </Slide>
             <Slide direction="up" in={animationTrigger} timeout={1200}>
@@ -666,10 +840,12 @@ const StartPage: React.FC = () => {
                 sx={{
                   opacity: 0.9,
                   fontWeight: 400,
-                  maxWidth: 600,
+                  maxWidth: 500,
+                  lineHeight: 1.6,
                 }}
               >
-                Join teams who have streamlined their requirements management with Requify.
+                Join thousands of teams who have streamlined their requirements
+                management with Requify. Start your free trial today.
               </Typography>
             </Slide>
             <Slide direction="up" in={animationTrigger} timeout={1400}>
@@ -678,33 +854,33 @@ const StartPage: React.FC = () => {
                   variant="contained"
                   size="large"
                   endIcon={<ArrowForward />}
-                  onClick={() =>
-                    user ? navigate("/dashboard") : navigate("/login")
-                  }
+                  onClick={handleGetStarted}
                   sx={{
                     py: 1.5,
-                    px: 3,
-                    borderRadius: 1,
+                    px: 4,
+                    borderRadius: 3,
                     backgroundColor: "white",
                     color: "primary.main",
-                    fontWeight: 500,
+                    fontWeight: 600,
                     textTransform: "none",
                     "&:hover": {
-                      backgroundColor: "grey.100",
+                      backgroundColor: alpha("#fff", 0.9),
+                      transform: "translateY(-2px)",
                     },
                   }}
                 >
-                  Get Started
+                  Start Free Trial
                 </Button>
                 <Button
                   variant="outlined"
                   size="large"
-                  onClick={() => navigate("/api-overview")}
+                  startIcon={<CalendarToday />}
+                  onClick={handleScheduleDemo}
                   sx={{
                     py: 1.5,
-                    px: 3,
-                    borderRadius: 1,
-                    borderColor: "white",
+                    px: 4,
+                    borderRadius: 3,
+                    borderColor: alpha("#fff", 0.3),
                     color: "white",
                     fontWeight: 500,
                     textTransform: "none",
@@ -714,7 +890,7 @@ const StartPage: React.FC = () => {
                     },
                   }}
                 >
-                  View Documentation
+                  Schedule Demo
                 </Button>
               </Stack>
             </Slide>
@@ -723,72 +899,373 @@ const StartPage: React.FC = () => {
       </Box>
 
       {/* Footer */}
-      <Slide direction="up" in={animationTrigger} timeout={1600}>
-        <Box sx={{ py: 6, backgroundColor: "grey.900", color: "white" }}>
-          <Container maxWidth="lg">
-            <Grid container spacing={4} alignItems="center">
-              <Grid item xs={12} md={6}>
+      <Box
+        sx={{
+          backgroundColor: "white",
+          py: 6,
+          borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Stack spacing={2}>
                 <Typography
                   variant="h6"
                   sx={{
-                    fontWeight: 700,
-                    mb: 2,
+                    fontWeight: 600,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    color: "transparent",
+                    cursor: "pointer",
                   }}
+                  onClick={() =>
+                    window.scrollTo({ top: 0, behavior: "smooth" })
+                  }
                 >
                   Requify
                 </Typography>
                 <Typography
                   variant="body2"
-                  sx={{ opacity: 0.7, maxWidth: 400 }}
+                  color="text.secondary"
+                  sx={{ maxWidth: 400, lineHeight: 1.6 }}
                 >
-                  Professional requirements management platform for efficient project delivery.
+                  The modern requirements management platform that helps teams
+                  build better products faster.
                 </Typography>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Stack direction="row" spacing={2} justifyContent={{ xs: "flex-start", md: "flex-end" }}>
-                  <IconButton
-                    sx={{
-                      color: "white",
-                      "&:hover": {
-                        color: "primary.main",
-                      },
-                    }}
-                  >
-                    <Twitter />
-                  </IconButton>
-                  <IconButton
-                    sx={{
-                      color: "white",
-                      "&:hover": {
-                        color: "primary.main",
-                      },
-                    }}
-                  >
-                    <LinkedIn />
-                  </IconButton>
-                  <IconButton
-                    sx={{
-                      color: "white",
-                      "&:hover": {
-                        color: "primary.main",
-                      },
-                    }}
-                  >
-                    <GitHub />
-                  </IconButton>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Email fontSize="small" color="action" />
+                  <Typography variant="body2" color="text.secondary">
+                    support@requify.com
+                  </Typography>
                 </Stack>
-              </Grid>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Phone fontSize="small" color="action" />
+                  <Typography variant="body2" color="text.secondary">
+                    +1 (555) 123-4567
+                  </Typography>
+                </Stack>
+              </Stack>
             </Grid>
-            <Divider sx={{ my: 4, borderColor: alpha("#fff", 0.1) }} />
+            <Grid item xs={12} md={6}>
+              <Stack
+                direction="row"
+                spacing={1}
+                justifyContent={{ xs: "flex-start", md: "flex-end" }}
+              >
+                <IconButton
+                  onClick={() => handleSocialClick("twitter")}
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": { color: "#1DA1F2" },
+                  }}
+                >
+                  <Twitter />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleSocialClick("linkedin")}
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": { color: "#0A66C2" },
+                  }}
+                >
+                  <LinkedIn />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleSocialClick("github")}
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": { color: "#333" },
+                  }}
+                >
+                  <GitHub />
+                </IconButton>
+              </Stack>
+            </Grid>
+          </Grid>
+          <Divider
+            sx={{ my: 4, borderColor: alpha(theme.palette.divider, 0.1) }}
+          />
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={2}
+          >
             <Typography
               variant="body2"
-              sx={{ opacity: 0.5, textAlign: "center" }}
+              color="text.secondary"
+              sx={{ opacity: 0.7 }}
             >
               © 2025 Requify. All rights reserved.
             </Typography>
-          </Container>
-        </Box>
-      </Slide>
+            <Stack direction="row" spacing={3}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ cursor: "pointer", "&:hover": { color: "primary.main" } }}
+                onClick={() =>
+                  setSnackbarMessage("Privacy Policy - Coming Soon")
+                }
+              >
+                Privacy Policy
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ cursor: "pointer", "&:hover": { color: "primary.main" } }}
+                onClick={() =>
+                  setSnackbarMessage("Terms of Service - Coming Soon")
+                }
+              >
+                Terms of Service
+              </Typography>
+            </Stack>
+          </Stack>
+        </Container>
+      </Box>
+
+      {/* Watch Demo Dialog */}
+      <Dialog
+        open={demoDialogOpen}
+        onClose={() => setDemoDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography variant="h6" fontWeight={600}>
+              Request Demo Access
+            </Typography>
+            <IconButton onClick={() => setDemoDialogOpen(false)} size="small">
+              <Close />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Get instant access to our interactive demo and see how Requify can
+              transform your requirements management process.
+            </Typography>
+            <TextField
+              label="Full Name"
+              value={demoRequest.name}
+              onChange={(e) =>
+                setDemoRequest({ ...demoRequest, name: e.target.value })
+              }
+              fullWidth
+              required
+            />
+            <TextField
+              label="Email Address"
+              type="email"
+              value={demoRequest.email}
+              onChange={(e) =>
+                setDemoRequest({ ...demoRequest, email: e.target.value })
+              }
+              fullWidth
+              required
+            />
+            <TextField
+              label="Company"
+              value={demoRequest.company}
+              onChange={(e) =>
+                setDemoRequest({ ...demoRequest, company: e.target.value })
+              }
+              fullWidth
+            />
+            <TextField
+              label="Message (Optional)"
+              multiline
+              rows={3}
+              value={demoRequest.message}
+              onChange={(e) =>
+                setDemoRequest({ ...demoRequest, message: e.target.value })
+              }
+              fullWidth
+              placeholder="Tell us about your requirements management challenges..."
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button onClick={() => setDemoDialogOpen(false)} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDemoRequest}
+            variant="contained"
+            disabled={!demoRequest.name || !demoRequest.email}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 500,
+            }}
+          >
+            Get Demo Access
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Schedule Demo Dialog */}
+      <Dialog
+        open={scheduleDialogOpen}
+        onClose={() => setScheduleDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Typography variant="h6" fontWeight={600}>
+              Schedule Live Demo
+            </Typography>
+            <IconButton
+              onClick={() => setScheduleDialogOpen(false)}
+              size="small"
+            >
+              <Close />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Book a personalized demo with our team to explore how Requify can
+              meet your specific needs.
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Full Name"
+                  value={scheduleRequest.name}
+                  onChange={(e) =>
+                    setScheduleRequest({
+                      ...scheduleRequest,
+                      name: e.target.value,
+                    })
+                  }
+                  fullWidth
+                  required
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Email Address"
+                  type="email"
+                  value={scheduleRequest.email}
+                  onChange={(e) =>
+                    setScheduleRequest({
+                      ...scheduleRequest,
+                      email: e.target.value,
+                    })
+                  }
+                  fullWidth
+                  required
+                />
+              </Grid>
+            </Grid>
+            <TextField
+              label="Company"
+              value={scheduleRequest.company}
+              onChange={(e) =>
+                setScheduleRequest({
+                  ...scheduleRequest,
+                  company: e.target.value,
+                })
+              }
+              fullWidth
+            />
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Preferred Date"
+                  type="date"
+                  value={scheduleRequest.preferredDate}
+                  onChange={(e) =>
+                    setScheduleRequest({
+                      ...scheduleRequest,
+                      preferredDate: e.target.value,
+                    })
+                  }
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Preferred Time"
+                  type="time"
+                  value={scheduleRequest.preferredTime}
+                  onChange={(e) =>
+                    setScheduleRequest({
+                      ...scheduleRequest,
+                      preferredTime: e.target.value,
+                    })
+                  }
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
+            <TextField
+              label="Additional Notes (Optional)"
+              multiline
+              rows={3}
+              value={scheduleRequest.message}
+              onChange={(e) =>
+                setScheduleRequest({
+                  ...scheduleRequest,
+                  message: e.target.value,
+                })
+              }
+              fullWidth
+              placeholder="Specific features you'd like to see, team size, etc..."
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button onClick={() => setScheduleDialogOpen(false)} color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleScheduleRequest}
+            variant="contained"
+            disabled={!scheduleRequest.name || !scheduleRequest.email}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 500,
+            }}
+          >
+            Schedule Demo
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
