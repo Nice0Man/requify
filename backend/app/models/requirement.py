@@ -10,9 +10,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
-    from .requirement_type import RequirementType
-    from .requirement_priority import RequirementPriority
-    from .requirement_status import RequirementStatus
+    from .requirement_types import RequirementType
+    from .requirement_priorities import RequirementPriority
+    from .requirement_statuses import RequirementStatus
     from .project import Project
     from .user import User
     from .release import Release

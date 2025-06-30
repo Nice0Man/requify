@@ -13,6 +13,7 @@ from app.api.deps import (
     get_releases_read_user,
     get_releases_write_user,
     get_releases_delete_user,
+    get_analyst_user,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -569,12 +570,15 @@ async def create_release_from_requirements(
     )
 
 
-@router.post("/{release_id}/generate-specification", response_model=dict)
+@router.post(
+    "/{release_id}/generate-specification", 
+    response_model=schemas.SpecificationGenerationResponse
+)
 async def generate_release_specification(
     release_id: int,
-    spec_options: dict = None,
+    spec_options: schemas.SpecificationGenerationOptions = None,
     db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_write_user),
+    current_user=Depends(get_analyst_user),  # Changed to analyst role as per TZ
 ):
     """
     Генерация спецификации релиза.
@@ -589,76 +593,215 @@ async def generate_release_specification(
         current_user: Текущий пользователь
 
     Returns:
-        dict: Информация о сгенерированной спецификации
+        SpecificationGenerationResponse: Информация о сгенерированной спецификации
 
     Raises:
         HTTPException: Если релиз не найден
     """
+    # Получаем релиз с требованиями
     release = await crud.release.get_with_requirements(db, id=release_id)
     if not release:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Release not found"
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Release not found"
         )
 
+    # Используем значения по умолчанию, если опции не переданы
     if spec_options is None:
-        spec_options = {}
+        spec_options = schemas.SpecificationGenerationOptions()
 
-    # Получаем требования релиза
-    requirements = await crud.requirement.get_by_release(db, release_id=release_id)
+    # Получаем требования релиза с деталями
+    requirements = await crud.requirement.get_by_release(
+        db, release_id=release_id
+    )
 
-    # Создаем спецификацию
-    from datetime import datetime, UTC
-    from app.schemas.spec import SpecCreate
+    # Анализируем связи требований, если включено
+    relationships_count = 0
+    relationships_data = []
+    
+    if spec_options.include_relationships and requirements:
+        from app.crud.relationship import relationship
+        
+        # Получаем все связи для требований релиза
+        requirement_ids = [req.id for req in requirements]
+        all_relationships = []
+        
+        for req_id in requirement_ids:
+            rel_data = await relationship.get_by_requirement(db, requirement_id=req_id)
+            all_relationships.extend(rel_data)
+        
+        relationships_count = len(all_relationships)
+        relationships_data = [
+            {
+                "source_id": rel.source_id,
+                "target_id": rel.target_id,
+                "type_name": rel.type.name if rel.type else "Unknown"
+            }
+            for rel in all_relationships
+        ]
 
-    spec_data = SpecCreate(
-        name=f"Specification for {release.name} {release.version}",
-        description=f"Auto-generated specification for release {release.name}",
-        content={
-            "release_info": {
-                "name": release.name,
-                "version": release.version,
-                "description": release.description,
-            },
-            "requirements": [
-                {
-                    "id": req.id,
-                    "title": req.title,
-                    "description": req.description,
-                    "type": req.type.name if req.type else None, # type: RequirementType
-                    "priority": req.priority.name if req.priority else None, # type: RequirementPriority
-                    "status": req.status.name if req.status else None, # type: RequirementStatus
-                }
-                for req in requirements # type: List["Requirement"]
-            ],
-            "sections": [
+    # Генерируем разделы спецификации
+    sections = []
+    if spec_options.custom_sections:
+        sections = spec_options.custom_sections
+    else:
+        # Стандартные разделы в зависимости от стиля
+        if spec_options.template_style == "detailed":
+            sections = [
+                "Введение",
+                "Обзор релиза", 
+                "Функциональные требования",
+                "Нефункциональные требования",
+                "Архитектурные требования",
+                "Интерфейсы",
+                "Связи требований",
+                "Матрица трассировки",
+                "Тестирование",
+                "Приложения"
+            ]
+        elif spec_options.template_style == "compact":
+            sections = [
+                "Требования",
+                "Связи",
+                "Тестирование"
+            ]
+        elif spec_options.template_style == "technical":
+            sections = [
+                "Техническое описание",
+                "Функциональность",
+                "API и интерфейсы",
+                "Конфигурация",
+                "Развертывание"
+            ]
+        else:  # standard
+            sections = [
                 "Введение",
                 "Функциональные требования",
                 "Нефункциональные требования",
                 "Интерфейсы",
-                "Тестирование",
-            ],
-            "generated_at": datetime.now(UTC).isoformat(),
-            "generated_by": current_user.id if hasattr(current_user, "id") else None,
-            "format": spec_options.get("format", "pdf"),
-            "language": spec_options.get("language", "ru"),
+                "Тестирование"
+            ]
+
+    # Подготавливаем содержимое спецификации
+    from datetime import datetime, UTC
+    
+    content_data = {
+        "release_info": {
+            "name": release.name,
+            "version": release.version,
+            "description": release.description,
+            "status": release.status,
+            "planned_date": release.planned_date.isoformat() if release.planned_date else None,
+            "release_date": release.release_date.isoformat() if release.release_date else None,
         },
+        "requirements": [
+            {
+                "id": req.id,
+                "title": req.title,
+                "description": req.description,
+                "type": req.type.name if req.type else None,
+                "priority": req.priority.name if req.priority else None,
+                "status": req.status.name if req.status else None,
+            }
+            for req in requirements
+        ] if spec_options.include_requirements else [],
+        "relationships": relationships_data if spec_options.include_relationships else [],
+        "sections": sections,
+        "generation_options": {
+            "format": spec_options.format,
+            "language": spec_options.language,
+            "template_style": spec_options.template_style,
+            "auto_numbering": spec_options.auto_numbering,
+            "include_requirements": spec_options.include_requirements,
+            "include_relationships": spec_options.include_relationships,
+            "include_test_cases": spec_options.include_test_cases,
+            "include_changelog": spec_options.include_changelog,
+            "include_statistics": spec_options.include_statistics,
+        },
+        "statistics": {
+            "total_requirements": len(requirements),
+            "total_relationships": relationships_count,
+            "requirements_by_type": {},
+            "requirements_by_status": {},
+            "requirements_by_priority": {},
+        },
+        "generated_at": datetime.now(UTC).isoformat(),
+        "generated_by": current_user.id if hasattr(current_user, "id") else None,
+    }
+
+    # Собираем статистику по типам, статусам и приоритетам
+    if spec_options.include_statistics and requirements:
+        for req in requirements:
+            # По типам
+            type_name = req.type.name if req.type else "Unknown"
+            content_data["statistics"]["requirements_by_type"][type_name] = \
+                content_data["statistics"]["requirements_by_type"].get(type_name, 0) + 1
+            
+            # По статусам  
+            status_name = req.status.name if req.status else "Unknown"
+            content_data["statistics"]["requirements_by_status"][status_name] = \
+                content_data["statistics"]["requirements_by_status"].get(status_name, 0) + 1
+            
+            # По приоритетам
+            priority_name = req.priority.name if req.priority else "Unknown"
+            content_data["statistics"]["requirements_by_priority"][priority_name] = \
+                content_data["statistics"]["requirements_by_priority"].get(priority_name, 0) + 1
+
+    # Создаем спецификацию через обновленную схему
+    from app.schemas.spec import SpecCreate
+
+    spec_data = SpecCreate(
+        name=f"Specification for {release.name} v{release.version}",
+        description=f"Auto-generated specification for release {release.name}",
         version="1.0",
+        content=content_data,
+        format=spec_options.format,
+        language=spec_options.language,
+        status="generated",
         project_id=release.project_id,
+        generated_by=current_user.id if hasattr(current_user, "id") else None,
     )
 
+    # Создаем спецификацию в БД
     spec = await crud.spec.create(db, obj_in=spec_data)
 
-    return {
-        "release_id": release_id,
-        "specification_id": spec.id,
-        "format": spec_options.get("format", "pdf"),
-        "language": spec_options.get("language", "ru"),
-        "sections": spec_data.content["sections"],
-        "generated_at": spec_data.content["generated_at"],
-        "download_url": f"/api/v1/specs/{spec.id}/download",
-        "status": "generated",
-        "requirements_count": len(requirements),
+    # Формируем статистику генерации
+    generation_stats = {
+        "processing_time_ms": 0,  # Placeholder - можно добавить реальные замеры
+        "requirements_processed": len(requirements),
+        "relationships_analyzed": relationships_count,
+        "sections_generated": len(sections),
+        "format": spec_options.format,
+        "template_style": spec_options.template_style,
+        "options_used": {
+            "include_requirements": spec_options.include_requirements,
+            "include_relationships": spec_options.include_relationships,
+            "include_test_cases": spec_options.include_test_cases,
+            "include_changelog": spec_options.include_changelog,
+            "include_statistics": spec_options.include_statistics,
+            "auto_numbering": spec_options.auto_numbering,
+        }
     }
+
+    # Формируем ответ
+    response = schemas.SpecificationGenerationResponse(
+        release_id=release_id,
+        specification_id=spec.id,
+        specification_name=spec.name,
+        format=spec_options.format,
+        language=spec_options.language,
+        status="generated",
+        generated_at=datetime.now(UTC).isoformat(),
+        generated_by=current_user.id if hasattr(current_user, "id") else None,
+        sections=sections,
+        requirements_count=len(requirements),
+        relationships_count=relationships_count,
+        download_url=f"/api/v1/specifications/{spec.id}/download",
+        preview_url=f"/api/v1/specifications/{spec.id}/preview",
+        generation_stats=generation_stats,
+    )
+
+    return response
 
 
 @router.post("/{release_id}/publish", response_model=dict)

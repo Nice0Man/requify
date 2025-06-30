@@ -69,6 +69,10 @@ from .release import (
     ReleaseCreationSummary,
     ReleaseWithLinkedRequirements,
     RequirementSummary,
+    # Function 12 schemas
+    SpecificationGenerationOptions,
+    SpecificationGenerationResponse,
+    SpecificationGenerationSummary,
 )
 
 # Test Result schemas
@@ -201,6 +205,7 @@ from .spec import (
     SpecBase,
     SpecInDBBase,
     SpecWithRequirements,
+    SpecDetailed,
 )
 
 # Report schemas
@@ -300,6 +305,10 @@ __all__ = [
     "ReleaseCreationSummary",
     "ReleaseWithLinkedRequirements",
     "RequirementSummary",
+    # Function 12 schemas
+    "SpecificationGenerationOptions",
+    "SpecificationGenerationResponse",
+    "SpecificationGenerationSummary",
     # Report
     "Report",
     "ReportCreate",
