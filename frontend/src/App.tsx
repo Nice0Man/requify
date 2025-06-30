@@ -50,6 +50,9 @@ const ProjectCreatePage = React.lazy(
 const ProjectDetailsPage = React.lazy(
   () => import("@/features/projects/pages/ProjectDetailsPage")
 );
+const ProjectEditPage = React.lazy(
+  () => import("@/features/projects/pages/ProjectEditPage")
+);
 const RequirementsPage = React.lazy(
   () => import("@/features/requirements/pages/RequirementsPage")
 );
@@ -238,6 +241,14 @@ const AppRoutes: React.FC = () => {
           element={
             <React.Suspense fallback={<LoadingFallback />}>
               <ProjectCreatePage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="projects/:id/edit"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ProjectEditPage />
             </React.Suspense>
           }
         />
