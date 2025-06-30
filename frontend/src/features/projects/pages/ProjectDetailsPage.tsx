@@ -10,14 +10,10 @@ import {
   IconButton,
   Tabs,
   Tab,
-  List,
-  ListItem,
-  ListItemText,
   LinearProgress,
   Alert,
   CircularProgress,
   Divider,
-  Avatar,
   Paper,
 } from "@mui/material";
 import {
@@ -33,7 +29,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   projectsApi,
   ProjectWithStats,
-  ProjectStatus,
 } from "../api/projects.api";
 import { getStatusColor } from "../types/project.types";
 

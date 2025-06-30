@@ -24,9 +24,6 @@ import {
   Badge,
   Autocomplete,
   InputAdornment,
-  Switch,
-  FormControlLabel,
-  Avatar,
   Tooltip,
   Stack,
   Fade,
@@ -44,7 +41,6 @@ import {
 import {
   Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon,
   Visibility as ViewIcon,
   Search as SearchIcon,
   FilterList as FilterIcon,
@@ -53,15 +49,10 @@ import {
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
   FolderOpen as ProjectIcon,
-  Business as BusinessIcon,
-  People as PeopleIcon,
   Schedule as ScheduleIcon,
   CheckCircle as CheckCircleIcon,
   Archive as ArchiveIcon,
-  Assignment as RequirementsIcon,
-  RocketLaunch as ReleasesIcon,
   Clear as ClearIcon,
-  AttachMoney as BudgetIcon,
   Warning as WarningIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";

@@ -23,8 +23,6 @@ import {
   TextField,
   MenuItem,
   Alert,
-  Stack,
-  Fade,
   InputAdornment,
   Fab,
   Paper,
@@ -35,7 +33,6 @@ import {
   Edit,
   Delete,
   Schedule,
-  Timeline,
   BugReport,
   Refresh,
   GetApp,
@@ -47,7 +44,6 @@ import {
   CalendarToday,
   Search,
   FilterList,
-  Publish,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -57,16 +53,9 @@ import {
   ReleaseListParams,
   Release,
   ReleaseStatus,
-  ReleaseStatusType,
   ReleaseCreate,
   ReleaseUpdate,
 } from "../api/releases.api";
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
 
 interface ReleaseStats {
   total: number;
