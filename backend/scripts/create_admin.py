@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Admin user creation script for Requify.
 """
