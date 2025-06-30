@@ -11,7 +11,6 @@ import {
   MenuItem,
   Chip,
   IconButton,
-  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -25,19 +24,12 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
-  Divider,
   Badge,
-  LinearProgress,
   Autocomplete,
-  Stack,
   InputAdornment,
   Switch,
   FormControlLabel,
-  Tabs,
-  Tab,
-  CircularProgress,
   Avatar,
-  AvatarGroup,
 } from "@mui/material";
 import {
   DataGrid,
@@ -58,21 +50,16 @@ import {
   Refresh as RefreshIcon,
   MoreVert as MoreVertIcon,
   Assignment as AssignmentIcon,
-  BugReport as BugIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   PriorityHigh as HighPriorityIcon,
-  Label as TagIcon,
-  AccountTree as RelationIcon,
-  Comment as CommentIcon,
-  Attachment as AttachmentIcon,
   Clear as ClearIcon,
+  ArrowUpward as ArrowUpwardIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { format, isAfter, parseISO } from "date-fns";
 import {
-  Requirement,
   RequirementWithDetails,
   RequirementFilters,
   RequirementListParams,
@@ -601,7 +588,7 @@ const RequirementsPage: React.FC = () => {
                     {requirementsStats.highRisk}
                   </Typography>
                 </Box>
-                <BugIcon color="error" sx={{ fontSize: 40 }} />
+                <ArrowUpwardIcon color="error" sx={{ fontSize: 40 }} />
               </Box>
             </CardContent>
           </Card>
