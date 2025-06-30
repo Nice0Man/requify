@@ -405,11 +405,11 @@ const ReportsPage: React.FC = () => {
               }}
             >
               Reports & Analytics
-            </Typography>
+        </Typography>
             <Typography variant="body1" color="text.secondary">
               Generate insights, track performance, and analyze project data
               with comprehensive reports.
-            </Typography>
+        </Typography>
           </Stack>
 
           <Stack direction="row" spacing={2}>
@@ -526,7 +526,7 @@ const ReportsPage: React.FC = () => {
                 </Typography>
               </Stack>
             </Card>
-          </Grid>
+                  </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
             <Card
@@ -550,7 +550,7 @@ const ReportsPage: React.FC = () => {
                   justifyContent="space-between"
                   alignItems="center"
                 >
-                  <Typography
+                    <Typography
                     variant="h4"
                     fontWeight={700}
                     color="success.main"
@@ -564,10 +564,10 @@ const ReportsPage: React.FC = () => {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Most requested
-                </Typography>
+                    </Typography>
               </Stack>
             </Card>
-          </Grid>
+                  </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
             <Card
@@ -601,10 +601,10 @@ const ReportsPage: React.FC = () => {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Generated this week
-                </Typography>
+                    </Typography>
               </Stack>
             </Card>
-          </Grid>
+                </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
             <Card
@@ -642,7 +642,7 @@ const ReportsPage: React.FC = () => {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   PDF, Excel, CSV, JSON
-                </Typography>
+                    </Typography>
               </Stack>
             </Card>
           </Grid>
@@ -758,7 +758,7 @@ const ReportsPage: React.FC = () => {
               </Grid>
             </Grid>
           </Stack>
-        </Card>
+            </Card>
 
         {/* Tabs */}
         <Paper
@@ -804,29 +804,29 @@ const ReportsPage: React.FC = () => {
                   <Box key={category}>
                     <Typography variant="h6" fontWeight={600} gutterBottom>
                       {category}
-                    </Typography>
+              </Typography>
                     <Grid container spacing={3}>
                       {filteredReports.map((report) => (
                         <Grid item xs={12} sm={6} md={4} key={report.id}>
-                          <Card
+                    <Card
                             elevation={0}
-                            sx={{
+                      sx={{
                               height: "100%",
                               borderRadius: 3,
                               border: `1px solid ${alpha(
                                 theme.palette.divider,
                                 0.1
                               )}`,
-                              cursor: "pointer",
+                        cursor: "pointer",
                               transition: "all 0.3s ease",
                               "&:hover": {
                                 transform: "translateY(-4px)",
                                 boxShadow: "0 12px 30px rgba(0,0,0,0.1)",
                                 borderColor: alpha(report.color, 0.3),
                               },
-                            }}
+                      }}
                             onClick={() => handleGenerateReport(report)}
-                          >
+                    >
                             <CardContent sx={{ p: 3 }}>
                               <Stack spacing={2}>
                                 <Stack
@@ -855,13 +855,13 @@ const ReportsPage: React.FC = () => {
                                 </Stack>
                                 <Typography variant="h6" fontWeight={600}>
                                   {report.name}
-                                </Typography>
+                          </Typography>
                                 <Typography
                                   variant="body2"
                                   color="text.secondary"
                                 >
                                   {report.description}
-                                </Typography>
+                        </Typography>
                                 <Stack direction="row" spacing={1}>
                                   <Chip
                                     label={report.estimatedTime}
@@ -870,15 +870,15 @@ const ReportsPage: React.FC = () => {
                                     icon={<Schedule />}
                                   />
                                   {report.lastGenerated && (
-                                    <Chip
+                        <Chip
                                       label={`Last: ${report.lastGenerated}`}
-                                      size="small"
+                          size="small"
                                       variant="outlined"
-                                    />
+                        />
                                   )}
                                 </Stack>
                               </Stack>
-                            </CardContent>
+                      </CardContent>
                             <CardActions sx={{ p: 2, pt: 0 }}>
                               <Button
                                 variant="contained"
@@ -896,11 +896,11 @@ const ReportsPage: React.FC = () => {
                                 Generate Report
                               </Button>
                             </CardActions>
-                          </Card>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
                 );
               })}
             </Stack>
@@ -945,16 +945,16 @@ const ReportsPage: React.FC = () => {
                           >
                             <Typography variant="h6" fontWeight={600}>
                               {report.name}
-                            </Typography>
+                </Typography>
                             <Chip
                               label="Popular"
                               size="small"
                               color="primary"
                             />
                           </Stack>
-                          <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary">
                             {report.description}
-                          </Typography>
+                  </Typography>
                           <Stack direction="row" spacing={1}>
                             <Chip
                               label={report.estimatedTime}
@@ -995,8 +995,8 @@ const ReportsPage: React.FC = () => {
                         ),
                       },
                     }}
-                  >
-                    <ListItemIcon>
+                        >
+                          <ListItemIcon>
                       <Avatar
                         sx={{
                           backgroundColor: alpha(report.color, 0.1),
@@ -1007,17 +1007,17 @@ const ReportsPage: React.FC = () => {
                       >
                         {report.icon}
                       </Avatar>
-                    </ListItemIcon>
-                    <ListItemText
+                          </ListItemIcon>
+                          <ListItemText
                       primary={
                         <Stack direction="row" alignItems="center" spacing={1}>
                           <Typography variant="subtitle1" fontWeight={500}>
                             {report.name}
-                          </Typography>
+                                </Typography>
                           {report.isPopular && (
-                            <Chip
+                                <Chip
                               label="Popular"
-                              size="small"
+                                  size="small"
                               color="primary"
                             />
                           )}
@@ -1060,9 +1060,9 @@ const ReportsPage: React.FC = () => {
                     </Stack>
                   </ListItemButton>
                   {index < recentReports.length - 1 && <Divider />}
-                </React.Fragment>
-              ))}
-            </List>
+                      </React.Fragment>
+                    ))}
+                  </List>
           </TabPanel>
         </Paper>
       </Stack>
@@ -1186,7 +1186,7 @@ const ReportsPage: React.FC = () => {
                     Generating report... Estimated time:{" "}
                     {selectedReport.estimatedTime}
                   </Typography>
-                </Box>
+      </Box>
               )}
             </Stack>
           )}

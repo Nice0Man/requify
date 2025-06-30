@@ -281,11 +281,11 @@ const SettingsPage: React.FC = () => {
       // Update notification settings from user data
       if (user.notification_preferences) {
         setNotificationSettings(user.notification_preferences);
-      }
+    }
 
       // Update appearance settings from user data
       setAppearanceSettings((prev) => ({
-        ...prev,
+      ...prev,
         language: user.language || "en",
         timezone: user.timezone || "UTC",
       }));
@@ -553,21 +553,21 @@ const SettingsPage: React.FC = () => {
         </Backdrop>
         <Container component="main" maxWidth="lg">
           <Box sx={{ py: 4 }}>
-            <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 4 }}>
               <Skeleton variant="text" width="30%" height={48} sx={{ mb: 1 }} />
-              <Skeleton variant="text" width="50%" height={24} />
-            </Box>
-            <Skeleton
+          <Skeleton variant="text" width="50%" height={24} />
+        </Box>
+                <Skeleton
               variant="rectangular"
               height={400}
               sx={{ borderRadius: 3, mb: 2 }}
-            />
-            <Skeleton
+                />
+                <Skeleton
               variant="rectangular"
               height={600}
               sx={{ borderRadius: 3 }}
             />
-          </Box>
+      </Box>
         </Container>
       </>
     );
@@ -622,26 +622,26 @@ const SettingsPage: React.FC = () => {
           >
             <Tooltip title="Refresh Settings" arrow>
               <span>
-                <IconButton
-                  onClick={handleRefresh}
-                  disabled={refreshing}
-                  sx={{
-                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+          <IconButton
+            onClick={handleRefresh}
+            disabled={refreshing}
+            sx={{
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
                     border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
                     color: theme.palette.primary.main,
-                    "&:hover": {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.2),
                       transform: refreshing ? "none" : "rotate(180deg)",
                       borderColor: theme.palette.primary.main,
-                    },
+              },
                     "&:disabled": {
                       backgroundColor: alpha(theme.palette.action.disabled, 0.1),
                     },
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  }}
-                >
+            }}
+          >
                   {refreshing ? <CircularProgress size={24} /> : <Refresh />}
-                </IconButton>
+          </IconButton>
               </span>
             </Tooltip>
             <Button
@@ -685,7 +685,7 @@ const SettingsPage: React.FC = () => {
               {saving ? "Saving..." : "Save All"}
             </Button>
           </Stack>
-        </Box>
+      </Box>
 
         {/* Enhanced Settings Navigation Tabs */}
         <Card
@@ -772,13 +772,13 @@ const SettingsPage: React.FC = () => {
 
         {/* Profile Settings Tab */}
         <TabPanel value={activeTab} index={0}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
-              <Card
-                sx={{
-                  borderRadius: 3,
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={4}>
+          <Card
+            sx={{
+              borderRadius: 3,
                   boxShadow: `0 4px 20px ${alpha(
-                    theme.palette.common.black,
+                theme.palette.common.black,
                     0.06
                   )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
@@ -791,10 +791,10 @@ const SettingsPage: React.FC = () => {
                       0.12
                     )}`,
                   },
-                }}
-              >
-                <CardHeader
-                  title={
+            }}
+          >
+            <CardHeader
+              title={
                     <Box display="flex" alignItems="center" gap={1.5}>
                       <Box
                         sx={{
@@ -809,50 +809,50 @@ const SettingsPage: React.FC = () => {
                       >
                         <Person sx={{ color: "white", fontSize: 18 }} />
                       </Box>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: 600, fontSize: "1.1rem" }}
-                      >
+                  <Typography
+                    variant="h6"
+                    sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+                  >
                         Profile Summary
-                      </Typography>
-                    </Box>
-                  }
+                  </Typography>
+                </Box>
+              }
                   sx={{ pb: 1 }}
-                />
+            />
                 <CardContent sx={{ textAlign: "center", pt: 0 }}>
                   <Box position="relative" display="inline-block" mb={3}>
-                    <Avatar
-                      sx={{
+                <Avatar
+                  sx={{
                         width: 96,
                         height: 96,
                         fontSize: "2.5rem",
                         background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                        mb: 1,
+                    mb: 1,
                         border: `4px solid ${theme.palette.background.paper}`,
                         boxShadow: `0 4px 16px ${alpha(
                           theme.palette.primary.main,
                           0.2
                         )}`,
-                      }}
-                      src={user?.avatar}
-                    >
+                  }}
+                  src={user?.avatar}
+                >
                       {getInitials(user?.first_name, user?.last_name) ||
                         user?.username?.[0] ||
                         "U"}
-                    </Avatar>
-                    <IconButton
-                      size="small"
-                      sx={{
-                        position: "absolute",
-                        bottom: 8,
+                </Avatar>
+                <IconButton
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    bottom: 8,
                         right: -4,
-                        backgroundColor: theme.palette.background.paper,
-                        border: `2px solid ${theme.palette.background.paper}`,
+                    backgroundColor: theme.palette.background.paper,
+                    border: `2px solid ${theme.palette.background.paper}`,
                         boxShadow: `0 2px 8px ${alpha(
                           theme.palette.common.black,
                           0.15
                         )}`,
-                        "&:hover": {
+                    "&:hover": {
                           backgroundColor: alpha(
                             theme.palette.primary.main,
                             0.1
@@ -863,8 +863,8 @@ const SettingsPage: React.FC = () => {
                       }}
                     >
                       <PhotoCamera fontSize="small" color="primary" />
-                    </IconButton>
-                  </Box>
+                </IconButton>
+              </Box>
 
                   <Typography
                     variant="h6"
@@ -874,18 +874,18 @@ const SettingsPage: React.FC = () => {
                       color: theme.palette.text.primary,
                     }}
                   >
-                    {user?.first_name && user?.last_name
-                      ? `${user.first_name} ${user.last_name}`
-                      : user?.username}
-                  </Typography>
+                {user?.first_name && user?.last_name
+                  ? `${user.first_name} ${user.last_name}`
+                  : user?.username}
+              </Typography>
 
                   <Typography
                     variant="body2"
                     color="text.secondary"
                     sx={{ mb: 2, fontWeight: 500 }}
                   >
-                    {user?.email}
-                  </Typography>
+                {user?.email}
+              </Typography>
 
                   <Chip
                     label={user?.role ? getRoleLabel(user.role) : "Unknown"}
@@ -928,18 +928,18 @@ const SettingsPage: React.FC = () => {
                             }
                           )
                         : "Unknown"}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
 
-            <Grid item xs={12} md={8}>
-              <Card
-                sx={{
-                  borderRadius: 3,
+        <Grid item xs={12} md={8}>
+          <Card
+            sx={{
+              borderRadius: 3,
                   boxShadow: `0 4px 20px ${alpha(
-                    theme.palette.common.black,
+                theme.palette.common.black,
                     0.06
                   )}`,
                   border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
@@ -951,9 +951,9 @@ const SettingsPage: React.FC = () => {
                       0.12
                     )}`,
                   },
-                }}
-              >
-                <CardHeader
+            }}
+          >
+            <CardHeader
                   title={
                     <Box display="flex" alignItems="center" gap={1.5}>
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -961,15 +961,15 @@ const SettingsPage: React.FC = () => {
                       </Typography>
                     </Box>
                   }
-                  action={
-                    <Box display="flex" gap={1}>
+              action={
+                <Box display="flex" gap={1}>
                       {isEditingProfile ? (
-                        <>
-                          <Button
-                            variant="outlined"
-                            startIcon={<Cancel />}
+                    <>
+                      <Button
+                        variant="outlined"
+                        startIcon={<Cancel />}
                             onClick={handleCancelProfileEdit}
-                            size="small"
+                        size="small"
                             sx={{
                               borderRadius: 2,
                               textTransform: "none",
@@ -987,11 +987,11 @@ const SettingsPage: React.FC = () => {
                                 ),
                               },
                             }}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            variant="contained"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="contained"
                             startIcon={
                               saving ? (
                                 <CircularProgress size={16} color="inherit" />
@@ -1000,7 +1000,7 @@ const SettingsPage: React.FC = () => {
                               )
                             }
                             onClick={handleSaveProfile}
-                            size="small"
+                        size="small"
                             disabled={saving}
                             sx={{
                               borderRadius: 2,
@@ -1015,14 +1015,14 @@ const SettingsPage: React.FC = () => {
                             }}
                           >
                             {saving ? "Saving..." : "Save"}
-                          </Button>
-                        </>
-                      ) : (
-                        <Button
-                          variant="outlined"
-                          startIcon={<Edit />}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      startIcon={<Edit />}
                           onClick={() => setIsEditingProfile(true)}
-                          size="small"
+                      size="small"
                           sx={{
                             borderRadius: 2,
                             textTransform: "none",
@@ -1039,22 +1039,22 @@ const SettingsPage: React.FC = () => {
                             },
                             transition: "all 0.3s ease",
                           }}
-                        >
-                          Edit
-                        </Button>
-                      )}
-                    </Box>
-                  }
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </Box>
+              }
                   sx={{ pb: 1 }}
-                />
+            />
                 <CardContent sx={{ pt: 0 }}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="First Name"
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="First Name"
                         value={profileFormData.first_name || ""}
-                        onChange={(e) =>
+                    onChange={(e) =>
                           handleProfileFieldChange("first_name", e.target.value)
                         }
                         disabled={!isEditingProfile}
@@ -1086,15 +1086,15 @@ const SettingsPage: React.FC = () => {
                             </InputAdornment>
                           ) : undefined,
                         }}
-                      />
-                    </Grid>
+                  />
+                </Grid>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Last Name"
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Last Name"
                         value={profileFormData.last_name || ""}
-                        onChange={(e) =>
+                    onChange={(e) =>
                           handleProfileFieldChange("last_name", e.target.value)
                         }
                         disabled={!isEditingProfile}
@@ -1126,14 +1126,14 @@ const SettingsPage: React.FC = () => {
                             </InputAdornment>
                           ) : undefined,
                         }}
-                      />
-                    </Grid>
+                  />
+                </Grid>
 
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Email"
-                        type="email"
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    type="email"
                         value={profileFormData.email || ""}
                         onChange={(e) =>
                           handleProfileFieldChange("email", e.target.value)
@@ -1167,15 +1167,15 @@ const SettingsPage: React.FC = () => {
                             </InputAdornment>
                           ),
                         }}
-                      />
-                    </Grid>
+                  />
+                </Grid>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Username"
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Username"
                         value={profileFormData.username || ""}
-                        onChange={(e) =>
+                    onChange={(e) =>
                           handleProfileFieldChange("username", e.target.value)
                         }
                         disabled={!isEditingProfile}
@@ -1205,15 +1205,15 @@ const SettingsPage: React.FC = () => {
                             <InputAdornment position="start">@</InputAdornment>
                           ),
                         }}
-                      />
-                    </Grid>
+                  />
+                </Grid>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Department"
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Department"
                         value={profileFormData.department || ""}
-                        onChange={(e) =>
+                    onChange={(e) =>
                           handleProfileFieldChange("department", e.target.value)
                         }
                         disabled={!isEditingProfile}
@@ -1238,13 +1238,13 @@ const SettingsPage: React.FC = () => {
                             },
                           },
                         }}
-                      />
-                    </Grid>
+                  />
+                </Grid>
 
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Phone"
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Phone"
                         value={profileFormData.phone || ""}
                         onChange={(e) =>
                           handleProfileFieldChange("phone", e.target.value)
@@ -1271,22 +1271,22 @@ const SettingsPage: React.FC = () => {
                             },
                           },
                         }}
-                      />
-                    </Grid>
+                  />
+                </Grid>
 
-                    <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={6}>
                       <FormControl
                         fullWidth
                         disabled={!isEditingProfile}
                         variant={isEditingProfile ? "outlined" : "filled"}
                       >
-                        <InputLabel>Timezone</InputLabel>
-                        <Select
+                    <InputLabel>Timezone</InputLabel>
+                    <Select
                           value={profileFormData.timezone || "UTC"}
-                          onChange={(e) =>
+                      onChange={(e) =>
                             handleProfileFieldChange("timezone", e.target.value)
-                          }
-                          label="Timezone"
+                      }
+                      label="Timezone"
                           sx={{
                             borderRadius: 2,
                             "& .MuiFilledInput-root": {
@@ -1302,8 +1302,8 @@ const SettingsPage: React.FC = () => {
                               },
                             },
                           }}
-                        >
-                          <MenuItem value="UTC">UTC</MenuItem>
+                    >
+                      <MenuItem value="UTC">UTC</MenuItem>
                           <MenuItem value="America/New_York">
                             Eastern Time
                           </MenuItem>
@@ -1313,15 +1313,15 @@ const SettingsPage: React.FC = () => {
                           <MenuItem value="America/Denver">
                             Mountain Time
                           </MenuItem>
-                          <MenuItem value="America/Los_Angeles">
-                            Pacific Time
-                          </MenuItem>
-                          <MenuItem value="Europe/London">London</MenuItem>
-                          <MenuItem value="Europe/Paris">Paris</MenuItem>
-                          <MenuItem value="Asia/Tokyo">Tokyo</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
+                      <MenuItem value="America/Los_Angeles">
+                        Pacific Time
+                      </MenuItem>
+                      <MenuItem value="Europe/London">London</MenuItem>
+                      <MenuItem value="Europe/Paris">Paris</MenuItem>
+                      <MenuItem value="Asia/Tokyo">Tokyo</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
                   </Grid>
                 </CardContent>
               </Card>
@@ -1817,23 +1817,23 @@ const SettingsPage: React.FC = () => {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <FormControl fullWidth>
-                        <InputLabel>Language</InputLabel>
-                        <Select
+                    <InputLabel>Language</InputLabel>
+                    <Select
                           value={appearanceSettings.language}
-                          onChange={(e) =>
+                      onChange={(e) =>
                             handleAppearanceChange("language", e.target.value)
-                          }
-                          label="Language"
-                        >
-                          <MenuItem value="en">English</MenuItem>
-                          <MenuItem value="es">Spanish</MenuItem>
-                          <MenuItem value="fr">French</MenuItem>
-                          <MenuItem value="de">German</MenuItem>
-                          <MenuItem value="zh">Chinese</MenuItem>
-                          <MenuItem value="ja">Japanese</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
+                      }
+                      label="Language"
+                    >
+                      <MenuItem value="en">English</MenuItem>
+                      <MenuItem value="es">Spanish</MenuItem>
+                      <MenuItem value="fr">French</MenuItem>
+                      <MenuItem value="de">German</MenuItem>
+                      <MenuItem value="zh">Chinese</MenuItem>
+                      <MenuItem value="ja">Japanese</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
 
                     <Grid item xs={12}>
                       <FormControl fullWidth>
@@ -1864,11 +1864,11 @@ const SettingsPage: React.FC = () => {
                         </Select>
                       </FormControl>
                     </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
         </TabPanel>
 
         {/* Privacy Tab */}
@@ -2175,13 +2175,13 @@ const SettingsPage: React.FC = () => {
           </TabPanel>
         )}
 
-        {/* Success/Error Messages */}
-        <Snackbar
+      {/* Success/Error Messages */}
+      <Snackbar
           open={snackbarOpen}
           autoHideDuration={6000}
           onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
           <Alert
             onClose={() => setSnackbarOpen(false)}
             severity={snackbarSeverity}
@@ -2189,8 +2189,8 @@ const SettingsPage: React.FC = () => {
             sx={{ borderRadius: 2 }}
           >
             {snackbarMessage}
-          </Alert>
-        </Snackbar>
+        </Alert>
+      </Snackbar>
 
         {/* Legacy error/success states for backwards compatibility */}
         {error && (
@@ -2198,12 +2198,12 @@ const SettingsPage: React.FC = () => {
             <Box sx={{ mb: 2 }}>
               <Alert
                 severity="error"
-                onClose={() => setError(null)}
+        onClose={() => setError(null)}
                 sx={{ borderRadius: 2 }}
-              >
-                {error}
-              </Alert>
-            </Box>
+      >
+          {error}
+        </Alert>
+    </Box>
           </Fade>
         )}
 

@@ -67,9 +67,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { format, isAfter, parseISO, differenceInDays } from "date-fns";
-import {
-  Project,
-  ProjectFilters,
+import { 
+  Project, 
+  ProjectFilters, 
   ProjectStatus,
 } from "../types/projects.types";
 import {
@@ -84,7 +84,7 @@ const ProjectsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const theme = useTheme();
-
+  
   // State
   const [projects, setProjects] = useState<ApiProject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +95,7 @@ const ProjectsPage: React.FC = () => {
   const [sortModel, setSortModel] = useState([
     { field: "updated_at", sort: "desc" as const },
   ]);
-
+  
   // Filters
   const [filters, setFilters] = useState<ProjectFilters>({
     search: "",
@@ -107,11 +107,11 @@ const ProjectsPage: React.FC = () => {
     isPublic: null,
     dateRange: { start: null, end: null },
   });
-
+  
   // Reference data
   const [users, setUsers] = useState([]);
   const [clients, setClients] = useState([]);
-
+  
   // UI State
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -274,78 +274,78 @@ const ProjectsPage: React.FC = () => {
   const getProjectHealth = (project: ApiProject) => {
     if (project.status === ApiProjectStatus.COMPLETED) return "success";
     if (project.status === ApiProjectStatus.CANCELLED) return "default";
-
+    
     const now = new Date();
     if (project.end_date) {
       const endDate = parseISO(project.end_date);
       const daysLeft = differenceInDays(endDate, now);
-
+      
       if (daysLeft < 0) return "error"; // Overdue
       if (daysLeft < 7) return "warning"; // Due soon
     }
-
+    
     return "success"; // On track
   };
 
   // Column definitions
   const columns: GridColDef[] = useMemo(
     () => [
-      {
+    {
         field: "name",
         headerName: "Project Name",
-        flex: 1,
-        minWidth: 200,
-        renderCell: (params) => (
-          <Box>
-            <Typography variant="body2" fontWeight={600} noWrap>
-              {params.value}
+      flex: 1,
+      minWidth: 200,
+      renderCell: (params) => (
+        <Box>
+          <Typography variant="body2" fontWeight={600} noWrap>
+            {params.value}
+          </Typography>
+          {params.row.description && (
+            <Typography variant="caption" color="text.secondary" noWrap>
+              {params.row.description}
             </Typography>
-            {params.row.description && (
-              <Typography variant="caption" color="text.secondary" noWrap>
-                {params.row.description}
-              </Typography>
-            )}
-          </Box>
-        ),
-      },
-      {
+          )}
+        </Box>
+      ),
+    },
+    {
         field: "status",
         headerName: "Status",
-        width: 120,
-        renderCell: (params) => (
-          <Chip
-            size="small"
-            label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
-            color={getStatusColor(params.value)}
-            icon={getStatusIcon(params.value)}
-          />
-        ),
-      },
-      {
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          size="small"
+          label={params.value.charAt(0).toUpperCase() + params.value.slice(1)}
+          color={getStatusColor(params.value)}
+          icon={getStatusIcon(params.value)}
+        />
+      ),
+    },
+    {
         field: "created_by",
         headerName: "Created By",
-        width: 150,
+      width: 150,
         valueGetter: (params) => params.row.created_by || "Unknown",
-        renderCell: (params) => (
+      renderCell: (params) => (
           <Typography variant="body2" color="text.secondary">
             {params.row.created_by || "Unknown"}
           </Typography>
-        ),
-      },
-      {
+      ),
+    },
+    {
         field: "health",
         headerName: "Health",
-        width: 100,
-        renderCell: (params) => {
-          const health = getProjectHealth(params.row);
-          return (
-            <Box display="flex" alignItems="center" gap={1}>
-              <Box
-                sx={{
-                  width: 12,
-                  height: 12,
+      width: 100,
+      renderCell: (params) => {
+        const health = getProjectHealth(params.row);
+        return (
+          <Box display="flex" alignItems="center" gap={1}>
+            <Box
+              sx={{
+                width: 12,
+                height: 12,
                   borderRadius: "50%",
-                  backgroundColor:
+                backgroundColor: 
                     health === "success"
                       ? "success.main"
                       : health === "warning"
@@ -353,9 +353,9 @@ const ProjectsPage: React.FC = () => {
                       : health === "error"
                       ? "error.main"
                       : "grey.400",
-                }}
-              />
-              <Typography variant="caption" color="text.secondary">
+              }}
+            />
+            <Typography variant="caption" color="text.secondary">
                 {health === "success"
                   ? "On Track"
                   : health === "warning"
@@ -363,26 +363,26 @@ const ProjectsPage: React.FC = () => {
                   : health === "error"
                   ? "Overdue"
                   : "Unknown"}
-              </Typography>
-            </Box>
-          );
-        },
+            </Typography>
+          </Box>
+        );
       },
-      {
+    },
+    {
         field: "end_date",
         headerName: "Due Date",
-        width: 120,
+      width: 120,
         valueFormatter: (params: GridValueFormatterParams) =>
           params.value ? format(parseISO(params.value), "MMM dd, yyyy") : "",
-        renderCell: (params) => {
-          if (!params.value) return null;
-          const isOverdue = isAfter(new Date(), parseISO(params.value));
-          const daysLeft = differenceInDays(parseISO(params.value), new Date());
-
-          return (
-            <Box>
-              <Typography
-                variant="body2"
+      renderCell: (params) => {
+        if (!params.value) return null;
+        const isOverdue = isAfter(new Date(), parseISO(params.value));
+        const daysLeft = differenceInDays(parseISO(params.value), new Date());
+        
+        return (
+          <Box>
+            <Typography
+              variant="body2"
                 color={
                   isOverdue
                     ? "error"
@@ -390,57 +390,57 @@ const ProjectsPage: React.FC = () => {
                     ? "warning.main"
                     : "text.primary"
                 }
-                fontWeight={isOverdue ? 600 : 400}
-              >
+              fontWeight={isOverdue ? 600 : 400}
+            >
                 {format(parseISO(params.value), "MMM dd, yyyy")}
+            </Typography>
+            {daysLeft >= 0 && daysLeft < 30 && (
+              <Typography variant="caption" color="text.secondary">
+                {daysLeft} days left
               </Typography>
-              {daysLeft >= 0 && daysLeft < 30 && (
-                <Typography variant="caption" color="text.secondary">
-                  {daysLeft} days left
-                </Typography>
-              )}
-              {isOverdue && (
-                <Typography variant="caption" color="error">
-                  {Math.abs(daysLeft)} days overdue
-                </Typography>
-              )}
-            </Box>
-          );
-        },
+            )}
+            {isOverdue && (
+              <Typography variant="caption" color="error">
+                {Math.abs(daysLeft)} days overdue
+              </Typography>
+            )}
+          </Box>
+        );
       },
-      {
+    },
+    {
         field: "updated_at",
         headerName: "Updated",
-        width: 120,
+      width: 120,
         valueFormatter: (params: GridValueFormatterParams) =>
           format(parseISO(params.value), "MMM dd, yyyy"),
-      },
-      {
+    },
+    {
         field: "actions",
         type: "actions",
         headerName: "Actions",
-        width: 120,
-        getActions: (params: GridRowParams) => [
-          <GridActionsCellItem
-            icon={<ViewIcon />}
-            label="View"
-            onClick={() => navigate(`/projects/${params.id}`)}
-          />,
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            onClick={() => navigate(`/projects/${params.id}/edit`)}
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={() => {
-              setItemToDelete(params.id as number);
-              setDeleteDialogOpen(true);
-            }}
-          />,
-        ],
-      },
+      width: 120,
+      getActions: (params: GridRowParams) => [
+        <GridActionsCellItem
+          icon={<ViewIcon />}
+          label="View"
+          onClick={() => navigate(`/projects/${params.id}`)}
+        />,
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={() => navigate(`/projects/${params.id}/edit`)}
+        />,
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={() => {
+            setItemToDelete(params.id as number);
+            setDeleteDialogOpen(true);
+          }}
+        />,
+      ],
+    },
     ],
     [navigate]
   );
@@ -684,7 +684,7 @@ const ProjectsPage: React.FC = () => {
             }}
             sx={{ minWidth: 300 }}
           />
-
+          
           <Badge badgeContent={activeFiltersCount} color="primary">
             <Button
               variant={showFilters ? "contained" : "outlined"}
@@ -694,13 +694,13 @@ const ProjectsPage: React.FC = () => {
               Filters
             </Button>
           </Badge>
-
+          
           {activeFiltersCount > 0 && (
             <Button variant="outlined" onClick={handleClearFilters}>
               Clear Filters
             </Button>
           )}
-
+          
           <IconButton onClick={loadProjects}>
             <RefreshIcon />
           </IconButton>
@@ -911,9 +911,9 @@ const ProjectsPage: React.FC = () => {
                 </Box>
               </Stack>
             </Box>
-            <Typography>
+          <Typography>
               Are you sure you want to delete this project?
-            </Typography>
+          </Typography>
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
@@ -924,8 +924,8 @@ const ProjectsPage: React.FC = () => {
           >
             Cancel
           </Button>
-          <Button
-            onClick={() => itemToDelete && handleDelete(itemToDelete)}
+          <Button 
+            onClick={() => itemToDelete && handleDelete(itemToDelete)} 
             color="error"
             variant="contained"
             sx={{ borderRadius: 2 }}
@@ -971,4 +971,4 @@ const ProjectsPage: React.FC = () => {
   );
 };
 
-export default ProjectsPage;
+export default ProjectsPage; 

@@ -156,7 +156,7 @@ const DashboardPage: React.FC = () => {
   const handleQuickAction = (action: string, title: string) => {
     switch (action) {
       case "create-project":
-        navigate("/projects/new");
+        navigate("/projects/create");
         break;
       case "view-projects":
         navigate("/projects");
@@ -449,7 +449,7 @@ const DashboardPage: React.FC = () => {
             <Button
               variant="contained"
               startIcon={<Add />}
-              onClick={() => navigate("/projects/new")}
+              onClick={() => navigate("/projects/create")}
               sx={{
                 borderRadius: 2,
                 textTransform: "none",
