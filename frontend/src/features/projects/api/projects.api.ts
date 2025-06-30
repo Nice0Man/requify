@@ -55,6 +55,9 @@ export interface ProjectListResponse {
   pages: number;
 }
 
+// Simple array response (current backend format)
+export type ProjectsResponse = Project[];
+
 // Backend-defined valid statuses matching project.py validation
 export enum ProjectStatus {
   ACTIVE = 'active',
@@ -84,7 +87,28 @@ export class ProjectsApi {
     const queryString = queryParams.toString();
     const url = queryString ? `/projects/?${queryString}` : '/projects/';
     
-    return this.client.get<ProjectListResponse>(url);
+    // Backend returns simple array, transform to expected format
+    const response = await this.client.get<ProjectsResponse>(url);
+    const projects = response.data || [];
+    
+    // Calculate pagination info
+    const skip = params?.skip || 0;
+    const limit = params?.limit || 100;
+    const page = Math.floor(skip / limit);
+    const total = projects.length; // Note: This is not the real total from DB
+    const pages = Math.ceil(total / limit);
+    
+    return {
+      data: {
+        items: projects,
+        total: total,
+        page: page,
+        size: limit,
+        pages: pages,
+      },
+      status: response.status,
+      message: response.message,
+    };
   }
 
   // 2. Create Project

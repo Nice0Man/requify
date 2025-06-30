@@ -3,7 +3,7 @@ CRUD операции для модели Project.
 """
 
 from typing import List, Optional
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -127,6 +127,36 @@ class CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):
         stmt = (
             select(Project)
             .where(Project.name.ilike(f"%{query}%"))
+            .offset(skip)
+            .limit(limit)
+        )
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
+    async def search_projects(
+        self, db: AsyncSession, *, query: str, skip: int = 0, limit: int = 100
+    ) -> List[Project]:
+        """
+        Поиск проектов по названию, коду или описанию.
+
+        Args:
+            db: Сессия базы данных
+            query: Поисковый запрос
+            skip: Количество пропускаемых записей
+            limit: Максимальное количество записей
+
+        Returns:
+            Список проектов
+        """
+        stmt = (
+            select(Project)
+            .where(
+                or_(
+                    Project.name.ilike(f"%{query}%"),
+                    Project.code.ilike(f"%{query}%"),
+                    Project.description.ilike(f"%{query}%"),
+                )
+            )
             .offset(skip)
             .limit(limit)
         )
