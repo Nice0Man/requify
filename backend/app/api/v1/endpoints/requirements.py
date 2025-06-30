@@ -173,6 +173,24 @@ async def create_requirement(
                 detail="Статус требования не найден",
             )
 
+    # Проверяем существование релиза (если указан)
+    if hasattr(requirement_in, 'release_id') and requirement_in.release_id:
+        release = await crud.release.get(db, id=requirement_in.release_id)
+        if not release:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Релиз не найден",
+            )
+
+    # Проверяем существование спецификации (если указана)
+    if hasattr(requirement_in, 'spec_id') and requirement_in.spec_id:
+        spec = await crud.spec.get(db, id=requirement_in.spec_id)
+        if not spec:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Спецификация не найдена",
+            )
+
     # Создаем требование с author_id
     requirement = await crud.requirement.create(
         db, obj_in=requirement_in, author_id=current_user.id

@@ -44,7 +44,9 @@ class Requirement(Base, TimestampedMixin):
     description: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True, comment="Подробное описание требования"
     )
-
+    deadline: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True, comment="Срок выполнения требования"
+    )
     # Внешние ключи для справочников
     type_id: Mapped[int] = mapped_column(
         Integer,

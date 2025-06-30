@@ -1252,7 +1252,7 @@ const StartPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle sx={{ pb: 1 }}>
+        <DialogTitle sx={{ px: 3, py: 2 }}>
           <Stack
             direction="row"
             alignItems="center"
@@ -1266,7 +1266,7 @@ const StartPage: React.FC = () => {
             </IconButton>
           </Stack>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ px: 3 }}>
           <Stack spacing={3} sx={{ pt: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Get instant access to our interactive demo and see how Requify can
@@ -1312,7 +1312,7 @@ const StartPage: React.FC = () => {
             />
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 2 }}>
+        <DialogActions sx={{ px: 3, py: 2 }}>
           <Button onClick={() => setDemoDialogOpen(false)} color="inherit">
             Cancel
           </Button>
@@ -1338,7 +1338,7 @@ const StartPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle sx={{ pb: 1 }}>
+        <DialogTitle sx={{ px: 3, py: 2 }}>
           <Stack
             direction="row"
             alignItems="center"
@@ -1355,7 +1355,7 @@ const StartPage: React.FC = () => {
             </IconButton>
           </Stack>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ px: 3 }}>
           <Stack spacing={3} sx={{ pt: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Book a personalized demo with our team to explore how Requify can

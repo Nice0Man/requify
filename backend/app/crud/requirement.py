@@ -312,7 +312,8 @@ class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate
             Созданное требование
         """
         # Создаем требование, исключая deadline из схемы
-        requirement_data = obj_in.model_dump(exclude={"deadline"})
+        requirement_data = obj_in.model_dump()
+
         db_obj = Requirement(
             **requirement_data,
             author_id=author_id,
