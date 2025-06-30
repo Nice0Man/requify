@@ -403,3 +403,149 @@ class ReleaseCreationSummary(BaseModel):
         if self.release.requirements_count != len(self.release.linked_requirements):
             raise ValueError("Requirements count must match linked requirements list length")
         return self
+
+
+# === Function 12 Schemas: Specification Generation ===
+
+class SpecificationGenerationOptions(BaseModel):
+    """
+    Опции генерации спецификации релиза.
+    
+    Функция 12 из ТЗ: Автоматическая генерация спецификаций.
+    """
+    
+    format: str = Field(
+        "pdf",
+        description="Формат документа спецификации",
+        pattern="^(pdf|html|docx|markdown)$"
+    )
+    language: str = Field(
+        "ru",
+        description="Язык спецификации",
+        pattern="^(ru|en)$"
+    )
+    include_requirements: bool = Field(
+        True,
+        description="Включать подробности требований в спецификацию"
+    )
+    include_relationships: bool = Field(
+        True,
+        description="Включать информацию о связях между требованиями"
+    )
+    include_test_cases: bool = Field(
+        False,
+        description="Включать связанные тест-кейсы"
+    )
+    include_changelog: bool = Field(
+        True,
+        description="Включать журнал изменений релиза"
+    )
+    include_statistics: bool = Field(
+        True,
+        description="Включать статистику требований"
+    )
+    custom_sections: Optional[List[str]] = Field(
+        None,
+        description="Пользовательские разделы спецификации"
+    )
+    template_style: str = Field(
+        "standard",
+        description="Стиль шаблона спецификации",
+        pattern="^(standard|detailed|compact|technical)$"
+    )
+    auto_numbering: bool = Field(
+        True,
+        description="Автоматическая нумерация разделов и требований"
+    )
+    
+    @field_validator("custom_sections")
+    def validate_custom_sections(cls, v):
+        """Валидация пользовательских разделов"""
+        if v is not None:
+            if len(v) > 20:
+                raise ValueError("Cannot have more than 20 custom sections")
+            for section in v:
+                if not section or len(section.strip()) == 0:
+                    raise ValueError("Section names cannot be empty")
+                if len(section) > 100:
+                    raise ValueError("Section names cannot exceed 100 characters")
+        return v
+
+
+class SpecificationGenerationResponse(BaseModel):
+    """
+    Ответ генерации спецификации релиза.
+    
+    Результат выполнения Function 12.
+    """
+    
+    release_id: int = Field(..., description="ID релиза")
+    specification_id: int = Field(..., description="ID созданной спецификации")
+    specification_name: str = Field(..., description="Название спецификации")
+    format: str = Field(..., description="Формат документа")
+    language: str = Field(..., description="Язык спецификации")
+    status: str = Field(..., description="Статус генерации")
+    generated_at: str = Field(..., description="Время генерации в ISO формате")
+    generated_by: Optional[int] = Field(None, description="ID пользователя, создавшего спецификацию")
+    
+    # Содержимое спецификации
+    sections: List[str] = Field(
+        default_factory=list,
+        description="Список разделов спецификации"
+    )
+    requirements_count: int = Field(0, description="Количество включенных требований")
+    relationships_count: int = Field(0, description="Количество анализируемых связей")
+    
+    # Ссылки и доступ
+    download_url: str = Field(..., description="URL для скачивания спецификации")
+    preview_url: Optional[str] = Field(None, description="URL для предварительного просмотра")
+    
+    # Статистика генерации
+    generation_stats: dict = Field(
+        default_factory=dict,
+        description="Статистика процесса генерации"
+    )
+    
+    @field_validator("status")
+    def validate_status(cls, v):
+        """Валидация статуса генерации"""
+        allowed_statuses = ["generated", "processing", "failed", "pending"]
+        if v not in allowed_statuses:
+            raise ValueError(f"Status must be one of: {allowed_statuses}")
+        return v
+    
+    @field_validator("requirements_count", "relationships_count")
+    def validate_counts(cls, v):
+        """Валидация счетчиков"""
+        if v < 0:
+            raise ValueError("Counts cannot be negative")
+        return v
+
+
+class SpecificationGenerationSummary(BaseModel):
+    """
+    Подробная сводка генерации спецификации.
+    
+    Расширенная информация о процессе создания спецификации.
+    """
+    
+    specification: SpecificationGenerationResponse
+    processing_details: dict = Field(
+        default_factory=dict,
+        description="Детали обработки и генерации"
+    )
+    validation_results: dict = Field(
+        default_factory=dict,
+        description="Результаты валидации данных"
+    )
+    warnings: List[str] = Field(
+        default_factory=list,
+        description="Предупреждения в процессе генерации"
+    )
+    
+    @model_validator(mode="after")
+    def validate_consistency(self):
+        """Проверка согласованности данных сводки"""
+        if len(self.warnings) > 50:
+            raise ValueError("Too many warnings - possible generation issues")
+        return self

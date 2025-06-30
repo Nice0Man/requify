@@ -12429,6 +12429,33 @@
         "documentation": {}
     },
     {
+        "label": "SpecificationGenerationOptions",
+        "kind": 6,
+        "importPath": "backend.app.schemas.release",
+        "description": "backend.app.schemas.release",
+        "peekOfCode": "class SpecificationGenerationOptions(BaseModel):\n    \"\"\"\n    Опции генерации спецификации релиза.\n    Функция 12 из ТЗ: Автоматическая генерация спецификаций.\n    \"\"\"\n    format: str = Field(\n        \"pdf\",\n        description=\"Формат документа спецификации\",\n        pattern=\"^(pdf|html|docx|markdown)$\"\n    )",
+        "detail": "backend.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "SpecificationGenerationResponse",
+        "kind": 6,
+        "importPath": "backend.app.schemas.release",
+        "description": "backend.app.schemas.release",
+        "peekOfCode": "class SpecificationGenerationResponse(BaseModel):\n    \"\"\"\n    Ответ генерации спецификации релиза.\n    Результат выполнения Function 12.\n    \"\"\"\n    release_id: int = Field(..., description=\"ID релиза\")\n    specification_id: int = Field(..., description=\"ID созданной спецификации\")\n    specification_name: str = Field(..., description=\"Название спецификации\")\n    format: str = Field(..., description=\"Формат документа\")\n    language: str = Field(..., description=\"Язык спецификации\")",
+        "detail": "backend.app.schemas.release",
+        "documentation": {}
+    },
+    {
+        "label": "SpecificationGenerationSummary",
+        "kind": 6,
+        "importPath": "backend.app.schemas.release",
+        "description": "backend.app.schemas.release",
+        "peekOfCode": "class SpecificationGenerationSummary(BaseModel):\n    \"\"\"\n    Подробная сводка генерации спецификации.\n    Расширенная информация о процессе создания спецификации.\n    \"\"\"\n    specification: SpecificationGenerationResponse\n    processing_details: dict = Field(\n        default_factory=dict,\n        description=\"Детали обработки и генерации\"\n    )",
+        "detail": "backend.app.schemas.release",
+        "documentation": {}
+    },
+    {
         "label": "ReportBase",
         "kind": 6,
         "importPath": "backend.app.schemas.report",
