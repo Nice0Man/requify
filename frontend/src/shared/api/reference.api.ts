@@ -1,42 +1,9 @@
 import { apiClient, ApiResponse } from "@/shared/api/client";
-import { RequirementType, RequirementPriority, RequirementStatus } from '../../features/requirements/types/requirements.types';
-
-export interface RequirementType {
-  id: number;
-  name: string;
-  description?: string;
-  color?: string;
-  icon?: string;
-  is_active: boolean;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface RequirementPriority {
-  id: number;
-  name: string;
-  description?: string;
-  level: number;
-  color?: string;
-  is_active: boolean;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface RequirementStatus {
-  id: number;
-  name: string;
-  description?: string;
-  color?: string;
-  is_final: boolean;
-  is_active: boolean;
-  sort_order: number;
-  workflow_transitions: number[];
-  created_at: string;
-  updated_at: string;
-}
+import {
+  RequirementType,
+  RequirementPriority,
+  RequirementStatus,
+} from "../../features/requirements/types/requirements.types";
 
 export interface RelationshipType {
   id: number;
@@ -90,53 +57,93 @@ export class ReferenceApi {
 
   // Requirement Types
   async getRequirementTypes(): Promise<ApiResponse<RequirementType[]>> {
-    return this.client.get<RequirementType[]>('/requirement-types/');
+    return this.client.get<RequirementType[]>("/requirement-types/");
   }
 
-  async createRequirementType(data: { name: string; description?: string }): Promise<ApiResponse<RequirementType>> {
-    return this.client.post<RequirementType>('/requirement-types/', data);
+  async createRequirementType(data: {
+    name: string;
+    description?: string;
+  }): Promise<ApiResponse<RequirementType>> {
+    return this.client.post<RequirementType>("/requirement-types/", data);
   }
 
-  async updateRequirementType(id: number, data: { name: string; description?: string }): Promise<ApiResponse<RequirementType>> {
+  async updateRequirementType(
+    id: number,
+    data: { name: string; description?: string }
+  ): Promise<ApiResponse<RequirementType>> {
     return this.client.put<RequirementType>(`/requirement-types/${id}`, data);
   }
 
-  async deleteRequirementType(id: number): Promise<ApiResponse<{ message: string }>> {
+  async deleteRequirementType(
+    id: number
+  ): Promise<ApiResponse<{ message: string }>> {
     return this.client.delete<{ message: string }>(`/requirement-types/${id}`);
   }
 
   // Requirement Priorities
-  async getRequirementPriorities(): Promise<ApiResponse<RequirementPriority[]>> {
-    return this.client.get<RequirementPriority[]>('/requirement-priorities/');
+  async getRequirementPriorities(): Promise<
+    ApiResponse<RequirementPriority[]>
+  > {
+    return this.client.get<RequirementPriority[]>("/requirement-priorities/");
   }
 
-  async createRequirementPriority(data: { name: string; description?: string; level?: number }): Promise<ApiResponse<RequirementPriority>> {
-    return this.client.post<RequirementPriority>('/requirement-priorities/', data);
+  async createRequirementPriority(data: {
+    name: string;
+    description?: string;
+    level?: number;
+  }): Promise<ApiResponse<RequirementPriority>> {
+    return this.client.post<RequirementPriority>(
+      "/requirement-priorities/",
+      data
+    );
   }
 
-  async updateRequirementPriority(id: number, data: { name: string; description?: string; level?: number }): Promise<ApiResponse<RequirementPriority>> {
-    return this.client.put<RequirementPriority>(`/requirement-priorities/${id}`, data);
+  async updateRequirementPriority(
+    id: number,
+    data: { name: string; description?: string; level?: number }
+  ): Promise<ApiResponse<RequirementPriority>> {
+    return this.client.put<RequirementPriority>(
+      `/requirement-priorities/${id}`,
+      data
+    );
   }
 
-  async deleteRequirementPriority(id: number): Promise<ApiResponse<{ message: string }>> {
-    return this.client.delete<{ message: string }>(`/requirement-priorities/${id}`);
+  async deleteRequirementPriority(
+    id: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(
+      `/requirement-priorities/${id}`
+    );
   }
 
   // Requirement Statuses
   async getRequirementStatuses(): Promise<ApiResponse<RequirementStatus[]>> {
-    return this.client.get<RequirementStatus[]>('/requirement-statuses/');
+    return this.client.get<RequirementStatus[]>("/requirement-statuses/");
   }
 
-  async createRequirementStatus(data: { name: string; description?: string }): Promise<ApiResponse<RequirementStatus>> {
-    return this.client.post<RequirementStatus>('/requirement-statuses/', data);
+  async createRequirementStatus(data: {
+    name: string;
+    description?: string;
+  }): Promise<ApiResponse<RequirementStatus>> {
+    return this.client.post<RequirementStatus>("/requirement-statuses/", data);
   }
 
-  async updateRequirementStatus(id: number, data: { name: string; description?: string }): Promise<ApiResponse<RequirementStatus>> {
-    return this.client.put<RequirementStatus>(`/requirement-statuses/${id}`, data);
+  async updateRequirementStatus(
+    id: number,
+    data: { name: string; description?: string }
+  ): Promise<ApiResponse<RequirementStatus>> {
+    return this.client.put<RequirementStatus>(
+      `/requirement-statuses/${id}`,
+      data
+    );
   }
 
-  async deleteRequirementStatus(id: number): Promise<ApiResponse<{ message: string }>> {
-    return this.client.delete<{ message: string }>(`/requirement-statuses/${id}`);
+  async deleteRequirementStatus(
+    id: number
+  ): Promise<ApiResponse<{ message: string }>> {
+    return this.client.delete<{ message: string }>(
+      `/requirement-statuses/${id}`
+    );
   }
 
   // Relationship Types
