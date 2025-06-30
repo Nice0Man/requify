@@ -341,7 +341,7 @@ const AppRoutes: React.FC = () => {
           }
         />
 
-        {/* Testing */}
+        {/* Testing Routes */}
         <Route
           path="testing"
           element={
@@ -367,10 +367,18 @@ const AppRoutes: React.FC = () => {
           }
         />
         <Route
-          path="testing/runs/:id"
+          path="testing/reports"
           element={
             <React.Suspense fallback={<LoadingFallback />}>
-              <TestRunDetailsPage />
+              <ReportsPage />
+            </React.Suspense>
+          }
+        />
+        <Route
+          path="testing/execute"
+          element={
+            <React.Suspense fallback={<LoadingFallback />}>
+              <TestingPage />
             </React.Suspense>
           }
         />

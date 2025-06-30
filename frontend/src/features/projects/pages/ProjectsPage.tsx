@@ -54,6 +54,7 @@ import {
   Archive as ArchiveIcon,
   Clear as ClearIcon,
   Warning as WarningIcon,
+  Settings as SettingsIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -125,9 +126,9 @@ const ProjectsPage: React.FC = () => {
         search: filters.search || undefined,
         status:
           filters.status && filters.status.length === 1
-            ? filters.status[0]  // Single status selected
+            ? filters.status[0] // Single status selected
             : filters.status && filters.status.length > 1
-            ? undefined          // Multiple statuses selected - let backend return all
+            ? undefined // Multiple statuses selected - let backend return all
             : undefined, // No status selected - show all projects
         owner_id: filters.owner_id || undefined,
       };
@@ -142,7 +143,7 @@ const ProjectsPage: React.FC = () => {
       setTotalCount(total);
     } catch (error: any) {
       console.error("Failed to load projects:", error);
-      
+
       setError(error.message || "Failed to load projects");
       setProjects([]); // Ensure projects is always an array
       setTotalCount(0);
@@ -192,7 +193,7 @@ const ProjectsPage: React.FC = () => {
     try {
       // Soft delete: Change status to inactive for all selected projects
       await Promise.all(
-        selectedRows.map((id) => 
+        selectedRows.map((id) =>
           projectsApi.updateProject(id, { status: ProjectStatus.INACTIVE })
         )
       );
@@ -317,14 +318,19 @@ const ProjectsPage: React.FC = () => {
             label="Edit"
             onClick={() => navigate(`/projects/${params.id}/edit`)}
           />,
-                  <GridActionsCellItem
-          icon={<ArchiveIcon />}
-          label="Archive"
-          onClick={() => {
-            setItemToDelete(params.id as number);
-            setDeleteDialogOpen(true);
-          }}
-        />,
+          <GridActionsCellItem
+            icon={<SettingsIcon />}
+            label="Settings"
+            onClick={() => navigate(`/projects/${params.id}/settings`)}
+          />,
+          <GridActionsCellItem
+            icon={<ArchiveIcon />}
+            label="Archive"
+            onClick={() => {
+              setItemToDelete(params.id as number);
+              setDeleteDialogOpen(true);
+            }}
+          />,
         ],
       },
     ],
@@ -596,9 +602,9 @@ const ProjectsPage: React.FC = () => {
                 value={filters.status || []}
                 onChange={(_, value) => handleFilterChange("status", value)}
                 renderInput={(params) => (
-                  <TextField 
-                    {...params} 
-                    label="Status" 
+                  <TextField
+                    {...params}
+                    label="Status"
                     helperText="Leave empty to show all projects"
                   />
                 )}
@@ -678,7 +684,6 @@ const ProjectsPage: React.FC = () => {
                   </ListItemIcon>
                   <ListItemText>Change Status</ListItemText>
                 </MenuItem>
-
               </Menu>
             </Box>
           </Box>
@@ -783,14 +788,15 @@ const ProjectsPage: React.FC = () => {
                     Project will be archived
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    The project will be hidden from the list but can be restored later by changing its status.
+                    The project will be hidden from the list but can be restored
+                    later by changing its status.
                   </Typography>
                 </Box>
               </Stack>
             </Box>
-                      <Typography>
+            <Typography>
               Are you sure you want to archive this project?
-          </Typography>
+            </Typography>
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
@@ -801,8 +807,8 @@ const ProjectsPage: React.FC = () => {
           >
             Cancel
           </Button>
-                    <Button 
-            onClick={() => itemToDelete && handleDelete(itemToDelete)} 
+          <Button
+            onClick={() => itemToDelete && handleDelete(itemToDelete)}
             color="warning"
             variant="contained"
             sx={{ borderRadius: 2 }}

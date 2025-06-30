@@ -774,6 +774,119 @@ const TestingPage: React.FC = () => {
     setTabValue(newValue);
   };
 
+  // Handle export functionality
+  const handleExport = () => {
+    try {
+      let data: any[] = [];
+      let filename = "";
+      let headers: string[] = [];
+
+      if (tabValue === 0) {
+        // Export Test Plans
+        data = testPlans;
+        filename = `test_plans_export_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ["ID", "Name", "Description", "Project ID", "Status", "Created By", "Created At"];
+        
+        const csvContent = [
+          headers.join(","),
+          ...data.map(plan => [
+            plan.id,
+            `"${plan.name.replace(/"/g, '""')}"`,
+            `"${(plan.description || "").replace(/"/g, '""')}"`,
+            plan.project_id,
+            plan.status,
+            plan.created_by,
+            plan.created_at
+          ].join(","))
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        
+        if (link.download !== undefined) {
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          toast.success(`Exported ${data.length} test plans to CSV`);
+        }
+      } else if (tabValue === 1) {
+        // Export Test Cases
+        data = testCases;
+        filename = `test_cases_export_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ["ID", "Title", "Description", "Priority", "Status", "Test Plan ID", "Automation Level"];
+        
+        const csvContent = [
+          headers.join(","),
+          ...data.map(testCase => [
+            testCase.id,
+            `"${testCase.title.replace(/"/g, '""')}"`,
+            `"${(testCase.description || "").replace(/"/g, '""')}"`,
+            testCase.priority,
+            testCase.status,
+            testCase.test_plan_id,
+            testCase.automation_level
+          ].join(","))
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        
+        if (link.download !== undefined) {
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          toast.success(`Exported ${data.length} test cases to CSV`);
+        }
+      } else {
+        // Export Test Executions
+        data = testExecutions;
+        filename = `test_executions_export_${new Date().toISOString().split('T')[0]}.csv`;
+        headers = ["ID", "Test Case ID", "Test Plan ID", "Status", "Executed By", "Execution Date", "Environment"];
+        
+        const csvContent = [
+          headers.join(","),
+          ...data.map(execution => [
+            execution.id,
+            execution.test_case_id,
+            execution.test_plan_id,
+            execution.status,
+            execution.executed_by,
+            execution.execution_date,
+            execution.environment
+          ].join(","))
+        ].join("\n");
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        
+        if (link.download !== undefined) {
+          const url = URL.createObjectURL(blob);
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = "hidden";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          toast.success(`Exported ${data.length} test executions to CSV`);
+        }
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast.error("Failed to export data");
+    }
+  };
+
   // Statistics calculations
   const stats = useMemo(() => {
     const totalTestCases = testCases?.length || 0;
@@ -833,9 +946,7 @@ const TestingPage: React.FC = () => {
           <Button
             variant="outlined"
             startIcon={<DownloadIcon />}
-            onClick={() => {
-              /* TODO: Export functionality */
-            }}
+            onClick={handleExport}
           >
             Export
           </Button>
