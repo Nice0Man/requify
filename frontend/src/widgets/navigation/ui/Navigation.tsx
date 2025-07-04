@@ -31,6 +31,7 @@ import {
   ChevronRight,
   Notifications,
   ExitToApp,
+  ViewColumn,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -57,6 +58,11 @@ const navigationItems: NavItem[] = [
     label: 'Dashboard',
     icon: <Dashboard />,
     path: '/dashboard',
+  },
+  {
+    label: 'Kanban Board',
+    icon: <ViewColumn />,
+    path: '/kanban',
   },
   {
     label: 'Projects',

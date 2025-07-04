@@ -73,6 +73,7 @@ const ApiOverviewPage = React.lazy(
   () => import("@/pages/dashboard/ui/ApiOverviewPage")
 );
 const StartPage = React.lazy(() => import("@/pages/dashboard/ui/StartPage"));
+const KanbanPage = React.lazy(() => import("@/pages/kanban/ui/KanbanPage"));
 const NotFoundPage = React.lazy(
   () => import("@/pages/not-found/ui/NotFoundPage")
 );
@@ -155,6 +156,9 @@ export const AppRouter: React.FC = () => {
         >
           {/* Dashboard */}
           <Route path="dashboard" element={<DashboardPage />} />
+
+          {/* Kanban Board */}
+          <Route path="kanban" element={<KanbanPage />} />
 
           {/* Projects */}
           <Route path="projects" element={<ProjectsPage />} />
