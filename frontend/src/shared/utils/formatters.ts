@@ -1,32 +1,75 @@
-import { format, parseISO, formatDistanceToNow, isValid } from 'date-fns';
+// Native date formatting - no external dependencies needed
 
 // Date formatting utilities
-export const formatDate = (date: string | Date, pattern = 'dd/MM/yyyy'): string => {
-  try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return isValid(dateObj) ? format(dateObj, pattern) : 'Invalid date';
-  } catch {
-    return 'Invalid date';
-  }
+export const formatDate = (date: string | Date | null | undefined): string => {
+  if (!date) return "";
+
+  const d = typeof date === "string" ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) return "";
+
+  return d.toLocaleDateString("ru-RU", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 };
 
-export const formatDateTime = (date: string | Date): string => {
-  return formatDate(date, 'dd/MM/yyyy HH:mm');
+export const formatDateTime = (
+  date: string | Date | null | undefined
+): string => {
+  if (!date) return "";
+
+  const d = typeof date === "string" ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) return "";
+
+  return d.toLocaleString("ru-RU", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 };
 
-export const formatTimeAgo = (date: string | Date): string => {
-  try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date;
-    return isValid(dateObj) ? formatDistanceToNow(dateObj, { addSuffix: true }) : 'Invalid date';
-  } catch {
-    return 'Invalid date';
-  }
+export const formatTime = (date: string | Date | null | undefined): string => {
+  if (!date) return "";
+
+  const d = typeof date === "string" ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) return "";
+
+  return d.toLocaleTimeString("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+export const formatRelativeDate = (
+  date: string | Date | null | undefined
+): string => {
+  if (!date) return "";
+
+  const d = typeof date === "string" ? new Date(date) : date;
+
+  if (isNaN(d.getTime())) return "";
+
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return "Сегодня";
+  if (diffDays === 1) return "Вчера";
+  if (diffDays > 1 && diffDays < 7) return `${diffDays} дня назад`;
+
+  return formatDate(date);
 };
 
 // Text formatting utilities
 export const truncateText = (text: string, maxLength: number): string => {
   if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + '...';
+  return text.slice(0, maxLength) + "...";
 };
 
 export const capitalizeFirst = (text: string): string => {
@@ -34,29 +77,30 @@ export const capitalizeFirst = (text: string): string => {
 };
 
 export const capitalizeWords = (text: string): string => {
-  return text.replace(/\w\S*/g, (txt) => 
-    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  return text.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
   );
 };
 
 export const slugify = (text: string): string => {
   return text
     .toLowerCase()
-    .replace(/[^\w ]+/g, '')
-    .replace(/ +/g, '-');
+    .replace(/[^\w ]+/g, "")
+    .replace(/ +/g, "-");
 };
 
 // Number formatting utilities
 export const formatNumber = (num: number, decimals = 0): string => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(num);
 };
 
-export const formatCurrency = (amount: number, currency = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
+export const formatCurrency = (amount: number, currency = "USD"): string => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
     currency,
   }).format(amount);
 };
@@ -66,65 +110,79 @@ export const formatPercentage = (value: number, decimals = 1): string => {
 };
 
 export const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes';
-  
+  if (bytes === 0) return "0 Bytes";
+
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
 // Status formatting utilities
-export const formatStatus = (status: string): { label: string; color: string } => {
+export const formatStatus = (
+  status: string
+): { label: string; color: string } => {
   const statusMap: Record<string, { label: string; color: string }> = {
-    active: { label: 'Active', color: 'success' },
-    inactive: { label: 'Inactive', color: 'default' },
-    pending: { label: 'Pending', color: 'warning' },
-    completed: { label: 'Completed', color: 'success' },
-    cancelled: { label: 'Cancelled', color: 'error' },
-    draft: { label: 'Draft', color: 'info' },
-    published: { label: 'Published', color: 'success' },
-    archived: { label: 'Archived', color: 'default' },
+    active: { label: "Active", color: "success" },
+    inactive: { label: "Inactive", color: "default" },
+    pending: { label: "Pending", color: "warning" },
+    completed: { label: "Completed", color: "success" },
+    cancelled: { label: "Cancelled", color: "error" },
+    draft: { label: "Draft", color: "info" },
+    published: { label: "Published", color: "success" },
+    archived: { label: "Archived", color: "default" },
   };
-  
-  return statusMap[status.toLowerCase()] || { label: capitalizeFirst(status), color: 'default' };
+
+  return (
+    statusMap[status.toLowerCase()] || {
+      label: capitalizeFirst(status),
+      color: "default",
+    }
+  );
 };
 
-export const formatPriority = (priority: string): { label: string; color: string } => {
+export const formatPriority = (
+  priority: string
+): { label: string; color: string } => {
   const priorityMap: Record<string, { label: string; color: string }> = {
-    low: { label: 'Low', color: 'success' },
-    medium: { label: 'Medium', color: 'warning' },
-    high: { label: 'High', color: 'error' },
-    critical: { label: 'Critical', color: 'error' },
+    low: { label: "Low", color: "success" },
+    medium: { label: "Medium", color: "warning" },
+    high: { label: "High", color: "error" },
+    critical: { label: "Critical", color: "error" },
   };
-  
-  return priorityMap[priority.toLowerCase()] || { label: capitalizeFirst(priority), color: 'default' };
+
+  return (
+    priorityMap[priority.toLowerCase()] || {
+      label: capitalizeFirst(priority),
+      color: "default",
+    }
+  );
 };
 
 // Array formatting utilities
 export const formatList = (items: string[], maxItems = 3): string => {
-  if (items.length === 0) return '';
-  if (items.length <= maxItems) return items.join(', ');
-  
+  if (items.length === 0) return "";
+  if (items.length <= maxItems) return items.join(", ");
+
   const visible = items.slice(0, maxItems);
   const remaining = items.length - maxItems;
-  
-  return `${visible.join(', ')} and ${remaining} more`;
+
+  return `${visible.join(", ")} and ${remaining} more`;
 };
 
 // URL formatting utilities
 export const formatUrl = (url: string): string => {
-  if (!url) return '';
-  if (url.startsWith('http')) return url;
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
   return `https://${url}`;
 };
 
 export const extractDomain = (url: string): string => {
   try {
     const domain = new URL(formatUrl(url)).hostname;
-    return domain.replace('www.', '');
+    return domain.replace("www.", "");
   } catch {
     return url;
   }
-}; 
+};

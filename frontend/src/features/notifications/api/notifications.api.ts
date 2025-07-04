@@ -148,55 +148,62 @@ class NotificationsApi {
     hasNext: boolean;
     hasPrev: boolean;
   }> {
-    const response = await apiClient.get('/notifications', { params });
+    const response = await apiClient.get<{
+      notifications: Notification[];
+      total: number;
+      page: number;
+      limit: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    }>('/notifications', { params });
     return response.data;
   }
 
   // Get notification summary/counts
   async getNotificationSummary(): Promise<NotificationSummary> {
-    const response = await apiClient.get('/notifications/summary');
+    const response = await apiClient.get<NotificationSummary>('/notifications/summary');
     return response.data;
   }
 
   // Get specific notification
   async getNotification(notificationId: string): Promise<Notification> {
-    const response = await apiClient.get(`/notifications/${notificationId}`);
+    const response = await apiClient.get<Notification>(`/notifications/${notificationId}`);
     return response.data;
   }
 
   // Mark notification as read
   async markAsRead(notificationId: string): Promise<void> {
-    await apiClient.put(`/notifications/${notificationId}/read`);
+    await apiClient.put<void>(`/notifications/${notificationId}/read`);
   }
 
   // Mark notification as unread
   async markAsUnread(notificationId: string): Promise<void> {
-    await apiClient.put(`/notifications/${notificationId}/unread`);
+    await apiClient.put<void>(`/notifications/${notificationId}/unread`);
   }
 
   // Mark multiple notifications as read
   async markMultipleAsRead(notificationIds: string[]): Promise<void> {
-    await apiClient.put('/notifications/bulk/read', { notificationIds });
+    await apiClient.put<void>('/notifications/bulk/read', { notificationIds });
   }
 
   // Mark all notifications as read
   async markAllAsRead(): Promise<void> {
-    await apiClient.put('/notifications/all/read');
+    await apiClient.put<void>('/notifications/all/read');
   }
 
   // Delete notification
   async deleteNotification(notificationId: string): Promise<void> {
-    await apiClient.delete(`/notifications/${notificationId}`);
+    await apiClient.delete<void>(`/notifications/${notificationId}`);
   }
 
   // Delete multiple notifications
   async deleteMultiple(notificationIds: string[]): Promise<void> {
-    await apiClient.delete('/notifications/bulk', { data: { notificationIds } });
+    await apiClient.delete<void>('/notifications/bulk', { data: { notificationIds } });
   }
 
   // Clear all notifications
   async clearAll(): Promise<void> {
-    await apiClient.delete('/notifications/all');
+    await apiClient.delete<void>('/notifications/all');
   }
 
   // Execute notification action
@@ -205,19 +212,23 @@ class NotificationsApi {
     result?: any;
     message?: string;
   }> {
-    const response = await apiClient.post(`/notifications/${notificationId}/actions/${actionId}`);
+    const response = await apiClient.post<{
+      success: boolean;
+      result?: any;
+      message?: string;
+    }>(`/notifications/${notificationId}/actions/${actionId}`);
     return response.data;
   }
 
   // Get notification settings
   async getSettings(): Promise<NotificationSettings> {
-    const response = await apiClient.get('/notifications/settings');
+    const response = await apiClient.get<NotificationSettings>('/notifications/settings');
     return response.data;
   }
 
   // Update notification settings
   async updateSettings(settings: Partial<NotificationSettings>): Promise<NotificationSettings> {
-    const response = await apiClient.put('/notifications/settings', settings);
+    const response = await apiClient.put<NotificationSettings>('/notifications/settings', settings);
     return response.data;
   }
 
@@ -226,7 +237,10 @@ class NotificationsApi {
     notificationId: string;
     recipientCount: number;
   }> {
-    const response = await apiClient.post('/notifications', request);
+    const response = await apiClient.post<{
+      notificationId: string;
+      recipientCount: number;
+    }>('/notifications', request);
     return response.data;
   }
 
@@ -243,7 +257,10 @@ class NotificationsApi {
     success: boolean;
     message: string;
   }> {
-    const response = await apiClient.post(`/notifications/test/${channel}`);
+    const response = await apiClient.post<{
+      success: boolean;
+      message: string;
+    }>(`/notifications/test/${channel}`);
     return response.data;
   }
 
@@ -261,7 +278,19 @@ class NotificationsApi {
     variables: string[];
     isActive: boolean;
   }>> {
-    const response = await apiClient.get('/notifications/templates');
+    const response = await apiClient.get<Array<{
+      id: string;
+      name: string;
+      description: string;
+      category: string;
+      template: {
+        title: string;
+        message: string;
+        type: 'info' | 'success' | 'warning' | 'error';
+      };
+      variables: string[];
+      isActive: boolean;
+    }>>('/notifications/templates');
     return response.data;
   }
 
@@ -270,7 +299,10 @@ class NotificationsApi {
     notificationId: string;
     recipientCount: number;
   }> {
-    const response = await apiClient.post(`/notifications/templates/${templateId}/send`, {
+    const response = await apiClient.post<{
+      notificationId: string;
+      recipientCount: number;
+    }>(`/notifications/templates/${templateId}/send`, {
       variables,
       recipientIds,
     });
@@ -284,7 +316,9 @@ class NotificationsApi {
   }): Promise<{
     scheduledNotificationId: string;
   }> {
-    const response = await apiClient.post('/notifications/schedule', request);
+    const response = await apiClient.post<{
+      scheduledNotificationId: string;
+    }>('/notifications/schedule', request);
     return response.data;
   }
 
@@ -299,13 +333,22 @@ class NotificationsApi {
     sentAt?: string;
     error?: string;
   }>> {
-    const response = await apiClient.get('/notifications/scheduled');
+    const response = await apiClient.get<Array<{
+      id: string;
+      notification: CreateNotificationRequest;
+      scheduledFor: string;
+      timezone: string;
+      status: 'pending' | 'sent' | 'failed' | 'cancelled';
+      createdAt: string;
+      sentAt?: string;
+      error?: string;
+    }>>('/notifications/scheduled');
     return response.data;
   }
 
   // Cancel scheduled notification
   async cancelScheduledNotification(scheduledNotificationId: string): Promise<void> {
-    await apiClient.delete(`/notifications/scheduled/${scheduledNotificationId}`);
+    await apiClient.delete<void>(`/notifications/scheduled/${scheduledNotificationId}`);
   }
 
   // Get notification analytics
@@ -323,7 +366,20 @@ class NotificationsApi {
       read: number;
     }>;
   }> {
-    const response = await apiClient.get(`/notifications/analytics?period=${period}`);
+    const response = await apiClient.get<{
+      totalSent: number;
+      totalRead: number;
+      readRate: number;
+      averageReadTime: number;
+      typeBreakdown: Record<string, number>;
+      categoryBreakdown: Record<string, number>;
+      channelBreakdown: Record<string, number>;
+      timeline: Array<{
+        date: string;
+        sent: number;
+        read: number;
+      }>;
+    }>(`/notifications/analytics?period=${period}`);
     return response.data;
   }
 }

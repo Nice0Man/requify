@@ -21,32 +21,34 @@ export const isValidPhone = (phone: string): boolean => {
 };
 
 // Password strength validation
-export const validatePassword = (password: string): {
+export const validatePassword = (
+  password: string
+): {
   isValid: boolean;
   errors: string[];
 } => {
   const errors: string[] = [];
-  
+
   if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long');
+    errors.push("Password must be at least 8 characters long");
   }
-  
+
   if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter');
+    errors.push("Password must contain at least one uppercase letter");
   }
-  
+
   if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter');
+    errors.push("Password must contain at least one lowercase letter");
   }
-  
+
   if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number');
+    errors.push("Password must contain at least one number");
   }
-  
+
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character');
+    errors.push("Password must contain at least one special character");
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -56,7 +58,7 @@ export const validatePassword = (password: string): {
 // Required field validation
 export const isRequired = (value: any): boolean => {
   if (value === null || value === undefined) return false;
-  if (typeof value === 'string') return value.trim().length > 0;
+  if (typeof value === "string") return value.trim().length > 0;
   if (Array.isArray(value)) return value.length > 0;
   return true;
 };
@@ -80,7 +82,10 @@ export const hasMaxLength = (value: string, maxLength: number): boolean => {
 };
 
 // File validation
-export const isValidFileType = (file: File, allowedTypes: string[]): boolean => {
+export const isValidFileType = (
+  file: File,
+  allowedTypes: string[]
+): boolean => {
   return allowedTypes.includes(file.type);
 };
 
@@ -91,17 +96,17 @@ export const isValidFileSize = (file: File, maxSizeInMB: number): boolean => {
 
 // Date validations
 export const isValidDate = (date: string | Date): boolean => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const dateObj = typeof date === "string" ? new Date(date) : date;
   return dateObj instanceof Date && !isNaN(dateObj.getTime());
 };
 
 export const isFutureDate = (date: string | Date): boolean => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const dateObj = typeof date === "string" ? new Date(date) : date;
   return isValidDate(dateObj) && dateObj > new Date();
 };
 
 export const isPastDate = (date: string | Date): boolean => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const dateObj = typeof date === "string" ? new Date(date) : date;
   return isValidDate(dateObj) && dateObj < new Date();
 };
 
@@ -125,38 +130,38 @@ export const validateField = (
 export const emailValidationRules = [
   {
     validator: isRequired,
-    message: 'Email is required',
+    message: "Email is required",
   },
   {
     validator: isValidEmail,
-    message: 'Please enter a valid email address',
+    message: "Please enter a valid email address",
   },
 ];
 
 export const passwordValidationRules = [
   {
     validator: isRequired,
-    message: 'Password is required',
+    message: "Password is required",
   },
   {
     validator: (value: string) => validatePassword(value).isValid,
-    message: 'Password does not meet security requirements',
+    message: "Password does not meet security requirements",
   },
 ];
 
 export const phoneValidationRules = [
   {
     validator: isRequired,
-    message: 'Phone number is required',
+    message: "Phone number is required",
   },
   {
     validator: isValidPhone,
-    message: 'Please enter a valid phone number',
+    message: "Please enter a valid phone number",
   },
 ];
 
 // Custom validation builders
-export const requiredRule = (message = 'This field is required') => ({
+export const requiredRule = (message = "This field is required") => ({
   validator: isRequired,
   message,
 });
@@ -174,4 +179,4 @@ export const maxLengthRule = (maxLength: number, message?: string) => ({
 export const rangeRule = (min: number, max: number, message?: string) => ({
   validator: (value: number) => isInRange(value, min, max),
   message: message || `Must be between ${min} and ${max}`,
-}); 
+});

@@ -8,9 +8,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // FSD Architecture layers
+      '@/app': path.resolve(__dirname, './src/app'),
+      '@/pages': path.resolve(__dirname, './src/pages'),
+      '@/widgets': path.resolve(__dirname, './src/widgets'),
       '@/features': path.resolve(__dirname, './src/features'),
+      '@/entities': path.resolve(__dirname, './src/entities'),
       '@/shared': path.resolve(__dirname, './src/shared'),
-      '@/assets': path.resolve(__dirname, './src/assets'),
+      // Legacy aliases for compatibility
+      '@/assets': path.resolve(__dirname, './src/shared/assets'),
     },
   },
   server: {

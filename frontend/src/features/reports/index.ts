@@ -1,8 +1,9 @@
-// Pages
-export { default as ReportsPage } from './pages/ReportsPage';
-
-// API
-export { reportsApi } from './api/reports.api';
-
-// Types
-export * from './types/reports.types'; 
+// Re-export from reporting feature with explicit naming to avoid conflicts
+export { reportsApi } from '../reporting/api/reports.api';
+export type { 
+  ReportStatus,
+  ReportMetrics,
+  ReportFilter,
+  ReportTemplate,
+  ReportSummary
+} from '../reporting/model/reports.types'; 

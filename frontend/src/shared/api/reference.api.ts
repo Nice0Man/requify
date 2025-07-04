@@ -1,75 +1,30 @@
 import { apiClient, ApiResponse } from "@/shared/api/client";
-import {
+import type {
   RequirementType,
   RequirementPriority,
   RequirementStatus,
-} from "../../features/requirements/types/requirements.types";
-
-export interface RelationshipType {
-  id: number;
-  name: string;
-  description?: string;
-  forward_label: string;
-  backward_label: string;
-  is_symmetric: boolean;
-  is_active: boolean;
-  sort_order: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface RequirementTypeCreate {
-  name: string;
-  description?: string;
-  color?: string;
-  icon?: string;
-  sort_order?: number;
-}
-
-export interface RequirementPriorityCreate {
-  name: string;
-  description?: string;
-  level: number;
-  color?: string;
-  sort_order?: number;
-}
-
-export interface RequirementStatusCreate {
-  name: string;
-  description?: string;
-  color?: string;
-  is_final?: boolean;
-  sort_order?: number;
-  workflow_transitions?: number[];
-}
-
-export interface RelationshipTypeCreate {
-  name: string;
-  description?: string;
-  forward_label: string;
-  backward_label: string;
-  is_symmetric?: boolean;
-  sort_order?: number;
-}
+  RelationshipType,
+  RequirementTypeCreate,
+  RequirementPriorityCreate,
+  RequirementStatusCreate,
+  RelationshipTypeCreate,
+} from "@/shared/types/api";
 
 export class ReferenceApi {
   constructor(private client = apiClient) {}
 
   // Requirement Types
   async getRequirementTypes(): Promise<ApiResponse<RequirementType[]>> {
-    return this.client.get<RequirementType[]>("/reference/requirement-types");
+    return this.client.get<RequirementType[]>("/api/v1/reference/requirement-types/");
   }
 
-  async createRequirementType(data: {
-    name: string;
-    description?: string;
-  }): Promise<ApiResponse<RequirementType>> {
+  async createRequirementType(data: RequirementTypeCreate): Promise<ApiResponse<RequirementType>> {
     return this.client.post<RequirementType>("/reference/requirement-types", data);
   }
 
   async updateRequirementType(
     id: number,
-    data: { name: string; description?: string }
+    data: Partial<RequirementTypeCreate>
   ): Promise<ApiResponse<RequirementType>> {
     return this.client.put<RequirementType>(`/reference/requirement-types/${id}`, data);
   }
@@ -84,14 +39,10 @@ export class ReferenceApi {
   async getRequirementPriorities(): Promise<
     ApiResponse<RequirementPriority[]>
   > {
-    return this.client.get<RequirementPriority[]>("/reference/requirement-priorities");
+    return this.client.get<RequirementPriority[]>("/api/v1/reference/requirement-priorities/");
   }
 
-  async createRequirementPriority(data: {
-    name: string;
-    description?: string;
-    level?: number;
-  }): Promise<ApiResponse<RequirementPriority>> {
+  async createRequirementPriority(data: RequirementPriorityCreate): Promise<ApiResponse<RequirementPriority>> {
     return this.client.post<RequirementPriority>(
       "/reference/requirement-priorities",
       data
@@ -100,7 +51,7 @@ export class ReferenceApi {
 
   async updateRequirementPriority(
     id: number,
-    data: { name: string; description?: string; level?: number }
+    data: Partial<RequirementPriorityCreate>
   ): Promise<ApiResponse<RequirementPriority>> {
     return this.client.put<RequirementPriority>(
       `/reference/requirement-priorities/${id}`,
@@ -118,19 +69,16 @@ export class ReferenceApi {
 
   // Requirement Statuses
   async getRequirementStatuses(): Promise<ApiResponse<RequirementStatus[]>> {
-    return this.client.get<RequirementStatus[]>("/reference/requirement-statuses");
+    return this.client.get<RequirementStatus[]>("/api/v1/reference/requirement-statuses/");
   }
 
-  async createRequirementStatus(data: {
-    name: string;
-    description?: string;
-  }): Promise<ApiResponse<RequirementStatus>> {
+  async createRequirementStatus(data: RequirementStatusCreate): Promise<ApiResponse<RequirementStatus>> {
     return this.client.post<RequirementStatus>("/reference/requirement-statuses", data);
   }
 
   async updateRequirementStatus(
     id: number,
-    data: { name: string; description?: string }
+    data: Partial<RequirementStatusCreate>
   ): Promise<ApiResponse<RequirementStatus>> {
     return this.client.put<RequirementStatus>(
       `/reference/requirement-statuses/${id}`,
@@ -147,12 +95,10 @@ export class ReferenceApi {
   }
 
   // Relationship Types
-  // 7. Get Relationship Types
   async getRelationshipTypes(): Promise<ApiResponse<RelationshipType[]>> {
-    return this.client.get<RelationshipType[]>("/reference/relationship-types");
+    return this.client.get<RelationshipType[]>("/api/v1/reference/relationship-types/");
   }
 
-  // 8. Create Relationship Type
   async createRelationshipType(
     relationshipData: RelationshipTypeCreate
   ): Promise<ApiResponse<RelationshipType>> {

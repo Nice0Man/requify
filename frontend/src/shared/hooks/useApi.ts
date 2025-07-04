@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { useState, useCallback } from "react";
+import { toast } from "react-toastify";
+import { apiClient, type ApiResponse } from "@/shared/api/client";
 
 interface UseApiState<T> {
   data: T | null;
@@ -15,7 +16,7 @@ interface UseApiOptions {
   onError?: (error: any) => void;
 }
 
-export function useApi<T = any>() {
+export const useApi = <T = any>() => {
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
     loading: false,
@@ -23,46 +24,36 @@ export function useApi<T = any>() {
   });
 
   const execute = useCallback(
-    async (
-      apiCall: () => Promise<T>,
-      options: UseApiOptions = {}
-    ): Promise<T | null> => {
-      const {
-        showSuccessToast = false,
-        showErrorToast = true,
-        successMessage,
-        onSuccess,
-        onError,
-      } = options;
-
-      setState(prev => ({ ...prev, loading: true, error: null }));
+    async (apiCall: () => Promise<ApiResponse<T>>, options?: UseApiOptions) => {
+      setState((prev) => ({ ...prev, loading: true, error: null }));
 
       try {
-        const result = await apiCall();
-        setState({ data: result, loading: false, error: null });
-        
-        if (showSuccessToast && successMessage) {
-          toast.success(successMessage);
+        const response = await apiCall();
+        const data = response.data;
+        setState({ data, loading: false, error: null });
+
+        if (options?.showSuccessToast && options?.successMessage) {
+          toast.success(options.successMessage);
         }
-        
-        if (onSuccess) {
-          onSuccess(result);
+
+        if (options?.onSuccess) {
+          options.onSuccess(data);
         }
-        
-        return result;
+
+        return data;
       } catch (error: any) {
-        const errorMessage = error.response?.data?.message || error.message || 'An error occurred';
-        setState(prev => ({ ...prev, loading: false, error: errorMessage }));
-        
-        if (showErrorToast) {
+        const errorMessage = error?.message || "Произошла ошибка";
+        setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
+
+        if (options?.showErrorToast !== false) {
           toast.error(errorMessage);
         }
-        
-        if (onError) {
-          onError(error);
+
+        if (options?.onError) {
+          options.onError(error);
         }
-        
-        return null;
+
+        throw error;
       }
     },
     []
@@ -77,9 +68,9 @@ export function useApi<T = any>() {
     execute,
     reset,
   };
-}
+};
 
-// Specialized hook for CRUD operations
+// Specialized hook for CRUD operations using ApiClient
 export function useCrudApi<T = any>(baseUrl: string) {
   const createApi = useApi<T>();
   const updateApi = useApi<T>();
@@ -89,14 +80,11 @@ export function useCrudApi<T = any>(baseUrl: string) {
 
   const create = useCallback(
     (data: Partial<T>, options?: UseApiOptions) => {
-      return createApi.execute(
-        () => fetch(`${baseUrl}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        }).then(res => res.json()),
-        { showSuccessToast: true, successMessage: 'Created successfully', ...options }
-      );
+      return createApi.execute(() => apiClient.post<T>(baseUrl, data), {
+        showSuccessToast: true,
+        successMessage: "Created successfully",
+        ...options,
+      });
     },
     [baseUrl, createApi]
   );
@@ -104,12 +92,12 @@ export function useCrudApi<T = any>(baseUrl: string) {
   const update = useCallback(
     (id: string | number, data: Partial<T>, options?: UseApiOptions) => {
       return updateApi.execute(
-        () => fetch(`${baseUrl}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        }).then(res => res.json()),
-        { showSuccessToast: true, successMessage: 'Updated successfully', ...options }
+        () => apiClient.put<T>(`${baseUrl}/${id}`, data),
+        {
+          showSuccessToast: true,
+          successMessage: "Updated successfully",
+          ...options,
+        }
       );
     },
     [baseUrl, updateApi]
@@ -118,8 +106,12 @@ export function useCrudApi<T = any>(baseUrl: string) {
   const remove = useCallback(
     (id: string | number, options?: UseApiOptions) => {
       return deleteApi.execute(
-        () => fetch(`${baseUrl}/${id}`, { method: 'DELETE' }).then(res => res.json()),
-        { showSuccessToast: true, successMessage: 'Deleted successfully', ...options }
+        () => apiClient.delete<void>(`${baseUrl}/${id}`),
+        {
+          showSuccessToast: true,
+          successMessage: "Deleted successfully",
+          ...options,
+        }
       );
     },
     [baseUrl, deleteApi]
@@ -128,7 +120,7 @@ export function useCrudApi<T = any>(baseUrl: string) {
   const fetchById = useCallback(
     (id: string | number, options?: UseApiOptions) => {
       return fetchApi.execute(
-        () => fetch(`${baseUrl}/${id}`).then(res => res.json()),
+        () => apiClient.get<T>(`${baseUrl}/${id}`),
         options
       );
     },
@@ -137,11 +129,8 @@ export function useCrudApi<T = any>(baseUrl: string) {
 
   const fetchAll = useCallback(
     (params?: Record<string, any>, options?: UseApiOptions) => {
-      const queryString = params ? new URLSearchParams(params).toString() : '';
-      const url = queryString ? `${baseUrl}?${queryString}` : baseUrl;
-      
       return listApi.execute(
-        () => fetch(url).then(res => res.json()),
+        () => apiClient.get<T[]>(baseUrl, { params }),
         options
       );
     },
@@ -155,4 +144,4 @@ export function useCrudApi<T = any>(baseUrl: string) {
     fetch: { ...fetchApi, execute: fetchById },
     list: { ...listApi, execute: fetchAll },
   };
-} 
+}

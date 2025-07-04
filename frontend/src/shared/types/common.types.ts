@@ -1,56 +1,9 @@
-// Common types shared across features
+// UI-related типы, используемые в shared слое
+// Для API типов используйте @/shared/lib/types/api
 
-export interface ApiError {
-  error: string;
-  error_description: string;
-  error_details?: Record<string, any>;
-  status_code?: number;
-}
-
-export interface PaginationParams {
-  skip?: number;
-  limit?: number;
-  page?: number;
-  per_page?: number;
-}
-
-export interface PaginationInfo {
-  page: number;
-  per_page: number;
-  total: number;
-  pages: number;
-  has_next: boolean;
-  has_prev: boolean;
-}
-
-export interface SortParams {
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
-}
-
-export interface BaseFilters {
-  search?: string;
-  created_from?: string;
-  created_to?: string;
-  updated_from?: string;
-  updated_to?: string;
-}
-
-export interface ListResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-}
-
-export interface BaseEntity {
-  id: number;
-  created_at: string;
-  updated_at: string;
-  created_by?: number;
-  updated_by?: number;
-}
+// =============================================================================
+// UI Form Types
+// =============================================================================
 
 export interface SelectOption {
   value: string | number;
@@ -85,6 +38,30 @@ export interface FormFieldConfig {
   };
 }
 
+export interface FormState {
+  isDirty: boolean;
+  isValid: boolean;
+  isSubmitting: boolean;
+  errors: Record<string, string>;
+  touched: Record<string, boolean>;
+}
+
+export interface SearchableSelectProps {
+  options: SelectOption[];
+  value?: string | number | (string | number)[];
+  onChange: (value: string | number | (string | number)[]) => void;
+  placeholder?: string;
+  multiple?: boolean;
+  searchable?: boolean;
+  clearable?: boolean;
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+// =============================================================================
+// File & Attachment Types
+// =============================================================================
+
 export interface FileUpload {
   file: File;
   progress: number;
@@ -104,61 +81,9 @@ export interface Attachment {
   uploaded_at: string;
 }
 
-export interface Comment {
-  id: number;
-  content: string;
-  author_id: number;
-  author_name: string;
-  author_avatar?: string;
-  created_at: string;
-  updated_at: string;
-  replies?: Comment[];
-  attachments?: Attachment[];
-}
-
-export interface Permission {
-  scope: string;
-  action: "read" | "write" | "delete" | "admin";
-  resource?: string;
-}
-
-export interface AuditLog {
-  id: number;
-  entity_type: string;
-  entity_id: number;
-  action: string;
-  changes: Record<string, { old: any; new: any }>;
-  user_id: number;
-  user_name: string;
-  ip_address?: string;
-  user_agent?: string;
-  timestamp: string;
-}
-
-export interface Notification {
-  id: number;
-  type: NotificationType;
-  title: string;
-  message: string;
-  data?: Record<string, any>;
-  read: boolean;
-  user_id: number;
-  created_at: string;
-  expires_at?: string;
-}
-
-export enum NotificationType {
-  INFO = "info",
-  SUCCESS = "success",
-  WARNING = "warning",
-  ERROR = "error",
-  REQUIREMENT_UPDATED = "requirement_updated",
-  TEST_COMPLETED = "test_completed",
-  RELEASE_DEPLOYED = "release_deployed",
-  PROJECT_UPDATED = "project_updated",
-  COMMENT_ADDED = "comment_added",
-  APPROVAL_REQUESTED = "approval_requested",
-}
+// =============================================================================
+// UI State Types
+// =============================================================================
 
 export interface Toast {
   id: string;
@@ -179,13 +104,9 @@ export interface AsyncData<T> extends LoadingState {
   data: T | null;
 }
 
-export interface FormState {
-  isDirty: boolean;
-  isValid: boolean;
-  isSubmitting: boolean;
-  errors: Record<string, string>;
-  touched: Record<string, boolean>;
-}
+// =============================================================================
+// Table Types
+// =============================================================================
 
 export interface TableColumn<T = any> {
   key: keyof T | string;
@@ -221,17 +142,9 @@ export interface TableConfig<T = any> {
   size?: "small" | "middle" | "large";
 }
 
-export interface SearchableSelectProps {
-  options: SelectOption[];
-  value?: string | number | (string | number)[];
-  onChange: (value: string | number | (string | number)[]) => void;
-  placeholder?: string;
-  multiple?: boolean;
-  searchable?: boolean;
-  clearable?: boolean;
-  disabled?: boolean;
-  loading?: boolean;
-}
+// =============================================================================
+// Date & Time Types
+// =============================================================================
 
 export interface DateRange {
   start: string;
@@ -242,6 +155,10 @@ export interface TimeRange {
   start: string;
   end: string;
 }
+
+// =============================================================================
+// Chart Types
+// =============================================================================
 
 export interface ChartData {
   labels: string[];
@@ -267,6 +184,10 @@ export interface MetricCard {
   icon?: string;
 }
 
+// =============================================================================
+// Theme & Preferences
+// =============================================================================
+
 export interface Theme {
   mode: "light" | "dark";
   primary: string;
@@ -277,7 +198,7 @@ export interface Theme {
   border: string;
 }
 
-export interface UserPreferences {
+export interface UserUIPreferences {
   theme: Theme["mode"];
   language: string;
   timezone: string;
@@ -291,3 +212,5 @@ export interface UserPreferences {
   table_page_size: number;
   default_project?: number;
 }
+
+export type BasicUserRole = "admin" | "manager" | "user" | "viewer";

@@ -1,27 +1,12 @@
 import { apiClient, ApiResponse } from "@/shared/api/client";
-
-export interface Comment {
-  id: number;
-  content: string;
-  requirement_id: number;
-  author_id: number;
-  created_at: string;
-  updated_at?: string;
-}
-
-export interface CommentWithAuthor extends Comment {
-  author_name?: string;
-  author_email?: string;
-  requirement_title?: string;
-}
-
-export interface CommentCreate {
-  content: string;
-}
-
-export interface CommentUpdate {
-  content: string;
-}
+import type {
+  Comment,
+  CommentWithAuthor,
+  CommentCreate,
+  CommentUpdate,
+  CommentCreateForRequirement,
+  PaginatedResponse,
+} from "@/shared/types/api";
 
 export interface CommentListParams {
   skip?: number;
@@ -59,7 +44,7 @@ export class CommentsApi {
   // Create comment for a requirement
   async createRequirementComment(
     requirementId: number,
-    data: CommentCreate
+    data: CommentCreateForRequirement
   ): Promise<ApiResponse<Comment>> {
     return this.client.post<Comment>(
       `/comments/requirements/${requirementId}/comments`,
@@ -69,7 +54,7 @@ export class CommentsApi {
 
   // Update requirement comment
   async updateRequirementComment(
-    requirementId: number,
+    _requirementId: number,
     commentId: number,
     data: CommentUpdate
   ): Promise<ApiResponse<Comment>> {
@@ -81,7 +66,7 @@ export class CommentsApi {
 
   // Delete requirement comment
   async deleteRequirementComment(
-    requirementId: number,
+    _requirementId: number,
     commentId: number
   ): Promise<ApiResponse<{ message: string }>> {
     return this.client.delete<{ message: string }>(

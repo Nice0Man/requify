@@ -135,7 +135,7 @@ export function useServerPagination({
   params,
 }: UseServerPaginationProps) {
   const [state, setState] = useState({
-    data: [],
+    data: [] as any[],
     loading: false,
     error: null as string | null,
     currentPage: initialPage,

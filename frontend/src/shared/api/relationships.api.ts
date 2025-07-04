@@ -1,37 +1,13 @@
-import { apiClient, ApiResponse } from "@/shared/api/client";
-
-export interface Relationship {
-  id: number;
-  source_requirement_id: number;
-  target_requirement_id: number;
-  relationship_type_id: number;
-  description?: string;
-  created_by: number;
-  validated: boolean;
-  validation_notes?: string;
-  created_at: string;
-  updated_at: string;
-  // Expanded data from joins
-  source_requirement_title?: string;
-  target_requirement_title?: string;
-  relationship_type_name?: string;
-  relationship_forward_label?: string;
-  relationship_backward_label?: string;
-}
-
-export interface RelationshipCreate {
-  source_requirement_id: number;
-  target_requirement_id: number;
-  relationship_type_id: number;
-  description?: string;
-}
-
-export interface RelationshipUpdate {
-  relationship_type_id?: number;
-  description?: string;
-  validated?: boolean;
-  validation_notes?: string;
-}
+import { apiClient, type ApiResponse } from "@/shared/api/client";
+import type {
+  Relationship,
+  RelationshipCreate,
+  RelationshipUpdate,
+  RequirementDependency,
+  TraceMatrixEntry,
+  TraceMatrix,
+  PaginatedResponse,
+} from "@/shared/types/api";
 
 export interface RelationshipListParams {
   skip?: number;
@@ -45,43 +21,8 @@ export interface RelationshipListParams {
   sort_order?: "asc" | "desc";
 }
 
-export interface RelationshipListResponse {
-  items: Relationship[];
-  total: number;
-  page: number;
-  size: number;
-  pages: number;
-}
-
-export interface RequirementDependency {
-  requirement_id: number;
-  requirement_title: string;
-  relationship_type: string;
-  relationship_direction: "incoming" | "outgoing";
-  depth: number;
-  path: number[];
-  is_circular: boolean;
-}
-
-export interface TraceMatrixEntry {
-  source_requirement_id: number;
-  source_requirement_title: string;
-  target_requirement_id: number;
-  target_requirement_title: string;
-  relationship_type: string;
-  relationship_path: string;
-  depth: number;
-  is_direct: boolean;
-}
-
-export interface TraceMatrix {
-  requirement_id: number;
-  requirement_title: string;
-  upstream_traces: TraceMatrixEntry[];
-  downstream_traces: TraceMatrixEntry[];
-  coverage_percentage: number;
-  orphan_status: "none" | "orphan" | "island";
-}
+export interface RelationshipListResponse
+  extends PaginatedResponse<Relationship> {}
 
 export class RelationshipsApi {
   constructor(private client = apiClient) {}
