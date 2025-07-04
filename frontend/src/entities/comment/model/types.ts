@@ -1,27 +1,6 @@
-// Comment entity types - используют контракты из shared/api
-// В соответствии с принципами FSD, entities используют типы из shared
+// Comment entity types
 
-import type {
-  Comment as CommentSchema,
-  CommentCreate as CommentCreateSchema,
-  CommentUpdate as CommentUpdateSchema,
-  CommentWithAuthor as CommentWithAuthorSchema,
-  CommentBase as CommentBaseSchema,
-  CommentCreateForRequirement as CommentCreateForRequirementSchema,
-  CommentStats as CommentStatsSchema,
-} from '@/shared/api/types';
-
-// =============================================================================
-// Re-export API types for entity usage
-// =============================================================================
-
-export type CommentBase = CommentBaseSchema;
-export type Comment = CommentSchema;
-export type CommentCreate = CommentCreateSchema;
-export type CommentUpdate = CommentUpdateSchema;
-export type CommentWithAuthor = CommentWithAuthorSchema;
-export type CommentCreateForRequirement = CommentCreateForRequirementSchema;
-export type CommentStats = CommentStatsSchema;
+import type { Comment, CommentWithAuthor } from "@/shared/api/user.api";
 
 // =============================================================================
 // Extended UI Types (не в API, только для UI)
@@ -102,7 +81,7 @@ export interface CommentFilters {
 // =============================================================================
 
 export interface CommentAction {
-  type: 'like' | 'dislike' | 'reply' | 'edit' | 'delete' | 'report' | 'resolve';
+  type: "like" | "dislike" | "reply" | "edit" | "delete" | "report" | "resolve";
   timestamp: string;
   user_id: number;
   comment_id: number;
@@ -113,13 +92,13 @@ export interface CommentReaction {
   id: number;
   comment_id: number;
   user_id: number;
-  reaction_type: 'like' | 'dislike' | 'love' | 'laugh' | 'angry' | 'sad';
+  reaction_type: "like" | "dislike" | "love" | "laugh" | "angry" | "sad";
   created_at: string;
 }
 
 export interface CommentNotification {
   id: number;
-  type: 'new_comment' | 'reply' | 'mention' | 'reaction';
+  type: "new_comment" | "reply" | "mention" | "reaction";
   comment_id: number;
   user_id: number;
   triggered_by: number;
@@ -164,9 +143,9 @@ export const formatCommentDate = (date: string): string => {
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
   const diffMinutes = Math.floor(diffTime / (1000 * 60));
-  
+
   if (diffDays > 7) {
-    return commentDate.toLocaleDateString('ru-RU');
+    return commentDate.toLocaleDateString("ru-RU");
   } else if (diffDays > 0) {
     return `${diffDays} дн. назад`;
   } else if (diffHours > 0) {
@@ -174,116 +153,144 @@ export const formatCommentDate = (date: string): string => {
   } else if (diffMinutes > 0) {
     return `${diffMinutes} мин. назад`;
   } else {
-    return 'Только что';
+    return "Только что";
   }
 };
 
-export const getCommentAuthorInitials = (comment: CommentWithAuthor): string => {
-  const firstName = comment.author_first_name?.charAt(0).toUpperCase() || '';
-  const lastName = comment.author_last_name?.charAt(0).toUpperCase() || '';
-  
+export const getCommentAuthorInitials = (
+  comment: CommentWithAuthor
+): string => {
+  const firstName = comment.author_first_name?.charAt(0).toUpperCase() || "";
+  const lastName = comment.author_last_name?.charAt(0).toUpperCase() || "";
+
   if (firstName && lastName) {
     return firstName + lastName;
   }
-  
+
   if (firstName) return firstName;
   if (lastName) return lastName;
-  
-  return comment.author_username?.charAt(0).toUpperCase() || 'U';
+
+  return comment.author_username?.charAt(0).toUpperCase() || "U";
 };
 
-export const getCommentAuthorFullName = (comment: CommentWithAuthor): string => {
+export const getCommentAuthorFullName = (
+  comment: CommentWithAuthor
+): string => {
   if (comment.author_first_name && comment.author_last_name) {
     return `${comment.author_first_name} ${comment.author_last_name}`;
   }
-  return comment.author_first_name || comment.author_last_name || comment.author_username || 'Неизвестный пользователь';
+  return (
+    comment.author_first_name ||
+    comment.author_last_name ||
+    comment.author_username ||
+    "Неизвестный пользователь"
+  );
 };
 
-export const parseCommentMentions = (content: string): Array<{ username: string; position: number }> => {
+export const parseCommentMentions = (
+  content: string
+): Array<{ username: string; position: number }> => {
   const mentionRegex = /@(\w+)/g;
   const mentions: Array<{ username: string; position: number }> = [];
   let match;
-  
+
   while ((match = mentionRegex.exec(content)) !== null) {
     mentions.push({
       username: match[1],
       position: match.index,
     });
   }
-  
+
   return mentions;
 };
 
-export const renderCommentContent = (content: string, format?: CommentFormat): string => {
+export const renderCommentContent = (
+  content: string,
+  format?: CommentFormat
+): string => {
   if (!format) return content;
-  
+
   let rendered = content;
-  
+
   // Apply formatting in reverse order to maintain positions
   const allFormats = [
-    ...(format.bold || []).map(f => ({ ...f, type: 'bold' })),
-    ...(format.italic || []).map(f => ({ ...f, type: 'italic' })),
-    ...(format.underline || []).map(f => ({ ...f, type: 'underline' })),
-    ...(format.code || []).map(f => ({ ...f, type: 'code' })),
-    ...(format.links || []).map(f => ({ ...f, type: 'link' })),
-    ...(format.mentions || []).map(f => ({ ...f, type: 'mention' })),
-    ...(format.quotes || []).map(f => ({ ...f, type: 'quote' })),
+    ...(format.bold || []).map((f) => ({ ...f, type: "bold" })),
+    ...(format.italic || []).map((f) => ({ ...f, type: "italic" })),
+    ...(format.underline || []).map((f) => ({ ...f, type: "underline" })),
+    ...(format.code || []).map((f) => ({ ...f, type: "code" })),
+    ...(format.links || []).map((f) => ({ ...f, type: "link" })),
+    ...(format.mentions || []).map((f) => ({ ...f, type: "mention" })),
+    ...(format.quotes || []).map((f) => ({ ...f, type: "quote" })),
   ].sort((a, b) => b.start - a.start);
-  
+
   for (const fmt of allFormats) {
     const before = rendered.substring(0, fmt.start);
     const text = rendered.substring(fmt.start, fmt.end);
     const after = rendered.substring(fmt.end);
-    
+
     switch (fmt.type) {
-      case 'bold':
+      case "bold":
         rendered = before + `<strong>${text}</strong>` + after;
         break;
-      case 'italic':
+      case "italic":
         rendered = before + `<em>${text}</em>` + after;
         break;
-      case 'underline':
+      case "underline":
         rendered = before + `<u>${text}</u>` + after;
         break;
-      case 'code':
+      case "code":
         rendered = before + `<code>${text}</code>` + after;
         break;
-      case 'link':
-        rendered = before + `<a href="${(fmt as any).url}" target="_blank">${text}</a>` + after;
+      case "link":
+        rendered =
+          before +
+          `<a href="${(fmt as any).url}" target="_blank">${text}</a>` +
+          after;
         break;
-      case 'mention':
-        rendered = before + `<span class="mention" data-user-id="${(fmt as any).user_id}">${text}</span>` + after;
+      case "mention":
+        rendered =
+          before +
+          `<span class="mention" data-user-id="${
+            (fmt as any).user_id
+          }">${text}</span>` +
+          after;
         break;
-      case 'quote':
+      case "quote":
         rendered = before + `<blockquote>${text}</blockquote>` + after;
         break;
     }
   }
-  
+
   return rendered;
 };
 
-export const isCommentEditable = (comment: Comment, currentUserId: number): boolean => {
+export const isCommentEditable = (
+  comment: Comment,
+  currentUserId: number
+): boolean => {
   // Комментарий можно редактировать в течение 15 минут после создания
   // или если пользователь является автором и прошло не более 24 часов
   const created = new Date(comment.created_at);
   const now = new Date();
   const diffMinutes = (now.getTime() - created.getTime()) / (1000 * 60);
   const diffHours = diffMinutes / 60;
-  
-  if (comment.author_id !== currentUserId) return false;
+
+  if (comment.user_id !== currentUserId) return false;
   if (diffMinutes <= 15) return true;
   if (diffHours <= 24) return true;
-  
+
   return false;
 };
 
 export const getCommentWordCount = (content: string): number => {
-  return content.trim().split(/\s+/).filter(word => word.length > 0).length;
+  return content
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0).length;
 };
 
 export const getCommentReadingTime = (content: string): number => {
   const wordsPerMinute = 200;
   const wordCount = getCommentWordCount(content);
   return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
-}; 
+};

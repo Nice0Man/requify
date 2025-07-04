@@ -1,5 +1,5 @@
-// Requirement entity types - используют контракты из shared/api
-// В соответствии с принципами FSD, entities используют типы из shared
+// Requirement entity types - use contracts from shared/api
+// According to FSD principles, entities use types from shared
 
 import type {
   Requirement as RequirementSchema,
@@ -22,11 +22,10 @@ import type {
   TraceLink,
   TraceMatrix,
   Comment as CommentSchema,
-  CommentCreate as CommentCreateSchema,
   CommentCreateForRequirement as CommentCreateForRequirementSchema,
   CommentUpdate as CommentUpdateSchema,
   CommentWithAuthor as CommentWithAuthorSchema,
-} from '@/shared/api/types';
+} from "@/shared/api/requirement";
 
 // =============================================================================
 // Re-export API types for entity usage
@@ -53,17 +52,17 @@ export type RequirementStatus = RequirementStatusSchema;
 
 export type RequirementRelationship = RelationshipSchema;
 export type RelationshipCreate = RelationshipCreateSchema;
-export type RelationshipCreateForRequirement = RelationshipCreateForRequirementSchema;
+export type RelationshipCreateForRequirement =
+  RelationshipCreateForRequirementSchema;
 export type RelationshipUpdate = RelationshipUpdateSchema;
 export type RequirementRelationshipWithDetails = RelationshipWithDetailsSchema;
 export type RelationshipType = RelationshipTypeSchema;
 
 // =============================================================================
-// Comment Types (re-export from API)
+// Comment Types (requirement-specific only)
 // =============================================================================
 
 export type RequirementComment = CommentSchema;
-export type CommentCreate = CommentCreateSchema;
 export type CommentCreateForRequirement = CommentCreateForRequirementSchema;
 export type CommentUpdate = CommentUpdateSchema;
 export type CommentWithAuthor = CommentWithAuthorSchema;
@@ -109,12 +108,12 @@ export interface RequirementFilters {
   deadline_from?: string;
   deadline_to?: string;
   tags?: string[];
-  risk_level?: ('low' | 'medium' | 'high' | 'critical')[];
-  complexity?: ('low' | 'medium' | 'high')[];
+  risk_level?: ("low" | "medium" | "high" | "critical")[];
+  complexity?: ("low" | "medium" | "high")[];
 }
 
 // =============================================================================
-// Extended UI Types (не в API, только для UI)
+// Extended UI Types (not in API, UI only)
 // =============================================================================
 
 export interface RequirementExtended extends RequirementWithDetails {
@@ -125,8 +124,8 @@ export interface RequirementExtended extends RequirementWithDetails {
   technical_notes?: string;
   estimated_effort?: number;
   actual_effort?: number;
-  risk_level?: 'low' | 'medium' | 'high' | 'critical';
-  complexity?: 'low' | 'medium' | 'high';
+  risk_level?: "low" | "medium" | "high" | "critical";
+  complexity?: "low" | "medium" | "high";
   source?: string;
   external_id?: string;
   custom_fields?: Record<string, any>;
@@ -136,9 +135,17 @@ export interface RequirementExtended extends RequirementWithDetails {
 // UI Helper Functions
 // =============================================================================
 
-export const getRequirementProgress = (requirement: RequirementWithTestResults): number => {
-  if (requirement.test_count === 0) return 0;
-  return Math.round((requirement.tests_passed / requirement.test_count) * 100);
+export const getRequirementProgress = (
+  requirement: RequirementWithTestResults
+): number => {
+  if (!requirement.test_results || requirement.test_results.length === 0)
+    return 0;
+  return Math.round(
+    (requirement.test_results?.filter((test) => test.status === "passed")
+      .length /
+      requirement.test_results?.length) *
+      100
+  );
 };
 
 export const isRequirementOverdue = (requirement: Requirement): boolean => {
@@ -148,46 +155,48 @@ export const isRequirementOverdue = (requirement: Requirement): boolean => {
   return deadline < now;
 };
 
+const priorityColorMap = new Map([
+  ["critical", "#ff4d4f"],
+  ["high", "#fa8c16"],
+  ["medium", "#fadb14"],
+  ["low", "#52c41a"],
+]);
+
 export const getRequirementPriorityColor = (priority?: string): string => {
-  switch (priority?.toLowerCase()) {
-    case 'critical': return '#ff4d4f';
-    case 'high': return '#fa8c16';
-    case 'medium': return '#fadb14';
-    case 'low': return '#52c41a';
-    default: return '#d9d9d9';
-  }
+  return priorityColorMap.get(priority?.toLowerCase() || "") || "#d9d9d9";
 };
 
+const statusColorMap = new Map([
+  ["new", "#1890ff"],
+  ["in_progress", "#fadb14"],
+  ["review", "#722ed1"],
+  ["approved", "#52c41a"],
+  ["completed", "#389e0d"],
+  ["rejected", "#ff4d4f"],
+  ["cancelled", "#8c8c8c"],
+]);
+
 export const getRequirementStatusColor = (status?: string): string => {
-  switch (status?.toLowerCase()) {
-    case 'new': return '#1890ff';
-    case 'in_progress': return '#fadb14';
-    case 'review': return '#722ed1';
-    case 'approved': return '#52c41a';
-    case 'completed': return '#389e0d';
-    case 'rejected': return '#ff4d4f';
-    case 'cancelled': return '#8c8c8c';
-    default: return '#d9d9d9';
-  }
+  return statusColorMap.get(status?.toLowerCase() || "") || "#d9d9d9";
 };
 
 export const formatRequirementDeadline = (deadline?: string): string => {
-  if (!deadline) return 'Не установлен';
-  
+  if (!deadline) return "Not set";
+
   const date = new Date(deadline);
   const now = new Date();
   const diffTime = date.getTime() - now.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays < 0) {
-    return `Просрочен на ${Math.abs(diffDays)} дн.`;
+    return `Overdue by ${Math.abs(diffDays)} days`;
   } else if (diffDays === 0) {
-    return 'Сегодня';
+    return "Today";
   } else if (diffDays === 1) {
-    return 'Завтра';
+    return "Tomorrow";
   } else if (diffDays <= 7) {
-    return `Через ${diffDays} дн.`;
+    return `In ${diffDays} days`;
   } else {
-    return date.toLocaleDateString('ru-RU');
+    return date.toLocaleDateString("en-US");
   }
-}; 
+};

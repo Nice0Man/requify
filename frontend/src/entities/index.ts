@@ -1,215 +1,29 @@
-// Entities exports - в соответствии с принципами FSD
-// Экспортируем только типы и UI-хелперы, не логику
+// ==== ADMIN ENTITY ====
+// Admin-specific types and system management
+export * from './admin';
 
-// Project entity
-export type {
-  ProjectBase,
-  Project,
-  ProjectCreate,
-  ProjectUpdate,
-  ProjectWithStats,
-  ProjectWithDetails,
-  ProjectState,
-  ProjectFilters,
-  ProjectMetrics,
-  ProjectStatus,
-  ProjectManager,
-  ProjectTeamLead,
-  ProjectClient,
-  QuickProject,
-} from './project/model/types';
+// ==== PROJECT ENTITY ====
+// Project management types and helpers
+export * from './project';
 
-export {
-  PROJECT_STATUSES,
-  getProjectCompletionPercentage,
-  isProjectCompleted,
-  getProjectHealthScore,
-} from './project/model/types';
+// ==== RELEASE ENTITY ====
+// Release management types and helpers  
+export * from './release';
 
-// Requirement entity
-export type {
-  RequirementBase,
-  Requirement,
-  RequirementCreate,
-  RequirementUpdate,
-  RequirementWithDetails,
-  RequirementWithTestResults,
-  RequirementType,
-  RequirementPriority,
-  RequirementStatus,
-  RequirementRelationship,
-  RelationshipCreate,
-  RelationshipCreateForRequirement,
-  RelationshipUpdate,
-  RequirementRelationshipWithDetails,
-  RelationshipType,
-  RequirementComment,
-  CommentCreate,
-  CommentCreateForRequirement,
-  CommentUpdate,
-  CommentWithAuthor,
-  RequirementState,
-  RequirementFilters,
-  RequirementExtended,
-  QuickRequirement,
-  TraceNode,
-  TraceLink,
-  TraceMatrix,
-} from './requirement/model/types';
+// ==== REQUIREMENT ENTITY ====
+// Requirement management types and helpers
+// Note: CommentCreate conflict resolved by using specific comment entity
+export * from './requirement';
 
-export {
-  getRequirementProgress,
-  isRequirementOverdue,
-  getRequirementPriorityColor,
-  getRequirementStatusColor,
-  formatRequirementDeadline,
-} from './requirement/model/types';
+// ==== USER ENTITY ====
+// User management types and helpers
+// Note: User* types are primary source, admin entity imports from here
+export * from './user';
 
-// Release entity
-export type {
-  ReleaseBase,
-  Release,
-  ReleaseCreate,
-  ReleaseUpdate,
-  ReleaseWithStats,
-  ReleaseWithDetails,
-  ReleaseCreateFromRequirements,
-  ReleaseSpecification,
-  ReleaseChangelog,
-  ReleaseRequirement,
-  ReleaseStatus,
-  ReleaseState,
-  ReleaseFilters,
-  ReleaseMetrics,
-} from './release/model/types';
+// ==== TEST-CASE ENTITY ====
+// Testing types and helpers
+export * from './test-case';
 
-export {
-  RELEASE_STATUSES,
-  getReleaseProgress,
-  isReleaseOverdue,
-  getReleaseStatusColor,
-  formatReleaseDate,
-  getReleaseHealthScore,
-  canPublishRelease,
-  getReleaseVersionSuggestion,
-} from './release/model/types';
-
-// User entity
-export type {
-  UserBase,
-  User,
-  UserCreate,
-  UserUpdate,
-  UserWithStats,
-  UserWithDetails,
-  UserRegistration,
-  UserProfile,
-  UserPreferences,
-  UserSession,
-  UserSettings,
-  UserRole,
-  UserStatus,
-  UserState,
-  UserFilters,
-  UserPermissions,
-  TeamMember,
-  UserActivity,
-} from './user/model/types';
-
-export {
-  USER_ROLES,
-  USER_STATUSES,
-  getUserFullName,
-  getUserInitials,
-  getUserStatusColor,
-  getUserRoleColor,
-  isUserActive,
-  canUserAccessProject,
-  canUserManageProject,
-  getUserWorkloadColor,
-  formatLastLogin,
-} from './user/model/types';
-
-// Test Case entity
-export type {
-  TestCaseBase,
-  TestCase,
-  TestCaseCreate,
-  TestCaseUpdate,
-  TestCaseWithResults,
-  TestCaseWithDetails,
-  TestPlanBase,
-  TestPlan,
-  TestPlanCreate,
-  TestPlanUpdate,
-  TestPlanWithStats,
-  TestPlanWithDetails,
-  TestExecutionBase,
-  TestExecution,
-  TestExecutionCreate,
-  TestExecutionUpdate,
-  TestExecutionWithDetails,
-  TestResultBase,
-  TestResult,
-  TestResultCreate,
-  TestResultUpdate,
-  TestResultWithDetails,
-  TestStatus,
-  TestPriority,
-  TestType,
-  TestCaseState,
-  TestPlanState,
-  TestExecutionState,
-  TestCaseFilters,
-  TestPlanFilters,
-  IntegrationTestJob,
-  IntegrationTestStatus,
-  TestSummary,
-  AutomationScript,
-  AutomationResult,
-} from './test-case/model/types';
-
-export {
-  TEST_STATUSES,
-  TEST_PRIORITIES,
-  TEST_TYPES,
-  getTestStatusColor,
-  getTestPriorityColor,
-  getTestTypeIcon,
-  calculateTestCoverage,
-  getTestExecutionDuration,
-  getTestPlanProgress,
-  getTestPlanSuccessRate,
-  isTestCaseAutomatable,
-} from './test-case/model/types';
-
-// Comment entity
-export type {
-  CommentBase,
-  Comment,
-  CommentCreate,
-  CommentUpdate,
-  CommentWithAuthor,
-  CommentCreateForRequirement,
-  CommentStats,
-  CommentWithDetails,
-  CommentThread,
-  CommentState,
-  CommentFilters,
-  CommentAction,
-  CommentReaction,
-  CommentNotification,
-  CommentFormat,
-  CommentDraft,
-} from './comment/model/types';
-
-export {
-  formatCommentDate,
-  getCommentAuthorInitials,
-  getCommentAuthorFullName,
-  parseCommentMentions,
-  renderCommentContent,
-  isCommentEditable,
-  getCommentWordCount,
-  getCommentReadingTime,
-} from './comment/model/types';
+// ==== COMMENT ENTITY ====
+// Comment system types and helpers (primary source for comment types)
+export * from './comment';

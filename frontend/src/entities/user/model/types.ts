@@ -1,62 +1,49 @@
-// User entity types - используют контракты из shared/api
-// В соответствии с принципами FSD, entities используют типы из shared
+// User entity types - use contracts from shared/api
+// According to FSD principles, entities use types from shared
 
-import type {
-  User as UserSchema,
-  UserCreate as UserCreateSchema,
-  UserUpdate as UserUpdateSchema,
-  UserWithStats as UserWithStatsSchema,
-  UserBase as UserBaseSchema,
-  UserRegistration as UserRegistrationSchema,
-  UserProfile as UserProfileSchema,
-  UserPreferences as UserPreferencesSchema,
-  UserSession as UserSessionSchema,
-  UserSettings as UserSettingsSchema,
+import {
   UserRole,
   UserStatus,
-} from '@/shared/api/types';
+  UserBase,
+  User,
+  UserCreate,
+  UserUpdate,
+  UserWithStats,
+  UserRegistration,
+  UserProfile,
+  UserPreferences,
+  UserSession,
+  UserSettings,
+  USER_ROLES,
+  USER_STATUSES
+} from '@/shared/api/user.api';
 
 // =============================================================================
 // Re-export API types for entity usage
 // =============================================================================
 
-export type UserBase = UserBaseSchema;
-export type User = UserSchema;
-export type UserCreate = UserCreateSchema;
-export type UserUpdate = UserUpdateSchema;
-export type UserWithStats = UserWithStatsSchema;
-export type UserRegistration = UserRegistrationSchema;
-export type UserProfile = UserProfileSchema;
-export type UserPreferences = UserPreferencesSchema;
-export type UserSession = UserSessionSchema;
-export type UserSettings = UserSettingsSchema;
+export type { UserBase, User, UserCreate, UserUpdate, UserWithStats, UserRegistration, UserProfile, UserPreferences, UserSession, UserSettings };
+
+export type UserBaseSchema = UserBase;
+export type UserSchema = User;
+export type UserCreateSchema = UserCreate;
+export type UserUpdateSchema = UserUpdate;
+export type UserWithStatsSchema = UserWithStats;
+export type UserRegistrationSchema = UserRegistration;
+export type UserProfileSchema = UserProfile;
+export type UserPreferencesSchema = UserPreferences;
+export type UserSessionSchema = UserSession;
+export type UserSettingsSchema = UserSettings;
 
 // =============================================================================
 // User Role and Status Types (re-export from API)
 // =============================================================================
 
+export { USER_ROLES, USER_STATUSES };
 export type { UserRole, UserStatus };
 
-export const USER_ROLES: Record<UserRole, string> = {
-  admin: 'Администратор',
-  manager: 'Менеджер',
-  analyst: 'Аналитик',
-  developer: 'Разработчик',
-  tester: 'Тестировщик',
-  client: 'Клиент',
-  viewer: 'Наблюдатель',
-};
-
-export const USER_STATUSES: Record<UserStatus, string> = {
-  active: 'Активный',
-  inactive: 'Неактивный',
-  pending: 'Ожидает подтверждения',
-  suspended: 'Заблокирован',
-  deleted: 'Удален',
-};
-
 // =============================================================================
-// Extended UI Types (не в API, только для UI)
+// Extended UI Types (not in API, UI only)
 // =============================================================================
 
 export interface UserWithDetails extends UserWithStats {
@@ -166,7 +153,7 @@ export const getUserFullName = (user: User): string => {
   if (user.first_name && user.last_name) {
     return `${user.first_name} ${user.last_name}`;
   }
-  return user.first_name || user.last_name || user.email || 'Неизвестный пользователь';
+  return user.first_name || user.last_name || user.email || 'Unknown User';
 };
 
 export const getUserInitials = (user: User): string => {
@@ -183,58 +170,63 @@ export const getUserInitials = (user: User): string => {
   return user.email?.charAt(0).toUpperCase() || 'U';
 };
 
+
+const statusColorMap = new Map<UserStatus, string>([
+  [USER_STATUSES.ACTIVE as unknown as UserStatus, '#52c41a'],
+  [USER_STATUSES.INACTIVE as unknown as UserStatus, '#8c8c8c'],
+  [USER_STATUSES.PENDING as unknown as UserStatus, '#fadb14'],
+  [USER_STATUSES.SUSPENDED as unknown as UserStatus, '#ff4d4f'],
+  [USER_STATUSES.DELETED as unknown as UserStatus, '#f5222d']
+]);
+
+const roleColorMap = new Map<UserRole, string>([
+  [USER_ROLES.ADMIN as unknown as UserRole, '#722ed1'],
+  [USER_ROLES.MANAGER as unknown as UserRole, '#13c2c2'],
+  [USER_ROLES.ANALYST as unknown as UserRole, '#1890ff'],
+  [USER_ROLES.DEVELOPER as unknown as UserRole, '#52c41a'],
+  [USER_ROLES.TESTER as unknown as UserRole, '#fa8c16'],
+  [USER_ROLES.CLIENT as unknown as UserRole, '#eb2f96'],
+  [USER_ROLES.VIEWER as unknown as UserRole, '#8c8c8c']
+]);
+
+const workloadColorMap = new Map<'low' | 'medium' | 'high' | 'overloaded', string>([
+  ['low', '#52c41a'],
+  ['medium', '#fadb14'],
+  ['high', '#fa8c16'],
+  ['overloaded', '#ff4d4f']
+]);
+
 export const getUserStatusColor = (status: UserStatus): string => {
-  switch (status) {
-    case 'active': return '#52c41a';
-    case 'inactive': return '#8c8c8c';
-    case 'pending': return '#fadb14';
-    case 'suspended': return '#ff4d4f';
-    case 'deleted': return '#f5222d';
-    default: return '#d9d9d9';
-  }
+  return statusColorMap.get(status) || '#d9d9d9';
 };
 
 export const getUserRoleColor = (role: UserRole): string => {
-  switch (role) {
-    case 'admin': return '#722ed1';
-    case 'manager': return '#13c2c2';
-    case 'analyst': return '#1890ff';
-    case 'developer': return '#52c41a';
-    case 'tester': return '#fa8c16';
-    case 'client': return '#eb2f96';
-    case 'viewer': return '#8c8c8c';
-    default: return '#d9d9d9';
-  }
+  return roleColorMap.get(role) || '#d9d9d9';
 };
 
 export const isUserActive = (user: User): boolean => {
-  return user.status === 'active' && user.is_active;
+  return user.status === (USER_STATUSES.ACTIVE as unknown as UserStatus) && user.is_active;
 };
 
 export const canUserAccessProject = (user: User, projectId: number, permissions?: UserPermissions): boolean => {
-  if (user.role === 'admin') return true;
+  if (user.role === (USER_ROLES.ADMIN as unknown as UserRole)) return true;
   if (!permissions) return false;
   return permissions.projects_accessible.includes(projectId);
 };
 
 export const canUserManageProject = (user: User, projectId: number, permissions?: UserPermissions): boolean => {
-  if (user.role === 'admin') return true;
+  if (user.role === (USER_ROLES.ADMIN as unknown as UserRole)) return true;
   if (!permissions) return false;
   return permissions.projects_manageable.includes(projectId);
 };
 
 export const getUserWorkloadColor = (workload?: 'low' | 'medium' | 'high' | 'overloaded'): string => {
-  switch (workload) {
-    case 'low': return '#52c41a';
-    case 'medium': return '#fadb14';
-    case 'high': return '#fa8c16';
-    case 'overloaded': return '#ff4d4f';
-    default: return '#d9d9d9';
-  }
+  if (!workload) return '#d9d9d9';
+  return workloadColorMap.get(workload) || '#d9d9d9';
 };
 
 export const formatLastLogin = (lastLogin?: string): string => {
-  if (!lastLogin) return 'Никогда';
+  if (!lastLogin) return 'Never';
   
   const date = new Date(lastLogin);
   const now = new Date();
@@ -244,14 +236,14 @@ export const formatLastLogin = (lastLogin?: string): string => {
   const diffMinutes = Math.floor(diffTime / (1000 * 60));
   
   if (diffDays > 7) {
-    return date.toLocaleDateString('ru-RU');
+    return date.toLocaleDateString('en-US');
   } else if (diffDays > 0) {
-    return `${diffDays} дн. назад`;
+    return `${diffDays} days ago`;
   } else if (diffHours > 0) {
-    return `${diffHours} ч. назад`;
+    return `${diffHours} hours ago`;
   } else if (diffMinutes > 0) {
-    return `${diffMinutes} мин. назад`;
+    return `${diffMinutes} minutes ago`;
   } else {
-    return 'Только что';
+    return 'Just now';
   }
 }; 

@@ -75,7 +75,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/model/auth.context";
 import { usePermissions } from "@/shared/hooks/usePermissions";
-import { UserProfile } from '@/entities/user/model/types';
+import { UserProfile } from "@/entities/user/model/types";
 import { usersApi } from "@/features/auth/api/users.api";
 import { adminApi } from "@/features/admin-panel/api/admin.api";
 import { UserRole } from "@/features/admin-panel/model/admin.types";
@@ -462,35 +462,49 @@ const SettingsPage: React.FC = () => {
     }`.toUpperCase();
   }, []);
 
-  const roleColorMap = useMemo(() => new Map<UserRole, string>([
-    [UserRole.ADMIN, "error"],
-    [UserRole.PRODUCT_MANAGER, "secondary"],
-    [UserRole.MANAGER, "secondary"],
-    [UserRole.SENIOR_DEVELOPER, "success"],
-    [UserRole.DEVELOPER, "success"],
-    [UserRole.ANALYST, "warning"],
-    [UserRole.TESTER, "info"],
-    [UserRole.VIEWER, "default"],
-  ]), []);
+  const roleColorMap = useMemo(
+    () =>
+      new Map<UserRole, string>([
+        [UserRole.ADMIN, "error"],
+        [UserRole.PRODUCT_MANAGER, "secondary"],
+        [UserRole.MANAGER, "secondary"],
+        [UserRole.SENIOR_DEVELOPER, "success"],
+        [UserRole.DEVELOPER, "success"],
+        [UserRole.ANALYST, "warning"],
+        [UserRole.TESTER, "info"],
+        [UserRole.VIEWER, "default"],
+      ]),
+    []
+  );
 
-  const roleLabelMap = useMemo(() => new Map<UserRole, string>([
-    [UserRole.ADMIN, "Administrator"],
-    [UserRole.PRODUCT_MANAGER, "Product Manager"],
-    [UserRole.MANAGER, "Manager"],
-    [UserRole.SENIOR_DEVELOPER, "Senior Developer"],
-    [UserRole.DEVELOPER, "Developer"],
-    [UserRole.ANALYST, "Business Analyst"],
-    [UserRole.TESTER, "Tester"],
-    [UserRole.VIEWER, "Viewer"],
-  ]), []);
+  const roleLabelMap = useMemo(
+    () =>
+      new Map<UserRole, string>([
+        [UserRole.ADMIN, "Administrator"],
+        [UserRole.PRODUCT_MANAGER, "Product Manager"],
+        [UserRole.MANAGER, "Manager"],
+        [UserRole.SENIOR_DEVELOPER, "Senior Developer"],
+        [UserRole.DEVELOPER, "Developer"],
+        [UserRole.ANALYST, "Business Analyst"],
+        [UserRole.TESTER, "Tester"],
+        [UserRole.VIEWER, "Viewer"],
+      ]),
+    []
+  );
 
-  const getRoleColor = useCallback((role: UserRole) => {
-    return roleColorMap.get(role) || "default";
-  }, [roleColorMap]);
+  const getRoleColor = useCallback(
+    (role: UserRole) => {
+      return roleColorMap.get(role) || "default";
+    },
+    [roleColorMap]
+  );
 
-  const getRoleLabel = useCallback((role: UserRole) => {
-    return roleLabelMap.get(role) || "Unknown";
-  }, [roleLabelMap]);
+  const getRoleLabel = useCallback(
+    (role: UserRole) => {
+      return roleLabelMap.get(role) || "Unknown";
+    },
+    [roleLabelMap]
+  );
 
   // Loading state with backdrop
   if (initialLoading || (isLoading && !user)) {

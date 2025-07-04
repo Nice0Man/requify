@@ -13,9 +13,22 @@ export interface Release {
   updated_at: string;
 }
 
+// Base release interface for forms and basic operations
+export interface ReleaseBase {
+  name: string;
+  version: string;
+  description?: string;
+  project_id: number;
+  status?: string;
+  planned_date?: string;
+}
+
 export interface ReleaseWithDetails extends Release {
   project_name?: string;
 }
+
+// Alias for compatibility - this should refer to ReleaseStats
+export type ReleaseWithStats = ReleaseStats;
 
 export interface ReleaseCreate {
   name: string;
@@ -29,9 +42,55 @@ export interface ReleaseCreate {
 
 // Extended interface for UI forms with additional fields (legacy support)
 export interface ReleaseCreateExtended extends ReleaseCreate {
-  type?: ReleaseType;
+  type?: ReleaseTypeValue;
   requirement_ids?: number[];
   custom_fields?: Record<string, any>;
+}
+
+// Create release from requirements
+export interface ReleaseCreateFromRequirements {
+  name: string;
+  version: string;
+  description?: string;
+  project_id: number;
+  requirement_ids: number[];
+  planned_date?: string;
+  auto_sync?: boolean;
+}
+
+// Release specification for documentation generation
+export interface ReleaseSpecification {
+  id: number;
+  release_id: number;
+  title: string;
+  content: string;
+  format: "markdown" | "html" | "pdf";
+  template_id?: number;
+  generated_at: string;
+  generated_by: number;
+  version: string;
+  sections: Array<{
+    id: string;
+    title: string;
+    content: string;
+    order: number;
+  }>;
+}
+
+// Release changelog structure
+export interface ReleaseChangelog {
+  release_id: number;
+  version: string;
+  release_date: string;
+  entries: ChangeLogEntry[];
+  summary: {
+    new_features: number;
+    improvements: number;
+    bug_fixes: number;
+    breaking_changes: number;
+  };
+  migration_notes?: string;
+  known_issues?: string[];
 }
 
 export interface ReleaseUpdate {
@@ -56,22 +115,40 @@ export const ReleaseStatus = {
   PLANNING: "planning",
 } as const;
 
+// Export the statuses for compatibility
+export const RELEASE_STATUSES = ReleaseStatus;
+
 export type ReleaseStatusType =
   (typeof ReleaseStatus)[keyof typeof ReleaseStatus];
 
-// Legacy enum support for backward compatibility
-export enum ReleaseType {
+// Modern release type constants with const assertion
+export const ReleaseType = {
+  MAJOR: "major",
+  MINOR: "minor",
+  PATCH: "patch",
+  HOTFIX: "hotfix",
+  BETA: "beta",
+  ALPHA: "alpha",
+  FEATURE: "feature", // Унифицировано к lowercase
+} as const;
+
+// Type inference for modern TypeScript usage
+export type ReleaseTypeValue = (typeof ReleaseType)[keyof typeof ReleaseType];
+
+// Legacy enum export for backward compatibility
+export enum ReleaseTypeEnum {
   MAJOR = "major",
   MINOR = "minor",
   PATCH = "patch",
   HOTFIX = "hotfix",
   BETA = "beta",
   ALPHA = "alpha",
-  FEATURE = "FEATURE",
+  FEATURE = "feature",
 }
 
 // Legacy interfaces for UI compatibility
 export interface ReleaseRequirement {
+  priority: string;
   id: number;
   requirement_id: number;
   requirement_title: string;
@@ -256,7 +333,7 @@ export interface ReleaseMetrics {
 export interface ReleaseFilters {
   project_id?: number;
   status?: string[];
-  type?: ReleaseType[];
+  type?: ReleaseTypeValue[];
   planned_from?: string;
   planned_to?: string;
   actual_from?: string;
@@ -283,7 +360,7 @@ export interface ReleaseListResponse {
 
 // Legacy extended release interface for UI compatibility
 export interface ReleaseExtended extends Release {
-  type?: ReleaseType;
+  type?: ReleaseTypeValue;
   requirements: ReleaseRequirement[];
   change_log: ChangeLogEntry[];
   dependencies: ReleaseDependency[];
@@ -317,11 +394,14 @@ export interface ReleaseWithDetailsExtended extends ReleaseWithDetails {
 export interface ReleaseStats {
   total_releases: number;
   by_status: Record<string, number>;
-  by_type: Record<ReleaseType, number>;
+  by_type: Record<ReleaseTypeValue, number>;
   avg_lead_time: number;
   deployment_frequency: number;
   success_rate: number;
   upcoming_releases: number;
+  active_releases: number;
+  completed_releases: number;
+  cancelled_releases: number;
 }
 
 export interface ReleaseState {
@@ -362,3 +442,171 @@ export interface FieldError {
 export interface ValidationError {
   [field: string]: string;
 }
+
+// Helper functions
+export const getReleaseProgress = (release: Release): number => {
+  if (!release) return 0;
+
+  switch (release.status) {
+    case ReleaseStatus.DRAFT:
+    case ReleaseStatus.PLANNING:
+      return 10;
+    case ReleaseStatus.PLANNED:
+      return 25;
+    case ReleaseStatus.IN_PROGRESS:
+      return 50;
+    case ReleaseStatus.TESTING:
+      return 75;
+    case ReleaseStatus.READY:
+      return 90;
+    case ReleaseStatus.PUBLISHED:
+    case ReleaseStatus.RELEASED:
+      return 100;
+    case ReleaseStatus.CANCELLED:
+      return 0;
+    default:
+      return 0;
+  }
+};
+
+export const isReleaseOverdue = (release: Release): boolean => {
+  if (!release.planned_date) return false;
+
+  const plannedDate = new Date(release.planned_date);
+  const today = new Date();
+
+  return (
+    plannedDate < today &&
+    release.status !== ReleaseStatus.RELEASED &&
+    release.status !== ReleaseStatus.PUBLISHED &&
+    release.status !== ReleaseStatus.CANCELLED
+  );
+};
+
+export const getReleaseStatusColor = (status: string): string => {
+  switch (status) {
+    case ReleaseStatus.DRAFT:
+    case ReleaseStatus.PLANNING:
+      return "#gray";
+    case ReleaseStatus.PLANNED:
+      return "#blue";
+    case ReleaseStatus.IN_PROGRESS:
+      return "#orange";
+    case ReleaseStatus.TESTING:
+      return "#purple";
+    case ReleaseStatus.READY:
+      return "#green";
+    case ReleaseStatus.PUBLISHED:
+    case ReleaseStatus.RELEASED:
+      return "#green";
+    case ReleaseStatus.CANCELLED:
+      return "#red";
+    default:
+      return "#gray";
+  }
+};
+
+export const formatReleaseDate = (dateString?: string): string => {
+  if (!dateString) return "Not set";
+
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+export const getReleaseHealthScore = (
+  release: ReleaseExtended | ReleaseWithDetailsExtended
+): number => {
+  if (!release) return 0;
+
+  let score = 100;
+
+  // Penalize for overdue releases
+  if (isReleaseOverdue(release)) {
+    score -= 30;
+  }
+
+  // Consider requirements completion
+  if (
+    "requirements" in release &&
+    release.requirements &&
+    release.requirements.length > 0
+  ) {
+    const completedRequirements = release.requirements.filter(
+      (req) =>
+        req.implementation_status === RequirementImplementationStatus.COMPLETED
+    ).length;
+    const completionRate = completedRequirements / release.requirements.length;
+    score = score * completionRate;
+  }
+
+  // Consider test results (only available on ReleaseWithDetailsExtended)
+  if ("test_results" in release && release.test_results) {
+    score = score * (release.test_results.pass_rate / 100);
+  }
+
+  return Math.max(0, Math.min(100, Math.round(score)));
+};
+
+export const canPublishRelease = (release: ReleaseExtended): boolean => {
+  if (!release) return false;
+
+  // Must be in READY status
+  if (release.status !== ReleaseStatus.READY) return false;
+
+  // All requirements must be completed
+  if (release.requirements && release.requirements.length > 0) {
+    const allCompleted = release.requirements.every(
+      (req) =>
+        req.implementation_status === RequirementImplementationStatus.COMPLETED
+    );
+    if (!allCompleted) return false;
+  }
+
+  // All required approvals must be approved
+  if (release.approvals && release.approvals.length > 0) {
+    const requiredApprovals = release.approvals.filter(
+      (approval) => approval.required
+    );
+    const allApproved = requiredApprovals.every(
+      (approval) => approval.status === ApprovalStatus.APPROVED
+    );
+    if (!allApproved) return false;
+  }
+
+  return true;
+};
+
+export const getReleaseVersionSuggestion = (
+  lastVersion: string,
+  changeType: "major" | "minor" | "patch" = "minor"
+): string => {
+  if (!lastVersion) return "1.0.0";
+
+  const versionRegex = /^(\d+)\.(\d+)\.(\d+)$/;
+  const match = lastVersion.match(versionRegex);
+
+  if (!match) return "1.0.0";
+
+  let [, major, minor, patch] = match.map(Number);
+
+  switch (changeType) {
+    case "major":
+      major += 1;
+      minor = 0;
+      patch = 0;
+      break;
+    case "minor":
+      minor += 1;
+      patch = 0;
+      break;
+    case "patch":
+      patch += 1;
+      break;
+  }
+
+  return `${major}.${minor}.${patch}`;
+};

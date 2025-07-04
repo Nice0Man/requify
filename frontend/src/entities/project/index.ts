@@ -1,15 +1,15 @@
-// Export project entity types and API
+// Export project entity types
 export type {
   Project,
   ProjectBase,
   ProjectCreate,
   ProjectUpdate,
   ProjectWithStats,
-  ProjectStatus,
-  ProjectStatusRu,
-  PROJECT_STATUS_LABELS,
-  PROJECT_STATUS_COLORS,
-} from "./model/types";
+  ProjectStatus as ProjectStatusType,
+} from "./model/projects.types";
 
-// Export project API if needed
-export { projectsApi } from "./api/projects.api"; 
+// Export project API
+export { ProjectsApi, projectsApi } from "./api";
+
+// Export project UI components
+export { ProjectCard, ProjectStatus, ProjectProgress, ProjectInfo } from "./ui"; 

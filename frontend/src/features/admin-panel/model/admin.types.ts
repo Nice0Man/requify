@@ -1,456 +1,226 @@
-// Admin types based on backend contracts
+// Admin Panel Feature Types
+// Business-level types that extend entity types with feature-specific logic
 
-export interface SystemInfo {
-  platform: string;
-  platform_version?: string;
-  python_version: string;
-  cpu_count?: number;
-  memory?: {
-    total: number; // GB
-    available: number; // GB
-    percent: number;
-  };
-  disk?: {
-    total: number; // GB
-    free: number; // GB
-    used: number; // GB
-    percent: number;
-  };
-  app_version: string;
-  debug_mode: boolean;
-  environment: string;
-  uptime?: number;
-  error?: string;
+import type {
+  UserManagement,
+  SystemInfo,
+  SystemMetrics,
+  AdminStats,
+  SecurityEvent,
+  SystemLog,
+  SystemBackup,
+  LogLevel,
+  SecurityEventType,
+  SecuritySeverity,
+  UserRole,
+} from '@/entities/admin/model/types';
 
-  // Legacy fields for compatibility
-  version?: string;
-  database?: DatabaseInfo;
-  cache?: CacheInfo;
-  storage?: StorageInfo;
-  api_health?: ApiHealthInfo;
-}
+// Re-export entity types for convenience
+export type {
+  UserManagement,
+  SystemInfo,
+  SystemMetrics,
+  AdminStats,
+  SecurityEvent,
+  SystemLog,
+  SystemBackup,
+  LogLevel,
+  SecurityEventType,
+  SecuritySeverity,
+  UserRole,
+};
 
-export interface DatabaseInfo {
-  status: "healthy" | "degraded" | "down";
-  connection_count: number;
-  max_connections: number;
-  query_performance: {
-    avg_query_time: number;
-    slow_queries_count: number;
-  };
-  size: number;
-  last_backup: string;
-}
-
-export interface CacheInfo {
-  status: "healthy" | "degraded" | "down";
-  hit_rate: number;
-  memory_usage: number;
-  max_memory: number;
-  connected_clients: number;
-}
-
-export interface StorageInfo {
-  status: "healthy" | "degraded" | "down";
-  used_space: number;
-  total_space: number;
-  available_space: number;
-  uploads_count: number;
-}
-
-export interface ApiHealthInfo {
-  status: "healthy" | "degraded" | "down";
-  response_time: number;
-  error_rate: number;
-  requests_per_minute: number;
-  active_sessions: number;
-}
-
-export interface SystemMetrics {
-  timestamp: string;
-  cpu_usage: number;
-  memory_usage: number;
-  disk_usage: number;
-  network_io: {
-    bytes_in: number;
-    bytes_out: number;
-  };
-  api_metrics: {
-    total_requests: number;
-    successful_requests: number;
-    error_rate: number;
-    avg_response_time: number;
-  };
-  user_metrics: {
-    active_users: number;
-    new_registrations: number;
-    login_attempts: number;
-    failed_logins: number;
-  };
-}
-
-// User management matching backend UserProfile and User schemas
-export interface UserManagement {
-  id: number;
-  email: string;
-  username?: string;
-  first_name?: string;
-  last_name?: string;
-  role: string;
-  is_active: boolean;
-  is_superuser?: boolean;
-  last_login?: string;
-  login_count?: number;
-  failed_login_attempts?: number;
-  account_locked_until?: string;
-  email_verified: boolean;
-  email_verified_at?: string;
-  created_at: string;
-  updated_at?: string;
-  permissions?: string[];
-  projects_count?: number;
-  requirements_count?: number;
-  department?: string;
-  phone?: string;
-
-  // Additional computed fields
-  authored_requirements_count?: number;
-  modified_requirements_count?: number;
-  comments_count?: number;
-}
-
-export interface UserCreate {
-  email: string;
-  username?: string;
-  first_name?: string;
-  last_name?: string;
-  role: string;
-  password: string;
-  department?: string;
-  phone?: string;
-  send_invite_email?: boolean;
-  permissions?: string[];
-}
-
-export interface UserUpdate {
-  email?: string;
-  username?: string;
-  first_name?: string;
-  last_name?: string;
-  role?: string;
-  is_active?: boolean;
-  department?: string;
-  phone?: string;
-  permissions?: string[];
-}
-
-export enum UserRole {
-  ADMIN = "admin",
-  PRODUCT_MANAGER = "product_manager",
-  MANAGER = "manager",
-  SENIOR_DEVELOPER = "senior_developer",
-  DEVELOPER = "developer",
-  ANALYST = "analyst",
-  TESTER = "tester",
-  VIEWER = "viewer",
-}
-
-export interface UserActivity {
-  id: number;
-  user_id: number;
-  user_email: string;
-  action: string;
-  entity_type?: string;
-  entity_id?: number;
-  ip_address?: string;
-  user_agent?: string;
-  metadata?: Record<string, any>;
-  timestamp: string;
-}
-
-export interface SystemSettings {
-  id: number;
-  category: SettingCategory;
-  key: string;
-  value: string;
-  data_type: SettingDataType;
-  description?: string;
-  is_public: boolean;
-  updated_by: number;
-  updated_at: string;
-}
-
-export enum SettingCategory {
-  GENERAL = "general",
-  SECURITY = "security",
-  EMAIL = "email",
-  NOTIFICATIONS = "notifications",
-  INTEGRATIONS = "integrations",
-  APPEARANCE = "appearance",
-  BACKUP = "backup",
-}
-
-export enum SettingDataType {
-  STRING = "string",
-  INTEGER = "integer",
-  FLOAT = "float",
-  BOOLEAN = "boolean",
-  JSON = "json",
-  PASSWORD = "password",
-}
-
-// Backup types matching backend response
-export interface SystemBackup {
-  id: number;
-  name: string;
-  type?: BackupType;
-  status: BackupStatus;
-  file_path?: string;
-  file_size?: number;
-  includes?: BackupIncludes;
-  started_at: string;
-  completed_at?: string;
-  created_by?: number;
-  created_by_name?: string;
-  error_message?: string;
-  description?: string;
-}
-
-export enum BackupType {
-  FULL = "full",
-  INCREMENTAL = "incremental",
-  DIFFERENTIAL = "differential",
-}
-
-export enum BackupStatus {
-  PENDING = "pending",
-  IN_PROGRESS = "in_progress",
-  COMPLETED = "completed",
-  FAILED = "failed",
-  CANCELLED = "cancelled",
-}
-
-export interface BackupIncludes {
-  database: boolean;
-  uploads: boolean;
-  system_config: boolean;
-  user_data: boolean;
-}
-
-// System logs matching backend response
-export interface SystemLog {
-  id: number;
-  level: LogLevel;
-  message: string;
-  module: string;
-  function_name?: string;
-  user_id?: number;
-  user_email?: string;
-  ip_address?: string;
-  request_id?: string;
-  metadata?: Record<string, any>;
-  timestamp: string;
-
-  // Additional fields that might be returned
-  logger?: string;
-  created_at?: string;
-}
-
-export enum LogLevel {
-  DEBUG = "debug",
-  INFO = "info",
-  WARNING = "warning",
-  ERROR = "error",
-  CRITICAL = "critical",
-}
-
-export interface SecurityEvent {
-  id: number;
-  event_type: SecurityEventType;
-  severity: SecuritySeverity;
-  description: string;
-  user_id?: number;
-  user_email?: string;
-  ip_address?: string;
-  user_agent?: string;
-  details?: Record<string, any>;
-  resolved: boolean;
-  resolved_by?: number;
-  resolved_at?: string;
-  timestamp: string;
-}
-
-export enum SecurityEventType {
-  FAILED_LOGIN = "failed_login",
-  ACCOUNT_LOCKED = "account_locked",
-  PERMISSION_DENIED = "permission_denied",
-  SUSPICIOUS_ACTIVITY = "suspicious_activity",
-  DATA_BREACH_ATTEMPT = "data_breach_attempt",
-  MALICIOUS_REQUEST = "malicious_request",
-  UNAUTHORIZED_ACCESS = "unauthorized_access",
-}
-
-export enum SecuritySeverity {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  CRITICAL = "critical",
-}
-
-export interface Integration {
-  id: number;
-  name: string;
-  type: IntegrationType;
-  status: IntegrationStatus;
-  configuration: Record<string, any>;
-  last_sync?: string;
-  sync_frequency?: number;
-  error_message?: string;
-  created_by: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export enum IntegrationType {
-  PROJECT_MANAGEMENT = "project_management",
-  VERSION_CONTROL = "version_control",
-  CI_CD = "ci_cd",
-  TESTING_TOOLS = "testing_tools",
-  NOTIFICATION = "notification",
-  SSO = "sso",
-  DATABASE = "database",
-  FILE_STORAGE = "file_storage",
-}
-
-export enum IntegrationStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  ERROR = "error",
-  PENDING = "pending",
-}
-
-export interface AdminFilters {
-  user_role?: UserRole[];
-  user_status?: ("active" | "inactive")[];
-  date_from?: string;
-  date_to?: string;
-  search?: string;
-  log_level?: LogLevel[];
-  event_type?: SecurityEventType[];
-  resolved?: boolean;
-}
-
-export interface AdminListParams {
-  skip?: number;
-  limit?: number;
-  filters?: AdminFilters;
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
-}
-
-export interface UserListResponse {
-  items: UserManagement[];
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-}
-
-export interface ActivityListResponse {
-  items: UserActivity[];
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-}
-
-export interface LogListResponse {
-  items: SystemLog[];
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-}
-
-export interface SecurityEventListResponse {
-  items: SecurityEvent[];
-  total: number;
-  page: number;
-  per_page: number;
-  pages: number;
-}
-
-export interface AdminStats {
-  users: {
-    total: number;
-    active: number;
-    by_role: Record<string, number>;
-    new_this_month: number;
-  };
-  system: {
-    uptime: number;
-    total_requests: number;
-    avg_response_time: number;
-    error_rate: number;
-  };
-  security: {
-    failed_logins_today: number;
-    security_events_today: number;
-    open_security_events: number;
-    locked_accounts: number;
-  };
-  content: {
-    total_projects: number;
-    total_requirements: number;
-    total_test_cases: number;
-    total_releases: number;
-  };
-}
-
-export interface AdminState {
+// Feature-specific Dashboard State
+export interface AdminDashboardState {
+  isLoading: boolean;
+  lastUpdated: Date | null;
+  error: string | null;
+  
+  // Dashboard data
   systemInfo: SystemInfo | null;
-  systemMetrics: SystemMetrics[];
+  metrics: SystemMetrics | null;
+  stats: AdminStats | null;
+  recentLogs: SystemLog[];
+  securityEvents: SecurityEvent[];
+  
+  // Health summary
+  healthSummary: {
+    overall: 'healthy' | 'warning' | 'critical';
+    components: Record<string, 'healthy' | 'warning' | 'critical'>;
+    uptime: number;
+  } | null;
+  
+  // Security summary
+  securitySummary: {
+    totalEvents: number;
+    criticalEvents: number;
+    resolvedToday: number;
+    failedLoginsToday: number;
+    topThreats: Array<{
+      type: string;
+      count: number;
+      severity: string;
+    }>;
+  } | null;
+}
+
+// User Management State
+export interface AdminUserManagementState {
+  isLoading: boolean;
   users: UserManagement[];
-  currentUser: UserManagement | null;
-  activities: UserActivity[];
+  total: number;
+  currentPage: number;
+  totalPages: number;
+  filters: AdminUserFilters;
+  selectedUsers: number[];
+  bulkOperationInProgress: boolean;
+  error: string | null;
+}
+
+export interface AdminUserFilters {
+  search: string;
+  role: string[];
+  status: string[];
+  department: string;
+  dateFrom: string;
+  dateTo: string;
+  limit: number;
+}
+
+// System Management State
+export interface AdminSystemState {
+  isLoading: boolean;
+  backups: SystemBackup[];
   systemLogs: SystemLog[];
   securityEvents: SecurityEvent[];
-  systemSettings: SystemSettings[];
-  backups: SystemBackup[];
-  integrations: Integration[];
-  stats: AdminStats | null;
-  isLoading: boolean;
+  settings: Record<string, any>;
+  maintenanceMode: boolean;
   error: string | null;
-  filters: AdminFilters;
-  pagination: {
-    page: number;
-    per_page: number;
-    total: number;
-    pages: number;
+  
+  // Logs filtering
+  logFilters: {
+    level: LogLevel[];
+    module: string;
+    dateFrom: string;
+    dateTo: string;
+    search: string;
+  };
+  
+  // Security events filtering
+  securityFilters: {
+    eventType: SecurityEventType[];
+    severity: SecuritySeverity[];
+    resolved: boolean | null;
+    dateFrom: string;
+    dateTo: string;
   };
 }
 
-// Health check response type matching backend
-export interface HealthCheckResponse {
-  status: "healthy" | "degraded" | "unhealthy";
-  components: {
-    database?: {
-      status: "healthy" | "unhealthy";
-      response_time?: string;
-      error?: string;
-    };
-    filesystem?: {
-      status: "healthy" | "warning" | "critical" | "unknown";
-      disk_usage: string;
-      free_space: string;
-      error?: string;
-    };
-    memory?: {
-      status: "healthy" | "warning" | "critical" | "unknown";
-      usage: string;
-      available: string;
-      error?: string;
-    };
-  };
-  timestamp: string;
+// Admin Action Types
+export type AdminAction =
+  | { type: 'DASHBOARD_LOAD_START' }
+  | { type: 'DASHBOARD_LOAD_SUCCESS'; payload: Partial<AdminDashboardState> }
+  | { type: 'DASHBOARD_LOAD_ERROR'; payload: string }
+  | { type: 'USERS_LOAD_START' }
+  | { type: 'USERS_LOAD_SUCCESS'; payload: { users: UserManagement[]; total: number; page: number; totalPages: number } }
+  | { type: 'USERS_LOAD_ERROR'; payload: string }
+  | { type: 'USERS_SET_FILTERS'; payload: Partial<AdminUserFilters> }
+  | { type: 'USERS_SELECT'; payload: number[] }
+  | { type: 'USERS_BULK_OPERATION_START' }
+  | { type: 'USERS_BULK_OPERATION_SUCCESS' }
+  | { type: 'USERS_BULK_OPERATION_ERROR'; payload: string }
+  | { type: 'SYSTEM_LOAD_START' }
+  | { type: 'SYSTEM_LOAD_SUCCESS'; payload: Partial<AdminSystemState> }
+  | { type: 'SYSTEM_LOAD_ERROR'; payload: string }
+  | { type: 'SYSTEM_SET_LOG_FILTERS'; payload: Partial<AdminSystemState['logFilters']> }
+  | { type: 'SYSTEM_SET_SECURITY_FILTERS'; payload: Partial<AdminSystemState['securityFilters']> }
+  | { type: 'SYSTEM_TOGGLE_MAINTENANCE'; payload: boolean };
+
+// Admin Permission Constants
+export const ADMIN_PERMISSIONS = {
+  READ_USERS: 'admin:users:read',
+  WRITE_USERS: 'admin:users:write',
+  DELETE_USERS: 'admin:users:delete',
+  READ_SYSTEM: 'admin:system:read',
+  WRITE_SYSTEM: 'admin:system:write',
+  READ_LOGS: 'admin:logs:read',
+  CLEAR_LOGS: 'admin:logs:clear',
+  READ_SECURITY: 'admin:security:read',
+  RESOLVE_SECURITY: 'admin:security:resolve',
+  CREATE_BACKUP: 'admin:backup:create',
+  RESTORE_BACKUP: 'admin:backup:restore',
+  MAINTENANCE_MODE: 'admin:system:maintenance',
+} as const;
+
+// Admin UI Configuration
+export interface AdminTabConfig {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  component: React.ComponentType;
+  requiredPermissions: string[];
+  badge?: () => Promise<number | string | null>;
 }
+
+// Data Export Options
+export interface AdminExportOptions {
+  format: 'csv' | 'excel' | 'pdf' | 'json';
+  includeUsers: boolean;
+  includeLogs: boolean;
+  includeSecurityEvents: boolean;
+  includeSystemInfo: boolean;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+// Backup Configuration
+export interface AdminBackupConfig {
+  name: string;
+  type: 'full' | 'incremental';
+  description?: string;
+  includeDatabase: boolean;
+  includeUploads: boolean;
+  includeSystemConfig: boolean;
+  includeUserData: boolean;
+  schedule?: {
+    frequency: 'daily' | 'weekly' | 'monthly';
+    time: string; // HH:MM format
+    enabled: boolean;
+  };
+}
+
+// System Alert Configuration
+export interface AdminSystemAlert {
+  id: string;
+  type: 'cpu' | 'memory' | 'disk' | 'security' | 'custom';
+  title: string;
+  message: string;
+  severity: 'info' | 'warning' | 'error' | 'critical';
+  threshold?: number;
+  currentValue?: number;
+  timestamp: Date;
+  acknowledged: boolean;
+  actions?: Array<{
+    label: string;
+    action: () => void;
+    variant?: 'primary' | 'secondary' | 'danger';
+  }>;
+}
+
+// Admin Notification Settings
+export interface AdminNotificationSettings {
+  emailAlerts: boolean;
+  pushNotifications: boolean;
+  securityEvents: boolean;
+  systemAlerts: boolean;
+  userRegistrations: boolean;
+  backupStatus: boolean;
+  alertThresholds: {
+    cpuUsage: number;
+    memoryUsage: number;
+    diskUsage: number;
+    errorRate: number;
+  };
+} 

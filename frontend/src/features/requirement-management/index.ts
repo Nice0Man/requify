@@ -1,13 +1,9 @@
-// Requirement management feature exports
-export type {
-  RequirementFilters,
-  RequirementFormData,
-  RequirementValidationError,
-  RequirementApiError,
-  RequirementStats,
-  RequirementStatusChange,
-  RequirementComment,
-  RequirementManagementState,
-} from './model/requirements.types';
+// API
+export { requirementManagementApi } from './api/requirement-management.api';
 
-export * from './api/requirements.api'; 
+// Model (Types and Hooks)
+export * from './model/requirement-management.types';
+export * from './model/requirement-management.hooks';
+
+// UI Components
+export * from './ui'; 

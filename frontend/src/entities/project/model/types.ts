@@ -1,47 +1,58 @@
-// Project entity types - используют контракты из shared/api
+// Project entity types - импортируют контракты из shared/api
 // В соответствии с принципами FSD, entities используют типы из shared
 
 import type {
-  Project as ProjectSchema,
-  ProjectCreate as ProjectCreateSchema,
-  ProjectUpdate as ProjectUpdateSchema,
-  ProjectWithStats as ProjectWithStatsSchema,
-  ProjectBase as ProjectBaseSchema,
-} from '@/shared/api/types';
+  ProjectBase,
+  Project,
+  ProjectCreate,
+  ProjectUpdate,
+} from "@/shared/api/project.api";
 
 // =============================================================================
-// Re-export API types for entity usage
+// Re-export основных типов из shared/api
 // =============================================================================
 
-export type ProjectBase = ProjectBaseSchema;
-export type Project = ProjectSchema;
-export type ProjectCreate = ProjectCreateSchema;
-export type ProjectUpdate = ProjectUpdateSchema;
-export type ProjectWithStats = ProjectWithStatsSchema;
+export type { ProjectBase, Project, ProjectCreate, ProjectUpdate };
+
+// =============================================================================
+// Extended Project Types (расширения для UI)
+// =============================================================================
+
+export interface ProjectWithStats extends Project {
+  total_requirements: number;
+  requirements_completed: number;
+  requirements_in_progress: number;
+  requirements_pending: number;
+  total_releases: number;
+  active_releases: number;
+  completed_releases: number;
+  team_members_count: number;
+  last_activity?: string;
+}
 
 // =============================================================================
 // Project Status Types (UI specific)
 // =============================================================================
 
-export type ProjectStatus = 
-  | 'active'
-  | 'inactive' 
-  | 'archived'
-  | 'planning'
-  | 'development'
-  | 'testing'
-  | 'completed'
-  | 'cancelled';
+export type ProjectStatus =
+  | "active"
+  | "inactive"
+  | "archived"
+  | "planning"
+  | "development"
+  | "testing"
+  | "completed"
+  | "cancelled";
 
 export const PROJECT_STATUSES: Record<ProjectStatus, string> = {
-  active: 'Активный',
-  inactive: 'Неактивный',
-  archived: 'Архивированный', 
-  planning: 'Планирование',
-  development: 'Разработка',
-  testing: 'Тестирование',
-  completed: 'Завершен',
-  cancelled: 'Отменен',
+  active: "Активный",
+  inactive: "Неактивный",
+  archived: "Архивированный",
+  planning: "Планирование",
+  development: "Разработка",
+  testing: "Тестирование",
+  completed: "Завершен",
+  cancelled: "Отменен",
 };
 
 // =============================================================================
@@ -76,6 +87,7 @@ export interface ProjectWithDetails extends ProjectWithStats {
   team_lead?: ProjectTeamLead;
   client?: ProjectClient;
   owner_name?: string;
+  specs_count?: number;
 }
 
 // =============================================================================
@@ -104,10 +116,18 @@ export interface ProjectFilters {
 }
 
 // =============================================================================
-// Project for Dashboard/Quick Access (re-export from API)
+// Project for Dashboard/Quick Access
 // =============================================================================
 
-export type { QuickProject } from '@/shared/api/types';
+export interface QuickProject {
+  id: number;
+  name: string;
+  status: string;
+  completion_rate: number;
+  last_activity: string;
+  requirements_count: number;
+  team_members_count: number;
+}
 
 // =============================================================================
 // Project Metrics (UI specific)
@@ -131,23 +151,29 @@ export interface ProjectMetrics {
 // Computed Properties (UI helpers)
 // =============================================================================
 
-export const getProjectCompletionPercentage = (project: ProjectWithStats): number => {
+export const getProjectCompletionPercentage = (
+  project: ProjectWithStats
+): number => {
   if (project.total_requirements === 0) return 0;
-  return Math.round((project.requirements_completed / project.total_requirements) * 100);
+  return Math.round(
+    (project.requirements_completed / project.total_requirements) * 100
+  );
 };
 
 export const isProjectCompleted = (project: ProjectWithStats): boolean => {
   return (
-    project.status === 'completed' &&
+    project.status === "completed" &&
     project.total_requirements > 0 &&
     project.requirements_completed === project.total_requirements
   );
 };
 
-export const getProjectHealthScore = (project: ProjectWithStats): 'good' | 'warning' | 'critical' => {
+export const getProjectHealthScore = (
+  project: ProjectWithStats
+): "good" | "warning" | "critical" => {
   const completionRate = getProjectCompletionPercentage(project);
-  
-  if (completionRate >= 80) return 'good';
-  if (completionRate >= 50) return 'warning';
-  return 'critical';
-}; 
+
+  if (completionRate >= 80) return "good";
+  if (completionRate >= 50) return "warning";
+  return "critical";
+};

@@ -1,157 +1,133 @@
-// Release entity types - используют контракты из shared/api
-// В соответствии с принципами FSD, entities используют типы из shared
+// Release entity types - main exports for release functionality
+// Re-export from release.types.ts and add missing types and helpers
 
-import type {
-  Release as ReleaseSchema,
-  ReleaseCreate as ReleaseCreateSchema,
-  ReleaseUpdate as ReleaseUpdateSchema,
-  ReleaseWithStats as ReleaseWithStatsSchema,
-  ReleaseBase as ReleaseBaseSchema,
-  ReleaseCreateFromRequirements as ReleaseCreateFromRequirementsSchema,
-  ReleaseSpecification as ReleaseSpecificationSchema,
-  ReleaseChangelog as ReleaseChangelogSchema,
-  ReleaseRequirement as ReleaseRequirementSchema,
-  ReleaseStatus,
-} from '@/shared/api/types';
+export * from './release.types';
+import type { Release } from './release.types';
 
-// =============================================================================
-// Re-export API types for entity usage
-// =============================================================================
+// Additional types that may be needed for UI
+export interface ReleaseBase {
+  name: string;
+  version: string;
+  description?: string;
+  project_id: number;
+  status: string;
+}
 
-export type ReleaseBase = ReleaseBaseSchema;
-export type Release = ReleaseSchema;
-export type ReleaseCreate = ReleaseCreateSchema;
-export type ReleaseUpdate = ReleaseUpdateSchema;
-export type ReleaseWithStats = ReleaseWithStatsSchema;
-export type ReleaseCreateFromRequirements = ReleaseCreateFromRequirementsSchema;
-export type ReleaseSpecification = ReleaseSpecificationSchema;
-export type ReleaseChangelog = ReleaseChangelogSchema;
-export type ReleaseRequirement = ReleaseRequirementSchema;
+export interface ReleaseWithStats extends Release {
+  total_requirements?: number;
+  completed_requirements?: number;
+  progress?: number;
+  requirements_count?: number;
+  test_pass_rate?: number;
+}
 
-// =============================================================================
-// Release Status Types (UI specific)
-// =============================================================================
+export interface ReleaseCreateFromRequirements {
+  name: string;
+  version: string;
+  project_id: number;
+  requirement_ids: number[];
+  description?: string;
+  planned_date?: string;
+}
 
-export type { ReleaseStatus };
+export interface ReleaseSpecification {
+  id: number;
+  release_id: number;
+  content: string;
+  format: 'html' | 'pdf' | 'markdown';
+  generated_at: string;
+  download_url?: string;
+}
 
-export const RELEASE_STATUSES: Record<ReleaseStatus, string> = {
-  planning: 'Планирование',
-  development: 'Разработка',
-  testing: 'Тестирование',
-  staging: 'Стейджинг',
-  production: 'Продакшн',
-  released: 'Выпущен',
-  archived: 'Архивирован',
-  cancelled: 'Отменен',
-};
-
-// =============================================================================
-// Extended UI Types (не в API, только для UI)
-// =============================================================================
-
-export interface ReleaseWithDetails extends ReleaseWithStats {
-  project_name?: string;
-  author_name?: string;
-  requirements_details?: Array<{
-    id: number;
-    title: string;
-    status: string;
-    priority: string;
-    completion_percentage: number;
-  }>;
-  team_members?: Array<{
-    id: number;
-    name: string;
-    role: string;
-    email: string;
-  }>;
-  milestones?: Array<{
-    id: number;
-    name: string;
-    date: string;
-    completed: boolean;
-    description?: string;
+export interface ReleaseChangelog {
+  id: number;
+  release_id: number;
+  content: string;
+  format: 'markdown' | 'html' | 'json';
+  generated_at: string;
+  sections: Array<{
+    type: 'new_feature' | 'improvement' | 'bug_fix' | 'breaking_change';
+    items: Array<{
+      title: string;
+      description?: string;
+      requirement_id?: number;
+    }>;
   }>;
 }
 
-// =============================================================================
-// UI State Types
-// =============================================================================
-
-export interface ReleaseState {
-  releases: Release[];
-  currentRelease: Release | null;
-  isLoading: boolean;
-  error: string | null;
-  total: number;
-  page: number;
-  per_page: number;
+export interface ReleaseRequirement {
+  id: number;
+  release_id: number;
+  requirement_id: number;
+  requirement_title: string;
+  requirement_description?: string;
+  status: string;
+  priority: string;
+  implementation_status: string;
+  test_status: string;
+  added_at: string;
+  completed_at?: string;
 }
 
-export interface ReleaseFilters {
-  search?: string;
-  project_id?: number;
-  status?: ReleaseStatus[];
-  author_id?: number;
-  created_from?: string;
-  created_to?: string;
-  release_date_from?: string;
-  release_date_to?: string;
-  tags?: string[];
-  version_pattern?: string;
-}
+// Constants
+export const RELEASE_STATUSES = {
+  DRAFT: 'draft',
+  PLANNED: 'planned', 
+  IN_PROGRESS: 'in_progress',
+  TESTING: 'testing',
+  READY: 'ready',
+  PUBLISHED: 'published',
+  RELEASED: 'released',
+  CANCELLED: 'cancelled',
+} as const;
 
-// =============================================================================
-// Release Progress and Metrics (UI specific)
-// =============================================================================
-
-export interface ReleaseMetrics {
-  total_requirements: number;
-  completed_requirements: number;
-  in_progress_requirements: number;
-  pending_requirements: number;
-  test_coverage: number;
-  quality_score: number;
-  completion_rate: number;
-  estimated_effort: number;
-  actual_effort: number;
-  days_remaining: number;
-  is_on_schedule: boolean;
-  risk_level: 'low' | 'medium' | 'high' | 'critical';
-}
-
-// =============================================================================
-// UI Helper Functions
-// =============================================================================
-
+// Helper functions
 export const getReleaseProgress = (release: ReleaseWithStats): number => {
-  if (release.total_requirements === 0) return 0;
-  return Math.round((release.requirements_completed / release.total_requirements) * 100);
+  if (release.progress !== undefined) {
+    return release.progress;
+  }
+  
+  if (release.total_requirements && release.completed_requirements !== undefined) {
+    return Math.round((release.completed_requirements / release.total_requirements) * 100);
+  }
+  
+  // Default progress based on status
+  switch (release.status?.toLowerCase()) {
+    case 'draft': return 0;
+    case 'planned': return 10;
+    case 'in_progress': return 50;
+    case 'testing': return 80;
+    case 'ready': return 95;
+    case 'published':
+    case 'released': return 100;
+    case 'cancelled': return 0;
+    default: return 0;
+  }
 };
 
 export const isReleaseOverdue = (release: Release): boolean => {
-  if (!release.release_date) return false;
-  const releaseDate = new Date(release.release_date);
+  if (!release.planned_date) return false;
+  const plannedDate = new Date(release.planned_date);
   const now = new Date();
-  return releaseDate < now && release.status !== 'released';
+  return plannedDate < now && !['published', 'released', 'cancelled'].includes(release.status?.toLowerCase());
 };
 
-export const getReleaseStatusColor = (status: ReleaseStatus): string => {
-  switch (status) {
-    case 'planning': return '#1890ff';
-    case 'development': return '#fadb14';
+export const getReleaseStatusColor = (status: string): string => {
+  switch (status?.toLowerCase()) {
+    case 'draft': return '#8c8c8c';
+    case 'planned': return '#1890ff';
+    case 'in_progress': return '#fadb14';
     case 'testing': return '#fa8c16';
-    case 'staging': return '#722ed1';
-    case 'production': return '#13c2c2';
-    case 'released': return '#52c41a';
-    case 'archived': return '#8c8c8c';
+    case 'ready': return '#722ed1';
+    case 'published': return '#52c41a';
+    case 'released': return '#389e0d';
     case 'cancelled': return '#ff4d4f';
     default: return '#d9d9d9';
   }
 };
 
 export const formatReleaseDate = (date?: string): string => {
-  if (!date) return 'Не установлена';
+  if (!date) return 'Not set';
   
   const releaseDate = new Date(date);
   const now = new Date();
@@ -159,15 +135,15 @@ export const formatReleaseDate = (date?: string): string => {
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   
   if (diffDays < 0) {
-    return `Просрочен на ${Math.abs(diffDays)} дн.`;
+    return `Released ${Math.abs(diffDays)} days ago`;
   } else if (diffDays === 0) {
-    return 'Сегодня';
+    return 'Today';
   } else if (diffDays === 1) {
-    return 'Завтра';
+    return 'Tomorrow';
   } else if (diffDays <= 7) {
-    return `Через ${diffDays} дн.`;
+    return `In ${diffDays} days`;
   } else {
-    return releaseDate.toLocaleDateString('ru-RU');
+    return releaseDate.toLocaleDateString();
   }
 };
 
@@ -175,32 +151,21 @@ export const getReleaseHealthScore = (release: ReleaseWithStats): 'good' | 'warn
   const progress = getReleaseProgress(release);
   const isOverdue = isReleaseOverdue(release);
   
-  if (isOverdue) return 'critical';
-  if (progress >= 80) return 'good';
-  if (progress >= 50) return 'warning';
-  return 'critical';
+  if (isOverdue || progress < 30) return 'critical';
+  if (progress < 70) return 'warning';
+  return 'good';
 };
 
-export const canPublishRelease = (release: Release): boolean => {
-  return release.status === 'production' && !isReleaseOverdue(release);
+export const canPublishRelease = (release: ReleaseWithStats): boolean => {
+  const progress = getReleaseProgress(release);
+  return progress >= 100 && release.status?.toLowerCase() === 'ready';
 };
 
-export const getReleaseVersionSuggestion = (existingVersions: string[]): string => {
-  if (existingVersions.length === 0) return '1.0.0';
-  
-  // Simple version increment logic - можно улучшить
-  const lastVersion = existingVersions
-    .map(v => v.split('.').map(Number))
-    .sort((a, b) => {
-      for (let i = 0; i < Math.max(a.length, b.length); i++) {
-        const diff = (a[i] || 0) - (b[i] || 0);
-        if (diff !== 0) return diff;
-      }
-      return 0;
-    })
-    .pop();
-  
-  if (!lastVersion) return '1.0.0';
-  
-  return `${lastVersion[0]}.${lastVersion[1]}.${(lastVersion[2] || 0) + 1}`;
+export const getReleaseVersionSuggestion = (lastVersion: string): string => {
+  const versionParts = lastVersion.split('.');
+  if (versionParts.length >= 3) {
+    const patch = parseInt(versionParts[2]) + 1;
+    return `${versionParts[0]}.${versionParts[1]}.${patch}`;
+  }
+  return '1.0.0';
 }; 

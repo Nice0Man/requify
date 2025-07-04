@@ -1,27 +1,35 @@
-// Export requirement entity types and API
+// Export requirement entity types
 export type {
   Requirement,
   RequirementBase,
   RequirementCreate,
   RequirementUpdate,
   RequirementWithDetails,
-  RequirementWithStats,
+  RequirementWithTestResults,
   RequirementType,
-  RequirementPriority,
-  RequirementStatus,
+  RequirementPriority as RequirementPriorityType,
+  RequirementStatus as RequirementStatusType,
   RequirementRelationship,
-  RequirementRelationshipCreate,
-  RequirementRelationshipType,
+  RelationshipCreate,
+  RelationshipCreateForRequirement,
   RequirementComment,
-  RequirementStatusRu,
-  RequirementPriorityRu,
-  RequirementTypeRu,
-  REQUIREMENT_STATUS_LABELS,
-  REQUIREMENT_PRIORITY_LABELS,
-  REQUIREMENT_TYPE_LABELS,
-  REQUIREMENT_STATUS_COLORS,
-  REQUIREMENT_PRIORITY_COLORS,
+  TraceMatrix,
+  TraceNode,
+  TraceLink,
+  QuickRequirement,
 } from "./model/types";
 
-// Export requirement API if needed
-export * from "./api/requirements.api"; 
+// Export requirement constants and helpers
+export {
+  getRequirementProgress,
+  isRequirementOverdue,
+  getRequirementPriorityColor,
+  getRequirementStatusColor,
+  formatRequirementDeadline,
+} from "./model/types";
+
+// Export requirement API
+export { RequirementsApi, requirementsApi } from "./api";
+
+// Export requirement UI components
+export { RequirementCard, RequirementStatus, RequirementPriority, RequirementInfo } from "./ui"; 

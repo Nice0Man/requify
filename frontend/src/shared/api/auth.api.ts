@@ -129,4 +129,4 @@ export class AuthApi {
 }
 
 // Export singleton instance
-export const authApi = new AuthApi(); 
+export const authApi = new AuthApi();

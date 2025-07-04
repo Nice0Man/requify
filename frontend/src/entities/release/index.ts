@@ -1,4 +1,4 @@
-// Export release entity types and API
+// Export release entity types
 export type {
   Release,
   ReleaseBase,
@@ -7,10 +7,27 @@ export type {
   ReleaseWithDetails,
   ReleaseWithStats,
   ReleaseStatus,
-  ReleaseStatusRu,
-  RELEASE_STATUS_LABELS,
-  RELEASE_STATUS_COLORS,
-} from "./model/types";
+  ReleaseCreateFromRequirements,
+  ReleaseSpecification,
+  ReleaseChangelog,
+  ReleaseRequirement,
+} from "./model/release.types";
 
-// Export release API if needed
-export { releasesApi } from "./api/releases.api"; 
+// Export release constants and helpers
+export { 
+  RELEASE_STATUSES,
+  getReleaseProgress,
+  isReleaseOverdue,
+  getReleaseStatusColor,
+  formatReleaseDate,
+  getReleaseHealthScore,
+  canPublishRelease,
+  getReleaseVersionSuggestion
+} from "./model/release.types";
+
+// Export release API
+export { ReleasesApi, releasesApi } from "./api";
+
+// Export release UI components
+export { ReleaseCard, ReleaseProgress, ReleaseInfo } from "./ui";
+export { ReleaseStatus as ReleaseStatusComponent } from "./ui"; 

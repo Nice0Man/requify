@@ -1,32 +1,48 @@
-// Export test-case entity types and API
+// Export test-case entity types
 export type {
   TestCase,
   TestCaseBase,
   TestCaseCreate,
   TestCaseUpdate,
   TestCaseWithDetails,
-  TestCaseWithStats,
+  TestCaseWithResults,
   TestPlan,
+  TestPlanBase,
   TestPlanCreate,
   TestPlanUpdate,
+  TestPlanWithStats,
   TestExecution,
+  TestExecutionBase,
   TestExecutionCreate,
   TestExecutionUpdate,
+  TestExecutionWithDetails,
   TestResult,
+  TestResultBase,
   TestResultCreate,
-  TestCasePriority,
-  TestCaseStatus,
-  TestExecutionStatus,
-  TestCasePriorityRu,
-  TestCaseStatusRu,
-  TestExecutionStatusRu,
-  TEST_CASE_PRIORITY_LABELS,
-  TEST_CASE_STATUS_LABELS,
-  TEST_EXECUTION_STATUS_LABELS,
-  TEST_CASE_PRIORITY_COLORS,
-  TEST_CASE_STATUS_COLORS,
-  TEST_EXECUTION_STATUS_COLORS,
+  TestResultUpdate,
+  TestResultWithDetails,
+  TestStatus,
+  TestPriority,
+  TestType,
+  IntegrationTestJob,
+  IntegrationTestStatus,
+  TestSummary,
 } from "./model/types";
 
-// Export test-case API if needed
-export * from "./api/testing.api"; 
+// Export test constants and helpers
+export {
+  TEST_STATUSES,
+  TEST_PRIORITIES,
+  TEST_TYPES,
+  getTestStatusColor,
+  getTestPriorityColor,
+  getTestTypeIcon,
+  calculateTestCoverage,
+  getTestExecutionDuration,
+  getTestPlanProgress,
+  getTestPlanSuccessRate,
+  isTestCaseAutomatable,
+} from "./model/types";
+
+// Export testing API
+export { TestingApi, testingApi } from "./api"; 
