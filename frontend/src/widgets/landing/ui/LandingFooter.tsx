@@ -28,6 +28,11 @@ import {
   Assignment,
   FolderOpen,
   Dashboard,
+  BugReport,
+  Analytics,
+  Extension,
+  Work,
+  ContactMail,
 } from '@mui/icons-material';
 
 const LandingFooter: React.FC = () => {
@@ -41,37 +46,38 @@ const LandingFooter: React.FC = () => {
   ];
 
   const productLinks = [
-    { title: 'Возможности', href: '#features', icon: <RocketLaunch /> },
-    { title: 'Управление требованиями', href: '#requirements', icon: <Assignment /> },
-    { title: 'Управление проектами', href: '#projects', icon: <FolderOpen /> },
-    { title: 'Аналитика', href: '#analytics', icon: <Dashboard /> },
+    { title: 'Requirements Management', href: '#requirements', icon: <Assignment /> },
+    { title: 'Project Management', href: '#projects', icon: <FolderOpen /> },
+    { title: 'Testing & QA', href: '#testing', icon: <BugReport /> },
+    { title: 'Analytics', href: '#analytics', icon: <Analytics /> },
+    { title: 'Integrations', href: '#integrations', icon: <Extension /> },
   ];
 
   const resourceLinks = [
-    { title: 'Документация', href: '/docs', icon: <Help /> },
+    { title: 'Documentation', href: '/docs', icon: <Help /> },
     { title: 'API', href: '/api-overview', icon: <Business /> },
-    { title: 'Руководство пользователя', href: '/guide', icon: <Info /> },
-    { title: 'Безопасность', href: '/security', icon: <Security /> },
+    { title: 'User Guide', href: '/guide', icon: <Info /> },
+    { title: 'Security', href: '/security', icon: <Security /> },
   ];
 
   const companyLinks = [
-    { title: 'О нас', href: '/about', icon: <Info /> },
-    { title: 'Карьера', href: '/careers', icon: <Business /> },
-    { title: 'Блог', href: '/blog', icon: <Info /> },
-    { title: 'Новости', href: '/news', icon: <Info /> },
+    { title: 'About Us', href: '/about', icon: <Info /> },
+    { title: 'Security', href: '/security', icon: <Security /> },
+    { title: 'Careers', href: '/careers', icon: <Work /> },
+    { title: 'Contact', href: '/contact', icon: <ContactMail /> },
   ];
 
   const legalLinks = [
-    { title: 'Политика конфиденциальности', href: '/privacy' },
-    { title: 'Условия использования', href: '/terms' },
-    { title: 'Лицензия', href: '/license' },
-    { title: 'Файлы cookie', href: '/cookies' },
+    { title: 'Privacy Policy', href: '/privacy' },
+    { title: 'Terms of Use', href: '/terms' },
+    { title: 'License', href: '/license' },
+    { title: 'Cookies', href: '/cookies' },
   ];
 
   const contactInfo = [
     { icon: <Email />, text: 'hello@requify.com', href: 'mailto:hello@requify.com' },
     { icon: <Phone />, text: '+7 (495) 123-45-67', href: 'tel:+74951234567' },
-    { icon: <LocationOn />, text: 'Москва, Россия', href: '#' },
+    { icon: <LocationOn />, text: 'Moscow, Russia', href: '#' },
   ];
 
   return (
@@ -95,18 +101,22 @@ const LandingFooter: React.FC = () => {
       }}
     >
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
-        {/* Верхняя секция с призывом к действию */}
-        <Box sx={{ py: 6, textAlign: 'center' }}>
+        {/* CTA Section */}
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
           <Typography
-            variant="h4"
-            component="h2"
-            gutterBottom
-            sx={{ fontWeight: 'bold', mb: 2 }}
+            variant="h3"
+            sx={{
+              fontSize: { xs: '2rem', md: '2.5rem' },
+              fontWeight: 700,
+              color: theme.palette.common.white,
+              mb: 3,
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            }}
           >
-            Готовы начать управлять требованиями эффективно?
+            Ready to start managing requirements efficiently?
           </Typography>
           <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-            Присоединяйтесь к тысячам команд, которые уже используют Requify
+            Join thousands of teams that are already using Requify
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Button
@@ -127,7 +137,7 @@ const LandingFooter: React.FC = () => {
                 boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
               }}
             >
-              Начать бесплатно
+              Start Free
             </Button>
             <Button
               variant="outlined"
@@ -147,7 +157,7 @@ const LandingFooter: React.FC = () => {
                 fontWeight: 'bold',
               }}
             >
-              Демо версия
+              Demo Version
             </Button>
           </Box>
         </Box>
@@ -168,8 +178,8 @@ const LandingFooter: React.FC = () => {
                 Requify
               </Typography>
               <Typography variant="body1" sx={{ mb: 3, opacity: 0.9, lineHeight: 1.7 }}>
-                Современная платформа для управления требованиями, которая помогает командам
-                создавать качественное программное обеспечение быстрее и эффективнее.
+                Modern platform for requirements management that helps teams
+                create, track, and manage software requirements efficiently.
               </Typography>
               
               {/* Социальные сети */}
@@ -204,7 +214,7 @@ const LandingFooter: React.FC = () => {
                     500+
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Активных команд
+                    Active Teams
                   </Typography>
                 </Box>
                 <Box>
