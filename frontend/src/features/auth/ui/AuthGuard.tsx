@@ -22,14 +22,14 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   fallback,
   redirectTo = "/auth/login",
 }) => {
-  const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [isInitialized, setIsInitialized] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const initAuth = async () => {
       try {
-        await checkAuth();
+        await useAuth();
       } finally {
         setIsInitialized(true);
       }
@@ -38,7 +38,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     if (!isInitialized) {
       initAuth();
     }
-  }, [checkAuth, isInitialized]);
+  }, [isInitialized]);
 
   const handleGoToLogin = () => {
     navigate(redirectTo);

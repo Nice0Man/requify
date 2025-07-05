@@ -18,6 +18,7 @@ export interface AuthState {
   requireEmailVerification: boolean;
   allowRegistration: boolean;
   allowPasswordReset: boolean;
+  grant_type: GrantType;
 }
 
 export interface AuthError {
@@ -30,10 +31,13 @@ export interface AuthError {
 // Form Data Types
 // =============================================================================
 
+export type GrantType = "password" | "refresh_token";
+
 export interface LoginFormData {
   username: string;
   password: string;
   remember_me: boolean;
+  grant_type: GrantType;
 }
 
 export interface RegisterFormData {
@@ -153,14 +157,16 @@ export interface AuthContextType {
   permissions: string[];
   sessions: ActiveSession[];
   error: AuthError | null;
+  grant_type: GrantType;
   requireEmailVerification: boolean;
   allowRegistration: boolean;
   allowPasswordReset: boolean;
-
+    
   // Actions
   login: (credentials: LoginFormData) => Promise<void>;
   register: (userData: RegisterFormData) => Promise<void>;
   logout: (logoutAll?: boolean) => Promise<void>;
+  setGrantType: (grantType: GrantType) => void; 
   refreshToken: () => Promise<void>;
   updateUser: (userData: Partial<UserProfile>) => Promise<void>;
   changePassword: (data: PasswordChangeFormData) => Promise<void>;

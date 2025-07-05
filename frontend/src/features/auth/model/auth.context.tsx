@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useCallback,
   useRef,
+  useState,
 } from "react";
 import type { UserProfile } from "@/entities/user";
 import { authApi } from "../api/auth.api";
@@ -22,6 +23,7 @@ import type {
   EmailVerificationFormData,
   EmailVerificationConfirmFormData,
   ActiveSession,
+  GrantType,
 } from "./auth.types";
 import { AUTH_ERRORS } from "./auth.types";
 
@@ -43,6 +45,7 @@ const initialState: AuthState = {
   requireEmailVerification: false,
   allowRegistration: true,
   allowPasswordReset: true,
+  grant_type: "password",
 };
 
 // =============================================================================
@@ -161,11 +164,13 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const [grantType, setGrantType] = useState<GrantType>(state.grant_type);
   const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // =============================================================================
   // Utility Methods
   // =============================================================================
+
 
   const clearError = useCallback(() => {
     dispatch({ type: "AUTH_CLEAR_ERROR" });
@@ -664,7 +669,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     requireEmailVerification: state.requireEmailVerification,
     allowRegistration: state.allowRegistration,
     allowPasswordReset: state.allowPasswordReset,
-
+    grant_type: state.grant_type,
+    setGrantType,
     // Actions
     login,
     register,

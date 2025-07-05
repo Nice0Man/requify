@@ -1,34 +1,25 @@
 import React, { useState, useCallback } from "react";
 import {
   Box,
-  Paper,
   Tabs,
   Tab,
-  TextField,
-  Button,
   Typography,
   Alert,
   Checkbox,
   FormControlLabel,
   Link,
   Divider,
-  IconButton,
-  InputAdornment,
-  CircularProgress,
   Fade,
+  Slide,
 } from "@mui/material";
 import {
-  Visibility,
-  VisibilityOff,
   Google,
   GitHub,
-  Person,
-  Email,
-  Lock,
-  AccountCircle,
+  Login,
+  PersonAdd,
 } from "@mui/icons-material";
-import { useTheme } from "@mui/material/styles";
 import { useAuth } from "@/features/auth/model/auth.context";
+import { AuthFormLayout, AuthFormField, AuthButton } from "@/shared/ui";
 import type { LoginFormData, RegisterFormData } from "@/features/auth/model/auth.types";
 
 interface TabPanelProps {
@@ -48,19 +39,20 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`auth-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && (
+        <Slide direction="left" in={value === index} timeout={300}>
+          <Box>{children}</Box>
+        </Slide>
+      )}
     </div>
   );
 }
 
 const QuickAuth: React.FC = () => {
-  const theme = useTheme();
   const { login, register, isLoading, error, clearError } = useAuth();
 
   // Tab management
   const [activeTab, setActiveTab] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Form states
   const [loginData, setLoginData] = useState<LoginFormData>({
@@ -167,490 +159,441 @@ const QuickAuth: React.FC = () => {
     setRegisterErrors({});
   }, [clearError]);
 
-  const handleLoginChange = useCallback((field: keyof LoginFormData) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
-    setLoginData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear field error when user starts typing
-    if (loginErrors[field]) {
-      setLoginErrors(prev => ({ ...prev, [field]: "" }));
-    }
-  }, [loginErrors]);
-
-  const handleRegisterChange = useCallback((field: keyof RegisterFormData) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
-    setRegisterData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear field error when user starts typing
-    if (registerErrors[field]) {
-      setRegisterErrors(prev => ({ ...prev, [field]: "" }));
-    }
-  }, [registerErrors]);
-
-  const handleLogin = useCallback(async (event: React.FormEvent) => {
+  const handleLoginSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     
     const errors = validateLogin(loginData);
     setLoginErrors(errors);
     
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
+    if (Object.keys(errors).length > 0) return;
 
     try {
       await login(loginData);
     } catch (error) {
-      // Error is handled by the auth context
+      console.error("Login failed:", error);
     }
   }, [loginData, validateLogin, login]);
 
-  const handleRegister = useCallback(async (event: React.FormEvent) => {
+  const handleRegisterSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     
     const errors = validateRegister(registerData);
     setRegisterErrors(errors);
     
-    if (Object.keys(errors).length > 0) {
-      return;
-    }
+    if (Object.keys(errors).length > 0) return;
 
     try {
       await register(registerData);
     } catch (error) {
-      // Error is handled by the auth context
+      console.error("Registration failed:", error);
     }
   }, [registerData, validateRegister, register]);
 
   const handleSocialLogin = useCallback((provider: string) => {
-    // TODO: Implement social login
     console.log(`Social login with ${provider}`);
+    // TODO: Implement social login
   }, []);
 
   // =============================================================================
-  // Render
+  // Render Methods
   // =============================================================================
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        background: `linear-gradient(135deg, ${theme.palette.primary.main}22 0%, ${theme.palette.secondary.main}22 100%)`,
-        p: 2,
-      }}
-    >
-      <Paper
-        elevation={24}
-        sx={{
-          width: "100%",
-          maxWidth: 480,
-          borderRadius: 3,
-          overflow: "hidden",
-          background: theme.palette.background.paper,
-        }}
-      >
-        {/* Header */}
-        <Box
-          sx={{
-            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            color: "white",
-            p: 3,
-            textAlign: "center",
-          }}
+  const renderSocialButtons = () => (
+    <Box sx={{ mb: 3 }}>
+      <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ mb: 2 }}>
+        Continue with
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <AuthButton
+          variant="social"
+          socialProvider="google"
+          icon={<Google />}
+          onClick={() => handleSocialLogin('google')}
+          size="medium"
         >
-          <Typography variant="h4" component="h1" gutterBottom>
-            Welcome to Requify
-          </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9 }}>
-            Requirements Management System
-          </Typography>
-        </Box>
+          Google
+        </AuthButton>
+        <AuthButton
+          variant="social"
+          socialProvider="github"
+          icon={<GitHub />}
+          onClick={() => handleSocialLogin('github')}
+          size="medium"
+        >
+          GitHub
+        </AuthButton>
+      </Box>
+      
+      <Box sx={{ display: 'flex', alignItems: 'center', my: 3 }}>
+        <Divider sx={{ flex: 1 }} />
+        <Typography variant="body2" color="text.secondary" sx={{ mx: 2 }}>
+          or
+        </Typography>
+        <Divider sx={{ flex: 1 }} />
+      </Box>
+    </Box>
+  );
 
-        {/* Error Alert */}
-        {error && (
-          <Fade in={!!error}>
-            <Alert
-              severity="error"
-              onClose={clearError}
-              sx={{ m: 2, mb: 0 }}
-            >
-              {error.message}
-            </Alert>
-          </Fade>
+  const renderLoginForm = () => (
+    <Box component="form" onSubmit={handleLoginSubmit}>
+      <AuthFormField
+        name="username"
+        label="Username or Email"
+        type="text"
+        value={loginData.username}
+        onChange={(value) => {
+          setLoginData(prev => ({ ...prev, username: value }));
+          if (loginErrors.username) {
+            setLoginErrors(prev => ({ ...prev, username: "" }));
+          }
+        }}
+        error={loginErrors.username}
+        placeholder="Enter your username or email"
+        autoComplete="username"
+        autoFocus
+        required
+        validation={{
+          minLength: 3,
+        }}
+      />
+
+      <AuthFormField
+        name="password"
+        label="Password"
+        type="password"
+        value={loginData.password}
+        onChange={(value) => {
+          setLoginData(prev => ({ ...prev, password: value }));
+          if (loginErrors.password) {
+            setLoginErrors(prev => ({ ...prev, password: "" }));
+          }
+        }}
+        error={loginErrors.password}
+        placeholder="Enter your password"
+        autoComplete="current-password"
+        required
+        validation={{
+          minLength: 6,
+        }}
+      />
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={loginData.remember_me}
+              onChange={(e) => setLoginData(prev => ({ ...prev, remember_me: e.target.checked }))}
+              color="primary"
+            />
+          }
+          label="Remember me"
+        />
+        <Link href="/auth/forgot-password" variant="body2" color="primary" underline="hover">
+          Forgot password?
+        </Link>
+      </Box>
+
+      <AuthButton
+        type="submit"
+        variant="primary"
+        size="large"
+        loading={isLoading}
+        icon={<Login />}
+        iconPosition="end"
+      >
+        Sign In
+      </AuthButton>
+    </Box>
+  );
+
+  const renderRegisterForm = () => (
+    <Box component="form" onSubmit={handleRegisterSubmit}>
+      <Box sx={{ display: 'flex', gap: 2, mb: 0 }}>
+        <AuthFormField
+          name="first_name"
+          label="First Name"
+          type="text"
+          value={registerData.first_name}
+          onChange={(value) => {
+            setRegisterData(prev => ({ ...prev, first_name: value }));
+            if (registerErrors.first_name) {
+              setRegisterErrors(prev => ({ ...prev, first_name: "" }));
+            }
+          }}
+          error={registerErrors.first_name}
+          placeholder="John"
+          autoComplete="given-name"
+          required
+        />
+
+        <AuthFormField
+          name="last_name"
+          label="Last Name"
+          type="text"
+          value={registerData.last_name}
+          onChange={(value) => {
+            setRegisterData(prev => ({ ...prev, last_name: value }));
+            if (registerErrors.last_name) {
+              setRegisterErrors(prev => ({ ...prev, last_name: "" }));
+            }
+          }}
+          error={registerErrors.last_name}
+          placeholder="Doe"
+          autoComplete="family-name"
+          required
+        />
+      </Box>
+
+      <AuthFormField
+        name="username"
+        label="Username"
+        type="text"
+        value={registerData.username}
+        onChange={(value) => {
+          setRegisterData(prev => ({ ...prev, username: value }));
+          if (registerErrors.username) {
+            setRegisterErrors(prev => ({ ...prev, username: "" }));
+          }
+        }}
+        error={registerErrors.username}
+        placeholder="johndoe"
+        autoComplete="username"
+        required
+        validation={{
+          minLength: 3,
+          pattern: /^[a-zA-Z0-9_]+$/,
+        }}
+        helperText="Only letters, numbers, and underscores allowed"
+      />
+
+      <AuthFormField
+        name="email"
+        label="Email Address"
+        type="email"
+        value={registerData.email}
+        onChange={(value) => {
+          setRegisterData(prev => ({ ...prev, email: value }));
+          if (registerErrors.email) {
+            setRegisterErrors(prev => ({ ...prev, email: "" }));
+          }
+        }}
+        error={registerErrors.email}
+        placeholder="john.doe@example.com"
+        autoComplete="email"
+        required
+        validation={{
+          pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        }}
+      />
+
+      <AuthFormField
+        name="password"
+        label="Password"
+        type="password"
+        value={registerData.password}
+        onChange={(value) => {
+          setRegisterData(prev => ({ ...prev, password: value }));
+          if (registerErrors.password) {
+            setRegisterErrors(prev => ({ ...prev, password: "" }));
+          }
+        }}
+        error={registerErrors.password}
+        placeholder="Create a strong password"
+        autoComplete="new-password"
+        required
+        showPasswordStrength
+        validation={{
+          minLength: 8,
+          pattern: /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+        }}
+      />
+
+      <AuthFormField
+        name="confirm_password"
+        label="Confirm Password"
+        type="password"
+        value={registerData.confirm_password}
+        onChange={(value) => {
+          setRegisterData(prev => ({ ...prev, confirm_password: value }));
+          if (registerErrors.confirm_password) {
+            setRegisterErrors(prev => ({ ...prev, confirm_password: "" }));
+          }
+        }}
+        error={registerErrors.confirm_password}
+        placeholder="Confirm your password"
+        autoComplete="new-password"
+        required
+        validation={{
+          customValidator: (value) => 
+            value !== registerData.password ? "Passwords do not match" : null,
+        }}
+      />
+
+      <Box sx={{ mb: 3 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={registerData.terms_accepted}
+              onChange={(e) => {
+                setRegisterData(prev => ({ ...prev, terms_accepted: e.target.checked }));
+                if (registerErrors.terms_accepted) {
+                  setRegisterErrors(prev => ({ ...prev, terms_accepted: "" }));
+                }
+              }}
+              color="primary"
+            />
+          }
+          label={
+            <Typography variant="body2">
+              I agree to the{" "}
+              <Link href="/terms" color="primary" underline="hover">
+                Terms of Service
+              </Link>
+            </Typography>
+          }
+        />
+        {registerErrors.terms_accepted && (
+          <Typography variant="body2" color="error" sx={{ ml: 4, mt: 0.5 }}>
+            {registerErrors.terms_accepted}
+          </Typography>
         )}
 
-        {/* Tabs */}
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="fullWidth"
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={registerData.privacy_accepted}
+              onChange={(e) => {
+                setRegisterData(prev => ({ ...prev, privacy_accepted: e.target.checked }));
+                if (registerErrors.privacy_accepted) {
+                  setRegisterErrors(prev => ({ ...prev, privacy_accepted: "" }));
+                }
+              }}
+              color="primary"
+            />
+          }
+          label={
+            <Typography variant="body2">
+              I agree to the{" "}
+              <Link href="/privacy" color="primary" underline="hover">
+                Privacy Policy
+              </Link>
+            </Typography>
+          }
+        />
+        {registerErrors.privacy_accepted && (
+          <Typography variant="body2" color="error" sx={{ ml: 4, mt: 0.5 }}>
+            {registerErrors.privacy_accepted}
+          </Typography>
+        )}
+      </Box>
+
+      <AuthButton
+        type="submit"
+        variant="primary"
+        size="large"
+        loading={isLoading}
+        icon={<PersonAdd />}
+        iconPosition="end"
+      >
+        Create Account
+      </AuthButton>
+    </Box>
+  );
+
+  return (
+    <AuthFormLayout
+      title="Welcome to Requify"
+      subtitle="Professional requirements management for development teams"
+      maxWidth="md"
+    >
+      {/* Error Alert */}
+      {error && (
+        <Fade in>
+                     <Alert 
+             severity="error" 
+             sx={{ mb: 3, borderRadius: 2 }}
+             onClose={clearError}
+           >
+             {error.message || 'Authentication failed. Please try again.'}
+           </Alert>
+        </Fade>
+      )}
+
+      {/* Social Login */}
+      {renderSocialButtons()}
+
+      {/* Auth Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange} 
+          centered
           sx={{
-            borderBottom: 1,
-            borderColor: "divider",
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '1rem',
+            },
           }}
         >
-          <Tab
-            label="Sign In"
-            icon={<Person />}
-            iconPosition="start"
-            sx={{ textTransform: "none" }}
-          />
-          <Tab
-            label="Sign Up"
-            icon={<AccountCircle />}
-            iconPosition="start"
-            sx={{ textTransform: "none" }}
-          />
+          <Tab label="Sign In" id="auth-tab-0" aria-controls="auth-tabpanel-0" />
+          <Tab label="Create Account" id="auth-tab-1" aria-controls="auth-tabpanel-1" />
         </Tabs>
+      </Box>
 
-        {/* Login Form */}
-        <TabPanel value={activeTab} index={0}>
-          <Box component="form" onSubmit={handleLogin} noValidate>
-            <TextField
-              fullWidth
-              label="Username"
-              name="username"
-              autoComplete="username"
-              value={loginData.username}
-              onChange={handleLoginChange("username")}
-              error={!!loginErrors.username}
-              helperText={loginErrors.username}
-              margin="normal"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Person color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
-              value={loginData.password}
-              onChange={handleLoginChange("password")}
-              error={!!loginErrors.password}
-              helperText={loginErrors.password}
-              margin="normal"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={loginData.remember_me}
-                  onChange={handleLoginChange("remember_me")}
-                  color="primary"
-                />
-              }
-              label="Remember me"
-              sx={{ mt: 1 }}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={isLoading}
-              sx={{
-                mt: 3,
-                mb: 2,
-                py: 1.5,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                "&:hover": {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-                },
-              }}
+      {/* Tab Panels */}
+      <TabPanel value={activeTab} index={0}>
+        {renderLoginForm()}
+        <Box sx={{ textAlign: 'center', mt: 3 }}>
+          <Typography variant="body2" color="text.secondary">
+            Don't have an account?{" "}
+            <Link
+              component="button"
+              type="button"
+              onClick={() => setActiveTab(1)}
+              color="primary"
+              underline="hover"
+              sx={{ fontWeight: 600 }}
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-
-            <Box sx={{ textAlign: "center", mt: 2 }}>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Box>
-          </Box>
-        </TabPanel>
-
-        {/* Register Form */}
-        <TabPanel value={activeTab} index={1}>
-          <Box component="form" onSubmit={handleRegister} noValidate>
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <TextField
-                fullWidth
-                label="First Name"
-                name="firstName"
-                autoComplete="given-name"
-                value={registerData.first_name}
-                onChange={handleRegisterChange("first_name")}
-                error={!!registerErrors.first_name}
-                helperText={registerErrors.first_name}
-                margin="normal"
-              />
-
-              <TextField
-                fullWidth
-                label="Last Name"
-                name="lastName"
-                autoComplete="family-name"
-                value={registerData.last_name}
-                onChange={handleRegisterChange("last_name")}
-                error={!!registerErrors.last_name}
-                helperText={registerErrors.last_name}
-                margin="normal"
-              />
-            </Box>
-
-            <TextField
-              fullWidth
-              label="Username"
-              name="username"
-              autoComplete="username"
-              value={registerData.username}
-              onChange={handleRegisterChange("username")}
-              error={!!registerErrors.username}
-              helperText={registerErrors.username}
-              margin="normal"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Person color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={registerData.email}
-              onChange={handleRegisterChange("email")}
-              error={!!registerErrors.email}
-              helperText={registerErrors.email}
-              margin="normal"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Email color="action" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              autoComplete="new-password"
-              value={registerData.password}
-              onChange={handleRegisterChange("password")}
-              error={!!registerErrors.password}
-              helperText={registerErrors.password}
-              margin="normal"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Confirm Password"
-              name="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              autoComplete="new-password"
-              value={registerData.confirm_password}
-              onChange={handleRegisterChange("confirm_password")}
-              error={!!registerErrors.confirm_password}
-              helperText={registerErrors.confirm_password}
-              margin="normal"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock color="action" />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={registerData.terms_accepted}
-                  onChange={handleRegisterChange("terms_accepted")}
-                  color="primary"
-                />
-              }
-              label={
-                <Typography variant="body2">
-                  I agree to the{" "}
-                  <Link href="#" color="primary">
-                    Terms of Service
-                  </Link>
-                </Typography>
-              }
-              sx={{ mt: 1 }}
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={registerData.privacy_accepted}
-                  onChange={handleRegisterChange("privacy_accepted")}
-                  color="primary"
-                />
-              }
-              label={
-                <Typography variant="body2">
-                  I agree to the{" "}
-                  <Link href="#" color="primary">
-                    Privacy Policy
-                  </Link>
-                </Typography>
-              }
-              sx={{ mt: 1 }}
-            />
-
-            {registerErrors.terms_accepted && (
-              <Typography color="error" variant="caption" display="block">
-                {registerErrors.terms_accepted}
-              </Typography>
-            )}
-
-            {registerErrors.privacy_accepted && (
-              <Typography color="error" variant="caption" display="block">
-                {registerErrors.privacy_accepted}
-              </Typography>
-            )}
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={isLoading}
-              sx={{
-                mt: 3,
-                mb: 2,
-                py: 1.5,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                "&:hover": {
-                  background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-                },
-              }}
-            >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Create Account"
-              )}
-            </Button>
-          </Box>
-        </TabPanel>
-
-        {/* Social Login */}
-        <Box sx={{ p: 3, pt: 0 }}>
-          <Divider sx={{ mb: 3 }}>
-            <Typography variant="body2" color="text.secondary">
-              Or continue with
-            </Typography>
-          </Divider>
-
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<Google />}
-              onClick={() => handleSocialLogin("google")}
-              sx={{
-                py: 1.5,
-                borderColor: theme.palette.divider,
-                "&:hover": {
-                  borderColor: theme.palette.primary.main,
-                  backgroundColor: theme.palette.primary.main + "08",
-                },
-              }}
-            >
-              Google
-            </Button>
-
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<GitHub />}
-              onClick={() => handleSocialLogin("github")}
-              sx={{
-                py: 1.5,
-                borderColor: theme.palette.divider,
-                "&:hover": {
-                  borderColor: theme.palette.primary.main,
-                  backgroundColor: theme.palette.primary.main + "08",
-                },
-              }}
-            >
-              GitHub
-            </Button>
-          </Box>
+              Create one now
+            </Link>
+          </Typography>
         </Box>
-      </Paper>
-    </Box>
+      </TabPanel>
+
+      <TabPanel value={activeTab} index={1}>
+        {renderRegisterForm()}
+        <Box sx={{ textAlign: 'center', mt: 3 }}>
+          <Typography variant="body2" color="text.secondary">
+            Already have an account?{" "}
+            <Link
+              component="button"
+              type="button"
+              onClick={() => setActiveTab(0)}
+              color="primary"
+              underline="hover"
+              sx={{ fontWeight: 600 }}
+            >
+              Sign in instead
+            </Link>
+          </Typography>
+        </Box>
+      </TabPanel>
+
+      {/* Footer Links */}
+      <Box sx={{ textAlign: 'center', mt: 4, pt: 3, borderTop: 1, borderColor: 'divider' }}>
+        <Typography variant="body2" color="text.secondary">
+          Need help?{" "}
+          <Link href="/support" color="primary" underline="hover">
+            Contact Support
+          </Link>
+          {" · "}
+          <Link href="/api-overview" color="primary" underline="hover">
+            API Documentation
+          </Link>
+        </Typography>
+      </Box>
+    </AuthFormLayout>
   );
 };
 

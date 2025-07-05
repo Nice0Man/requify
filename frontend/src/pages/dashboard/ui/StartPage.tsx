@@ -11,11 +11,11 @@ import {
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { 
-  Dashboard, 
-  ArrowBack, 
-  Info, 
-  ContactSupport, 
+import {
+  Dashboard,
+  ArrowBack,
+  Info,
+  ContactSupport,
   Language,
   GitHub,
   Description,
@@ -160,10 +160,10 @@ const StartPage: React.FC = () => {
           }}
         >
           {/* Logo Section - Enhanced */}
-          <Box 
-            sx={{ 
-              display: "flex", 
-              alignItems: "center", 
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
               flexGrow: 1,
               cursor: "pointer",
             }}
@@ -187,11 +187,11 @@ const StartPage: React.FC = () => {
                 },
               }}
             >
-              <Dashboard 
-                sx={{ 
+              <Dashboard
+                sx={{
                   fontSize: { xs: "2rem", md: "2.2rem" },
                   color: "white",
-                }} 
+                }}
               />
             </Box>
             <Box>
@@ -262,7 +262,9 @@ const StartPage: React.FC = () => {
             {/* GitHub */}
             <Tooltip title="GitHub Repository">
               <IconButton
-                onClick={() => window.open("https://github.com/requify", "_blank")}
+                onClick={() =>
+                  window.open("https://github.com/requify", "_blank")
+                }
                 sx={{
                   color: theme.palette.text.secondary,
                   "&:hover": {
