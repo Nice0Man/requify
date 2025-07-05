@@ -63,7 +63,6 @@ const AuthPage: React.FC = () => {
     isLoading,
     error,
     clearError,
-    grant_type,
   } = useAuth();
 
   // Tab management
@@ -74,6 +73,7 @@ const AuthPage: React.FC = () => {
     username: "",
     password: "",
     remember_me: false,
+    grant_type: "password",
   });
 
   const [registerData, setRegisterData] = useState<RegisterFormData>({
