@@ -46,7 +46,7 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Slide direction="left" in={value === index} timeout={300}>
-          <Box>{children}</Box>
+          <Box sx={{ width: "100%" }}>{children}</Box>
         </Slide>
       )}
     </div>
@@ -245,7 +245,7 @@ const AuthPage: React.FC = () => {
       >
         Continue with
       </Typography>
-      <Box sx={{ display: "flex", gap: 2 }}>
+      <Box sx={{ display: "flex", gap: 2, justifyContent: "center" }}>
         <AuthButton
           variant="social"
           socialProvider="google"
@@ -354,16 +354,25 @@ const AuthPage: React.FC = () => {
         </Link>
       </Box>
 
-      <AuthButton
-        type="submit"
-        variant="primary"
-        size="large"
-        loading={isLoading}
-        icon={<Login />}
-        iconPosition="end"
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          mt: 3,
+        }}
       >
-        Sign In
-      </AuthButton>
+        <AuthButton
+          type="submit"
+          variant="primary"
+          size="large"
+          loading={isLoading}
+          icon={<Login />}
+          iconPosition="end"
+          fullWidth={true}
+        >
+          Sign In
+        </AuthButton>
+      </Box>
     </Box>
   );
 
@@ -560,16 +569,25 @@ const AuthPage: React.FC = () => {
         )}
       </Box>
 
-      <AuthButton
-        type="submit"
-        variant="primary"
-        size="large"
-        loading={isLoading}
-        icon={<PersonAdd />}
-        iconPosition="end"
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          mt: 3,
+        }}
       >
-        Create Account
-      </AuthButton>
+        <AuthButton
+          type="submit"
+          variant="primary"
+          size="large"
+          loading={isLoading}
+          icon={<PersonAdd />}
+          iconPosition="end"
+          fullWidth={true}
+        >
+          Create Account
+        </AuthButton>
+      </Box>
     </Box>
   );
 

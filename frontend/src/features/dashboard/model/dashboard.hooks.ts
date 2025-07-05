@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { dashboardApi } from '../api/dashboard.api';
+import { useAuth } from '@/features/auth';
 import type { 
   DashboardOverview,
   DashboardStats,
@@ -51,12 +52,14 @@ export const dashboardKeys = {
 
 export const useDashboard = (refreshInterval?: number) => {
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
 
   const overviewQuery = useQuery({
     queryKey: dashboardKeys.overview(),
     queryFn: () => dashboardApi.getOverview(),
     refetchInterval: refreshInterval || 5 * 60 * 1000, // 5 minutes default
     staleTime: 2 * 60 * 1000, // 2 minutes
+    enabled: isAuthenticated,
   });
 
   const activityQuery = useQuery({
@@ -64,6 +67,7 @@ export const useDashboard = (refreshInterval?: number) => {
     queryFn: () => dashboardApi.getActivity(20),
     refetchInterval: refreshInterval || 30 * 1000, // 30 seconds for activity
     staleTime: 15 * 1000, // 15 seconds
+    enabled: isAuthenticated,
   });
 
   const notificationsQuery = useQuery({
@@ -71,6 +75,7 @@ export const useDashboard = (refreshInterval?: number) => {
     queryFn: () => dashboardApi.getNotifications(),
     refetchInterval: refreshInterval || 60 * 1000, // 1 minute
     staleTime: 30 * 1000, // 30 seconds
+    enabled: isAuthenticated,
   });
 
   const refreshDashboard = () => {
@@ -110,22 +115,27 @@ export const useDashboard = (refreshInterval?: number) => {
 // =============================================================================
 
 export const useDashboardStats = (projectId?: number) => {
+  const { isAuthenticated } = useAuth();
+
   const statsQuery = useQuery({
     queryKey: dashboardKeys.stats(),
     queryFn: () => dashboardApi.getStats(),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
   });
 
   const projectStatsQuery = useQuery({
     queryKey: dashboardKeys.projectStats(projectId),
     queryFn: () => dashboardApi.getProjectStats(projectId),
     staleTime: 3 * 60 * 1000, // 3 minutes
+    enabled: isAuthenticated,
   });
 
   const requirementStatsQuery = useQuery({
     queryKey: dashboardKeys.requirementStats(projectId),
     queryFn: () => dashboardApi.getRequirementStats(projectId),
     staleTime: 3 * 60 * 1000, // 3 minutes
+    enabled: isAuthenticated,
   });
 
   return {
@@ -154,16 +164,20 @@ export const useDashboardStats = (projectId?: number) => {
 // =============================================================================
 
 export const useDashboardProjects = (limit: number = 10) => {
+  const { isAuthenticated } = useAuth();
+
   const myProjectsQuery = useQuery({
     queryKey: dashboardKeys.myProjects(limit),
     queryFn: () => dashboardApi.getMyProjects(limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
   });
 
   const recentProjectsQuery = useQuery({
     queryKey: dashboardKeys.recentProjects(limit),
     queryFn: () => dashboardApi.getRecentProjects(limit),
     staleTime: 3 * 60 * 1000, // 3 minutes
+    enabled: isAuthenticated,
   });
 
   return {
@@ -179,16 +193,20 @@ export const useDashboardProjects = (limit: number = 10) => {
 // =============================================================================
 
 export const useDashboardRequirements = (limit: number = 10) => {
+  const { isAuthenticated } = useAuth();
+
   const myRequirementsQuery = useQuery({
     queryKey: dashboardKeys.myRequirements(limit),
     queryFn: () => dashboardApi.getMyRequirements(limit),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: isAuthenticated,
   });
 
   const recentRequirementsQuery = useQuery({
     queryKey: dashboardKeys.recentRequirements(limit),
     queryFn: () => dashboardApi.getRecentRequirements(limit),
     staleTime: 3 * 60 * 1000, // 3 minutes
+    enabled: isAuthenticated,
   });
 
   return {
@@ -204,10 +222,12 @@ export const useDashboardRequirements = (limit: number = 10) => {
 // =============================================================================
 
 export const useDashboardSearch = (query: string, filters?: Record<string, any>) => {
+  const { isAuthenticated } = useAuth();
+
   const searchQuery = useQuery({
     queryKey: dashboardKeys.search(query, filters),
     queryFn: () => dashboardApi.search(query, filters),
-    enabled: query.length >= 2, // Only search with 2+ characters
+    enabled: isAuthenticated && query.length >= 2, // Only search with 2+ characters and authenticated
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
@@ -215,6 +235,6 @@ export const useDashboardSearch = (query: string, filters?: Record<string, any>)
     results: searchQuery.data,
     isLoading: searchQuery.isLoading,
     error: searchQuery.error,
-    isEnabled: query.length >= 2,
+    isEnabled: isAuthenticated && query.length >= 2,
   };
 }; 

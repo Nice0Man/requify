@@ -1,11 +1,22 @@
 // Auth API exports
-export { authApi, usersApi } from './auth.api';
+export { authApi } from './auth.api';
 export type { 
   LoginRequest, 
   RegisterRequest, 
-  AuthResponse,
+  LoginResponse,
+  RefreshTokenRequest,
+  RefreshTokenResponse,
+  LogoutRequest,
+  LogoutResponse,
   PasswordChangeRequest,
   PasswordResetRequest,
   PasswordResetConfirm,
-  TokenRefreshRequest
+  TokenValidationRequest,
+  TokenValidationResponse,
+  EmailVerificationRequest,
+  EmailVerificationConfirm,
+  EmailVerificationResponse,
+  ActiveSession,
+  SessionListResponse,
+  RevokeSessionRequest
 } from './auth.api'; 

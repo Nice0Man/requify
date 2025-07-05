@@ -18,27 +18,109 @@ export interface ApiError {
   details?: Record<string, any>;
 }
 
+export interface TokenManager {
+  getAccessToken(): string | null;
+  refreshToken(): Promise<string | null>;
+  clearTokens(): void;
+}
+
+// Simple TokenManager implementation using localStorage directly
+class SimpleTokenManager implements TokenManager {
+  // Use the same keys as authStorage
+  private readonly ACCESS_TOKEN_KEY = 'requify_access_token';
+  private readonly REFRESH_TOKEN_KEY = 'requify_refresh_token';
+
+  getAccessToken(): string | null {
+    try {
+      return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  async refreshToken(): Promise<string | null> {
+    try {
+      const refreshToken = localStorage.getItem(this.REFRESH_TOKEN_KEY);
+      if (!refreshToken) {
+        return null;
+      }
+
+      // Create a separate axios instance to avoid interceptor conflicts
+      const refreshClient = axios.create({
+        baseURL: '/api/v1',
+        timeout: 10000,
+      });
+
+      // Make direct refresh request to avoid circular dependency
+      const response = await refreshClient.post('/auth/refresh', 
+        new URLSearchParams({ refresh_token: refreshToken }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+
+      if (response.data?.access_token) {
+        localStorage.setItem(this.ACCESS_TOKEN_KEY, response.data.access_token);
+        if (response.data.refresh_token) {
+          localStorage.setItem(this.REFRESH_TOKEN_KEY, response.data.refresh_token);
+        }
+        
+        // Also update token expiry if provided
+        if (response.data.expires_in) {
+          const expiry = Date.now() + response.data.expires_in * 1000;
+          localStorage.setItem('requify_token_expiry', expiry.toString());
+        }
+        
+        return response.data.access_token;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      this.clearTokens();
+      return null;
+    }
+  }
+
+  clearTokens(): void {
+    try {
+      localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+      localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+      localStorage.removeItem('requify_token_expiry');
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
+}
+
 export class ApiClient {
   private client: AxiosInstance;
   private tokenManager?: TokenManager;
 
   constructor(baseURL?: string) {
-    // In development, always use proxy path for Vite proxy to work
-    // In production, use full backend URL
-    const apiBaseUrl = baseURL || (import.meta.env.DEV ? "/api/v1" : 
-      import.meta.env.VITE_API_URL || 
-      import.meta.env.VITE_API_BASE_URL || 
-      "http://backend:8000/api/v1");
+    // Determine baseURL based on environment
+    // Docker development: use VITE_API_URL if provided
+    // Standalone development: use proxy path
+    // Production: use full backend URL
+    let apiBaseUrl = baseURL;
 
-    console.log('[ApiClient] Configuration:', {
-      baseURL,
-      VITE_API_URL: import.meta.env.VITE_API_URL,
-      VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
-      DEV: import.meta.env.DEV,
-      finalApiBaseUrl: apiBaseUrl,
-    });
+    if (!apiBaseUrl) {
+      if (import.meta.env.VITE_API_URL) {
+        // Docker development or production with explicit API URL
+        apiBaseUrl = import.meta.env.VITE_API_URL;
+      } else if (import.meta.env.DEV) {
+        // Standalone development with Vite proxy
+        apiBaseUrl = "/api/v1";
+      } else {
+        // Fallback for production
+        apiBaseUrl =
+          import.meta.env.VITE_API_BASE_URL || "http://backend:8000/api/v1";
+      }
+    }
 
-
+    // Configuration logging removed
 
     this.client = axios.create({
       baseURL: apiBaseUrl,
@@ -65,14 +147,9 @@ export class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
-        
-        console.log('[ApiClient] Request:', {
-          method: config.method?.toUpperCase(),
-          url: config.url,
-          baseURL: config.baseURL,
-          fullURL: `${config.baseURL}${config.url}`,
-        });
-        
+
+        // Request logging removed
+
         return config;
       },
       (error) => {
@@ -258,11 +335,9 @@ export class ApiClient {
   }
 }
 
-export interface TokenManager {
-  getAccessToken(): string | null;
-  refreshToken(): Promise<string | null>;
-  clearTokens(): void;
-}
-
 // Create and export singleton instance
 export const apiClient = new ApiClient();
+
+// Create and set token manager
+const tokenManager = new SimpleTokenManager();
+apiClient.setTokenManager(tokenManager);

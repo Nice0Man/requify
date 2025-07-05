@@ -1,7 +1,7 @@
-// Testing pages exports - в соответствии с принципами FSD
+// Types
+export * from './types/testing.types';
 
-// UI components
-// export * from './ui'; // TODO: Create ui/index.ts
-
-// Types (if needed on page level)
-export * from './types'; 
+// Components (default exports)
+export { default as TestingPage } from './ui/TestingPage';
+export { default as TestCaseCreatePage } from './ui/TestCaseCreatePage';
+export { default as TestPlanCreatePage } from './ui/TestPlanCreatePage'; 

@@ -84,17 +84,10 @@ class TokenData(BaseModel):
 
 class LoginRequest(BaseModel):
     """Схема для запроса аутентификации."""
-
-    username: str = Field(..., min_length=1, description="Username или email")
+    email: EmailStr = Field(..., description="Email")
+    username: Optional[str] = Field(None, description="Username")
     password: str = Field(..., min_length=1, description="Пароль")
     remember_me: bool = Field(default=False, description="Запомнить меня")
-
-    @field_validator("username")
-    def validate_username(cls, v):
-        """Валидация username."""
-        if not v or not v.strip():
-            raise ValueError("Username не может быть пустым")
-        return v.strip()
 
 
 class LoginResponse(BaseModel):

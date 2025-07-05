@@ -66,20 +66,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 fontSize: { xs: '1.5rem', sm: '1.8rem' },
                 fontWeight: 700,
                 boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.3)}`,
-                animation: 'logoFloat 4s ease-in-out infinite',
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': {
-                  transform: 'scale(1.05) rotate(5deg)',
-                  boxShadow: `0 12px 40px ${alpha(theme.palette.primary.main, 0.4)}`,
-                },
-                '@keyframes logoFloat': {
-                  '0%, 100%': {
-                    transform: 'translateY(0px) rotate(0deg)',
-                  },
-                  '50%': {
-                    transform: 'translateY(-8px) rotate(3deg)',
-                  },
-                },
               }}
             >
               R
@@ -260,21 +247,11 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
       backdropFilter: 'blur(20px)',
       border: `1px solid ${alpha('#e3f2fd', 0.3)}`,
       boxShadow: `
-        0 20px 25px -5px ${alpha('#1976d2', 0.1)},
-        0 10px 10px -5px ${alpha('#1976d2', 0.04)},
-        inset 0 1px 0 ${alpha('#ffffff', 0.2)},
-        0 0 0 1px ${alpha('#e3f2fd', 0.1)}
+        0 10px 25px -5px ${alpha('#1976d2', 0.08)},
+        0 4px 12px -2px ${alpha('#1976d2', 0.04)},
+        inset 0 1px 0 ${alpha('#ffffff', 0.2)}
       `,
       p: { xs: 3, sm: 5, md: 6 },
-      '&:hover': {
-        transform: 'translateY(-4px) scale(1.01)',
-        boxShadow: `
-          0 32px 40px -12px ${alpha('#1976d2', 0.15)},
-          0 18px 20px -8px ${alpha('#1976d2', 0.08)},
-          inset 0 1px 0 ${alpha('#ffffff', 0.3)},
-          0 0 0 1px ${alpha('#e3f2fd', 0.2)}
-        `,
-      },
     };
   };
 

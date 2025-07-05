@@ -62,7 +62,7 @@ export interface SearchParams {
 // =============================================================================
 
 export interface LoginRequest {
-  username: string;
+  username: string; // OAuth2 expects 'username' field (can contain email)
   password: string;
   remember_me?: boolean;
 }

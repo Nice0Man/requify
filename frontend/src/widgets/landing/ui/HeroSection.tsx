@@ -348,6 +348,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     "&:hover": {
                       transform: "scale(1.02)",
                       boxShadow: theme.shadows[20],
+                      zIndex: 100,
                     },
                     "&::before": {
                       content: '""',
@@ -370,7 +371,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                       objectFit: "cover",
                       borderRadius: "inherit",
                       position: "relative",
-                      zIndex: 1,
+                      zIndex: 100,
                     }}
                   />
                 </Box>

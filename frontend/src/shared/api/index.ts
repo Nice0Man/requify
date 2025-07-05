@@ -11,7 +11,7 @@ export { SpecificationsApi, specificationsApi } from "./specifications.api";
 
 // Authentication API
 export { AuthApi, authApi } from "./auth.api";
-export { usersApi } from "@/features/auth/api/auth.api";
+export { usersApi } from "@/entities/user";
 
 // Entity APIs - Re-export from entities for convenience
 export { projectsApi } from "@/entities/project";

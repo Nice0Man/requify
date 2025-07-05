@@ -2,7 +2,7 @@
 // Uses user entity and handles login, registration, password management
 
 // Export auth API
-export { authApi, usersApi } from './api';
+export { authApi } from './api';
 
 // Export auth models and hooks  
 export { AuthProvider, useAuth, usePermissions } from './model';

@@ -1,26 +1,27 @@
 import { apiClient } from "@/shared/api/client";
 import type { UserProfile } from "@/entities/user";
 import type { ApiResponse } from "@/shared/types/api";
+import { authStorage } from "../model/auth.storage";
 
 // =============================================================================
 // Auth Request/Response Types (matching backend schemas exactly)
 // =============================================================================
 
 export interface LoginRequest {
-  username: string;
+  username: string; // OAuth2 expects 'username' field (can contain email)
   password: string;
-  remember_me: boolean;
+  remember_me?: boolean;
 }
 
 export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
-  confirm_password: string;
-  first_name: string;
-  last_name: string;
-  terms_accepted: boolean;
-  privacy_accepted: boolean;
+  first_name?: string;
+  last_name?: string;
+  role?: string;
+  department?: string;
+  phone?: string;
 }
 
 export interface LoginResponse {
@@ -35,7 +36,6 @@ export interface LoginResponse {
 
 export interface RefreshTokenRequest {
   refresh_token: string;
-  grant_type: 'refresh_token';
 }
 
 export interface RefreshTokenResponse {
@@ -127,9 +127,19 @@ export class AuthApi {
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
+      // OAuth2 expects form data, not JSON
+      const formData = new URLSearchParams();
+      formData.append('username', credentials.username);
+      formData.append('password', credentials.password);
+      
       const response = await apiClient.post<LoginResponse>(
         `${this.baseUrl}/login`,
-        credentials
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
       );
       return response.data;
     } catch (error: any) {
@@ -168,13 +178,12 @@ export class AuthApi {
   }
 
   /**
-   * Refresh access token with OAuth2 refresh_token grant
+   * Refresh access token
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     try {
       const refreshData: RefreshTokenRequest = {
         refresh_token: refreshToken,
-        grant_type: 'refresh_token'
       };
       
       const response = await apiClient.post<RefreshTokenResponse>(
@@ -192,13 +201,30 @@ export class AuthApi {
    */
   async validateToken(token?: string): Promise<TokenValidationResponse> {
     try {
+      // Если токен не передан, получаем текущий из storage
+      const tokenToValidate = token || authStorage.getAccessToken();
+      
+      // Проверяем что токен есть
+      if (!tokenToValidate) {
+        return {
+          valid: false,
+          expires_at: undefined,
+          user: undefined
+        };
+      }
+
       const response = await apiClient.post<TokenValidationResponse>(
         `${this.baseUrl}/validate-token`,
-        token ? { token } : {}
+        { token: tokenToValidate } // Всегда отправляем корректную схему TokenValidationRequest
       );
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.detail || "Token validation failed");
+      // При ошибке валидации возвращаем invalid вместо выброса исключения
+      return {
+        valid: false,
+        expires_at: undefined,
+        user: undefined
+      };
     }
   }
 

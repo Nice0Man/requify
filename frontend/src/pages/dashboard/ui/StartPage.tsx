@@ -20,7 +20,7 @@ import {
 } from "@mui/icons-material";
 
 import { useAuth } from "@/features/auth/model/auth.context";
-import { FullPageScroll } from "@/shared/ui";
+import { FullPageScroll, LoadingSpinner } from "@/shared/ui";
 import {
   HeroSection,
   SystemFeatures,
@@ -28,7 +28,6 @@ import {
   QuickAuth,
   LandingFooter,
 } from "@/widgets/landing";
-import { GrantType } from "@/features/auth/model/auth.types";
 
 const StartPage: React.FC = () => {
   const theme = useTheme();
@@ -38,6 +37,27 @@ const StartPage: React.FC = () => {
   const [showAuthSection, setShowAuthSection] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+
+  // Show loading spinner during initial auth check
+  if (isLoading && !isAuthenticated && !showAuthSection) {
+    return (
+      <Box 
+        sx={{ 
+          minHeight: "100vh", 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "center",
+          backgroundColor: "background.default"
+        }}
+      >
+        <LoadingSpinner 
+          size="large" 
+          message="Loading Requify..." 
+          variant="page"
+        />
+      </Box>
+    );
+  }
 
   // Handle section change
   const handleSectionChange = (index: number) => {
@@ -62,7 +82,7 @@ const StartPage: React.FC = () => {
     username: string;
     password: string;
     remember_me: boolean;
-    grant_type: GrantType;
+    grant_type: string;
   }) => {
     try {
       setAuthError(null);

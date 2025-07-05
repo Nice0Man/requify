@@ -13,25 +13,39 @@ import type {
   EmailVerificationConfirm,
   EmailVerificationResponse,
   UserProfile,
-  ActiveSession,
   SessionListResponse,
   RevokeSessionRequest,
 } from "@/shared/types/api";
+
+// Import auth storage to get current token
+import { authStorage } from "@/features/auth/model/auth.storage";
 
 export class AuthApi {
   constructor(private client = apiClient) {}
 
   // Authentication endpoints
   async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    return this.client.post<LoginResponse>("/auth/login", credentials);
+    // OAuth2 expects form data, not JSON
+    const formData = new URLSearchParams();
+    formData.append('username', credentials.username);
+    formData.append('password', credentials.password);
+    
+    return this.client.post<LoginResponse>("/auth/login", formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
   }
 
   async register(userData: {
     username: string;
     email: string;
     password: string;
-    confirm_password: string;
-    name?: string;
+    first_name?: string;
+    last_name?: string;
+    role?: string;
+    department?: string;
+    phone?: string;
   }): Promise<ApiResponse<LoginResponse>> {
     return this.client.post<LoginResponse>("/auth/register", userData);
   }
@@ -47,11 +61,30 @@ export class AuthApi {
   }
 
   async validateToken(
-    request: TokenValidationRequest
+    request?: TokenValidationRequest
   ): Promise<ApiResponse<TokenValidationResponse>> {
+    // Если request не передан или нет токена, получаем текущий из storage
+    const tokenToValidate = request?.token || authStorage.getAccessToken();
+    
+    // Проверяем что токен есть
+    if (!tokenToValidate) {
+      // Возвращаем результат с invalid вместо выброса ошибки
+      const response: TokenValidationResponse = {
+        valid: false,
+        expires_at: undefined,
+        user: undefined
+      };
+      
+      return {
+        data: response,
+        status: 200, // Технически это успешный ответ с результатом "invalid"
+        message: "No token available for validation"
+      };
+    }
+
     return this.client.post<TokenValidationResponse>(
       "/auth/validate-token",
-      request
+      { token: tokenToValidate } // Всегда отправляем корректную схему TokenValidationRequest
     );
   }
 

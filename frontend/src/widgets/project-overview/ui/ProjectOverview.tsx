@@ -13,6 +13,11 @@ import {
   useTheme,
   alpha,
   Skeleton,
+  Stack,
+  Tooltip,
+  Fade,
+  Grow,
+  Divider,
 } from '@mui/material';
 import {
   RocketLaunch,
@@ -22,6 +27,10 @@ import {
   Schedule,
   Refresh,
   ArrowForward,
+  TrendingUp,
+  Visibility,
+  WarningAmber,
+  CheckCircleOutline,
 } from '@mui/icons-material';
 
 // Using entities according to FSD
@@ -31,8 +40,14 @@ import type { ProjectWithStats } from '@/entities/project/model/types';
 // Using shared utilities
 import { formatDate } from '@/shared/utils';
 
-// Widget props from types
-import type { ProjectOverviewProps } from '../../types';
+interface ProjectOverviewProps {
+  projectId?: number;
+  showDetails?: boolean;
+  showProgress?: boolean;
+  className?: string;
+  onProjectClick?: (projectId: number) => void;
+  variant?: 'compact' | 'detailed' | 'dashboard';
+}
 
 export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
   projectId,
@@ -40,6 +55,7 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
   showProgress = true,
   className,
   onProjectClick,
+  variant = 'detailed',
 }) => {
   const theme = useTheme();
   const [project, setProject] = useState<ProjectWithStats | null>(null);
@@ -78,27 +94,73 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
     loadProject();
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (status.toLowerCase()) {
       case 'active':
         return 'success';
       case 'planning':
         return 'info';
       case 'completed':
-        return 'default';
+        return 'primary';
       case 'cancelled':
         return 'error';
+      case 'on_hold':
+        return 'warning';
       default:
-        return 'primary';
+        return 'default';
     }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return <CheckCircleOutline sx={{ fontSize: 16 }} />;
+      case 'planning':
+        return <Schedule sx={{ fontSize: 16 }} />;
+      case 'completed':
+        return <CheckCircle sx={{ fontSize: 16 }} />;
+      case 'cancelled':
+        return <WarningAmber sx={{ fontSize: 16 }} />;
+      default:
+        return <Visibility sx={{ fontSize: 16 }} />;
+    }
+  };
+
+  const getHealthScore = () => {
+    if (!project) return 0;
+    const completion = project.total_requirements > 0 
+      ? (project.requirements_completed / project.total_requirements) * 100
+      : 0;
+    
+    // Simplified health calculation
+    let score = completion * 0.6;
+    if (project.status === 'active') score += 20;
+    if (project.active_releases > 0) score += 20;
+    
+    return Math.min(Math.round(score), 100);
+  };
+
+  const getHealthColor = (score: number) => {
+    if (score >= 80) return theme.palette.success.main;
+    if (score >= 60) return theme.palette.warning.main;
+    return theme.palette.error.main;
   };
 
   if (!projectId) {
     return (
-      <Card className={className}>
-        <CardContent>
-          <Typography color="text.secondary">
-            No project selected
+      <Card 
+        className={className}
+        sx={{
+          borderRadius: 3,
+          border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+          background: alpha(theme.palette.background.paper, 0.6),
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <CardContent sx={{ textAlign: 'center', py: 4 }}>
+          <RocketLaunch sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+          <Typography color="text.secondary" variant="body1">
+            Select a project to view details
           </Typography>
         </CardContent>
       </Card>
@@ -107,12 +169,27 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
 
   if (error) {
     return (
-      <Card className={className}>
-        <CardContent>
-          <Typography color="error" variant="body2">
+      <Card 
+        className={className}
+        sx={{
+          borderRadius: 3,
+          border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+          background: alpha(theme.palette.error.main, 0.02),
+        }}
+      >
+        <CardContent sx={{ textAlign: 'center', py: 4 }}>
+          <WarningAmber sx={{ fontSize: 48, color: 'error.main', mb: 2 }} />
+          <Typography color="error" variant="body1" sx={{ mb: 2 }}>
             {error}
           </Typography>
-          <IconButton onClick={handleRefresh} size="small">
+          <IconButton 
+            onClick={handleRefresh} 
+            color="error"
+            sx={{ 
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+            }}
+          >
             <Refresh />
           </IconButton>
         </CardContent>
@@ -122,16 +199,27 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
 
   if (isLoading) {
     return (
-      <Card className={className}>
+      <Card 
+        className={className}
+        sx={{
+          borderRadius: 3,
+          border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+          background: theme.palette.background.paper,
+        }}
+      >
         <CardHeader
-          avatar={<Skeleton variant="circular" width={40} height={40} />}
-          title={<Skeleton variant="text" width="60%" />}
-          action={<Skeleton variant="circular" width={24} height={24} />}
+          avatar={<Skeleton variant="circular" width={48} height={48} />}
+          title={<Skeleton variant="text" width="60%" height={28} />}
+          subheader={<Skeleton variant="text" width="40%" height={20} />}
+          action={<Skeleton variant="circular" width={32} height={32} />}
         />
         <CardContent>
           <Skeleton variant="text" width="80%" sx={{ mb: 2 }} />
-          <Skeleton variant="rectangular" height={60} sx={{ mb: 2 }} />
-          <Skeleton variant="text" width="100%" />
+          <Skeleton variant="rectangular" height={80} sx={{ mb: 2, borderRadius: 2 }} />
+          <Stack direction="row" spacing={2}>
+            <Skeleton variant="rectangular" width="48%" height={60} sx={{ borderRadius: 2 }} />
+            <Skeleton variant="rectangular" width="48%" height={60} sx={{ borderRadius: 2 }} />
+          </Stack>
         </CardContent>
       </Card>
     );
@@ -139,9 +227,18 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
 
   if (!project) {
     return (
-      <Card className={className}>
-        <CardContent>
-          <Typography color="text.secondary">
+      <Card 
+        className={className}
+        sx={{
+          borderRadius: 3,
+          border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+          background: alpha(theme.palette.background.paper, 0.6),
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <CardContent sx={{ textAlign: 'center', py: 4 }}>
+          <RocketLaunch sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+          <Typography color="text.secondary" variant="body1">
             Project not found
           </Typography>
         </CardContent>
@@ -153,152 +250,363 @@ export const ProjectOverview: React.FC<ProjectOverviewProps> = ({
     ? Math.round((project.requirements_completed / project.total_requirements) * 100)
     : 0;
 
+  const healthScore = getHealthScore();
+
   return (
-    <Card 
-      className={className}
-      sx={{
-        borderRadius: 3,
-        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black, 0.08)}`,
-        cursor: onProjectClick ? 'pointer' : 'default',
-        transition: 'all 0.3s ease',
-        '&:hover': onProjectClick ? {
-          transform: 'translateY(-2px)',
-          boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.12)}`,
-        } : {},
-      }}
-      onClick={handleProjectClick}
-    >
-      <CardHeader
-        avatar={
-          <Avatar
-            sx={{
-              bgcolor: theme.palette.primary.main,
-              width: 40,
-              height: 40,
-            }}
-          >
-            <RocketLaunch />
-          </Avatar>
-        }
-        title={
-          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
-            {project.name}
-          </Typography>
-        }
-        subheader={project.code}
-        action={
-          <Box display="flex" alignItems="center" gap={1}>
-            <Chip
-              label={project.status}
-              color={getStatusColor(project.status) as any}
-              size="small"
-              sx={{ fontWeight: 600 }}
-            />
-            <IconButton size="small" onClick={handleRefresh}>
-              <Refresh />
-            </IconButton>
-            {onProjectClick && (
-              <IconButton size="small">
-                <ArrowForward />
-              </IconButton>
-            )}
-          </Box>
-        }
-        sx={{ pb: 1 }}
-      />
-
-      <CardContent sx={{ pt: 0 }}>
-        {project.description && (
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
-            sx={{ mb: 2, lineHeight: 1.5 }}
-          >
-            {project.description}
-          </Typography>
-        )}
-
-        {showProgress && (
-          <Box mb={2}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-              <Typography variant="body2" color="text.secondary">
-                Progress
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {completionPercentage}%
-              </Typography>
-            </Box>
-            <LinearProgress
-              variant="determinate"
-              value={completionPercentage}
-              sx={{
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 4,
-                  background: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.primary.main})`,
-                },
-              }}
-            />
-          </Box>
-        )}
-
-        {showDetails && (
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Assignment sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="caption" color="text.secondary">
-                  Requirements
-                </Typography>
-              </Box>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {project.requirements_completed}/{project.total_requirements}
-              </Typography>
-            </Grid>
-
-            <Grid item xs={6}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <CheckCircle sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="caption" color="text.secondary">
-                  Releases
-                </Typography>
-              </Box>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {project.active_releases}
-              </Typography>
-            </Grid>
-
-            {project.specs_count !== undefined && (
-              <Grid item xs={6}>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <People sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="caption" color="text.secondary">
-                    Specs
-                  </Typography>
+    <Grow in timeout={600}>
+      <Card 
+        className={className}
+        sx={{
+          borderRadius: 3,
+          border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+          boxShadow: `0 4px 24px ${alpha(theme.palette.common.black, 0.06)}`,
+          background: theme.palette.background.paper,
+          cursor: onProjectClick ? 'pointer' : 'default',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          overflow: 'hidden',
+          '&:hover': onProjectClick ? {
+            transform: 'translateY(-4px)',
+            boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.12)}`,
+            '& .project-header': {
+              background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.02)}, ${alpha(theme.palette.secondary.main, 0.02)})`,
+            },
+          } : {},
+        }}
+        onClick={handleProjectClick}
+      >
+        <CardHeader
+          className="project-header"
+          avatar={
+            <Box position="relative">
+              <Avatar
+                sx={{
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  width: 48,
+                  height: 48,
+                  boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+                }}
+              >
+                <RocketLaunch />
+              </Avatar>
+              {healthScore >= 80 && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: -4,
+                    right: -4,
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    background: theme.palette.success.main,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: `2px solid ${theme.palette.background.paper}`,
+                  }}
+                >
+                  <TrendingUp sx={{ fontSize: 12, color: 'white' }} />
                 </Box>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {project.specs_count}
-                </Typography>
-              </Grid>
-            )}
-
-            <Grid item xs={6}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Schedule sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="caption" color="text.secondary">
-                  Created
-                </Typography>
-              </Box>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              )}
+            </Box>
+          }
+          title={
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                {project.name}
+              </Typography>
+              <Tooltip title={`Health Score: ${healthScore}%`}>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: getHealthColor(healthScore),
+                    boxShadow: `0 0 8px ${alpha(getHealthColor(healthScore), 0.6)}`,
+                  }}
+                />
+              </Tooltip>
+            </Stack>
+          }
+          subheader={
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
+              <Typography variant="body2" color="text.secondary">
+                {project.code}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                •
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
                 {formatDate(project.created_at)}
               </Typography>
-            </Grid>
-          </Grid>
-        )}
-      </CardContent>
-    </Card>
+            </Stack>
+          }
+          action={
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Chip
+                icon={getStatusIcon(project.status)}
+                label={project.status}
+                color={getStatusColor(project.status)}
+                size="small"
+                sx={{ 
+                  fontWeight: 600,
+                  '& .MuiChip-icon': {
+                    marginLeft: 1,
+                  },
+                }}
+              />
+              <IconButton 
+                size="small" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRefresh();
+                }}
+                sx={{
+                  borderRadius: 2,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                  },
+                }}
+              >
+                <Refresh />
+              </IconButton>
+              {onProjectClick && (
+                <IconButton 
+                  size="small"
+                  sx={{
+                    borderRadius: 2,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    '&:hover': {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                      borderColor: alpha(theme.palette.primary.main, 0.2),
+                      transform: 'translateX(2px)',
+                    },
+                  }}
+                >
+                  <ArrowForward />
+                </IconButton>
+              )}
+            </Stack>
+          }
+          sx={{ pb: 1 }}
+        />
+
+        <CardContent sx={{ pt: 0 }}>
+          {project.description && (
+            <Fade in timeout={800}>
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ 
+                  mb: 3, 
+                  lineHeight: 1.6,
+                  display: '-webkit-box',
+                  WebkitLineClamp: variant === 'compact' ? 2 : 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {project.description}
+              </Typography>
+            </Fade>
+          )}
+
+          {showProgress && (
+            <Fade in timeout={1000}>
+              <Box mb={3}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    Project Progress
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    {completionPercentage}%
+                  </Typography>
+                </Stack>
+                <LinearProgress
+                  variant="determinate"
+                  value={completionPercentage}
+                  sx={{
+                    height: 10,
+                    borderRadius: 5,
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                    '& .MuiLinearProgress-bar': {
+                      borderRadius: 5,
+                      background: `linear-gradient(90deg, ${theme.palette.success.main}, ${theme.palette.primary.main})`,
+                      boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}`,
+                    },
+                  }}
+                />
+              </Box>
+            </Fade>
+          )}
+
+          {showDetails && (
+            <Fade in timeout={1200}>
+              <Box>
+                <Divider sx={{ mb: 2, opacity: 0.6 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Stack 
+                      direction="row" 
+                      alignItems="center" 
+                      spacing={1}
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        background: alpha(theme.palette.info.main, 0.04),
+                        border: `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 1.5,
+                          background: alpha(theme.palette.info.main, 0.1),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: theme.palette.info.main,
+                        }}
+                      >
+                        <Assignment sx={{ fontSize: 16 }} />
+                      </Box>
+                      <Stack spacing={0.5}>
+                        <Typography variant="caption" color="text.secondary">
+                          Requirements
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {project.requirements_completed}/{project.total_requirements}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Grid>
+
+                  <Grid item xs={6}>
+                    <Stack 
+                      direction="row" 
+                      alignItems="center" 
+                      spacing={1}
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        background: alpha(theme.palette.success.main, 0.04),
+                        border: `1px solid ${alpha(theme.palette.success.main, 0.1)}`,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 1.5,
+                          background: alpha(theme.palette.success.main, 0.1),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: theme.palette.success.main,
+                        }}
+                      >
+                        <CheckCircle sx={{ fontSize: 16 }} />
+                      </Box>
+                      <Stack spacing={0.5}>
+                        <Typography variant="caption" color="text.secondary">
+                          Releases
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {project.active_releases}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Grid>
+
+                  {project.specs_count !== undefined && (
+                    <Grid item xs={6}>
+                      <Stack 
+                        direction="row" 
+                        alignItems="center" 
+                        spacing={1}
+                        sx={{
+                          p: 1.5,
+                          borderRadius: 2,
+                          background: alpha(theme.palette.warning.main, 0.04),
+                          border: `1px solid ${alpha(theme.palette.warning.main, 0.1)}`,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 1.5,
+                            background: alpha(theme.palette.warning.main, 0.1),
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: theme.palette.warning.main,
+                          }}
+                        >
+                          <People sx={{ fontSize: 16 }} />
+                        </Box>
+                        <Stack spacing={0.5}>
+                          <Typography variant="caption" color="text.secondary">
+                            Specifications
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {project.specs_count}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                  )}
+
+                  <Grid item xs={6}>
+                    <Stack 
+                      direction="row" 
+                      alignItems="center" 
+                      spacing={1}
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        background: alpha(theme.palette.secondary.main, 0.04),
+                        border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 1.5,
+                          background: alpha(theme.palette.secondary.main, 0.1),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: theme.palette.secondary.main,
+                        }}
+                      >
+                        <Schedule sx={{ fontSize: 16 }} />
+                      </Box>
+                      <Stack spacing={0.5}>
+                        <Typography variant="caption" color="text.secondary">
+                          Health Score
+                        </Typography>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            fontWeight: 600,
+                            color: getHealthColor(healthScore),
+                          }}
+                        >
+                          {healthScore}%
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Grid>
+                </Grid>
+              </Box>
+            </Fade>
+          )}
+        </CardContent>
+      </Card>
+    </Grow>
   );
 }; 

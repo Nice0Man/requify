@@ -25,7 +25,6 @@ const LoginPage: React.FC = () => {
     username: "",
     password: "",
     remember_me: false,
-    grant_type: "password",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,10 +65,9 @@ const LoginPage: React.FC = () => {
 
     try {
       const loginData: LoginFormData = {
-        username: formData.username,
+        username: formData.username, // username contains email in the form
         password: formData.password,
         remember_me: formData.remember_me || false,
-        grant_type: "password",
       };
 
       await login(loginData);

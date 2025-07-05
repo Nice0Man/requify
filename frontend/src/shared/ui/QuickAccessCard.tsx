@@ -3,38 +3,65 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Grid,
   Typography,
   Box,
-  LinearProgress,
-  Chip,
   IconButton,
-  Skeleton,
+  Grid,
+  Chip,
+  Avatar,
   useTheme,
   alpha,
-  Button,
-  Fade,
+  Skeleton,
   Stack,
 } from "@mui/material";
 import {
-  MoreVert,
   FolderOpen,
   Assignment,
-  Group,
-  Schedule,
-  Warning,
   CheckCircle,
+  Warning,
   Error,
+  MoreVert,
+  Visibility,
+  TrendingUp,
+  Schedule,
   Person,
-  ArrowForward,
-  Circle,
+  AccessTime,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import {
-  QuickProject,
-  QuickRequirement,
-  PendingApproval,
-} from "@/shared/api/types/schemas";
+
+// Local type definitions instead of importing from non-existent schemas
+interface QuickProject {
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  health: string;
+  completion_percentage: number;
+  team_size: number;
+  next_milestone?: string;
+  updated_at: string;
+}
+
+interface QuickRequirement {
+  id: number;
+  title: string;
+  priority: string;
+  status: string;
+  project_name: string;
+  assignee_name?: string;
+  due_date?: string;
+  updated_at: string;
+}
+
+interface PendingApproval {
+  id: number;
+  title: string;
+  type: string;
+  urgency: string;
+  requester_name: string;
+  requested_at: string;
+  project_name?: string;
+}
 
 export interface QuickAccessProps {
   projects: QuickProject[];

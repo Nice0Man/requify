@@ -18,7 +18,6 @@ export interface AuthState {
   requireEmailVerification: boolean;
   allowRegistration: boolean;
   allowPasswordReset: boolean;
-  grant_type: GrantType;
 }
 
 export interface AuthError {
@@ -28,13 +27,11 @@ export interface AuthError {
 }
 
 // =============================================================================
-// Form Data Types
+// Form Data Types (matching backend schemas)
 // =============================================================================
 
-export type GrantType = "password" | "refresh_token";
-
 export interface LoginFormData {
-  username: string;
+  username: string; // Contains email in form
   password: string;
   remember_me: boolean;
 }
@@ -43,9 +40,14 @@ export interface RegisterFormData {
   username: string;
   email: string;
   password: string;
+  // Backend validation fields (handled on frontend)
   confirm_password: string;
-  first_name: string;
-  last_name: string;
+  first_name?: string;
+  last_name?: string;
+  role?: string;
+  department?: string;
+  phone?: string;
+  // UI only fields for terms/privacy (not sent to backend)
   terms_accepted: boolean;
   privacy_accepted: boolean;
 }
@@ -75,7 +77,7 @@ export interface EmailVerificationConfirmFormData {
 }
 
 // =============================================================================
-// Session Types
+// Session Types (matching backend schemas)
 // =============================================================================
 
 export interface ActiveSession {
@@ -156,26 +158,26 @@ export interface AuthContextType {
   permissions: string[];
   sessions: ActiveSession[];
   error: AuthError | null;
-  grant_type: GrantType;
   requireEmailVerification: boolean;
   allowRegistration: boolean;
   allowPasswordReset: boolean;
-    
+
   // Actions
   login: (credentials: LoginFormData) => Promise<void>;
   register: (userData: RegisterFormData) => Promise<void>;
   logout: (logoutAll?: boolean) => Promise<void>;
-  setGrantType: (grantType: GrantType) => void; 
   refreshToken: () => Promise<void>;
   updateUser: (userData: Partial<UserProfile>) => Promise<void>;
   changePassword: (data: PasswordChangeFormData) => Promise<void>;
   requestPasswordReset: (data: PasswordResetFormData) => Promise<void>;
   confirmPasswordReset: (data: PasswordResetConfirmFormData) => Promise<void>;
   requestEmailVerification: (data: EmailVerificationFormData) => Promise<void>;
-  confirmEmailVerification: (data: EmailVerificationConfirmFormData) => Promise<void>;
+  confirmEmailVerification: (
+    data: EmailVerificationConfirmFormData
+  ) => Promise<void>;
   getSessions: () => Promise<void>;
   revokeSessions: (sessionIds?: number[], revokeAll?: boolean) => Promise<void>;
-  
+
   // Utilities
   clearError: () => void;
   hasPermission: (permission: string) => boolean;

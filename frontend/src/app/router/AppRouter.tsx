@@ -82,11 +82,11 @@ const NotFoundPage = React.lazy(
 );
 
 // Enhanced Loading component with modern design
-const LoadingFallback: React.FC<{ message?: string }> = ({ 
-  message = "Loading..." 
+const LoadingFallback: React.FC<{ message?: string }> = ({
+  message = "Loading...",
 }) => {
   const theme = useTheme();
-  
+
   return (
     <Fade in timeout={300}>
       <Box
@@ -272,11 +272,9 @@ const LoadingFallback: React.FC<{ message?: string }> = ({
 };
 
 // Page-specific loading components
-const PageLoadingFallback: React.FC<{ pageName?: string }> = ({ 
-  pageName = "page" 
-}) => (
-  <LoadingFallback message={`Loading ${pageName}...`} />
-);
+const PageLoadingFallback: React.FC<{ pageName?: string }> = ({
+  pageName = "page",
+}) => <LoadingFallback message={`Loading ${pageName}...`} />;
 
 const AuthLoadingFallback: React.FC = () => (
   <LoadingFallback message="Preparing authentication..." />
@@ -341,7 +339,9 @@ export const AppRouter: React.FC = () => {
             isAuthenticated ? (
               <Navigate to="/dashboard" replace />
             ) : (
-              <Suspense fallback={<PageLoadingFallback pageName="password reset" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="password reset" />}
+              >
                 <PasswordResetRequestPage />
               </Suspense>
             )
@@ -353,39 +353,45 @@ export const AppRouter: React.FC = () => {
             isAuthenticated ? (
               <Navigate to="/dashboard" replace />
             ) : (
-              <Suspense fallback={<PageLoadingFallback pageName="password reset" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="password reset" />}
+              >
                 <PasswordResetConfirmPage />
               </Suspense>
             )
           }
         />
-        <Route 
-          path="/verify-email" 
+        <Route
+          path="/verify-email"
           element={
-            <Suspense fallback={<PageLoadingFallback pageName="email verification" />}>
+            <Suspense
+              fallback={<PageLoadingFallback pageName="email verification" />}
+            >
               <EmailVerificationPage />
             </Suspense>
-          } 
+          }
         />
 
         {/* Start Page - Public Route */}
-        <Route 
-          path="/start" 
+        <Route
+          path="/start"
           element={
             <Suspense fallback={<PageLoadingFallback pageName="start page" />}>
               <StartPage />
             </Suspense>
-          } 
+          }
         />
 
         {/* API Overview - Public Route */}
-        <Route 
-          path="/api-overview" 
+        <Route
+          path="/api-overview"
           element={
-            <Suspense fallback={<PageLoadingFallback pageName="API overview" />}>
+            <Suspense
+              fallback={<PageLoadingFallback pageName="API overview" />}
+            >
               <ApiOverviewPage />
             </Suspense>
-          } 
+          }
         />
 
         {/* Root redirect to start */}
@@ -401,72 +407,86 @@ export const AppRouter: React.FC = () => {
           }
         >
           {/* Dashboard */}
-          <Route 
-            path="dashboard" 
+          <Route
+            path="dashboard"
             element={
               <Suspense fallback={<DashboardLoadingFallback />}>
                 <DashboardPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Kanban Board */}
-          <Route 
-            path="kanban" 
+          <Route
+            path="kanban"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="kanban board" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="kanban board" />}
+              >
                 <KanbanPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Projects */}
-          <Route 
-            path="projects" 
+          <Route
+            path="projects"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="projects" />}>
                 <ProjectsPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="projects/create" 
+          <Route
+            path="projects/create"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="project creation" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="project creation" />}
+              >
                 <ProjectCreatePage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="projects/:id/edit" 
+          <Route
+            path="projects/:id/edit"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="project editor" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="project editor" />}
+              >
                 <ProjectEditPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="projects/:id" 
+          <Route
+            path="projects/:id"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="project details" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="project details" />}
+              >
                 <ProjectDetailsPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Requirements */}
-          <Route 
-            path="requirements" 
+          <Route
+            path="requirements"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="requirements" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="requirements" />}
+              >
                 <RequirementsPage />
               </Suspense>
-            } 
+            }
           />
           <Route
             path="requirements/create"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="requirement creation" />}>
+              <Suspense
+                fallback={
+                  <PageLoadingFallback pageName="requirement creation" />
+                }
+              >
                 <RequirementCreatePage />
               </Suspense>
             }
@@ -474,170 +494,200 @@ export const AppRouter: React.FC = () => {
           <Route
             path="requirements/:id/edit"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="requirement editor" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="requirement editor" />}
+              >
                 <RequirementCreatePage />
               </Suspense>
             }
           />
-          <Route 
-            path="requirements/:id" 
+          <Route
+            path="requirements/:id"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="requirement details" />}>
+              <Suspense
+                fallback={
+                  <PageLoadingFallback pageName="requirement details" />
+                }
+              >
                 <RequirementDetailsPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Activity page */}
-          <Route 
-            path="activity" 
+          <Route
+            path="activity"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="activity" />}>
                 <RequirementsPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Notifications */}
-          <Route 
-            path="notifications" 
+          <Route
+            path="notifications"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="notifications" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="notifications" />}
+              >
                 <DashboardPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Project sub-routes */}
           <Route
             path="projects/:id/requirements"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="project requirements" />}>
+              <Suspense
+                fallback={
+                  <PageLoadingFallback pageName="project requirements" />
+                }
+              >
                 <RequirementsPage />
               </Suspense>
             }
           />
-          <Route 
-            path="projects/:id/releases" 
+          <Route
+            path="projects/:id/releases"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="project releases" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="project releases" />}
+              >
                 <ReleasesPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="projects/:id/settings" 
+          <Route
+            path="projects/:id/settings"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="project settings" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="project settings" />}
+              >
                 <ProjectEditPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Testing Routes */}
-          <Route 
-            path="testing" 
+          <Route
+            path="testing"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="testing" />}>
                 <TestingPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="testing/plans/create" 
+          <Route
+            path="testing/plans/create"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="test plan creation" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="test plan creation" />}
+              >
                 <TestPlanCreatePage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="testing/cases/create" 
+          <Route
+            path="testing/cases/create"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="test case creation" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="test case creation" />}
+              >
                 <TestCaseCreatePage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="testing/reports" 
+          <Route
+            path="testing/reports"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="test reports" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="test reports" />}
+              >
                 <ReportsPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="testing/execute" 
+          <Route
+            path="testing/execute"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="test execution" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="test execution" />}
+              >
                 <TestingPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Team */}
-          <Route 
-            path="team" 
+          <Route
+            path="team"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="team" />}>
                 <DashboardPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Activity History */}
-          <Route 
-            path="history" 
+          <Route
+            path="history"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="history" />}>
                 <DashboardPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Releases */}
-          <Route 
-            path="releases" 
+          <Route
+            path="releases"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="releases" />}>
                 <ReleasesPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="releases/create" 
+          <Route
+            path="releases/create"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="release creation" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="release creation" />}
+              >
                 <ReleaseCreatePage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="releases/:id" 
+          <Route
+            path="releases/:id"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="release details" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="release details" />}
+              >
                 <ReleaseDetailsPage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="releases/:id/edit" 
+          <Route
+            path="releases/:id/edit"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="release editor" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="release editor" />}
+              >
                 <ReleaseEditPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Reports */}
-          <Route 
-            path="reports" 
+          <Route
+            path="reports"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="reports" />}>
                 <ReportsPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Admin */}
@@ -645,7 +695,9 @@ export const AppRouter: React.FC = () => {
             path="admin/*"
             element={
               <PrivateRoute requiredPermissions={["admin:read"]}>
-                <Suspense fallback={<PageLoadingFallback pageName="admin panel" />}>
+                <Suspense
+                  fallback={<PageLoadingFallback pageName="admin panel" />}
+                >
                   <AdminPage />
                 </Suspense>
               </PrivateRoute>
@@ -653,58 +705,64 @@ export const AppRouter: React.FC = () => {
           />
 
           {/* Profile/Auth Routes */}
-          <Route 
-            path="profile" 
+          <Route
+            path="profile"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="profile" />}>
                 <ProfilePage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="profile/settings" 
+          <Route
+            path="profile/settings"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="profile settings" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="profile settings" />}
+              >
                 <ProfilePage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="profile/password" 
+          <Route
+            path="profile/password"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="password change" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="password change" />}
+              >
                 <PasswordChangePage />
               </Suspense>
-            } 
+            }
           />
-          <Route 
-            path="settings" 
+          <Route
+            path="settings"
             element={
               <Suspense fallback={<PageLoadingFallback pageName="settings" />}>
                 <SettingsPage />
               </Suspense>
-            } 
+            }
           />
 
           {/* Auth - Password Change (requires authentication) */}
-          <Route 
-            path="auth/change-password" 
+          <Route
+            path="auth/change-password"
             element={
-              <Suspense fallback={<PageLoadingFallback pageName="password change" />}>
+              <Suspense
+                fallback={<PageLoadingFallback pageName="password change" />}
+              >
                 <PasswordChangePage />
               </Suspense>
-            } 
+            }
           />
         </Route>
 
         {/* 404 */}
-        <Route 
-          path="*" 
+        <Route
+          path="*"
           element={
             <Suspense fallback={<PageLoadingFallback pageName="page" />}>
               <NotFoundPage />
             </Suspense>
-          } 
+          }
         />
       </Routes>
     </Suspense>

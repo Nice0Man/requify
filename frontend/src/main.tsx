@@ -45,6 +45,8 @@ const styleElement = document.createElement("style");
 styleElement.textContent = hideScrollbarStyles;
 document.head.insertBefore(styleElement, document.head.firstChild);
 
+// Debug utilities removed
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />

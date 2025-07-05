@@ -89,19 +89,19 @@ export interface UserProfile {
   id: number; // Исправлено: было string
   username: string;
   email: string;
-  name?: string;
-  role: UserRoleValue;
+  name?: string; // This field exists in backend auth.py UserProfile
+  role: string;
   is_active: boolean;
   is_superuser: boolean;
   email_verified: boolean;
   email_verified_at?: string;
   last_login?: string;
-  permissions?: string[];
   
-  // UI расширения (не в бэкенде)
+  // UI расширения (не в бэкенде) - marked as optional
   avatar?: string;
   first_name?: string;
   last_name?: string;
+  permissions?: string[];
 }
 
 // =============================================================================
