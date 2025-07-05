@@ -5,10 +5,21 @@ import {
   Toolbar,
   Typography,
   Button,
+  IconButton,
+  Tooltip,
+  Chip,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { useTheme, alpha } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { Dashboard, ArrowBack } from "@mui/icons-material";
+import { 
+  Dashboard, 
+  ArrowBack, 
+  Info, 
+  ContactSupport, 
+  Language,
+  GitHub,
+  Description,
+} from "@mui/icons-material";
 
 import { useAuth } from "@/features/auth/model/auth.context";
 import { FullPageScroll } from "@/shared/ui";
@@ -129,32 +140,160 @@ const StartPage: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "background.default" }}>
-      {/* Navigation Bar */}
+      {/* Enhanced Navigation Bar */}
       <AppBar
         position="fixed"
         elevation={0}
         sx={{
-          backgroundColor: "background.paper",
+          backgroundColor: alpha(theme.palette.background.paper, 0.95),
           backdropFilter: "blur(20px)",
           borderBottom: `1px solid ${theme.palette.divider}`,
           zIndex: 1200,
+          height: { xs: 72, md: 80 },
         }}
       >
-        <Toolbar>
-          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Dashboard sx={{ mr: 2, color: theme.palette.primary.main }} />
-            <Typography
-              variant="h6"
+        <Toolbar
+          sx={{
+            height: "100%",
+            px: { xs: 2, md: 4 },
+            minHeight: { xs: 72, md: 80 },
+          }}
+        >
+          {/* Logo Section - Enhanced */}
+          <Box 
+            sx={{ 
+              display: "flex", 
+              alignItems: "center", 
+              flexGrow: 1,
+              cursor: "pointer",
+            }}
+            onClick={() => navigate("/")}
+          >
+            <Box
               sx={{
-                fontWeight: 700,
-                color: "text.primary",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: { xs: 48, md: 56 },
+                height: { xs: 48, md: 56 },
+                borderRadius: 3,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                mr: { xs: 2, md: 3 },
+                boxShadow: theme.shadows[8],
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: theme.shadows[12],
+                },
               }}
             >
-              Requify
-            </Typography>
+              <Dashboard 
+                sx={{ 
+                  fontSize: { xs: "2rem", md: "2.2rem" },
+                  color: "white",
+                }} 
+              />
+            </Box>
+            <Box>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: "1.8rem", md: "2.2rem" },
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1,
+                }}
+              >
+                Requify
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: "0.75rem",
+                  color: theme.palette.text.secondary,
+                  fontWeight: 500,
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Requirements Management
+              </Typography>
+            </Box>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* Status Badge */}
+          <Chip
+            label="Beta"
+            size="small"
+            sx={{
+              backgroundColor: theme.palette.success.main,
+              color: "white",
+              fontWeight: 600,
+              fontSize: "0.7rem",
+              height: 24,
+              mr: 2,
+              display: { xs: "none", sm: "flex" },
+            }}
+          />
+
+          {/* Navigation Buttons */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* Documentation */}
+            <Tooltip title="Documentation">
+              <IconButton
+                onClick={() => window.open("/docs", "_blank")}
+                sx={{
+                  color: theme.palette.text.secondary,
+                  "&:hover": {
+                    color: theme.palette.primary.main,
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  },
+                  display: { xs: "none", md: "flex" },
+                }}
+              >
+                <Description />
+              </IconButton>
+            </Tooltip>
+
+            {/* GitHub */}
+            <Tooltip title="GitHub Repository">
+              <IconButton
+                onClick={() => window.open("https://github.com/requify", "_blank")}
+                sx={{
+                  color: theme.palette.text.secondary,
+                  "&:hover": {
+                    color: theme.palette.text.primary,
+                    backgroundColor: alpha(theme.palette.grey[500], 0.1),
+                  },
+                  display: { xs: "none", md: "flex" },
+                }}
+              >
+                <GitHub />
+              </IconButton>
+            </Tooltip>
+
+            {/* Support */}
+            <Tooltip title="Support & Help">
+              <IconButton
+                onClick={() => navigate("/support")}
+                sx={{
+                  color: theme.palette.text.secondary,
+                  "&:hover": {
+                    color: theme.palette.info.main,
+                    backgroundColor: alpha(theme.palette.info.main, 0.1),
+                  },
+                  display: { xs: "none", sm: "flex" },
+                }}
+              >
+                <ContactSupport />
+              </IconButton>
+            </Tooltip>
+
+            {/* Back Button (when in auth section) */}
             {showAuthSection && (
               <Button
                 variant="text"
@@ -163,36 +302,82 @@ const StartPage: React.FC = () => {
                 sx={{
                   textTransform: "none",
                   color: "text.primary",
+                  fontWeight: 600,
+                  px: 2,
+                  borderRadius: 2,
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.grey[500], 0.1),
+                  },
                 }}
               >
                 Back
               </Button>
             )}
 
+            {/* Main Action Buttons */}
             {isAuthenticated ? (
               <Button
                 variant="contained"
                 onClick={() => navigate("/dashboard")}
                 sx={{
                   textTransform: "none",
-                  fontWeight: 600,
-                  borderRadius: 2,
+                  fontWeight: 700,
+                  fontSize: { xs: "0.9rem", md: "1rem" },
+                  px: { xs: 2, md: 3 },
+                  py: { xs: 1, md: 1.2 },
+                  borderRadius: 3,
+                  boxShadow: theme.shadows[4],
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                  "&:hover": {
+                    boxShadow: theme.shadows[8],
+                    transform: "translateY(-1px)",
+                  },
+                  transition: "all 0.3s ease",
                 }}
               >
                 Dashboard
               </Button>
             ) : !showAuthSection ? (
-              <Button
-                variant="outlined"
-                onClick={handleSignIn}
-                sx={{
-                  textTransform: "none",
-                  fontWeight: 600,
-                  borderRadius: 2,
-                }}
-              >
-                Sign In
-              </Button>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  variant="text"
+                  onClick={() => navigate("/demo")}
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 600,
+                    color: theme.palette.text.primary,
+                    px: 2,
+                    borderRadius: 2,
+                    display: { xs: "none", sm: "flex" },
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.grey[500], 0.1),
+                    },
+                  }}
+                >
+                  Demo
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSignIn}
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 700,
+                    fontSize: { xs: "0.9rem", md: "1rem" },
+                    px: { xs: 2.5, md: 3.5 },
+                    py: { xs: 1, md: 1.2 },
+                    borderRadius: 3,
+                    boxShadow: theme.shadows[4],
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                    "&:hover": {
+                      boxShadow: theme.shadows[8],
+                      transform: "translateY(-1px)",
+                    },
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Sign In
+                </Button>
+              </Box>
             ) : null}
           </Box>
         </Toolbar>
@@ -200,7 +385,7 @@ const StartPage: React.FC = () => {
 
       {/* Main Content */}
       {!showAuthSection ? (
-        <Box sx={{ pt: 8 }}>
+        <Box sx={{ pt: { xs: 9, md: 10 } }}>
           <FullPageScroll
             onSectionChange={handleSectionChange}
             showNavigation={true}
@@ -226,7 +411,7 @@ const StartPage: React.FC = () => {
         </Box>
       ) : (
         /* Authentication Section */
-        <Box sx={{ pt: 8 }}>
+        <Box sx={{ pt: { xs: 9, md: 10 } }}>
           <QuickAuth
             onLogin={handleLogin}
             onRegister={handleRegister}
