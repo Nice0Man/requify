@@ -1,7 +1,7 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { App } from './app'
-import './app/styles/index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { App } from "./app";
+import "./app/styles/index.css";
 
 // Force hide scrollbars immediately
 const hideScrollbarStyles = `
@@ -41,12 +41,12 @@ const hideScrollbarStyles = `
 `;
 
 // Inject styles immediately
-const styleElement = document.createElement('style');
+const styleElement = document.createElement("style");
 styleElement.textContent = hideScrollbarStyles;
 document.head.insertBefore(styleElement, document.head.firstChild);
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-) 
+  </React.StrictMode>
+);

@@ -17,11 +17,63 @@
     <!-- Title -->
     <title>Requify - Requirements Management System</title>
     
-    <!-- Prevent FOUC (Flash of Unstyled Content) -->
+    <!-- CRITICAL: Hide scrollbars immediately before any content loads -->
     <style>
+      /* Hide scrollbars for all browsers - HIGHEST PRIORITY */
+      html, body, #root, *, div, section, main, article, aside, nav, header, footer {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
+      
+      html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
+      *::-webkit-scrollbar, div::-webkit-scrollbar, section::-webkit-scrollbar,
+      main::-webkit-scrollbar, article::-webkit-scrollbar, aside::-webkit-scrollbar,
+      nav::-webkit-scrollbar, header::-webkit-scrollbar, footer::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+        -webkit-appearance: none !important;
+      }
+      
+      html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, #root::-webkit-scrollbar-track,
+      *::-webkit-scrollbar-track {
+        display: none !important;
+        background: transparent !important;
+      }
+      
+      html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, #root::-webkit-scrollbar-thumb,
+      *::-webkit-scrollbar-thumb {
+        display: none !important;
+        background: transparent !important;
+      }
+      
+      html::-webkit-scrollbar-corner, body::-webkit-scrollbar-corner, #root::-webkit-scrollbar-corner,
+      *::-webkit-scrollbar-corner {
+        display: none !important;
+        background: transparent !important;
+      }
+      
+      /* Base styles */
+      html {
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      
       #root {
         min-height: 100vh;
         background-color: #ffffff;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
       
       /* Loading spinner for initial load */
