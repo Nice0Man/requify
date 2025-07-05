@@ -50,12 +50,12 @@ const StartPage: React.FC = () => {
     if (isAuthenticated) {
       navigate("/dashboard");
     } else {
-      setShowAuthSection(true);
+      navigate("/auth");
     }
   };
 
   const handleSignIn = () => {
-    setShowAuthSection(true);
+    navigate("/auth");
   };
 
   // Обработчики для аутентификации

@@ -6,7 +6,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import type { UserProfile, UserRole } from "@/entities/user";
+import type { UserProfile } from "@/entities/user";
 import { authApi } from "../api/auth.api";
 import { authStorage } from "./auth.storage";
 import type {
@@ -18,7 +18,12 @@ import type {
   RegisterFormData,
   PasswordChangeFormData,
   PasswordResetFormData,
+  PasswordResetConfirmFormData,
+  EmailVerificationFormData,
+  EmailVerificationConfirmFormData,
+  ActiveSession,
 } from "./auth.types";
+import { AUTH_ERRORS } from "./auth.types";
 
 // =============================================================================
 // Initial State
@@ -170,12 +175,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch({ type: "AUTH_SET_ERROR", payload: error });
   }, []);
 
-  const updateUser = useCallback((user: UserProfile) => {
-    dispatch({ type: "AUTH_UPDATE_USER", payload: user });
-  }, []);
-
-  const updatePermissions = useCallback((permissions: string[]) => {
-    dispatch({ type: "AUTH_UPDATE_PERMISSIONS", payload: permissions });
+  const createAuthError = useCallback((message: string, code?: string): AuthError => {
+    return {
+      code: code || AUTH_ERRORS.UNKNOWN_ERROR,
+      message,
+    };
   }, []);
 
   // =============================================================================
@@ -207,483 +211,488 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     [state.permissions]
   );
 
+  const hasRole = useCallback(
+    (role: string): boolean => {
+      return state.user?.role === role;
+    },
+    [state.user]
+  );
+
+  // =============================================================================
+  // Token Management
+  // =============================================================================
+
+  const scheduleTokenRefresh = useCallback(() => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+
+    if (!state.tokenExpiry) return;
+
+    const now = Date.now();
+    const expiry = state.tokenExpiry;
+    const refreshTime = expiry - now - 60000; // Refresh 1 minute before expiry
+
+    if (refreshTime > 0) {
+      refreshTimeoutRef.current = setTimeout(() => {
+        refreshToken();
+      }, refreshTime);
+    }
+  }, [state.tokenExpiry]);
+
+  const refreshToken = useCallback(async () => {
+    try {
+      const refreshTokenValue = authStorage.getRefreshToken();
+      if (!refreshTokenValue) {
+        throw new Error("No refresh token available");
+      }
+
+      const response = await authApi.refreshToken(refreshTokenValue);
+      
+      const tokenExpiry = Date.now() + response.expires_in * 1000;
+      
+      // Update storage
+      authStorage.setAccessToken(response.access_token);
+      if (response.refresh_token) {
+        authStorage.setRefreshToken(response.refresh_token);
+      }
+      authStorage.setTokenExpiry(tokenExpiry);
+
+      // Update state
+      dispatch({
+        type: "AUTH_REFRESH_TOKEN_SUCCESS",
+        payload: {
+          accessToken: response.access_token,
+          tokenExpiry,
+        },
+      });
+
+      // Schedule next refresh
+      scheduleTokenRefresh();
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Token refresh failed",
+        AUTH_ERRORS.TOKEN_EXPIRED
+      );
+      
+      dispatch({ type: "AUTH_REFRESH_TOKEN_FAILURE", payload: authError });
+      
+      // Clear storage on refresh failure
+      authStorage.clearAll();
+    }
+  }, [createAuthError, scheduleTokenRefresh]);
+
   // =============================================================================
   // Authentication Methods
   // =============================================================================
 
-  const login = useCallback(
-    async (credentials: LoginFormData): Promise<void> => {
-      try {
-        dispatch({ type: "AUTH_LOGIN_START" });
+  const login = useCallback(async (credentials: LoginFormData) => {
+    dispatch({ type: "AUTH_LOGIN_START" });
 
-        console.log("[AuthContext] Login attempt with credentials:", {
-          username: credentials.username,
-          password: credentials.password ? "***" : "empty",
-          remember_me: credentials.remember_me,
-        });
-
-        const response = await authApi.login(credentials);
-        const { access_token, refresh_token, expires_in, user } = response;
-
-        const tokenExpiry = new Date(Date.now() + expires_in * 1000);
-
-        // Store tokens in storage
-        authStorage.setTokens(access_token, refresh_token, expires_in);
-        if (credentials.remember_me) {
-          authStorage.setRememberMe(true);
-        }
-
-        // TODO: Get user permissions from API
-        const permissions: string[] = [];
-
-        dispatch({
-          type: "AUTH_LOGIN_SUCCESS",
-          payload: {
-            user,
-            permissions,
-            accessToken: access_token,
-            refreshToken: refresh_token,
-            tokenExpiry,
-          },
-        });
-      } catch (error: any) {
-        console.error("[AuthContext] Login error:", error);
-
-        const authError: AuthError = {
-          type: "authentication",
-          message:
-            error?.response?.data?.detail ||
-            error?.response?.data?.message ||
-            error?.message ||
-            "Login error",
-          details: error?.response?.data,
-        };
-
-        dispatch({ type: "AUTH_LOGIN_FAILURE", payload: authError });
-        throw authError;
-      }
-    },
-    []
-  );
-
-  const register = useCallback(
-    async (userData: RegisterFormData): Promise<void> => {
-      try {
-        dispatch({ type: "AUTH_REGISTER_START" });
-
-        const response = await authApi.register(userData);
-        const { access_token, refresh_token, expires_in, user } = response;
-
-        const tokenExpiry = new Date(Date.now() + expires_in * 1000);
-
-        // Store tokens in storage
-        authStorage.setTokens(access_token, refresh_token, expires_in);
-
-        // TODO: Get user permissions from API
-        const permissions: string[] = [];
-
-        dispatch({
-          type: "AUTH_REGISTER_SUCCESS",
-          payload: {
-            user,
-            permissions,
-            accessToken: access_token,
-            refreshToken: refresh_token,
-            tokenExpiry,
-          },
-        });
-      } catch (error) {
-        const authError: AuthError = {
-          type: "authentication",
-          message:
-            error instanceof Error ? error.message : "Registration error",
-        };
-
-        dispatch({ type: "AUTH_REGISTER_FAILURE", payload: authError });
-        throw authError;
-      }
-    },
-    []
-  );
-
-  const logout = useCallback(async (): Promise<void> => {
     try {
-      dispatch({ type: "AUTH_LOGOUT_START" });
+      const response = await authApi.login({
+        username: credentials.username,
+        password: credentials.password,
+        remember_me: credentials.remember_me,
+      });
 
-      await authApi.logout();
+      const tokenExpiry = Date.now() + response.expires_in * 1000;
 
-      // Clear tokens from storage
-      authStorage.clearTokens();
-      authStorage.clearUserData();
+      // Store auth data
+      authStorage.setAuthData({
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+        tokenExpiry,
+        user: response.user,
+        permissions: response.permissions,
+      });
 
-      // Cancel token auto-refresh
+      // Set remember me preference
+      authStorage.setRememberMe(credentials.remember_me);
+      authStorage.setLastLogin();
+
+      dispatch({
+        type: "AUTH_LOGIN_SUCCESS",
+        payload: {
+          user: response.user,
+          permissions: response.permissions,
+          accessToken: response.access_token,
+          refreshToken: response.refresh_token,
+          tokenExpiry,
+        },
+      });
+
+      // Schedule token refresh
+      scheduleTokenRefresh();
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Login failed",
+        AUTH_ERRORS.INVALID_CREDENTIALS
+      );
+      dispatch({ type: "AUTH_LOGIN_FAILURE", payload: authError });
+    }
+  }, [createAuthError, scheduleTokenRefresh]);
+
+  const register = useCallback(async (userData: RegisterFormData) => {
+    dispatch({ type: "AUTH_REGISTER_START" });
+
+    try {
+      const response = await authApi.register({
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        confirm_password: userData.confirm_password,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        terms_accepted: userData.terms_accepted,
+        privacy_accepted: userData.privacy_accepted,
+      });
+
+      const tokenExpiry = Date.now() + response.expires_in * 1000;
+
+      // Store auth data
+      authStorage.setAuthData({
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+        tokenExpiry,
+        user: response.user,
+        permissions: response.permissions,
+      });
+
+      authStorage.setLastLogin();
+
+      dispatch({
+        type: "AUTH_REGISTER_SUCCESS",
+        payload: {
+          user: response.user,
+          permissions: response.permissions,
+          accessToken: response.access_token,
+          refreshToken: response.refresh_token,
+          tokenExpiry,
+        },
+      });
+
+      // Schedule token refresh
+      scheduleTokenRefresh();
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Registration failed",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      dispatch({ type: "AUTH_REGISTER_FAILURE", payload: authError });
+    }
+  }, [createAuthError, scheduleTokenRefresh]);
+
+  const logout = useCallback(async (logoutAll = false) => {
+    dispatch({ type: "AUTH_LOGOUT_START" });
+
+    try {
+      const refreshTokenValue = authStorage.getRefreshToken();
+      
+      await authApi.logout({
+        refresh_token: refreshTokenValue || undefined,
+        logout_all: logoutAll,
+      });
+
+      // Clear storage
+      authStorage.clearAll();
+
+      // Clear refresh timeout
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
         refreshTimeoutRef.current = null;
       }
 
       dispatch({ type: "AUTH_LOGOUT_SUCCESS" });
-    } catch (error) {
-      const authError: AuthError = {
-        type: "authentication",
-        message: error instanceof Error ? error.message : "Logout error",
-      };
-
-      dispatch({ type: "AUTH_LOGOUT_FAILURE", payload: authError });
-
-      // Force clear data even on error
-      authStorage.clearTokens();
-      authStorage.clearUserData();
-
+    } catch (error: any) {
+      // Even if logout fails, clear local data
+      authStorage.clearAll();
+      
       if (refreshTimeoutRef.current) {
         clearTimeout(refreshTimeoutRef.current);
         refreshTimeoutRef.current = null;
       }
+
+      const authError = createAuthError(
+        error.message || "Logout failed",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      dispatch({ type: "AUTH_LOGOUT_FAILURE", payload: authError });
     }
-  }, []);
-
-  const refreshToken = useCallback(async (): Promise<void> => {
-    try {
-      const currentRefreshToken = authStorage.getRefreshToken();
-      if (!currentRefreshToken) {
-        throw new Error("Refresh token not found");
-      }
-
-      const response = await authApi.refreshToken(currentRefreshToken);
-      const { access_token, expires_in } = response;
-
-      const tokenExpiry = new Date(Date.now() + expires_in * 1000);
-
-      authStorage.setAccessToken(access_token);
-      authStorage.setTokenExpiry(tokenExpiry);
-
-      dispatch({
-        type: "AUTH_REFRESH_TOKEN_SUCCESS",
-        payload: {
-          accessToken: access_token,
-          tokenExpiry,
-        },
-      });
-    } catch (error) {
-      const authError: AuthError = {
-        type: "authentication",
-        message: "Token refresh error",
-      };
-
-      authStorage.clearTokens();
-      dispatch({ type: "AUTH_REFRESH_TOKEN_FAILURE", payload: authError });
-      throw authError;
-    }
-  }, []);
+  }, [createAuthError]);
 
   // =============================================================================
-  // Auth Validation
+  // User Management
   // =============================================================================
 
-  const checkAuth = useCallback(async (): Promise<boolean> => {
+  const updateUser = useCallback(async (userData: Partial<UserProfile>) => {
     try {
-      const accessToken = authStorage.getAccessToken();
-      if (!accessToken) {
-        console.log("AuthContext: No access token found");
-        return false;
-      }
-
-      if (authStorage.isTokenExpired()) {
-        console.log("AuthContext: Token expired, attempting refresh");
-        try {
-          await refreshToken();
-        } catch (error) {
-          console.log("AuthContext: Token refresh failed:", error);
-          return false;
-        }
-      }
-
-      console.log("AuthContext: Validating token...");
-      try {
-        const validation = await authApi.validateToken();
-
-        if (validation.valid && validation.user) {
-          console.log("AuthContext: Token validation successful");
-          dispatch({
-            type: "AUTH_INITIALIZE_SUCCESS",
-            payload: {
-              user: validation.user,
-              permissions: [], // TODO: get from API
-            },
-          });
-          return true;
-        }
-
-        console.log("AuthContext: Token validation failed");
-        return false;
-      } catch (apiError) {
-        console.warn("AuthContext: API unavailable, using fallback mode");
-        // Fallback для разработки когда API недоступен
-        dispatch({
-          type: "AUTH_INITIALIZE_SUCCESS",
-          payload: {
-            user: {
-              id: 1,
-              username: "demo_user",
-              email: "demo@example.com",
-              first_name: "Demo",
-              last_name: "User",
-              is_active: true,
-              is_superuser: false,
-              email_verified: true,
-              role: "viewer" as const,
-            },
-            permissions: ["view:basic", "projects:create"],
-          },
-        });
-        return true;
-      }
-    } catch (error) {
-      console.error("AuthContext: checkAuth error:", error);
-      return false;
+      const updatedUser = await authApi.updateCurrentUser(userData);
+      
+      // Update storage
+      authStorage.setUserData(updatedUser);
+      
+      dispatch({ type: "AUTH_UPDATE_USER", payload: updatedUser });
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Failed to update user",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      setError(authError);
     }
-  }, [refreshToken]);
+  }, [createAuthError, setError]);
 
   // =============================================================================
   // Password Management
   // =============================================================================
 
-  const changePassword = useCallback(
-    async (request: PasswordChangeFormData): Promise<void> => {
-      try {
-        await authApi.changePassword(request);
-      } catch (error) {
-        const authError: AuthError = {
-          type: "validation",
-          message:
-            error instanceof Error ? error.message : "Password change error",
-        };
-        throw authError;
-      }
-    },
-    []
-  );
+  const changePassword = useCallback(async (data: PasswordChangeFormData) => {
+    try {
+      await authApi.changePassword({
+        current_password: data.current_password,
+        new_password: data.new_password,
+        confirm_password: data.confirm_password,
+      });
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Password change failed",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      throw authError;
+    }
+  }, [createAuthError]);
 
-  const requestPasswordReset = useCallback(
-    async (email: string): Promise<void> => {
-      try {
-        await authApi.requestPasswordReset({ email });
-      } catch (error) {
-        const authError: AuthError = {
-          type: "validation",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Password reset request error",
-        };
-        throw authError;
-      }
-    },
-    []
-  );
+  const requestPasswordReset = useCallback(async (data: PasswordResetFormData) => {
+    try {
+      await authApi.requestPasswordReset({ email: data.email });
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Password reset request failed",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      throw authError;
+    }
+  }, [createAuthError]);
 
-  const confirmPasswordReset = useCallback(
-    async (data: PasswordResetFormData): Promise<void> => {
-      try {
-        await authApi.confirmPasswordReset(data);
-      } catch (error) {
-        const authError: AuthError = {
-          type: "validation",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Password reset confirmation error",
-        };
-        throw authError;
-      }
-    },
-    []
-  );
+  const confirmPasswordReset = useCallback(async (data: PasswordResetConfirmFormData) => {
+    try {
+      await authApi.confirmPasswordReset({
+        token: data.token,
+        new_password: data.new_password,
+        confirm_password: data.confirm_password,
+      });
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Password reset confirmation failed",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      throw authError;
+    }
+  }, [createAuthError]);
 
   // =============================================================================
   // Email Verification
   // =============================================================================
 
-  const requestEmailVerification = useCallback(
-    async (email: string): Promise<void> => {
-      try {
-        await authApi.requestEmailVerification({ email });
-      } catch (error) {
-        const authError: AuthError = {
-          type: "validation",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Email verification request error",
-        };
-        throw authError;
-      }
-    },
-    []
-  );
+  const requestEmailVerification = useCallback(async (data: EmailVerificationFormData) => {
+    try {
+      await authApi.requestEmailVerification({ email: data.email });
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Email verification request failed",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      throw authError;
+    }
+  }, [createAuthError]);
 
-  const confirmEmailVerification = useCallback(
-    async (token: string): Promise<void> => {
-      try {
-        await authApi.confirmEmailVerification({ token });
-      } catch (error) {
-        const authError: AuthError = {
-          type: "validation",
-          message:
-            error instanceof Error ? error.message : "Email confirmation error",
-        };
-        throw authError;
+  const confirmEmailVerification = useCallback(async (data: EmailVerificationConfirmFormData) => {
+    try {
+      await authApi.confirmEmailVerification({ token: data.token });
+      
+      // Refresh user data to get updated email verification status
+      if (state.user) {
+        const updatedUser = await authApi.getCurrentUser();
+        authStorage.setUserData(updatedUser);
+        dispatch({ type: "AUTH_UPDATE_USER", payload: updatedUser });
       }
-    },
-    []
-  );
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Email verification failed",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      throw authError;
+    }
+  }, [createAuthError, state.user]);
 
   // =============================================================================
   // Session Management
   // =============================================================================
 
-  const refreshUserSessions = useCallback(async (): Promise<void> => {
+  const getSessions = useCallback(async () => {
     try {
-      const sessions = await authApi.getUserSessions();
-      dispatch({ type: "AUTH_UPDATE_SESSIONS", payload: sessions });
-    } catch (error) {
-      console.error("Error fetching sessions:", error);
+      const response = await authApi.getUserSessions();
+      dispatch({ type: "AUTH_UPDATE_SESSIONS", payload: response.sessions });
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Failed to get sessions",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      setError(authError);
     }
+  }, [createAuthError, setError]);
+
+  const revokeSessions = useCallback(async (sessionIds?: number[], revokeAll = false) => {
+    try {
+      await authApi.revokeSessions({
+        session_id: sessionIds?.[0],
+        revoke_all: revokeAll,
+      });
+      
+      // Refresh sessions list
+      await getSessions();
+    } catch (error: any) {
+      const authError = createAuthError(
+        error.message || "Failed to revoke sessions",
+        AUTH_ERRORS.UNKNOWN_ERROR
+      );
+      setError(authError);
+    }
+  }, [createAuthError, setError, getSessions]);
+
+  // =============================================================================
+  // Availability Checks
+  // =============================================================================
+
+  const checkUsernameAvailability = useCallback(async (username: string) => {
+    return authApi.checkUsernameAvailability(username);
   }, []);
 
-  const revokeSessions = useCallback(
-    async (sessionIds: string[]): Promise<void> => {
-      try {
-        await authApi.revokeSessions(sessionIds);
-        await refreshUserSessions();
-      } catch (error) {
-        const authError: AuthError = {
-          type: "server",
-          message:
-            error instanceof Error ? error.message : "Session revocation error",
-        };
-        throw authError;
-      }
-    },
-    [refreshUserSessions]
-  );
-
-  const revokeAllOtherSessions = useCallback(async (): Promise<void> => {
-    try {
-      await authApi.revokeAllOtherSessions();
-      await refreshUserSessions();
-    } catch (error) {
-      const authError: AuthError = {
-        type: "server",
-        message:
-          error instanceof Error ? error.message : "Session revocation error",
-      };
-      throw authError;
-    }
-  }, [refreshUserSessions]);
-
-  // =============================================================================
-  // Profile Management
-  // =============================================================================
-
-  const updateProfile = useCallback(
-    async (data: Partial<UserProfile>): Promise<void> => {
-      try {
-        // TODO: Implement profile update via API
-        console.log("Profile update:", data);
-      } catch (error) {
-        const authError: AuthError = {
-          type: "server",
-          message:
-            error instanceof Error ? error.message : "Profile update error",
-        };
-        throw authError;
-      }
-    },
-    []
-  );
-
-  const refreshUserData = useCallback(async (): Promise<void> => {
-    try {
-      const user = await authApi.getCurrentUser();
-      dispatch({ type: "AUTH_UPDATE_USER", payload: user });
-    } catch (error) {
-      console.error("Error refreshing user data:", error);
-    }
+  const checkEmailAvailability = useCallback(async (email: string) => {
+    return authApi.checkEmailAvailability(email);
   }, []);
 
   // =============================================================================
-  // Initialization Effect
+  // Initialization
+  // =============================================================================
+
+  const initializeAuth = useCallback(async () => {
+    dispatch({ type: "AUTH_INITIALIZE_START" });
+
+    try {
+      // Check if we have stored auth data
+      const storedData = authStorage.getAuthData();
+      
+      if (!storedData || authStorage.isTokenExpired()) {
+        // No valid stored data
+        dispatch({
+          type: "AUTH_INITIALIZE_FAILURE",
+          payload: createAuthError("No valid session", AUTH_ERRORS.TOKEN_EXPIRED),
+        });
+        return;
+      }
+
+      // Validate token with server
+      const validation = await authApi.validateToken();
+      
+      if (!validation.valid || !validation.user) {
+        // Token is invalid
+        authStorage.clearAll();
+        dispatch({
+          type: "AUTH_INITIALIZE_FAILURE",
+          payload: createAuthError("Invalid session", AUTH_ERRORS.TOKEN_INVALID),
+        });
+        return;
+      }
+
+      // Update stored user data if needed
+      authStorage.setUserData(validation.user);
+      
+      dispatch({
+        type: "AUTH_INITIALIZE_SUCCESS",
+        payload: {
+          user: validation.user,
+          permissions: storedData.permissions,
+        },
+      });
+
+      // Schedule token refresh
+      scheduleTokenRefresh();
+    } catch (error: any) {
+      authStorage.clearAll();
+      dispatch({
+        type: "AUTH_INITIALIZE_FAILURE",
+        payload: createAuthError(
+          error.message || "Authentication initialization failed",
+          AUTH_ERRORS.NETWORK_ERROR
+        ),
+      });
+    }
+  }, [createAuthError, scheduleTokenRefresh]);
+
+  // =============================================================================
+  // Effects
   // =============================================================================
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        dispatch({ type: "AUTH_INITIALIZE_START" });
-        const isAuthenticated = await checkAuth();
+    initializeAuth();
+  }, [initializeAuth]);
 
-        if (!isAuthenticated) {
-          // Пользователь не аутентифицирован, но инициализация завершена
-          dispatch({
-            type: "AUTH_INITIALIZE_FAILURE",
-            payload: {
-              type: "authentication",
-              message: "User is not authenticated",
-            },
-          });
-        }
-        // Если пользователь аутентифицирован, checkAuth уже вызовет AUTH_INITIALIZE_SUCCESS
-      } catch (error) {
-        dispatch({
-          type: "AUTH_INITIALIZE_FAILURE",
-          payload: {
-            type: "authentication",
-            message:
-              error instanceof Error ? error.message : "Initialization error",
-          },
-        });
+  useEffect(() => {
+    scheduleTokenRefresh();
+    
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
       }
     };
-
-    initializeAuth();
-  }, [checkAuth]);
+  }, [scheduleTokenRefresh]);
 
   // =============================================================================
   // Context Value
   // =============================================================================
 
   const contextValue: AuthContextType = {
-    ...state,
+    // State
+    isAuthenticated: state.isAuthenticated,
+    isLoading: state.isLoading,
+    isInitialized: state.isInitialized,
+    user: state.user,
+    permissions: state.permissions,
+    sessions: state.sessions,
+    error: state.error,
+    requireEmailVerification: state.requireEmailVerification,
+    allowRegistration: state.allowRegistration,
+    allowPasswordReset: state.allowPasswordReset,
+
+    // Actions
     login,
-    logout,
     register,
+    logout,
     refreshToken,
     updateUser,
-    updatePermissions,
-    clearError,
-    setError,
     changePassword,
     requestPasswordReset,
     confirmPasswordReset,
     requestEmailVerification,
     confirmEmailVerification,
-    refreshUserSessions,
+    getSessions,
     revokeSessions,
-    revokeAllOtherSessions,
-    updateProfile,
-    refreshUserData,
-    checkAuth,
+
+    // Utilities
+    clearError,
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
+    hasRole,
+    checkUsernameAvailability,
+    checkEmailAvailability,
   };
 
-  // =============================================================================
-  // Provider
-  // =============================================================================
-
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 
@@ -699,33 +708,15 @@ export const useAuth = () => {
   return context;
 };
 
-// =============================================================================
-// Permissions Hook
-// =============================================================================
-
 export const usePermissions = () => {
-  const { permissions, hasPermission, hasAnyPermission, hasAllPermissions } =
-    useAuth();
-
+  const { hasPermission, hasAnyPermission, hasAllPermissions, hasRole, permissions, user } = useAuth();
+  
   return {
-    permissions,
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
-    // Additional convenience methods
-    canManageUsers: () => hasPermission("users:manage"),
-    canCreateProjects: () => hasPermission("projects:create"),
-    canManageProjects: () => hasPermission("projects:manage"),
-    canViewReports: () => hasPermission("reports:view"),
-    canAccessAdmin: () => hasPermission("admin:access"),
-    isAdmin: () => hasPermission("admin:access"),
-    isManager: () => hasAnyPermission(["projects:manage", "users:manage"]),
-    isViewer: () => hasPermission("view:basic"),
+    hasRole,
+    permissions,
+    user,
   };
 };
-
-// =============================================================================
-// Legacy Support - Alias for compatibility
-// =============================================================================
-
-export const useAuthStore = useAuth;

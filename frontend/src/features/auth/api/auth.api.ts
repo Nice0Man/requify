@@ -1,31 +1,58 @@
 import { apiClient } from "@/shared/api/client";
-import type { UserProfile, UserCreate } from "@/entities/user";
+import type { UserProfile } from "@/entities/user";
 import type { ApiResponse } from "@/shared/types/api";
 
 // =============================================================================
-// Auth Request/res Types
+// Auth Request/Response Types (matching backend schemas)
 // =============================================================================
 
 export interface LoginRequest {
   username: string;
   password: string;
-  remember_me?: boolean;
+  remember_me: boolean;
 }
 
-export interface RegisterRequest extends UserCreate {
+export interface RegisterRequest {
+  username: string;
+  email: string;
   password: string;
   confirm_password: string;
+  first_name: string;
+  last_name: string;
   terms_accepted: boolean;
   privacy_accepted: boolean;
 }
 
-export interface AuthResponse {
+export interface LoginResponse {
   access_token: string;
   refresh_token: string;
-  token_type: "bearer";
+  token_type: string;
   expires_in: number;
+  refresh_expires_in: number;
   user: UserProfile;
   permissions: string[];
+}
+
+export interface RefreshTokenRequest {
+  refresh_token: string;
+}
+
+export interface RefreshTokenResponse {
+  access_token: string;
+  refresh_token?: string;
+  token_type: string;
+  expires_in: number;
+  refresh_expires_in?: number;
+}
+
+export interface LogoutRequest {
+  refresh_token?: string;
+  logout_all: boolean;
+}
+
+export interface LogoutResponse {
+  message: string;
+  revoked_tokens: number;
 }
 
 export interface PasswordChangeRequest {
@@ -44,8 +71,14 @@ export interface PasswordResetConfirm {
   confirm_password: string;
 }
 
-export interface TokenRefreshRequest {
-  refresh_token: string;
+export interface TokenValidationRequest {
+  token: string;
+}
+
+export interface TokenValidationResponse {
+  valid: boolean;
+  expires_at?: string;
+  user?: UserProfile;
 }
 
 export interface EmailVerificationRequest {
@@ -56,15 +89,29 @@ export interface EmailVerificationConfirm {
   token: string;
 }
 
-export interface SessionInfo {
-  id: string;
-  device: string;
-  browser: string;
-  ip_address: string;
-  location?: string;
+export interface EmailVerificationResponse {
+  message: string;
+  verified: boolean;
+}
+
+export interface ActiveSession {
+  id: number;
   created_at: string;
-  last_activity: string;
+  last_used_at?: string;
+  expires_at: string;
+  ip_address?: string;
+  user_agent?: string;
   is_current: boolean;
+}
+
+export interface SessionListResponse {
+  sessions: ActiveSession[];
+  total: number;
+}
+
+export interface RevokeSessionRequest {
+  session_id?: number;
+  revoke_all: boolean;
 }
 
 // =============================================================================
@@ -72,278 +119,257 @@ export interface SessionInfo {
 // =============================================================================
 
 export class AuthApi {
-  private readonly baseUrl = "/auth";
+  private readonly baseUrl = "/api/v1/auth";
 
   /**
    * User login
    */
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
-    return apiClient
-      .post<AuthResponse>(`${this.baseUrl}/login`, credentials)
-      .then((res) => res.data);
+  async login(credentials: LoginRequest): Promise<LoginResponse> {
+    try {
+      const response = await apiClient.post<LoginResponse>(
+        `${this.baseUrl}/login`,
+        credentials
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Login failed");
+    }
   }
 
   /**
    * User registration
    */
-  async register(userData: RegisterRequest): Promise<AuthResponse> {
-    return apiClient
-      .post<AuthResponse>(`${this.baseUrl}/register`, userData)
-      .then((res) => res.data);
+  async register(userData: RegisterRequest): Promise<LoginResponse> {
+    try {
+      const response = await apiClient.post<LoginResponse>(
+        `${this.baseUrl}/register`,
+        userData
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Registration failed");
+    }
   }
 
   /**
    * User logout
    */
-  async logout(): Promise<void> {
-    return apiClient
-      .post<void>(`${this.baseUrl}/logout`)
-      .then((res) => res.data);
+  async logout(request?: LogoutRequest): Promise<LogoutResponse> {
+    try {
+      const response = await apiClient.post<LogoutResponse>(
+        `${this.baseUrl}/logout`,
+        request || { logout_all: false }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Logout failed");
+    }
   }
 
   /**
    * Refresh access token
    */
-  async refreshToken(refreshToken: string): Promise<{
-    access_token: string;
-    expires_in: number;
-  }> {
-    return apiClient
-      .post<{
-        access_token: string;
-        expires_in: number;
-      }>(`${this.baseUrl}/refresh`, { refresh_token: refreshToken })
-      .then((res) => res.data);
+  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
+    try {
+      const response = await apiClient.post<RefreshTokenResponse>(
+        `${this.baseUrl}/refresh`,
+        { refresh_token: refreshToken }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Token refresh failed");
+    }
   }
 
   /**
    * Validate current token
    */
-  async validateToken(): Promise<{
-    valid: boolean;
-    user?: UserProfile;
-    expires_at?: string;
-  }> {
-    return apiClient
-      .post<{
-        valid: boolean;
-        user?: UserProfile;
-        expires_at?: string;
-      }>(`${this.baseUrl}/validate-token`)
-      .then((res) => res.data);
+  async validateToken(token?: string): Promise<TokenValidationResponse> {
+    try {
+      const response = await apiClient.post<TokenValidationResponse>(
+        `${this.baseUrl}/validate-token`,
+        token ? { token } : {}
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Token validation failed");
+    }
   }
 
   /**
    * Change user password
    */
-  async changePassword(
-    request: PasswordChangeRequest
-  ): Promise<ApiResponse<void>> {
-    return apiClient
-      .post<ApiResponse<void>>(`${this.baseUrl}/change-password`, request)
-      .then((res) => res.data);
+  async changePassword(request: PasswordChangeRequest): Promise<void> {
+    try {
+      await apiClient.post<void>(`${this.baseUrl}/change-password`, request);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Password change failed");
+    }
   }
 
   /**
    * Request password reset
    */
-  async requestPasswordReset(request: PasswordResetRequest): Promise<
-    ApiResponse<{
-      message: string;
-      reset_token_expires_in: number;
-    }>
-  > {
-    return apiClient
-      .post<
-        ApiResponse<{
-          message: string;
-          reset_token_expires_in: number;
-        }>
-      >(`${this.baseUrl}/reset-password`, request)
-      .then((res) => res.data);
+  async requestPasswordReset(request: PasswordResetRequest): Promise<{
+    message: string;
+  }> {
+    try {
+      const response = await apiClient.post<{ message: string }>(
+        `${this.baseUrl}/reset-password`,
+        request
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Password reset request failed");
+    }
   }
 
   /**
    * Confirm password reset
    */
-  async confirmPasswordReset(request: PasswordResetConfirm): Promise<
-    ApiResponse<{
-      message: string;
-    }>
-  > {
-    return apiClient
-      .post<
-        ApiResponse<{
-          message: string;
-        }>
-      >(`${this.baseUrl}/reset-password/confirm`, request)
-      .then((res) => res.data);
+  async confirmPasswordReset(request: PasswordResetConfirm): Promise<{
+    message: string;
+  }> {
+    try {
+      const response = await apiClient.post<{ message: string }>(
+        `${this.baseUrl}/reset-password/confirm`,
+        request
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Password reset confirmation failed");
+    }
   }
 
   /**
    * Request email verification
    */
-  async requestEmailVerification(request: EmailVerificationRequest): Promise<
-    ApiResponse<{
-      message: string;
-      verification_token_expires_in: number;
-    }>
-  > {
-    return apiClient
-      .post<
-        ApiResponse<{
-          message: string;
-          verification_token_expires_in: number;
-        }>
-      >(`${this.baseUrl}/verify-email/request`, request)
-      .then((res) => res.data);
+  async requestEmailVerification(request: EmailVerificationRequest): Promise<{
+    message: string;
+  }> {
+    try {
+      const response = await apiClient.post<{ message: string }>(
+        `${this.baseUrl}/verify-email/request`,
+        request
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Email verification request failed");
+    }
   }
 
   /**
    * Confirm email verification
    */
-  async confirmEmailVerification(request: EmailVerificationConfirm): Promise<
-    ApiResponse<{
-      message: string;
-    }>
-  > {
-    return apiClient
-      .post<
-        ApiResponse<{
-          message: string;
-        }>
-      >(`${this.baseUrl}/verify-email/confirm`, request)
-      .then((res) => res.data);
+  async confirmEmailVerification(request: EmailVerificationConfirm): Promise<EmailVerificationResponse> {
+    try {
+      const response = await apiClient.post<EmailVerificationResponse>(
+        `${this.baseUrl}/verify-email/confirm`,
+        request
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Email verification failed");
+    }
   }
 
   /**
    * Get user sessions
    */
-  async getUserSessions(): Promise<SessionInfo[]> {
-    return apiClient
-      .get<SessionInfo[]>(`${this.baseUrl}/sessions`)
-      .then((res) => res.data);
+  async getUserSessions(): Promise<SessionListResponse> {
+    try {
+      const response = await apiClient.get<SessionListResponse>(
+        `${this.baseUrl}/sessions`
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Failed to get sessions");
+    }
   }
 
   /**
-   * Revoke specific sessions
+   * Revoke sessions
    */
-  async revokeSessions(sessionIds: string[]): Promise<
-    ApiResponse<{
-      revoked_sessions: number;
-      failed_sessions: string[];
-    }>
-  > {
-    return apiClient
-      .post<
-        ApiResponse<{
-          revoked_sessions: number;
-          failed_sessions: string[];
-        }>
-      >(`${this.baseUrl}/sessions/revoke`, { session_ids: sessionIds })
-      .then((res) => res.data);
+  async revokeSessions(request: RevokeSessionRequest): Promise<{
+    message: string;
+    revoked_sessions: number;
+  }> {
+    try {
+      const response = await apiClient.post<{
+        message: string;
+        revoked_sessions: number;
+      }>(`${this.baseUrl}/sessions/revoke`, request);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Failed to revoke sessions");
+    }
   }
 
   /**
-   * Revoke all other sessions except current
-   */
-  async revokeAllOtherSessions(): Promise<
-    ApiResponse<{
-      revoked_sessions: number;
-    }>
-  > {
-    return apiClient
-      .post<
-        ApiResponse<{
-          revoked_sessions: number;
-        }>
-      >(`${this.baseUrl}/sessions/revoke-others`)
-      .then((res) => res.data);
-  }
-
-  /**
-   * Get current user profile
+   * Get current user info
    */
   async getCurrentUser(): Promise<UserProfile> {
-    return apiClient
-      .get<UserProfile>("/api/v1/users/me")
-      .then((res) => res.data);
+    try {
+      const response = await apiClient.get<UserProfile>("/api/v1/users/me");
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Failed to get current user");
+    }
   }
 
   /**
-   * Update current user profile
+   * Update current user
    */
   async updateCurrentUser(userData: Partial<UserProfile>): Promise<UserProfile> {
-    return apiClient
-      .put<UserProfile>('/api/v1/users/me', userData)
-      .then((res) => res.data);
+    try {
+      const response = await apiClient.put<UserProfile>(
+        "/api/v1/users/me",
+        userData
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || "Failed to update user");
+    }
   }
 
   /**
-   * Get user by ID
-   */
-  async getUser(userId: number): Promise<UserProfile> {
-    return apiClient
-      .get<UserProfile>(`/api/v1/users/${userId}`)
-      .then((res) => res.data);
-  }
-
-  /**
-   * Get users list
-   */
-  async getUsers(params?: {
-    skip?: number;
-    limit?: number;
-    search?: string;
-    role?: string;
-  }): Promise<{ items: UserProfile[]; total: number }> {
-    return apiClient
-      .get<{ items: UserProfile[]; total: number }>('/api/v1/users/', { params })
-      .then((res) => res.data);
-  }
-
-  /**
-   * Check if username is available
+   * Check username availability
    */
   async checkUsernameAvailability(username: string): Promise<{
     available: boolean;
     suggestions?: string[];
   }> {
-    return apiClient
-      .get<{
+    try {
+      const response = await apiClient.get<{
         available: boolean;
         suggestions?: string[];
-      }>(
-        `${this.baseUrl}/check-username?username=${encodeURIComponent(
-          username
-        )}`
-      )
-      .then((res) => res.data);
+      }>(`/api/v1/users/check-username/${encodeURIComponent(username)}`);
+      return response.data;
+    } catch (error: any) {
+      // If endpoint doesn't exist, assume available for now
+      return { available: true };
+    }
   }
 
   /**
-   * Check if email is available
+   * Check email availability
    */
   async checkEmailAvailability(email: string): Promise<{
     available: boolean;
     registered: boolean;
   }> {
-    return apiClient
-      .get<{
+    try {
+      const response = await apiClient.get<{
         available: boolean;
         registered: boolean;
-      }>(`${this.baseUrl}/check-email?email=${encodeURIComponent(email)}`)
-      .then((res) => res.data);
+      }>(`/api/v1/users/check-email/${encodeURIComponent(email)}`);
+      return response.data;
+    } catch (error: any) {
+      // If endpoint doesn't exist, assume available for now
+      return { available: true, registered: false };
+    }
   }
 }
 
-// Экспорт экземпляра API
+// Export singleton instance
 export const authApi = new AuthApi();
-
-// Создаем алиас для пользовательских операций
-export const usersApi = {
-  getCurrentUser: () => authApi.getCurrentUser(),
-  updateCurrentUser: (userData: Partial<UserProfile>) => authApi.updateCurrentUser(userData),
-  getUser: (userId: number) => authApi.getUser(userId),
-  getUsers: (params?: { skip?: number; limit?: number; search?: string; role?: string }) => authApi.getUsers(params),
-};

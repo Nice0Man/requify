@@ -1,63 +1,102 @@
 import type { UserProfile } from "@/entities/user";
-import type { SessionInfo } from "../api/auth.api";
 
 // =============================================================================
 // Auth State Types
 // =============================================================================
 
 export interface AuthState {
-  // Authentication status
   isAuthenticated: boolean;
   isLoading: boolean;
   isInitialized: boolean;
-
-  // User data
   user: UserProfile | null;
   permissions: string[];
-
-  // Token management
   accessToken: string | null;
   refreshToken: string | null;
-  tokenExpiry: Date | null;
-
-  // Session management
-  sessions: SessionInfo[];
-
-  // Error handling
+  tokenExpiry: number | null;
+  sessions: ActiveSession[];
   error: AuthError | null;
-
-  // Feature flags
   requireEmailVerification: boolean;
   allowRegistration: boolean;
   allowPasswordReset: boolean;
 }
 
 export interface AuthError {
-  type:
-    | "validation"
-    | "authentication"
-    | "authorization"
-    | "network"
-    | "server";
+  code: string;
   message: string;
-  field?: string;
-  code?: string;
   details?: Record<string, any>;
 }
 
-export interface ValidationErrors {
-  [field: string]: string;
+// =============================================================================
+// Form Data Types
+// =============================================================================
+
+export interface LoginFormData {
+  username: string;
+  password: string;
+  remember_me: boolean;
+}
+
+export interface RegisterFormData {
+  username: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+  first_name: string;
+  last_name: string;
+  terms_accepted: boolean;
+  privacy_accepted: boolean;
+}
+
+export interface PasswordChangeFormData {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+export interface PasswordResetFormData {
+  email: string;
+}
+
+export interface PasswordResetConfirmFormData {
+  token: string;
+  new_password: string;
+  confirm_password: string;
+}
+
+export interface EmailVerificationFormData {
+  email: string;
+}
+
+export interface EmailVerificationConfirmFormData {
+  token: string;
 }
 
 // =============================================================================
-// Auth Actions
+// Session Types
+// =============================================================================
+
+export interface ActiveSession {
+  id: number;
+  created_at: string;
+  last_used_at?: string;
+  expires_at: string;
+  ip_address?: string;
+  user_agent?: string;
+  is_current: boolean;
+}
+
+// =============================================================================
+// Auth Action Types
 // =============================================================================
 
 export type AuthAction =
   | { type: "AUTH_INITIALIZE_START" }
   | {
       type: "AUTH_INITIALIZE_SUCCESS";
-      payload: { user: UserProfile; permissions: string[] };
+      payload: {
+        user: UserProfile;
+        permissions: string[];
+      };
     }
   | { type: "AUTH_INITIALIZE_FAILURE"; payload: AuthError }
   | { type: "AUTH_LOGIN_START" }
@@ -68,13 +107,10 @@ export type AuthAction =
         permissions: string[];
         accessToken: string;
         refreshToken: string;
-        tokenExpiry: Date;
+        tokenExpiry: number;
       };
     }
   | { type: "AUTH_LOGIN_FAILURE"; payload: AuthError }
-  | { type: "AUTH_LOGOUT_START" }
-  | { type: "AUTH_LOGOUT_SUCCESS" }
-  | { type: "AUTH_LOGOUT_FAILURE"; payload: AuthError }
   | { type: "AUTH_REGISTER_START" }
   | {
       type: "AUTH_REGISTER_SUCCESS";
@@ -83,19 +119,24 @@ export type AuthAction =
         permissions: string[];
         accessToken: string;
         refreshToken: string;
-        tokenExpiry: Date;
+        tokenExpiry: number;
       };
     }
   | { type: "AUTH_REGISTER_FAILURE"; payload: AuthError }
-  | { type: "AUTH_REFRESH_TOKEN_START" }
+  | { type: "AUTH_LOGOUT_START" }
+  | { type: "AUTH_LOGOUT_SUCCESS" }
+  | { type: "AUTH_LOGOUT_FAILURE"; payload: AuthError }
   | {
       type: "AUTH_REFRESH_TOKEN_SUCCESS";
-      payload: { accessToken: string; tokenExpiry: Date };
+      payload: {
+        accessToken: string;
+        tokenExpiry: number;
+      };
     }
   | { type: "AUTH_REFRESH_TOKEN_FAILURE"; payload: AuthError }
   | { type: "AUTH_UPDATE_USER"; payload: UserProfile }
   | { type: "AUTH_UPDATE_PERMISSIONS"; payload: string[] }
-  | { type: "AUTH_UPDATE_SESSIONS"; payload: SessionInfo[] }
+  | { type: "AUTH_UPDATE_SESSIONS"; payload: ActiveSession[] }
   | { type: "AUTH_CLEAR_ERROR" }
   | { type: "AUTH_SET_ERROR"; payload: AuthError };
 
@@ -104,120 +145,190 @@ export type AuthAction =
 // =============================================================================
 
 export interface AuthContextType {
-  // Auth state properties
-  user: UserProfile | null;
+  // State
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: AuthError | null;
+  isInitialized: boolean;
+  user: UserProfile | null;
   permissions: string[];
-  sessions: SessionInfo[];
-  accessToken: string | null;
-  tokenExpiry: Date | null;
+  sessions: ActiveSession[];
+  error: AuthError | null;
+  requireEmailVerification: boolean;
+  allowRegistration: boolean;
+  allowPasswordReset: boolean;
 
-  // Authentication methods 
+  // Actions
   login: (credentials: LoginFormData) => Promise<void>;
   register: (userData: RegisterFormData) => Promise<void>;
-  logout: () => Promise<void>;
-
-  // Password management
-  changePassword: (request: PasswordChangeFormData) => Promise<void>;
-  requestPasswordReset: (email: string) => Promise<void>;
-  confirmPasswordReset: (data: PasswordResetFormData) => Promise<void>;
-
-  // Email verification
-  requestEmailVerification: (email: string) => Promise<void>;
-  confirmEmailVerification: (token: string) => Promise<void>;
-
-  // Session management
-  refreshUserSessions: () => Promise<void>;
-  revokeSessions: (sessionIds: string[]) => Promise<void>;
-  revokeAllOtherSessions: () => Promise<void>;
-
-  // Profile management
-  updateProfile: (data: Partial<UserProfile>) => Promise<void>;
-  refreshUserData: () => Promise<void>;
-
-  // Utility methods
+  logout: (logoutAll?: boolean) => Promise<void>;
+  refreshToken: () => Promise<void>;
+  updateUser: (userData: Partial<UserProfile>) => Promise<void>;
+  changePassword: (data: PasswordChangeFormData) => Promise<void>;
+  requestPasswordReset: (data: PasswordResetFormData) => Promise<void>;
+  confirmPasswordReset: (data: PasswordResetConfirmFormData) => Promise<void>;
+  requestEmailVerification: (data: EmailVerificationFormData) => Promise<void>;
+  confirmEmailVerification: (data: EmailVerificationConfirmFormData) => Promise<void>;
+  getSessions: () => Promise<void>;
+  revokeSessions: (sessionIds?: number[], revokeAll?: boolean) => Promise<void>;
+  
+  // Utilities
   clearError: () => void;
-  checkAuth: () => Promise<boolean>;
   hasPermission: (permission: string) => boolean;
   hasAnyPermission: (permissions: string[]) => boolean;
   hasAllPermissions: (permissions: string[]) => boolean;
-  refreshToken: () => Promise<void>;
-  updateUser: (user: UserProfile) => void;
-  updatePermissions: (permissions: string[]) => void;
-  setError: (error: AuthError) => void;
+  hasRole: (role: string) => boolean;
+  checkUsernameAvailability: (username: string) => Promise<{
+    available: boolean;
+    suggestions?: string[];
+  }>;
+  checkEmailAvailability: (email: string) => Promise<{
+    available: boolean;
+    registered: boolean;
+  }>;
 }
 
 // =============================================================================
-// Form Data Types
+// Permission Types
 // =============================================================================
 
-export interface LoginFormData {
-  username: string;
-  password: string;
-  remember_me?: boolean;
-}
-
-export interface RegisterFormData {
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  password: string;
-  confirm_password: string;
-  terms_accepted: boolean;
-  privacy_accepted: boolean;
-  marketing_accepted?: boolean;
-}
-
-export interface PasswordChangeFormData {
-  current_password: string;
-  new_password: string;
-  confirm_password: string;
-}
-
-export interface PasswordResetFormData {
-  token: string;
-  new_password: string;
-  confirm_password: string;
+export interface PermissionContextType {
+  hasPermission: (permission: string) => boolean;
+  hasAnyPermission: (permissions: string[]) => boolean;
+  hasAllPermissions: (permissions: string[]) => boolean;
+  hasRole: (role: string) => boolean;
+  permissions: string[];
+  user: UserProfile | null;
 }
 
 // =============================================================================
-// Token Management
+// Auth Hook Types
 // =============================================================================
 
-export interface TokenManager {
-  getAccessToken: () => string | null;
-  getRefreshToken: () => string | null;
-  setTokens: (
-    accessToken: string,
-    refreshToken: string,
-    expiresIn: number
-  ) => void;
-  clearTokens: () => void;
-  isTokenExpired: () => boolean;
-  getTokenExpiry: () => Date | null;
-  refreshAccessToken: () => Promise<string | null>;
-  scheduleTokenRefresh: () => void;
-  cancelTokenRefresh: () => void;
+export interface UseAuthReturn extends AuthContextType {}
+
+export interface UsePermissionsReturn extends PermissionContextType {}
+
+// =============================================================================
+// Auth Storage Types
+// =============================================================================
+
+export interface AuthStorageData {
+  accessToken: string;
+  refreshToken: string;
+  tokenExpiry: number;
+  user: UserProfile;
+  permissions: string[];
 }
 
 // =============================================================================
-// Auth Guards and Routing
+// Validation Types
 // =============================================================================
 
-export interface AuthGuardConfig {
-  requireAuth?: boolean;
-  requirePermissions?: string[];
-  requireAllPermissions?: boolean;
-  redirectTo?: string;
-  allowUnverifiedEmail?: boolean;
+export interface ValidationResult {
+  isValid: boolean;
+  errors: Record<string, string>;
 }
 
-export interface AuthRedirectConfig {
-  loginRedirect?: string;
-  logoutRedirect?: string;
-  registerRedirect?: string;
-  defaultRedirect?: string;
+export interface LoginValidation extends ValidationResult {}
+export interface RegisterValidation extends ValidationResult {}
+export interface PasswordChangeValidation extends ValidationResult {}
+export interface PasswordResetValidation extends ValidationResult {}
+
+// =============================================================================
+// API Error Types
+// =============================================================================
+
+export interface ApiError {
+  detail: string;
+  status_code?: number;
+  error_code?: string;
+  validation_errors?: Record<string, string[]>;
 }
+
+// =============================================================================
+// Auth Constants
+// =============================================================================
+
+export const AUTH_STORAGE_KEYS = {
+  ACCESS_TOKEN: "requify_access_token",
+  REFRESH_TOKEN: "requify_refresh_token",
+  USER: "requify_user",
+  PERMISSIONS: "requify_permissions",
+  TOKEN_EXPIRY: "requify_token_expiry",
+} as const;
+
+export const AUTH_ERRORS = {
+  INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+  USER_NOT_FOUND: "USER_NOT_FOUND",
+  EMAIL_NOT_VERIFIED: "EMAIL_NOT_VERIFIED",
+  ACCOUNT_DISABLED: "ACCOUNT_DISABLED",
+  TOKEN_EXPIRED: "TOKEN_EXPIRED",
+  TOKEN_INVALID: "TOKEN_INVALID",
+  REFRESH_TOKEN_EXPIRED: "REFRESH_TOKEN_EXPIRED",
+  PERMISSION_DENIED: "PERMISSION_DENIED",
+  RATE_LIMIT_EXCEEDED: "RATE_LIMIT_EXCEEDED",
+  NETWORK_ERROR: "NETWORK_ERROR",
+  UNKNOWN_ERROR: "UNKNOWN_ERROR",
+} as const;
+
+export const USER_ROLES = {
+  ADMIN: "admin",
+  MANAGER: "manager",
+  ANALYST: "analyst",
+  DEVELOPER: "developer",
+  TESTER: "tester",
+  VIEWER: "viewer",
+  GUEST: "guest",
+} as const;
+
+export const PERMISSIONS = {
+  // Project permissions
+  PROJECT_VIEW: "project:view",
+  PROJECT_CREATE: "project:create",
+  PROJECT_EDIT: "project:edit",
+  PROJECT_DELETE: "project:delete",
+  PROJECT_MANAGE: "project:manage",
+
+  // Requirement permissions
+  REQUIREMENT_VIEW: "requirement:view",
+  REQUIREMENT_CREATE: "requirement:create",
+  REQUIREMENT_EDIT: "requirement:edit",
+  REQUIREMENT_DELETE: "requirement:delete",
+  REQUIREMENT_APPROVE: "requirement:approve",
+
+  // Release permissions
+  RELEASE_VIEW: "release:view",
+  RELEASE_CREATE: "release:create",
+  RELEASE_EDIT: "release:edit",
+  RELEASE_DELETE: "release:delete",
+  RELEASE_PUBLISH: "release:publish",
+
+  // User permissions
+  USER_VIEW: "user:view",
+  USER_CREATE: "user:create",
+  USER_EDIT: "user:edit",
+  USER_DELETE: "user:delete",
+  USER_MANAGE: "user:manage",
+
+  // Admin permissions
+  ADMIN_ACCESS: "admin:access",
+  ADMIN_SYSTEM: "admin:system",
+  ADMIN_LOGS: "admin:logs",
+  ADMIN_BACKUP: "admin:backup",
+
+  // Testing permissions
+  TEST_VIEW: "test:view",
+  TEST_CREATE: "test:create",
+  TEST_EXECUTE: "test:execute",
+  TEST_MANAGE: "test:manage",
+
+  // Comment permissions
+  COMMENT_VIEW: "comment:view",
+  COMMENT_CREATE: "comment:create",
+  COMMENT_EDIT: "comment:edit",
+  COMMENT_DELETE: "comment:delete",
+} as const;
+
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
+export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
+export type AuthErrorCode = (typeof AUTH_ERRORS)[keyof typeof AUTH_ERRORS];
