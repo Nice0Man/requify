@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Container,
@@ -9,7 +9,7 @@ import {
   Divider,
   useTheme,
   alpha,
-} from '@mui/material';
+} from "@mui/material";
 import {
   GitHub,
   LinkedIn,
@@ -23,45 +23,61 @@ import {
   Info,
   Policy,
   Gavel,
-} from '@mui/icons-material';
+  RocketLaunch,
+  Code,
+  Article,
+  Work,
+} from "@mui/icons-material";
 
 const Footer: React.FC = () => {
   const theme = useTheme();
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
-    { icon: <GitHub />, href: '#', label: 'GitHub' },
-    { icon: <LinkedIn />, href: '#', label: 'LinkedIn' },
-    { icon: <Twitter />, href: '#', label: 'Twitter' },
+    { icon: <GitHub />, href: "#", label: "GitHub" },
+    { icon: <LinkedIn />, href: "#", label: "LinkedIn" },
+    { icon: <Twitter />, href: "#", label: "Twitter" },
   ];
 
-  const quickLinks = [
-    { title: 'О системе', href: '/about', icon: <Info /> },
-    { title: 'Документация', href: '/docs', icon: <Help /> },
-    { title: 'API', href: '/api-overview', icon: <Business /> },
-    { title: 'Безопасность', href: '/security', icon: <Security /> },
+  const productLinks = [
+    { title: "Features", href: "/features", icon: <RocketLaunch /> },
+    { title: "Documentation", href: "/docs", icon: <Help /> },
+    { title: "API", href: "/api", icon: <Code /> },
+    { title: "Security", href: "/security", icon: <Security /> },
+  ];
+
+  const companyLinks = [
+    { title: "About", href: "/about", icon: <Info /> },
+    { title: "Blog", href: "/blog", icon: <Article /> },
+    { title: "Careers", href: "/careers", icon: <Work /> },
+    { title: "Contact", href: "/contact", icon: <Email /> },
   ];
 
   const legalLinks = [
-    { title: 'Политика конфиденциальности', href: '/privacy', icon: <Policy /> },
-    { title: 'Условия использования', href: '/terms', icon: <Gavel /> },
-    { title: 'Лицензия', href: '/license', icon: <Business /> },
+    { title: "Privacy Policy", href: "/privacy" },
+    { title: "Terms of Service", href: "/terms" },
+    { title: "License", href: "/license" },
   ];
 
   const contactInfo = [
-    { icon: <Email />, text: 'support@requify.com', href: 'mailto:support@requify.com' },
-    { icon: <Phone />, text: '+7 (495) 123-45-67', href: 'tel:+74951234567' },
-    { icon: <LocationOn />, text: 'Москва, Россия', href: '#' },
+    {
+      icon: <Email />,
+      text: "support@requify.com",
+      href: "mailto:support@requify.com",
+    },
+    { icon: <Phone />, text: "+7 (495) 123-45-67", href: "tel:+74951234567" },
+    { icon: <LocationOn />, text: "Moscow, Russia", href: "#" },
   ];
 
   return (
     <Box
       component="footer"
       sx={{
-        backgroundColor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.100',
+        backgroundColor:
+          theme.palette.mode === "dark" ? "grey.900" : "grey.100",
         borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         py: 4,
-        mt: 'auto',
+        mt: "auto",
       }}
     >
       <Container maxWidth="xl">
@@ -72,15 +88,19 @@ const Footer: React.FC = () => {
               variant="h6"
               component="h3"
               gutterBottom
-              sx={{ fontWeight: 'bold', color: 'primary.main' }}
+              sx={{ fontWeight: "bold", color: "primary.main" }}
             >
               Requify
             </Typography>
-            <Typography variant="body2" color="text.secondary" paragraph>
-              Профессиональная система управления требованиями для команд разработки.
-              Упрощаем процесс создания, отслеживания и управления требованиями к программному обеспечению.
+            <Typography
+              variant="body1"
+              sx={{ mb: 3, opacity: 0.9, lineHeight: 1.7 }}
+            >
+              Professional requirements management system for development teams.
+              Simplify the process of creating, tracking, and managing software
+              requirements.
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
               {socialLinks.map((social) => (
                 <IconButton
                   key={social.label}
@@ -89,9 +109,9 @@ const Footer: React.FC = () => {
                   aria-label={social.label}
                   size="small"
                   sx={{
-                    color: 'text.secondary',
-                    '&:hover': {
-                      color: 'primary.main',
+                    color: "text.secondary",
+                    "&:hover": {
+                      color: "primary.main",
                       backgroundColor: alpha(theme.palette.primary.main, 0.1),
                     },
                   }}
@@ -104,27 +124,27 @@ const Footer: React.FC = () => {
 
           {/* Быстрые ссылки */}
           <Grid item xs={12} sm={6} md={2}>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-              Продукт
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+              Product
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {quickLinks.map((link) => (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {productLinks.map((link) => (
                 <Link
                   key={link.title}
                   href={link.href}
                   color="text.secondary"
                   underline="hover"
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
+                    display: "flex",
+                    alignItems: "center",
                     gap: 1,
-                    fontSize: '0.875rem',
-                    '&:hover': {
-                      color: 'primary.main',
+                    fontSize: "0.875rem",
+                    "&:hover": {
+                      color: "primary.main",
                     },
                   }}
                 >
-                  {React.cloneElement(link.icon, { fontSize: 'small' })}
+                  {React.cloneElement(link.icon, { fontSize: "small" })}
                   {link.title}
                 </Link>
               ))}
@@ -133,27 +153,27 @@ const Footer: React.FC = () => {
 
           {/* Правовая информация */}
           <Grid item xs={12} sm={6} md={2}>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-              Правовая информация
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+              Company
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {legalLinks.map((link) => (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {companyLinks.map((link) => (
                 <Link
                   key={link.title}
                   href={link.href}
                   color="text.secondary"
                   underline="hover"
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
+                    display: "flex",
+                    alignItems: "center",
                     gap: 1,
-                    fontSize: '0.875rem',
-                    '&:hover': {
-                      color: 'primary.main',
+                    fontSize: "0.875rem",
+                    "&:hover": {
+                      color: "primary.main",
                     },
                   }}
                 >
-                  {React.cloneElement(link.icon, { fontSize: 'small' })}
+                  {React.cloneElement(link.icon, { fontSize: "small" })}
                   {link.title}
                 </Link>
               ))}
@@ -162,29 +182,30 @@ const Footer: React.FC = () => {
 
           {/* Контактная информация */}
           <Grid item xs={12} md={4}>
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-              Контакты
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+              Contact
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               {contactInfo.map((contact, index) => (
                 <Box
                   key={index}
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
+                    display: "flex",
+                    alignItems: "center",
                     gap: 1,
-                    color: 'text.secondary',
+                    color: "text.secondary",
                   }}
                 >
-                  {React.cloneElement(contact.icon, { fontSize: 'small' })}
-                  {contact.href.startsWith('mailto:') || contact.href.startsWith('tel:') ? (
+                  {React.cloneElement(contact.icon, { fontSize: "small" })}
+                  {contact.href.startsWith("mailto:") ||
+                  contact.href.startsWith("tel:") ? (
                     <Link
                       href={contact.href}
                       color="inherit"
                       underline="hover"
                       sx={{
-                        fontSize: '0.875rem',
-                        '&:hover': { color: 'primary.main' },
+                        fontSize: "0.875rem",
+                        "&:hover": { color: "primary.main" },
                       }}
                     >
                       {contact.text}
@@ -201,10 +222,10 @@ const Footer: React.FC = () => {
             {/* Дополнительная информация */}
             <Box sx={{ mt: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                Техническая поддержка: 24/7
+                Technical support: 24/7
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Время ответа: до 2 часов
+                Response time: up to 2 hours
               </Typography>
             </Box>
           </Grid>
@@ -215,48 +236,48 @@ const Footer: React.FC = () => {
         {/* Нижняя часть */}
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "space-between",
+            alignItems: "center",
             gap: 2,
           }}
         >
-          <Typography variant="body2" color="text.secondary">
-            © {currentYear} Requify. Все права защищены.
+          <Typography variant="body2" sx={{ opacity: 0.8 }}>
+            © {currentYear} Requify. All rights reserved.
           </Typography>
-          
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
             <Typography variant="body2" color="text.secondary">
-              Версия: 1.0.0
+              Version: 1.0.0
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Статус: Активная
+              Status: Active
             </Typography>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 0.5,
-                color: 'success.main',
+                color: "success.main",
               }}
             >
               <Box
                 sx={{
                   width: 8,
                   height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: 'success.main',
-                  animation: 'pulse 2s infinite',
-                  '@keyframes pulse': {
-                    '0%': { opacity: 1 },
-                    '50%': { opacity: 0.5 },
-                    '100%': { opacity: 1 },
+                  borderRadius: "50%",
+                  backgroundColor: "success.main",
+                  animation: "pulse 2s infinite",
+                  "@keyframes pulse": {
+                    "0%": { opacity: 1 },
+                    "50%": { opacity: 0.5 },
+                    "100%": { opacity: 1 },
                   },
                 }}
               />
               <Typography variant="body2" color="inherit">
-                Все системы работают
+                All systems are operational
               </Typography>
             </Box>
           </Box>
@@ -266,4 +287,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer; 
+export default Footer;

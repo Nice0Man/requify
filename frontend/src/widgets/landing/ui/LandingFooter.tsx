@@ -222,7 +222,7 @@ const LandingFooter: React.FC = () => {
                     10k+
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Требований создано
+                    Requirements Created
                   </Typography>
                 </Box>
                 <Box>
@@ -230,7 +230,7 @@ const LandingFooter: React.FC = () => {
                     99.9%
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Время работы
+                    Uptime
                   </Typography>
                 </Box>
               </Box>
@@ -239,7 +239,7 @@ const LandingFooter: React.FC = () => {
             {/* Продукт */}
             <Grid item xs={12} sm={6} md={2}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
-                Продукт
+                Product
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {productLinks.map((link) => (
@@ -270,7 +270,7 @@ const LandingFooter: React.FC = () => {
             {/* Ресурсы */}
             <Grid item xs={12} sm={6} md={2}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
-                Ресурсы
+                Resources
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {resourceLinks.map((link) => (
@@ -301,7 +301,7 @@ const LandingFooter: React.FC = () => {
             {/* Компания */}
             <Grid item xs={12} sm={6} md={2}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
-                Компания
+                Company
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {companyLinks.map((link) => (
@@ -332,7 +332,7 @@ const LandingFooter: React.FC = () => {
             {/* Контакты */}
             <Grid item xs={12} md={2}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', mb: 2 }}>
-                Контакты
+                Contact
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {contactInfo.map((contact, index) => (
@@ -376,7 +376,7 @@ const LandingFooter: React.FC = () => {
           <Grid container spacing={3} alignItems="center">
             <Grid item xs={12} md={6}>
               <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                © {currentYear} Requify. Все права защищены.
+                © {currentYear} Requify. All rights reserved.
               </Typography>
             </Grid>
             
