@@ -359,8 +359,9 @@ async def change_requirement_status(
         schemas.Requirement: Updated requirement
 
     Raises:
-        HTTPException: If requirement or status are not found
+        HTTPException: If requirement or status is not found
     """
+    # Check requirement existence
     requirement = await crud.requirement.get(db, id=requirement_id)
     if not requirement:
         raise HTTPException(
@@ -375,9 +376,46 @@ async def change_requirement_status(
             detail="Requirement status not found",
         )
 
-    # Update status
+    # Update requirement status
+    requirement = await crud.requirement.update_status_only(
+        db, requirement_id=requirement_id, status_id=status_id
+    )
+    return requirement
+
+
+@router.put("/{requirement_id}/progress", response_model=schemas.Requirement)
+async def update_requirement_progress(
+    requirement_id: int,
+    progress: float = Query(..., ge=0.0, le=100.0, description="Progress percentage (0.0-100.0)"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_requirements_write_user),
+):
+    """
+    Update requirement progress.
+
+    Args:
+        requirement_id: Requirement ID
+        progress: Progress percentage (0.0-100.0)
+        db: Database session
+        current_user: Current user
+
+    Returns:
+        schemas.Requirement: Updated requirement
+
+    Raises:
+        HTTPException: If requirement is not found
+    """
+    # Check requirement existence
+    requirement = await crud.requirement.get(db, id=requirement_id)
+    if not requirement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
+        )
+
+    # Update requirement progress
+    update_data = schemas.RequirementUpdate(progress=progress)
     requirement = await crud.requirement.update(
-        db, db_obj=requirement, obj_in={"status_id": status_id}
+        db, db_obj=requirement, obj_in=update_data
     )
     return requirement
 

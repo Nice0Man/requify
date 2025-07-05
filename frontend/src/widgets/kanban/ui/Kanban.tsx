@@ -870,8 +870,8 @@ export const Kanban: React.FC<KanbanProps> = ({
               : typeof req.type === "string"
               ? [req.type]
               : [],
-            // TODO: Implement real progress calculation based on requirement completion status
-            progress: undefined,
+              // TODO: Implement real progress calculation based on requirement completion status
+            progress: req.progress,
           }));
           break;
 

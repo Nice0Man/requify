@@ -6,6 +6,7 @@ export interface RequirementBase {
   title: string;
   description?: string;
   deadline?: string; // ISO datetime string
+  progress?: number; // Progress percentage (0-100)
 }
 
 export interface Requirement extends RequirementBase {
@@ -21,6 +22,7 @@ export interface Requirement extends RequirementBase {
   created_at: string;
   updated_at: string;
   version: number;
+  progress: number; // Progress percentage (0-100)
   // Extended fields for UI compatibility
   status?: string;
   priority?: string;
@@ -37,6 +39,7 @@ export interface RequirementCreate extends RequirementBase {
   assigned_to?: number;
   release_id?: number;
   code?: string;
+  progress?: number; // Progress percentage (0-100)
 }
 
 export interface RequirementUpdate {
@@ -49,6 +52,7 @@ export interface RequirementUpdate {
   release_id?: number;
   deadline?: string;
   code?: string;
+  progress?: number; // Progress percentage (0-100)
 }
 
 export interface RequirementWithDetails extends Requirement {
@@ -180,6 +184,7 @@ export interface QuickRequirement {
   priority: string;
   project_name: string;
   updated_at: string;
+  progress: number; // Progress percentage (0-100)
 }
 
 // =============================================================================

@@ -28,8 +28,20 @@ export {
   formatRequirementDeadline,
 } from "./model/types";
 
+// Export requirement hooks
+export {
+  useRequirementProgress,
+  useProgressStats,
+} from "./model/hooks";
+
 // Export requirement API
 export { RequirementsApi, requirementsApi } from "./api";
 
 // Export requirement UI components
-export { RequirementCard, RequirementStatus, RequirementPriority, RequirementInfo } from "./ui"; 
+export { 
+  RequirementCard, 
+  RequirementStatus, 
+  RequirementPriority, 
+  RequirementInfo,
+  RequirementProgress,
+} from "./ui"; 

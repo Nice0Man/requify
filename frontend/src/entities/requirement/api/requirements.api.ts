@@ -146,6 +146,18 @@ export class RequirementsApi {
   }
 
   /**
+   * Обновить прогресс требования
+   */
+  async updateRequirementProgress(
+    id: number,
+    progress: number
+  ): Promise<Requirement> {
+    return apiClient
+      .put<Requirement>(`${this.baseUrl}/${id}/progress?progress=${progress}`)
+      .then((res) => res.data);
+  }
+
+  /**
    * Получить тесты требования
    */
   async getRequirementTests(

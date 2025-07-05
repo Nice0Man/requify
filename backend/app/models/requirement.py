@@ -3,7 +3,7 @@ import uuid
 from datetime import UTC, datetime
 from typing import List, Optional, TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, Index
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, Index, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -47,6 +47,10 @@ class Requirement(Base, TimestampedMixin):
     deadline: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True, comment="Срок выполнения требования"
     )
+    progress: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0.0, comment="Прогресс выполнения требования (0.0-100.0)"
+    )
+    
     # Внешние ключи для справочников
     type_id: Mapped[int] = mapped_column(
         Integer,

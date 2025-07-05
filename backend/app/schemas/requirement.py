@@ -18,6 +18,12 @@ class RequirementBase(BaseModel):
     )
     description: Optional[str] = Field(None, description="Описание требования")
     deadline: Optional[datetime] = None
+    progress: float = Field(
+        default=0.0, 
+        ge=0.0, 
+        le=100.0, 
+        description="Прогресс выполнения требования (0.0-100.0)"
+    )
 
     @field_validator("title")
     def validate_title(cls, v):
@@ -65,6 +71,15 @@ class RequirementBase(BaseModel):
 
         return v
 
+    @field_validator("progress")
+    def validate_progress(cls, v):
+        """Валидация прогресса"""
+        if v < 0.0:
+            raise ValueError("Progress cannot be negative")
+        if v > 100.0:
+            raise ValueError("Progress cannot exceed 100%")
+        return round(v, 2)  # Округляем до 2 знаков после запятой
+
 
 class RequirementCreate(RequirementBase):
     """Схема для создания требования."""
@@ -98,6 +113,12 @@ class RequirementUpdate(BaseModel):
         None, min_length=3, max_length=200, description="Заголовок требования"
     )
     description: Optional[str] = Field(None, description="Описание требования")
+    progress: Optional[float] = Field(
+        None, 
+        ge=0.0, 
+        le=100.0, 
+        description="Прогресс выполнения требования (0.0-100.0)"
+    )
     type_id: Optional[int] = Field(None, gt=0, description="ID типа требования")
     priority_id: Optional[int] = Field(
         None, gt=0, description="ID приоритета требования"
@@ -132,6 +153,17 @@ class RequirementUpdate(BaseModel):
             return v if v else None
         return v
 
+    @field_validator("progress")
+    def validate_progress(cls, v):
+        """Валидация прогресса при обновлении"""
+        if v is not None:
+            if v < 0.0:
+                raise ValueError("Progress cannot be negative")
+            if v > 100.0:
+                raise ValueError("Progress cannot exceed 100%")
+            return round(v, 2)  # Округляем до 2 знаков после запятой
+        return v
+
     @field_validator("release_id", "spec_id")
     def validate_optional_ids_update(cls, v):
         """Валидация опциональных ID при обновлении"""
@@ -162,6 +194,7 @@ class RequirementInDBBase(RequirementBase):
     last_modified_by: int
     release_id: Optional[int] = None
     spec_id: Optional[int] = None
+    progress: float = 0.0
     created_at: datetime
     updated_at: datetime
 
