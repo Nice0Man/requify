@@ -19,7 +19,7 @@ import type { PaginatedResponse, ApiResponse } from '@/shared/types/api';
  * According to FSD principles, contains only API functions without business logic
  */
 export class AdminApi {
-  private readonly baseUrl = '/api/v1/admin';
+  private readonly baseUrl = '/admin';
 
   /**
    * Get system information

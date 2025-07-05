@@ -52,8 +52,8 @@ export interface ProjectArchive {
 // Project Management API Class
 // =============================================================================
 
-class ProjectManagementApi {
-  private baseUrl = '/api/v1/projects';
+export class ProjectManagementApi {
+  private baseUrl = '/projects';
 
   // Extend basic project API
   async getProjects(filters?: Record<string, any>) {

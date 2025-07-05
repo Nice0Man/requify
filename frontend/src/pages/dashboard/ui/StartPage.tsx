@@ -14,9 +14,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Dashboard,
   ArrowBack,
-  Info,
   ContactSupport,
-  Language,
   GitHub,
   Description,
 } from "@mui/icons-material";
@@ -30,6 +28,7 @@ import {
   QuickAuth,
   LandingFooter,
 } from "@/widgets/landing";
+import { GrantType } from "@/features/auth/model/auth.types";
 
 const StartPage: React.FC = () => {
   const theme = useTheme();
@@ -63,6 +62,7 @@ const StartPage: React.FC = () => {
     username: string;
     password: string;
     remember_me: boolean;
+    grant_type: GrantType;
   }) => {
     try {
       setAuthError(null);

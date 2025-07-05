@@ -119,7 +119,7 @@ export interface RevokeSessionRequest {
 // =============================================================================
 
 export class AuthApi {
-  private readonly baseUrl = "/api/v1/auth";
+  private readonly baseUrl = "/auth";
 
   /**
    * User login

@@ -11,7 +11,7 @@ import type { PaginatedResponse, ApiResponse } from '@/shared/types/api';
  * According to FSD principles, contains only API functions without business logic
  */
 export class CommentsApi {
-  private readonly baseUrl = '/api/v1/comments';
+  private readonly baseUrl = '/comments';
 
   /**
    * Get comments list
