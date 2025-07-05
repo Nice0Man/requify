@@ -41,7 +41,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     if (variant === 'minimal') return null;
 
     return (
-      <Fade in timeout={600}>
+      <Fade in timeout={800} style={{ transitionDelay: '200ms' }}>
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           {/* Brand Logo */}
           <Box
@@ -65,14 +65,19 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 color: 'white',
                 fontSize: { xs: '1.5rem', sm: '1.8rem' },
                 fontWeight: 700,
-                boxShadow: theme.shadows[8],
-                animation: 'logoFloat 3s ease-in-out infinite',
+                boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.3)}`,
+                animation: 'logoFloat 4s ease-in-out infinite',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  transform: 'scale(1.05) rotate(5deg)',
+                  boxShadow: `0 12px 40px ${alpha(theme.palette.primary.main, 0.4)}`,
+                },
                 '@keyframes logoFloat': {
                   '0%, 100%': {
                     transform: 'translateY(0px) rotate(0deg)',
                   },
                   '50%': {
-                    transform: 'translateY(-5px) rotate(2deg)',
+                    transform: 'translateY(-8px) rotate(3deg)',
                   },
                 },
               }}
@@ -88,6 +93,10 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 fontSize: { xs: '2rem', sm: '2.5rem' },
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                },
               }}
             >
               Requify
@@ -102,6 +111,10 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               color: theme.palette.text.primary,
               mb: 1,
               fontSize: { xs: '1.5rem', sm: '2rem' },
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                color: theme.palette.primary.main,
+              },
             }}
           >
             {title}
@@ -117,6 +130,11 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
                 maxWidth: 400,
                 mx: 'auto',
                 lineHeight: 1.6,
+                opacity: 0.8,
+                transition: 'opacity 0.3s ease-in-out',
+                '&:hover': {
+                  opacity: 1,
+                },
               }}
             >
               {subtitle}
@@ -140,6 +158,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
             '& .MuiLinearProgress-bar': {
               borderRadius: 2,
               background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              animation: 'progressShimmer 2s ease-in-out infinite',
+              '@keyframes progressShimmer': {
+                '0%': { opacity: 0.8 },
+                '50%': { opacity: 1 },
+                '100%': { opacity: 0.8 },
+              },
             },
           }}
         />
@@ -167,9 +191,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     return {
       ...baseStyles,
       background: `linear-gradient(135deg, 
-        ${alpha(theme.palette.primary.main, 0.05)} 0%, 
-        ${alpha(theme.palette.background.default, 0.8)} 35%, 
-        ${alpha(theme.palette.secondary.main, 0.05)} 100%
+        #ffffff 0%, 
+        #f8fafc 20%, 
+        #e3f2fd 40%, 
+        #bbdefb 60%, 
+        #90caf9 80%, 
+        #64b5f6 100%
       )`,
       '&::before': {
         content: '""',
@@ -179,25 +206,39 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
         right: 0,
         bottom: 0,
         background: `
-          radial-gradient(circle at 20% 80%, ${alpha(theme.palette.primary.main, 0.1)} 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, ${alpha(theme.palette.secondary.main, 0.1)} 0%, transparent 50%),
-          radial-gradient(circle at 40% 40%, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 50%)
+          radial-gradient(circle at 20% 80%, ${alpha('#2196f3', 0.15)} 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, ${alpha('#1976d2', 0.1)} 0%, transparent 50%),
+          radial-gradient(circle at 40% 40%, ${alpha('#ffffff', 0.8)} 0%, transparent 50%),
+          radial-gradient(circle at 60% 60%, ${alpha('#e3f2fd', 0.6)} 0%, transparent 50%)
         `,
         zIndex: 0,
+        animation: 'backgroundFloat 20s ease-in-out infinite',
+        '@keyframes backgroundFloat': {
+          '0%, 100%': {
+            transform: 'translate(0, 0) rotate(0deg)',
+          },
+          '33%': {
+            transform: 'translate(10px, -10px) rotate(1deg)',
+          },
+          '66%': {
+            transform: 'translate(-10px, 10px) rotate(-1deg)',
+          },
+        },
       },
     };
   };
 
   const getPaperStyles = () => {
     const baseStyles = {
-      position: 'relative',
+      position: 'relative' as const,
       zIndex: 1,
       width: '100%',
-      maxWidth: { xs: 400, sm: 480, md: 600 }[maxWidth],
+      maxWidth: maxWidth === 'xs' ? 400 : maxWidth === 'sm' ? 480 : 600,
       mx: 'auto',
-      borderRadius: { xs: 0, sm: 4 },
-      overflow: 'hidden',
-      transition: 'all 0.3s ease-in-out',
+      borderRadius: { xs: 0, sm: 6 },
+      overflow: 'hidden' as const,
+      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+      minHeight: { xs: 'auto', sm: '600px' }, // Fixed minimum height
     };
 
     if (variant === 'minimal') {
@@ -212,23 +253,26 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     return {
       ...baseStyles,
       background: `linear-gradient(145deg, 
-        ${alpha(theme.palette.background.paper, 0.95)} 0%, 
-        ${alpha(theme.palette.background.paper, 0.9)} 100%
+        ${alpha('#ffffff', 0.95)} 0%, 
+        ${alpha('#f8fafc', 0.9)} 50%,
+        ${alpha('#ffffff', 0.95)} 100%
       )`,
       backdropFilter: 'blur(20px)',
-      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+      border: `1px solid ${alpha('#e3f2fd', 0.3)}`,
       boxShadow: `
-        0 20px 25px -5px ${alpha(theme.palette.common.black, 0.1)},
-        0 10px 10px -5px ${alpha(theme.palette.common.black, 0.04)},
-        inset 0 1px 0 ${alpha(theme.palette.common.white, 0.1)}
+        0 20px 25px -5px ${alpha('#1976d2', 0.1)},
+        0 10px 10px -5px ${alpha('#1976d2', 0.04)},
+        inset 0 1px 0 ${alpha('#ffffff', 0.2)},
+        0 0 0 1px ${alpha('#e3f2fd', 0.1)}
       `,
       p: { xs: 3, sm: 5, md: 6 },
       '&:hover': {
-        transform: 'translateY(-2px)',
+        transform: 'translateY(-4px) scale(1.01)',
         boxShadow: `
-          0 25px 30px -5px ${alpha(theme.palette.common.black, 0.15)},
-          0 15px 15px -5px ${alpha(theme.palette.common.black, 0.06)},
-          inset 0 1px 0 ${alpha(theme.palette.common.white, 0.1)}
+          0 32px 40px -12px ${alpha('#1976d2', 0.15)},
+          0 18px 20px -8px ${alpha('#1976d2', 0.08)},
+          inset 0 1px 0 ${alpha('#ffffff', 0.3)},
+          0 0 0 1px ${alpha('#e3f2fd', 0.2)}
         `,
       },
     };
@@ -237,12 +281,21 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   return (
     <Box sx={getContainerStyles()}>
       <Container maxWidth={maxWidth}>
-        <Slide in direction="up" timeout={500}>
+        <Slide in direction="up" timeout={600} style={{ transitionDelay: '100ms' }}>
           <Paper elevation={0} sx={getPaperStyles()}>
             {renderProgress()}
             {renderHeader()}
-            <Fade in timeout={800}>
-              <Box>{children}</Box>
+            <Fade in timeout={1000} style={{ transitionDelay: '400ms' }}>
+              <Box 
+                sx={{
+                  minHeight: '200px', // Fixed minimum height for content area
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                {children}
+              </Box>
             </Fade>
           </Paper>
         </Slide>

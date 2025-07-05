@@ -189,21 +189,42 @@ export const AuthFormField: React.FC<AuthFormFieldProps> = ({
   const getFieldStyles = () => {
     const baseStyles = {
       "& .MuiOutlinedInput-root": {
-        borderRadius: 2,
-        transition: "all 0.3s ease-in-out",
+        borderRadius: 3,
+        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         backgroundColor: focused
-          ? alpha(theme.palette.primary.main, 0.02)
-          : alpha(theme.palette.background.paper, 0.8),
+          ? alpha(theme.palette.primary.main, 0.03)
+          : alpha('#ffffff', 0.9),
+        backdropFilter: 'blur(10px)',
+        minHeight: '56px', // Fixed height to prevent layout shifts
         "&:hover": {
-          backgroundColor: alpha(theme.palette.primary.main, 0.04),
+          backgroundColor: alpha(theme.palette.primary.main, 0.05),
+          transform: 'translateY(-1px)',
+          boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
+        },
+        "&.Mui-focused": {
+          backgroundColor: alpha(theme.palette.primary.main, 0.03),
+          transform: 'translateY(-2px)',
+          boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
         },
       },
       "& .MuiOutlinedInput-notchedOutline": {
-        borderWidth: 1.5,
-        transition: "all 0.3s ease-in-out",
+        borderWidth: 2,
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       },
       "& .MuiInputLabel-root": {
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         fontWeight: 500,
+      },
+      "& .MuiInputBase-input": {
+        transition: "all 0.3s ease-in-out",
+      },
+      // Fixed height for helper text area to prevent layout shifts
+      "& .MuiFormHelperText-root": {
+        minHeight: '20px',
+        margin: '4px 14px 0',
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        opacity: currentError || helperText ? 1 : 0,
+        transform: currentError || helperText ? 'translateY(0)' : 'translateY(-4px)',
       },
     };
 
@@ -213,34 +234,96 @@ export const AuthFormField: React.FC<AuthFormFieldProps> = ({
           ...baseStyles,
           "& .MuiOutlinedInput-root": {
             ...baseStyles["& .MuiOutlinedInput-root"],
-            backgroundColor: alpha(theme.palette.error.main, 0.02),
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.palette.error.main,
+            backgroundColor: alpha(theme.palette.error.main, 0.03),
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.error.main, 0.05),
+              transform: 'translateY(-1px)',
+              boxShadow: `0 4px 12px ${alpha(theme.palette.error.main, 0.15)}`,
+            },
+            "&.Mui-focused": {
+              backgroundColor: alpha(theme.palette.error.main, 0.03),
+              transform: 'translateY(-2px)',
+              boxShadow: `0 8px 20px ${alpha(theme.palette.error.main, 0.2)}`,
             },
           },
+          "& .MuiOutlinedInput-notchedOutline": {
+            ...baseStyles["& .MuiOutlinedInput-notchedOutline"],
+            borderColor: theme.palette.error.main,
+            borderWidth: 2,
+          },
+          "& .MuiInputLabel-root": {
+            ...baseStyles["& .MuiInputLabel-root"],
+            color: theme.palette.error.main,
+          },
+          "& .MuiFormHelperText-root": {
+            ...baseStyles["& .MuiFormHelperText-root"],
+            color: theme.palette.error.main,
+            fontWeight: 500,
+          },
         };
+
       case "success":
         return {
           ...baseStyles,
           "& .MuiOutlinedInput-root": {
             ...baseStyles["& .MuiOutlinedInput-root"],
-            backgroundColor: alpha(theme.palette.success.main, 0.02),
-            "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: theme.palette.success.main,
+            backgroundColor: alpha(theme.palette.success.main, 0.03),
+            "&:hover": {
+              backgroundColor: alpha(theme.palette.success.main, 0.05),
+              transform: 'translateY(-1px)',
+              boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.15)}`,
+            },
+            "&.Mui-focused": {
+              backgroundColor: alpha(theme.palette.success.main, 0.03),
+              transform: 'translateY(-2px)',
+              boxShadow: `0 8px 20px ${alpha(theme.palette.success.main, 0.2)}`,
             },
           },
+          "& .MuiOutlinedInput-notchedOutline": {
+            ...baseStyles["& .MuiOutlinedInput-notchedOutline"],
+            borderColor: theme.palette.success.main,
+            borderWidth: 2,
+          },
+          "& .MuiInputLabel-root": {
+            ...baseStyles["& .MuiInputLabel-root"],
+            color: theme.palette.success.main,
+          },
         };
+
       case "focused":
         return {
           ...baseStyles,
           "& .MuiOutlinedInput-root": {
             ...baseStyles["& .MuiOutlinedInput-root"],
-            transform: "translateY(-1px)",
-            boxShadow: `0 4px 8px ${alpha(theme.palette.primary.main, 0.15)}`,
+            backgroundColor: alpha(theme.palette.primary.main, 0.03),
+            transform: 'translateY(-2px)',
+            boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.2)}`,
+          },
+          "& .MuiOutlinedInput-notchedOutline": {
+            ...baseStyles["& .MuiOutlinedInput-notchedOutline"],
+            borderColor: theme.palette.primary.main,
+            borderWidth: 2,
+            boxShadow: `0 0 0 1px ${alpha(theme.palette.primary.main, 0.2)}`,
+          },
+          "& .MuiInputLabel-root": {
+            ...baseStyles["& .MuiInputLabel-root"],
+            color: theme.palette.primary.main,
+            fontWeight: 600,
           },
         };
+
       default:
-        return baseStyles;
+        return {
+          ...baseStyles,
+          "& .MuiOutlinedInput-notchedOutline": {
+            ...baseStyles["& .MuiOutlinedInput-notchedOutline"],
+            borderColor: alpha(theme.palette.divider, 0.3),
+          },
+          "& .MuiInputLabel-root": {
+            ...baseStyles["& .MuiInputLabel-root"],
+            color: theme.palette.text.secondary,
+          },
+        };
     }
   };
 

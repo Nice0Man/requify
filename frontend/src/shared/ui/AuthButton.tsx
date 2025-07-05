@@ -85,12 +85,13 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
 
   const getButtonStyles = () => {
     const baseStyles = {
-      borderRadius: 2,
+      borderRadius: 3,
       textTransform: "none" as const,
       fontWeight: 600,
       position: "relative",
       overflow: "hidden",
-      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+      minHeight: '48px', // Fixed minimum height
       "&:before": {
         content: '""',
         position: "absolute",
@@ -99,12 +100,28 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
         right: 0,
         bottom: 0,
         background:
-          "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)",
+          "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%)",
         transform: "translateX(-100%)",
-        transition: "transform 0.6s",
+        transition: "transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
+        zIndex: 1,
       },
       "&:hover:before": {
         transform: "translateX(100%)",
+      },
+      "&:after": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "inherit",
+        zIndex: 0,
+        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+      },
+      "& > *": {
+        position: "relative",
+        zIndex: 2,
       },
     };
 
@@ -137,15 +154,18 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
           boxShadow: `0 4px 14px 0 ${alpha(theme.palette.primary.main, 0.3)}`,
           "&:hover": {
             background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.dark})`,
-            boxShadow: `0 6px 20px 0 ${alpha(theme.palette.primary.main, 0.4)}`,
-            transform: "translateY(-2px)",
+            boxShadow: `0 8px 25px 0 ${alpha(theme.palette.primary.main, 0.4)}`,
+            transform: "translateY(-3px) scale(1.02)",
           },
           "&:active": {
-            transform: "translateY(0px)",
+            transform: "translateY(-1px) scale(0.98)",
             boxShadow: `0 2px 8px 0 ${alpha(theme.palette.primary.main, 0.3)}`,
+            transition: "all 0.1s ease-out",
           },
           "&:focus-visible": {
             animation: `${pulseAnimation} 1.5s infinite`,
+            outline: `2px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+            outlineOffset: 2,
           },
         };
 
@@ -153,13 +173,19 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
         return {
           ...baseStyles,
           ...sizeStyles[size],
-          background: alpha(theme.palette.primary.main, 0.1),
+          background: `linear-gradient(135deg, ${alpha('#ffffff', 0.9)}, ${alpha('#f8fafc', 0.9)})`,
           color: theme.palette.primary.main,
           border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+          backdropFilter: 'blur(10px)',
           "&:hover": {
-            background: alpha(theme.palette.primary.main, 0.15),
+            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.primary.main, 0.05)})`,
             borderColor: theme.palette.primary.main,
-            transform: "translateY(-1px)",
+            transform: "translateY(-2px) scale(1.01)",
+            boxShadow: `0 6px 20px 0 ${alpha(theme.palette.primary.main, 0.2)}`,
+          },
+          "&:active": {
+            transform: "translateY(-1px) scale(0.99)",
+            transition: "all 0.1s ease-out",
           },
         };
 
@@ -173,7 +199,12 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
           "&:hover": {
             background: theme.palette.primary.main,
             color: theme.palette.primary.contrastText,
-            transform: "translateY(-1px)",
+            transform: "translateY(-2px) scale(1.01)",
+            boxShadow: `0 6px 20px 0 ${alpha(theme.palette.primary.main, 0.3)}`,
+          },
+          "&:active": {
+            transform: "translateY(-1px) scale(0.99)",
+            transition: "all 0.1s ease-out",
           },
         };
 
@@ -185,8 +216,13 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
           color: theme.palette.text.primary,
           border: "none",
           "&:hover": {
-            background: alpha(theme.palette.primary.main, 0.08),
+            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.08)}, ${alpha(theme.palette.primary.main, 0.04)})`,
             color: theme.palette.primary.main,
+            transform: "translateY(-1px)",
+          },
+          "&:active": {
+            transform: "translateY(0)",
+            transition: "all 0.1s ease-out",
           },
         };
 
@@ -198,11 +234,15 @@ export const AuthButton: React.FC<AuthButtonProps> = ({
           background: socialColors.background,
           color: socialColors.color,
           border: `1px solid ${socialColors.border}`,
-          boxShadow: "0 2px 4px 0 rgba(0,0,0,0.1)",
+          boxShadow: `0 2px 8px 0 ${alpha('#000000', 0.1)}`,
           "&:hover": {
             background: socialColors.hover,
-            transform: "translateY(-1px)",
-            boxShadow: "0 4px 8px 0 rgba(0,0,0,0.15)",
+            transform: "translateY(-2px) scale(1.01)",
+            boxShadow: `0 6px 20px 0 ${alpha('#000000', 0.15)}`,
+          },
+          "&:active": {
+            transform: "translateY(-1px) scale(0.99)",
+            transition: "all 0.1s ease-out",
           },
         };
 
