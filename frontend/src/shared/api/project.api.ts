@@ -15,6 +15,10 @@ export interface Project extends ProjectBase {
   id: number;
   owner_id: number;
   created_at: string;
+  // Extended fields for UI compatibility
+  updated_at?: string;
+  owner_name?: string;
+  specs_count?: number;
   // Убраны поля которых нет в бэкенде: manager_id, team_lead_id, client_id, start_date, end_date, tags, is_active
 }
 

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Box, BoxProps, CircularProgress, Typography } from '@mui/material';
-import { useResponsiveImage } from '../hooks/useResponsiveImage';
+import React from "react";
+import { Box, BoxProps, CircularProgress, Typography } from "@mui/material";
+import { useResponsiveImage } from "../hooks/useResponsiveImage";
 
-interface ResponsiveImageProps extends Omit<BoxProps, 'component'> {
+interface ResponsiveImageProps extends Omit<BoxProps, "component" | "onError"> {
   src: string;
   alt: string;
   width?: string | number;
@@ -15,7 +15,7 @@ interface ResponsiveImageProps extends Omit<BoxProps, 'component'> {
   onError?: (error: Event) => void;
   sizes?: string;
   srcSet?: string;
-  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  objectFit?: "cover" | "contain" | "fill" | "none" | "scale-down";
   objectPosition?: string;
   borderRadius?: number | string;
   showLoadingSpinner?: boolean;
@@ -24,8 +24,8 @@ interface ResponsiveImageProps extends Omit<BoxProps, 'component'> {
 export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
   src,
   alt,
-  width = '100%',
-  height = 'auto',
+  width = "100%",
+  height = "auto",
   aspectRatio,
   lazy = true,
   placeholder,
@@ -34,14 +34,14 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
   onError,
   sizes,
   srcSet,
-  objectFit = 'cover',
-  objectPosition = 'center',
+  objectFit = "cover",
+  objectPosition = "center",
   borderRadius = 0,
   showLoadingSpinner = true,
   sx,
   ...boxProps
 }) => {
-  const { imgRef, isLoaded, hasError, containerStyle } = useResponsiveImage({
+  const { imgRef, isLoaded, hasError } = useResponsiveImage({
     src,
     alt,
     lazy,
@@ -50,25 +50,25 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
   });
 
   const containerSx = {
-    position: 'relative',
+    position: "relative" as const,
     width,
     height,
-    aspectRatio,
+    ...(aspectRatio && { aspectRatio }),
     borderRadius,
-    overflow: 'hidden',
-    backgroundColor: '#f5f5f5',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: "hidden" as const,
+    backgroundColor: "#f5f5f5",
+    display: "flex" as const,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
     ...sx,
   };
 
   const imageSx = {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     objectFit,
     objectPosition,
-    transition: 'opacity 0.3s ease-in-out',
+    transition: "opacity 0.3s ease-in-out",
     opacity: isLoaded ? 1 : 0,
   };
 
@@ -79,7 +79,7 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
           <Typography
             variant="body2"
             color="text.secondary"
-            sx={{ textAlign: 'center', p: 2 }}
+            sx={{ textAlign: "center", p: 2 }}
           >
             Failed to load image
           </Typography>
@@ -94,26 +94,22 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
       {!isLoaded && (
         <Box
           sx={{
-            position: 'absolute',
+            position: "absolute" as const,
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#f5f5f5',
+            display: "flex" as const,
+            alignItems: "center" as const,
+            justifyContent: "center" as const,
+            backgroundColor: "#f5f5f5",
             zIndex: 1,
           }}
         >
-          {placeholder || (
-            showLoadingSpinner && (
-              <CircularProgress
-                size={24}
-                sx={{ color: 'text.secondary' }}
-              />
-            )
-          )}
+          {placeholder ||
+            (showLoadingSpinner && (
+              <CircularProgress size={24} sx={{ color: "text.secondary" }} />
+            ))}
         </Box>
       )}
 
@@ -125,7 +121,7 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
         alt={alt}
         sizes={sizes}
         srcSet={srcSet}
-        loading={lazy ? 'lazy' : 'eager'}
+        loading={lazy ? "lazy" : "eager"}
         sx={imageSx}
       />
     </Box>
@@ -133,7 +129,9 @@ export const ResponsiveImage: React.FC<ResponsiveImageProps> = ({
 };
 
 // Предустановленные варианты для типичных случаев использования
-export const HeroImage: React.FC<Omit<ResponsiveImageProps, 'aspectRatio'>> = (props) => (
+export const HeroImage: React.FC<Omit<ResponsiveImageProps, "aspectRatio">> = (
+  props
+) => (
   <ResponsiveImage
     aspectRatio="16/9"
     objectFit="cover"
@@ -142,7 +140,9 @@ export const HeroImage: React.FC<Omit<ResponsiveImageProps, 'aspectRatio'>> = (p
   />
 );
 
-export const AvatarImage: React.FC<Omit<ResponsiveImageProps, 'aspectRatio' | 'borderRadius'>> = (props) => (
+export const AvatarImage: React.FC<
+  Omit<ResponsiveImageProps, "aspectRatio" | "borderRadius">
+> = (props) => (
   <ResponsiveImage
     aspectRatio="1/1"
     objectFit="cover"
@@ -151,11 +151,13 @@ export const AvatarImage: React.FC<Omit<ResponsiveImageProps, 'aspectRatio' | 'b
   />
 );
 
-export const CardImage: React.FC<Omit<ResponsiveImageProps, 'aspectRatio'>> = (props) => (
+export const CardImage: React.FC<Omit<ResponsiveImageProps, "aspectRatio">> = (
+  props
+) => (
   <ResponsiveImage
     aspectRatio="4/3"
     objectFit="cover"
     borderRadius={1}
     {...props}
   />
-); 
+);

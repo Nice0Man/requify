@@ -26,7 +26,6 @@ import {
   Refresh,
   Dashboard,
 } from '@mui/icons-material';
-import { dashboardApi } from '@/features/dashboard/api';
 
 interface DashboardStatsProps {
   layout?: 'grid' | 'horizontal' | 'vertical';

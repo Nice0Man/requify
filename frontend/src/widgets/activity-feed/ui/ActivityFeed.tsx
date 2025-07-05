@@ -1,41 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-  Box,
   Card,
   CardContent,
   CardHeader,
   Typography,
+  Box,
   List,
   ListItem,
-  ListItemAvatar,
   ListItemText,
+  ListItemAvatar,
   Avatar,
-  IconButton,
-  Button,
   Chip,
-  alpha,
   useTheme,
-  Stack,
+  alpha,
+  IconButton,
   Divider,
-} from '@mui/material';
+  Stack,
+  Button,
+} from "@mui/material";
 import {
-  Timeline,
+  Assignment,
+  RocketLaunch,
+  CheckCircle,
+  Person,
   Refresh,
   FilterList,
-  ChevronRight,
-  Person,
-  Assignment,
   BugReport,
-  CheckCircle,
-  RocketLaunch,
   Code,
   Notifications,
-} from '@mui/icons-material';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { dashboardApi } from '@/features/dashboard/api';
-import { dashboardKeys } from '@/features/dashboard/model/dashboard.hooks';
-import { LoadingSpinner } from '@/shared/ui';
-import { formatDate } from '@/shared/utils';
+  Timeline,
+  ChevronRight,
+} from "@mui/icons-material";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { dashboardKeys } from "@/features/dashboard/model/dashboard.hooks";
+import { LoadingSpinner } from "@/shared/ui";
+import { formatDate } from "@/shared/utils";
 
 interface ActivityFeedProps {
   limit?: number;
@@ -55,22 +54,22 @@ interface DashboardActivity {
 
 const getActivityIcon = (type: string) => {
   switch (type) {
-    case 'user_created':
-    case 'user_updated':
+    case "user_created":
+    case "user_updated":
       return <Person />;
-    case 'requirement_created':
-    case 'requirement_updated':
+    case "requirement_created":
+    case "requirement_updated":
       return <Assignment />;
-    case 'test_created':
-    case 'test_executed':
+    case "test_created":
+    case "test_executed":
       return <BugReport />;
-    case 'project_created':
-    case 'project_updated':
+    case "project_created":
+    case "project_updated":
       return <RocketLaunch />;
-    case 'release_created':
-    case 'release_published':
+    case "release_created":
+    case "release_published":
       return <Code />;
-    case 'task_completed':
+    case "task_completed":
       return <CheckCircle />;
     default:
       return <Notifications />;
@@ -79,25 +78,25 @@ const getActivityIcon = (type: string) => {
 
 const getActivityColor = (type: string) => {
   switch (type) {
-    case 'user_created':
-    case 'user_updated':
-      return 'primary';
-    case 'requirement_created':
-    case 'requirement_updated':
-      return 'info';
-    case 'test_created':
-    case 'test_executed':
-      return 'warning';
-    case 'project_created':
-    case 'project_updated':
-      return 'secondary';
-    case 'release_created':
-    case 'release_published':
-      return 'success';
-    case 'task_completed':
-      return 'success';
+    case "user_created":
+    case "user_updated":
+      return "primary";
+    case "requirement_created":
+    case "requirement_updated":
+      return "info";
+    case "test_created":
+    case "test_executed":
+      return "warning";
+    case "project_created":
+    case "project_updated":
+      return "secondary";
+    case "release_created":
+    case "release_published":
+      return "success";
+    case "task_completed":
+      return "success";
     default:
-      return 'default';
+      return "default";
   }
 };
 
@@ -111,25 +110,29 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const queryClient = useQueryClient();
   const [showAll, setShowAll] = useState(false);
 
-  const { data: activity = [], isLoading, error } = useQuery<DashboardActivity[]>({
+  const {
+    data: activity = [],
+    isLoading,
+    error,
+  } = useQuery<DashboardActivity[]>({
     queryKey: dashboardKeys.activity(),
     queryFn: async () => {
       // Mock data for now until real API is implemented
       return [
         {
-          id: '1',
-          type: 'requirement_created',
-          title: 'New requirement added',
-          description: 'User authentication requirement has been created',
-          user_name: 'John Doe',
+          id: "1",
+          type: "requirement_created",
+          title: "New requirement added",
+          description: "User authentication requirement has been created",
+          user_name: "John Doe",
           created_at: new Date().toISOString(),
         },
         {
-          id: '2',
-          type: 'project_updated',
-          title: 'Project updated',
-          description: 'Project settings have been modified',
-          user_name: 'Jane Smith',
+          id: "2",
+          type: "project_updated",
+          title: "Project updated",
+          description: "Project settings have been modified",
+          user_name: "Jane Smith",
           created_at: new Date(Date.now() - 60000).toISOString(),
         },
       ] as DashboardActivity[];
@@ -155,15 +158,17 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <Card className={className} sx={{ borderRadius: 3 }}>
         <CardContent sx={{ p: 3 }}>
           <Stack spacing={2} alignItems="center">
-            <Timeline sx={{ fontSize: 48, color: 'text.secondary', opacity: 0.3 }} />
+            <Timeline
+              sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
+            />
             <Typography color="error" variant="body2" textAlign="center">
               Error loading activity
             </Typography>
-            <Button 
-              onClick={refreshActivity} 
-              size="small" 
+            <Button
+              onClick={refreshActivity}
+              size="small"
               variant="outlined"
-              sx={{ textTransform: 'none' }}
+              sx={{ textTransform: "none" }}
             >
               Try again
             </Button>
@@ -211,12 +216,12 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
         action={
           <Stack direction="row" spacing={1}>
             {showFilters && (
-              <IconButton 
-                size="small" 
-                sx={{ 
+              <IconButton
+                size="small"
+                sx={{
                   opacity: 0.7,
                   borderRadius: 2,
-                  '&:hover': { opacity: 1 },
+                  "&:hover": { opacity: 1 },
                 }}
               >
                 <FilterList />
@@ -226,10 +231,10 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
               size="small"
               onClick={refreshActivity}
               disabled={isLoading}
-              sx={{ 
+              sx={{
                 borderRadius: 2,
                 border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                '&:hover': {
+                "&:hover": {
                   backgroundColor: alpha(theme.palette.primary.main, 0.04),
                   borderColor: alpha(theme.palette.primary.main, 0.2),
                 },
@@ -239,10 +244,10 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             </IconButton>
           </Stack>
         }
-        sx={{ 
+        sx={{
           pb: 1,
-          '& .MuiCardHeader-content': {
-            overflow: 'hidden',
+          "& .MuiCardHeader-content": {
+            overflow: "hidden",
           },
         }}
       />
@@ -287,9 +292,14 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                     py: 2,
                     px: 3,
                     transition: "all 0.2s ease",
-                    '&:hover': onActivityClick ? {
-                      backgroundColor: alpha(theme.palette.action.hover, 0.3),
-                    } : {},
+                    "&:hover": onActivityClick
+                      ? {
+                          backgroundColor: alpha(
+                            theme.palette.action.hover,
+                            0.3
+                          ),
+                        }
+                      : {},
                   }}
                 >
                   <ListItemAvatar>
@@ -297,9 +307,34 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                       sx={{
                         width: 36,
                         height: 36,
-                        bgcolor: alpha(theme.palette[getActivityColor(activityItem.type) as keyof typeof theme.palette]?.main || theme.palette.primary.main, 0.1),
-                        color: theme.palette[getActivityColor(activityItem.type) as keyof typeof theme.palette]?.main || theme.palette.primary.main,
-                        border: `1px solid ${alpha(theme.palette[getActivityColor(activityItem.type) as keyof typeof theme.palette]?.main || theme.palette.primary.main, 0.2)}`,
+                        bgcolor: alpha(
+                          ((
+                            theme.palette[
+                              getActivityColor(
+                                activityItem.type
+                              ) as keyof typeof theme.palette
+                            ] as any
+                          )?.main as string) || theme.palette.primary.main,
+                          0.1
+                        ),
+                        color:
+                          ((
+                            theme.palette[
+                              getActivityColor(
+                                activityItem.type
+                              ) as keyof typeof theme.palette
+                            ] as any
+                          )?.main as string) || theme.palette.primary.main,
+                        border: `1px solid ${alpha(
+                          ((
+                            theme.palette[
+                              getActivityColor(
+                                activityItem.type
+                              ) as keyof typeof theme.palette
+                            ] as any
+                          )?.main as string) || theme.palette.primary.main,
+                          0.2
+                        )}`,
                       }}
                     >
                       {getActivityIcon(activityItem.type)}
@@ -311,15 +346,16 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                     secondary={
                       <React.Fragment>
                         <Typography variant="caption" color="text.secondary">
-                          by {activityItem.user_name} • {formatDate(activityItem.created_at)}
+                          by {activityItem.user_name} •{" "}
+                          {formatDate(activityItem.created_at)}
                         </Typography>
                         {activityItem.description && (
                           <Typography
                             variant="caption"
                             color="text.secondary"
-                            sx={{ 
+                            sx={{
                               display: "block",
-                              fontSize: '0.75rem',
+                              fontSize: "0.75rem",
                               opacity: 0.8,
                               mt: 0.5,
                             }}
@@ -331,28 +367,35 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
                     }
                     primaryTypographyProps={{
                       variant: "body2",
-                      sx: { 
-                        fontWeight: 500, 
-                        fontSize: '0.875rem',
-                      }
+                      sx: {
+                        fontWeight: 500,
+                        fontSize: "0.875rem",
+                      },
                     }}
                     secondaryTypographyProps={{
                       component: "div",
-                      sx: { mt: 0.5 }
+                      sx: { mt: 0.5 },
                     }}
                   />
-                  
+
                   {/* Activity Type Chip */}
-                  <Box sx={{ ml: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <Box
+                    sx={{
+                      ml: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-end",
+                    }}
+                  >
                     <Chip
-                      label={activityItem.type.replace('_', ' ')}
+                      label={activityItem.type.replace("_", " ")}
                       size="small"
                       color={getActivityColor(activityItem.type) as any}
                       variant="outlined"
                       sx={{
                         fontSize: "0.7rem",
                         height: 20,
-                        textTransform: 'capitalize',
+                        textTransform: "capitalize",
                         "& .MuiChip-label": { px: 1 },
                         borderRadius: 1,
                       }}
@@ -361,15 +404,15 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
                   {onActivityClick && (
                     <ChevronRight
-                      sx={{ 
-                        color: "text.secondary", 
+                      sx={{
+                        color: "text.secondary",
                         opacity: 0.5,
                         ml: 1,
                       }}
                     />
                   )}
                 </ListItem>
-                
+
                 {index < displayedActivities.length - 1 && (
                   <Divider sx={{ mx: 3, opacity: 0.3 }} />
                 )}
@@ -382,16 +425,21 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
           displayedActivities.length > 0 &&
           !showAll &&
           activity.length > limit && (
-            <Box sx={{ p: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.08)}` }}>
+            <Box
+              sx={{
+                p: 2,
+                borderTop: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              }}
+            >
               <Button
                 size="small"
                 onClick={() => setShowAll(true)}
-                sx={{ 
+                sx={{
                   textTransform: "none",
-                  width: '100%',
+                  width: "100%",
                   borderRadius: 2,
                   color: theme.palette.text.secondary,
-                  '&:hover': {
+                  "&:hover": {
                     backgroundColor: alpha(theme.palette.primary.main, 0.04),
                     color: theme.palette.primary.main,
                   },

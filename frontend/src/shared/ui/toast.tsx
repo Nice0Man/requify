@@ -12,19 +12,19 @@ export const useToast = () => {
 
   const toast = {
     success: (message: string, options?: ToastOptions) => {
-      showSnackbar(message, { severity: 'success', ...options });
+      showSnackbar(message, 'success', options?.autoHideDuration);
     },
     error: (message: string, options?: ToastOptions) => {
-      showSnackbar(message, { severity: 'error', ...options });
+      showSnackbar(message, 'error', options?.autoHideDuration);
     },
     warning: (message: string, options?: ToastOptions) => {
-      showSnackbar(message, { severity: 'warning', ...options });
+      showSnackbar(message, 'warning', options?.autoHideDuration);
     },
     info: (message: string, options?: ToastOptions) => {
-      showSnackbar(message, { severity: 'info', ...options });
+      showSnackbar(message, 'info', options?.autoHideDuration);
     },
     show: (message: string, options?: ToastOptions) => {
-      showSnackbar(message, options);
+      showSnackbar(message, options?.variant || 'info', options?.autoHideDuration);
     }
   };
 
@@ -33,16 +33,16 @@ export const useToast = () => {
 
 // Export для совместимости с существующим кодом
 export const toast = {
-  success: (message: string) => {
+  success: (_message: string) => {
     console.warn('toast.success called outside of component. Use useToast hook instead.');
   },
-  error: (message: string) => {
+  error: (_message: string) => {
     console.warn('toast.error called outside of component. Use useToast hook instead.');
   },
-  warning: (message: string) => {
+  warning: (_message: string) => {
     console.warn('toast.warning called outside of component. Use useToast hook instead.');
   },
-  info: (message: string) => {
+  info: (_message: string) => {
     console.warn('toast.info called outside of component. Use useToast hook instead.');
   },
 }; 

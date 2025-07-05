@@ -56,7 +56,11 @@ import {
 import { requirementsApi } from "@/entities/requirement";
 import { projectsApi } from "@/entities/project";
 import { testCasesApi } from "@/entities/test-case";
-import type { Requirement } from "@/entities/requirement/model/types";
+import type {
+  Requirement,
+  RequirementWithDetails,
+  RequirementType,
+} from "@/entities/requirement/model/types";
 import type { Project } from "@/entities/project/model/types";
 import type { TestCase } from "@/entities/test-case/model/types";
 
@@ -442,7 +446,6 @@ const KanbanCard: React.FC<KanbanCardProps> = ({
                 textOverflow: "ellipsis",
                 WebkitLineClamp: variant === "compact" ? 1 : 2,
                 WebkitBoxOrient: "vertical",
-                display: "-webkit-box",
               }}
             >
               {item.description}
@@ -846,18 +849,29 @@ export const Kanban: React.FC<KanbanProps> = ({
             project_id: projectId,
             limit: 100,
           });
-          data = reqResponse.items.map((req: Requirement) => ({
+          data = reqResponse.items.map((req: RequirementWithDetails) => ({
             id: req.id,
             title: req.title,
             description: req.description,
-            status: req.status,
-            priority: req.priority,
+            status:
+              typeof req.status === "string"
+                ? req.status
+                : req.status?.name || "unknown",
+            priority:
+              typeof req.priority === "string"
+                ? req.priority
+                : req.priority?.name || "medium",
             assignee: req.author_name,
             created_at: req.created_at,
             updated_at: req.updated_at,
             type: "requirement" as const,
-            labels: req.type ? [req.type] : [],
-            progress: Math.floor(Math.random() * 100), // Mock progress
+            labels: req.type?.name
+              ? [req.type.name]
+              : typeof req.type === "string"
+              ? [req.type]
+              : [],
+            // TODO: Implement real progress calculation based on requirement completion status
+            progress: undefined,
           }));
           break;
 
@@ -873,10 +887,10 @@ export const Kanban: React.FC<KanbanProps> = ({
             priority: "medium",
             assignee: "PM",
             created_at: proj.created_at,
-            updated_at: proj.updated_at,
+            updated_at: proj.updated_at || proj.created_at,
             type: "project" as const,
             labels: proj.code ? [proj.code] : [],
-            progress: Math.floor(Math.random() * 100), // Mock progress
+            progress: undefined,
           }));
           break;
 
@@ -895,7 +909,7 @@ export const Kanban: React.FC<KanbanProps> = ({
             updated_at: test.updated_at,
             type: "task" as const,
             labels: test.type ? [test.type] : [],
-            progress: Math.floor(Math.random() * 100), // Mock progress
+            progress: undefined,
           }));
           break;
       }

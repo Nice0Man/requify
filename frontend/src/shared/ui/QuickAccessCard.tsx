@@ -8,11 +8,13 @@ import {
   IconButton,
   Grid,
   Chip,
-  Avatar,
   useTheme,
   alpha,
   Skeleton,
   Stack,
+  Button,
+  Fade,
+  LinearProgress,
 } from "@mui/material";
 import {
   FolderOpen,
@@ -21,11 +23,11 @@ import {
   Warning,
   Error,
   MoreVert,
-  Visibility,
-  TrendingUp,
   Schedule,
   Person,
-  AccessTime,
+  ArrowForward,
+  FiberManualRecord,
+  Group,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -40,6 +42,9 @@ interface QuickProject {
   team_size: number;
   next_milestone?: string;
   updated_at: string;
+  code?: string;
+  health_score?: string;
+  requirements_count?: number;
 }
 
 interface QuickRequirement {
@@ -51,6 +56,7 @@ interface QuickRequirement {
   assignee_name?: string;
   due_date?: string;
   updated_at: string;
+  progress?: number;
 }
 
 interface PendingApproval {
@@ -353,7 +359,7 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                           </Box>
                           <Box display="flex" alignItems="center" gap={0.5}>
                             {getHealthIcon(project.health_score || "good")}
-                            <Circle
+                            <FiberManualRecord
                               sx={{
                                 fontSize: 8,
                                 color: getHealthColor(
@@ -645,27 +651,19 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                             {requirement.title}
                           </Typography>
                           <Chip
-                            label={
-                              requirement.priority
-                            }
+                            label={requirement.priority}
                             size="small"
                             sx={{
                               height: 22,
                               fontSize: "0.7rem",
                               fontWeight: 600,
                               backgroundColor: alpha(
-                                getPriorityColor(
-                                  requirement.priority
-                                ),
+                                getPriorityColor(requirement.priority),
                                 0.12
                               ),
-                              color: getPriorityColor(
-                                requirement.priority
-                              ),
+                              color: getPriorityColor(requirement.priority),
                               border: `1px solid ${alpha(
-                                getPriorityColor(
-                                  requirement.priority
-                                ),
+                                getPriorityColor(requirement.priority),
                                 0.2
                               )}`,
                               textTransform: "capitalize",
@@ -733,10 +731,10 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                           alignItems="center"
                         >
                           <Chip
-                            label={(
-                              requirement.status ||
-                              "unknown"
-                            ).replace("_", " ")}
+                            label={(requirement.status || "unknown").replace(
+                              "_",
+                              " "
+                            )}
                             size="small"
                             sx={{
                               height: 24,
@@ -989,7 +987,7 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
                             color="text.secondary"
                             sx={{ fontSize: "0.75rem" }}
                           >
-                            Requested by {approval.requested_by}
+                            Requested by {approval.requester_name}
                           </Typography>
                         </Box>
 
@@ -1064,5 +1062,5 @@ export const QuickAccess: React.FC<QuickAccessProps> = ({
   );
 };
 
-// Rename main component for clarity  
+// Rename main component for clarity
 export const QuickAccessCard = QuickAccess;

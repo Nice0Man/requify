@@ -21,6 +21,13 @@ export interface Requirement extends RequirementBase {
   created_at: string;
   updated_at: string;
   version: number;
+  // Extended fields for UI compatibility
+  status?: string;
+  priority?: string;
+  type?: string;
+  author_name?: string;
+  assignee_name?: string;
+  project_name?: string;
 }
 
 export interface RequirementCreate extends RequirementBase {
