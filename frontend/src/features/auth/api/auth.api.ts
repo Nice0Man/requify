@@ -10,6 +10,7 @@ export interface LoginRequest {
   username: string;
   password: string;
   remember_me: boolean;
+  grant_type: 'password';
 }
 
 export interface RegisterRequest {
@@ -35,6 +36,7 @@ export interface LoginResponse {
 
 export interface RefreshTokenRequest {
   refresh_token: string;
+  grant_type: 'refresh_token';
 }
 
 export interface RefreshTokenResponse {
@@ -122,13 +124,18 @@ export class AuthApi {
   private readonly baseUrl = "/auth";
 
   /**
-   * User login
+   * User login with OAuth2 password grant
    */
-  async login(credentials: LoginRequest): Promise<LoginResponse> {
+  async login(credentials: Omit<LoginRequest, 'grant_type'>): Promise<LoginResponse> {
     try {
+      const loginData: LoginRequest = {
+        ...credentials,
+        grant_type: 'password'
+      };
+      
       const response = await apiClient.post<LoginResponse>(
         `${this.baseUrl}/login`,
-        credentials
+        loginData
       );
       return response.data;
     } catch (error: any) {
@@ -167,13 +174,18 @@ export class AuthApi {
   }
 
   /**
-   * Refresh access token
+   * Refresh access token with OAuth2 refresh_token grant
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     try {
+      const refreshData: RefreshTokenRequest = {
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token'
+      };
+      
       const response = await apiClient.post<RefreshTokenResponse>(
         `${this.baseUrl}/refresh`,
-        { refresh_token: refreshToken }
+        refreshData
       );
       return response.data;
     } catch (error: any) {

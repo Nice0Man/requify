@@ -49,10 +49,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   }, []);
 
   const certifications = [
-    "SOC 2 Type II Certified",
-    "GDPR Compliant",
-    "ISO 27001 Certified",
-    "Enterprise Ready",
+    "The best requirements management software",
+    "Powerful and easy to use",
   ];
 
   const keyFeatures = [
