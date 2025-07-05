@@ -634,7 +634,7 @@ interface KanbanColumnProps {
 
 const KanbanColumn: React.FC<KanbanColumnProps> = ({
   column,
-  items,
+  items = [],
   onItemClick,
   allowDragDrop,
   variant = "detailed",
@@ -834,8 +834,20 @@ export const Kanban: React.FC<KanbanProps> = ({
   const [priorityFilter, setPriorityFilter] = useState("");
   const [assigneeFilter, setAssigneeFilter] = useState("");
 
+  // Ensure items is always an array
+  const safeItems = Array.isArray(items) ? items : [];
+
   const currentColumns =
-    columns || defaultColumns[mode] || defaultColumns.requirements;
+    columns || defaultColumns[mode] || defaultColumns.requirements || [];
+
+  console.log("Component initialized with:", {
+    mode,
+    projectId,
+    itemsLength: safeItems.length,
+    columnsLength: currentColumns.length,
+    isLoading,
+    error,
+  });
 
   const loadItems = useCallback(async () => {
     try {
@@ -843,80 +855,210 @@ export const Kanban: React.FC<KanbanProps> = ({
       setError(null);
       let data: KanbanItem[] = [];
 
+      console.log(`Loading items for mode: ${mode}, projectId: ${projectId}`);
+
       switch (mode) {
         case "requirements":
-          const reqResponse = await requirementsApi.getRequirements({
-            project_id: projectId,
-            limit: 100,
-          });
-          data = reqResponse.items.map((req: RequirementWithDetails) => ({
-            id: req.id,
-            title: req.title,
-            description: req.description,
-            status:
-              typeof req.status === "string"
-                ? req.status
-                : req.status?.name || "unknown",
-            priority:
-              typeof req.priority === "string"
-                ? req.priority
-                : req.priority?.name || "medium",
-            assignee: req.author_name,
-            created_at: req.created_at,
-            updated_at: req.updated_at,
-            type: "requirement" as const,
-            labels: req.type?.name
-              ? [req.type.name]
-              : typeof req.type === "string"
-              ? [req.type]
-              : [],
-              // TODO: Implement real progress calculation based on requirement completion status
-            progress: req.progress,
-          }));
+          try {
+            const reqResponse = await requirementsApi.getRequirements({
+              project_id: projectId,
+              limit: 100,
+            });
+            console.log("Requirements API response:", reqResponse);
+
+            if (!reqResponse) {
+              throw new Error("Requirements API returned null response");
+            }
+
+            if (!reqResponse.items) {
+              console.warn(
+                "Requirements API returned response without items array"
+              );
+              reqResponse.items = [];
+            }
+
+            if (!Array.isArray(reqResponse.items)) {
+              throw new Error(
+                `Requirements API returned non-array items: ${typeof reqResponse.items}`
+              );
+            }
+
+            data = reqResponse.items
+              .map((req: RequirementWithDetails) => {
+                if (!req || typeof req !== "object") {
+                  console.warn("Invalid requirement object:", req);
+                  return null;
+                }
+
+                return {
+                  id: req.id || 0,
+                  title: req.title || "Untitled",
+                  description: req.description || "",
+                  status:
+                    typeof req.status === "string"
+                      ? req.status
+                      : req.status?.name || "draft",
+                  priority:
+                    typeof req.priority === "string"
+                      ? req.priority
+                      : req.priority?.name || "medium",
+                  assignee: req.author_name || "Unassigned",
+                  created_at: req.created_at || new Date().toISOString(),
+                  updated_at: req.updated_at || new Date().toISOString(),
+                  type: "requirement" as const,
+                  labels: req.type?.name
+                    ? [req.type.name]
+                    : typeof req.type === "string"
+                    ? [req.type]
+                    : [],
+                  progress: req.progress || 0,
+                };
+              })
+              .filter(Boolean) as KanbanItem[];
+          } catch (reqError) {
+            console.error("Error loading requirements:", reqError);
+            throw new Error(
+              `Failed to load requirements: ${
+                reqError instanceof Error ? reqError.message : String(reqError)
+              }`
+            );
+          }
           break;
 
         case "projects":
-          const projResponse = await projectsApi.getProjects({
-            limit: 100,
-          });
-          data = projResponse.items.map((proj: Project) => ({
-            id: proj.id,
-            title: proj.name,
-            description: proj.description,
-            status: proj.status,
-            priority: "medium",
-            assignee: "PM",
-            created_at: proj.created_at,
-            updated_at: proj.updated_at || proj.created_at,
-            type: "project" as const,
-            labels: proj.code ? [proj.code] : [],
-            progress: proj.status === "active" ? 100 : 0,
-          }));
+          try {
+            const projResponse = await projectsApi.getProjects({
+              limit: 100,
+            });
+            console.log("Projects API response:", projResponse);
+
+            if (!projResponse) {
+              throw new Error("Projects API returned null response");
+            }
+
+            if (!projResponse.items) {
+              console.warn(
+                "Projects API returned response without items array"
+              );
+              projResponse.items = [];
+            }
+
+            if (!Array.isArray(projResponse.items)) {
+              throw new Error(
+                `Projects API returned non-array items: ${typeof projResponse.items}`
+              );
+            }
+
+            data = projResponse.items
+              .map((proj: Project) => {
+                if (!proj || typeof proj !== "object") {
+                  console.warn("Invalid project object:", proj);
+                  return null;
+                }
+
+                return {
+                  id: proj.id || 0,
+                  title: proj.name || "Untitled Project",
+                  description: proj.description || "",
+                  status: proj.status || "planning",
+                  priority: "medium",
+                  assignee: "PM",
+                  created_at: proj.created_at || new Date().toISOString(),
+                  updated_at:
+                    proj.updated_at ||
+                    proj.created_at ||
+                    new Date().toISOString(),
+                  type: "project" as const,
+                  labels: proj.code ? [proj.code] : [],
+                  progress: proj.status === "active" ? 100 : 0,
+                };
+              })
+              .filter(Boolean) as KanbanItem[];
+          } catch (projError) {
+            console.error("Error loading projects:", projError);
+            throw new Error(
+              `Failed to load projects: ${
+                projError instanceof Error
+                  ? projError.message
+                  : String(projError)
+              }`
+            );
+          }
           break;
 
         case "tasks":
-          const testResponse = await testCasesApi.getTestCases({
-            limit: 100,
-          });
-          data = testResponse.items.map((test: TestCase) => ({
-            id: test.id,
-            title: test.title,
-            description: test.description,
-            status: test.status,
-            priority: test.priority,
-            assignee: test.author_name,
-            created_at: test.created_at,
-            updated_at: test.updated_at,
-            type: "task" as const,
-            labels: test.type ? [test.type] : [],
-            progress: test.progress,
-          }));
+          try {
+            const testResponse = await testCasesApi.getTestCases({
+              limit: 100,
+            });
+            console.log("Test cases API response:", testResponse);
+
+            if (!testResponse) {
+              throw new Error("Test cases API returned null response");
+            }
+
+            if (!testResponse.items) {
+              console.warn(
+                "Test cases API returned response without items array"
+              );
+              testResponse.items = [];
+            }
+
+            if (!Array.isArray(testResponse.items)) {
+              throw new Error(
+                `Test cases API returned non-array items: ${typeof testResponse.items}`
+              );
+            }
+
+            data = testResponse.items
+              .map((test: TestCase) => {
+                if (!test || typeof test !== "object") {
+                  console.warn("Invalid test case object:", test);
+                  return null;
+                }
+
+                return {
+                  id: test.id || 0,
+                  title: test.title || "Untitled Test",
+                  description: test.description || "",
+                  status: test.status || "pending",
+                  priority: test.priority || "medium",
+                  assignee: test.author_name || "Unassigned",
+                  created_at: test.created_at || new Date().toISOString(),
+                  updated_at: test.updated_at || new Date().toISOString(),
+                  type: "task" as const,
+                  labels: test.type ? [test.type] : [],
+                  progress: test.progress || 0,
+                };
+              })
+              .filter(Boolean) as KanbanItem[];
+          } catch (testError) {
+            console.error("Error loading test cases:", testError);
+            throw new Error(
+              `Failed to load test cases: ${
+                testError instanceof Error
+                  ? testError.message
+                  : String(testError)
+              }`
+            );
+          }
           break;
+
+        default:
+          throw new Error(`Unknown mode: ${mode}`);
+      }
+
+      console.log("Processed data:", data);
+
+      if (!Array.isArray(data)) {
+        throw new Error(`Processed data is not an array: ${typeof data}`);
       }
 
       setItems(data);
     } catch (err: any) {
-      setError(err.message || "Failed to load items");
+      console.error("Error loading items:", err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -939,14 +1081,15 @@ export const Kanban: React.FC<KanbanProps> = ({
       onItemMove(itemId, fromColumn, toColumn);
     }
     // Update local state
-    setItems((prev) =>
-      prev.map((item) =>
+    setItems((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return safePrev.map((item) =>
         item.id === itemId ? { ...item, status: toColumn } : item
-      )
-    );
+      );
+    });
   };
 
-  const filteredItems = items.filter((item) => {
+  const filteredItems = (safeItems || []).filter((item) => {
     if (
       searchTerm &&
       !item.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -962,13 +1105,25 @@ export const Kanban: React.FC<KanbanProps> = ({
     return true;
   });
 
+  console.log("Render state:", {
+    items: safeItems?.length || 0,
+    filteredItems: filteredItems?.length || 0,
+    currentColumns: currentColumns?.length || 0,
+    isLoading,
+    error,
+    mode,
+    projectId,
+  });
+
   const getColumnItems = (columnId: string) => {
-    return filteredItems.filter(
+    const result = (filteredItems || []).filter(
       (item) =>
         item.status === columnId ||
         item.status ===
-          currentColumns.find((col) => col.id === columnId)?.status
+          (currentColumns || []).find((col) => col.id === columnId)?.status
     );
+    console.log(`Column ${columnId} items:`, result.length);
+    return result;
   };
 
   const getModeIcon = () => {
@@ -998,11 +1153,12 @@ export const Kanban: React.FC<KanbanProps> = ({
   };
 
   const getStats = () => {
-    const total = filteredItems.length;
-    const completed = filteredItems.filter((item) =>
+    const safeFilteredItems = filteredItems || [];
+    const total = safeFilteredItems.length;
+    const completed = safeFilteredItems.filter((item) =>
       ["approved", "completed", "passed"].includes(item.status)
     ).length;
-    const inProgress = filteredItems.filter((item) =>
+    const inProgress = safeFilteredItems.filter((item) =>
       ["review", "active", "in_progress"].includes(item.status)
     ).length;
 
@@ -1202,7 +1358,11 @@ export const Kanban: React.FC<KanbanProps> = ({
                 >
                   <MenuItem value="">All Assignees</MenuItem>
                   {Array.from(
-                    new Set(items.map((item) => item.assignee).filter(Boolean))
+                    new Set(
+                      (safeItems || [])
+                        .map((item) => item.assignee)
+                        .filter(Boolean)
+                    )
                   ).map((assignee) => (
                     <MenuItem key={assignee} value={assignee}>
                       <Stack direction="row" alignItems="center" spacing={1}>
@@ -1225,7 +1385,7 @@ export const Kanban: React.FC<KanbanProps> = ({
       {/* Kanban Board */}
       {isLoading ? (
         <Box display="flex" gap={3} overflow="auto" pb={2}>
-          {currentColumns.map((_, index) => (
+          {(currentColumns || []).map((_, index) => (
             <Box key={index} minWidth={300}>
               <Skeleton
                 variant="rectangular"
@@ -1258,7 +1418,7 @@ export const Kanban: React.FC<KanbanProps> = ({
             },
           }}
         >
-          {currentColumns.map((column, index) => (
+          {(currentColumns || []).map((column, index) => (
             <KanbanColumn
               key={column.id}
               column={column}

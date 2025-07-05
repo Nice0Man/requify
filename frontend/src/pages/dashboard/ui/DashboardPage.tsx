@@ -471,3 +471,5 @@ export const DashboardPage: React.FC = () => {
     </Container>
   );
 };
+
+export default DashboardPage;

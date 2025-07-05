@@ -75,6 +75,7 @@ const ReportsPage = React.lazy(() => import("@/pages/reports/ui/ReportsPage"));
 const ApiOverviewPage = React.lazy(
   () => import("@/pages/dashboard/ui/ApiOverviewPage")
 );
+const HomePage = React.lazy(() => import("@/pages/dashboard/ui/HomePage"));
 const StartPage = React.lazy(() => import("@/pages/dashboard/ui/StartPage"));
 const KanbanPage = React.lazy(() => import("@/pages/kanban/ui/KanbanPage"));
 const NotFoundPage = React.lazy(
@@ -372,7 +373,17 @@ export const AppRouter: React.FC = () => {
           }
         />
 
-        {/* Start Page - Public Route */}
+        {/* Root homepage */}
+        <Route
+          path="/"
+          element={
+            <Suspense fallback={<PageLoadingFallback pageName="homepage" />}>
+              <HomePage />
+            </Suspense>
+          }
+        />
+
+        {/* Start Page - Full Landing Page */}
         <Route
           path="/start"
           element={
@@ -393,9 +404,6 @@ export const AppRouter: React.FC = () => {
             </Suspense>
           }
         />
-
-        {/* Root redirect to start */}
-        <Route path="/" element={<Navigate to="/start" replace />} />
 
         {/* Private Routes */}
         <Route
