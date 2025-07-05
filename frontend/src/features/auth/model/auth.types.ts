@@ -37,7 +37,6 @@ export interface LoginFormData {
   username: string;
   password: string;
   remember_me: boolean;
-  grant_type: GrantType;
 }
 
 export interface RegisterFormData {

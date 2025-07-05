@@ -3,14 +3,13 @@ import type { UserProfile } from "@/entities/user";
 import type { ApiResponse } from "@/shared/types/api";
 
 // =============================================================================
-// Auth Request/Response Types (matching backend schemas)
+// Auth Request/Response Types (matching backend schemas exactly)
 // =============================================================================
 
 export interface LoginRequest {
   username: string;
   password: string;
   remember_me: boolean;
-  grant_type: 'password';
 }
 
 export interface RegisterRequest {
@@ -126,16 +125,11 @@ export class AuthApi {
   /**
    * User login with OAuth2 password grant
    */
-  async login(credentials: Omit<LoginRequest, 'grant_type'>): Promise<LoginResponse> {
+  async login(credentials: LoginRequest): Promise<LoginResponse> {
     try {
-      const loginData: LoginRequest = {
-        ...credentials,
-        grant_type: 'password'
-      };
-      
       const response = await apiClient.post<LoginResponse>(
         `${this.baseUrl}/login`,
-        loginData
+        credentials
       );
       return response.data;
     } catch (error: any) {
