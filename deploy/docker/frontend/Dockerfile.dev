@@ -5,7 +5,10 @@ WORKDIR /app
 
 # Create non-root user with home directory for npm cache
 RUN addgroup -g 1001 -S frontend && \
-    adduser -S -u 1001 -G frontend -h /app frontend
+    adduser -S -u 1001 -G frontend -h /home/frontend frontend
+
+# Change ownership of app directory to frontend user
+RUN chown -R frontend:frontend /app
 
 # Copy package files first to leverage Docker cache
 COPY --chown=frontend:frontend package*.json ./
@@ -13,7 +16,6 @@ COPY --chown=frontend:frontend package*.json ./
 # Install dependencies as non-root user
 USER frontend
 RUN npm install
-RUN npm audit fix --force
 
 # Copy application code with proper ownership
 COPY --chown=frontend:frontend . .

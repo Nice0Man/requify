@@ -128,7 +128,7 @@ export interface EmailVerificationResponse {
   verified: boolean;
 }
 
-// Профиль пользователя для auth ответов
+// Профиль пользователя для auth ответов (точно соответствует backend/app/schemas/auth.py)
 export interface UserProfile {
   id: number;
   username: string;
@@ -141,6 +141,8 @@ export interface UserProfile {
   email_verified_at?: string;
   last_login?: string;
   permissions?: string[];
+  
+  // UI расширения (не в бэкенде)
   avatar?: string;
   first_name?: string;
   last_name?: string;
@@ -295,7 +297,7 @@ export interface RevokeSessionRequest {
 // =============================================================================
 
 // =============================================================================
-// Comment API Types (shared across features)
+// Comment API Types (точно соответствуют backend/app/schemas/comment.py)
 // =============================================================================
 
 export interface CommentBase {

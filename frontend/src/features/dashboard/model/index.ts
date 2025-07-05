@@ -1,5 +1,10 @@
 // Dashboard model exports
-export { useDashboard, useDashboardStats } from './dashboard.hooks';
+export { 
+  useDashboard, 
+  useDashboardStats,
+  useDashboardProjects,
+  useDashboardRequirements 
+} from './dashboard.hooks';
 export type { 
   DashboardOverview,
   DashboardStats,

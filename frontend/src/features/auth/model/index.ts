@@ -1,5 +1,5 @@
 // Auth model exports - state management and business logic
-export { AuthProvider, useAuth } from "./auth.context";
+export { AuthProvider, useAuth, usePermissions } from "./auth.context";
 export { useAuthGuard, useAuthRedirect } from "./auth.hooks";
 export { authStorage } from "./auth.storage";
 

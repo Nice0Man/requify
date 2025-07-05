@@ -45,4 +45,4 @@ export {
 } from "./model/types";
 
 // Export testing API
-export { TestingApi, testingApi } from "./api"; 
+export { TestingApi, testingApi, testCasesApi } from "./api"; 

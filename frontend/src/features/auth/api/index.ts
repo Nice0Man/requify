@@ -1,5 +1,5 @@
 // Auth API exports
-export { authApi } from './auth.api';
+export { authApi, usersApi } from './auth.api';
 export type { 
   LoginRequest, 
   RegisterRequest, 

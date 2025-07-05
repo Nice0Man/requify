@@ -1,25 +1,19 @@
-// UI Components exports - Only named exports for consistency
-export { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
-export { ErrorBoundary } from "../ErrorBoundary/ErrorBoundary";
-export { Modal, ConfirmModal } from "../Modal/Modal";
-export { Layout } from "../Layout/Layout";
-export {
-  FormField,
-  FormTextField,
-  FormSelectField,
-  FormCheckboxField,
-  FormRadioField,
-  FormAutocompleteField,
-} from "../Form/FormField";
-export { PrivateRoute } from "../PrivateRoute/PrivateRoute";
-export { PermissionGuard } from "../PermissionGuard/PermissionGuard";
-export { StatCard } from "../StatCard/StatCard";
-export { ActivityFeed } from "../ActivityFeed/ActivityFeed";
-export { QuickAccess } from "../QuickAccess/QuickAccess";
-export { QuickAccessCard } from "../QuickAccess/QuickAccessCard";
-export { DataTable } from "../DataTable/DataTable";
-export type { 
-  Column, 
-  Action, 
-  DataTableProps 
-} from "../DataTable/DataTable";
+// Export all UI components
+export * from "../TabPanel";
+export * from "../UserAvatar";
+export * from "../RoleBadge";
+export * from "../LoadingBackdrop";
+export * from "../Snackbar";
+export * from "../ConfirmDialog";
+export * from "../LoadingSpinner";
+export * from "../ErrorBoundary";
+export * from "../toast";
+export * from "../Modal";
+export * from "../Layout";
+export * from "../PrivateRoute";
+export * from "../PermissionGuard";
+export * from "../DataTable";
+export * from "../FormField";
+export * from "../StatCard";
+export * from "../ActivityFeed";
+export * from "../QuickAccessCard";

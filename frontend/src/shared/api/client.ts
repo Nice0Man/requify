@@ -23,11 +23,22 @@ export class ApiClient {
   private tokenManager?: TokenManager;
 
   constructor(baseURL?: string) {
-    // Use environment variable or default to nginx proxy path
-    const apiBaseUrl =
-      baseURL ||
-      import.meta.env.VITE_API_URL ||
-      (import.meta.env.DEV ? "/api/v1" : "http://localhost/api/v1");
+    // In development, always use proxy path for Vite proxy to work
+    // In production, use full backend URL
+    const apiBaseUrl = baseURL || (import.meta.env.DEV ? "/api/v1" : 
+      import.meta.env.VITE_API_URL || 
+      import.meta.env.VITE_API_BASE_URL || 
+      "http://backend:8000/api/v1");
+
+    console.log('[ApiClient] Configuration:', {
+      baseURL,
+      VITE_API_URL: import.meta.env.VITE_API_URL,
+      VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+      DEV: import.meta.env.DEV,
+      finalApiBaseUrl: apiBaseUrl,
+    });
+
+
 
     this.client = axios.create({
       baseURL: apiBaseUrl,
@@ -54,6 +65,14 @@ export class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        
+        console.log('[ApiClient] Request:', {
+          method: config.method?.toUpperCase(),
+          url: config.url,
+          baseURL: config.baseURL,
+          fullURL: `${config.baseURL}${config.url}`,
+        });
+        
         return config;
       },
       (error) => {

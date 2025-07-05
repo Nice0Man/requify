@@ -52,16 +52,16 @@ import {
   Timeline as TrendsIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { format, parseISO, differenceInDays } from "date-fns";
 import type {
   TestPlan,
   TestCase,
   TestExecution,
-} from "@/shared/api/types/schemas";
-import { projectsApi, testingApi } from "@/shared/api/index";
-import { useAuth } from "@/features/auth/model/auth.context";
-import { Project } from "@/features/project-management/model/projects.types";
+} from "@/entities/test-case";
+import { projectsApi, testingApi } from "@/shared/api";
+import { useAuth } from "@/features/auth";
+import { Project } from "@/entities/project";
+import { toast } from "@/shared/ui";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -171,8 +171,8 @@ const TestingPage: React.FC = () => {
       };
 
       const response = await testingApi.getTestPlans(params);
-      setTestPlans(response.data?.items || []);
-      setTestPlanCount(response.data?.total || 0);
+      setTestPlans(response.items || []);
+      setTestPlanCount(response.total || 0);
     } catch (error: any) {
       console.error("Failed to load test plans:", error);
       setTestPlans([]); // Ensure array is never undefined
@@ -204,9 +204,9 @@ const TestingPage: React.FC = () => {
         search: testFilters.search || undefined,
       };
 
-      const response = await testingApi.getTestCases(params);
-      setTestCases(response.data?.items || []);
-      setTestCaseCount(response.data?.total || 0);
+      const response = await testingApi.getTestCasesWithPagination(params);
+      setTestCases(response.items || []);
+      setTestCaseCount(response.total || 0);
     } catch (error: any) {
       console.error("Failed to load test cases:", error);
       setTestCases([]); // Ensure array is never undefined
@@ -237,8 +237,8 @@ const TestingPage: React.FC = () => {
       };
 
       const response = await testingApi.getTestExecutions(params);
-      setTestExecutions(response.data?.items || []);
-      setTestExecutionCount(response.data?.total || 0);
+      setTestExecutions(response.items || []);
+      setTestExecutionCount(response.total || 0);
     } catch (error: any) {
       console.error("Failed to load test executions:", error);
       setTestExecutions([]); // Ensure array is never undefined
@@ -251,11 +251,8 @@ const TestingPage: React.FC = () => {
 
   const loadReferenceData = useCallback(async () => {
     try {
-      const [projectsRes] = await Promise.all([
-        projectsApi.getProjects({ limit: 1000 }),
-      ]);
-
-      setProjects((projectsRes.data?.items || []) as any as Project[]);
+      const projectsRes = await projectsApi.getProjects({ limit: 1000 });
+      setProjects(projectsRes.items || []);
     } catch (error: any) {
       toast.error("Failed to load reference data");
     }

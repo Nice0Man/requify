@@ -1,249 +1,147 @@
-import React from 'react';
-import { Row, Col, Card, Statistic, Spin, Alert } from 'antd';
-import { 
-  ProjectOutlined, 
-  FileTextOutlined, 
-  RocketOutlined, 
-  UserOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined
-} from '@ant-design/icons';
-import { useDashboard } from '../model';
-import { ProjectCard } from '@/entities/project';
-import { RequirementCard } from '@/entities/requirement';
-import { UserAvatar } from '@/entities/user';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
+import {
+  Person as UserIcon,
+  Assignment as ProjectIcon,
+  Description as RequirementIcon,
+  Build as ToolIcon,
+} from "@mui/icons-material";
+import { useDashboard } from "@/features/dashboard";
+import { useQueryClient } from "@tanstack/react-query";
+import { dashboardKeys } from "../model/dashboard.hooks";
 
-export interface DashboardOverviewProps {
-  refreshInterval?: number;
-  className?: string;
+interface DashboardStats {
+  users: { total: number; active: number };
+  projects: { total: number; active: number };
+  requirements: { total: number; pending: number };
+  tests: { total: number; passed: number };
 }
 
-export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
-  refreshInterval,
-  className,
-}) => {
-  const { 
-    overview, 
-    activity, 
-    notifications, 
-    isLoading, 
-    error, 
-    refresh 
-  } = useDashboard(refreshInterval);
+export const DashboardOverview: React.FC = () => {
+  const { overview, isLoading, error } = useDashboard();
+  const queryClient = useQueryClient();
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isInitialized) {
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.overview() });
+      setIsInitialized(true);
+    }
+  }, [queryClient, isInitialized]);
+
+  if (isLoading && !overview) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" tip="Loading dashboard..." />
-      </div>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="200px"
+      >
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Alert
-        message="Failed to load dashboard"
-        description={error.message}
-        type="error"
-        showIcon
-        action={
-          <button onClick={refresh}>
-            Retry
-          </button>
-        }
-      />
+      <Alert severity="error" sx={{ mb: 2 }}>
+        Failed to load dashboard data: {error.message}
+      </Alert>
     );
   }
 
-  if (!overview) {
-    return (
-      <Alert
-        message="No dashboard data available"
-        type="info"
-        showIcon
-      />
-    );
-  }
+  const defaultStats: DashboardStats = {
+    users: { total: 0, active: 0 },
+    projects: { total: 0, active: 0 },
+    requirements: { total: 0, pending: 0 },
+    tests: { total: 0, passed: 0 },
+  };
 
-  const { stats, my_projects, my_requirements, quick_stats } = overview;
+  const currentStats = (overview as unknown as DashboardStats) || defaultStats;
+
+  const statCards = [
+    {
+      title: "Users",
+      value: currentStats.users?.total || 0,
+      subtitle: `${currentStats.users?.active || 0} active`,
+      icon: <UserIcon fontSize="large" />,
+      color: "#1976d2",
+    },
+    {
+      title: "Projects",
+      value: currentStats.projects?.total || 0,
+      subtitle: `${currentStats.projects?.active || 0} active`,
+      icon: <ProjectIcon fontSize="large" />,
+      color: "#388e3c",
+    },
+    {
+      title: "Requirements",
+      value: currentStats.requirements?.total || 0,
+      subtitle: `${currentStats.requirements?.pending || 0} pending`,
+      icon: <RequirementIcon fontSize="large" />,
+      color: "#f57c00",
+    },
+    {
+      title: "Tests",
+      value: currentStats.tests?.total || 0,
+      subtitle: `${currentStats.tests?.passed || 0} passed`,
+      icon: <ToolIcon fontSize="large" />,
+      color: "#7b1fa2",
+    },
+  ];
 
   return (
-    <div className={className}>
-      {/* Quick Stats Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Total Projects"
-              value={stats.total_projects}
-              prefix={<ProjectOutlined />}
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Requirements"
-              value={stats.total_requirements}
-              prefix={<FileTextOutlined />}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Releases"
-              value={stats.total_releases}
-              prefix={<RocketOutlined />}
-              valueStyle={{ color: '#722ed1' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Active Users"
-              value={stats.active_users}
-              prefix={<UserOutlined />}
-              valueStyle={{ color: '#fa8c16' }}
-            />
-          </Card>
-        </Col>
-      </Row>
+    <Box>
+      <Typography variant="h4" component="h1" gutterBottom fontWeight={600}>
+        Dashboard Overview
+      </Typography>
 
-      {/* Progress Stats */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Completion Rate"
-              value={stats.requirements_completion_rate}
-              suffix="%"
-              prefix={<CheckCircleOutlined />}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Project Health"
-              value={stats.project_health_score}
-              suffix="/100"
-              prefix={<ClockCircleOutlined />}
-              valueStyle={{ 
-                color: stats.project_health_score >= 80 ? '#52c41a' : 
-                       stats.project_health_score >= 60 ? '#fa8c16' : '#ff4d4f'
-              }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Test Coverage"
-              value={stats.test_coverage}
-              suffix="%"
-              valueStyle={{ color: '#1890ff' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Pending Items"
-              value={quick_stats.tasks_assigned_to_me}
-              valueStyle={{ color: '#fa8c16' }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* My Projects and Requirements */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} lg={12}>
-          <Card title="My Projects" size="small">
-            {my_projects.length > 0 ? (
-              my_projects.slice(0, 5).map(project => (
-                <ProjectCard 
-                  key={project.id} 
-                  project={project}
-                  variant="compact"
-                  style={{ marginBottom: 8 }}
-                />
-              ))
-            ) : (
-              <p style={{ textAlign: 'center', color: '#999' }}>
-                No projects assigned
-              </p>
-            )}
-          </Card>
-        </Col>
-        
-        <Col xs={24} lg={12}>
-          <Card title="My Requirements" size="small">
-            {my_requirements.length > 0 ? (
-              my_requirements.slice(0, 5).map(requirement => (
-                <RequirementCard 
-                  key={requirement.id} 
-                  requirement={requirement}
-                  variant="compact"
-                  style={{ marginBottom: 8 }}
-                />
-              ))
-            ) : (
-              <p style={{ textAlign: 'center', color: '#999' }}>
-                No requirements assigned
-              </p>
-            )}
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Recent Activity */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col xs={24}>
-          <Card title="Recent Activity" size="small">
-            {activity.length > 0 ? (
-              activity.slice(0, 10).map(item => (
-                <div key={item.id} style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  padding: '8px 0',
-                  borderBottom: '1px solid #f0f0f0'
-                }}>
-                  <UserAvatar 
-                    user={{ 
-                      id: item.user_id, 
-                      username: item.user_name,
-                      avatar: item.user_avatar 
-                    } as any}
-                    size="small"
-                    style={{ marginRight: 12 }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 500 }}>{item.title}</div>
-                    {item.description && (
-                      <div style={{ fontSize: '12px', color: '#666' }}>
-                        {item.description}
-                      </div>
-                    )}
-                    <div style={{ fontSize: '11px', color: '#999' }}>
-                      {new Date(item.created_at).toLocaleString()}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p style={{ textAlign: 'center', color: '#999' }}>
-                No recent activity
-              </p>
-            )}
-          </Card>
-        </Col>
-      </Row>
-    </div>
+      <Grid container spacing={3}>
+        {statCards.map((card, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card sx={{ height: "100%" }}>
+              <CardContent>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 56,
+                      height: 56,
+                      borderRadius: "12px",
+                      bgcolor: `${card.color}15`,
+                      color: card.color,
+                      mr: 2,
+                    }}
+                  >
+                    {card.icon}
+                  </Box>
+                  <Box>
+                    <Typography variant="h4" component="div" fontWeight={700}>
+                      {card.value}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {card.subtitle}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Typography variant="h6" component="h3">
+                  {card.title}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
-}; 
+};

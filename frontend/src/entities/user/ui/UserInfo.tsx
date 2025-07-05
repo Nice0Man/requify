@@ -1,19 +1,17 @@
 import React from 'react';
-import { Descriptions, Space, Typography } from 'antd';
+import { Box, Typography, Grid, Divider } from '@mui/material';
 import { UserAvatar } from './UserAvatar';
 import { UserStatus } from './UserStatus';
 import type { User, UserWithDetails } from '../model/types';
 import { getUserFullName, formatLastLogin, USER_ROLES } from '../model/types';
 
-const { Text, Title } = Typography;
-
 interface UserInfoProps {
   user: User | UserWithDetails;
   layout?: 'horizontal' | 'vertical';
-  size?: 'small' | 'middle' | 'default';
+  size?: 'small' | 'medium' | 'large';
   showAvatar?: boolean;
   showExtendedInfo?: boolean;
-  column?: number;
+  columns?: number;
   className?: string;
 }
 
@@ -24,10 +22,10 @@ interface UserInfoProps {
 export const UserInfo: React.FC<UserInfoProps> = ({
   user,
   layout = 'horizontal',
-  size = 'default',
+  size = 'medium',
   showAvatar = true,
   showExtendedInfo = false,
-  column = 1,
+  columns = 1,
   className,
 }) => {
   const fullName = getUserFullName(user);
@@ -37,104 +35,87 @@ export const UserInfo: React.FC<UserInfoProps> = ({
   const getRoleLabel = () => {
     switch (user.role) {
       case USER_ROLES.ADMIN:
-        return 'Администратор';
+        return 'Administrator';
       case USER_ROLES.MANAGER:
-        return 'Менеджер';
+        return 'Manager';
       case USER_ROLES.ANALYST:
-        return 'Аналитик';
+        return 'Analyst';
       case USER_ROLES.DEVELOPER:
-        return 'Разработчик';
+        return 'Developer';
       case USER_ROLES.TESTER:
-        return 'Тестировщик';
+        return 'Tester';
       case USER_ROLES.CLIENT:
-        return 'Клиент';
+        return 'Client';
       case USER_ROLES.VIEWER:
-        return 'Наблюдатель';
+        return 'Viewer';
       default:
         return user.role;
     }
   };
 
+  const InfoItem: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+    <Box mb={layout === 'vertical' ? 2 : 1}>
+      <Typography variant="body2" color="text.secondary" component="dt">
+        {label}
+      </Typography>
+      <Typography variant="body1" component="dd" sx={{ mt: 0.5 }}>
+        {children}
+      </Typography>
+    </Box>
+  );
+
   const basicItems = [
-    {
-      key: 'name',
-      label: 'Имя',
-      children: fullName,
-    },
-    {
-      key: 'email',
-      label: 'Email',
-      children: user.email,
-    },
-    {
-      key: 'role',
-      label: 'Роль',
-      children: getRoleLabel(),
-    },
-    {
-      key: 'status',
-      label: 'Статус',
-      children: <UserStatus status={user.status} />,
-    },
+    { label: 'Name', value: fullName },
+    { label: 'Email', value: user.email },
+    { label: 'Role', value: getRoleLabel() },
+    { label: 'Status', value: <UserStatus user={user} variant="chip" size={size === 'small' ? 'small' : 'medium'} /> },
   ];
 
   const extendedItems = showExtendedInfo && userWithDetails ? [
     ...basicItems,
-    ...(userWithDetails.department ? [{
-      key: 'department',
-      label: 'Отдел',
-      children: userWithDetails.department,
-    }] : []),
-    ...(userWithDetails.last_login ? [{
-      key: 'lastLogin',
-      label: 'Последний вход',
-      children: formatLastLogin(userWithDetails.last_login),
-    }] : []),
-    ...(userWithDetails.projects_managed !== undefined ? [{
-      key: 'projectsManaged',
-      label: 'Управляет проектами',
-      children: userWithDetails.projects_managed,
-    }] : []),
-    ...(userWithDetails.projects_participating !== undefined ? [{
-      key: 'projectsParticipating',
-      label: 'Участвует в проектах',
-      children: userWithDetails.projects_participating,
-    }] : []),
-    ...(userWithDetails.requirements_created !== undefined ? [{
-      key: 'requirementsCreated',
-      label: 'Создано требований',
-      children: userWithDetails.requirements_created,
-    }] : []),
-    {
-      key: 'createdAt',
-      label: 'Дата регистрации',
-      children: new Date(user.created_at).toLocaleDateString('ru-RU'),
-    },
+    ...(userWithDetails.department ? [{ label: 'Department', value: userWithDetails.department }] : []),
+    ...(userWithDetails.last_login ? [{ label: 'Last Login', value: formatLastLogin(userWithDetails.last_login) }] : []),
+    ...(userWithDetails.projects_managed !== undefined ? [{ label: 'Managed Projects', value: userWithDetails.projects_managed }] : []),
+    ...(userWithDetails.projects_participating !== undefined ? [{ label: 'Participating Projects', value: userWithDetails.projects_participating }] : []),
+    ...(userWithDetails.requirements_created !== undefined ? [{ label: 'Created Requirements', value: userWithDetails.requirements_created }] : []),
+    { label: 'Registration Date', value: new Date(user.created_at).toLocaleDateString() },
   ] : basicItems;
 
   return (
-    <div className={className}>
+    <Box className={className}>
       {showAvatar && (
-        <div style={{ marginBottom: 16, textAlign: layout === 'vertical' ? 'center' : 'left' }}>
-          <Space direction={layout === 'vertical' ? 'vertical' : 'horizontal'} align="center">
+        <Box mb={2} textAlign={layout === 'vertical' ? 'center' : 'left'}>
+          <Box 
+            display="flex" 
+            flexDirection={layout === 'vertical' ? 'column' : 'row'} 
+            alignItems="center" 
+            gap={2}
+          >
             <UserAvatar user={user} size="large" />
-            <div>
-              <Title level={4} style={{ margin: 0 }}>
+            <Box textAlign={layout === 'vertical' ? 'center' : 'left'}>
+              <Typography variant="h5" fontWeight={600} gutterBottom>
                 {fullName}
-              </Title>
-              <Text type="secondary">{user.email}</Text>
-            </div>
-          </Space>
-        </div>
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {user.email}
+              </Typography>
+            </Box>
+          </Box>
+          <Divider sx={{ mt: 2 }} />
+        </Box>
       )}
       
-      <Descriptions
-        layout={layout}
-        size={size}
-        column={column}
-        items={extendedItems}
-        bordered={layout === 'vertical'}
-      />
-    </div>
+      <Box component="dl" sx={{ margin: 0 }}>
+        <Grid container spacing={layout === 'vertical' ? 2 : 1}>
+          {extendedItems.map((item, index) => (
+            <Grid item xs={12} sm={columns > 1 ? 12 / columns : 12} key={index}>
+              <InfoItem label={item.label}>
+                {item.value}
+              </InfoItem>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Box>
   );
 }; 

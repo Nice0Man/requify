@@ -72,7 +72,7 @@ export interface SessionInfo {
 // =============================================================================
 
 export class AuthApi {
-  private readonly baseUrl = "/api/v1/auth";
+  private readonly baseUrl = "/auth";
 
   /**
    * User login
@@ -271,6 +271,38 @@ export class AuthApi {
   }
 
   /**
+   * Update current user profile
+   */
+  async updateCurrentUser(userData: Partial<UserProfile>): Promise<UserProfile> {
+    return apiClient
+      .put<UserProfile>('/api/v1/users/me', userData)
+      .then((res) => res.data);
+  }
+
+  /**
+   * Get user by ID
+   */
+  async getUser(userId: number): Promise<UserProfile> {
+    return apiClient
+      .get<UserProfile>(`/api/v1/users/${userId}`)
+      .then((res) => res.data);
+  }
+
+  /**
+   * Get users list
+   */
+  async getUsers(params?: {
+    skip?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+  }): Promise<{ items: UserProfile[]; total: number }> {
+    return apiClient
+      .get<{ items: UserProfile[]; total: number }>('/api/v1/users/', { params })
+      .then((res) => res.data);
+  }
+
+  /**
    * Check if username is available
    */
   async checkUsernameAvailability(username: string): Promise<{
@@ -305,5 +337,13 @@ export class AuthApi {
   }
 }
 
-// Export singleton instance
+// Экспорт экземпляра API
 export const authApi = new AuthApi();
+
+// Создаем алиас для пользовательских операций
+export const usersApi = {
+  getCurrentUser: () => authApi.getCurrentUser(),
+  updateCurrentUser: (userData: Partial<UserProfile>) => authApi.updateCurrentUser(userData),
+  getUser: (userId: number) => authApi.getUser(userId),
+  getUsers: (params?: { skip?: number; limit?: number; search?: string; role?: string }) => authApi.getUsers(params),
+};

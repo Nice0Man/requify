@@ -53,7 +53,7 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import { authApi } from "@/features/auth/api/auth.api";
 import { UserCreate } from '@/shared/api/types';
-import { UserRole } from '@/entities/user/model/types';
+import { UserRole } from '@/entities/user';
 
 // Validation schema
 const registerSchema = yup.object({

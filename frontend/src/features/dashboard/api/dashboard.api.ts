@@ -93,7 +93,7 @@ export interface DashboardRequirementStats {
 // =============================================================================
 
 class DashboardApi {
-  private baseUrl = "/api/v1/dashboard";
+  private baseUrl = "/dashboard";
 
   /**
    * Get complete dashboard overview

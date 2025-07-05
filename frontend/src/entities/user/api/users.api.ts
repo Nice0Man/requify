@@ -18,7 +18,7 @@ import type { PaginatedResponse, ApiResponse } from "@/shared/types/api";
  * В соответствии с принципами FSD, содержит только API функции без бизнес-логики
  */
 export class UsersApi {
-  private readonly baseUrl = "/api/v1/users";
+  private readonly baseUrl = "/users";
 
   /**
    * Получить список пользователей

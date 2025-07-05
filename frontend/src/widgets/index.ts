@@ -10,6 +10,9 @@ export { SystemHealth } from "./system-health";
 export { QuickActions } from "./quick-actions";
 export { Kanban } from "./kanban";
 
+// Landing widgets
+export * from './landing';
+
 // Export widget types
 export type {
   ActivityFeedProps,

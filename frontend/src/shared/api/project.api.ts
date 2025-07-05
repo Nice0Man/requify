@@ -2,67 +2,58 @@ import { apiClient } from "@/shared/api/client";
 import type { ApiResponse } from "@/shared/api/client";
 import type { UserProfile } from "@/entities/user";
 
-// =============================================================================
-// Project API Types (Контракты на основе API документации)
-// =============================================================================
 
-// Базовые типы проекта
+
 export interface ProjectBase {
-  id: number;
+  code: string; 
   name: string;
   description?: string;
   status: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface Project extends ProjectBase {
+  id: number;
   owner_id: number;
-  manager_id?: number;
-  team_lead_id?: number;
-  client_id?: number;
-  start_date?: string;
-  end_date?: string;
-  tags?: string[];
-  is_active: boolean;
+  created_at: string;
+  // Убраны поля которых нет в бэкенде: manager_id, team_lead_id, client_id, start_date, end_date, tags, is_active
 }
 
 export interface ProjectCreate {
+  code: string; // Добавлено: обязательное поле из бэкенда
   name: string;
   description?: string;
   status?: string;
-  manager_id?: number;
-  team_lead_id?: number;
-  client_id?: number;
-  start_date?: string;
-  end_date?: string;
-  tags?: string[];
+  // Убраны поля которых нет в бэкенде: manager_id, team_lead_id, client_id, start_date, end_date, tags
 }
 
 export interface ProjectUpdate {
+  code?: string; // Добавлено: обязательное поле из бэкенда
   name?: string;
   description?: string;
   status?: string;
-  manager_id?: number;
-  team_lead_id?: number;
-  client_id?: number;
-  start_date?: string;
-  end_date?: string;
-  tags?: string[];
-  is_active?: boolean;
+  // Убраны поля которых нет в бэкенде: manager_id, team_lead_id, client_id, start_date, end_date, tags, is_active
 }
 
+// Расширенная версия с статистикой (соответствует ProjectWithStats в бэкенде)
 export interface ProjectWithStats extends Project {
   total_requirements: number;
   requirements_completed: number;
-  requirements_in_progress: number;
-  requirements_pending: number;
-  total_releases: number;
   active_releases: number;
-  completed_releases: number;
-  team_members_count: number;
+  specs_count: number;
+  requirement_groups_count: number;
+  
+  // UI расширения (не в бэкенде)
+  requirements_in_progress?: number;
+  requirements_pending?: number;
+  total_releases?: number;
+  completed_releases?: number;
+  team_members_count?: number;
   last_activity?: string;
 }
+
+// =============================================================================
+// Related Types (Requirements, Releases)
+// =============================================================================
 
 // Типы для требований проекта
 export interface Requirement {
@@ -70,14 +61,19 @@ export interface Requirement {
   project_id: number;
   title: string;
   description?: string;
-  type: string;
-  priority: string;
-  status: string;
+  type_id: number; // Как в бэкенде - ID типа, а не строка
+  priority_id: number; // Как в бэкенде - ID приоритета, а не строка  
+  status_id: number; // Как в бэкенде - ID статуса, а не строка
+  author_id: number;
+  last_modified_by: number;
+  release_id?: number;
+  spec_id?: number;
+  deadline?: string;
   created_at: string;
   updated_at: string;
 }
 
-// Типы для релизов проекта
+// Типы для релизов проекта  
 export interface Release {
   id: number;
   project_id: number;
@@ -85,39 +81,47 @@ export interface Release {
   version: string;
   description?: string;
   status: string;
+  planned_date?: string;
   release_date?: string;
   created_at: string;
   updated_at: string;
 }
 
-// Статистика проекта
+// =============================================================================
+// Response Types
+// =============================================================================
+
+// Статистика проекта (соответствует бэкенду)
 export interface ProjectStats {
   total_requirements: number;
+  requirements_completed: number;
+  active_releases: number;
+  specs_count: number;
+  requirement_groups_count: number;
+  
+  // Дополнительная статистика для UI
   requirements_by_status: Record<string, number>;
   requirements_by_type: Record<string, number>;
   requirements_by_priority: Record<string, number>;
   total_releases: number;
   releases_by_status: Record<string, number>;
-  team_members_count: number;
   completion_percentage: number;
-  average_completion_time: number;
-  last_activity: string;
+  average_completion_time?: number;
+  last_activity?: string;
 }
 
 // Фильтры для получения проектов
 export interface ProjectFilters {
   search?: string;
   status?: string[];
-  manager_id?: number;
-  team_lead_id?: number;
-  client_id?: number;
+  owner_id?: number; // Изменено с manager_id на owner_id как в бэкенде
   created_from?: string;
   created_to?: string;
-  tags?: string[];
   limit?: number;
   offset?: number;
   order_by?: string;
   order_direction?: "asc" | "desc";
+  // Убраны: manager_id, team_lead_id, client_id, tags
 }
 
 // Ответ для списка проектов
@@ -143,7 +147,7 @@ export interface ProjectsWithStatsResponse {
 // =============================================================================
 
 export class ProjectApi {
-  private readonly baseUrl = "/api/v1/projects";
+  private readonly baseUrl = "/projects";
 
   /**
    * Получить список проектов

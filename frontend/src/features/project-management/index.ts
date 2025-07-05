@@ -4,7 +4,7 @@
 export { projectManagementApi } from './api';
 
 // Export project management models and hooks  
-export { useProjectManagement, useProjectForm } from './model';
+export { useProjectManagement, useProjectForm, getStatusColor } from './model';
 export type { 
   ProjectManagementState,
   ProjectFormData

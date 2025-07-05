@@ -59,21 +59,16 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { format, isAfter, parseISO } from "date-fns";
-import type {
-  Requirement,
-  RequirementWithDetails,
-  RequirementCreate,
-  RequirementUpdate,
-  RequirementType,
-  RequirementPriority,
-  RequirementStatus,
-} from "@/shared/api/types/schemas";
+
 import { 
   requirementsApi,
   projectsApi,
 } from "@/shared/api/index";
 import { referenceApi } from "@/shared/api/reference.api";
 import { useAuth } from "@/features/auth/model/auth.context";
+import type { Project } from "@/shared/api/project.api";
+import type { PaginatedResponse, RequirementPriority, RequirementStatus } from "@/shared/types/api";
+import { RequirementType, RequirementWithDetails } from "@/entities";
 
 // Local interfaces for this page
 interface RequirementListParams {
@@ -132,7 +127,7 @@ const RequirementsPage: React.FC = () => {
   });
   
   // Reference data
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [types, setTypes] = useState<RequirementType[]>([]);
   const [priorities, setPriorities] = useState<RequirementPriority[]>([]);
   const [statuses, setStatuses] = useState<RequirementStatus[]>([]);
@@ -167,29 +162,29 @@ const RequirementsPage: React.FC = () => {
         sort_order: sortModel[0]?.sort,
         project_id: filters.projectId || undefined,
         status_id:
-          filters.statusIds.length === 1 ? filters.statusIds[0] : undefined,
+          filters.statusIds && filters.statusIds.length === 1 ? filters.statusIds[0] : undefined,
         priority_id:
-          filters.priorityIds.length === 1 ? filters.priorityIds[0] : undefined,
-        type_id: filters.typeIds.length === 1 ? filters.typeIds[0] : undefined,
+          filters.priorityIds && filters.priorityIds.length === 1 ? filters.priorityIds[0] : undefined,
+        type_id: filters.typeIds && filters.typeIds.length === 1 ? filters.typeIds[0] : undefined,
       };
 
       const response = await requirementsApi.getRequirements(params);
-      let fetchedRequirements = response.data?.items || [];
+      let fetchedRequirements = response.items || [];
 
       // Enrich requirements with reference data names if missing
-      if (fetchedRequirements.length > 0 && !fetchedRequirements[0].project_name) {
-        fetchedRequirements = fetchedRequirements.map(req => ({
+      if (fetchedRequirements.length > 0 && !fetchedRequirements[0].project?.name  ) {
+        fetchedRequirements = fetchedRequirements.map((req: RequirementWithDetails) => ({
           ...req,
           project_name: projects.find(p => p.id === req.project_id)?.name || 'Unknown Project',
           type_name: types.find(t => t.id === req.type_id)?.name || 'Unknown Type',
           priority_name: priorities.find(p => p.id === req.priority_id)?.name || 'Unknown Priority',
           status_name: statuses.find(s => s.id === req.status_id)?.name || 'Unknown Status',
-          author_name: req.author_name || 'Unknown Author'
+          author_name: req.assigned_to_user?.email || 'Unknown Author'
         }));
       }
 
       setRequirements(fetchedRequirements);
-      setTotalCount(response.data?.total || 0);
+      setTotalCount(response.total || 0);
     } catch (error: any) {
       console.error("Failed to load requirements:", error);
       setRequirements([]);
@@ -210,7 +205,7 @@ const RequirementsPage: React.FC = () => {
         referenceApi.getRequirementStatuses(),
       ]);
 
-      setProjects(projectsRes.data.items || []);
+      setProjects(projectsRes.items || []);
       setTypes(typesRes.data || []);
       setPriorities(prioritiesRes.data || []);
       setStatuses(statusesRes.data || []);
@@ -288,10 +283,10 @@ const RequirementsPage: React.FC = () => {
       const params = {
         project_id: filters.projectId || undefined,
         status_ids:
-          filters.statusIds.length > 0 ? filters.statusIds : undefined,
+          filters.statusIds && filters.statusIds.length > 0 ? filters.statusIds : undefined,
         priority_ids:
-          filters.priorityIds.length > 0 ? filters.priorityIds : undefined,
-        type_ids: filters.typeIds.length > 0 ? filters.typeIds : undefined,
+          filters.priorityIds && filters.priorityIds.length > 0 ? filters.priorityIds : undefined,
+        type_ids: filters.typeIds && filters.typeIds.length > 0 ? filters.typeIds : undefined,
         include_relationships: true,
         include_test_results: true,
         include_comments: false,
@@ -473,11 +468,11 @@ const RequirementsPage: React.FC = () => {
     let count = 0;
     if (filters.search) count++;
     if (filters.projectId) count++;
-    if (filters.statusIds.length > 0) count++;
-    if (filters.priorityIds.length > 0) count++;
-    if (filters.typeIds.length > 0) count++;
-    if (filters.assigneeIds.length > 0) count++;
-    if (filters.authorIds.length > 0) count++;
+    if (filters.statusIds && filters.statusIds.length > 0) count++;
+    if (filters.priorityIds && filters.priorityIds.length > 0) count++;
+    if (filters.typeIds && filters.typeIds.length > 0) count++;
+    if (filters.assigneeIds && filters.assigneeIds.length > 0) count++;
+    if (filters.authorIds && filters.authorIds.length > 0) count++;
     if (filters.hasParent !== null) count++;
     if (filters.isOverdue !== null) count++;
     return count;
@@ -490,18 +485,18 @@ const RequirementsPage: React.FC = () => {
     
     // For status-based calculations, check both status_name and fall back to status lookup
     const inProgress = reqsWithDetails.filter((r) => {
-      const statusName = r.status_name || statuses.find(s => s.id === r.status_id)?.name || '';
+      const statusName = r.status?.name || statuses.find(s => s.id === r.status_id)?.name || '';
       return statusName && !statusName.toLowerCase().includes("completed") && !statusName.toLowerCase().includes("done");
     }).length;
     
     const completed = reqsWithDetails.filter((r) => {
-      const statusName = r.status_name || statuses.find(s => s.id === r.status_id)?.name || '';
+      const statusName = r.status?.name || statuses.find(s => s.id === r.status_id)?.name || '';
       return statusName && (statusName.toLowerCase().includes("completed") || statusName.toLowerCase().includes("done"));
     }).length;
     
     // For priority-based calculations, check both priority_name and fall back to priority lookup
     const highRisk = reqsWithDetails.filter((r) => {
-      const priorityName = r.priority_name || priorities.find(p => p.id === r.priority_id)?.name || '';
+      const priorityName = r.priority?.name || priorities.find(p => p.id === r.priority_id)?.name || '';
       return priorityName && (priorityName.toLowerCase().includes("high") || priorityName.toLowerCase().includes("critical"));
     }).length;
 
@@ -709,7 +704,7 @@ const RequirementsPage: React.FC = () => {
                   label="Project"
                 >
                   <MenuItem value="">All Projects</MenuItem>
-                  {projects.map((project: any) => (
+                  {projects.map((project) => (
                     <MenuItem key={project.id} value={project.id}>
                       {project.name}
                     </MenuItem>
@@ -724,7 +719,7 @@ const RequirementsPage: React.FC = () => {
                 size="small"
                 options={statuses}
                 getOptionLabel={(option) => option.name}
-                value={statuses.filter((s) => filters.statusIds.includes(s.id))}
+                value={statuses.filter((s) => filters.statusIds && filters.statusIds.includes(s.id))}
                 onChange={(_, value) =>
                   handleFilterChange(
                     "statusIds",
@@ -753,7 +748,7 @@ const RequirementsPage: React.FC = () => {
                 options={priorities}
                 getOptionLabel={(option) => option.name}
                 value={priorities.filter((p) =>
-                  filters.priorityIds.includes(p.id)
+                  filters.priorityIds && filters.priorityIds.includes(p.id)
                 )}
                 onChange={(_, value) =>
                   handleFilterChange(
@@ -783,7 +778,7 @@ const RequirementsPage: React.FC = () => {
                 size="small"
                 options={types}
                 getOptionLabel={(option) => option.name}
-                value={types.filter((t) => filters.typeIds.includes(t.id))}
+                value={types.filter((t) => filters.typeIds && filters.typeIds.includes(t.id))}
                 onChange={(_, value) =>
                   handleFilterChange(
                     "typeIds",

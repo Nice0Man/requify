@@ -1,95 +1,100 @@
-import React from 'react';
-import { Tag, Badge } from 'antd';
-import type { UserStatus as UserStatusType } from '../model/types';
-import { USER_STATUSES, getUserStatusColor } from '../model/types';
+import React from "react";
+import { Chip, Badge } from "@mui/material";
+import { USER_STATUSES, getUserStatusColor } from "../model/types";
+import type { User, UserStatus as UserStatusType } from "../model/types";
 
-interface UserStatusProps {
-  status: UserStatusType;
-  type?: 'tag' | 'badge' | 'dot';
-  size?: 'small' | 'default';
+export interface UserStatusProps {
+  user?: User;
+  status?: UserStatusType;
+  variant?: "chip" | "badge" | "dot";
+  size?: "small" | "medium";
   showText?: boolean;
-  className?: string;
 }
 
-/**
- * UserStatus - компонент для отображения статуса пользователя
- * Может отображаться как Tag, Badge или просто цветная точка
- */
 export const UserStatus: React.FC<UserStatusProps> = ({
+  user,
   status,
-  type = 'tag',
-  size = 'default',
+  variant = "chip",
+  size = "medium",
   showText = true,
-  className,
 }) => {
-  const statusColor = getUserStatusColor(status);
+  const userStatus = status || user?.status;
   
-  // Получаем читаемое название статуса
+  if (!userStatus) return null;
+
+  const statusColor = getUserStatusColor(userStatus);
+  const statusText = userStatus.charAt(0).toUpperCase() + userStatus.slice(1);
+  
   const getStatusLabel = () => {
-    switch (status) {
-      case USER_STATUSES.ACTIVE as UserStatusType:
-        return 'Активный';
-      case USER_STATUSES.INACTIVE as UserStatusType:
-        return 'Неактивный';
-      case USER_STATUSES.PENDING as UserStatusType:
-        return 'Ожидает';
-      case USER_STATUSES.SUSPENDED as UserStatusType:
-        return 'Заблокирован';
-      case USER_STATUSES.DELETED as UserStatusType:
-        return 'Удален';
-      default:
-        return status;
+    switch (userStatus) {
+      case USER_STATUSES.ACTIVE: return "Active";
+      case USER_STATUSES.INACTIVE: return "Inactive";
+      case USER_STATUSES.PENDING: return "Pending";
+      case USER_STATUSES.SUSPENDED: return "Suspended";
+      case USER_STATUSES.DELETED: return "Deleted";
+      default: return statusText;
     }
   };
 
-  const statusLabel = getStatusLabel();
+  const getMuiColor = () => {
+    switch (userStatus) {
+      case USER_STATUSES.ACTIVE: return "success";
+      case USER_STATUSES.INACTIVE: return "default";
+      case USER_STATUSES.PENDING: return "warning";
+      case USER_STATUSES.SUSPENDED: return "error";
+      case USER_STATUSES.DELETED: return "error";
+      default: return "default";
+    }
+  };
 
-  if (type === 'tag') {
+  if (variant === "chip") {
     return (
-      <Tag
-        color={statusColor}
-        className={className}
-        style={{ 
-          fontSize: size === 'small' ? '11px' : '12px',
-          margin: 0,
+      <Chip
+        label={showText ? getStatusLabel() : ""}
+        color={getMuiColor() as any}
+        size={size}
+        variant="filled"
+        sx={{
+          backgroundColor: statusColor,
+          color: 'white',
+          fontWeight: 500,
         }}
-      >
-        {showText ? statusLabel : ''}
-      </Tag>
-    );
-  }
-
-  if (type === 'badge') {
-    return (
-      <Badge
-        color={statusColor}
-        text={showText ? statusLabel : ''}
-        className={className}
-        style={{ fontSize: size === 'small' ? '11px' : '12px' }}
       />
     );
   }
 
-  if (type === 'dot') {
+  if (variant === "badge") {
     return (
-      <span className={className} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-        <span
-          style={{
-            width: size === 'small' ? 6 : 8,
-            height: size === 'small' ? 6 : 8,
-            borderRadius: '50%',
+      <Badge
+        color={getMuiColor() as any}
+        variant="dot"
+        sx={{
+          '& .MuiBadge-badge': {
             backgroundColor: statusColor,
-            display: 'inline-block',
-          }}
-        />
-        {showText && (
-          <span style={{ fontSize: size === 'small' ? '11px' : '12px' }}>
-            {statusLabel}
-          </span>
-        )}
-      </span>
+          }
+        }}
+      >
+        {showText && getStatusLabel()}
+      </Badge>
     );
   }
 
-  return null;
+  // dot variant
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div
+        style={{
+          width: size === 'small' ? 6 : 8,
+          height: size === 'small' ? 6 : 8,
+          borderRadius: '50%',
+          backgroundColor: statusColor,
+        }}
+      />
+      {showText && (
+        <span style={{ fontSize: size === 'small' ? '12px' : '14px' }}>
+          {getStatusLabel()}
+        </span>
+      )}
+    </div>
+  );
 }; 

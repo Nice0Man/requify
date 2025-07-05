@@ -1,143 +1,142 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { Spin, Result, Button } from 'antd';
-import { useAuth } from '../model';
-import { useAuthGuard } from '../model/auth.hooks';
-import type { AuthGuardConfig } from '../model';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  CircularProgress,
+  Alert,
+  Button,
+  Typography,
+} from "@mui/material";
+import { useAuth } from "../model/auth.context";
+import { useNavigate } from "react-router-dom";
 
-export interface AuthGuardProps extends AuthGuardConfig {
+interface AuthGuardProps {
   children: React.ReactNode;
+  requiredRole?: string[];
   fallback?: React.ReactNode;
-  loadingComponent?: React.ReactNode;
-  unauthorizedComponent?: React.ReactNode;
+  redirectTo?: string;
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({
   children,
+  requiredRole,
   fallback,
-  loadingComponent,
-  unauthorizedComponent,
-  requireAuth = true,
-  requirePermissions = [],
-  requireAllPermissions = false,
-  redirectTo = '/auth/login',
-  allowUnverifiedEmail = false,
+  redirectTo = "/auth/login",
 }) => {
-  const location = useLocation();
-  const { isAuthenticated, isLoading, isInitialized, user, permissions } = useAuth();
-  
-  const guardConfig: AuthGuardConfig = {
-    requireAuth,
-    requirePermissions,
-    requireAllPermissions,
-    redirectTo,
-    allowUnverifiedEmail,
+  const { user, isAuthenticated, isLoading, checkAuth } = useAuth();
+  const [isInitialized, setIsInitialized] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        await checkAuth();
+      } finally {
+        setIsInitialized(true);
+      }
+    };
+
+    if (!isInitialized) {
+      initAuth();
+    }
+  }, [checkAuth, isInitialized]);
+
+  const handleGoToLogin = () => {
+    navigate(redirectTo);
   };
 
-  const { isAuthorized, isLoading: guardLoading } = useAuthGuard(guardConfig);
-
-  // Show loading while auth is initializing or guard is checking
-  if (!isInitialized || isLoading || guardLoading) {
-    if (loadingComponent) {
-      return <>{loadingComponent}</>;
-    }
-    
+  // Показываем загрузку пока проверяем аутентификацию
+  if (isLoading || !isInitialized) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '200px' 
-      }}>
-        <Spin size="large" tip="Loading..." />
-      </div>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+        flexDirection="column"
+        gap={2}
+      >
+        <CircularProgress size={40} />
+        <Typography variant="body1" color="text.secondary">
+          Loading...
+        </Typography>
+      </Box>
     );
   }
 
-  // Handle unauthenticated users
-  if (requireAuth && !isAuthenticated) {
+  // Пользователь не аутентифицирован
+  if (!isAuthenticated || !user) {
     if (fallback) {
       return <>{fallback}</>;
     }
-    
+
     return (
-      <Navigate 
-        to={redirectTo} 
-        state={{ from: location.pathname }} 
-        replace 
-      />
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+        flexDirection="column"
+        gap={3}
+        p={3}
+      >
+        <Alert severity="warning" sx={{ maxWidth: 400 }}>
+          <Typography variant="h6" gutterBottom>
+            Authentication Required
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            You need to sign in to access this page.
+          </Typography>
+        </Alert>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleGoToLogin}
+          size="large"
+        >
+          Go to Login
+        </Button>
+      </Box>
     );
   }
 
-  // Handle unverified email if required
-  if (requireAuth && !allowUnverifiedEmail && user && !(user as any).email_verified) {
-    if (unauthorizedComponent) {
-      return <>{unauthorizedComponent}</>;
-    }
-    
-    return (
-      <Result
-        status="warning"
-        title="Email Verification Required"
-        subTitle="Please verify your email address to access this feature."
-        extra={[
-          <Button type="primary" key="verify">
-            Resend Verification Email
-          </Button>,
-          <Button key="logout">
-            Sign Out
-          </Button>,
-        ]}
-      />
-    );
-  }
+  // Проверяем роли если они требуются
+  if (requiredRole && requiredRole.length > 0) {
+    const hasRequiredRole = requiredRole.includes(user.role);
 
-  // Handle insufficient permissions
-  if (requirePermissions && requirePermissions.length > 0) {
-    const hasRequiredPermissions = requireAllPermissions
-      ? requirePermissions.every(permission => permissions.includes(permission))
-      : requirePermissions.some(permission => permissions.includes(permission));
-
-    if (!hasRequiredPermissions) {
-      if (unauthorizedComponent) {
-        return <>{unauthorizedComponent}</>;
-      }
-      
+    if (!hasRequiredRole) {
       return (
-        <Result
-          status="403"
-          title="Access Denied"
-          subTitle="You don't have permission to access this resource."
-          extra={[
-            <Button type="primary" key="home" onClick={() => window.history.back()}>
-              Go Back
-            </Button>,
-          ]}
-        />
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          flexDirection="column"
+          gap={3}
+          p={3}
+        >
+          <Alert severity="error" sx={{ maxWidth: 400 }}>
+            <Typography variant="h6" gutterBottom>
+              Access Denied
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              You don't have permission to access this page. Required role:{" "}
+              {requiredRole.join(", ")}
+            </Typography>
+          </Alert>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/")}
+            size="large"
+          >
+            Go to Dashboard
+          </Button>
+        </Box>
       );
     }
   }
 
-  // User is authorized, render children
-  if (isAuthorized === false) {
-    if (unauthorizedComponent) {
-      return <>{unauthorizedComponent}</>;
-    }
-    
-    return (
-      <Result
-        status="403"
-        title="Access Denied"
-        subTitle="You are not authorized to access this resource."
-        extra={[
-          <Button type="primary" key="home" onClick={() => window.history.back()}>
-            Go Back
-          </Button>,
-        ]}
-      />
-    );
-  }
-
+  // Пользователь аутентифицирован и имеет необходимые права
   return <>{children}</>;
 };
 
@@ -148,7 +147,11 @@ export const RequireAuth: React.FC<{
   redirectTo?: string;
 }> = ({ children, fallback, redirectTo }) => {
   return (
-    <AuthGuard requireAuth={true} fallback={fallback} redirectTo={redirectTo}>
+    <AuthGuard
+      requiredRole={["admin", "developer", "viewer", "manager", "qa"]}
+      fallback={fallback}
+      redirectTo={redirectTo}
+    >
       {children}
     </AuthGuard>
   );
@@ -158,17 +161,11 @@ export const RequireAuth: React.FC<{
 export const RequirePermissions: React.FC<{
   children: React.ReactNode;
   permissions: string[];
-  requireAll?: boolean;
   fallback?: React.ReactNode;
-}> = ({ children, permissions, requireAll = false, fallback }) => {
+}> = ({ children, permissions, fallback }) => {
   return (
-    <AuthGuard 
-      requireAuth={true}
-      requirePermissions={permissions}
-      requireAllPermissions={requireAll}
-      fallback={fallback}
-    >
+    <AuthGuard requiredRole={permissions} fallback={fallback}>
       {children}
     </AuthGuard>
   );
-}; 
+};

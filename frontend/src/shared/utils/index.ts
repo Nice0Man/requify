@@ -25,3 +25,6 @@ export { tokenStorage } from "./tokenStorage";
 export * from "./formatters";
 export * from "./validators";
 export * from "./constants";
+
+// User utilities (re-export from user entity)
+export { getUserInitials, getUserFullName } from "@/entities/user";

@@ -1,14 +1,12 @@
 import React from 'react';
-import { Card, Avatar, Typography, Tag, Space } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { Card, CardContent, Avatar, Typography, Chip, Box } from '@mui/material';
+import { Person as UserOutlined } from '@mui/icons-material';
 import type { User } from '../model/types';
 import { getUserFullName, getUserInitials, getUserStatusColor, getUserRoleColor, isUserActive } from '../model/types';
 
-const { Text, Title } = Typography;
-
 interface UserCardProps {
   user: User;
-  size?: 'small' | 'default' | 'large';
+  size?: 'small' | 'medium' | 'large';
   showStatus?: boolean;
   showRole?: boolean;
   showEmail?: boolean;
@@ -22,7 +20,7 @@ interface UserCardProps {
  */
 export const UserCard: React.FC<UserCardProps> = ({
   user,
-  size = 'default',
+  size = 'medium',
   showStatus = true,
   showRole = true,
   showEmail = true,
@@ -39,66 +37,97 @@ export const UserCard: React.FC<UserCardProps> = ({
     }
   };
 
-  const avatarSize = size === 'small' ? 32 : size === 'large' ? 64 : 48;
+  const getAvatarSize = () => {
+    switch (size) {
+      case 'small': return { width: 32, height: 32 };
+      case 'medium': return { width: 48, height: 48 };
+      case 'large': return { width: 64, height: 64 };
+      default: return { width: 48, height: 48 };
+    }
+  };
+
+  const getPadding = () => {
+    switch (size) {
+      case 'small': return 1;
+      case 'medium': return 2;
+      case 'large': return 3;
+      default: return 2;
+    }
+  };
 
   return (
     <Card
-      size={size}
-      hoverable={!!onClick}
-      onClick={handleClick}
       className={className}
-      bodyStyle={{ padding: size === 'small' ? 12 : 16 }}
+      onClick={handleClick}
+      sx={{
+        cursor: onClick ? 'pointer' : 'default',
+        '&:hover': onClick ? {
+          boxShadow: 2,
+        } : undefined,
+      }}
     >
-      <Space direction="horizontal" size="middle" style={{ width: '100%' }}>
-        <Avatar
-          size={avatarSize}
-          icon={<UserOutlined />}
-          style={{
-            backgroundColor: isActive ? '#1890ff' : '#d9d9d9',
-            color: '#fff',
-          }}
-        >
-          {initials}
-        </Avatar>
-        
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <Title 
-            level={size === 'small' ? 5 : 4} 
-            style={{ margin: 0, marginBottom: 4 }}
-            ellipsis={{ tooltip: fullName }}
+      <CardContent sx={{ padding: getPadding() }}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Avatar
+            sx={{
+              ...getAvatarSize(),
+              backgroundColor: isActive ? 'primary.main' : 'grey.400',
+              color: 'white',
+            }}
+            src={user.avatar_url}
           >
-            {fullName}
-          </Title>
+            {user.avatar_url ? null : initials || <UserOutlined />}
+          </Avatar>
           
-          {showEmail && (
-            <Text type="secondary" style={{ fontSize: '12px' }}>
-              {user.email}
-            </Text>
-          )}
-          
-          <div style={{ marginTop: 8 }}>
-            <Space size="small">
+          <Box flex={1} minWidth={0}>
+            <Typography 
+              variant={size === 'small' ? 'body2' : 'h6'}
+              fontWeight={600}
+              noWrap
+              title={fullName}
+            >
+              {fullName}
+            </Typography>
+            
+            {showEmail && (
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                display="block"
+              >
+                {user.email}
+              </Typography>
+            )}
+            
+            <Box mt={1} display="flex" gap={1} flexWrap="wrap">
               {showStatus && (
-                <Tag
-                  color={getUserStatusColor(user.status)}
-                  style={{ margin: 0 }}
-                >
-                  {user.status}
-                </Tag>
+                <Chip
+                  label={user.status}
+                  size="small"
+                  sx={{
+                    backgroundColor: getUserStatusColor(user.status),
+                    color: 'white',
+                    fontSize: '11px',
+                  }}
+                />
               )}
               
               {showRole && (
-                <Tag
-                  color={getUserRoleColor(user.role)}
-                  style={{ margin: 0 }}
-                >
-                  {user.role}
-                </Tag>
+                <Chip
+                  label={user.role}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    borderColor: getUserRoleColor(user.role),
+                    color: getUserRoleColor(user.role),
+                    fontSize: '11px',
+                  }}
+                />
               )}
-            </Space>
-          </div>
-        </div>
-      </Space>
+            </Box>
+          </Box>
+        </Box>
+      </CardContent>
     </Card>
   );
 }; 

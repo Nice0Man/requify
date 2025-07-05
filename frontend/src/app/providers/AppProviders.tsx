@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { AuthProvider } from "@/features/auth/model/auth.context";
 import { theme } from "@/app/styles/theme";
-import { ErrorBoundary } from "@/shared/ui";
+import { ErrorBoundary, ApiStatusIndicator } from "@/shared/ui";
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -19,7 +19,10 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthProvider>
-          <BrowserRouter>{children}</BrowserRouter>
+          <BrowserRouter>
+            <ApiStatusIndicator />
+            {children}
+          </BrowserRouter>
         </AuthProvider>
         <ToastContainer
           position="top-right"

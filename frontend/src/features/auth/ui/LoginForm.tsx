@@ -1,185 +1,132 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Checkbox, Alert, Typography, Space, Divider } from 'antd';
-import { UserOutlined, LockOutlined, EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../model';
-import type { LoginFormData } from '../model';
+import {
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Alert,
+  Typography,
+  Divider,
+  CircularProgress,
+} from '@mui/material';
+import { useAuth } from '../model/auth.context';
 
-const { Title, Text } = Typography;
-
-export interface LoginFormProps {
+interface LoginFormProps {
   onSuccess?: () => void;
-  onError?: (error: Error) => void;
-  showRememberMe?: boolean;
-  showForgotPassword?: boolean;
-  showRegisterLink?: boolean;
-  redirectAfterLogin?: boolean;
-  className?: string;
+  onSwitchToRegister?: () => void;
+  onSwitchToReset?: () => void;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   onSuccess,
-  onError,
-  showRememberMe = true,
-  showForgotPassword = true,
-  showRegisterLink = true,
-  redirectAfterLogin = true,
-  className,
+  onSwitchToRegister,
+  onSwitchToReset,
 }) => {
-  const [form] = Form.useForm();
-  const { login, isLoading, error, clearError } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (values: LoginFormData) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
     try {
-      setIsSubmitting(true);
-      clearError();
-      
-      await login(values);
-      
-      if (onSuccess) {
-        onSuccess();
-      }
-      
-      if (redirectAfterLogin) {
-        // Redirect will be handled by auth context/navigation
-      }
-    } catch (err) {
-      const error = err as Error;
-      if (onError) {
-        onError(error);
-      }
+      await login({ username, password, remember_me: rememberMe });
+      onSuccess?.();
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Login failed');
     } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleFormChange = () => {
-    if (error) {
-      clearError();
+      setLoading(false);
     }
   };
 
   return (
-    <div className={className}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <div style={{ textAlign: 'center' }}>
-          <Title level={2}>Sign In</Title>
-          <Text type="secondary">
-            Welcome back! Please sign in to your account.
-          </Text>
-        </div>
-
+    <Card sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
+      <CardContent>
+        <Typography variant="h4" component="h1" gutterBottom textAlign="center">
+          Sign In
+        </Typography>
+        
         {error && (
-          <Alert
-            message="Login Failed"
-            description={error.message}
-            type="error"
-            showIcon
-            closable
-            onClose={clearError}
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          <TextField
+            fullWidth
+            type="text"
+            label="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            margin="normal"
+            required
+            autoComplete="username"
+            autoFocus
           />
-        )}
-
-        <Form
-          form={form}
-          name="login"
-          layout="vertical"
-          onFinish={handleSubmit}
-          onFieldsChange={handleFormChange}
-          size="large"
-          autoComplete="on"
-        >
-          <Form.Item
-            name="username"
-            label="Username or Email"
-            rules={[
-              {
-                required: true,
-                message: 'Please enter your username or email',
-              },
-              {
-                type: 'string',
-                min: 3,
-                message: 'Username must be at least 3 characters',
-              },
-            ]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="Enter username or email"
-              autoComplete="username"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
+          
+          <TextField
+            fullWidth
+            type="password"
             label="Password"
-            rules={[
-              {
-                required: true,
-                message: 'Please enter your password',
-              },
-              {
-                min: 6,
-                message: 'Password must be at least 6 characters',
-              },
-            ]}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            margin="normal"
+            required
+            autoComplete="current-password"
+          />
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                color="primary"
+              />
+            }
+            label="Remember me"
+            sx={{ mt: 1 }}
+          />
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={loading}
+            sx={{ mt: 3, mb: 2 }}
           >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="Enter password"
-              autoComplete="current-password"
-              iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-            />
-          </Form.Item>
+            {loading ? <CircularProgress size={24} /> : 'Sign In'}
+          </Button>
 
-          <Form.Item style={{ marginBottom: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              {showRememberMe && (
-                <Form.Item name="remember_me" valuePropName="checked" noStyle>
-                  <Checkbox>Remember me</Checkbox>
-                </Form.Item>
-              )}
-              
-              {showForgotPassword && (
-                <Link to="/auth/forgot-password">
-                  <Text type="secondary">Forgot password?</Text>
-                </Link>
-              )}
-            </div>
-          </Form.Item>
+          <Divider sx={{ my: 2 }} />
 
-          <Form.Item style={{ marginTop: 24 }}>
+          <Box textAlign="center" sx={{ mt: 2 }}>
             <Button
-              type="primary"
-              htmlType="submit"
-              loading={isLoading || isSubmitting}
-              block
-              size="large"
+              variant="text"
+              onClick={onSwitchToReset}
+              sx={{ mr: 2 }}
             >
-              Sign In
+              Forgot Password?
             </Button>
-          </Form.Item>
-        </Form>
-
-        {showRegisterLink && (
-          <>
-            <Divider>
-              <Text type="secondary">New to our platform?</Text>
-            </Divider>
-            
-            <div style={{ textAlign: 'center' }}>
-              <Text type="secondary">
-                Don't have an account?{' '}
-                <Link to="/auth/register">
-                  <Text strong>Sign up here</Text>
-                </Link>
-              </Text>
-            </div>
-          </>
-        )}
-      </Space>
-    </div>
+            <Button
+              variant="text"
+              onClick={onSwitchToRegister}
+            >
+              Create Account
+            </Button>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }; 

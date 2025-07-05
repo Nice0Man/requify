@@ -405,6 +405,90 @@ export class TestManagementApi {
     }
   }
 
+  /**
+   * Wrapper методы для совместимости с UI
+   */
+  
+  async getTestPlans(params: {
+    skip?: number;
+    limit?: number;
+    project_id?: number;
+    search?: string;
+  }): Promise<{ items: TestPlan[]; total: number }> {
+    try {
+      const response = await testCasesApi.getTestPlans({
+        project_id: params.project_id,
+        search: params.search,
+        limit: params.limit || 25,
+        offset: params.skip || 0,
+      });
+      return {
+        items: response.items || [],
+        total: response.total || 0,
+      };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
+  async getTestExecutions(params: {
+    skip?: number;
+    limit?: number;
+    test_plan_id?: number;
+    test_case_id?: number;
+    status?: string;
+    executed_by?: number;
+    environment?: string;
+  }): Promise<{ items: TestExecution[]; total: number }> {
+    try {
+      const response = await testCasesApi.getTestExecutions({
+        test_plan_id: params.test_plan_id,
+        test_case_id: params.test_case_id,
+        status: params.status,
+        executed_by: params.executed_by,
+        environment: params.environment,
+        limit: params.limit || 25,
+        offset: params.skip || 0,
+      });
+      return {
+        items: response.items || [],
+        total: response.total || 0,
+      };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
+  async getTestCasesWithPagination(params: {
+    skip?: number;
+    limit?: number;
+    test_plan_id?: number;
+    priority?: string;
+    type?: string;
+    status?: string;
+    automation_level?: string;
+    search?: string;
+  }): Promise<{ items: TestCase[]; total: number }> {
+    try {
+      const response = await testCasesApi.getTestCases({
+        test_plan_id: params.test_plan_id,
+        priority: params.priority,
+        type: params.type,
+        status: params.status,
+        automation_level: params.automation_level,
+        search: params.search,
+        limit: params.limit || 25,
+        offset: params.skip || 0,
+      });
+      return {
+        items: response.items || [],
+        total: response.total || 0,
+      };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  }
+
   // Вспомогательные методы
   private calculatePassRate(executions: TestExecution[]): number {
     if (executions.length === 0) return 0;
@@ -448,4 +532,5 @@ export class TestManagementApi {
 }
 
 // Экспорт экземпляра API
-export const testManagementApi = new TestManagementApi(); 
+export const testManagementApi = new TestManagementApi();
+export const testingApi = new TestManagementApi(); 

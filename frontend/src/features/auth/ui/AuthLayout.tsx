@@ -1,48 +1,67 @@
-import React from 'react';
-import { Layout, Card, Typography } from 'antd';
+import React from "react";
+import { Box, Card, CardContent, Typography, Container } from "@mui/material";
 
-const { Content } = Layout;
-const { Title } = Typography;
-
-export interface AuthLayoutProps {
+interface AuthLayoutProps {
   children: React.ReactNode;
   title?: string;
   subtitle?: string;
-  maxWidth?: number;
+  maxWidth?: "xs" | "sm" | "md" | "lg" | "xl";
 }
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({
   children,
-  title = "Requify",
-  subtitle = "Requirements Management Platform",
-  maxWidth = 400,
+  title,
+  subtitle,
+  maxWidth = "sm",
 }) => {
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
-      <Content style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        padding: '20px'
-      }}>
-        <Card 
-          style={{ 
-            width: '100%', 
-            maxWidth,
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        bgcolor: "grey.50",
+        py: 3,
+      }}
+    >
+      <Container maxWidth={maxWidth}>
+        <Card
+          sx={{
+            maxWidth: 450,
+            mx: "auto",
+            boxShadow: 3,
+            borderRadius: 2,
           }}
         >
-          <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <Title level={1} style={{ color: '#1890ff', marginBottom: 8 }}>
-              {title}
-            </Title>
-            <Typography.Text type="secondary">
-              {subtitle}
-            </Typography.Text>
-          </div>
-          {children}
+          <CardContent sx={{ p: 4 }}>
+            {(title || subtitle) && (
+              <Box textAlign="center" mb={3}>
+                {title && (
+                  <Typography
+                    variant="h4"
+                    component="h1"
+                    gutterBottom
+                    fontWeight={600}
+                  >
+                    {title}
+                  </Typography>
+                )}
+                {subtitle && (
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    {subtitle}
+                  </Typography>
+                )}
+              </Box>
+            )}
+            {children}
+          </CardContent>
         </Card>
-      </Content>
-    </Layout>
+      </Container>
+    </Box>
   );
-}; 
+};

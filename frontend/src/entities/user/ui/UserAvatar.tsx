@@ -1,103 +1,69 @@
-import React from 'react';
-import { Avatar, Badge, Tooltip } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
-import type { User } from '../model/types';
-import { getUserFullName, getUserInitials, isUserActive } from '../model/types';
+import React from "react";
+import { Avatar, Badge, Tooltip } from "@mui/material";
+import { Person as UserOutlined } from "@mui/icons-material";
+import { getUserFullName, getUserInitials, isUserActive } from "../model/types";
+import type { User } from "../model/types";
 
-interface UserAvatarProps {
+export interface UserAvatarProps {
   user: User;
-  size?: number | 'large' | 'small' | 'default';
-  showOnlineStatus?: boolean;
-  shape?: 'circle' | 'square';
+  size?: "small" | "medium" | "large";
+  showStatus?: boolean;
   showTooltip?: boolean;
-  onClick?: (user: User) => void;
-  className?: string;
-  style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
-/**
- * UserAvatar - компонент для отображения аватара пользователя
- * Используется везде, где нужно показать аватар: в комментариях, списках, профилях и т.д.
- */
 export const UserAvatar: React.FC<UserAvatarProps> = ({
   user,
-  size = 'default',
-  showOnlineStatus = false,
-  shape = 'circle',
+  size = "medium",
+  showStatus = false,
   showTooltip = true,
   onClick,
-  className,
-  style,
 }) => {
+  const isActive = isUserActive(user);
   const fullName = getUserFullName(user);
   const initials = getUserInitials(user);
-  const isActive = isUserActive(user);
   
-  const handleClick = () => {
-    if (onClick) {
-      onClick(user);
+  const getSize = () => {
+    switch (size) {
+      case "small": return { width: 32, height: 32 };
+      case "medium": return { width: 40, height: 40 };
+      case "large": return { width: 56, height: 56 };
+      default: return { width: 40, height: 40 };
     }
   };
 
-  // Определяем цвет аватара на основе статуса пользователя
-  const getAvatarColor = () => {
-    if (!isActive) return '#d9d9d9';
-    
-    // Генерируем цвет на основе имени пользователя для консистентности
-    const colors = ['#f56a00', '#7265e6', '#ffbf00', '#00a2ae', '#1890ff', '#722ed1', '#eb2f96'];
-    const hash = fullName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
-  };
-
-  const avatarElement = (
+  const avatar = (
     <Avatar
-      size={size}
-      shape={shape}
-      icon={<UserOutlined />}
-      style={{
-        backgroundColor: getAvatarColor(),
-        color: '#fff',
+      sx={{
+        ...getSize(),
+        bgcolor: 'primary.main',
         cursor: onClick ? 'pointer' : 'default',
-        ...style,
+        fontSize: size === 'small' ? '0.75rem' : size === 'large' ? '1.25rem' : '1rem'
       }}
-      className={className}
-      onClick={handleClick}
+      onClick={onClick}
+      src={user.avatar_url}
     >
-      {initials}
+      {user.avatar_url ? null : initials || <UserOutlined />}
     </Avatar>
   );
 
-  // Оборачиваем в Badge если нужно показать онлайн статус
-  const avatarWithStatus = showOnlineStatus ? (
+  const avatarWithStatus = showStatus ? (
     <Badge
-      status={isActive ? 'success' : 'default'}
-      dot
-      offset={[-8, size === 'small' ? 20 : size === 'large' ? 40 : 30]}
+      color={isActive ? "success" : "default"}
+      variant="dot"
+      overlap="circular"
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}
     >
-      {avatarElement}
+      {avatar}
     </Badge>
-  ) : (
-    avatarElement
-  );
+  ) : avatar;
 
-  // Оборачиваем в Tooltip если нужно показать подсказку
-  if (showTooltip) {
-    return (
-      <Tooltip 
-        title={
-          <div>
-            <div>{fullName}</div>
-            <div style={{ fontSize: '12px', opacity: 0.8 }}>{user.email}</div>
-            <div style={{ fontSize: '12px', opacity: 0.8 }}>
-              {user.role} • {user.status}
-            </div>
-          </div>
-        }
-      >
-        {avatarWithStatus}
-      </Tooltip>
-    );
-  }
-
-  return avatarWithStatus;
+  return showTooltip ? (
+    <Tooltip title={fullName}>
+      {avatarWithStatus}
+    </Tooltip>
+  ) : avatarWithStatus;
 }; 

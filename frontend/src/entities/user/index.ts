@@ -9,8 +9,9 @@ export type {
   UserPreferences,
   UserSession,
   UserSettings,
-  UserRole,
+  UserRoleValue,
   UserStatus,
+  UserStatusValue,
   UserWithDetails,
   UserState,
   UserFilters,
@@ -23,6 +24,7 @@ export type {
 export {
   USER_ROLES,
   USER_STATUSES,
+  UserRole,
   getUserFullName,
   getUserInitials,
   getUserStatusColor,

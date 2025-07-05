@@ -2,8 +2,8 @@ import React, { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/model/auth.context";
 
-import { Layout } from "@/shared/ui/Layout/Layout";
-import { PrivateRoute } from "@/shared/ui/PrivateRoute/PrivateRoute";
+import { Layout } from "@/shared/ui/Layout";
+import { PrivateRoute } from "@/shared/ui/PrivateRoute";
 
 // Feature Pages - Lazy loaded for better performance
 const LoginPage = React.lazy(() => import("@/pages/auth/ui/LoginPage"));
