@@ -919,20 +919,25 @@ export const RequirementList: React.FC<RequirementListProps> = ({
               </ToggleButtonGroup>
 
               <Tooltip title="Refresh data">
-                <IconButton
-                  onClick={handleRefresh}
-                  disabled={isLoading}
-                  sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                    "&:hover": {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                      borderColor: alpha(theme.palette.primary.main, 0.2),
-                    },
-                  }}
-                >
-                  <Refresh />
-                </IconButton>
+                <span>
+                  <IconButton
+                    onClick={handleRefresh}
+                    disabled={isLoading}
+                    sx={{
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      "&:hover": {
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.04
+                        ),
+                        borderColor: alpha(theme.palette.primary.main, 0.2),
+                      },
+                    }}
+                  >
+                    <Refresh />
+                  </IconButton>
+                </span>
               </Tooltip>
             </Stack>
           </Stack>

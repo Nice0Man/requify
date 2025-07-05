@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -22,7 +22,7 @@ import {
   Divider,
   CircularProgress,
   Skeleton,
-} from '@mui/material';
+} from "@mui/material";
 import {
   HealthAndSafety,
   CheckCircle,
@@ -42,7 +42,7 @@ import {
   Cloud,
   Security,
   NetworkCheck,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 interface SystemHealthProps {
   showDetails?: boolean;
@@ -50,16 +50,16 @@ interface SystemHealthProps {
   refreshInterval?: number;
   className?: string;
   onHealthClick?: (component: string) => void;
-  variant?: 'compact' | 'detailed' | 'dashboard';
+  variant?: "compact" | "detailed" | "dashboard";
 }
 
 interface SystemInfo {
-  overall_status: 'healthy' | 'warning' | 'critical';
-  database_status: 'healthy' | 'warning' | 'critical';
-  api_status: 'healthy' | 'warning' | 'critical';
-  storage_status: 'healthy' | 'warning' | 'critical';
-  network_status?: 'healthy' | 'warning' | 'critical';
-  security_status?: 'healthy' | 'warning' | 'critical';
+  overall_status: "healthy" | "warning" | "critical";
+  database_status: "healthy" | "warning" | "critical";
+  api_status: "healthy" | "warning" | "critical";
+  storage_status: "healthy" | "warning" | "critical";
+  network_status?: "healthy" | "warning" | "critical";
+  security_status?: "healthy" | "warning" | "critical";
   cpu_usage: number;
   memory_usage: number;
   disk_usage: number;
@@ -70,20 +70,24 @@ interface SystemInfo {
 }
 
 // Mock hook for system data
-const useSystemHealthQuery = ({ refetchInterval }: { refetchInterval?: number | false }) => {
+const useSystemHealthQuery = ({
+  refetchInterval,
+}: {
+  refetchInterval?: number | false;
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [systemInfo] = useState<SystemInfo>({
-    overall_status: 'healthy',
-    database_status: 'healthy',
-    api_status: 'healthy',
-    storage_status: 'healthy',
-    network_status: 'healthy',
-    security_status: 'healthy',
+    overall_status: "healthy",
+    database_status: "healthy",
+    api_status: "healthy",
+    storage_status: "healthy",
+    network_status: "healthy",
+    security_status: "healthy",
     cpu_usage: 42,
     memory_usage: 67,
     disk_usage: 23,
-    uptime: '2 days 14 hours',
+    uptime: "2 days 14 hours",
     response_time: 156,
     active_connections: 47,
     error_rate: 0.02,
@@ -92,13 +96,13 @@ const useSystemHealthQuery = ({ refetchInterval }: { refetchInterval?: number | 
   const refetch = async () => {
     setIsLoading(true);
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setLastUpdated(new Date());
     setIsLoading(false);
   };
 
   useEffect(() => {
-    if (refetchInterval && typeof refetchInterval === 'number') {
+    if (refetchInterval && typeof refetchInterval === "number") {
       const interval = setInterval(refetch, refetchInterval);
       return () => clearInterval(interval);
     }
@@ -108,26 +112,28 @@ const useSystemHealthQuery = ({ refetchInterval }: { refetchInterval?: number | 
 };
 
 // Helper functions
-const getHealthColor = (status: string): 'success' | 'warning' | 'error' | 'default' => {
+const getHealthColor = (
+  status: string
+): "success" | "warning" | "error" | "default" => {
   switch (status) {
-    case 'healthy':
-      return 'success';
-    case 'warning':
-      return 'warning';
-    case 'critical':
-      return 'error';
+    case "healthy":
+      return "success";
+    case "warning":
+      return "warning";
+    case "critical":
+      return "error";
     default:
-      return 'default';
+      return "default";
   }
 };
 
 const getHealthIcon = (status: string) => {
   switch (status) {
-    case 'healthy':
+    case "healthy":
       return <CheckCircle sx={{ fontSize: 16 }} />;
-    case 'warning':
+    case "warning":
       return <Warning sx={{ fontSize: 16 }} />;
-    case 'critical':
+    case "critical":
       return <Error sx={{ fontSize: 16 }} />;
     default:
       return <HealthAndSafety sx={{ fontSize: 16 }} />;
@@ -152,10 +158,10 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
   refreshInterval = 30000,
   className,
   onHealthClick,
-  variant = 'detailed',
+  variant = "detailed",
 }) => {
   const theme = useTheme();
-  
+
   const {
     data: systemInfo,
     isLoading,
@@ -177,7 +183,7 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
 
   if (!systemInfo) {
     return (
-      <Card 
+      <Card
         className={className}
         sx={{
           borderRadius: 3,
@@ -185,75 +191,80 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
           background: theme.palette.background.paper,
         }}
       >
-        <CardContent sx={{ textAlign: 'center', py: 4 }}>
-          <Skeleton variant="circular" width={60} height={60} sx={{ mx: 'auto', mb: 2 }} />
-          <Skeleton variant="text" width="60%" sx={{ mx: 'auto', mb: 1 }} />
-          <Skeleton variant="text" width="40%" sx={{ mx: 'auto' }} />
+        <CardContent sx={{ textAlign: "center", py: 4 }}>
+          <Skeleton
+            variant="circular"
+            width={60}
+            height={60}
+            sx={{ mx: "auto", mb: 2 }}
+          />
+          <Skeleton variant="text" width="60%" sx={{ mx: "auto", mb: 1 }} />
+          <Skeleton variant="text" width="40%" sx={{ mx: "auto" }} />
         </CardContent>
       </Card>
     );
   }
 
-  const overallHealth = systemInfo.overall_status || 'unknown';
+  const overallHealth = systemInfo.overall_status || "unknown";
   const components = [
     {
-      name: 'Database',
-      status: systemInfo.database_status || 'unknown',
+      name: "Database",
+      status: systemInfo.database_status || "unknown",
       icon: <Database />,
-      key: 'database',
-      description: 'PostgreSQL cluster',
+      key: "database",
+      description: "PostgreSQL cluster",
     },
     {
-      name: 'API Server',
-      status: systemInfo.api_status || 'unknown',
+      name: "API Server",
+      status: systemInfo.api_status || "unknown",
       icon: <Api />,
-      key: 'api',
-      description: 'FastAPI backend',
+      key: "api",
+      description: "FastAPI backend",
     },
     {
-      name: 'Storage',
-      status: systemInfo.storage_status || 'unknown',
+      name: "Storage",
+      status: systemInfo.storage_status || "unknown",
       icon: <Storage />,
-      key: 'storage',
-      description: 'File storage system',
+      key: "storage",
+      description: "File storage system",
     },
     {
-      name: 'Network',
-      status: systemInfo.network_status || 'unknown',
+      name: "Network",
+      status: systemInfo.network_status || "unknown",
       icon: <NetworkCheck />,
-      key: 'network',
-      description: 'Network connectivity',
+      key: "network",
+      description: "Network connectivity",
     },
     {
-      name: 'Security',
-      status: systemInfo.security_status || 'unknown',
+      name: "Security",
+      status: systemInfo.security_status || "unknown",
       icon: <Security />,
-      key: 'security',
-      description: 'Security monitoring',
+      key: "security",
+      description: "Security monitoring",
     },
   ];
 
   const metrics = [
     {
-      name: 'CPU Usage',
+      name: "CPU Usage",
       value: systemInfo.cpu_usage,
-      unit: '%',
+      unit: "%",
       icon: <Speed />,
       color: getUsageColor(systemInfo.cpu_usage, theme),
       trend: getTrendIcon(systemInfo.cpu_usage, 50),
     },
     {
-      name: 'Memory Usage',
+      name: "Memory Usage",
       value: systemInfo.memory_usage,
-      unit: '%',
+      unit: "%",
       icon: <Memory />,
       color: getUsageColor(systemInfo.memory_usage, theme),
       trend: getTrendIcon(systemInfo.memory_usage, 60),
     },
     {
-      name: 'Disk Usage',
+      name: "Disk Usage",
       value: systemInfo.disk_usage,
-      unit: '%',
+      unit: "%",
       icon: <Cloud />,
       color: getUsageColor(systemInfo.disk_usage, theme),
       trend: getTrendIcon(systemInfo.disk_usage, 40),
@@ -262,14 +273,14 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
 
   return (
     <Grow in timeout={600}>
-      <Card 
+      <Card
         className={className}
         sx={{
           borderRadius: 3,
           border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
           boxShadow: `0 4px 24px ${alpha(theme.palette.common.black, 0.06)}`,
           background: theme.palette.background.paper,
-          overflow: 'hidden',
+          overflow: "hidden",
         }}
       >
         <CardHeader
@@ -281,34 +292,37 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                   height: 48,
                   borderRadius: 2.5,
                   background: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.primary.main})`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.3)}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  boxShadow: `0 4px 12px ${alpha(
+                    theme.palette.success.main,
+                    0.3
+                  )}`,
                 }}
               >
                 <HealthAndSafety sx={{ fontSize: 24 }} />
               </Box>
-              {overallHealth === 'healthy' && (
+              {overallHealth === "healthy" && (
                 <Box
                   sx={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: -4,
                     right: -4,
                     width: 20,
                     height: 20,
-                    borderRadius: '50%',
+                    borderRadius: "50%",
                     background: theme.palette.success.main,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                     border: `2px solid ${theme.palette.background.paper}`,
-                    animation: 'pulse 2s infinite',
-                    '@keyframes pulse': {
-                      '0%': { transform: 'scale(1)' },
-                      '50%': { transform: 'scale(1.1)' },
-                      '100%': { transform: 'scale(1)' },
+                    animation: "pulse 2s infinite",
+                    "@keyframes pulse": {
+                      "0%": { transform: "scale(1)" },
+                      "50%": { transform: "scale(1.1)" },
+                      "100%": { transform: "scale(1)" },
                     },
                   }}
                 />
@@ -317,10 +331,15 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
           }
           title={
             <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+              >
                 System Health
               </Typography>
-              <Tooltip title={`Last updated: ${lastUpdated.toLocaleTimeString()}`}>
+              <Tooltip
+                title={`Last updated: ${lastUpdated.toLocaleTimeString()}`}
+              >
                 <Typography variant="caption" color="text.secondary">
                   ({systemInfo.uptime})
                 </Typography>
@@ -334,33 +353,34 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                 label={overallHealth.toUpperCase()}
                 color={getHealthColor(overallHealth)}
                 size="small"
-                sx={{ 
+                sx={{
                   fontWeight: 600,
-                  '& .MuiChip-icon': {
+                  "& .MuiChip-icon": {
                     marginLeft: 1,
                   },
                 }}
               />
-              <Tooltip title={isLoading ? 'Refreshing...' : 'Refresh status'}>
-                <IconButton 
-                  size="small" 
-                  onClick={handleRefresh} 
-                  disabled={isLoading}
-                  sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                    '&:hover': {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                      borderColor: alpha(theme.palette.primary.main, 0.2),
-                    },
-                  }}
-                >
-                  {isLoading ? (
-                    <CircularProgress size={16} />
-                  ) : (
-                    <Refresh />
-                  )}
-                </IconButton>
+              <Tooltip title={isLoading ? "Refreshing..." : "Refresh status"}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={handleRefresh}
+                    disabled={isLoading}
+                    sx={{
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      "&:hover": {
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.04
+                        ),
+                        borderColor: alpha(theme.palette.primary.main, 0.2),
+                      },
+                    }}
+                  >
+                    {isLoading ? <CircularProgress size={16} /> : <Refresh />}
+                  </IconButton>
+                </span>
               </Tooltip>
             </Stack>
           }
@@ -371,7 +391,11 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
           {/* Performance Metrics */}
           <Fade in timeout={800}>
             <Box mb={3}>
-              <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2, fontWeight: 600 }}>
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                sx={{ mb: 2, fontWeight: 600 }}
+              >
                 Performance Metrics
               </Typography>
               <Grid container spacing={2}>
@@ -384,37 +408,47 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                           borderRadius: 2,
                           background: alpha(metric.color, 0.04),
                           border: `1px solid ${alpha(metric.color, 0.1)}`,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            transform: 'translateY(-2px)',
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            transform: "translateY(-2px)",
                             boxShadow: `0 8px 24px ${alpha(metric.color, 0.2)}`,
                           },
                         }}
                       >
-                        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          spacing={1}
+                          mb={1}
+                        >
                           <Box
                             sx={{
                               width: 32,
                               height: 32,
                               borderRadius: 1.5,
                               background: alpha(metric.color, 0.1),
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
                               color: metric.color,
                             }}
                           >
                             {metric.icon}
                           </Box>
-                          <Typography variant="body2" sx={{ fontWeight: 600, flex: 1 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 600, flex: 1 }}
+                          >
                             {metric.name}
                           </Typography>
-                          <Box sx={{ color: metric.color }}>
-                            {metric.trend}
-                          </Box>
+                          <Box sx={{ color: metric.color }}>{metric.trend}</Box>
                         </Stack>
-                        <Typography variant="h6" sx={{ fontWeight: 700, color: metric.color, mb: 1 }}>
-                          {metric.value}{metric.unit}
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: 700, color: metric.color, mb: 1 }}
+                        >
+                          {metric.value}
+                          {metric.unit}
                         </Typography>
                         <LinearProgress
                           variant="determinate"
@@ -423,10 +457,13 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                             height: 8,
                             borderRadius: 4,
                             backgroundColor: alpha(metric.color, 0.1),
-                            '& .MuiLinearProgress-bar': {
+                            "& .MuiLinearProgress-bar": {
                               borderRadius: 4,
                               backgroundColor: metric.color,
-                              boxShadow: `0 2px 8px ${alpha(metric.color, 0.3)}`,
+                              boxShadow: `0 2px 8px ${alpha(
+                                metric.color,
+                                0.3
+                              )}`,
                             },
                           }}
                         />
@@ -439,10 +476,16 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
           </Fade>
 
           {/* System Statistics */}
-          {(systemInfo.response_time || systemInfo.active_connections || systemInfo.error_rate) && (
+          {(systemInfo.response_time ||
+            systemInfo.active_connections ||
+            systemInfo.error_rate) && (
             <Fade in timeout={1000}>
               <Box mb={3}>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2, fontWeight: 600 }}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{ mb: 2, fontWeight: 600 }}
+                >
                   System Statistics
                 </Typography>
                 <Grid container spacing={2}>
@@ -453,15 +496,30 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                           p: 2,
                           borderRadius: 2,
                           background: alpha(theme.palette.info.main, 0.04),
-                          border: `1px solid ${alpha(theme.palette.info.main, 0.1)}`,
-                          textAlign: 'center',
+                          border: `1px solid ${alpha(
+                            theme.palette.info.main,
+                            0.1
+                          )}`,
+                          textAlign: "center",
                         }}
                       >
-                        <Timer sx={{ fontSize: 24, color: theme.palette.info.main, mb: 1 }} />
+                        <Timer
+                          sx={{
+                            fontSize: 24,
+                            color: theme.palette.info.main,
+                            mb: 1,
+                          }}
+                        />
                         <Typography variant="body2" color="text.secondary">
                           Response Time
                         </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.info.main }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.info.main,
+                          }}
+                        >
                           {systemInfo.response_time}ms
                         </Typography>
                       </Box>
@@ -474,15 +532,30 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                           p: 2,
                           borderRadius: 2,
                           background: alpha(theme.palette.secondary.main, 0.04),
-                          border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
-                          textAlign: 'center',
+                          border: `1px solid ${alpha(
+                            theme.palette.secondary.main,
+                            0.1
+                          )}`,
+                          textAlign: "center",
                         }}
                       >
-                        <NetworkCheck sx={{ fontSize: 24, color: theme.palette.secondary.main, mb: 1 }} />
+                        <NetworkCheck
+                          sx={{
+                            fontSize: 24,
+                            color: theme.palette.secondary.main,
+                            mb: 1,
+                          }}
+                        />
                         <Typography variant="body2" color="text.secondary">
                           Active Connections
                         </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.secondary.main,
+                          }}
+                        >
                           {systemInfo.active_connections}
                         </Typography>
                       </Box>
@@ -495,15 +568,30 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                           p: 2,
                           borderRadius: 2,
                           background: alpha(theme.palette.warning.main, 0.04),
-                          border: `1px solid ${alpha(theme.palette.warning.main, 0.1)}`,
-                          textAlign: 'center',
+                          border: `1px solid ${alpha(
+                            theme.palette.warning.main,
+                            0.1
+                          )}`,
+                          textAlign: "center",
                         }}
                       >
-                        <Timeline sx={{ fontSize: 24, color: theme.palette.warning.main, mb: 1 }} />
+                        <Timeline
+                          sx={{
+                            fontSize: 24,
+                            color: theme.palette.warning.main,
+                            mb: 1,
+                          }}
+                        />
                         <Typography variant="body2" color="text.secondary">
                           Error Rate
                         </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.warning.main }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: theme.palette.warning.main,
+                          }}
+                        >
                           {(systemInfo.error_rate * 100).toFixed(2)}%
                         </Typography>
                       </Box>
@@ -519,7 +607,11 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
             <Fade in timeout={1200}>
               <Box>
                 <Divider sx={{ mb: 2, opacity: 0.6 }} />
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 2, fontWeight: 600 }}>
+                <Typography
+                  variant="subtitle2"
+                  color="text.secondary"
+                  sx={{ mb: 2, fontWeight: 600 }}
+                >
                   Component Status
                 </Typography>
                 <List sx={{ py: 0 }}>
@@ -528,17 +620,35 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                       <ListItem
                         onClick={() => handleHealthClick(component.key)}
                         sx={{
-                          cursor: onHealthClick ? 'pointer' : 'default',
+                          cursor: onHealthClick ? "pointer" : "default",
                           borderRadius: 2,
                           mb: 1,
-                          border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                          background: alpha(theme.palette.background.paper, 0.5),
-                          '&:hover': onHealthClick ? {
-                            backgroundColor: alpha(getHealthColor(component.status) === 'success' ? theme.palette.success.main : theme.palette.primary.main, 0.04),
-                            borderColor: alpha(getHealthColor(component.status) === 'success' ? theme.palette.success.main : theme.palette.primary.main, 0.2),
-                            transform: 'translateX(4px)',
-                          } : {},
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          border: `1px solid ${alpha(
+                            theme.palette.divider,
+                            0.08
+                          )}`,
+                          background: alpha(
+                            theme.palette.background.paper,
+                            0.5
+                          ),
+                          "&:hover": onHealthClick
+                            ? {
+                                backgroundColor: alpha(
+                                  getHealthColor(component.status) === "success"
+                                    ? theme.palette.success.main
+                                    : theme.palette.primary.main,
+                                  0.04
+                                ),
+                                borderColor: alpha(
+                                  getHealthColor(component.status) === "success"
+                                    ? theme.palette.success.main
+                                    : theme.palette.primary.main,
+                                  0.2
+                                ),
+                                transform: "translateX(4px)",
+                              }
+                            : {},
+                          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                         }}
                       >
                         <ListItemIcon sx={{ minWidth: 48 }}>
@@ -548,17 +658,24 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                               height: 40,
                               borderRadius: 2,
                               background: alpha(
-                                getHealthColor(component.status) === 'success' ? theme.palette.success.main : theme.palette.primary.main,
+                                getHealthColor(component.status) === "success"
+                                  ? theme.palette.success.main
+                                  : theme.palette.primary.main,
                                 0.1
                               ),
                               border: `1px solid ${alpha(
-                                getHealthColor(component.status) === 'success' ? theme.palette.success.main : theme.palette.primary.main,
+                                getHealthColor(component.status) === "success"
+                                  ? theme.palette.success.main
+                                  : theme.palette.primary.main,
                                 0.2
                               )}`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: getHealthColor(component.status) === 'success' ? theme.palette.success.main : theme.palette.primary.main,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color:
+                                getHealthColor(component.status) === "success"
+                                  ? theme.palette.success.main
+                                  : theme.palette.primary.main,
                             }}
                           >
                             {component.icon}
@@ -566,12 +683,18 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                         </ListItemIcon>
                         <ListItemText
                           primary={
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               {component.name}
                             </Typography>
                           }
                           secondary={
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               {component.description}
                             </Typography>
                           }
@@ -581,9 +704,9 @@ export const SystemHealth: React.FC<SystemHealthProps> = ({
                           label={component.status.toUpperCase()}
                           color={getHealthColor(component.status)}
                           size="small"
-                          sx={{ 
+                          sx={{
                             fontWeight: 600,
-                            '& .MuiChip-icon': {
+                            "& .MuiChip-icon": {
                               marginLeft: 1,
                             },
                           }}

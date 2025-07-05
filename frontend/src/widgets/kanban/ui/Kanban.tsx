@@ -890,7 +890,7 @@ export const Kanban: React.FC<KanbanProps> = ({
             updated_at: proj.updated_at || proj.created_at,
             type: "project" as const,
             labels: proj.code ? [proj.code] : [],
-            progress: undefined,
+            progress: proj.status === "active" ? 100 : 0,
           }));
           break;
 
@@ -909,7 +909,7 @@ export const Kanban: React.FC<KanbanProps> = ({
             updated_at: test.updated_at,
             type: "task" as const,
             labels: test.type ? [test.type] : [],
-            progress: undefined,
+            progress: test.progress,
           }));
           break;
       }
@@ -1116,20 +1116,25 @@ export const Kanban: React.FC<KanbanProps> = ({
 
             <Stack direction="row" alignItems="center" spacing={1}>
               <Tooltip title="Refresh data">
-                <IconButton
-                  onClick={handleRefresh}
-                  disabled={isLoading}
-                  sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                    "&:hover": {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                      borderColor: alpha(theme.palette.primary.main, 0.2),
-                    },
-                  }}
-                >
-                  <Refresh />
-                </IconButton>
+                <span>
+                  <IconButton
+                    onClick={handleRefresh}
+                    disabled={isLoading}
+                    sx={{
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      "&:hover": {
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.04
+                        ),
+                        borderColor: alpha(theme.palette.primary.main, 0.2),
+                      },
+                    }}
+                  >
+                    <Refresh />
+                  </IconButton>
+                </span>
               </Tooltip>
             </Stack>
           </Stack>

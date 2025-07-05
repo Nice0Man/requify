@@ -1,315 +1,473 @@
-import React from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Container,
-  Grid,
   Typography,
+  Grid,
+  Paper,
+  Stack,
+  Chip,
+  IconButton,
   useTheme,
   alpha,
-  Stack,
-  Card,
-  CardContent,
   Fade,
   Grow,
-  Avatar,
-  Chip,
-} from '@mui/material';
-
-// Using widgets according to FSD
+  Card,
+  Button,
+  Tooltip,
+} from "@mui/material";
 import {
-  DashboardStats,
-  ActivityFeed,
-  QuickActions,
-  ProjectOverview,
-  SystemHealth,
-} from '@/widgets';
+  TrendingUp,
+  TrendingDown,
+  Assignment,
+  CheckCircle,
+  Add,
+  ArrowForward,
+  Refresh,
+  Analytics,
+  Notifications,
+  Settings,
+  FolderOpen,
+  Speed,
+  Timeline,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
-// Using features according to FSD
-import { useAuth } from '@/features/auth';
-import { useDashboard } from '@/features/dashboard';
+import { ActivityFeed } from "@/widgets/activity-feed";
+import { ProjectOverview } from "@/widgets/project-overview";
+import { SystemHealth } from "@/widgets/system-health";
+import { RequirementList } from "@/widgets/requirement-list";
 
-// Using shared utilities
-import { getUserInitials } from '@/shared/utils';
+interface DashboardMetric {
+  id: string;
+  title: string;
+  value: string | number;
+  change: number;
+  trend: "up" | "down" | "stable";
+  icon: React.ReactNode;
+  color: string;
+  description: string;
+}
 
-const DashboardPage: React.FC = () => {
+interface QuickAction {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  path: string;
+  badge?: string;
+}
+
+export const DashboardPage: React.FC = () => {
   const theme = useTheme();
-  const { user, hasPermission } = useAuth();
-  const { dashboardData, isLoading } = useDashboard();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+  // Minimalist metrics with key focus
+  const metrics: DashboardMetric[] = [
+    {
+      id: "active-projects",
+      title: "Active Projects",
+      value: 12,
+      change: 8.5,
+      trend: "up",
+      icon: <FolderOpen />,
+      color: theme.palette.primary.main,
+      description: "Projects in development",
+    },
+    {
+      id: "total-requirements",
+      title: "Requirements",
+      value: 247,
+      change: 12.3,
+      trend: "up",
+      icon: <Assignment />,
+      color: theme.palette.info.main,
+      description: "Total requirements tracked",
+    },
+    {
+      id: "completion-rate",
+      title: "Completion Rate",
+      value: "89%",
+      change: 4.2,
+      trend: "up",
+      icon: <CheckCircle />,
+      color: theme.palette.success.main,
+      description: "Overall project completion",
+    },
+    {
+      id: "team-velocity",
+      title: "Team Velocity",
+      value: 42,
+      change: -2.1,
+      trend: "down",
+      icon: <Speed />,
+      color: theme.palette.warning.main,
+      description: "Story points per sprint",
+    },
+  ];
+
+  // Minimalist quick actions
+  const quickActions: QuickAction[] = [
+    {
+      id: "new-project",
+      title: "New Project",
+      description: "Create a new project",
+      icon: <Add />,
+      color: theme.palette.primary.main,
+      path: "/projects/create",
+    },
+    {
+      id: "new-requirement",
+      title: "Add Requirement",
+      description: "Create new requirement",
+      icon: <Assignment />,
+      color: theme.palette.info.main,
+      path: "/requirements/create",
+    },
+    {
+      id: "view-reports",
+      title: "View Reports",
+      description: "Analytics & insights",
+      icon: <Analytics />,
+      color: theme.palette.secondary.main,
+      path: "/reports",
+    },
+    {
+      id: "system-health",
+      title: "System Status",
+      description: "Monitor system health",
+      icon: <Timeline />,
+      color: theme.palette.success.main,
+      path: "/admin",
+      badge: "All systems operational",
+    },
+  ];
+
+  const handleRefresh = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 1000);
   };
 
-  const getUserDisplayName = () => {
-    if (user?.first_name && user?.last_name) {
-      return `${user.first_name} ${user.last_name}`;
-    }
-    return user?.username || 'User';
+  const handleQuickAction = (action: QuickAction) => {
+    navigate(action.path);
   };
-
-  const isAdmin = hasPermission('admin:read');
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.02)}, ${alpha(theme.palette.secondary.main, 0.02)})`,
-        pb: 4,
-      }}
-    >
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        {/* Welcome Section */}
-        <Fade in timeout={600}>
-          <Box sx={{ mb: 6 }}>
-            <Stack spacing={3}>
-              {/* Header with User Info */}
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar
-                    sx={{
-                      width: 56,
-                      height: 56,
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      fontSize: '1.5rem',
-                      fontWeight: 600,
-                      border: `3px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                    }}
-                  >
-                    {getUserInitials(getUserDisplayName())}
-                  </Avatar>
-                  
-                  <Stack spacing={1}>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: 700,
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        color: 'transparent',
-                        fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
-                        lineHeight: 1.2,
-                      }}
-                    >
-                      {getGreeting()}, {getUserDisplayName()}!
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{ 
-                        fontSize: { xs: '0.95rem', sm: '1rem', md: '1.1rem' },
-                        fontWeight: 400,
-                        opacity: 0.8,
-                      }}
-                    >
-                      Welcome back to your project management dashboard
-                    </Typography>
-                  </Stack>
-                </Stack>
-
-                {/* Status Chip */}
-                <Chip
-                  label={isAdmin ? 'Administrator' : 'User'}
-                  color={isAdmin ? 'primary' : 'default'}
-                  variant="outlined"
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      {/* Header Section - Minimalist */}
+      <Fade in timeout={300}>
+        <Box mb={4}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Box>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  color: theme.palette.text.primary,
+                  mb: 0.5,
+                }}
+              >
+                Dashboard
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Welcome back! Here's what's happening with your projects.
+              </Typography>
+            </Box>
+            <Stack direction="row" spacing={1}>
+              <Tooltip title="Notifications">
+                <IconButton
                   sx={{
                     borderRadius: 2,
-                    fontWeight: 500,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-                    '&:hover': {
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    "&:hover": {
                       backgroundColor: alpha(theme.palette.primary.main, 0.04),
                     },
                   }}
-                />
-              </Box>
-
-              {/* Quick Stats Summary */}
-              <Box
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  background: alpha(theme.palette.background.paper, 0.6),
-                  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                  backdropFilter: 'blur(20px)',
-                  boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.04)}`,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  Today's Overview
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {dashboardData?.stats?.active_projects || 0} active projects • {dashboardData?.stats?.pending_requirements || 0} pending requirements
-                </Typography>
-              </Box>
-            </Stack>
-          </Box>
-        </Fade>
-
-        {/* Main Dashboard Grid */}
-        <Stack spacing={4}>
-          {/* Statistics Overview */}
-          <Grow in timeout={800}>
-            <Box>
-              <DashboardStats
-                layout="grid"
-                showTrends={true}
-                onStatClick={(statType) => {
-                  // Navigate to specific sections based on stat type
-                  switch (statType) {
-                    case 'projects':
-                      window.location.href = '/projects';
-                      break;
-                    case 'requirements':
-                      window.location.href = '/requirements';
-                      break;
-                    case 'testing':
-                      window.location.href = '/testing';
-                      break;
-                    case 'users':
-                      if (isAdmin) window.location.href = '/admin';
-                      break;
-                    case 'releases':
-                      window.location.href = '/releases';
-                      break;
-                  }
-                }}
-              />
-            </Box>
-          </Grow>
-
-          {/* Main Content Grid */}
-          <Grid container spacing={3}>
-            {/* Quick Actions */}
-            <Grid item xs={12} md={6} lg={4}>
-              <Grow in timeout={1000}>
-                <Box sx={{ height: '100%' }}>
-                  <QuickActions
-                    layout="grid"
-                    onActionClick={(action) => {
-                      switch (action) {
-                        case 'create-project':
-                          window.location.href = '/projects/create';
-                          break;
-                        case 'add-requirement':
-                          window.location.href = '/requirements/create';
-                          break;
-                        case 'create-release':
-                          window.location.href = '/releases/create';
-                          break;
-                        case 'run-tests':
-                          window.location.href = '/testing';
-                          break;
-                        case 'export-report':
-                          window.location.href = '/reports';
-                          break;
-                      }
-                    }}
-                  />
-                </Box>
-              </Grow>
-            </Grid>
-
-            {/* Activity Feed */}
-            <Grid item xs={12} md={6} lg={4}>
-              <Grow in timeout={1200}>
-                <Box sx={{ height: '100%' }}>
-                  <ActivityFeed
-                    limit={8}
-                    showFilters={false}
-                    onActivityClick={(activityId) => {
-                      console.log('Activity clicked:', activityId);
-                    }}
-                  />
-                </Box>
-              </Grow>
-            </Grid>
-
-            {/* System Health (Admin Only) */}
-            {isAdmin && (
-              <Grid item xs={12} md={6} lg={4}>
-                <Grow in timeout={1400}>
-                  <Box sx={{ height: '100%' }}>
-                    <SystemHealth
-                      showDetails={true}
-                      autoRefresh={true}
-                      refreshInterval={30000}
-                      onHealthClick={(component) => {
-                        window.location.href = `/admin?tab=system&component=${component}`;
-                      }}
-                    />
-                  </Box>
-                </Grow>
-              </Grid>
-            )}
-
-            {/* Recent Project Overview */}
-            {dashboardData?.recentProject && (
-              <Grid item xs={12} md={6} lg={isAdmin ? 4 : 6}>
-                <Grow in timeout={1600}>
-                  <Box sx={{ height: '100%' }}>
-                    <ProjectOverview
-                      projectId={dashboardData.recentProject.id}
-                      showDetails={true}
-                      showProgress={true}
-                      onProjectClick={(projectId) => {
-                        window.location.href = `/projects/${projectId}`;
-                      }}
-                    />
-                  </Box>
-                </Grow>
-              </Grid>
-            )}
-          </Grid>
-
-          {/* Additional Widgets Section */}
-          <Grid container spacing={3}>
-            {/* Extended Activity Feed for Large Screens */}
-            <Grid item xs={12} lg={8}>
-              <Grow in timeout={1800}>
-                <Card
+                >
+                  <Notifications />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Settings">
+                <IconButton
                   sx={{
-                    borderRadius: 3,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                    boxShadow: `0 2px 20px ${alpha(theme.palette.common.black, 0.04)}`,
-                    background: theme.palette.background.paper,
-                    overflow: 'hidden',
+                    borderRadius: 2,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    "&:hover": {
+                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    },
                   }}
                 >
-                  <CardContent sx={{ p: 0 }}>
-                    <ActivityFeed
-                      limit={15}
-                      showFilters={true}
-                      onActivityClick={(activityId) => {
-                        console.log('Activity clicked:', activityId);
+                  <Settings />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Refresh">
+                <span>
+                  <IconButton
+                    onClick={handleRefresh}
+                    disabled={isLoading}
+                    sx={{
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      "&:hover": {
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.04
+                        ),
+                      },
+                    }}
+                  >
+                    <Refresh />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Stack>
+          </Stack>
+        </Box>
+      </Fade>
+
+      {/* Key Metrics - Minimalist Cards */}
+      <Fade in timeout={600}>
+        <Grid container spacing={3} mb={4}>
+          {metrics.map((metric, index) => (
+            <Grid item xs={12} sm={6} md={3} key={metric.id}>
+              <Grow in timeout={400 + index * 100}>
+                <Card
+                  elevation={0}
+                  sx={{
+                    p: 2.5,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    background: theme.palette.background.paper,
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: `0 8px 24px ${alpha(metric.color, 0.12)}`,
+                      borderColor: alpha(metric.color, 0.2),
+                    },
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={2}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 2,
+                        background: alpha(metric.color, 0.1),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: metric.color,
                       }}
-                    />
-                  </CardContent>
+                    >
+                      {metric.icon}
+                    </Box>
+                    <Box flex={1}>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 700,
+                          color: theme.palette.text.primary,
+                          mb: 0.5,
+                        }}
+                      >
+                        {metric.value}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {metric.title}
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={0.5}
+                        mt={0.5}
+                      >
+                        {metric.trend === "up" ? (
+                          <TrendingUp
+                            sx={{
+                              fontSize: 16,
+                              color: theme.palette.success.main,
+                            }}
+                          />
+                        ) : (
+                          <TrendingDown
+                            sx={{
+                              fontSize: 16,
+                              color: theme.palette.error.main,
+                            }}
+                          />
+                        )}
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color:
+                              metric.trend === "up"
+                                ? theme.palette.success.main
+                                : theme.palette.error.main,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {metric.change > 0 ? "+" : ""}
+                          {metric.change}%
+                        </Typography>
+                      </Stack>
+                    </Box>
+                  </Stack>
                 </Card>
               </Grow>
             </Grid>
+          ))}
+        </Grid>
+      </Fade>
 
-            {/* Quick Actions Extended */}
-            <Grid item xs={12} lg={4}>
-              <Grow in timeout={2000}>
-                <Box sx={{ height: '100%' }}>
-                  <QuickActions
-                    layout="list"
-                    actions={['create-project', 'add-requirement', 'run-tests']}
-                    onActionClick={(action) => {
-                      console.log('Quick action:', action);
+      {/* Quick Actions - Minimalist */}
+      <Fade in timeout={800}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 3,
+            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            background: theme.palette.background.paper,
+          }}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={3}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Quick Actions
+            </Typography>
+            <Button
+              endIcon={<ArrowForward />}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+              }}
+            >
+              View All
+            </Button>
+          </Stack>
+          <Grid container spacing={2}>
+            {quickActions.map((action, index) => (
+              <Grid item xs={12} sm={6} md={3} key={action.id}>
+                <Grow in timeout={600 + index * 100}>
+                  <Card
+                    elevation={0}
+                    sx={{
+                      p: 2,
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                      background: alpha(theme.palette.background.paper, 0.8),
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        transform: "translateY(-1px)",
+                        borderColor: alpha(action.color, 0.3),
+                        background: alpha(action.color, 0.02),
+                      },
                     }}
-                  />
-                </Box>
-              </Grow>
-            </Grid>
+                    onClick={() => handleQuickAction(action)}
+                  >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Box
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 1.5,
+                          background: alpha(action.color, 0.1),
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: action.color,
+                        }}
+                      >
+                        {action.icon}
+                      </Box>
+                      <Box flex={1}>
+                        <Typography
+                          variant="subtitle2"
+                          sx={{ fontWeight: 600, mb: 0.5 }}
+                        >
+                          {action.title}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {action.description}
+                        </Typography>
+                        {action.badge && (
+                          <Chip
+                            label={action.badge}
+                            size="small"
+                            sx={{
+                              mt: 0.5,
+                              height: 20,
+                              fontSize: "0.6rem",
+                              backgroundColor: alpha(action.color, 0.1),
+                              color: action.color,
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </Stack>
+                  </Card>
+                </Grow>
+              </Grid>
+            ))}
           </Grid>
-        </Stack>
-      </Container>
-    </Box>
+        </Paper>
+      </Fade>
+
+      {/* Main Content Grid - Minimalist Layout */}
+      <Grid container spacing={3}>
+        {/* Left Column */}
+        <Grid item xs={12} lg={8}>
+          <Stack spacing={3}>
+            {/* Project Overview */}
+            <Fade in timeout={1000}>
+              <ProjectOverview variant="dashboard" />
+            </Fade>
+
+            {/* Recent Requirements */}
+            <Fade in timeout={1200}>
+              <RequirementList
+                limit={5}
+                showFilters={false}
+                showPagination={false}
+                variant="compact"
+                showStats={false}
+              />
+            </Fade>
+          </Stack>
+        </Grid>
+
+        {/* Right Column */}
+        <Grid item xs={12} lg={4}>
+          <Stack spacing={3}>
+            {/* System Health */}
+            <Fade in timeout={1400}>
+              <SystemHealth
+                variant="compact"
+                showDetails={false}
+                autoRefresh={true}
+              />
+            </Fade>
+
+            {/* Activity Feed */}
+            <Fade in timeout={1600}>
+              <ActivityFeed limit={5} showFilters={false} />
+            </Fade>
+          </Stack>
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
-
-export default DashboardPage;
