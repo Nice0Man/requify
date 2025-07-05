@@ -161,7 +161,7 @@ export interface AuthContextType {
   requireEmailVerification: boolean;
   allowRegistration: boolean;
   allowPasswordReset: boolean;
-
+    
   // Actions
   login: (credentials: LoginFormData) => Promise<void>;
   register: (userData: RegisterFormData) => Promise<void>;
@@ -177,7 +177,7 @@ export interface AuthContextType {
   ) => Promise<void>;
   getSessions: () => Promise<void>;
   revokeSessions: (sessionIds?: number[], revokeAll?: boolean) => Promise<void>;
-
+  
   // Utilities
   clearError: () => void;
   hasPermission: (permission: string) => boolean;

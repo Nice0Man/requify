@@ -147,9 +147,9 @@ export class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
-
+        
         // Request logging removed
-
+        
         return config;
       },
       (error) => {

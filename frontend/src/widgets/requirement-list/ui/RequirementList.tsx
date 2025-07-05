@@ -641,7 +641,7 @@ export const RequirementList: React.FC<RequirementListProps> = ({
     try {
       setIsLoading(true);
       setError(null);
-
+      
       const filters: any = {};
       if (projectId) filters.project_id = projectId;
       if (statusFilter) filters.status = statusFilter;
@@ -812,8 +812,8 @@ export const RequirementList: React.FC<RequirementListProps> = ({
           <CardContent sx={{ textAlign: "center", py: 4 }}>
             <ErrorOutline sx={{ fontSize: 48, color: "error.main", mb: 2 }} />
             <Typography color="error" variant="h6" sx={{ mb: 2 }}>
-              {error}
-            </Typography>
+            {error}
+          </Typography>
             <Button
               onClick={handleRefresh}
               variant="outlined"
@@ -822,8 +822,8 @@ export const RequirementList: React.FC<RequirementListProps> = ({
             >
               Try Again
             </Button>
-          </CardContent>
-        </Card>
+        </CardContent>
+      </Card>
       </Fade>
     );
   }
@@ -834,10 +834,10 @@ export const RequirementList: React.FC<RequirementListProps> = ({
       <Fade in timeout={400}>
         <Paper
           elevation={0}
-          sx={{
+      sx={{
             p: 3,
             mb: 3,
-            borderRadius: 3,
+        borderRadius: 3,
             background: `linear-gradient(135deg, ${alpha(
               theme.palette.info.main,
               0.02
@@ -853,12 +853,12 @@ export const RequirementList: React.FC<RequirementListProps> = ({
             gap={2}
           >
             <Stack direction="row" alignItems="center" spacing={2}>
-              <Box
-                sx={{
+          <Box
+            sx={{
                   width: 48,
                   height: 48,
                   borderRadius: 2.5,
-                  background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.primary.main})`,
+              background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.primary.main})`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -867,14 +867,14 @@ export const RequirementList: React.FC<RequirementListProps> = ({
                     theme.palette.info.main,
                     0.3
                   )}`,
-                }}
-              >
-                <Assignment />
-              </Box>
+            }}
+          >
+            <Assignment />
+          </Box>
               <Stack spacing={0.5}>
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                  Requirements
-                </Typography>
+            Requirements
+          </Typography>
                 {showStats && (
                   <Stack direction="row" spacing={2}>
                     <Chip
@@ -935,8 +935,8 @@ export const RequirementList: React.FC<RequirementListProps> = ({
                       },
                     }}
                   >
-                    <Refresh />
-                  </IconButton>
+            <Refresh />
+          </IconButton>
                 </span>
               </Tooltip>
             </Stack>
@@ -945,7 +945,7 @@ export const RequirementList: React.FC<RequirementListProps> = ({
       </Fade>
 
       {/* Filters */}
-      {showFilters && (
+        {showFilters && (
         <Fade in timeout={600}>
           <Paper
             elevation={0}
@@ -959,19 +959,19 @@ export const RequirementList: React.FC<RequirementListProps> = ({
             }}
           >
             <Stack spacing={2}>
-              <TextField
-                fullWidth
-                placeholder="Search requirements..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                size="small"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
+            <TextField
+              fullWidth
+              placeholder="Search requirements..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              size="small"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
+              }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: 2,
@@ -981,36 +981,36 @@ export const RequirementList: React.FC<RequirementListProps> = ({
 
               <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
                 <FormControl size="small" sx={{ minWidth: 140 }}>
-                  <InputLabel>Status</InputLabel>
-                  <Select
-                    value={statusFilter}
-                    label="Status"
-                    onChange={(e) => setStatusFilter(e.target.value)}
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label="Status"
+                  onChange={(e) => setStatusFilter(e.target.value)}
                     sx={{ borderRadius: 2 }}
-                  >
+                >
                     <MenuItem value="">All Statuses</MenuItem>
-                    <MenuItem value="draft">Draft</MenuItem>
+                  <MenuItem value="draft">Draft</MenuItem>
                     <MenuItem value="review">In Review</MenuItem>
-                    <MenuItem value="approved">Approved</MenuItem>
-                    <MenuItem value="rejected">Rejected</MenuItem>
-                  </Select>
-                </FormControl>
+                  <MenuItem value="approved">Approved</MenuItem>
+                  <MenuItem value="rejected">Rejected</MenuItem>
+                </Select>
+              </FormControl>
 
                 <FormControl size="small" sx={{ minWidth: 140 }}>
-                  <InputLabel>Priority</InputLabel>
-                  <Select
-                    value={priorityFilter}
-                    label="Priority"
-                    onChange={(e) => setPriorityFilter(e.target.value)}
+                <InputLabel>Priority</InputLabel>
+                <Select
+                  value={priorityFilter}
+                  label="Priority"
+                  onChange={(e) => setPriorityFilter(e.target.value)}
                     sx={{ borderRadius: 2 }}
-                  >
+                >
                     <MenuItem value="">All Priorities</MenuItem>
                     <MenuItem value="critical">Critical</MenuItem>
-                    <MenuItem value="high">High</MenuItem>
-                    <MenuItem value="medium">Medium</MenuItem>
-                    <MenuItem value="low">Low</MenuItem>
-                  </Select>
-                </FormControl>
+                  <MenuItem value="high">High</MenuItem>
+                  <MenuItem value="medium">Medium</MenuItem>
+                  <MenuItem value="low">Low</MenuItem>
+                </Select>
+              </FormControl>
 
                 <ButtonGroup size="small" variant="outlined">
                   <Button
@@ -1092,9 +1092,9 @@ export const RequirementList: React.FC<RequirementListProps> = ({
           }}
         >
           <CardContent sx={{ p: 0 }}>
-            {isLoading ? (
+        {isLoading ? (
               <Box sx={{ p: 3 }}>
-                {Array.from({ length: 5 }).map((_, index) => (
+            {Array.from({ length: 5 }).map((_, index) => (
                   <Stack
                     key={index}
                     direction="row"
@@ -1103,10 +1103,10 @@ export const RequirementList: React.FC<RequirementListProps> = ({
                     sx={{ mb: 2 }}
                   >
                     <Skeleton variant="circular" width={40} height={40} />
-                    <Box flex={1}>
-                      <Skeleton variant="text" width="80%" height={20} />
-                      <Skeleton variant="text" width="60%" height={16} />
-                    </Box>
+                <Box flex={1}>
+                  <Skeleton variant="text" width="80%" height={20} />
+                  <Skeleton variant="text" width="60%" height={16} />
+                </Box>
                     <Stack direction="row" spacing={1}>
                       <Skeleton
                         variant="rectangular"
@@ -1123,9 +1123,9 @@ export const RequirementList: React.FC<RequirementListProps> = ({
                     </Stack>
                   </Stack>
                 ))}
-              </Box>
-            ) : requirements.length === 0 ? (
-              <Box
+          </Box>
+        ) : requirements.length === 0 ? (
+          <Box 
                 sx={{
                   display: "flex",
                   flexDirection: "column",
@@ -1144,17 +1144,17 @@ export const RequirementList: React.FC<RequirementListProps> = ({
                   {searchTerm || statusFilter || priorityFilter
                     ? "Try adjusting your filters to see more results"
                     : "Create your first requirement to get started"}
-                </Typography>
-              </Box>
+                      </Typography>
+                    </Box>
             ) : (
               <Box sx={{ p: 3 }}>
                 {Object.entries(grouped).map(
                   ([groupName, groupRequirements]) => (
                     <Box key={groupName}>
                       {groupBy !== "none" && (
-                        <Typography
+                        <Typography 
                           variant="subtitle2"
-                          sx={{
+                          sx={{ 
                             fontWeight: 600,
                             mb: 2,
                             mt: groupName !== Object.keys(grouped)[0] ? 3 : 0,
@@ -1217,36 +1217,36 @@ export const RequirementList: React.FC<RequirementListProps> = ({
                                   : undefined
                               }
                             />
-                          ))}
-                        </List>
+            ))}
+          </List>
                       )}
                     </Box>
                   )
                 )}
               </Box>
-            )}
+        )}
 
-            {showPagination && totalPages > 1 && (
+        {showPagination && totalPages > 1 && (
               <Box
                 sx={{ display: "flex", justifyContent: "center", p: 3, pt: 0 }}
               >
-                <Pagination
-                  count={totalPages}
-                  page={page}
-                  onChange={handlePageChange}
-                  color="primary"
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
                   size="medium"
                   sx={{
                     "& .MuiPaginationItem-root": {
                       borderRadius: 2,
                     },
                   }}
-                />
-              </Box>
-            )}
-          </CardContent>
+            />
+          </Box>
+        )}
+      </CardContent>
         </Paper>
       </Fade>
     </Box>
   );
-};
+}; 

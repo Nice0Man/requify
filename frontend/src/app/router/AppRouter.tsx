@@ -373,22 +373,22 @@ export const AppRouter: React.FC = () => {
           }
         />
 
-        {/* Root homepage */}
+        {/* Root homepage - Full Landing Page */}
         <Route
           path="/"
           element={
-            <Suspense fallback={<PageLoadingFallback pageName="homepage" />}>
-              <HomePage />
+            <Suspense fallback={<PageLoadingFallback pageName="landing page" />}>
+              <StartPage />
             </Suspense>
           }
         />
 
-        {/* Start Page - Full Landing Page */}
+        {/* Start Page - Simple Homepage */}
         <Route
           path="/start"
           element={
-            <Suspense fallback={<PageLoadingFallback pageName="start page" />}>
-              <StartPage />
+            <Suspense fallback={<PageLoadingFallback pageName="homepage" />}>
+              <HomePage />
             </Suspense>
           }
         />

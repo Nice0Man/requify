@@ -167,7 +167,7 @@ export const getUserFullName = (user: User): string => {
   return user.first_name || user.last_name || user.email || "Unknown User";
 };
 
-export const getUserInitials = (user: User): string => {
+export const getUserInitials = (first_name: string | undefined, last_name: string | undefined, user: User): string => {
   const firstName = user.first_name?.charAt(0).toUpperCase() || "";
   const lastName = user.last_name?.charAt(0).toUpperCase() || "";
 

@@ -1,83 +1,14 @@
 import { ReactNode } from 'react';
 
-// Activity Feed Widget
-export interface ActivityFeedProps {
-  limit?: number;
-  showFilters?: boolean;
-  className?: string;
-  onActivityClick?: (activityId: string) => void;
-}
-
-// Dashboard Stats Widget  
-export interface DashboardStatsProps {
-  layout?: 'grid' | 'horizontal' | 'vertical';
-  showTrends?: boolean;
-  className?: string;
-  onStatClick?: (statType: string) => void;
-}
-
-// Navigation Widget
-export interface NavigationProps {
-  collapsed?: boolean;
-  onToggleCollapse?: () => void;
-  className?: string;
-  activeItem?: string;
-}
-
-// Project Overview Widget
-export interface ProjectOverviewProps {
-  projectId?: number;
-  showDetails?: boolean;
-  showProgress?: boolean;
-  className?: string;
-  onProjectClick?: (projectId: number) => void;
-}
-
-// Requirement List Widget
-export interface RequirementListProps {
-  projectId?: number;
-  limit?: number;
-  showFilters?: boolean;
-  showPagination?: boolean;
-  className?: string;
-  onRequirementClick?: (requirementId: number) => void;
-}
-
-// System Health Widget
-export interface SystemHealthProps {
-  showDetails?: boolean;
-  autoRefresh?: boolean;
-  refreshInterval?: number;
-  className?: string;
-  onHealthClick?: (component: string) => void;
-}
-
-// Quick Actions Widget
-export interface QuickActionsProps {
-  actions?: string[];
-  layout?: 'grid' | 'list';
-  className?: string;
-  onActionClick?: (action: string) => void;
-}
-
-// Kanban Widget
-export interface KanbanProps {
-  mode?: 'requirements' | 'projects' | 'tasks';
-  projectId?: number;
-  columns?: KanbanColumn[];
-  showFilters?: boolean;
-  allowDragDrop?: boolean;
-  className?: string;
-  onItemClick?: (itemId: number, itemType: string) => void;
-  onItemMove?: (itemId: number, fromColumn: string, toColumn: string) => void;
-}
-
+// Kanban types
 export interface KanbanColumn {
   id: string;
   title: string;
-  color?: string;
-  status?: string;
+  color: string;
+  status: string;
   limit?: number;
+  description?: string;
+  icon?: React.ReactNode;
 }
 
 export interface KanbanItem {
@@ -87,11 +18,130 @@ export interface KanbanItem {
   status: string;
   priority?: string;
   assignee?: string;
+  assignees?: string[];
   created_at: string;
-  updated_at?: string;
-  type: 'requirement' | 'project' | 'task';
+  updated_at: string;
+  type: "requirement" | "project" | "task";
   labels?: string[];
-  estimate?: number;
+  progress?: number;
+  dueDate?: string;
+  estimatedHours?: number;
+  actualHours?: number;
+  project_name?: string;
+  author?: string;
+}
+
+export interface KanbanProps {
+  mode?: "requirements" | "projects" | "tasks";
+  projectId?: number;
+  columns?: KanbanColumn[];
+  showFilters?: boolean;
+  allowDragDrop?: boolean;
+  className?: string;
+  onItemClick?: (itemId: number, itemType: string) => void;
+  onItemMove?: (itemId: number, fromColumn: string, toColumn: string) => void;
+  variant?: "compact" | "detailed" | "minimal";
+}
+
+// Dashboard types
+export interface DashboardStats {
+  totalProjects: number;
+  activeProjects: number;
+  totalRequirements: number;
+  completedRequirements: number;
+  totalTestCases: number;
+  passedTestCases: number;
+  totalUsers: number;
+  activeUsers: number;
+}
+
+export interface ActivityItem {
+  id: string;
+  type: 'project' | 'requirement' | 'test' | 'user';
+  action: 'created' | 'updated' | 'deleted' | 'completed';
+  title: string;
+  description?: string;
+  user: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+}
+
+// Navigation types
+export interface NavigationItem {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  path: string;
+  children?: NavigationItem[];
+  badge?: string | number;
+  disabled?: boolean;
+  permissions?: string[];
+}
+
+// Quick Actions types
+export interface QuickAction {
+  id: string;
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  action: () => void;
+  disabled?: boolean;
+  permissions?: string[];
+}
+
+// Project Overview types
+export interface ProjectOverview {
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  progress: number;
+  requirements: number;
+  testCases: number;
+  members: number;
+  dueDate?: string;
+  owner: string;
+  tags?: string[];
+}
+
+// System Health types
+export interface SystemHealth {
+  status: 'healthy' | 'warning' | 'error';
+  uptime: number;
+  memory: {
+    used: number;
+    total: number;
+    percentage: number;
+  };
+  cpu: {
+    usage: number;
+  };
+  database: {
+    status: 'connected' | 'disconnected' | 'error';
+    responseTime: number;
+  };
+  services: Array<{
+    name: string;
+    status: 'running' | 'stopped' | 'error';
+    uptime: number;
+  }>;
+}
+
+// Requirement List types
+export interface RequirementListItem {
+  id: number;
+  title: string;
+  description?: string;
+  status: string;
+  priority: string;
+  type: string;
+  assignee?: string;
+  project: string;
+  created_at: string;
+  updated_at: string;
+  progress?: number;
+  labels?: string[];
 }
 
 // Common widget state

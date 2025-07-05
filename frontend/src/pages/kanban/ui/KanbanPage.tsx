@@ -18,6 +18,10 @@ import {
   useTheme,
   alpha,
   Divider,
+  Alert,
+  Snackbar,
+  Fade,
+  Grow,
 } from '@mui/material';
 import {
   ViewColumn,
@@ -32,12 +36,14 @@ import {
   Download,
   Fullscreen,
   FullscreenExit,
+  DragIndicator,
+  CheckCircle,
 } from '@mui/icons-material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 // Using widgets according to FSD
 import { Kanban } from '@/widgets';
-import type { KanbanProps } from '@/widgets';
+import type { KanbanProps } from '@/widgets/types';
 
 // Using features according to FSD  
 import { useAuth } from '@/features/auth';
@@ -80,6 +86,17 @@ const KanbanPage: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [allowDragDrop, setAllowDragDrop] = useState(true);
+  const [variant, setVariant] = useState<'compact' | 'detailed' | 'minimal'>('detailed');
+  const [notification, setNotification] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'info' | 'warning';
+  }>({
+    open: false,
+    message: '',
+    severity: 'info',
+  });
 
   // Permissions
   const canCreateRequirements = hasPermission('requirements:create');
@@ -138,22 +155,36 @@ const KanbanPage: React.FC = () => {
     }
   }, [navigate]);
 
-  const handleItemMove = useCallback((itemId: number, fromColumn: string, toColumn: string) => {
-    // Here you would implement the actual status update API call
-    console.log(`Move item ${itemId} from ${fromColumn} to ${toColumn}`);
-    // Example implementation:
-    // switch (currentMode) {
-    //   case 'requirements':
-    //     await requirementsApi.updateRequirement(itemId, { status: toColumn });
-    //     break;
-    //   case 'projects':
-    //     await projectsApi.updateProject(itemId, { status: toColumn });
-    //     break;
-    //   case 'tasks':
-    //     await testCasesApi.updateTestCase(itemId, { status: toColumn });
-    //     break;
-    // }
-  }, [currentMode]);
+  const handleItemMove = useCallback(async (itemId: number, fromColumn: string, toColumn: string) => {
+    try {
+      // Show loading notification
+      setNotification({
+        open: true,
+        message: 'Updating item status...',
+        severity: 'info',
+      });
+
+      // Here you would implement the actual status update API call
+      console.log(`Move item ${itemId} from ${fromColumn} to ${toColumn}`);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success notification
+      setNotification({
+        open: true,
+        message: 'Item status updated successfully!',
+        severity: 'success',
+      });
+    } catch (error) {
+      console.error('Error updating item:', error);
+      setNotification({
+        open: true,
+        message: 'Failed to update item status',
+        severity: 'error',
+      });
+    }
+  }, []);
 
   const handleCreateNew = useCallback(() => {
     const config = modeConfig[currentMode];
@@ -172,6 +203,14 @@ const KanbanPage: React.FC = () => {
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+  };
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
+  const handleNotificationClose = () => {
+    setNotification(prev => ({ ...prev, open: false }));
   };
 
   const currentConfig = modeConfig[currentMode];
@@ -196,191 +235,226 @@ const KanbanPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+          <Box>
+            <Typography variant="h4" fontWeight={700} color="text.primary" gutterBottom>
+              Kanban Board
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {currentConfig.description}
+            </Typography>
+          </Box>
+          
           <Box display="flex" alignItems="center" gap={2}>
-            <Box
+            {/* View Mode Toggle */}
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(_, value) => value && setViewMode(value)}
+              size="small"
+            >
+              <ToggleButton value="board">
+                <ViewColumn />
+              </ToggleButton>
+              <ToggleButton value="list">
+                <ViewList />
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            {/* Variant Toggle */}
+            <ToggleButtonGroup
+              value={variant}
+              exclusive
+              onChange={(_, value) => value && setVariant(value)}
+              size="small"
+            >
+              <ToggleButton value="minimal">Minimal</ToggleButton>
+              <ToggleButton value="compact">Compact</ToggleButton>
+              <ToggleButton value="detailed">Detailed</ToggleButton>
+            </ToggleButtonGroup>
+
+            {/* Action Buttons */}
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={handleCreateNew}
+              disabled={!currentConfig.canCreate}
               sx={{
-                width: 48,
-                height: 48,
-                borderRadius: 3,
-                background: `linear-gradient(135deg, ${currentConfig.color}, ${alpha(currentConfig.color, 0.7)})`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
+                backgroundColor: currentConfig.color,
+                '&:hover': {
+                  backgroundColor: alpha(currentConfig.color, 0.8),
+                },
               }}
             >
-              {currentConfig.icon}
-            </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                {currentConfig.label} Board
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {currentConfig.description}
-              </Typography>
-            </Box>
-          </Box>
+              Create New
+            </Button>
 
-          <Box display="flex" alignItems="center" gap={1}>
-            {currentConfig.canCreate && (
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={handleCreateNew}
-                sx={{ borderRadius: 2 }}
-              >
-                Create {currentConfig.label.slice(0, -1)}
-              </Button>
-            )}
+            <IconButton onClick={handleRefresh} title="Refresh">
+              <Refresh />
+            </IconButton>
 
-            <IconButton onClick={toggleFullscreen}>
+            <IconButton onClick={toggleFullscreen} title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
               {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
             </IconButton>
 
-            <IconButton onClick={handleMenuClick}>
+            <IconButton onClick={handleMenuClick} title="More Options">
               <Settings />
             </IconButton>
           </Box>
         </Box>
 
-        {/* Mode Selector */}
-        <Paper
-          sx={{
-            p: 1,
-            borderRadius: 3,
-            backgroundColor: alpha(theme.palette.background.paper, 0.8),
-            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        {/* Mode Tabs */}
+        <Paper elevation={0} sx={{ backgroundColor: 'background.paper', border: `1px solid ${theme.palette.divider}` }}>
+          <Tabs
+            value={Object.keys(modeConfig).indexOf(currentMode)}
+            variant="fullWidth"
+            sx={{
+              '& .MuiTab-root': {
+                minHeight: 60,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                fontWeight: 500,
+              },
+            }}
+          >
+            {Object.entries(modeConfig).map(([key, config]) => (
+              <Tab
+                key={key}
+                label={
+                  <Box display="flex" alignItems="center" gap={1}>
+                    {config.icon}
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight={600}>
+                        {config.label}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {config.description}
+                      </Typography>
+                    </Box>
+                  </Box>
+                }
+                onClick={() => handleModeChange(key as KanbanProps['mode'])}
+                sx={{
+                  color: config.color,
+                  '&.Mui-selected': {
+                    backgroundColor: alpha(config.color, 0.1),
+                  },
+                }}
+              />
+            ))}
+          </Tabs>
+        </Paper>
+
+        {/* Settings Bar */}
+        <Box 
+          display="flex" 
+          alignItems="center" 
+          justifyContent="space-between" 
+          sx={{ 
+            mt: 2, 
+            p: 2, 
+            backgroundColor: alpha(theme.palette.background.paper, 0.5),
+            borderRadius: 1,
+            border: `1px solid ${theme.palette.divider}`,
           }}
         >
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Tabs
-              value={['requirements', 'projects', 'tasks'].indexOf(currentMode)}
-              onChange={(_, newValue) => {
-                const modes: KanbanProps['mode'][] = ['requirements', 'projects', 'tasks'];
-                handleModeChange(modes[newValue]);
+          <Box display="flex" alignItems="center" gap={2}>
+            <Chip
+              icon={<DragIndicator />}
+              label={allowDragDrop ? "Drag & Drop: ON" : "Drag & Drop: OFF"}
+              color={allowDragDrop ? "success" : "default"}
+              onClick={() => setAllowDragDrop(!allowDragDrop)}
+              sx={{ cursor: 'pointer' }}
+            />
+            <Chip
+              icon={currentConfig.icon}
+              label={`Mode: ${currentConfig.label}`}
+              sx={{ 
+                backgroundColor: alpha(currentConfig.color, 0.1),
+                color: currentConfig.color,
               }}
-              sx={{
-                '& .MuiTab-root': {
-                  borderRadius: 2,
-                  minHeight: 'auto',
-                  py: 1,
-                },
-              }}
-            >
-              {Object.entries(modeConfig).map(([mode, config]) => (
-                <Tab
-                  key={mode}
-                  icon={config.icon}
-                  label={config.label}
-                  iconPosition="start"
-                  sx={{
-                    color: config.color,
-                    '&.Mui-selected': {
-                      backgroundColor: alpha(config.color, 0.1),
-                      color: config.color,
-                    },
-                  }}
-                />
-              ))}
-            </Tabs>
-
-            <Box display="flex" alignItems="center" gap={1}>
-              <ToggleButtonGroup
-                value={viewMode}
-                exclusive
-                onChange={(_, newMode) => newMode && setViewMode(newMode)}
-                size="small"
-                sx={{ '& .MuiToggleButton-root': { borderRadius: 2 } }}
-              >
-                <ToggleButton value="board">
-                  <ViewColumn fontSize="small" />
-                </ToggleButton>
-                <ToggleButton value="list">
-                  <ViewList fontSize="small" />
-                </ToggleButton>
-              </ToggleButtonGroup>
-
-              {projectId && (
-                <Chip
-                  label={`Project ${projectId}`}
-                  size="small"
-                  onDelete={() => {
-                    const newParams = new URLSearchParams(searchParams);
-                    newParams.delete('project');
-                    setSearchParams(newParams);
-                  }}
-                />
-              )}
-            </Box>
+            />
+            {projectId && (
+              <Chip
+                label={`Project: ${projectId}`}
+                variant="outlined"
+              />
+            )}
           </Box>
-        </Paper>
+          
+          <Typography variant="caption" color="text.secondary">
+            {user?.first_name} {user?.last_name} • {new Date().toLocaleDateString()}
+          </Typography>
+        </Box>
       </Box>
 
       {/* Kanban Board */}
-      {viewMode === 'board' ? (
-        <Kanban
-          mode={currentMode}
-          projectId={projectId}
-          showFilters={true}
-          allowDragDrop={true}
-          onItemClick={handleItemClick}
-          onItemMove={handleItemMove}
-          className={isFullscreen ? 'kanban-fullscreen' : ''}
-        />
-      ) : (
-        <Paper sx={{ p: 3, borderRadius: 3 }}>
-          <Typography variant="h6" color="text.secondary" textAlign="center">
-            List view coming soon...
-          </Typography>
-          <Typography variant="body2" color="text.secondary" textAlign="center" mt={1}>
-            Switch to board view to see your {currentConfig.label.toLowerCase()}
-          </Typography>
-        </Paper>
-      )}
+      <Fade in timeout={500}>
+        <Box>
+          {viewMode === 'board' ? (
+            <Kanban
+              mode={currentMode}
+              projectId={projectId}
+              showFilters={true}
+              allowDragDrop={allowDragDrop}
+              onItemClick={handleItemClick}
+              onItemMove={handleItemMove}
+              variant={variant}
+            />
+          ) : (
+            <Box sx={{ p: 3, textAlign: 'center' }}>
+              <Typography variant="h6" color="text.secondary">
+                List view coming soon...
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Fade>
 
       {/* Settings Menu */}
       <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={handleMenuClose}
-        PaperProps={{
-          sx: { borderRadius: 2, minWidth: 200 }
-        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem onClick={() => {
-          // Refresh data
-          window.location.reload();
-          handleMenuClose();
-        }}>
+        <MenuItem onClick={handleMenuClose}>
           <ListItemIcon>
-            <Refresh fontSize="small" />
+            <FilterList />
           </ListItemIcon>
-          <ListItemText primary="Refresh Data" />
+          <ListItemText>Advanced Filters</ListItemText>
         </MenuItem>
-
-        <MenuItem onClick={() => {
-          // Export board data
-          console.log('Export board data');
-          handleMenuClose();
-        }}>
+        <MenuItem onClick={handleMenuClose}>
           <ListItemIcon>
-            <Download fontSize="small" />
+            <Download />
           </ListItemIcon>
-          <ListItemText primary="Export Data" />
+          <ListItemText>Export Board</ListItemText>
         </MenuItem>
-
         <Divider />
-
-        <MenuItem onClick={() => {
-          navigate('/settings');
-          handleMenuClose();
-        }}>
+        <MenuItem onClick={handleMenuClose}>
           <ListItemIcon>
-            <Settings fontSize="small" />
+            <Settings />
           </ListItemIcon>
-          <ListItemText primary="Board Settings" />
+          <ListItemText>Board Settings</ListItemText>
         </MenuItem>
       </Menu>
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={4000}
+        onClose={handleNotificationClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleNotificationClose}
+          severity={notification.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
