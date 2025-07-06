@@ -56,7 +56,12 @@ import {
 } from "@mui/icons-material";
 
 // React Beautiful DnD
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
 
 // Using entities according to FSD
 import { releasesApi } from "@/entities/release";
@@ -284,7 +289,10 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
     }
   };
 
-  const isOverdue = item.planned_date && new Date(item.planned_date) < new Date() && item.status !== "published";
+  const isOverdue =
+    item.planned_date &&
+    new Date(item.planned_date) < new Date() &&
+    item.status !== "published";
 
   return (
     <Draggable draggableId={`release-${item.id}`} index={index}>
@@ -319,7 +327,12 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
         >
           <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
             {/* Header */}
-            <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={1}>
+            <Box
+              display="flex"
+              alignItems="flex-start"
+              justifyContent="space-between"
+              mb={1}
+            >
               <Box display="flex" alignItems="center" gap={1} flex={1}>
                 <Rocket fontSize="small" color="success" />
                 <Typography
@@ -386,7 +399,10 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
                     sx={{
                       height: 20,
                       fontSize: "0.7rem",
-                      backgroundColor: alpha(getReleaseTypeColor(item.release_type), 0.1),
+                      backgroundColor: alpha(
+                        getReleaseTypeColor(item.release_type),
+                        0.1
+                      ),
                       color: getReleaseTypeColor(item.release_type),
                       fontWeight: 600,
                     }}
@@ -426,44 +442,51 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
             )}
 
             {/* Progress */}
-            {variant === "detailed" && item.completion_percentage !== undefined && (
-              <Box mb={1.5}>
-                <Box display="flex" alignItems="center" justifyContent="space-between" mb={0.5}>
-                  <Typography variant="caption" color="text.secondary">
-                    Completion
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {item.completion_percentage}%
-                  </Typography>
+            {variant === "detailed" &&
+              item.completion_percentage !== undefined && (
+                <Box mb={1.5}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    mb={0.5}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      Completion
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {item.completion_percentage}%
+                    </Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={item.completion_percentage}
+                    sx={{
+                      height: 4,
+                      borderRadius: 2,
+                      backgroundColor: alpha(theme.palette.success.main, 0.1),
+                    }}
+                  />
                 </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={item.completion_percentage}
-                  sx={{
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: alpha(theme.palette.success.main, 0.1),
-                  }}
-                />
-              </Box>
-            )}
+              )}
 
             {/* Requirements Count */}
-            {variant === "detailed" && item.requirements_count !== undefined && (
-              <Box display="flex" gap={1} mb={1.5}>
-                <Chip
-                  icon={<Assignment />}
-                  label={`${item.requirements_count} requirements`}
-                  size="small"
-                  sx={{
-                    height: 20,
-                    fontSize: "0.7rem",
-                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
-                  }}
-                />
-              </Box>
-            )}
+            {variant === "detailed" &&
+              item.requirements_count !== undefined && (
+                <Box display="flex" gap={1} mb={1.5}>
+                  <Chip
+                    icon={<Assignment />}
+                    label={`${item.requirements_count} requirements`}
+                    size="small"
+                    sx={{
+                      height: 20,
+                      fontSize: "0.7rem",
+                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                      color: theme.palette.primary.main,
+                    }}
+                  />
+                </Box>
+              )}
 
             {/* Labels */}
             {variant !== "minimal" && item.labels && item.labels.length > 0 && (
@@ -497,7 +520,11 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
             )}
 
             {/* Footer */}
-            <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+            >
               <Box display="flex" alignItems="center" gap={1}>
                 {/* Priority */}
                 {item.priority && (
@@ -507,7 +534,10 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
                     sx={{
                       height: 20,
                       fontSize: "0.7rem",
-                      backgroundColor: alpha(getPriorityColor(item.priority), 0.1),
+                      backgroundColor: alpha(
+                        getPriorityColor(item.priority),
+                        0.1
+                      ),
                       color: getPriorityColor(item.priority),
                       fontWeight: 600,
                     }}
@@ -518,12 +548,14 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
                 {variant === "detailed" && item.planned_date && (
                   <Tooltip title={`Planned: ${formatDate(item.planned_date)}`}>
                     <Box display="flex" alignItems="center" gap={0.5}>
-                      <Schedule sx={{ 
-                        fontSize: 14, 
-                        color: isOverdue ? "error.main" : "text.secondary" 
-                      }} />
-                      <Typography 
-                        variant="caption" 
+                      <Schedule
+                        sx={{
+                          fontSize: 14,
+                          color: isOverdue ? "error.main" : "text.secondary",
+                        }}
+                      />
+                      <Typography
+                        variant="caption"
                         color={isOverdue ? "error.main" : "text.secondary"}
                         fontWeight={isOverdue ? 600 : 400}
                       >
@@ -537,7 +569,9 @@ const ReleaseCard: React.FC<ReleaseCardProps> = ({
                 {variant === "detailed" && item.actual_date && (
                   <Tooltip title={`Released: ${formatDate(item.actual_date)}`}>
                     <Box display="flex" alignItems="center" gap={0.5}>
-                      <CheckCircle sx={{ fontSize: 14, color: "success.main" }} />
+                      <CheckCircle
+                        sx={{ fontSize: 14, color: "success.main" }}
+                      />
                       <Typography variant="caption" color="success.main">
                         {formatDate(item.actual_date)}
                       </Typography>
@@ -655,7 +689,12 @@ const ReleaseColumn: React.FC<ReleaseColumnProps> = ({
           borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={1}
+        >
           <Box display="flex" alignItems="center" gap={1}>
             <Box
               sx={{
@@ -665,7 +704,11 @@ const ReleaseColumn: React.FC<ReleaseColumnProps> = ({
                 backgroundColor: column.color,
               }}
             />
-            <Typography variant="subtitle1" fontWeight={600} color="text.primary">
+            <Typography
+              variant="subtitle1"
+              fontWeight={600}
+              color="text.primary"
+            >
               {column.title}
             </Typography>
             <Badge
@@ -729,7 +772,7 @@ const ReleaseColumn: React.FC<ReleaseColumnProps> = ({
               />
             ))}
             {provided.placeholder}
-            
+
             {/* Empty State */}
             {items.length === 0 && (
               <Box
@@ -835,14 +878,18 @@ const ReleaseDialog: React.FC<ReleaseDialogProps> = ({
           <TextField
             label="Version"
             value={formData.version}
-            onChange={(e) => setFormData({ ...formData, version: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, version: e.target.value })
+            }
             fullWidth
             placeholder="e.g., 1.0.0"
           />
           <TextField
             label="Description"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             fullWidth
             multiline
             rows={3}
@@ -888,7 +935,9 @@ const ReleaseDialog: React.FC<ReleaseDialogProps> = ({
             label="Planned Date"
             type="date"
             value={formData.planned_date}
-            onChange={(e) => setFormData({ ...formData, planned_date: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, planned_date: e.target.value })
+            }
             fullWidth
             InputLabelProps={{ shrink: true }}
           />
@@ -922,7 +971,9 @@ export const ReleasesKanban: React.FC<ReleasesKanbanProps> = ({
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<ReleaseKanbanItem | undefined>();
+  const [editingItem, setEditingItem] = useState<
+    ReleaseKanbanItem | undefined
+  >();
   const [dialogInitialStatus, setDialogInitialStatus] = useState<string>();
 
   // Load data
@@ -931,26 +982,21 @@ export const ReleasesKanban: React.FC<ReleasesKanbanProps> = ({
     try {
       const releases = await releaseManagementApi.getActiveReleases(projectId);
 
-      if (releases && Array.isArray(releases)) {
-        const data = releases.map((release: any) => ({
+      if (releases && Array.isArray(releases) && releases.length >= 0) {
+        const data = releases.map((release: Release) => ({
           id: release.id,
-          title: release.name || 'Untitled Release',
-          description: release.description || '',
-          status: release.status || 'draft',
-          priority: release.priority || 'medium',
-          version: release.version || '',
+          title: release.name || "Untitled Release",
+          description: release.description || "",
+          status: release.status || "draft",
+          version: release.version || "",
           created_at: release.created_at || new Date().toISOString(),
           updated_at: release.updated_at || new Date().toISOString(),
-          planned_date: release.planned_date || '',
-          actual_date: release.actual_date || '',
-          labels: release.labels || [],
-          progress: release.progress || 0,
-          requirements_count: release.requirements?.length || 0,
-          project_name: release.project_name || '',
-          release_type: release.release_type || 'minor',
-          completion_percentage: release.completion_percentage || 0,
+          planned_date: release.release_date || "",
         }));
         setItems(data);
+      } else {
+        console.warn("Invalid releases data received:", releases);
+        setItems([]);
       }
     } catch (error) {
       console.error("Error loading releases:", error);
@@ -1051,8 +1097,12 @@ export const ReleasesKanban: React.FC<ReleasesKanbanProps> = ({
         // Update local state
         setItems((prevItems) =>
           prevItems.map((item) =>
-            item.id === itemId 
-              ? { ...item, status: "published", actual_date: new Date().toISOString() } 
+            item.id === itemId
+              ? {
+                  ...item,
+                  status: "published",
+                  actual_date: new Date().toISOString(),
+                }
               : item
           )
         );
@@ -1162,4 +1212,4 @@ export const ReleasesKanban: React.FC<ReleasesKanbanProps> = ({
       />
     </Box>
   );
-}; 
+};

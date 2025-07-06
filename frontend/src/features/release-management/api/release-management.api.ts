@@ -45,42 +45,89 @@ export class ReleaseManagementApi {
    * Получить активные релизы с расширенной информацией
    */
   async getActiveReleases(projectId?: number): Promise<ReleaseExtended[]> {
-    const filters = {
-      project_id: projectId,
-      status: ["draft", "planned", "in_progress", "testing", "ready"] as const,
-    };
+    try {
+      const filters = {
+        project_id: projectId,
+        status: [
+          "draft",
+          "planned",
+          "in_progress",
+          "testing",
+          "ready",
+        ] as const,
+      };
 
-    const response = await releasesApi.getReleases({
-      limit: 50,
-      sort_by: "planned_date",
-      sort_order: "asc" as const,
-      project_id: projectId,
-      status: filters.status.join(","),
-    });
+      console.log("Calling releasesApi.getReleases with params:", {
+        limit: 50,
+        sort_by: "planned_date",
+        sort_order: "asc",
+        project_id: projectId,
+        status: filters.status.join(","),
+      });
 
-    // Обогащаем данные дополнительной информацией
-    const enrichedReleases = await Promise.all(
-      response.items.map(async (release) => {
-        const [requirements, changelog, approvals] = await Promise.all([
-          this.getReleaseRequirements(release.id),
-          this.getReleaseChangelog(release.id),
-          this.getReleaseApprovals(release.id),
-        ]).catch(() => [[], { entries: [] }, []]);
-        return {
-          ...release,
-          requirements: Array.isArray(requirements) ? requirements : [],
-          change_log: changelog?.entries || [],
-          approvals: approvals || [],
-          completion_percentage: this.calculateCompletionPercentage(
-            Array.isArray(requirements) ? requirements : []
-          ),
-          dependencies: [],
-          artifacts: [],
-        } as unknown as ReleaseExtended;
-      })
-    );
+      let response;
+      try {
+        response = await releasesApi.getReleases({
+          limit: 50,
+          sort_by: "planned_date",
+          sort_order: "asc" as const,
+          project_id: projectId,
+          status: filters.status.join(","),
+        });
+      } catch (apiError) {
+        console.warn("API call failed, using fallback data:", apiError);
+        // Fallback: return empty but valid response
+        response = { items: [] };
+      }
 
-    return enrichedReleases;
+      console.log("Response from releasesApi.getReleases:", response);
+
+      // Проверяем, что response и response.items существуют
+      if (!response) {
+        console.warn("Response is null or undefined");
+        return [];
+      }
+
+      if (!response.items) {
+        console.warn("Response.items is null or undefined, response:", response);
+        return [];
+      }
+
+      if (!Array.isArray(response.items)) {
+        console.warn("Response.items is not an array, type:", typeof response.items, "value:", response.items);
+        return [];
+      }
+
+      console.log("Processing", response.items.length, "releases");
+
+      // Обогащаем данные дополнительной информацией
+      const enrichedReleases = await Promise.all(
+        response.items.map(async (release) => {
+          const [requirements, changelog, approvals] = await Promise.all([
+            this.getReleaseRequirements(release.id),
+            this.getReleaseChangelog(release.id),
+            this.getReleaseApprovals(release.id),
+          ]).catch(() => [[], { entries: [] }, []]);
+          return {
+            ...release,
+            requirements: Array.isArray(requirements) ? requirements : [],
+            change_log: changelog?.entries || [],
+            approvals: approvals || [],
+            completion_percentage: this.calculateCompletionPercentage(
+              Array.isArray(requirements) ? requirements : []
+            ),
+            dependencies: [],
+            artifacts: [],
+          } as unknown as ReleaseExtended;
+        })
+      );
+
+      console.log("Enriched releases:", enrichedReleases.length);
+      return enrichedReleases;
+    } catch (error) {
+      console.error("Error in getActiveReleases:", error);
+      return [];
+    }
   }
 
   /**
@@ -111,8 +158,11 @@ export class ReleaseManagementApi {
       project_id: projectId,
     });
 
-    const trends = this.calculateTrends(releases.items);
-    const riskAssessment = this.assessReleaseRisks(releases.items);
+    // Проверяем, что releases и releases.items существуют
+    const releaseItems =
+      releases && Array.isArray(releases.items) ? releases.items : [];
+    const trends = this.calculateTrends(releaseItems);
+    const riskAssessment = this.assessReleaseRisks(releaseItems);
     const defaultByType: Record<ReleaseTypeValue, number> = {
       major: 0,
       minor: 0,
@@ -167,6 +217,15 @@ export class ReleaseManagementApi {
       limit: 20,
     });
 
+    // Проверяем, что response и response.items существуют
+    if (!response || !Array.isArray(response.items)) {
+      console.warn(
+        "Invalid response format from releasesApi.getReleases in getUpcomingReleases:",
+        response
+      );
+      return [];
+    }
+
     return response.items.filter((release) => {
       if (!release.planned_date) return false;
       const plannedDate = new Date(release.planned_date);
@@ -196,6 +255,15 @@ export class ReleaseManagementApi {
       sort_by: "updated_at",
       sort_order: "desc" as const,
     });
+
+    // Проверяем, что releases и releases.items существуют
+    if (!releases || !Array.isArray(releases.items)) {
+      console.warn(
+        "Invalid response format from releasesApi.getReleases in getRecentReleaseActivity:",
+        releases
+      );
+      return [];
+    }
 
     return releases.items.map((release) => ({
       id: `${release.id}-${release.updated_at}`,
@@ -335,6 +403,21 @@ export class ReleaseManagementApi {
       limit: 50,
     });
 
+    // Проверяем, что releases и releases.items существуют
+    if (!releases || !Array.isArray(releases.items)) {
+      console.warn(
+        "Invalid response format from releasesApi.getReleases in getReleasePlanner:",
+        releases
+      );
+      return {
+        timeline: [],
+        suggestions: {
+          optimalDates: {},
+          resourceConflicts: [],
+        },
+      };
+    }
+
     const timeline = releases.items.map((release) => ({
       release,
       conflicts: this.detectReleaseConflicts(release, releases.items),
@@ -353,23 +436,32 @@ export class ReleaseManagementApi {
   ): Promise<ReleaseRequirement[]> {
     try {
       const response = await releasesApi.getReleaseRequirements(releaseId);
-      return (
-        response.items?.map((item) => ({
-          ...item,
-          release_id: releaseId,
-          status: item.requirement_status || ("draft" as const),
-          requirement_id: item.requirement_id || 0,
-          requirement_title: item.requirement_title || "",
-          implementation_status:
-            item.implementation_status || ("not_started" as const),
-          test_status: item.test_status || ("not_tested" as const),
-          priority: "medium" as const,
-          notes: item.notes || "",
-          added_at: item.added_at || "",
-          completed_at: item.completed_at || "",
-        })) || []
-      );
-    } catch {
+
+      // Проверяем, что response и response.items существуют
+      if (!response || !Array.isArray(response.items)) {
+        console.warn(
+          "Invalid response format from getReleaseRequirements:",
+          response
+        );
+        return [];
+      }
+
+      return response.items.map((item) => ({
+        ...item,
+        release_id: releaseId,
+        status: item.requirement_status || ("draft" as const),
+        requirement_id: item.requirement_id || 0,
+        requirement_title: item.requirement_title || "",
+        implementation_status:
+          item.implementation_status || ("not_started" as const),
+        test_status: item.test_status || ("not_tested" as const),
+        priority: "medium" as const,
+        notes: item.notes || "",
+        added_at: item.added_at || "",
+        completed_at: item.completed_at || "",
+      }));
+    } catch (error) {
+      console.error("Error in getReleaseRequirements:", error);
       return [];
     }
   }
@@ -378,8 +470,22 @@ export class ReleaseManagementApi {
     releaseId: number
   ): Promise<{ entries: any[] }> {
     try {
-      return await releasesApi.getReleaseChangelog(releaseId);
-    } catch {
+      const response = await releasesApi.getReleaseChangelog(releaseId);
+
+      // Проверяем, что response существует и имеет правильный формат
+      if (!response || typeof response !== "object") {
+        console.warn(
+          "Invalid response format from getReleaseChangelog:",
+          response
+        );
+        return { entries: [] };
+      }
+
+      return {
+        entries: Array.isArray(response.entries) ? response.entries : [],
+      };
+    } catch (error) {
+      console.error("Error in getReleaseChangelog:", error);
       return { entries: [] };
     }
   }
