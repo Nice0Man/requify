@@ -688,67 +688,78 @@ export const Kanban: React.FC<KanbanProps> = ({
               project_id: projectId,
               limit: 100,
             });
-            data = requirements.items.map((req: Requirement) => ({
-              id: req.id,
-              title: req.title,
-              description: req.description,
-              status: req.status,
-              priority: req.priority,
-              assignee: req.assignee,
-              created_at: req.created_at,
-              updated_at: req.updated_at,
-              type: "requirement" as const,
-              labels: req.labels,
-              progress: req.progress,
-              project_name: req.project_name,
-              author: req.author,
-            }));
+            // Check if requirements and items exist
+            if (requirements && requirements.items && Array.isArray(requirements.items)) {
+              data = requirements.items.map((req: any) => ({
+                id: req.id,
+                title: req.title || 'Untitled Requirement',
+                description: req.description || '',
+                status: typeof req.status === 'string' ? req.status : req.status?.value || 'draft',
+                priority: req.priority || 'medium',
+                assignee: req.assignee || req.assigned_to || '',
+                created_at: req.created_at || new Date().toISOString(),
+                updated_at: req.updated_at || new Date().toISOString(),
+                type: "requirement" as const,
+                labels: req.labels || req.tags || [],
+                progress: req.progress || 0,
+                project_name: req.project_name || '',
+                author: req.author || req.created_by || '',
+              }));
+            }
             break;
 
           case "projects":
             const projects = await projectsApi.getProjects({
               limit: 100,
             });
-            data = projects.items.map((proj: Project) => ({
-              id: proj.id,
-              title: proj.name,
-              description: proj.description,
-              status: proj.status,
-              priority: proj.priority,
-              assignee: proj.owner,
-              created_at: proj.created_at,
-              updated_at: proj.updated_at,
-              type: "project" as const,
-              labels: proj.tags,
-              progress: proj.progress,
-              author: proj.owner,
-            }));
+            // Check if projects and items exist
+            if (projects && projects.items && Array.isArray(projects.items)) {
+              data = projects.items.map((proj: any) => ({
+                id: proj.id,
+                title: proj.name || 'Untitled Project',
+                description: proj.description || '',
+                status: proj.status || 'planning',
+                priority: proj.priority || 'medium',
+                assignee: proj.owner || proj.created_by || '',
+                created_at: proj.created_at || new Date().toISOString(),
+                updated_at: proj.updated_at || new Date().toISOString(),
+                type: "project" as const,
+                labels: proj.tags || [],
+                progress: proj.progress || 0,
+                author: proj.owner || proj.created_by || '',
+              }));
+            }
             break;
 
           case "tasks":
             const testCases = await testCasesApi.getTestCases({
-              project_id: projectId,
+              ...(projectId && { test_plan_id: projectId }),
               limit: 100,
             });
-            data = testCases.items.map((test: TestCase) => ({
-              id: test.id,
-              title: test.title,
-              description: test.description,
-              status: test.status,
-              priority: test.priority,
-              assignee: test.assignee,
-              created_at: test.created_at,
-              updated_at: test.updated_at,
-              type: "task" as const,
-              labels: test.labels,
-              author: test.author,
-            }));
+            // Check if testCases and items exist
+            if (testCases && testCases.items && Array.isArray(testCases.items)) {
+              data = testCases.items.map((test: any) => ({
+                id: test.id,
+                title: test.title || 'Untitled Test Case',
+                description: test.description || '',
+                status: test.status || 'pending',
+                priority: test.priority || 'medium',
+                assignee: test.assignee || test.assigned_to || '',
+                created_at: test.created_at || new Date().toISOString(),
+                updated_at: test.updated_at || new Date().toISOString(),
+                type: "task" as const,
+                labels: test.labels || test.tags || [],
+                author: test.author || test.created_by || '',
+              }));
+            }
             break;
         }
 
         setItems(data);
       } catch (error) {
         console.error("Error loading kanban data:", error);
+        // Set empty array on error to prevent further errors
+        setItems([]);
       } finally {
         setLoading(false);
       }
@@ -814,9 +825,9 @@ export const Kanban: React.FC<KanbanProps> = ({
   if (loading) {
     return (
       <Box sx={{ p: 3 }}>
-        <Box display="flex" gap={3} overflow="auto">
+        <Box display="flex" gap={1.5} overflow="auto">
           {Array.from({ length: 4 }).map((_, index) => (
-            <Box key={index} sx={{ minWidth: 300 }}>
+            <Box key={index} sx={{ minWidth: 280 }}>
               <Skeleton variant="rectangular" height={60} sx={{ mb: 2 }} />
               {Array.from({ length: 3 }).map((_, cardIndex) => (
                 <Skeleton
@@ -859,13 +870,13 @@ export const Kanban: React.FC<KanbanProps> = ({
         <Box
           sx={{
             display: "flex",
-            gap: 3,
+            gap: 1.5,
             overflow: "auto",
             pb: 2,
           }}
         >
           {activeColumns.map((column) => (
-            <Box key={column.id} sx={{ minWidth: 300, maxWidth: 350 }}>
+            <Box key={column.id} sx={{ minWidth: 280, maxWidth: 320 }}>
               <KanbanColumn
                 column={column}
                 items={getColumnItems(column.id)}
