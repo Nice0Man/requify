@@ -229,3 +229,17 @@ export const validateProjectForm = (data: ProjectCreate): ValidationErrors => {
 
   return errors;
 };
+
+export const getProjectCompletionPercentage = (
+  project: ProjectWithStats
+): number => {
+  return (project.requirements_completed / project.total_requirements) * 100;
+};
+
+export const getProjectHealthScore = (project: ProjectWithStats): number => {
+  return (project.requirements_completed / project.total_requirements) * 100;
+};
+
+export const isProjectCompleted = (project: ProjectWithStats): boolean => {
+  return project.requirements_completed === project.total_requirements;
+};

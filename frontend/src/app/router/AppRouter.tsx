@@ -77,11 +77,7 @@ const ApiOverviewPage = React.lazy(
 );
 const HomePage = React.lazy(() => import("@/pages/dashboard/ui/HomePage"));
 const StartPage = React.lazy(() => import("@/pages/dashboard/ui/StartPage"));
-const KanbanPage = React.lazy(() =>
-  import("@/pages/kanban/ui/KanbanPage").then((module) => ({
-    default: module.KanbanPage || module,
-  }))
-);
+const KanbanPage = React.lazy(() => import("@/pages/kanban/ui/KanbanPage"));
 const NotFoundPage = React.lazy(
   () => import("@/pages/not-found/ui/NotFoundPage")
 );

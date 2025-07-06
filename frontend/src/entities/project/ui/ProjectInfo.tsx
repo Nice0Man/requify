@@ -5,14 +5,14 @@ import { ProjectStatus } from "./ProjectStatus";
 import { ProjectProgress } from "./ProjectProgress";
 import type {
   Project,
-  ProjectWithDetails,
+  ProjectWithStats,
   ProjectStatus as ProjectStatusType,
-} from "../model/types";
+} from "../model/projects.types";
 
 const { Text, Title } = Typography;
 
 interface ProjectInfoProps {
-  project: Project | ProjectWithDetails;
+  project: Project | ProjectWithStats;
   layout?: "horizontal" | "vertical";
   size?: "small" | "middle" | "default";
   showProgress?: boolean;
@@ -34,8 +34,8 @@ export const ProjectInfo: React.FC<ProjectInfoProps> = ({
   column = 1,
   className,
 }) => {
-  const projectWithDetails = project as ProjectWithDetails;
-  const hasStats = "total_requirements" in projectWithDetails;
+  const projectWithStats = project as ProjectWithStats;
+  const hasStats = "total_requirements" in projectWithStats;
 
   const statusColorMap = new Map([
     ["active", "#52c41a"],
@@ -61,7 +61,7 @@ export const ProjectInfo: React.FC<ProjectInfoProps> = ({
     {
       key: "code",
       label: "Project Code",
-      children: (project as any).code || "N/A",
+      children: project.code || "N/A",
     },
     {
       key: "description",
@@ -77,65 +77,34 @@ export const ProjectInfo: React.FC<ProjectInfoProps> = ({
     {
       key: "owner",
       label: "Owner",
-      children: projectWithDetails.owner_name || `ID: ${project.owner_id}`,
+      children: `ID: ${project.owner_id}`,
     },
   ];
 
   const extendedItems =
-    showExtendedInfo && projectWithDetails
+    showExtendedInfo && hasStats
       ? [
           ...basicItems,
-          ...(projectWithDetails.manager
-            ? [
-                {
-                  key: "manager",
-                  label: "Manager",
-                  children: `${projectWithDetails.manager.first_name} ${projectWithDetails.manager.last_name}`,
-                },
-              ]
-            : []),
-          ...(projectWithDetails.team_lead
-            ? [
-                {
-                  key: "teamLead",
-                  label: "Team Lead",
-                  children: `${projectWithDetails.team_lead.first_name} ${projectWithDetails.team_lead.last_name}`,
-                },
-              ]
-            : []),
-          ...(projectWithDetails.client
-            ? [
-                {
-                  key: "client",
-                  label: "Client",
-                  children: projectWithDetails.client.name,
-                },
-              ]
-            : []),
-          ...(hasStats
-            ? [
-                {
-                  key: "totalRequirements",
-                  label: "Total Requirements",
-                  children: projectWithDetails.total_requirements || 0,
-                },
-                {
-                  key: "completedRequirements",
-                  label: "Completed Requirements",
-                  children: projectWithDetails.requirements_completed || 0,
-                },
-                {
-                  key: "activeReleases",
-                  label: "Active Releases",
-                  children: projectWithDetails.active_releases || 0,
-                },
-                {
-                  key: "specsCount",
-                  label: "Specifications",
-                  children: projectWithDetails.specs_count || 0,
-                },
-              ]
-            : []),
+          {
+            key: "totalRequirements",
+            label: "Total Requirements",
+            children: projectWithStats.total_requirements || 0,
+          },
+          {
+            key: "completedRequirements",
+            label: "Completed Requirements",
+            children: projectWithStats.requirements_completed || 0,
+          },
+          {
+            key: "activeReleases",
+            label: "Active Releases",
+            children: projectWithStats.active_releases || 0,
+          },
+          {
+            key: "specsCount",
+            label: "Specifications",
+            children: projectWithStats.specs_count || 0,
+          },
           {
             key: "createdAt",
             label: "Created Date",
@@ -166,7 +135,7 @@ export const ProjectInfo: React.FC<ProjectInfoProps> = ({
             <Title level={layout === "vertical" ? 3 : 4} style={{ margin: 0 }}>
               {project.name}
             </Title>
-            <Text type="secondary">{(project as any).code || "N/A"}</Text>
+            <Text type="secondary">{project.code || "N/A"}</Text>
           </div>
         </Space>
       </div>
@@ -174,7 +143,7 @@ export const ProjectInfo: React.FC<ProjectInfoProps> = ({
       {hasStats && showProgress && (
         <div style={{ marginBottom: 16 }}>
           <ProjectProgress
-            project={projectWithDetails}
+            project={projectWithStats}
             size={size === "small" ? "small" : "default"}
             format="line"
           />

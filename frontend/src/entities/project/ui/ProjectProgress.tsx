@@ -1,18 +1,21 @@
-import React from 'react';
-import { Progress, Space, Typography, Tooltip } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import type { ProjectWithStats } from '../model/types';
-import { getProjectCompletionPercentage, getProjectHealthScore } from '../model/types';
-import { ProgressSize } from 'antd/es/progress/progress';
+import React from "react";
+import { Progress, Space, Typography, Tooltip } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
+import type { ProjectWithStats } from "../model/projects.types";
+import {
+  getProjectCompletionPercentage,
+  getProjectHealthScore,
+} from "../model/projects.types";
+import { ProgressSize } from "antd/es/progress/progress";
 
 const { Text } = Typography;
 
 interface ProjectProgressProps {
   project: ProjectWithStats;
-  size?: 'small' | 'default' | 'large';
+  size?: "small" | "default" | "large";
   showText?: boolean;
   showTooltip?: boolean;
-  format?: 'line' | 'circle' | 'dashboard';
+  format?: "line" | "circle" | "dashboard";
   className?: string;
 }
 
@@ -22,27 +25,31 @@ interface ProjectProgressProps {
  */
 export const ProjectProgress: React.FC<ProjectProgressProps> = ({
   project,
-  size = 'default',
+  size = "default",
   showText = true,
   showTooltip = true,
-  format = 'line',
+  format = "line",
   className,
 }) => {
   const completionPercentage = getProjectCompletionPercentage(project);
   const healthScore = getProjectHealthScore(project);
-  
+
   const getProgressColor = () => {
     switch (healthScore) {
-      case 'good': return '#52c41a';
-      case 'warning': return '#fadb14';
-      case 'critical': return '#ff4d4f';
-      default: return '#d9d9d9';
+      case 100:
+        return "#52c41a";
+      case 75:
+        return "#fadb14";
+      case 50:
+        return "#ff4d4f";
+      default:
+        return "#d9d9d9";
     }
   };
 
   const getProgressSize = (format: string) => {
-    if (format === 'circle' || format === 'dashboard') {
-      return size === 'small' ? 60 : size === 'large' ? 120 : 80;
+    if (format === "circle" || format === "dashboard") {
+      return size === "small" ? 60 : size === "large" ? 120 : 80;
     }
     return size;
   };
@@ -53,55 +60,72 @@ export const ProjectProgress: React.FC<ProjectProgressProps> = ({
       percent={completionPercentage}
       strokeColor={getProgressColor()}
       size={getProgressSize(format) as ProgressSize}
-      showInfo={showText && format !== 'line'}
+      showInfo={showText && format !== "line"}
       className={className}
     />
   );
 
   const tooltipContent = showTooltip ? (
     <div>
-      <div>Завершено: {project.requirements_completed} из {project.total_requirements}</div>
-      <div>Прогресс: {completionPercentage}%</div>
-      <div>Статус: {healthScore === 'good' ? 'Хорошо' : healthScore === 'warning' ? 'Внимание' : 'Критично'}</div>
+      <div>
+        Completed: {project.requirements_completed} from{" "}
+        {project.total_requirements}
+      </div>
+      <div>Progress: {completionPercentage}%</div>
+      <div>
+        Status:{" "}
+        {healthScore === 100
+          ? "Good"
+          : healthScore === 75
+          ? "Warning"
+          : "Critical"}
+      </div>
     </div>
   ) : null;
 
-  if (format === 'line') {
+  if (format === "line") {
     return (
       <div className={className}>
         {showText && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: 4,
+            }}
+          >
             <Space size="small">
-              <Text style={{ fontSize: size === 'small' ? '12px' : '14px' }}>
-                Прогресс
+              <Text style={{ fontSize: size === "small" ? "12px" : "14px" }}>
+                Progress
               </Text>
               {showTooltip && (
                 <Tooltip title={tooltipContent}>
-                  <InfoCircleOutlined style={{ color: '#999', fontSize: '12px' }} />
+                  <InfoCircleOutlined
+                    style={{ color: "#999", fontSize: "12px" }}
+                  />
                 </Tooltip>
               )}
             </Space>
-            <Text style={{ fontSize: size === 'small' ? '12px' : '14px' }}>
+            <Text style={{ fontSize: size === "small" ? "12px" : "14px" }}>
               {completionPercentage}%
             </Text>
           </div>
         )}
-        
+
         {showTooltip ? (
-          <Tooltip title={tooltipContent}>
-            {progressElement}
-          </Tooltip>
+          <Tooltip title={tooltipContent}>{progressElement}</Tooltip>
         ) : (
           progressElement
         )}
-        
+
         {showText && project.total_requirements > 0 && (
           <div style={{ marginTop: 4 }}>
-            <Text 
-              type="secondary" 
-              style={{ fontSize: size === 'small' ? '11px' : '12px' }}
+            <Text
+              type="secondary"
+              style={{ fontSize: size === "small" ? "11px" : "12px" }}
             >
-              {project.requirements_completed} из {project.total_requirements} требований
+              {project.requirements_completed} из {project.total_requirements}{" "}
+              requirements
             </Text>
           </div>
         )}
@@ -111,29 +135,27 @@ export const ProjectProgress: React.FC<ProjectProgressProps> = ({
 
   // For circle and dashboard formats
   return (
-    <div className={className} style={{ textAlign: 'center' }}>
+    <div className={className} style={{ textAlign: "center" }}>
       {showTooltip ? (
-        <Tooltip title={tooltipContent}>
-          {progressElement}
-        </Tooltip>
+        <Tooltip title={tooltipContent}>{progressElement}</Tooltip>
       ) : (
         progressElement
       )}
-      
+
       {showText && (
         <div style={{ marginTop: 8 }}>
-          <Text style={{ fontSize: size === 'small' ? '12px' : '14px' }}>
+          <Text style={{ fontSize: size === "small" ? "12px" : "14px" }}>
             {project.requirements_completed} / {project.total_requirements}
           </Text>
           <br />
-          <Text 
-            type="secondary" 
-            style={{ fontSize: size === 'small' ? '11px' : '12px' }}
+          <Text
+            type="secondary"
+            style={{ fontSize: size === "small" ? "11px" : "12px" }}
           >
-            требований выполнено
+            requirements completed
           </Text>
         </div>
       )}
     </div>
   );
-}; 
+};

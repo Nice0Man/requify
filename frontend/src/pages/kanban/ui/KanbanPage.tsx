@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography, Container } from "@mui/material";
 import { Kanban } from "@/widgets/kanban";
 
-export const KanbanPage: React.FC = () => {
+const KanbanPage: React.FC = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<number | undefined>();
   const [selectedRequirementId, setSelectedRequirementId] = useState<number | undefined>();
 
@@ -51,4 +51,6 @@ export const KanbanPage: React.FC = () => {
       </Container>
     </Box>
   );
-}; 
+};
+
+export { KanbanPage as default }; 

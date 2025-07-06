@@ -107,11 +107,11 @@ interface ProjectsKanbanProps {
 // Default columns for projects - используем статусы из API
 const projectColumns: ProjectKanbanColumn[] = [
   {
-    id: "draft",
-    title: "Draft",
+    id: "planning",
+    title: "Planning",
     color: "#6366f1",
-    status: "draft",
-    description: "Project draft phase",
+    status: "planning",
+    description: "Project planning phase",
     icon: <Assignment />,
   },
   {
@@ -123,19 +123,19 @@ const projectColumns: ProjectKanbanColumn[] = [
     icon: <RocketLaunch />,
   },
   {
-    id: "on_hold",
-    title: "On Hold",
+    id: "development",
+    title: "Development",
     color: "#f59e0b",
-    status: "on_hold",
-    description: "Temporarily paused",
+    status: "development",
+    description: "In development",
     icon: <AccessTime />,
   },
   {
-    id: "archived",
-    title: "Archived",
+    id: "completed",
+    title: "Completed",
     color: "#64748b",
-    status: "archived",
-    description: "Archived projects",
+    status: "completed",
+    description: "Completed projects",
     icon: <CheckCircle />,
   },
 ];
@@ -663,7 +663,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
     name: "",
     description: "",
     priority: "medium",
-    status: initialStatus || "draft",
+    status: initialStatus || "planning",
     start_date: "",
     end_date: "",
   });
@@ -683,7 +683,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
         name: "",
         description: "",
         priority: "medium",
-        status: initialStatus || "draft",
+        status: initialStatus || "planning",
         start_date: "",
         end_date: "",
       });
@@ -749,10 +749,10 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
                   setFormData({ ...formData, status: e.target.value })
                 }
               >
-                <MenuItem value="draft">Draft</MenuItem>
+                <MenuItem value="planning">Planning</MenuItem>
                 <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="on_hold">On Hold</MenuItem>
-                <MenuItem value="archived">Archived</MenuItem>
+                <MenuItem value="development">Development</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -825,7 +825,7 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
           id: proj.id,
           title: proj.name || "Untitled Project",
           description: proj.description || "",
-          status: proj.status || "draft",
+          status: proj.status || "planning",
           priority: proj.priority || "medium",
           owner: proj.owner || proj.created_by || "",
           created_at: proj.created_at || new Date().toISOString(),
@@ -946,7 +946,7 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
           code: data.code || `PROJ-${Date.now()}`, // Генерируем код если не указан
           name: data.name || "",
           description: data.description,
-          status: (data.status || dialogInitialStatus || "draft") as ProjectStatus,
+          status: (data.status || dialogInitialStatus || "planning") as ProjectStatus,
         });
       }
       loadData(); // Reload data
@@ -1009,11 +1009,11 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
             pb: 2,
             px: 2,
             width: "100%",
-            minWidth: "max-content",
+            minWidth: "100%",
           }}
         >
           {projectColumns.map((column) => (
-            <Box key={column.id} sx={{ minWidth: 280, maxWidth: 320, flex: "0 0 auto" }}>
+            <Box key={column.id} sx={{ flex: 1, minWidth: 0 }}>
               <ProjectColumn
                 column={column}
                 items={getColumnItems(column.id)}

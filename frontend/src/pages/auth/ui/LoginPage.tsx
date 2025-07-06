@@ -149,10 +149,6 @@ const LoginPage: React.FC = () => {
                 height: { xs: 48, md: 56 },
                 borderRadius: 3,
                 background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                boxShadow: `0 8px 32px ${alpha(
-                  theme.palette.primary.main,
-                  0.3
-                )}`,
                 mr: 2,
               }}
             >
@@ -214,10 +210,6 @@ const LoginPage: React.FC = () => {
               border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
               background: alpha(theme.palette.background.paper, 0.8),
               backdropFilter: "blur(20px)",
-              boxShadow: `0 20px 60px ${alpha(
-                theme.palette.common.black,
-                0.1
-              )}`,
             }}
           >
             <Box sx={{ textAlign: "center", mb: 4 }}>

@@ -5,12 +5,12 @@ import {
   TeamOutlined,
   CheckCircleOutlined,
 } from "@ant-design/icons";
-import type { Project, ProjectWithStats } from "../model/types";
+import type { Project, ProjectWithStats } from "../model/projects.types";
 import {
   getProjectCompletionPercentage,
   isProjectCompleted,
   getProjectHealthScore,
-} from "../model/types";
+} from "../model/projects.types";
 
 const { Text, Title } = Typography;
 
@@ -91,7 +91,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   const getHealthColor = () => {
-    return healthColors.get(healthScore) || "#d9d9d9";
+    return healthColors.get(healthScore as string) || "#d9d9d9";
   };
 
   return (

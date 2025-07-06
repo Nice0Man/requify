@@ -1071,11 +1071,11 @@ export const TestsKanban: React.FC<TestsKanbanProps> = ({
             pb: 2,
             px: 2,
             width: "100%",
-            minWidth: "max-content",
+            minWidth: "100%",
           }}
         >
           {testColumns.map((column) => (
-            <Box key={column.id} sx={{ minWidth: 280, maxWidth: 320, flex: "0 0 auto" }}>
+            <Box key={column.id} sx={{ flex: 1, minWidth: 0 }}>
               <TestColumn
                 column={column}
                 items={getColumnItems(column.id)}

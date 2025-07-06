@@ -136,7 +136,10 @@ export const Kanban: React.FC<KanbanProps> = ({
   }, [variant]);
 
   // Handle type change
-  const handleTypeChange = (_event: React.MouseEvent<HTMLElement>, newType: KanbanType) => {
+  const handleTypeChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newType: KanbanType
+  ) => {
     if (newType !== null) {
       setCurrentType(newType);
       setNotification({
@@ -148,7 +151,10 @@ export const Kanban: React.FC<KanbanProps> = ({
   };
 
   // Handle variant change
-  const handleVariantChange = (_event: React.MouseEvent<HTMLElement>, newVariant: KanbanVariant) => {
+  const handleVariantChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newVariant: KanbanVariant
+  ) => {
     if (newVariant !== null) {
       setCurrentVariant(newVariant);
       setNotification({
@@ -241,7 +247,13 @@ export const Kanban: React.FC<KanbanProps> = ({
           borderLeft: `4px solid ${kanbanTypes[currentType].color}`,
         }}
       >
-        <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          flexWrap="wrap"
+          gap={2}
+        >
           {/* Title and Description */}
           <Box>
             <Box display="flex" alignItems="center" gap={1} mb={0.5}>
@@ -274,7 +286,10 @@ export const Kanban: React.FC<KanbanProps> = ({
               size="small"
               sx={{
                 "& .MuiToggleButton-root": {
-                  border: `1px solid ${alpha(kanbanTypes[currentType].color, 0.3)}`,
+                  border: `1px solid ${alpha(
+                    kanbanTypes[currentType].color,
+                    0.3
+                  )}`,
                   color: kanbanTypes[currentType].color,
                   "&.Mui-selected": {
                     backgroundColor: alpha(kanbanTypes[currentType].color, 0.1),
@@ -285,9 +300,7 @@ export const Kanban: React.FC<KanbanProps> = ({
             >
               {Object.entries(kanbanVariants).map(([key, config]) => (
                 <ToggleButton key={key} value={key}>
-                  <Tooltip title={config.description}>
-                    {config.icon}
-                  </Tooltip>
+                  <Tooltip title={config.description}>{config.icon}</Tooltip>
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
@@ -299,7 +312,9 @@ export const Kanban: React.FC<KanbanProps> = ({
               <IconButton
                 onClick={() => setShowTypeFilters(!showTypeFilters)}
                 sx={{
-                  color: showTypeFilters ? kanbanTypes[currentType].color : "text.secondary",
+                  color: showTypeFilters
+                    ? kanbanTypes[currentType].color
+                    : "text.secondary",
                 }}
               >
                 <FilterList />
@@ -312,7 +327,9 @@ export const Kanban: React.FC<KanbanProps> = ({
               </IconButton>
             </Tooltip>
 
-            <Tooltip title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>
+            <Tooltip
+              title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            >
               <IconButton onClick={handleFullscreenToggle}>
                 {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
               </IconButton>
