@@ -22,6 +22,9 @@ from .requirement_types import requirement_type
 from .spec import spec
 from .test_result import test_result
 
+# Team CRUD operations
+from .team import team, team_member
+
 # Dashboard CRUD operations
 from .dashboard import user_preferences, notification, activity, widget
 
@@ -42,6 +45,9 @@ __all__ = [
     "requirement_type",
     "spec",
     "test_result",
+    # Team CRUD
+    "team",
+    "team_member",
     # Dashboard CRUD
     "user_preferences",
     "notification",

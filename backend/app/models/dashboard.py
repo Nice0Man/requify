@@ -81,6 +81,7 @@ class DashboardNotification(Base):
     # Related entities
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     requirement_id = Column(Integer, ForeignKey("requirements.id"), nullable=True)
+    team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
 
     # Timestamps
     created_at = Column(DateTime, default=datetime.now)
@@ -91,6 +92,7 @@ class DashboardNotification(Base):
     user = relationship("User", back_populates="notifications")
     project = relationship("Project", back_populates="notifications")
     requirement = relationship("Requirement", back_populates="notifications")
+    team = relationship("Team", back_populates="notifications")
 
 
 class DashboardActivity(Base):
@@ -114,9 +116,12 @@ class DashboardActivity(Base):
     # Related entities
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
     requirement_id = Column(Integer, ForeignKey("requirements.id"), nullable=True)
+    team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
 
     # Entity details (denormalized for performance)
-    entity_type = Column(String(50), nullable=True)  # project, requirement, user, etc.
+    entity_type = Column(
+        String(50), nullable=True
+    )  # project, requirement, user, team, etc.
     entity_id = Column(Integer, nullable=True)
     entity_name = Column(String(200), nullable=True)
 
@@ -132,6 +137,7 @@ class DashboardActivity(Base):
     user = relationship("User", back_populates="activities")
     project = relationship("Project", back_populates="activities")
     requirement = relationship("Requirement", back_populates="activities")
+    team = relationship("Team", back_populates="activities")
 
 
 class DashboardWidget(Base):

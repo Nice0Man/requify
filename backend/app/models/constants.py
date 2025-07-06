@@ -104,3 +104,34 @@ class DashboardLayout(str, Enum):
     DEFAULT = "default"
     COMPACT = "compact"
     DETAILED = "detailed"
+
+
+class TeamRole(str, Enum):
+    """Team member role options"""
+
+    OWNER = "owner"
+    ADMIN = "admin"
+    LEAD = "lead"
+    DEVELOPER = "developer"
+    ANALYST = "analyst"
+    TESTER = "tester"
+    VIEWER = "viewer"
+
+
+class TeamPermission(str, Enum):
+    """Team permission options"""
+
+    READ = "read"
+    WRITE = "write"
+    DELETE = "delete"
+    MANAGE_MEMBERS = "manage_members"
+    MANAGE_SETTINGS = "manage_settings"
+    FULL_ACCESS = "full_access"
+
+
+class TeamStatus(str, Enum):
+    """Team status options"""
+
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    ARCHIVED = "archived"

@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from .spec import Spec
     from .requirement_group import RequirementGroup
     from .user import User
+    from .team import Team
     from .dashboard import DashboardNotification, DashboardActivity
 
 
@@ -53,10 +54,19 @@ class Project(Base, TimestampedMixin):
         nullable=False,
         comment="Владелец проекта",
     )
+    team_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        ForeignKey("teams.id", ondelete="SET NULL"),
+        nullable=True,
+        comment="Команда проекта",
+    )
 
     # Отношения
     owner: Mapped["User"] = relationship(
         "User", back_populates="owned_projects", lazy="select"
+    )
+    team: Mapped[Optional["Team"]] = relationship(
+        "Team", back_populates="projects", lazy="select"
     )
 
     requirements: Mapped[List["Requirement"]] = relationship(

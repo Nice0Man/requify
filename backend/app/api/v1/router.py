@@ -19,6 +19,7 @@ from .endpoints import (
     relationships_router,
     comments_router,
     dashboard_router,
+    teams_router,
 )
 
 # Создаем основной роутер для API v1
@@ -53,6 +54,8 @@ api_router.include_router(
 api_router.include_router(comments_router, prefix="/comments", tags=["comments"])
 
 api_router.include_router(dashboard_router, prefix="/dashboard", tags=["dashboard"])
+
+api_router.include_router(teams_router, prefix="/teams", tags=["teams"])
 
 
 @api_router.get("/")

@@ -15,6 +15,10 @@ from .relationship import Relationship
 from .comment import Comment
 from .test_result import TestResult
 
+# Team models
+from .team import Team
+from .team_member import TeamMember
+
 # Dashboard models
 from .dashboard import (
     UserDashboardPreferences,
@@ -41,6 +45,9 @@ __all__ = [
     "Relationship",
     "Comment",
     "TestResult",
+    # Team models
+    "Team",
+    "TeamMember",
     # Dashboard models
     "UserDashboardPreferences",
     "DashboardNotification",

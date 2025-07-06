@@ -16,6 +16,7 @@ from .specifications import router as specifications_router
 from .relationships import router as relationships_router
 from .comments import router as comments_router
 from .dashboard import router as dashboard_router
+from .teams import router as teams_router
 
 __all__ = [
     "auth_router",
@@ -30,4 +31,5 @@ __all__ = [
     "relationships_router",
     "comments_router",
     "dashboard_router",
+    "teams_router",
 ]

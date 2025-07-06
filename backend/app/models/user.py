@@ -13,6 +13,8 @@ if TYPE_CHECKING:
     from .requirement_group_version import RequirementGroupVersion
     from .test_result import TestResult
     from .refresh_token import RefreshToken
+    from .team import Team
+    from .team_member import TeamMember
     from .dashboard import (
         UserDashboardPreferences,
         DashboardNotification,
@@ -164,6 +166,21 @@ class User(Base, TimestampedMixin):
 
     dashboard_widgets: Mapped[List["DashboardWidget"]] = relationship(
         "DashboardWidget",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    # Team relationships
+    owned_teams: Mapped[List["Team"]] = relationship(
+        "Team",
+        back_populates="owner",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    team_memberships: Mapped[List["TeamMember"]] = relationship(
+        "TeamMember",
         back_populates="user",
         lazy="select",
         cascade="all, delete-orphan",

@@ -13,6 +13,31 @@ from .user import (
     UserWithStats,
 )
 
+# Team schemas
+from .team import (
+    TeamBase,
+    TeamCreate,
+    TeamUpdate,
+    TeamResponse,
+    TeamDetailResponse,
+    TeamListResponse,
+    TeamMemberBase,
+    TeamMemberCreate,
+    TeamMemberUpdate,
+    TeamMemberResponse,
+    TeamSearchRequest,
+    TeamStats,
+    TeamMemberStats,
+    TeamBulkCreate,
+    TeamBulkUpdate,
+    TeamBulkDelete,
+    TeamMemberBulkAdd,
+    TeamMemberBulkRemove,
+    TeamMemberBulkUpdate,
+    TeamPermissionCheck,
+    TeamPermissionResponse,
+)
+
 # Auth schemas
 from .auth import (
     UserProfile,
@@ -259,6 +284,28 @@ __all__ = [
     "UserBase",
     "UserInDBBase",
     "UserWithStats",
+    # Team
+    "TeamBase",
+    "TeamCreate",
+    "TeamUpdate",
+    "TeamResponse",
+    "TeamDetailResponse",
+    "TeamListResponse",
+    "TeamMemberBase",
+    "TeamMemberCreate",
+    "TeamMemberUpdate",
+    "TeamMemberResponse",
+    "TeamSearchRequest",
+    "TeamStats",
+    "TeamMemberStats",
+    "TeamBulkCreate",
+    "TeamBulkUpdate",
+    "TeamBulkDelete",
+    "TeamMemberBulkAdd",
+    "TeamMemberBulkRemove",
+    "TeamMemberBulkUpdate",
+    "TeamPermissionCheck",
+    "TeamPermissionResponse",
     # Auth
     "UserProfile",
     "LoginRequest",
