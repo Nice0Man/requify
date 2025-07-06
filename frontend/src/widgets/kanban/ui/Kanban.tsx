@@ -235,6 +235,7 @@ export const Kanban: React.FC<KanbanProps> = ({
         bottom: isFullscreen ? 0 : "auto",
         zIndex: isFullscreen ? 9999 : "auto",
         overflow: isFullscreen ? "hidden" : "visible",
+        p: isFullscreen ? 3 : 0,
       }}
     >
       {/* Header */}
@@ -244,7 +245,7 @@ export const Kanban: React.FC<KanbanProps> = ({
           p: 2,
           mb: 2,
           backgroundColor: alpha(kanbanTypes[currentType].color, 0.05),
-          borderLeft: `4px solid ${kanbanTypes[currentType].color}`,
+          borderRadius: isFullscreen ? 2 : 0,
         }}
       >
         <Box
@@ -376,8 +377,8 @@ export const Kanban: React.FC<KanbanProps> = ({
       <Box
         sx={{
           width: "100%",
-          height: isFullscreen ? "calc(100vh - 140px)" : "auto",
-          overflow: isFullscreen ? "hidden" : "visible",
+          height: isFullscreen ? "calc(100vh - 200px)" : "auto",
+          overflow: isFullscreen ? "auto" : "visible",
         }}
       >
         {renderKanbanComponent()}
