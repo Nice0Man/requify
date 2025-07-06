@@ -131,6 +131,14 @@ const projectColumns: ProjectKanbanColumn[] = [
     icon: <AccessTime />,
   },
   {
+    id: "testing",
+    title: "Testing",
+    color: "#8b5cf6",
+    status: "testing",
+    description: "In testing phase",
+    icon: <CheckCircle />,
+  },
+  {
     id: "completed",
     title: "Completed",
     color: "#64748b",
@@ -752,7 +760,11 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
                 <MenuItem value="planning">Planning</MenuItem>
                 <MenuItem value="active">Active</MenuItem>
                 <MenuItem value="development">Development</MenuItem>
+                <MenuItem value="testing">Testing</MenuItem>
                 <MenuItem value="completed">Completed</MenuItem>
+                <MenuItem value="cancelled">Cancelled</MenuItem>
+                <MenuItem value="inactive">Inactive</MenuItem>
+                <MenuItem value="archived">Archived</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -816,11 +828,37 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
+      console.log("Loading projects...");
       const projects = await projectsApi.getProjects({
         limit: 100,
       });
 
-      if (projects && projects.items && Array.isArray(projects.items)) {
+      console.log("Raw projects response:", projects);
+
+      // API возвращает массив напрямую, а не объект с items
+      if (Array.isArray(projects)) {
+        console.log("Projects array:", projects);
+        const data = projects.map((proj: any) => ({
+          id: proj.id,
+          title: proj.name || "Untitled Project",
+          description: proj.description || "",
+          status: proj.status || "planning",
+          priority: proj.priority || "medium",
+          owner: proj.owner || proj.created_by || "",
+          created_at: proj.created_at || new Date().toISOString(),
+          updated_at: proj.updated_at || new Date().toISOString(),
+          labels: proj.tags || [],
+          progress: proj.progress || 0,
+          members_count: proj.members_count || 0,
+          requirements_count: proj.requirements_count || 0,
+          start_date: proj.start_date || "",
+          end_date: proj.end_date || "",
+        }));
+        console.log("Mapped projects data:", data);
+        setItems(data);
+      } else if (projects && projects.items && Array.isArray(projects.items)) {
+        // Fallback для случая, если API вернет объект с items
+        console.log("Projects items:", projects.items);
         const data = projects.items.map((proj: any) => ({
           id: proj.id,
           title: proj.name || "Untitled Project",
@@ -837,7 +875,11 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
           start_date: proj.start_date || "",
           end_date: proj.end_date || "",
         }));
+        console.log("Mapped projects data:", data);
         setItems(data);
+      } else {
+        console.warn("Invalid projects response format:", projects);
+        setItems([]);
       }
     } catch (error) {
       console.error("Error loading projects:", error);
@@ -850,6 +892,15 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Debug: log items changes
+  useEffect(() => {
+    console.log("Items updated:", items);
+    console.log("Items by status:", items.reduce((acc, item) => {
+      acc[item.status] = (acc[item.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>));
+  }, [items]);
 
   // Filter items based on search
   const filteredItems = useMemo(() => {
@@ -866,7 +917,9 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
 
   // Get items for a specific column
   const getColumnItems = (columnId: string) => {
-    return filteredItems.filter((item) => item.status === columnId);
+    const columnItems = filteredItems.filter((item) => item.status === columnId);
+    // console.log(`Column ${columnId} items:`, columnItems);
+    return columnItems;
   };
 
   // Handle drag end
