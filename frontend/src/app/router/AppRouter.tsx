@@ -77,7 +77,11 @@ const ApiOverviewPage = React.lazy(
 );
 const HomePage = React.lazy(() => import("@/pages/dashboard/ui/HomePage"));
 const StartPage = React.lazy(() => import("@/pages/dashboard/ui/StartPage"));
-const KanbanPage = React.lazy(() => import("@/pages/kanban/ui/KanbanPage"));
+const KanbanPage = React.lazy(() =>
+  import("@/pages/kanban/ui/KanbanPage").then((module) => ({
+    default: module.KanbanPage || module,
+  }))
+);
 const NotFoundPage = React.lazy(
   () => import("@/pages/not-found/ui/NotFoundPage")
 );
@@ -377,7 +381,9 @@ export const AppRouter: React.FC = () => {
         <Route
           path="/"
           element={
-            <Suspense fallback={<PageLoadingFallback pageName="landing page" />}>
+            <Suspense
+              fallback={<PageLoadingFallback pageName="landing page" />}
+            >
               <StartPage />
             </Suspense>
           }

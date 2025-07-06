@@ -17,7 +17,6 @@ import {
   Badge,
   Stack,
   Paper,
-  AvatarGroup,
   LinearProgress,
   Divider,
   Menu,
@@ -39,16 +38,13 @@ import {
   RocketLaunch,
   Person,
   Schedule,
-  Flag,
   MoreVert,
   Visibility,
   CheckCircle,
   Assignment,
-  ErrorOutline,
   AccessTime,
   Edit,
   Delete,
-  LocalOffer,
   DragIndicator,
   Group,
 } from "@mui/icons-material";
@@ -64,18 +60,17 @@ import {
 // Using entities according to FSD
 import { projectsApi } from "@/entities/project";
 import type {
-  Project,
   ProjectCreate,
-  ProjectStatus,
   ProjectUpdate,
-} from "@/entities/project/model/types";
+  ProjectStatus,
+} from "@/entities/project/model/projects.types";
 
-// Using shared utilities
+// Using shared utilities   
 import { formatDate } from "@/shared/utils";
 
 // Interfaces
 interface ProjectKanbanColumn {
-  id: string;
+  id: string;   
   title: string;
   color: string;
   status: string;
@@ -109,14 +104,14 @@ interface ProjectsKanbanProps {
   variant?: "compact" | "detailed" | "minimal";
 }
 
-// Default columns for projects
+// Default columns for projects - используем статусы из API
 const projectColumns: ProjectKanbanColumn[] = [
   {
-    id: "planning",
-    title: "Planning",
+    id: "draft",
+    title: "Draft",
     color: "#6366f1",
-    status: "planning",
-    description: "Project planning phase",
+    status: "draft",
+    description: "Project draft phase",
     icon: <Assignment />,
   },
   {
@@ -136,20 +131,12 @@ const projectColumns: ProjectKanbanColumn[] = [
     icon: <AccessTime />,
   },
   {
-    id: "completed",
-    title: "Completed",
+    id: "archived",
+    title: "Archived",
     color: "#64748b",
-    status: "completed",
-    description: "Successfully completed",
+    status: "archived",
+    description: "Archived projects",
     icon: <CheckCircle />,
-  },
-  {
-    id: "cancelled",
-    title: "Cancelled",
-    color: "#ef4444",
-    status: "cancelled",
-    description: "Cancelled projects",
-    icon: <ErrorOutline />,
   },
 ];
 
@@ -676,7 +663,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
     name: "",
     description: "",
     priority: "medium",
-    status: initialStatus || "planning",
+    status: initialStatus || "draft",
     start_date: "",
     end_date: "",
   });
@@ -696,7 +683,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
         name: "",
         description: "",
         priority: "medium",
-        status: initialStatus || "planning",
+        status: initialStatus || "draft",
         start_date: "",
         end_date: "",
       });
@@ -709,7 +696,7 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
       ...(formData.start_date && { start_date: formData.start_date }),
       ...(formData.end_date && { end_date: formData.end_date }),
     };
-    onSubmit(submitData);
+    onSubmit(submitData as ProjectCreate | ProjectUpdate);
     onClose();
   };
 
@@ -762,11 +749,10 @@ const ProjectDialog: React.FC<ProjectDialogProps> = ({
                   setFormData({ ...formData, status: e.target.value })
                 }
               >
-                <MenuItem value="planning">Planning</MenuItem>
+                <MenuItem value="draft">Draft</MenuItem>
                 <MenuItem value="active">Active</MenuItem>
                 <MenuItem value="on_hold">On Hold</MenuItem>
-                <MenuItem value="completed">Completed</MenuItem>
-                <MenuItem value="cancelled">Cancelled</MenuItem>
+                <MenuItem value="archived">Archived</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -839,7 +825,7 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
           id: proj.id,
           title: proj.name || "Untitled Project",
           description: proj.description || "",
-          status: proj.status || "planning",
+          status: proj.status || "draft",
           priority: proj.priority || "medium",
           owner: proj.owner || proj.created_by || "",
           created_at: proj.created_at || new Date().toISOString(),
@@ -908,10 +894,10 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
       )
     );
 
-    // Update via API
+    // Update via API - используем правильный тип из shared/api
     try {
       await projectsApi.updateProject(itemId, {
-        status: toColumn as ProjectStatus | undefined,
+        status: toColumn as ProjectStatus,
       });
     } catch (error) {
       console.error("Error updating project status:", error);
@@ -952,15 +938,15 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
         // Update existing
         await projectsApi.updateProject(editingItem.id, {
           ...data,
-          status: data.status,
+          status: data.status as ProjectStatus,
         });
       } else {
-        // Create new
+        // Create new - используем обязательное поле code
         await projectsApi.createProject({
-          code: data.code || "",
+          code: data.code || `PROJ-${Date.now()}`, // Генерируем код если не указан
           name: data.name || "",
           description: data.description,
-          status: data.status || dialogInitialStatus || "draft",
+          status: (data.status || dialogInitialStatus || "draft") as ProjectStatus,
         });
       }
       loadData(); // Reload data
@@ -974,7 +960,7 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
     return (
       <Box sx={{ p: 3 }}>
         <Box display="flex" gap={1.5} overflow="auto">
-          {Array.from({ length: 5 }).map((_, index) => (
+          {Array.from({ length: 4 }).map((_, index) => (
             <Box key={index} sx={{ minWidth: 280 }}>
               <Skeleton variant="rectangular" height={60} sx={{ mb: 2 }} />
               {Array.from({ length: 3 }).map((_, cardIndex) => (
@@ -993,10 +979,10 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
   }
 
   return (
-    <Box className={className} sx={{ p: 3 }}>
+    <Box className={className} sx={{ width: "100%", px: 1 }}>
       {/* Filters */}
       {showFilters && (
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, px: 2 }}>
           <TextField
             placeholder="Search projects..."
             value={searchTerm}
@@ -1021,10 +1007,13 @@ export const ProjectsKanban: React.FC<ProjectsKanbanProps> = ({
             gap: 1.5,
             overflow: "auto",
             pb: 2,
+            px: 2,
+            width: "100%",
+            minWidth: "max-content",
           }}
         >
           {projectColumns.map((column) => (
-            <Box key={column.id} sx={{ minWidth: 280, maxWidth: 320 }}>
+            <Box key={column.id} sx={{ minWidth: 280, maxWidth: 320, flex: "0 0 auto" }}>
               <ProjectColumn
                 column={column}
                 items={getColumnItems(column.id)}

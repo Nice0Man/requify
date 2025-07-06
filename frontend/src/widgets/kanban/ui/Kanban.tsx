@@ -219,7 +219,8 @@ export const Kanban: React.FC<KanbanProps> = ({
     <Box
       className={className}
       sx={{
-        height: isFullscreen ? "100vh" : "auto",
+        width: "100%",
+        minHeight: isFullscreen ? "100vh" : "calc(100vh - 200px)",
         backgroundColor: theme.palette.background.default,
         position: isFullscreen ? "fixed" : "relative",
         top: isFullscreen ? 0 : "auto",
@@ -357,6 +358,7 @@ export const Kanban: React.FC<KanbanProps> = ({
       {/* Kanban Content */}
       <Box
         sx={{
+          width: "100%",
           height: isFullscreen ? "calc(100vh - 140px)" : "auto",
           overflow: isFullscreen ? "hidden" : "visible",
         }}

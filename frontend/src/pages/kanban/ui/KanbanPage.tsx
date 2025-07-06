@@ -28,25 +28,27 @@ export const KanbanPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth={false} sx={{ py: 3 }}>
-      <Box mb={3}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Kanban Board
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Manage your requirements, projects, tests, and releases with drag-and-drop kanban boards.
-        </Typography>
-      </Box>
+    <Box sx={{ width: "100%", minHeight: "100vh" }}>
+      <Container maxWidth={false} disableGutters sx={{ px: 2, py: 3 }}>
+        <Box mb={3}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Kanban Board
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Manage your requirements, projects, tests, and releases with drag-and-drop kanban boards.
+          </Typography>
+        </Box>
 
-      <Kanban
-        type="requirements"
-        projectId={selectedProjectId}
-        requirementId={selectedRequirementId}
-        allowDragDrop={true}
-        showFilters={true}
-        onItemClick={handleItemClick}
-        variant="detailed"
-      />
-    </Container>
+        <Kanban
+          type="requirements"
+          projectId={selectedProjectId}
+          requirementId={selectedRequirementId}
+          allowDragDrop={true}
+          showFilters={true}
+          onItemClick={handleItemClick}
+          variant="detailed"
+        />
+      </Container>
+    </Box>
   );
 }; 

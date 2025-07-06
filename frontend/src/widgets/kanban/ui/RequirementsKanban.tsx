@@ -945,10 +945,10 @@ export const RequirementsKanban: React.FC<RequirementsKanbanProps> = ({
   }
 
   return (
-    <Box className={className} sx={{ p: 3 }}>
+    <Box className={className} sx={{ width: "100%", px: 1 }}>
       {/* Filters */}
       {showFilters && (
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, px: 2 }}>
           <TextField
             placeholder="Search requirements..."
             value={searchTerm}
@@ -973,10 +973,13 @@ export const RequirementsKanban: React.FC<RequirementsKanbanProps> = ({
             gap: 1.5,
             overflow: "auto",
             pb: 2,
+            px: 2,
+            width: "100%",
+            minWidth: "max-content",
           }}
         >
           {requirementColumns.map((column) => (
-            <Box key={column.id} sx={{ minWidth: 280, maxWidth: 320 }}>
+            <Box key={column.id} sx={{ minWidth: 280, maxWidth: 320, flex: "0 0 auto" }}>
               <RequirementColumn
                 column={column}
                 items={getColumnItems(column.id)}
