@@ -40,4 +40,6 @@ client.interceptors.response.use(
   }
 );
 
+// Export aliases for better compatibility
+export const apiClient = client;
 export default client;

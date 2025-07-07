@@ -126,9 +126,10 @@ export const QuickActionsWidget: React.FC = () => {
             
             return (
               <Fade in timeout={800 + index * 150} key={index}>
-                <Button
-                  onClick={() => navigate(action.path)}
-                  sx={{
+                <Box>
+                  <Button
+                    onClick={() => navigate(action.path)}
+                    sx={{
                     p: 3,
                     borderRadius: 4,
                     border: `1px solid ${alpha(action.color, 0.1)}`,
@@ -204,6 +205,7 @@ export const QuickActionsWidget: React.FC = () => {
                     />
                   </Box>
                 </Button>
+                </Box>
               </Fade>
             );
           })}

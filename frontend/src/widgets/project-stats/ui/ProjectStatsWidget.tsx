@@ -113,8 +113,9 @@ export const ProjectStatsWidget: React.FC = () => {
             return (
               <Grid item xs={12} sm={6} key={index}>
                 <Fade in timeout={800 + index * 200}>
-                  <Box
-                    sx={{
+                  <Box>
+                    <Box
+                      sx={{
                       p: 3,
                       borderRadius: 3,
                       border: `1px solid ${alpha(stat.color, 0.1)}`,
@@ -228,6 +229,7 @@ export const ProjectStatsWidget: React.FC = () => {
                         из {stat.total} общего
                       </Typography>
                     </Box>
+                  </Box>
                   </Box>
                 </Fade>
               </Grid>

@@ -100,8 +100,10 @@ const DashboardPage: React.FC = () => {
 
             {/* Статистика */}
             <Fade in timeout={800}>
-              <Box sx={{ mb: 4 }}>
-                <DashboardStatsWidget />
+              <Box>
+                <Box sx={{ mb: 4 }}>
+                  <DashboardStatsWidget />
+                </Box>
               </Box>
             </Fade>
 
@@ -113,21 +115,27 @@ const DashboardPage: React.FC = () => {
                   {/* Обзор проектов */}
                   <Grid item xs={12} lg={6}>
                     <Fade in timeout={1000}>
-                      <ProjectOverviewWidget />
+                      <Box>
+                        <ProjectOverviewWidget />
+                      </Box>
                     </Fade>
                   </Grid>
 
                   {/* Статистика проекта */}
                   <Grid item xs={12} lg={6}>
                     <Fade in timeout={1100}>
-                      <ProjectStatsWidget />
+                      <Box>
+                        <ProjectStatsWidget />
+                      </Box>
                     </Fade>
                   </Grid>
 
                   {/* Быстрые действия */}
                   <Grid item xs={12}>
                     <Fade in timeout={1200}>
-                      <QuickActionsWidget />
+                      <Box>
+                        <QuickActionsWidget />
+                      </Box>
                     </Fade>
                   </Grid>
                 </Grid>
@@ -139,14 +147,18 @@ const DashboardPage: React.FC = () => {
                   {/* Уведомления */}
                   <Grid item xs={12}>
                     <Fade in timeout={1300}>
-                      <NotificationsWidget />
+                      <Box>
+                        <NotificationsWidget />
+                      </Box>
                     </Fade>
                   </Grid>
 
                   {/* Активность */}
                   <Grid item xs={12}>
                     <Fade in timeout={1400}>
-                      <ActivityFeedWidget />
+                      <Box>
+                        <ActivityFeedWidget />
+                      </Box>
                     </Fade>
                   </Grid>
                 </Grid>

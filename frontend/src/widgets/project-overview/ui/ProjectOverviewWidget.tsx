@@ -155,8 +155,9 @@ export const ProjectOverviewWidget: React.FC = () => {
             
             return (
               <Fade in timeout={1000 + index * 200} key={project.id}>
-                <Box
-                  sx={{
+                <Box>
+                  <Box
+                    sx={{
                     p: 3,
                     borderRadius: 4,
                     border: `1px solid ${alpha(statusConfig.color, 0.1)}`,
@@ -287,6 +288,7 @@ export const ProjectOverviewWidget: React.FC = () => {
                       </Typography>
                     </Box>
                   </Box>
+                </Box>
                 </Box>
               </Fade>
             );
