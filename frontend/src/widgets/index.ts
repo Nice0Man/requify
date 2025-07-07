@@ -5,6 +5,7 @@ export * from "./project-overview";
 export * from "./requirement-list";
 export * from "./activity-feed";
 export * from "./quick-actions";
+export * from "./notifications";
 export * from "./system-health";
 export * from "./kanban";
 export * from "./project-stats";
