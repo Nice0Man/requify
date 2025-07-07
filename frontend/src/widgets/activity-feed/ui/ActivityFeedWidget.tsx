@@ -14,7 +14,7 @@ import {
   useTheme,
   IconButton,
   Button,
-  Grow,
+  Fade,
 } from '@mui/material';
 import { 
   Assignment, 
@@ -29,6 +29,7 @@ import {
 import { useRecentActivity } from '@/features/dashboard/model/useDashboardQuery';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { LiquidGlassIcon } from '@/shared/ui';
 
 export const ActivityFeedWidget: React.FC = () => {
   const theme = useTheme();
@@ -41,369 +42,421 @@ export const ActivityFeedWidget: React.FC = () => {
           icon: Assignment,
           color: theme.palette.primary.main,
           label: 'Требование',
-          gradient: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+          background: alpha(theme.palette.primary.main, 0.1),
         };
-      case 'task':
-        return {
-          icon: CheckCircle,
-          color: theme.palette.success.main,
-          label: 'Задача',
-          gradient: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
-        };
-      case 'user':
-        return {
-          icon: Person,
-          color: theme.palette.info.main,
-          label: 'Пользователь',
-          gradient: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
-        };
-      case 'code':
+      case 'project':
         return {
           icon: Code,
-          color: theme.palette.warning.main,
-          label: 'Код',
-          gradient: `linear-gradient(135deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
+          color: theme.palette.secondary.main,
+          label: 'Проект',
+          background: alpha(theme.palette.secondary.main, 0.1),
         };
-      case 'bug':
+      case 'release':
+        return {
+          icon: Timeline,
+          color: theme.palette.info.main,
+          label: 'Релиз',
+          background: alpha(theme.palette.info.main, 0.1),
+        };
+      case 'test':
         return {
           icon: BugReport,
-          color: theme.palette.error.main,
-          label: 'Баг',
-          gradient: `linear-gradient(135deg, ${theme.palette.error.main}, ${theme.palette.error.dark})`,
+          color: theme.palette.warning.main,
+          label: 'Тест',
+          background: alpha(theme.palette.warning.main, 0.1),
         };
       default:
         return {
-          icon: Assignment,
-          color: theme.palette.primary.main,
-          label: 'Событие',
-          gradient: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+          icon: CheckCircle,
+          color: theme.palette.success.main,
+          label: 'Активность',
+          background: alpha(theme.palette.success.main, 0.1),
         };
     }
   };
 
-  // Мок данные для демонстрации
-  const mockActivities = activities || [
+  const mockActivities = [
     {
       id: '1',
-      title: 'Создано новое требование REQ-145',
-      description: 'Добавлена функция авторизации через OAuth',
       type: 'requirement',
-      user: 'Иван Петров',
-      timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 минут назад
+      title: 'Создано новое требование "Авторизация пользователей"',
+      description: 'Добавлено в проект E-commerce Platform',
+      timestamp: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+      user: 'Анна Смирнова',
+      userName: 'Анна Смирнова',
     },
     {
       id: '2',
-      title: 'Задача выполнена',
-      description: 'Реализована валидация форм на фронтенде',
-      type: 'task',
-      user: 'Мария Сидорова',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 часа назад
+      type: 'project',
+      title: 'Обновлен проект "Mobile App"',
+      description: 'Изменен статус на "В работе"',
+      timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+      user: 'Петр Иванов',
+      userName: 'Петр Иванов',
     },
     {
       id: '3',
-      title: 'Исправлен критический баг',
-      description: 'Устранена проблема с утечкой памяти в модуле кэширования',
-      type: 'bug',
-      user: 'Алексей Козлов',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4), // 4 часа назад
+      type: 'test',
+      title: 'Прошел тест "Интеграция платежей"',
+      description: 'Все проверки выполнены успешно',
+      timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+      user: 'Мария Коваль',
+      userName: 'Мария Коваль',
     },
     {
       id: '4',
-      title: 'Обновлен код компонента',
-      description: 'Оптимизированы запросы к базе данных',
-      type: 'code',
-      user: 'Елена Васильева',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6 часов назад
+      type: 'release',
+      title: 'Создан релиз v2.1.0',
+      description: 'Релиз готов к тестированию',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
+      user: 'Алексей Попов',
+      userName: 'Алексей Попов',
+    },
+    {
+      id: '5',
+      type: 'requirement',
+      title: 'Завершено требование "Система уведомлений"',
+      description: 'Требование прошло все этапы',
+      timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+      user: 'Елена Сидорова',
+      userName: 'Елена Сидорова',
     },
   ];
 
+  const displayActivities = isError || !activities ? mockActivities : activities;
+
+  const handleRefresh = () => {
+    // Trigger refresh logic here
+    window.location.reload();
+  };
+
   if (isLoading) {
     return (
-      <Card 
+      <Card
         elevation={0}
-        sx={{ 
-          height: '100%',
+        sx={{
           borderRadius: 4,
-          border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
           background: `linear-gradient(135deg, 
-            ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-            ${alpha(theme.palette.background.default, 0.4)} 100%)`,
+            ${alpha(theme.palette.background.paper, 0.8)} 0%, 
+            ${alpha(theme.palette.background.default, 0.4)} 100%
+          )`,
           backdropFilter: 'blur(20px)',
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          position: 'relative',
+          overflow: 'hidden',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        <CardContent sx={{ p: 4 }}>
-          <Box 
-            display="flex" 
-            justifyContent="center" 
-            alignItems="center" 
-            minHeight="200px"
-          >
-            <CircularProgress size={40} thickness={4} />
-          </Box>
-        </CardContent>
+        <CircularProgress 
+          size={40} 
+          thickness={4}
+          sx={{
+            color: theme.palette.primary.main,
+            filter: `drop-shadow(0 4px 8px ${alpha(theme.palette.primary.main, 0.3)})`,
+          }}
+        />
       </Card>
     );
   }
 
   if (isError) {
     return (
-      <Card 
-        elevation={0}
-        sx={{ 
-          height: '100%',
+      <Alert 
+        severity="error"
+        sx={{
           borderRadius: 4,
           border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.error.main, 0.05)} 0%, ${alpha(theme.palette.error.light, 0.03)} 100%)`,
+          background: `linear-gradient(135deg, 
+            ${alpha(theme.palette.error.main, 0.05)} 0%, 
+            ${alpha(theme.palette.error.light, 0.03)} 100%
+          )`,
+          backdropFilter: 'blur(20px)',
         }}
       >
-        <CardContent sx={{ p: 4 }}>
-          <Alert 
-            severity="error"
-            sx={{
-              borderRadius: 4,
-              backgroundColor: 'transparent',
-              border: 'none',
-            }}
-          >
-            Ошибка при загрузке активности: {error?.message || 'Неизвестная ошибка'}
-          </Alert>
-        </CardContent>
-      </Card>
+        Ошибка при загрузке активности: {error?.message || 'Неизвестная ошибка'}
+      </Alert>
     );
   }
 
   return (
-    <Card 
+    <Card
       elevation={0}
-      sx={{ 
-        height: '100%',
+      sx={{
         borderRadius: 4,
-        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
         background: `linear-gradient(135deg, 
-          ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-          ${alpha(theme.palette.background.default, 0.4)} 100%)`,
+          ${alpha(theme.palette.background.paper, 0.8)} 0%, 
+          ${alpha(theme.palette.background.default, 0.4)} 100%
+        )`,
         backdropFilter: 'blur(20px)',
+        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         position: 'relative',
         overflow: 'hidden',
+        height: '100%',
+        // Light refraction effect
         '&::before': {
           content: '""',
           position: 'absolute',
-          top: -50,
-          right: -50,
-          width: 100,
-          height: 100,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.05)} 0%, transparent 70%)`,
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '50%',
+          background: `linear-gradient(180deg, 
+            ${alpha(theme.palette.common.white, 0.05)} 0%, 
+            transparent 100%
+          )`,
+          pointerEvents: 'none',
         },
       }}
     >
-      <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
-        {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+      <CardContent sx={{ p: 3, position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Timeline sx={{ color: 'white', fontSize: 20 }} />
-            </Box>
-            <Typography
-              variant="h5"
-              sx={{
+            <LiquidGlassIcon
+              icon={Timeline}
+              color={theme.palette.info.main}
+              gradient={`linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`}
+              size={32}
+              variant="secondary"
+            />
+            <Typography 
+              variant="h6" 
+              sx={{ 
                 fontWeight: 700,
-                color: theme.palette.text.primary,
+                background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${alpha(theme.palette.text.primary, 0.8)})`,
+                backgroundClip: 'text',
+                textFillColor: 'transparent',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
               }}
             >
-              Активность
+              Последняя активность
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Chip 
-              label={`${mockActivities.length} событий`} 
-              size="small" 
-              sx={{
-                backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                color: theme.palette.secondary.main,
-                fontWeight: 600,
-                borderRadius: 2,
-              }}
-            />
             <IconButton
               size="small"
+              onClick={handleRefresh}
               sx={{
-                backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                color: theme.palette.secondary.main,
+                color: alpha(theme.palette.text.secondary, 0.6),
+                backgroundColor: alpha(theme.palette.background.paper, 0.5),
+                backdropFilter: 'blur(10px)',
+                border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
                 '&:hover': {
-                  backgroundColor: alpha(theme.palette.secondary.main, 0.2),
-                  transform: 'rotate(180deg)',
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  color: theme.palette.primary.main,
+                  borderColor: alpha(theme.palette.primary.main, 0.2),
                 },
-                transition: 'all 0.3s ease',
               }}
             >
-              <Refresh fontSize="small" />
+              <Refresh sx={{ fontSize: '1rem' }} />
             </IconButton>
+            <ArrowForward 
+              sx={{ 
+                color: alpha(theme.palette.text.secondary, 0.6),
+                fontSize: '1.2rem',
+              }} 
+            />
           </Box>
         </Box>
 
-        {/* Activity List */}
-        <List sx={{ maxHeight: 400, overflow: 'auto', p: 0 }}>
-          {mockActivities.length === 0 ? (
-            <ListItem sx={{ p: 4, textAlign: 'center' }}>
-              <ListItemText 
-                primary="Нет активности"
-                secondary="Активность появится здесь по мере работы с проектом"
-                primaryTypographyProps={{
-                  variant: 'h6',
-                  fontWeight: 600,
-                  color: 'text.secondary',
-                }}
-                secondaryTypographyProps={{
-                  variant: 'body2',
-                  color: 'text.secondary',
-                }}
-              />
-            </ListItem>
-          ) : (
-            mockActivities.map((activity, index) => {
-              const activityConfig = getActivityConfig(activity.type);
-              const ActivityIcon = activityConfig.icon;
-              
-              return (
-                <Grow 
-                  in 
-                  timeout={800 + index * 200} 
-                  key={activity.id}
-                  style={{ transformOrigin: '0 0 0' }}
-                >
-                  <Box>
-                    <ListItem 
+        <List sx={{ flex: 1, overflow: 'auto', px: 0 }}>
+          {displayActivities.map((activity, index) => {
+            const config = getActivityConfig(activity.type);
+            const Icon = config.icon;
+
+            return (
+              <Fade in timeout={600 + index * 150} key={activity.id}>
+                <Box>
+                  <ListItem
+                    sx={{
+                      p: 0,
+                      mb: 2,
+                      borderRadius: 4,
+                      border: `1px solid ${alpha(config.color, 0.1)}`,
+                      background: `linear-gradient(135deg, 
+                        ${alpha(config.color, 0.03)} 0%, 
+                        ${alpha(config.color, 0.01)} 100%
+                      )`,
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: alpha(config.color, 0.2),
+                        transform: 'translateY(-2px)',
+                        boxShadow: `0 8px 24px ${alpha(config.color, 0.15)}`,
+                        background: `linear-gradient(135deg, 
+                          ${alpha(config.color, 0.05)} 0%, 
+                          ${alpha(config.color, 0.02)} 100%
+                        )`,
+                      },
+                      // Timeline line
+                      '&::after': index < displayActivities.length - 1 ? {
+                        content: '""',
+                        position: 'absolute',
+                        left: 24,
+                        bottom: -10,
+                        width: 2,
+                        height: 20,
+                        background: alpha(theme.palette.divider, 0.3),
+                        zIndex: 0,
+                      } : {},
+                      // Light refraction on activity
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '40%',
+                        background: `linear-gradient(180deg, 
+                          ${alpha(theme.palette.common.white, 0.08)} 0%, 
+                          transparent 100%
+                        )`,
+                        pointerEvents: 'none',
+                      },
+                    }}
+                  >
+                    <Box
                       sx={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 2,
                         p: 2,
-                        borderRadius: 3,
-                        mb: 2,
-                        border: `1px solid ${alpha(activityConfig.color, 0.1)}`,
-                        background: `linear-gradient(135deg, ${alpha(activityConfig.color, 0.03)} 0%, ${alpha(activityConfig.color, 0.01)} 100%)`,
-                        transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                        '&:hover': {
-                          borderColor: alpha(activityConfig.color, 0.2),
-                          transform: 'translateX(4px)',
-                          backgroundColor: alpha(activityConfig.color, 0.06),
-                        },
+                        width: '100%',
+                        position: 'relative',
+                        zIndex: 1,
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, width: '100%' }}>
-                        <Box
-                          sx={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: '50%',
-                            background: activityConfig.gradient,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                            boxShadow: `0 4px 12px ${alpha(activityConfig.color, 0.3)}`,
-                          }}
-                        >
-                          <ActivityIcon sx={{ fontSize: 16, color: 'white' }} />
-                        </Box>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                            <Typography 
-                              variant="body1" 
-                              sx={{ 
-                                fontWeight: 600,
-                                color: theme.palette.text.primary,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                              }}
-                            >
-                              {activity.title}
-                            </Typography>
-                            <Chip 
-                              label={activityConfig.label} 
-                              size="small" 
-                              sx={{ 
-                                fontSize: '0.7rem',
-                                height: 20,
-                                backgroundColor: alpha(activityConfig.color, 0.1),
-                                color: activityConfig.color,
-                                fontWeight: 600,
-                                borderRadius: 1.5,
-                              }}
-                            />
-                          </Box>
-                          <Typography 
-                            variant="body2" 
-                            color="text.secondary" 
-                            sx={{ 
-                              mb: 1,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              display: '-webkit-box',
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
+                      <LiquidGlassIcon
+                        icon={Icon}
+                        color={config.color}
+                        gradient={`linear-gradient(135deg, ${config.color}, ${alpha(config.color, 0.8)})`}
+                        size={36}
+                        variant="subtle"
+                      />
+
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: 600,
+                              color: theme.palette.text.primary,
+                              fontSize: '0.9rem',
+                              lineHeight: 1.3,
+                              flex: 1,
+                              pr: 1,
                             }}
                           >
-                            {activity.description}
+                            {activity.title}
                           </Typography>
+                          <Chip
+                            label={config.label}
+                            size="small"
+                            sx={{
+                              backgroundColor: config.background,
+                              color: config.color,
+                              fontWeight: 600,
+                              fontSize: '0.7rem',
+                              height: 20,
+                              borderRadius: 2,
+                              border: `1px solid ${alpha(config.color, 0.2)}`,
+                            }}
+                          />
+                        </Box>
+
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: alpha(theme.palette.text.secondary, 0.8),
+                            fontSize: '0.8rem',
+                            lineHeight: 1.4,
+                            mb: 1,
+                          }}
+                        >
+                          {activity.description}
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant="caption" sx={{ fontWeight: 600, color: activityConfig.color }}>
-                              {activity.user}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              •
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {formatDistanceToNow(new Date(activity.timestamp), { 
-                                addSuffix: true, 
-                                locale: ru 
-                              })}
+                            <LiquidGlassIcon
+                              icon={Person}
+                              color={theme.palette.grey[600]}
+                              size={16}
+                              variant="subtle"
+                            />
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: alpha(theme.palette.text.secondary, 0.8),
+                                fontWeight: 500,
+                                fontSize: '0.75rem',
+                              }}
+                            >
+                              {activity.userName}
                             </Typography>
                           </Box>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: alpha(theme.palette.text.secondary, 0.6),
+                              fontSize: '0.7rem',
+                            }}
+                          >
+                            {formatDistanceToNow(new Date(activity.timestamp), { 
+                              addSuffix: true, 
+                              locale: ru 
+                            })}
+                          </Typography>
                         </Box>
                       </Box>
-                    </ListItem>
-                  </Box>
-                </Grow>
-              );
-            })
-          )}
+                    </Box>
+                  </ListItem>
+                </Box>
+              </Fade>
+            );
+          })}
         </List>
 
-        {/* Footer */}
-        <Button
-          fullWidth
-          endIcon={<ArrowForward />}
-          sx={{
-            mt: 3,
-            textTransform: 'none',
-            fontWeight: 600,
-            borderRadius: 3,
-            py: 1.5,
-            backgroundColor: alpha(theme.palette.secondary.main, 0.05),
-            color: theme.palette.secondary.main,
-            border: `1px solid ${alpha(theme.palette.secondary.main, 0.1)}`,
-            '&:hover': {
-              backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-              transform: 'translateY(-2px)',
-              boxShadow: `0 8px 20px ${alpha(theme.palette.secondary.main, 0.15)}`,
-            },
-            transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          }}
-        >
-          Вся активность
-        </Button>
+        {displayActivities.length === 0 && (
+          <Box sx={{ 
+            textAlign: 'center', 
+            py: 4,
+            color: alpha(theme.palette.text.secondary, 0.6),
+          }}>
+            <Typography variant="body2">
+              Нет активности
+            </Typography>
+          </Box>
+        )}
+
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
+          <Button
+            variant="text"
+            sx={{
+              color: alpha(theme.palette.text.secondary, 0.7),
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              textTransform: 'none',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 3,
+              px: 2,
+              py: 1,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                color: theme.palette.primary.main,
+              },
+            }}
+            endIcon={<ArrowForward sx={{ fontSize: '1rem' }} />}
+          >
+            Вся активность
+          </Button>
+        </Box>
       </CardContent>
     </Card>
   );

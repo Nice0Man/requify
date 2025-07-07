@@ -1,298 +1,349 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, LinearProgress, alpha, Chip, useTheme, Fade, IconButton } from '@mui/material';
 import { FolderOpen, Assignment, BugReport, Timeline, ArrowForward } from '@mui/icons-material';
+import { 
+  Card, 
+  CardContent, 
+  Typography, 
+  Box, 
+  alpha, 
+  useTheme, 
+  Button,
+  LinearProgress,
+  Chip,
+  Fade,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { LiquidGlassIcon } from '@/shared/ui';
 
 interface Project {
   id: string;
   name: string;
-  status: 'planning' | 'in_progress' | 'testing' | 'completed';
+  description: string;
+  status: 'active' | 'pending' | 'completed';
   progress: number;
-  requirements: number;
-  testCases: number;
+  tasksCount: number;
+  completedTasks: number;
+  color: string;
+  icon: React.ElementType;
 }
 
 export const ProjectOverviewWidget: React.FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case 'planning': 
-        return {
-          color: theme.palette.info.main,
-          label: 'Планирование',
-          icon: Assignment,
-          gradient: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
-        };
-      case 'in_progress': 
-        return {
-          color: theme.palette.primary.main,
-          label: 'В работе',
-          icon: Timeline,
-          gradient: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-        };
-      case 'testing': 
-        return {
-          color: theme.palette.warning.main,
-          label: 'Тестирование',
-          icon: BugReport,
-          gradient: `linear-gradient(135deg, ${theme.palette.warning.main}, ${theme.palette.warning.dark})`,
-        };
-      case 'completed': 
-        return {
-          color: theme.palette.success.main,
-          label: 'Завершен',
-          icon: FolderOpen,
-          gradient: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
-        };
-      default: 
-        return {
-          color: theme.palette.grey[500],
-          label: 'Неизвестно',
-          icon: FolderOpen,
-          gradient: `linear-gradient(135deg, ${theme.palette.grey[500]}, ${theme.palette.grey[700]})`,
-        };
-    }
-  };
-
+  // Mock data - replace with actual data from API
   const projects: Project[] = [
     {
       id: '1',
       name: 'E-commerce Platform',
-      status: 'in_progress',
+      description: 'Разработка интернет-магазина с интеграцией платежных систем',
+      status: 'active',
       progress: 75,
-      requirements: 24,
-      testCases: 18,
+      tasksCount: 24,
+      completedTasks: 18,
+      color: theme.palette.primary.main,
+      icon: FolderOpen,
     },
     {
       id: '2',
-      name: 'Mobile App Redesign',
-      status: 'testing',
-      progress: 90,
-      requirements: 16,
-      testCases: 12,
+      name: 'Mobile App',
+      description: 'Мобильное приложение для управления задачами',
+      status: 'active',
+      progress: 45,
+      tasksCount: 16,
+      completedTasks: 7,
+      color: theme.palette.secondary.main,
+      icon: Assignment,
     },
     {
       id: '3',
-      name: 'API Integration',
-      status: 'planning',
-      progress: 25,
-      requirements: 8,
-      testCases: 3,
+      name: 'Analytics Dashboard',
+      description: 'Система аналитики и отчетности для бизнеса',
+      status: 'pending',
+      progress: 20,
+      tasksCount: 12,
+      completedTasks: 2,
+      color: theme.palette.info.main,
+      icon: Timeline,
     },
   ];
 
+  const getStatusConfig = (status: Project['status']) => {
+    switch (status) {
+      case 'active':
+        return {
+          label: 'Активный',
+          color: theme.palette.success.main,
+          background: alpha(theme.palette.success.main, 0.1),
+        };
+      case 'pending':
+        return {
+          label: 'В ожидании',
+          color: theme.palette.warning.main,
+          background: alpha(theme.palette.warning.main, 0.1),
+        };
+      case 'completed':
+        return {
+          label: 'Завершен',
+          color: theme.palette.info.main,
+          background: alpha(theme.palette.info.main, 0.1),
+        };
+      default:
+        return {
+          label: 'Неизвестно',
+          color: theme.palette.grey[500],
+          background: alpha(theme.palette.grey[500], 0.1),
+        };
+    }
+  };
+
+  const handleProjectClick = (projectId: string) => {
+    navigate(`/projects/${projectId}`);
+  };
+
   return (
-    <Card 
+    <Card
       elevation={0}
-      sx={{ 
-        height: '100%',
+      sx={{
         borderRadius: 4,
-        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
         background: `linear-gradient(135deg, 
-          ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-          ${alpha(theme.palette.background.default, 0.4)} 100%)`,
+          ${alpha(theme.palette.background.paper, 0.8)} 0%, 
+          ${alpha(theme.palette.background.default, 0.4)} 100%
+        )`,
         backdropFilter: 'blur(20px)',
+        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         position: 'relative',
         overflow: 'hidden',
+        height: '100%',
+        // Light refraction effect
         '&::before': {
           content: '""',
           position: 'absolute',
-          top: -50,
-          right: -50,
-          width: 100,
-          height: 100,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '50%',
+          background: `linear-gradient(180deg, 
+            ${alpha(theme.palette.common.white, 0.05)} 0%, 
+            transparent 100%
+          )`,
+          pointerEvents: 'none',
         },
       }}
     >
-      <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <FolderOpen sx={{ color: 'white', fontSize: 20 }} />
-            </Box>
-            <Typography
-              variant="h5"
-              sx={{
-                fontWeight: 700,
-                color: theme.palette.text.primary,
-              }}
-            >
-              Последние проекты
-            </Typography>
-          </Box>
-          <IconButton
-            size="small"
-            sx={{
-              backgroundColor: alpha(theme.palette.primary.main, 0.1),
-              color: theme.palette.primary.main,
-              '&:hover': {
-                backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                transform: 'translateX(2px)',
-              },
-              transition: 'all 0.3s ease',
+      <CardContent sx={{ p: 3, position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 700,
+              background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${alpha(theme.palette.text.primary, 0.8)})`,
+              backgroundClip: 'text',
+              textFillColor: 'transparent',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
             }}
           >
-            <ArrowForward fontSize="small" />
-          </IconButton>
+            Обзор проектов
+          </Typography>
+          <ArrowForward 
+            sx={{ 
+              color: alpha(theme.palette.text.secondary, 0.6),
+              fontSize: '1.2rem',
+            }} 
+          />
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
           {projects.map((project, index) => {
             const statusConfig = getStatusConfig(project.status);
-            const StatusIcon = statusConfig.icon;
-            
+            const Icon = project.icon;
+
             return (
               <Fade in timeout={1000 + index * 200} key={project.id}>
                 <Box>
                   <Box
+                    onClick={() => handleProjectClick(project.id)}
                     sx={{
-                    p: 3,
-                    borderRadius: 4,
-                    border: `1px solid ${alpha(statusConfig.color, 0.1)}`,
-                    background: `linear-gradient(135deg, ${alpha(statusConfig.color, 0.05)} 0%, ${alpha(statusConfig.color, 0.02)} 100%)`,
-                    position: 'relative',
-                    overflow: 'hidden',
-                    transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                    '&:hover': {
-                      borderColor: alpha(statusConfig.color, 0.2),
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 12px 24px ${alpha(statusConfig.color, 0.1)}`,
-                    },
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: '30%',
-                      height: '100%',
-                      background: `radial-gradient(circle at top right, ${alpha(statusConfig.color, 0.06)} 0%, transparent 60%)`,
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      mb: 3,
+                      p: 2.5,
+                      borderRadius: 4,
+                      background: `linear-gradient(135deg, 
+                        ${alpha(theme.palette.background.paper, 0.6)} 0%, 
+                        ${alpha(theme.palette.background.default, 0.3)} 100%
+                      )`,
+                      backdropFilter: 'blur(10px)',
+                      border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+                      cursor: 'pointer',
                       position: 'relative',
-                      zIndex: 1,
+                      overflow: 'hidden',
+                      transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        background: `linear-gradient(135deg, 
+                          ${alpha(theme.palette.background.paper, 0.9)} 0%, 
+                          ${alpha(theme.palette.background.default, 0.6)} 100%
+                        )`,
+                        border: `1px solid ${alpha(project.color, 0.2)}`,
+                        boxShadow: `
+                          0 12px 32px ${alpha(project.color, 0.15)},
+                          inset 0 1px 0 ${alpha(theme.palette.common.white, 0.1)}
+                        `,
+                      },
+                      // Light refraction on project card
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '40%',
+                        background: `linear-gradient(180deg, 
+                          ${alpha(theme.palette.common.white, 0.08)} 0%, 
+                          transparent 100%
+                        )`,
+                        pointerEvents: 'none',
+                      },
+                      // Project color accent
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: '60%',
+                        height: '100%',
+                        background: `radial-gradient(circle at top right, 
+                          ${alpha(project.color, 0.03)} 0%, 
+                          transparent 70%
+                        )`,
+                        pointerEvents: 'none',
+                      },
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Box
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: '50%',
-                          background: statusConfig.gradient,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: `0 4px 12px ${alpha(statusConfig.color, 0.3)}`,
-                        }}
-                      >
-                        <StatusIcon sx={{ color: 'white', fontSize: 16 }} />
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2, position: 'relative', zIndex: 1 }}>
+                      <LiquidGlassIcon
+                        icon={Icon}
+                        color={project.color}
+                        gradient={`linear-gradient(135deg, ${project.color}, ${alpha(project.color, 0.8)})`}
+                        size={48}
+                        variant="secondary"
+                        clickable={true}
+                        onClick={() => handleProjectClick(project.id)}
+                      />
+                      
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography 
+                            variant="h6" 
+                            sx={{ 
+                              fontWeight: 600,
+                              color: theme.palette.text.primary,
+                              fontSize: '1.1rem',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {project.name}
+                          </Typography>
+                          <Chip
+                            label={statusConfig.label}
+                            size="small"
+                            sx={{
+                              backgroundColor: statusConfig.background,
+                              color: statusConfig.color,
+                              fontWeight: 600,
+                              fontSize: '0.75rem',
+                              borderRadius: 2,
+                              backdropFilter: 'blur(10px)',
+                              border: `1px solid ${alpha(statusConfig.color, 0.2)}`,
+                            }}
+                          />
+                        </Box>
+                        
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            color: alpha(theme.palette.text.secondary, 0.8),
+                            mb: 2,
+                            fontSize: '0.85rem',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                          }}
+                        >
+                          {project.description}
+                        </Typography>
                       </Box>
-                      <Typography
-                        variant="h6"
-                        sx={{ 
-                          fontWeight: 600,
-                          color: theme.palette.text.primary,
-                        }}
-                      >
-                        {project.name}
-                      </Typography>
                     </Box>
-                    <Chip
-                      label={statusConfig.label}
-                      size="small"
-                      sx={{
-                        backgroundColor: alpha(statusConfig.color, 0.1),
-                        color: statusConfig.color,
-                        fontWeight: 600,
-                        borderRadius: 2,
-                        fontSize: '0.8rem',
-                      }}
-                    />
-                  </Box>
 
-                  <Box sx={{ mb: 3, position: 'relative', zIndex: 1 }}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: 1,
-                      }}
-                    >
-                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                        Прогресс
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        sx={{ 
-                          color: statusConfig.color,
-                          fontWeight: 700,
+                    <Box sx={{ position: 'relative', zIndex: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: alpha(theme.palette.text.secondary, 0.8),
+                            fontWeight: 500,
+                          }}
+                        >
+                          Прогресс: {project.completedTasks}/{project.tasksCount} задач
+                        </Typography>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: project.color,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {project.progress}%
+                        </Typography>
+                      </Box>
+                      
+                      <LinearProgress
+                        variant="determinate"
+                        value={project.progress}
+                        sx={{
+                          height: 6,
+                          borderRadius: 3,
+                          backgroundColor: alpha(project.color, 0.1),
+                          '& .MuiLinearProgress-bar': {
+                            borderRadius: 3,
+                            background: `linear-gradient(90deg, ${project.color}, ${alpha(project.color, 0.8)})`,
+                            boxShadow: `0 2px 8px ${alpha(project.color, 0.3)}`,
+                          },
                         }}
-                      >
-                        {project.progress}%
-                      </Typography>
-                    </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={project.progress}
-                      sx={{
-                        height: 8,
-                        borderRadius: 4,
-                        backgroundColor: alpha(statusConfig.color, 0.1),
-                        '& .MuiLinearProgress-bar': {
-                          background: statusConfig.gradient,
-                          borderRadius: 4,
-                          boxShadow: `0 2px 8px ${alpha(statusConfig.color, 0.3)}`,
-                        },
-                      }}
-                    />
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      gap: 3,
-                      position: 'relative',
-                      zIndex: 1,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Assignment sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                        {project.requirements} требований
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <BugReport sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                        {project.testCases} тестов
-                      </Typography>
+                      />
                     </Box>
                   </Box>
-                </Box>
                 </Box>
               </Fade>
             );
           })}
+        </Box>
+
+        <Box sx={{ mt: 3, textAlign: 'center' }}>
+          <Button
+            variant="text"
+            sx={{
+              color: alpha(theme.palette.text.secondary, 0.7),
+              fontSize: '0.9rem',
+              fontWeight: 500,
+              textTransform: 'none',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 3,
+              px: 2,
+              py: 1,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                color: theme.palette.primary.main,
+              },
+            }}
+            endIcon={<ArrowForward sx={{ fontSize: '1rem' }} />}
+            onClick={() => navigate('/projects')}
+          >
+            Все проекты
+          </Button>
         </Box>
       </CardContent>
     </Card>

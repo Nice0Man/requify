@@ -1,405 +1,465 @@
 import React, { useState } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  Typography, 
-  Box, 
-  alpha, 
-  useTheme, 
-  Fade, 
+import {
+  Box,
+  Card,
+  CardContent,
   List,
   ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
+  Typography,
   IconButton,
-  Chip,
   Button,
-  Stack,
-  Badge,
+  Chip,
+  alpha,
+  useTheme,
+  Fade,
 } from '@mui/material';
-import { 
-  Notifications, 
-  CheckCircle, 
-  Warning, 
-  Error,
+import {
+  Notifications,
+  Flag,
   Info,
-  Close,
-  Settings,
+  Warning,
+  Error,
+  CheckCircle,
   MarkEmailRead,
-  NotificationsActive,
+  Clear,
+  ArrowForward,
 } from '@mui/icons-material';
+import { formatDistanceToNow } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import { LiquidGlassIcon } from '@/shared/ui';
 
-interface NotificationItem {
+interface Notification {
   id: string;
+  type: 'info' | 'warning' | 'error' | 'success';
+  priority: 'low' | 'medium' | 'high';
   title: string;
   message: string;
-  time: string;
-  type: 'success' | 'warning' | 'error' | 'info';
+  timestamp: Date;
   read: boolean;
-  priority: 'high' | 'medium' | 'low';
+  actions?: {
+    label: string;
+    action: () => void;
+  }[];
 }
 
 export const NotificationsWidget: React.FC = () => {
   const theme = useTheme();
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
+  const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: '1',
-      title: 'Релиз готов к развертыванию',
-      message: 'Версия 2.1.0 прошла все тесты и готова к публикации',
-      time: '5 мин назад',
-      type: 'success',
+      type: 'info',
+      priority: 'medium',
+      title: 'Новое требование добавлено',
+      message: 'Требование "Авторизация пользователей" добавлено в проект E-commerce Platform',
+      timestamp: new Date(Date.now() - 1000 * 60 * 15),
       read: false,
-      priority: 'high',
     },
     {
       id: '2',
-      title: 'Внимание: просроченное требование',
-      message: 'REQ-145 требует обновления до конца недели',
-      time: '1 час назад',
       type: 'warning',
-      read: false,
       priority: 'high',
+      title: 'Приближается дедлайн',
+      message: 'До завершения спринта осталось 2 дня',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      read: false,
     },
     {
       id: '3',
-      title: 'Новый участник команды',
-      message: 'Анна Иванова присоединилась к проекту Mobile App',
-      time: '2 часа назад',
-      type: 'info',
+      type: 'success',
+      priority: 'low',
+      title: 'Тест прошел успешно',
+      message: 'Модуль аутентификации успешно прошел все тесты',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4),
       read: true,
-      priority: 'medium',
     },
     {
       id: '4',
-      title: 'Критическая ошибка',
-      message: 'Обнаружена проблема в системе авторизации',
-      time: '3 часа назад',
       type: 'error',
-      read: false,
       priority: 'high',
-    },
-    {
-      id: '5',
-      title: 'Отчет готов',
-      message: 'Еженедельный отчет по проекту сформирован',
-      time: '1 день назад',
-      type: 'info',
-      read: true,
-      priority: 'low',
+      title: 'Ошибка в продакшене',
+      message: 'Обнаружена критическая ошибка в модуле платежей',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6),
+      read: false,
     },
   ]);
 
-  const getTypeConfig = (type: string) => {
+  const getNotificationConfig = (type: Notification['type']) => {
     switch (type) {
-      case 'success':
+      case 'info':
         return {
-          icon: CheckCircle,
-          color: theme.palette.success.main,
-          bgColor: alpha(theme.palette.success.main, 0.1),
+          color: theme.palette.info.main,
+          icon: Info,
+          background: alpha(theme.palette.info.main, 0.1),
         };
       case 'warning':
         return {
-          icon: Warning,
           color: theme.palette.warning.main,
-          bgColor: alpha(theme.palette.warning.main, 0.1),
+          icon: Warning,
+          background: alpha(theme.palette.warning.main, 0.1),
         };
       case 'error':
         return {
-          icon: Error,
           color: theme.palette.error.main,
-          bgColor: alpha(theme.palette.error.main, 0.1),
+          icon: Error,
+          background: alpha(theme.palette.error.main, 0.1),
+        };
+      case 'success':
+        return {
+          color: theme.palette.success.main,
+          icon: CheckCircle,
+          background: alpha(theme.palette.success.main, 0.1),
         };
       default:
         return {
-          icon: Info,
           color: theme.palette.info.main,
-          bgColor: alpha(theme.palette.info.main, 0.1),
+          icon: Info,
+          background: alpha(theme.palette.info.main, 0.1),
         };
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityConfig = (priority: Notification['priority']) => {
     switch (priority) {
-      case 'high': return theme.palette.error.main;
-      case 'medium': return theme.palette.warning.main;
-      default: return theme.palette.info.main;
+      case 'high':
+        return {
+          label: 'Высокий',
+          color: theme.palette.error.main,
+          background: alpha(theme.palette.error.main, 0.1),
+        };
+      case 'medium':
+        return {
+          label: 'Средний',
+          color: theme.palette.warning.main,
+          background: alpha(theme.palette.warning.main, 0.1),
+        };
+      case 'low':
+        return {
+          label: 'Низкий',
+          color: theme.palette.success.main,
+          background: alpha(theme.palette.success.main, 0.1),
+        };
+      default:
+        return {
+          label: 'Средний',
+          color: theme.palette.warning.main,
+          background: alpha(theme.palette.warning.main, 0.1),
+        };
     }
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id 
-          ? { ...notification, read: true }
-          : notification
+  const handleMarkAsRead = (id: string) => {
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === id ? { ...notification, read: true } : notification
       )
     );
   };
 
-  const removeNotification = (id: string) => {
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev =>
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+  };
+
+  const handleRemoveNotification = (id: string) => {
     setNotifications(prev => prev.filter(notification => notification.id !== id));
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
-  const recentNotifications = notifications.slice(0, 4);
 
   return (
-    <Card 
+    <Card
       elevation={0}
-      sx={{ 
-        height: '100%',
+      sx={{
         borderRadius: 4,
-        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
         background: `linear-gradient(135deg, 
-          ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-          ${alpha(theme.palette.background.default, 0.4)} 100%)`,
+          ${alpha(theme.palette.background.paper, 0.8)} 0%, 
+          ${alpha(theme.palette.background.default, 0.4)} 100%
+        )`,
         backdropFilter: 'blur(20px)',
+        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         position: 'relative',
         overflow: 'hidden',
+        height: '100%',
+        // Light refraction effect
         '&::before': {
           content: '""',
           position: 'absolute',
-          top: -40,
-          left: -40,
-          width: 100,
-          height: 100,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '50%',
+          background: `linear-gradient(180deg, 
+            ${alpha(theme.palette.common.white, 0.05)} 0%, 
+            transparent 100%
+          )`,
+          pointerEvents: 'none',
         },
       }}
     >
-      <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
-        {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+      <CardContent sx={{ p: 3, position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Badge badgeContent={unreadCount} color="error" max={99}>
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <NotificationsActive sx={{ color: 'white', fontSize: 20 }} />
-              </Box>
-            </Badge>
-            <Typography
-              variant="h5"
-              sx={{
+            <LiquidGlassIcon
+              icon={Notifications}
+              color={theme.palette.primary.main}
+              gradient={`linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`}
+              size={32}
+              variant="secondary"
+            />
+            <Typography 
+              variant="h6" 
+              sx={{ 
                 fontWeight: 700,
-                color: theme.palette.text.primary,
+                background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${alpha(theme.palette.text.primary, 0.8)})`,
+                backgroundClip: 'text',
+                textFillColor: 'transparent',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
               }}
             >
               Уведомления
             </Typography>
+            {unreadCount > 0 && (
+              <Chip
+                label={unreadCount}
+                size="small"
+                sx={{
+                  backgroundColor: theme.palette.error.main,
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  minWidth: 20,
+                  height: 20,
+                  '& .MuiChip-label': {
+                    px: 0.5,
+                  },
+                }}
+              />
+            )}
           </Box>
-          <Stack direction="row" spacing={1}>
-            <IconButton
-              size="small"
-              onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
-              sx={{
-                backgroundColor: alpha(theme.palette.success.main, 0.1),
-                color: theme.palette.success.main,
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.success.main, 0.2),
-                },
-              }}
-            >
-              <MarkEmailRead fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              sx={{
-                backgroundColor: alpha(theme.palette.grey[500], 0.1),
-                color: theme.palette.grey[600],
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.grey[500], 0.2),
-                },
-              }}
-            >
-              <Settings fontSize="small" />
-            </IconButton>
-          </Stack>
+          <ArrowForward 
+            sx={{ 
+              color: alpha(theme.palette.text.secondary, 0.6),
+              fontSize: '1.2rem',
+            }} 
+          />
         </Box>
 
-        {/* Notifications List */}
-        {recentNotifications.length > 0 ? (
-          <List sx={{ p: 0 }}>
-            {recentNotifications.map((notification, index) => {
-              const typeConfig = getTypeConfig(notification.type);
-              const Icon = typeConfig.icon;
-              
-              return (
-                <Fade in timeout={800 + index * 200} key={notification.id}>
-                  <Box>
-                    <ListItem
+        {unreadCount > 0 && (
+          <Box sx={{ mb: 2 }}>
+            <Button
+              size="small"
+              startIcon={<MarkEmailRead />}
+              onClick={handleMarkAllAsRead}
+              sx={{
+                color: theme.palette.primary.main,
+                fontSize: '0.8rem',
+                fontWeight: 500,
+                textTransform: 'none',
+                backdropFilter: 'blur(10px)',
+                backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                borderRadius: 2,
+                px: 2,
+                py: 0.5,
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                },
+              }}
+            >
+              Отметить все как прочитанные
+            </Button>
+          </Box>
+        )}
+
+        <List sx={{ flex: 1, overflow: 'auto', px: 0 }}>
+          {notifications.map((notification, index) => {
+            const typeConfig = getNotificationConfig(notification.type);
+            const priorityConfig = getPriorityConfig(notification.priority);
+            const Icon = typeConfig.icon;
+
+            return (
+              <Fade in timeout={800 + index * 200} key={notification.id}>
+                <Box>
+                  <ListItem
+                    sx={{
+                      p: 0,
+                      mb: 2,
+                      borderRadius: 4,
+                      border: `1px solid ${alpha(typeConfig.color, 0.1)}`,
+                      background: notification.read 
+                        ? alpha(theme.palette.grey[50], 0.3)
+                        : `linear-gradient(135deg, 
+                            ${alpha(typeConfig.color, 0.05)} 0%, 
+                            ${alpha(typeConfig.color, 0.02)} 100%
+                          )`,
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: alpha(typeConfig.color, 0.2),
+                        transform: 'translateX(4px)',
+                        boxShadow: `0 8px 24px ${alpha(typeConfig.color, 0.15)}`,
+                      },
+                      // Light refraction on notification
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '50%',
+                        background: `linear-gradient(180deg, 
+                          ${alpha(theme.palette.common.white, 0.08)} 0%, 
+                          transparent 100%
+                        )`,
+                        pointerEvents: 'none',
+                      },
+                    }}
+                    onClick={() => !notification.read && handleMarkAsRead(notification.id)}
+                  >
+                    <Box
                       sx={{
-                        p: 0,
-                        mb: 2,
-                        borderRadius: 3,
-                        border: `1px solid ${alpha(typeConfig.color, 0.1)}`,
-                        background: notification.read 
-                          ? alpha(theme.palette.grey[50], 0.3)
-                          : `linear-gradient(135deg, ${alpha(typeConfig.color, 0.05)} 0%, ${alpha(typeConfig.color, 0.02)} 100%)`,
-                        transition: 'all 0.3s ease',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 2,
+                        p: 2,
+                        width: '100%',
                         position: 'relative',
-                        overflow: 'hidden',
-                        '&:hover': {
-                          borderColor: alpha(typeConfig.color, 0.2),
-                          transform: 'translateX(4px)',
-                          boxShadow: `0 8px 16px ${alpha(typeConfig.color, 0.1)}`,
-                        },
-                        '&::before': notification.read ? {} : {
-                          content: '""',
-                          position: 'absolute',
-                          left: 0,
-                          top: 0,
-                          width: 4,
-                          height: '100%',
-                          background: typeConfig.color,
-                        },
+                        zIndex: 1,
                       }}
                     >
-                    <Box sx={{ p: 2, width: '100%' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                        <Avatar
-                          sx={{
-                            width: 36,
-                            height: 36,
-                            backgroundColor: typeConfig.bgColor,
-                            mt: 0.5,
-                          }}
-                        >
-                          <Icon sx={{ fontSize: 20, color: typeConfig.color }} />
-                        </Avatar>
-                        
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 0.5 }}>
-                            <Typography 
-                              variant="subtitle2" 
-                              sx={{ 
-                                fontWeight: notification.read ? 500 : 700,
-                                color: notification.read ? theme.palette.text.secondary : theme.palette.text.primary,
-                                flex: 1,
-                                pr: 1,
+                      <LiquidGlassIcon
+                        icon={Icon}
+                        color={typeConfig.color}
+                        gradient={`linear-gradient(135deg, ${typeConfig.color}, ${alpha(typeConfig.color, 0.8)})`}
+                        size={32}
+                        variant="subtle"
+                      />
+
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 }}>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{
+                              fontWeight: notification.read ? 500 : 700,
+                              color: theme.palette.text.primary,
+                              fontSize: '0.9rem',
+                              lineHeight: 1.3,
+                            }}
+                          >
+                            {notification.title}
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
+                            <Chip
+                              label={priorityConfig.label}
+                              size="small"
+                              icon={<Flag sx={{ fontSize: '0.8rem !important' }} />}
+                              sx={{
+                                backgroundColor: priorityConfig.background,
+                                color: priorityConfig.color,
+                                fontWeight: 600,
+                                fontSize: '0.7rem',
+                                height: 20,
+                                borderRadius: 2,
+                                border: `1px solid ${alpha(priorityConfig.color, 0.2)}`,
                               }}
-                            >
-                              {notification.title}
-                            </Typography>
+                            />
                             <IconButton
                               size="small"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                removeNotification(notification.id);
+                                handleRemoveNotification(notification.id);
                               }}
                               sx={{
-                                opacity: 0.5,
-                                '&:hover': { opacity: 1 },
                                 width: 20,
                                 height: 20,
+                                color: alpha(theme.palette.text.secondary, 0.6),
+                                '&:hover': {
+                                  backgroundColor: alpha(theme.palette.error.main, 0.1),
+                                  color: theme.palette.error.main,
+                                },
                               }}
                             >
-                              <Close sx={{ fontSize: 16 }} />
+                              <Clear sx={{ fontSize: '0.8rem' }} />
                             </IconButton>
                           </Box>
-                          
-                          <Typography 
-                            variant="body2" 
-                            color="text.secondary"
-                            sx={{ 
-                              mb: 1,
-                              display: '-webkit-box',
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            {notification.message}
-                          </Typography>
-                          
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Typography variant="caption" color="text.secondary">
-                                {notification.time}
-                              </Typography>
-                              <Chip
-                                label={notification.priority}
-                                size="small"
-                                sx={{
-                                  height: 16,
-                                  fontSize: '0.65rem',
-                                  backgroundColor: alpha(getPriorityColor(notification.priority), 0.1),
-                                  color: getPriorityColor(notification.priority),
-                                  '& .MuiChip-label': { px: 1 },
-                                }}
-                              />
-                            </Box>
-                            {!notification.read && (
-                              <Button
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  markAsRead(notification.id);
-                                }}
-                                sx={{
-                                  minWidth: 'auto',
-                                  fontSize: '0.7rem',
-                                  px: 1.5,
-                                  py: 0.25,
-                                  color: typeConfig.color,
-                                  '&:hover': {
-                                    backgroundColor: alpha(typeConfig.color, 0.1),
-                                  },
-                                }}
-                              >
-                                Прочитано
-                              </Button>
-                            )}
-                          </Box>
                         </Box>
+
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: alpha(theme.palette.text.secondary, 0.8),
+                            fontSize: '0.8rem',
+                            lineHeight: 1.4,
+                            mb: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                          }}
+                        >
+                          {notification.message}
+                        </Typography>
+
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: alpha(theme.palette.text.secondary, 0.6),
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          {formatDistanceToNow(notification.timestamp, { 
+                            addSuffix: true, 
+                            locale: ru 
+                          })}
+                        </Typography>
                       </Box>
                     </Box>
                   </ListItem>
                 </Box>
-                </Fade>
-              );
-            })}
-          </List>
-        ) : (
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Notifications sx={{ fontSize: 48, color: theme.palette.grey[400], mb: 2 }} />
-            <Typography variant="h6" color="text.secondary">
-              Нет новых уведомлений
+              </Fade>
+            );
+          })}
+        </List>
+
+        {notifications.length === 0 && (
+          <Box sx={{ 
+            textAlign: 'center', 
+            py: 4,
+            color: alpha(theme.palette.text.secondary, 0.6),
+          }}>
+            <Typography variant="body2">
+              Нет уведомлений
             </Typography>
           </Box>
         )}
 
-        {/* View All Button */}
-        {notifications.length > 4 && (
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
           <Button
-            fullWidth
-            variant="outlined"
+            variant="text"
             sx={{
-              mt: 3,
-              borderRadius: 2,
+              color: alpha(theme.palette.text.secondary, 0.7),
+              fontSize: '0.9rem',
+              fontWeight: 500,
               textTransform: 'none',
-              fontWeight: 600,
-              borderColor: alpha(theme.palette.primary.main, 0.2),
-              color: theme.palette.primary.main,
+              backdropFilter: 'blur(10px)',
+              borderRadius: 3,
+              px: 2,
+              py: 1,
               '&:hover': {
                 backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                borderColor: theme.palette.primary.main,
+                color: theme.palette.primary.main,
               },
             }}
+            endIcon={<ArrowForward sx={{ fontSize: '1rem' }} />}
           >
-            Показать все уведомления ({notifications.length - 4} еще)
+            Показать все уведомления
           </Button>
-        )}
+        </Box>
       </CardContent>
     </Card>
   );

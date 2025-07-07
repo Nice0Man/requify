@@ -49,6 +49,17 @@ export const dashboardApi = {
     }));
   },
 
+  // Get recent activity (alias for compatibility with useDashboardQuery)
+  getRecentActivity: async (): Promise<ActivityItem[]> => {
+    return dashboardApi.getActivity(20); // Get 20 recent items
+  },
+
+  // Get chart data for different periods
+  getChartData: async (period: 'week' | 'month' | 'year' = 'week'): Promise<ChartDataPoint[]> => {
+    const response = await client.get(`/dashboard/chart-data?period=${period}`);
+    return response.data;
+  },
+
   // Get system health status
   getSystemHealth: async () => {
     const response = await client.get("/dashboard/health");

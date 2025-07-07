@@ -1,241 +1,341 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, alpha, useTheme, Fade, LinearProgress, Grid, Chip } from '@mui/material';
 import { TrendingUp, Assignment, CheckCircle, Schedule, BugReport } from '@mui/icons-material';
+import { 
+  Card, 
+  CardContent, 
+  Typography, 
+  Box, 
+  Grid, 
+  LinearProgress, 
+  alpha, 
+  useTheme, 
+  Chip,
+  Fade,
+} from '@mui/material';
+import { LiquidGlassIcon } from '@/shared/ui';
 
-interface ProjectStat {
-  label: string;
+interface StatCard {
+  id: string;
+  title: string;
   value: number;
-  total: number;
-  color: string;
+  total?: number;
+  trend: number;
   icon: React.ElementType;
-  trend: string;
+  color: string;
+  unit?: string;
 }
 
 export const ProjectStatsWidget: React.FC = () => {
   const theme = useTheme();
 
-  const stats: ProjectStat[] = [
+  const stats: StatCard[] = [
     {
-      label: 'Требования',
-      value: 145,
-      total: 200,
-      color: theme.palette.primary.main,
+      id: 'requirements',
+      title: 'Требования',
+      value: 87,
+      total: 120,
+      trend: 12,
       icon: Assignment,
-      trend: '+12%',
+      color: theme.palette.primary.main,
+      unit: '%',
     },
     {
-      label: 'Завершено',
-      value: 89,
-      total: 145,
-      color: theme.palette.success.main,
+      id: 'completed',
+      title: 'Завершено',
+      value: 64,
+      total: 87,
+      trend: 8,
       icon: CheckCircle,
-      trend: '+8%',
+      color: theme.palette.success.main,
+      unit: '%',
     },
     {
-      label: 'В работе',
-      value: 34,
-      total: 145,
-      color: theme.palette.warning.main,
+      id: 'in-progress',
+      title: 'В работе',
+      value: 15,
+      total: 87,
+      trend: -3,
       icon: Schedule,
-      trend: '+5%',
+      color: theme.palette.warning.main,
+      unit: '%',
     },
     {
-      label: 'Проблемы',
-      value: 12,
-      total: 145,
-      color: theme.palette.error.main,
+      id: 'issues',
+      title: 'Проблемы',
+      value: 8,
+      total: 87,
+      trend: 5,
       icon: BugReport,
-      trend: '-3%',
+      color: theme.palette.error.main,
+      unit: '%',
     },
   ];
 
-  const getPercentage = (value: number, total: number) => Math.round((value / total) * 100);
+  const getProgressValue = (stat: StatCard) => {
+    if (stat.total) {
+      return (stat.value / stat.total) * 100;
+    }
+    return stat.value;
+  };
+
+  const getTrendColor = (trend: number) => {
+    return trend >= 0 ? theme.palette.success.main : theme.palette.error.main;
+  };
 
   return (
-    <Card 
+    <Card
       elevation={0}
-      sx={{ 
-        height: '100%',
+      sx={{
         borderRadius: 4,
-        border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
         background: `linear-gradient(135deg, 
-          ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-          ${alpha(theme.palette.background.default, 0.4)} 100%)`,
+          ${alpha(theme.palette.background.paper, 0.8)} 0%, 
+          ${alpha(theme.palette.background.default, 0.4)} 100%
+        )`,
         backdropFilter: 'blur(20px)',
+        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
         position: 'relative',
         overflow: 'hidden',
+        height: '100%',
+        // Light refraction effect
         '&::before': {
           content: '""',
           position: 'absolute',
-          top: -30,
-          right: -30,
-          width: 80,
-          height: 80,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '50%',
+          background: `linear-gradient(180deg, 
+            ${alpha(theme.palette.common.white, 0.05)} 0%, 
+            transparent 100%
+          )`,
+          pointerEvents: 'none',
         },
       }}
     >
-      <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
-        {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-          <Box
-            sx={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <TrendingUp sx={{ color: 'white', fontSize: 20 }} />
-          </Box>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 700,
-              color: theme.palette.text.primary,
-            }}
-          >
-            Статистика проекта
-          </Typography>
-        </Box>
+      <CardContent sx={{ p: 3, position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            mb: 3,
+            fontWeight: 700,
+            background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${alpha(theme.palette.text.primary, 0.8)})`,
+            backgroundClip: 'text',
+            textFillColor: 'transparent',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          Статистика проекта
+        </Typography>
 
-        {/* Stats Grid */}
-        <Grid container spacing={3}>
+        <Grid container spacing={2} sx={{ flex: 1 }}>
           {stats.map((stat, index) => {
             const Icon = stat.icon;
-            const percentage = getPercentage(stat.value, stat.total);
-            const isPositiveTrend = stat.trend.startsWith('+');
-            
+            const progressValue = getProgressValue(stat);
+            const isPositiveTrend = stat.trend >= 0;
+            const trendColor = getTrendColor(stat.trend);
+
             return (
-              <Grid item xs={12} sm={6} key={index}>
+              <Grid item xs={12} sm={6} key={stat.id}>
                 <Fade in timeout={800 + index * 200}>
                   <Box>
                     <Box
                       sx={{
-                      p: 3,
-                      borderRadius: 3,
-                      border: `1px solid ${alpha(stat.color, 0.1)}`,
-                      background: `linear-gradient(135deg, ${alpha(stat.color, 0.05)} 0%, ${alpha(stat.color, 0.02)} 100%)`,
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                      '&:hover': {
-                        borderColor: alpha(stat.color, 0.2),
-                        transform: 'translateY(-4px)',
-                        boxShadow: `0 12px 24px ${alpha(stat.color, 0.1)}`,
-                      },
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        width: '40%',
-                        height: '100%',
-                        background: `radial-gradient(circle at top right, ${alpha(stat.color, 0.06)} 0%, transparent 60%)`,
-                      },
-                    }}
-                  >
-                    <Box sx={{ position: 'relative', zIndex: 1 }}>
-                      {/* Header with icon and trend */}
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                        <Box
-                          sx={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: '50%',
-                            background: `linear-gradient(135deg, ${stat.color}, ${theme.palette.grey[800]})`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: `0 4px 12px ${alpha(stat.color, 0.3)}`,
-                          }}
-                        >
-                          <Icon sx={{ color: 'white', fontSize: 16 }} />
-                        </Box>
+                        p: 2.5,
+                        borderRadius: 4,
+                        background: `linear-gradient(135deg, 
+                          ${alpha(theme.palette.background.paper, 0.6)} 0%, 
+                          ${alpha(theme.palette.background.default, 0.3)} 100%
+                        )`,
+                        backdropFilter: 'blur(10px)',
+                        border: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          transform: 'translateY(-4px)',
+                          background: `linear-gradient(135deg, 
+                            ${alpha(theme.palette.background.paper, 0.9)} 0%, 
+                            ${alpha(theme.palette.background.default, 0.6)} 100%
+                          )`,
+                          border: `1px solid ${alpha(stat.color, 0.2)}`,
+                          boxShadow: `
+                            0 12px 32px ${alpha(stat.color, 0.15)},
+                            inset 0 1px 0 ${alpha(theme.palette.common.white, 0.1)}
+                          `,
+                        },
+                        // Light refraction on stat card
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '40%',
+                          background: `linear-gradient(180deg, 
+                            ${alpha(theme.palette.common.white, 0.08)} 0%, 
+                            transparent 100%
+                          )`,
+                          pointerEvents: 'none',
+                        },
+                        // Stat color accent
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          width: '60%',
+                          height: '100%',
+                          background: `radial-gradient(circle at top right, 
+                            ${alpha(stat.color, 0.03)} 0%, 
+                            transparent 70%
+                          )`,
+                          pointerEvents: 'none',
+                        },
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, position: 'relative', zIndex: 1 }}>
+                        <LiquidGlassIcon
+                          icon={Icon}
+                          color={stat.color}
+                          gradient={`linear-gradient(135deg, ${stat.color}, ${alpha(stat.color, 0.8)})`}
+                          size={40}
+                          variant="secondary"
+                        />
+                        
                         <Chip
-                          label={stat.trend}
+                          label={`${isPositiveTrend ? '+' : ''}${stat.trend}%`}
                           size="small"
+                          icon={<TrendingUp sx={{ 
+                            transform: isPositiveTrend ? 'none' : 'scaleY(-1)',
+                            fontSize: '0.9rem !important',
+                          }} />}
                           sx={{
-                            backgroundColor: alpha(isPositiveTrend ? theme.palette.success.main : theme.palette.error.main, 0.1),
-                            color: isPositiveTrend ? theme.palette.success.main : theme.palette.error.main,
+                            backgroundColor: alpha(trendColor, 0.1),
+                            color: trendColor,
                             fontWeight: 600,
                             fontSize: '0.75rem',
-                            borderRadius: 1.5,
-                            height: 20,
+                            borderRadius: 2,
+                            backdropFilter: 'blur(10px)',
+                            border: `1px solid ${alpha(trendColor, 0.2)}`,
+                            height: 24,
                           }}
                         />
                       </Box>
 
-                      {/* Value and label */}
-                      <Typography 
-                        variant="h4" 
-                        sx={{ 
-                          fontWeight: 700,
-                          color: stat.color,
-                          mb: 0.5,
-                          fontSize: '1.8rem',
-                        }}
-                      >
-                        {stat.value}
-                      </Typography>
-                      
-                      <Typography 
-                        variant="body1" 
-                        sx={{ 
-                          color: theme.palette.text.primary,
-                          fontWeight: 600,
-                          mb: 2,
-                        }}
-                      >
-                        {stat.label}
-                      </Typography>
-
-                      {/* Progress bar */}
-                      <Box sx={{ mb: 1 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                            Прогресс
+                      <Box sx={{ position: 'relative', zIndex: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, mb: 1 }}>
+                          <Typography 
+                            variant="h4" 
+                            sx={{ 
+                              fontWeight: 700,
+                              color: stat.color,
+                              fontSize: '1.8rem',
+                              lineHeight: 1,
+                              background: `linear-gradient(135deg, ${stat.color}, ${alpha(stat.color, 0.8)})`,
+                              backgroundClip: 'text',
+                              textFillColor: 'transparent',
+                              WebkitBackgroundClip: 'text',
+                              WebkitTextFillColor: 'transparent',
+                            }}
+                          >
+                            {stat.value}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: stat.color, fontWeight: 700 }}>
-                            {percentage}%
-                          </Typography>
+                          {stat.total && (
+                            <Typography 
+                              variant="body1" 
+                              sx={{ 
+                                color: alpha(theme.palette.text.secondary, 0.7),
+                                fontWeight: 500,
+                              }}
+                            >
+                              /{stat.total}
+                            </Typography>
+                          )}
                         </Box>
-                        <LinearProgress
-                          variant="determinate"
-                          value={percentage}
-                          sx={{
-                            height: 6,
-                            borderRadius: 3,
-                            backgroundColor: alpha(stat.color, 0.1),
-                            '& .MuiLinearProgress-bar': {
-                              background: `linear-gradient(90deg, ${stat.color}, ${alpha(stat.color, 0.7)})`,
-                              borderRadius: 3,
-                              boxShadow: `0 2px 6px ${alpha(stat.color, 0.3)}`,
-                            },
-                          }}
-                        />
-                      </Box>
 
-                      {/* Total count */}
-                      <Typography 
-                        variant="caption" 
-                        color="text.secondary"
-                        sx={{ fontSize: '0.75rem' }}
-                      >
-                        из {stat.total} общего
-                      </Typography>
+                        <Typography 
+                          variant="subtitle2" 
+                          sx={{ 
+                            color: theme.palette.text.primary,
+                            fontWeight: 600,
+                            mb: 2,
+                          }}
+                        >
+                          {stat.title}
+                        </Typography>
+
+                        <Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
+                                color: alpha(theme.palette.text.secondary, 0.8),
+                                fontWeight: 500,
+                              }}
+                            >
+                              Прогресс
+                            </Typography>
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
+                                color: stat.color,
+                                fontWeight: 600,
+                              }}
+                            >
+                              {Math.round(progressValue)}%
+                            </Typography>
+                          </Box>
+                          
+                          <LinearProgress
+                            variant="determinate"
+                            value={progressValue}
+                            sx={{
+                              height: 6,
+                              borderRadius: 3,
+                              backgroundColor: alpha(stat.color, 0.1),
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 3,
+                                background: `linear-gradient(90deg, ${stat.color}, ${alpha(stat.color, 0.8)})`,
+                                boxShadow: `0 2px 8px ${alpha(stat.color, 0.3)}`,
+                              },
+                            }}
+                          />
+                        </Box>
+                      </Box>
                     </Box>
-                  </Box>
                   </Box>
                 </Fade>
               </Grid>
             );
           })}
         </Grid>
+
+        {/* Overall Project Health */}
+        <Box sx={{ mt: 3, p: 2, borderRadius: 3, background: alpha(theme.palette.info.main, 0.05), border: `1px solid ${alpha(theme.palette.info.main, 0.1)}` }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              color: theme.palette.info.main,
+              fontWeight: 600,
+              mb: 1,
+              textAlign: 'center',
+            }}
+          >
+            Общее состояние проекта: Хорошее
+          </Typography>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: alpha(theme.palette.text.secondary, 0.8),
+              textAlign: 'center',
+              display: 'block',
+            }}
+          >
+            Проект выполняется в соответствии с планом
+          </Typography>
+        </Box>
       </CardContent>
     </Card>
   );

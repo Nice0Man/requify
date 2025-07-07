@@ -114,6 +114,12 @@ export default defineConfig({
     global: "globalThis",
     "process.env": {},
   },
+  ssr: {
+    noExternal: [
+      "@mui/*",
+      "@emotion/*",
+    ]
+  },
   optimizeDeps: {
     include: ["react", "react-dom", "react-router-dom"],
   },
