@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import {
-  Box,
   Card,
   CardContent,
+  Typography,
   List,
   ListItem,
-  Typography,
-  IconButton,
+  Box,
   Button,
+  IconButton,
   Chip,
-  alpha,
   useTheme,
+  alpha,
   Fade,
 } from '@mui/material';
 import {
@@ -44,6 +44,8 @@ interface Notification {
 
 export const NotificationsWidget: React.FC = () => {
   const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: '1',
@@ -171,17 +173,38 @@ export const NotificationsWidget: React.FC = () => {
     <Card
       elevation={0}
       sx={{
-        borderRadius: 4,
-        background: `linear-gradient(135deg, 
-          ${alpha(theme.palette.background.paper, 0.8)} 0%, 
-          ${alpha(theme.palette.background.default, 0.4)} 100%
-        )`,
-        backdropFilter: 'blur(20px)',
-        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        borderRadius: 5,
+        // Authentic Liquid Glass background
+        background: `
+          linear-gradient(135deg, 
+            ${alpha(theme.palette.common.white, isDark ? 0.12 : 0.25)} 0%, 
+            ${alpha(theme.palette.common.white, isDark ? 0.04 : 0.12)} 50%,
+            ${alpha(theme.palette.common.white, isDark ? 0.08 : 0.18)} 100%
+          ),
+          linear-gradient(225deg, 
+            ${alpha(theme.palette.primary.main, 0.06)} 0%, 
+            transparent 60%
+          ),
+          ${alpha(theme.palette.background.paper, isDark ? 0.5 : 0.85)}
+        `,
+        // Advanced backdrop filter
+        backdropFilter: 'blur(40px) saturate(150%) contrast(120%)',
+        WebkitBackdropFilter: 'blur(40px) saturate(150%) contrast(120%)',
+        // Multi-layer border
+        border: `1px solid ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.25)}`,
         position: 'relative',
         overflow: 'hidden',
         height: '100%',
-        // Light refraction effect
+        // Enhanced shadow system
+        boxShadow: `
+          inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.3)},
+          inset 0 -1px 0 ${alpha(theme.palette.common.black, isDark ? 0.2 : 0.05)},
+          0 4px 24px ${alpha(theme.palette.common.black, isDark ? 0.3 : 0.08)},
+          0 1px 6px ${alpha(theme.palette.common.black, isDark ? 0.2 : 0.04)},
+          0 0 0 1px ${alpha(theme.palette.primary.main, 0.08)}
+        `,
+        
+        // Top light refraction
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -189,11 +212,16 @@ export const NotificationsWidget: React.FC = () => {
           left: 0,
           right: 0,
           height: '50%',
-          background: `linear-gradient(180deg, 
-            ${alpha(theme.palette.common.white, 0.05)} 0%, 
-            transparent 100%
-          )`,
+          background: `
+            linear-gradient(180deg, 
+              ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.2)} 0%, 
+              ${alpha(theme.palette.common.white, isDark ? 0.05 : 0.1)} 40%,
+              transparent 100%
+            )
+          `,
+          borderRadius: '20px 20px 0 0',
           pointerEvents: 'none',
+          mixBlendMode: 'overlay',
         },
       }}
     >
@@ -203,7 +231,6 @@ export const NotificationsWidget: React.FC = () => {
             <LiquidGlassIcon
               icon={Notifications}
               color={theme.palette.primary.main}
-              gradient={`linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`}
               size={32}
               variant="secondary"
             />
@@ -213,9 +240,9 @@ export const NotificationsWidget: React.FC = () => {
                 fontWeight: 700,
                 background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${alpha(theme.palette.text.primary, 0.8)})`,
                 backgroundClip: 'text',
-                textFillColor: 'transparent',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                textShadow: `0 1px 2px ${alpha(theme.palette.common.black, isDark ? 0.3 : 0.1)}`,
               }}
             >
               Уведомления
@@ -225,45 +252,73 @@ export const NotificationsWidget: React.FC = () => {
                 label={unreadCount}
                 size="small"
                 sx={{
-                  backgroundColor: theme.palette.error.main,
-                  color: 'white',
-                  fontWeight: 600,
-                  fontSize: '0.75rem',
-                  minWidth: 20,
-                  height: 20,
-                  '& .MuiChip-label': {
-                    px: 0.5,
-                  },
+                  // Liquid Glass chip
+                  background: `
+                    linear-gradient(135deg, 
+                      ${alpha(theme.palette.primary.main, isDark ? 0.2 : 0.25)} 0%, 
+                      ${alpha(theme.palette.primary.main, isDark ? 0.1 : 0.15)} 100%
+                    )
+                  `,
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  color: theme.palette.primary.main,
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.25)}`,
+                  fontWeight: 700,
+                  fontSize: '0.7rem',
+                  height: 22,
+                  minWidth: 22,
+                  borderRadius: 2.5,
+                  boxShadow: `
+                    inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.25)},
+                    0 2px 8px ${alpha(theme.palette.primary.main, 0.2)}
+                  `,
                 }}
               />
             )}
           </Box>
-          <ArrowForward 
-            sx={{ 
-              color: alpha(theme.palette.text.secondary, 0.6),
-              fontSize: '1.2rem',
-            }} 
-          />
         </Box>
 
         {unreadCount > 0 && (
           <Box sx={{ mb: 2 }}>
             <Button
-              size="small"
-              startIcon={<MarkEmailRead />}
+              variant="text"
               onClick={handleMarkAllAsRead}
+              startIcon={<MarkEmailRead />}
               sx={{
-                color: theme.palette.primary.main,
                 fontSize: '0.8rem',
                 fontWeight: 500,
+                color: alpha(theme.palette.text.secondary, 0.8),
                 textTransform: 'none',
-                backdropFilter: 'blur(10px)',
-                backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                borderRadius: 2,
+                // Liquid Glass button
+                background: `
+                  linear-gradient(135deg, 
+                    ${alpha(theme.palette.common.white, isDark ? 0.08 : 0.15)} 0%, 
+                    ${alpha(theme.palette.common.white, isDark ? 0.03 : 0.08)} 100%
+                  )
+                `,
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: `1px solid ${alpha(theme.palette.divider, isDark ? 0.15 : 0.2)}`,
+                borderRadius: 3,
                 px: 2,
-                py: 0.5,
+                py: 0.75,
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  background: `
+                    linear-gradient(135deg, 
+                      ${alpha(theme.palette.common.white, isDark ? 0.12 : 0.22)} 0%, 
+                      ${alpha(theme.palette.common.white, isDark ? 0.06 : 0.12)} 100%
+                    )
+                  `,
+                  backdropFilter: 'blur(30px)',
+                  WebkitBackdropFilter: 'blur(30px)',
+                  color: theme.palette.primary.main,
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                  transform: 'translateY(-1px)',
+                  boxShadow: `
+                    inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.25)},
+                    0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}
+                  `,
                 },
               }}
             >
@@ -286,22 +341,59 @@ export const NotificationsWidget: React.FC = () => {
                       p: 0,
                       mb: 2,
                       borderRadius: 4,
-                      border: `1px solid ${alpha(typeConfig.color, 0.1)}`,
+                      // Notification Liquid Glass effect
                       background: notification.read 
-                        ? alpha(theme.palette.grey[50], 0.3)
-                        : `linear-gradient(135deg, 
-                            ${alpha(typeConfig.color, 0.05)} 0%, 
-                            ${alpha(typeConfig.color, 0.02)} 100%
-                          )`,
-                      backdropFilter: 'blur(10px)',
-                      transition: 'all 0.3s ease',
+                        ? `
+                          linear-gradient(135deg, 
+                            ${alpha(theme.palette.common.white, isDark ? 0.05 : 0.12)} 0%, 
+                            ${alpha(theme.palette.common.white, isDark ? 0.02 : 0.06)} 100%
+                          ),
+                          ${alpha(theme.palette.background.paper, isDark ? 0.3 : 0.6)}
+                        `
+                        : `
+                          linear-gradient(135deg, 
+                            ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.18)} 0%, 
+                            ${alpha(theme.palette.common.white, isDark ? 0.04 : 0.1)} 50%,
+                            ${alpha(theme.palette.common.white, isDark ? 0.06 : 0.14)} 100%
+                          ),
+                          linear-gradient(225deg, 
+                            ${alpha(typeConfig.color, 0.06)} 0%, 
+                            transparent 60%
+                          ),
+                          ${alpha(theme.palette.background.paper, isDark ? 0.4 : 0.7)}
+                        `,
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: `1px solid ${alpha(typeConfig.color, notification.read ? 0.05 : 0.12)}`,
+                      transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
                       position: 'relative',
                       overflow: 'hidden',
                       cursor: 'pointer',
+                      boxShadow: `
+                        inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.2)},
+                        0 2px 8px ${alpha(theme.palette.common.black, isDark ? 0.2 : 0.05)}
+                      `,
                       '&:hover': {
                         borderColor: alpha(typeConfig.color, 0.2),
                         transform: 'translateX(4px)',
-                        boxShadow: `0 8px 24px ${alpha(typeConfig.color, 0.15)}`,
+                        background: `
+                          linear-gradient(135deg, 
+                            ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.25)} 0%, 
+                            ${alpha(theme.palette.common.white, isDark ? 0.08 : 0.15)} 50%,
+                            ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.2)} 100%
+                          ),
+                          linear-gradient(225deg, 
+                            ${alpha(typeConfig.color, 0.1)} 0%, 
+                            transparent 60%
+                          ),
+                          ${alpha(theme.palette.background.paper, isDark ? 0.5 : 0.8)}
+                        `,
+                        backdropFilter: 'blur(30px)',
+                        WebkitBackdropFilter: 'blur(30px)',
+                        boxShadow: `
+                          inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.3)},
+                          0 8px 24px ${alpha(typeConfig.color, 0.15)}
+                        `,
                       },
                       // Light refraction on notification
                       '&::before': {
@@ -312,10 +404,12 @@ export const NotificationsWidget: React.FC = () => {
                         right: 0,
                         height: '50%',
                         background: `linear-gradient(180deg, 
-                          ${alpha(theme.palette.common.white, 0.08)} 0%, 
+                          ${alpha(theme.palette.common.white, isDark ? 0.06 : 0.12)} 0%, 
                           transparent 100%
                         )`,
                         pointerEvents: 'none',
+                        borderRadius: '16px 16px 0 0',
+                        mixBlendMode: 'overlay',
                       },
                     }}
                     onClick={() => !notification.read && handleMarkAsRead(notification.id)}
@@ -334,7 +428,6 @@ export const NotificationsWidget: React.FC = () => {
                       <LiquidGlassIcon
                         icon={Icon}
                         color={typeConfig.color}
-                        gradient={`linear-gradient(135deg, ${typeConfig.color}, ${alpha(typeConfig.color, 0.8)})`}
                         size={32}
                         variant="subtle"
                       />
@@ -348,6 +441,7 @@ export const NotificationsWidget: React.FC = () => {
                               color: theme.palette.text.primary,
                               fontSize: '0.9rem',
                               lineHeight: 1.3,
+                              textShadow: `0 1px 1px ${alpha(theme.palette.common.black, isDark ? 0.2 : 0.05)}`,
                             }}
                           >
                             {notification.title}
@@ -358,13 +452,25 @@ export const NotificationsWidget: React.FC = () => {
                               size="small"
                               icon={<Flag sx={{ fontSize: '0.8rem !important' }} />}
                               sx={{
-                                backgroundColor: priorityConfig.background,
+                                // Liquid Glass priority chip
+                                background: `
+                                  linear-gradient(135deg, 
+                                    ${alpha(priorityConfig.color, isDark ? 0.15 : 0.2)} 0%, 
+                                    ${alpha(priorityConfig.color, isDark ? 0.08 : 0.12)} 100%
+                                  )
+                                `,
+                                backdropFilter: 'blur(15px)',
+                                WebkitBackdropFilter: 'blur(15px)',
                                 color: priorityConfig.color,
                                 fontWeight: 600,
                                 fontSize: '0.7rem',
                                 height: 20,
                                 borderRadius: 2,
                                 border: `1px solid ${alpha(priorityConfig.color, 0.2)}`,
+                                boxShadow: `
+                                  inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.15)},
+                                  0 1px 4px ${alpha(priorityConfig.color, 0.15)}
+                                `,
                               }}
                             />
                             <IconButton
@@ -377,9 +483,31 @@ export const NotificationsWidget: React.FC = () => {
                                 width: 20,
                                 height: 20,
                                 color: alpha(theme.palette.text.secondary, 0.6),
+                                // Liquid Glass close button
+                                background: `
+                                  linear-gradient(135deg, 
+                                    ${alpha(theme.palette.common.white, isDark ? 0.08 : 0.15)} 0%, 
+                                    ${alpha(theme.palette.common.white, isDark ? 0.03 : 0.08)} 100%
+                                  )
+                                `,
+                                backdropFilter: 'blur(10px)',
+                                WebkitBackdropFilter: 'blur(10px)',
+                                border: `1px solid ${alpha(theme.palette.divider, isDark ? 0.1 : 0.15)}`,
+                                borderRadius: 1.5,
+                                transition: 'all 0.2s ease',
                                 '&:hover': {
-                                  backgroundColor: alpha(theme.palette.error.main, 0.1),
+                                  background: `
+                                    linear-gradient(135deg, 
+                                      ${alpha(theme.palette.error.main, 0.12)} 0%, 
+                                      ${alpha(theme.palette.error.main, 0.08)} 100%
+                                    )
+                                  `,
+                                  backdropFilter: 'blur(15px)',
+                                  WebkitBackdropFilter: 'blur(15px)',
                                   color: theme.palette.error.main,
+                                  border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+                                  transform: 'scale(1.1)',
+                                  boxShadow: `0 2px 8px ${alpha(theme.palette.error.main, 0.2)}`,
                                 },
                               }}
                             >
@@ -400,6 +528,7 @@ export const NotificationsWidget: React.FC = () => {
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
+                            textShadow: `0 1px 1px ${alpha(theme.palette.common.black, isDark ? 0.15 : 0.03)}`,
                           }}
                         >
                           {notification.message}
@@ -410,6 +539,7 @@ export const NotificationsWidget: React.FC = () => {
                           sx={{
                             color: alpha(theme.palette.text.secondary, 0.6),
                             fontSize: '0.75rem',
+                            textShadow: `0 1px 1px ${alpha(theme.palette.common.black, isDark ? 0.1 : 0.02)}`,
                           }}
                         >
                           {formatDistanceToNow(notification.timestamp, { 
@@ -446,13 +576,36 @@ export const NotificationsWidget: React.FC = () => {
               fontSize: '0.9rem',
               fontWeight: 500,
               textTransform: 'none',
-              backdropFilter: 'blur(10px)',
+              // Liquid Glass footer button
+              background: `
+                linear-gradient(135deg, 
+                  ${alpha(theme.palette.common.white, isDark ? 0.08 : 0.15)} 0%, 
+                  ${alpha(theme.palette.common.white, isDark ? 0.03 : 0.08)} 100%
+                )
+              `,
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: `1px solid ${alpha(theme.palette.divider, isDark ? 0.1 : 0.15)}`,
               borderRadius: 3,
               px: 2,
               py: 1,
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
               '&:hover': {
-                backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                background: `
+                  linear-gradient(135deg, 
+                    ${alpha(theme.palette.primary.main, 0.08)} 0%, 
+                    ${alpha(theme.palette.primary.main, 0.04)} 100%
+                  )
+                `,
+                backdropFilter: 'blur(30px)',
+                WebkitBackdropFilter: 'blur(30px)',
                 color: theme.palette.primary.main,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
+                transform: 'translateY(-1px)',
+                boxShadow: `
+                  inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.2)},
+                  0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}
+                `,
               },
             }}
             endIcon={<ArrowForward sx={{ fontSize: '1rem' }} />}

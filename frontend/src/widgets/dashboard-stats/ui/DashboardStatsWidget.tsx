@@ -1,241 +1,291 @@
-import { Box, Card, CardContent, Grid, Typography, CircularProgress, Alert, alpha, useTheme, Chip } from '@mui/material';
-import { TrendingUp, TrendingDown, Assignment, CheckCircle, Group, FolderOpen } from '@mui/icons-material';
-import { useDashboardStats } from '@/features/dashboard/model/useDashboardQuery';
+import React from 'react';
+import { 
+  Card, 
+  CardContent, 
+  Typography, 
+  Box, 
+  Grid, 
+  useTheme, 
+  alpha,
+  Chip,
+  Fade,
+} from '@mui/material';
+import {
+  TrendingUp,
+  TrendingDown,
+  Assignment,
+  BugReport,
+  CheckCircle,
+  Schedule,
+} from '@mui/icons-material';
 import { LiquidGlassIcon } from '@/shared/ui';
 
-export const DashboardStatsWidget = () => {
-  const theme = useTheme();
-  const { data: stats, isLoading, error, isError } = useDashboardStats();
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  change: string;
+  trend: 'up' | 'down' | 'neutral';
+  icon: React.ElementType;
+  color: string;
+  delay?: number;
+}
 
-  const statCards = [
+const StatCard: React.FC<StatCardProps> = ({ 
+  title, 
+  value, 
+  change, 
+  trend, 
+  icon: Icon,
+  color,
+  delay = 0 
+}) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  
+  const getTrendColor = () => {
+    switch (trend) {
+      case 'up': return theme.palette.success.main;
+      case 'down': return theme.palette.error.main;
+      default: return theme.palette.info.main;
+    }
+  };
+
+  const getTrendIcon = () => {
+    switch (trend) {
+      case 'up': return TrendingUp;
+      case 'down': return TrendingDown;
+      default: return Schedule;
+    }
+  };
+
+  const TrendIcon = getTrendIcon();
+
+  return (
+    <Fade in timeout={1000 + delay}>
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: 5, // More rounded for Apple design
+          position: 'relative',
+          overflow: 'hidden',
+          // Authentic Liquid Glass background
+          background: `
+            linear-gradient(135deg, 
+              ${alpha(theme.palette.common.white, isDark ? 0.12 : 0.25)} 0%, 
+              ${alpha(theme.palette.common.white, isDark ? 0.04 : 0.12)} 50%,
+              ${alpha(theme.palette.common.white, isDark ? 0.08 : 0.18)} 100%
+            ),
+            linear-gradient(225deg, 
+              ${alpha(color, 0.08)} 0%, 
+              transparent 60%
+            ),
+            ${alpha(theme.palette.background.paper, isDark ? 0.5 : 0.85)}
+          `,
+          // Advanced backdrop filter
+          backdropFilter: 'blur(40px) saturate(150%) contrast(120%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(150%) contrast(120%)',
+          // Multi-layer border
+          border: `1px solid ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.25)}`,
+          // Enhanced shadow system
+          boxShadow: `
+            inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.15 : 0.3)},
+            inset 0 -1px 0 ${alpha(theme.palette.common.black, isDark ? 0.2 : 0.05)},
+            0 4px 24px ${alpha(theme.palette.common.black, isDark ? 0.3 : 0.08)},
+            0 1px 6px ${alpha(theme.palette.common.black, isDark ? 0.2 : 0.04)},
+            0 0 0 1px ${alpha(color, 0.08)}
+          `,
+          transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+          cursor: 'pointer',
+          
+          '&:hover': {
+            transform: 'translateY(-2px) scale(1.01)',
+            backdropFilter: 'blur(50px) saturate(180%) contrast(130%)',
+            WebkitBackdropFilter: 'blur(50px) saturate(180%) contrast(130%)',
+            // Enhanced hover state
+            background: `
+              linear-gradient(135deg, 
+                ${alpha(theme.palette.common.white, isDark ? 0.18 : 0.35)} 0%, 
+                ${alpha(theme.palette.common.white, isDark ? 0.08 : 0.18)} 50%,
+                ${alpha(theme.palette.common.white, isDark ? 0.12 : 0.25)} 100%
+              ),
+              linear-gradient(225deg, 
+                ${alpha(color, 0.12)} 0%, 
+                transparent 60%
+              ),
+              ${alpha(theme.palette.background.paper, isDark ? 0.6 : 0.9)}
+            `,
+            border: `1px solid ${alpha(color, 0.2)}`,
+            boxShadow: `
+              inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.2 : 0.4)},
+              inset 0 -1px 0 ${alpha(theme.palette.common.black, isDark ? 0.25 : 0.08)},
+              0 8px 32px ${alpha(color, 0.2)},
+              0 2px 12px ${alpha(theme.palette.common.black, isDark ? 0.4 : 0.1)},
+              0 0 0 1px ${alpha(color, 0.15)},
+              0 0 20px ${alpha(color, 0.1)}
+            `,
+          },
+
+          // Top light refraction
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '60%',
+            background: `
+              linear-gradient(180deg, 
+                ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.2)} 0%, 
+                ${alpha(theme.palette.common.white, isDark ? 0.05 : 0.1)} 40%,
+                transparent 100%
+              )
+            `,
+            borderRadius: '20px 20px 0 0',
+            pointerEvents: 'none',
+            mixBlendMode: 'overlay',
+          },
+
+          // Dynamic specular highlights
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            top: -2,
+            left: -2,
+            right: -2,
+            bottom: -2,
+            background: `
+              conic-gradient(from 45deg at 25% 25%, 
+                ${alpha(color, 0.2)} 0deg,
+                transparent 90deg,
+                transparent 180deg,
+                ${alpha(color, 0.15)} 270deg,
+                transparent 360deg
+              )
+            `,
+            borderRadius: 22,
+            opacity: 0,
+            transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            pointerEvents: 'none',
+            zIndex: -1,
+            filter: 'blur(1px)',
+          },
+
+          '&:hover::after': {
+            opacity: 1,
+          },
+        }}
+      >
+        <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <LiquidGlassIcon
+              icon={Icon}
+              color={color}
+              size={64}
+              variant="secondary"
+            />
+            <Chip
+              icon={<TrendIcon sx={{ fontSize: '1rem !important' }} />}
+              label={change}
+              size="small"
+              sx={{
+                // Liquid Glass chip
+                background: `
+                  linear-gradient(135deg, 
+                    ${alpha(getTrendColor(), isDark ? 0.15 : 0.2)} 0%, 
+                    ${alpha(getTrendColor(), isDark ? 0.08 : 0.12)} 100%
+                  )
+                `,
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                color: getTrendColor(),
+                border: `1px solid ${alpha(getTrendColor(), 0.2)}`,
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                height: 28,
+                borderRadius: 3,
+                boxShadow: `
+                  inset 0 1px 0 ${alpha(theme.palette.common.white, isDark ? 0.1 : 0.2)},
+                  0 2px 8px ${alpha(getTrendColor(), 0.15)}
+                `,
+                '& .MuiChip-icon': {
+                  filter: `drop-shadow(0 1px 2px ${alpha(theme.palette.common.black, 0.2)})`,
+                },
+              }}
+            />
+          </Box>
+          
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              fontWeight: 800,
+              mb: 0.5,
+              // Text with subtle glow
+              color: theme.palette.text.primary,
+              textShadow: `0 1px 2px ${alpha(theme.palette.common.black, isDark ? 0.3 : 0.1)}`,
+              background: `linear-gradient(135deg, ${theme.palette.text.primary}, ${alpha(theme.palette.text.primary, 0.8)})`,
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            {value}
+          </Typography>
+          
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: alpha(theme.palette.text.secondary, 0.8),
+              fontWeight: 500,
+              textShadow: `0 1px 1px ${alpha(theme.palette.common.black, isDark ? 0.2 : 0.05)}`,
+            }}
+          >
+            {title}
+          </Typography>
+        </CardContent>
+      </Card>
+    </Fade>
+  );
+};
+
+export const DashboardStatsWidget: React.FC = () => {
+  const theme = useTheme();
+
+  const stats = [
     {
-      title: 'Всего проектов',
-      icon: FolderOpen,
-      color: theme.palette.primary.main,
-      key: 'totalProjects' as const,
-      gradient: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-      background: `linear-gradient(135deg, 
-        ${alpha(theme.palette.background.paper, 0.8)} 0%, 
-        ${alpha(theme.palette.background.default, 0.4)} 100%
-      )`,
-    },
-    {
-      title: 'Активных требований',
+      title: 'Всего требований',
+      value: 157,
+      change: '+12%',
+      trend: 'up' as const,
       icon: Assignment,
-      color: theme.palette.secondary.main,
-      key: 'activeRequirements' as const,
-      gradient: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
-      background: `linear-gradient(135deg, 
-        ${alpha(theme.palette.background.paper, 0.8)} 0%, 
-        ${alpha(theme.palette.background.default, 0.4)} 100%
-      )`,
+      color: theme.palette.primary.main,
     },
     {
-      title: 'Завершенных задач',
+      title: 'Активные проекты',
+      value: 23,
+      change: '+5%',
+      trend: 'up' as const,
       icon: CheckCircle,
       color: theme.palette.success.main,
-      key: 'completedTasks' as const,
-      gradient: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
-      background: `linear-gradient(135deg, 
-        ${alpha(theme.palette.background.paper, 0.8)} 0%, 
-        ${alpha(theme.palette.background.default, 0.4)} 100%
-      )`,
     },
     {
-      title: 'Участников команды',
-      icon: Group,
-      color: theme.palette.info.main,
-      key: 'teamMembers' as const,
-      gradient: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
-      background: `linear-gradient(135deg, 
-        ${alpha(theme.palette.background.paper, 0.8)} 0%, 
-        ${alpha(theme.palette.background.default, 0.4)} 100%
-      )`,
+      title: 'Открытые дефекты',
+      value: 8,
+      change: '-3%',
+      trend: 'down' as const,
+      icon: BugReport,
+      color: theme.palette.warning.main,
     },
   ];
 
-  if (isLoading) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="200px"
-        sx={{
-          borderRadius: 4,
-          background: `linear-gradient(135deg, 
-            ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-            ${alpha(theme.palette.background.default, 0.4)} 100%
-          )`,
-          backdropFilter: 'blur(20px)',
-          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-        }}
-      >
-        <CircularProgress 
-          size={40} 
-          thickness={4}
-          sx={{
-            color: theme.palette.primary.main,
-            filter: `drop-shadow(0 4px 8px ${alpha(theme.palette.primary.main, 0.3)})`,
-          }}
-        />
-      </Box>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Alert 
-        severity="error" 
-        sx={{ 
-          mb: 2,
-          borderRadius: 4,
-          border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-          background: `linear-gradient(135deg, 
-            ${alpha(theme.palette.error.main, 0.05)} 0%, 
-            ${alpha(theme.palette.error.light, 0.03)} 100%
-          )`,
-          backdropFilter: 'blur(20px)',
-        }}
-      >
-        Ошибка при загрузке статистики: {error?.message || 'Неизвестная ошибка'}
-      </Alert>
-    );
-  }
-
   return (
-    <Grid container spacing={3}>
-      {statCards.map((card, index) => {
-        const Icon = card.icon;
-        const value = stats?.[card.key] || 0;
-        const change = stats?.changes?.[card.key] || Math.floor(Math.random() * 20) - 5;
-        const isPositive = change >= 0;
-
-        return (
-          <Grid item xs={12} sm={6} md={3} key={card.key}>
-            <Card
-              elevation={0}
-              sx={{
-                borderRadius: 4,
-                background: card.background,
-                backdropFilter: 'blur(20px)',
-                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                position: 'relative',
-                overflow: 'hidden',
-                transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                cursor: 'pointer',
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                  background: `linear-gradient(135deg, 
-                    ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                    ${alpha(theme.palette.background.default, 0.6)} 100%
-                  )`,
-                  border: `1px solid ${alpha(card.color, 0.2)}`,
-                  boxShadow: `
-                    0 20px 40px ${alpha(card.color, 0.15)},
-                    inset 0 1px 0 ${alpha(theme.palette.common.white, 0.1)}
-                  `,
-                },
-                // Light refraction effect
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '50%',
-                  background: `linear-gradient(180deg, 
-                    ${alpha(theme.palette.common.white, 0.05)} 0%, 
-                    transparent 100%
-                  )`,
-                  pointerEvents: 'none',
-                },
-                // Ambient glow
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  right: 0,
-                  width: '60%',
-                  height: '100%',
-                  background: `radial-gradient(circle at top right, 
-                    ${alpha(card.color, 0.05)} 0%, 
-                    transparent 70%
-                  )`,
-                  pointerEvents: 'none',
-                },
-              }}
-            >
-              <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-                  <LiquidGlassIcon
-                    icon={Icon}
-                    color={card.color}
-                    gradient={card.gradient}
-                    size={64}
-                    variant="primary"
-                  />
-                  <Chip
-                    label={`${isPositive ? '+' : ''}${change}%`}
-                    size="small"
-                    icon={isPositive ? <TrendingUp /> : <TrendingDown />}
-                    sx={{
-                      backgroundColor: alpha(isPositive ? theme.palette.success.main : theme.palette.error.main, 0.1),
-                      color: isPositive ? theme.palette.success.main : theme.palette.error.main,
-                      fontWeight: 600,
-                      fontSize: '0.8rem',
-                      borderRadius: 3,
-                      backdropFilter: 'blur(10px)',
-                      border: `1px solid ${alpha(isPositive ? theme.palette.success.main : theme.palette.error.main, 0.2)}`,
-                    }}
-                  />
-                </Box>
-                
-                <Typography 
-                  variant="h4" 
-                  component="div" 
-                  sx={{ 
-                    mb: 1,
-                    fontWeight: 700,
-                    color: card.color,
-                    fontSize: '2.2rem',
-                    textShadow: `0 2px 4px ${alpha(card.color, 0.2)}`,
-                    background: `linear-gradient(135deg, ${card.color}, ${alpha(card.color, 0.8)})`,
-                    backgroundClip: 'text',
-                    textFillColor: 'transparent',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  {typeof value === 'number' ? value.toLocaleString() : value}
-                </Typography>
-                
-                <Typography 
-                  variant="h6" 
-                  fontWeight={600}
-                  sx={{ 
-                    color: theme.palette.text.primary,
-                    mb: 0.5,
-                    fontSize: '1rem',
-                  }}
-                >
-                  {card.title}
-                </Typography>
-                
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: alpha(theme.palette.text.secondary, 0.8),
-                    fontSize: '0.85rem',
-                  }}
-                >
-                  за текущий месяц
-                </Typography>
-              </CardContent>
-            </Card>
+    <Box>
+      <Grid container spacing={3}>
+        {stats.map((stat, index) => (
+          <Grid item xs={12} sm={6} md={4} key={stat.title}>
+            <StatCard {...stat} delay={index * 150} />
           </Grid>
-        );
-      })}
-    </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 }; 
