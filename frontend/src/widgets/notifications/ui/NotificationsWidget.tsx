@@ -236,34 +236,35 @@ export const NotificationsWidget: React.FC = () => {
               
               return (
                 <Fade in timeout={800 + index * 200} key={notification.id}>
-                  <ListItem
-                    sx={{
-                      p: 0,
-                      mb: 2,
-                      borderRadius: 3,
-                      border: `1px solid ${alpha(typeConfig.color, 0.1)}`,
-                      background: notification.read 
-                        ? alpha(theme.palette.grey[50], 0.3)
-                        : `linear-gradient(135deg, ${alpha(typeConfig.color, 0.05)} 0%, ${alpha(typeConfig.color, 0.02)} 100%)`,
-                      transition: 'all 0.3s ease',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      '&:hover': {
-                        borderColor: alpha(typeConfig.color, 0.2),
-                        transform: 'translateX(4px)',
-                        boxShadow: `0 8px 16px ${alpha(typeConfig.color, 0.1)}`,
-                      },
-                      '&::before': notification.read ? {} : {
-                        content: '""',
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        width: 4,
-                        height: '100%',
-                        background: typeConfig.color,
-                      },
-                    }}
-                  >
+                  <Box>
+                    <ListItem
+                      sx={{
+                        p: 0,
+                        mb: 2,
+                        borderRadius: 3,
+                        border: `1px solid ${alpha(typeConfig.color, 0.1)}`,
+                        background: notification.read 
+                          ? alpha(theme.palette.grey[50], 0.3)
+                          : `linear-gradient(135deg, ${alpha(typeConfig.color, 0.05)} 0%, ${alpha(typeConfig.color, 0.02)} 100%)`,
+                        transition: 'all 0.3s ease',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        '&:hover': {
+                          borderColor: alpha(typeConfig.color, 0.2),
+                          transform: 'translateX(4px)',
+                          boxShadow: `0 8px 16px ${alpha(typeConfig.color, 0.1)}`,
+                        },
+                        '&::before': notification.read ? {} : {
+                          content: '""',
+                          position: 'absolute',
+                          left: 0,
+                          top: 0,
+                          width: 4,
+                          height: '100%',
+                          background: typeConfig.color,
+                        },
+                      }}
+                    >
                     <Box sx={{ p: 2, width: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                         <Avatar
@@ -364,6 +365,7 @@ export const NotificationsWidget: React.FC = () => {
                       </Box>
                     </Box>
                   </ListItem>
+                </Box>
                 </Fade>
               );
             })}
