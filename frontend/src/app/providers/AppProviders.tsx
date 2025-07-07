@@ -1,69 +1,41 @@
-import React from "react";
-import { BrowserRouter } from "react-router-dom";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import { ToastContainer } from "react-toastify";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import "react-toastify/dist/ReactToastify.css";
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { store } from '../store';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
+import { theme } from '@/app/styles/theme';
+import { ErrorBoundary } from '@/shared/ui';
 
-import { AuthProvider } from "@/features/auth/model/auth.context";
-import { theme } from "@/app/styles/theme";
-import { ErrorBoundary, ApiStatusIndicator } from "@/shared/ui";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+    },
+  },
+});
 
 interface AppProvidersProps {
   children: React.ReactNode;
 }
 
-// Создаем QueryClient с оптимальными настройками
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 2,
-      staleTime: 1000 * 60 * 5, // 5 минут
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: 1,
-    },
-  },
-});
-
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <AuthProvider>
-            <BrowserRouter
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true,
-              }}
-            >
-              <ApiStatusIndicator />
+      <Provider store={store}>
+        <BrowserRouter>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
               {children}
-            </BrowserRouter>
-          </AuthProvider>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-        </ThemeProvider>
-        {/* DevTools только в development режиме */}
-        {process.env.NODE_ENV === "development" && (
-          <ReactQueryDevtools initialIsOpen={false} />
-        )}
-      </QueryClientProvider>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </BrowserRouter>
+      </Provider>
     </ErrorBoundary>
   );
-};
+}; 

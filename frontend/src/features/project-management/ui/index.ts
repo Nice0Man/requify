@@ -1,4 +1,6 @@
-// Project management UI exports
-export { ProjectManagementDashboard } from './ProjectManagementDashboard';
-export { ProjectForm } from './ProjectForm';
-export { ProjectList, ProjectDetails, ProjectSettings } from './ProjectList'; 
+// Project Management UI components exports
+export * from "./ProjectCreateForm";
+export * from "./ProjectEditForm";
+export * from "./ProjectDeleteDialog";
+// export * from './ProjectFilterPanel'; // TODO: Создать при необходимости
+// export * from './ProjectSearchBar'; // TODO: Создать при необходимости

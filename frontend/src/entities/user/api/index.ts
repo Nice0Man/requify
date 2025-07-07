@@ -1,2 +1,3 @@
-// Export user API
-export { UsersApi, usersApi } from './users.api'; 
+// User API exports
+export * from './userApi';
+export * from './mappers'; 

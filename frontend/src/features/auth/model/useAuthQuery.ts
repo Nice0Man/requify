@@ -1,0 +1,117 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { authApi } from "../api/authApi";
+
+// Query Keys
+export const authQueryKeys = {
+  currentUser: ["auth", "currentUser"] as const,
+  profile: ["auth", "profile"] as const,
+};
+
+// Queries
+export const useCurrentUser = () => {
+  return useQuery({
+    queryKey: authQueryKeys.currentUser,
+    queryFn: authApi.getMe,
+    retry: false,
+    staleTime: 30 * 60 * 1000, // 30 минут
+    gcTime: 60 * 60 * 1000, // 1 час
+  });
+};
+
+// Mutations
+export const useLoginMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.login,
+    onSuccess: (data) => {
+      // Сохраняем токен в localStorage
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
+      // Обновляем кэш пользователя
+      queryClient.setQueryData(authQueryKeys.currentUser, data.user);
+
+      // Инвалидируем связанные запросы
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
+    },
+  });
+};
+
+export const useRegisterMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.register,
+    onSuccess: (data) => {
+      // Сохраняем токен в localStorage
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
+      // Обновляем кэш пользователя
+      queryClient.setQueryData(authQueryKeys.currentUser, data.user);
+
+      // Инвалидируем связанные запросы
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    },
+    onError: (error) => {
+      console.error("Register error:", error);
+    },
+  });
+};
+
+export const useLogoutMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.logout,
+    onSuccess: () => {
+      // Удаляем токены из localStorage
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+
+      // Очищаем кэш
+      queryClient.clear();
+
+      // Перенаправляем на страницу авторизации
+      window.location.href = "/auth";
+    },
+    onError: (error) => {
+      console.error("Logout error:", error);
+      // Даже при ошибке очищаем локальные данные
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+      queryClient.clear();
+    },
+  });
+};
+
+export const useForgotPasswordMutation = () => {
+  return useMutation({
+    mutationFn: authApi.forgotPassword,
+    onSuccess: () => {
+      // Показываем уведомление об успешной отправке
+      console.log("Password reset email sent");
+    },
+    onError: (error) => {
+      console.error("Forgot password error:", error);
+    },
+  });
+};
+
+export const useResetPasswordMutation = () => {
+  return useMutation({
+    mutationFn: ({ token, password }: { token: string; password: string }) =>
+      authApi.resetPassword(token, password),
+    onSuccess: () => {
+      // Показываем уведомление об успешном сбросе пароля
+      console.log("Password reset successfully");
+    },
+    onError: (error) => {
+      console.error("Reset password error:", error);
+    },
+  });
+};

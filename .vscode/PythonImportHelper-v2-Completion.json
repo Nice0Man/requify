@@ -32,7 +32,7 @@
         "documentation": {}
     },
     {
-        "label": "Dict",
+        "label": "Sequence",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -40,71 +40,7 @@
         "documentation": {}
     },
     {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Any",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "List",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Optional",
+        "label": "Union",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -120,7 +56,7 @@
         "documentation": {}
     },
     {
-        "label": "Any",
+        "label": "List",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -128,7 +64,7 @@
         "documentation": {}
     },
     {
-        "label": "List",
+        "label": "Any",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -144,14 +80,6 @@
         "documentation": {}
     },
     {
-        "label": "Dict",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
         "label": "Any",
         "importPath": "typing",
         "description": "typing",
@@ -160,7 +88,7 @@
         "documentation": {}
     },
     {
-        "label": "List",
+        "label": "Optional",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -232,6 +160,30 @@
         "documentation": {}
     },
     {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "List",
         "importPath": "typing",
         "description": "typing",
@@ -241,6 +193,94 @@
     },
     {
         "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -784,6 +824,38 @@
         "documentation": {}
     },
     {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "AsyncGenerator",
         "importPath": "typing",
         "description": "typing",
@@ -1072,6 +1144,46 @@
         "documentation": {}
     },
     {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "TYPE_CHECKING",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Optional",
         "importPath": "typing",
         "description": "typing",
@@ -1313,6 +1425,30 @@
     },
     {
         "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Union",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -1613,6 +1749,14 @@
         "description": "typing",
         "isExtraImport": true,
         "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "op",
+        "importPath": "alembic",
+        "description": "alembic",
+        "isExtraImport": true,
+        "detail": "alembic",
         "documentation": {}
     },
     {
@@ -2114,6 +2258,54 @@
     },
     {
         "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "or_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "desc",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "asc",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -2785,6 +2977,102 @@
         "documentation": {}
     },
     {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Index",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Boolean",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "String",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Index",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ForeignKey",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Integer",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "Boolean",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "DateTime",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "DateTime",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -2963,6 +3251,22 @@
     },
     {
         "label": "async_engine_from_config",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
         "importPath": "sqlalchemy.ext.asyncio",
         "description": "sqlalchemy.ext.asyncio",
         "isExtraImport": true,
@@ -4190,71 +4494,7 @@
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
         "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4295,6 +4535,110 @@
     },
     {
         "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4799,6 +5143,46 @@
     },
     {
         "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Query",
         "importPath": "fastapi",
         "description": "fastapi",
         "isExtraImport": true,
@@ -5550,6 +5934,22 @@
         "documentation": {}
     },
     {
+        "label": "get_current_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
         "label": "get_testing_read_user",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
@@ -5627,6 +6027,22 @@
         "description": "app.api.deps",
         "isExtraImport": true,
         "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "app.models.user",
+        "description": "app.models.user",
+        "isExtraImport": true,
+        "detail": "app.models.user",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "app.models.user",
+        "description": "app.models.user",
+        "isExtraImport": true,
+        "detail": "app.models.user",
         "documentation": {}
     },
     {
@@ -6359,6 +6775,22 @@
     },
     {
         "label": "widget",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "team",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "team_member",
         "importPath": "app.crud",
         "description": "app.crud",
         "isExtraImport": true,
@@ -7126,6 +7558,374 @@
         "documentation": {}
     },
     {
+        "label": "TeamRole",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStatus",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStatus",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamRole",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectStatus",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementStatus",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "Priority",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationType",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "Theme",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "DashboardLayout",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStatus",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamRole",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamDetailResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamListResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamSearchRequest",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBulkCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBulkUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBulkDelete",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBulkAdd",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBulkRemove",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBulkUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamPermissionCheck",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamPermissionResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamSearchRequest",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "NotFoundError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "PermissionDeniedError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "BusinessLogicError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ExternalSystemError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ExternalServiceError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "NotificationError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ReportGenerationError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
         "label": "TestResultCreate",
         "importPath": "app.schemas.test_result",
         "description": "app.schemas.test_result",
@@ -7678,6 +8478,38 @@
         "documentation": {}
     },
     {
+        "label": "field_validator",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "ConfigDict",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
         "label": "BaseModel",
         "importPath": "pydantic",
         "description": "pydantic",
@@ -8051,6 +8883,22 @@
     },
     {
         "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "selectinload",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "joinedload",
         "importPath": "sqlalchemy.orm",
         "description": "sqlalchemy.orm",
         "isExtraImport": true,
@@ -8503,6 +9351,62 @@
         "description": "sqlalchemy.orm",
         "isExtraImport": true,
         "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "Mapped",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "mapped_column",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "relationship",
+        "importPath": "sqlalchemy.orm",
+        "description": "sqlalchemy.orm",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.orm",
+        "documentation": {}
+    },
+    {
+        "label": "CRUDBase",
+        "importPath": "app.crud.base",
+        "description": "app.crud.base",
+        "isExtraImport": true,
+        "detail": "app.crud.base",
         "documentation": {}
     },
     {
@@ -9323,6 +10227,22 @@
         "documentation": {}
     },
     {
+        "label": "Team",
+        "importPath": "app.models.team",
+        "description": "app.models.team",
+        "isExtraImport": true,
+        "detail": "app.models.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMember",
+        "importPath": "app.models.team_member",
+        "description": "app.models.team_member",
+        "isExtraImport": true,
+        "detail": "app.models.team_member",
+        "documentation": {}
+    },
+    {
         "label": "TestResult",
         "importPath": "app.models.test_result",
         "description": "app.models.test_result",
@@ -9556,38 +10476,6 @@
         "documentation": {}
     },
     {
-        "label": "ExternalSystemError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "ExternalServiceError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "NotificationError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "ReportGenerationError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
         "label": "UUID",
         "importPath": "sqlalchemy.dialects.postgresql",
         "description": "sqlalchemy.dialects.postgresql",
@@ -9604,51 +10492,11 @@
         "documentation": {}
     },
     {
-        "label": "ProjectStatus",
-        "importPath": "app.models.constants",
-        "description": "app.models.constants",
+        "label": "constr",
+        "importPath": "pydantic.types",
+        "description": "pydantic.types",
         "isExtraImport": true,
-        "detail": "app.models.constants",
-        "documentation": {}
-    },
-    {
-        "label": "RequirementStatus",
-        "importPath": "app.models.constants",
-        "description": "app.models.constants",
-        "isExtraImport": true,
-        "detail": "app.models.constants",
-        "documentation": {}
-    },
-    {
-        "label": "Priority",
-        "importPath": "app.models.constants",
-        "description": "app.models.constants",
-        "isExtraImport": true,
-        "detail": "app.models.constants",
-        "documentation": {}
-    },
-    {
-        "label": "NotificationType",
-        "importPath": "app.models.constants",
-        "description": "app.models.constants",
-        "isExtraImport": true,
-        "detail": "app.models.constants",
-        "documentation": {}
-    },
-    {
-        "label": "Theme",
-        "importPath": "app.models.constants",
-        "description": "app.models.constants",
-        "isExtraImport": true,
-        "detail": "app.models.constants",
-        "documentation": {}
-    },
-    {
-        "label": "DashboardLayout",
-        "importPath": "app.models.constants",
-        "description": "app.models.constants",
-        "isExtraImport": true,
-        "detail": "app.models.constants",
+        "detail": "pydantic.types",
         "documentation": {}
     },
     {
@@ -10044,6 +10892,24 @@
         "documentation": {}
     },
     {
+        "label": "upgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
+        "description": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
+        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.create_table(\n        \"teams\",\n        sa.Column(\"id\", sa.Integer(), nullable=False),\n        sa.Column(\"name\", sa.String(length=100), nullable=False, comment=\"Название команды\"),\n        sa.Column(\"code\", sa.String(length=50), nullable=False, comment=\"Уникальный код команды\"),\n        sa.Column(\"description\", sa.Text(), nullable=True, comment=\"Описание команды\"),\n        sa.Column(\"status\", sa.String(length=20), nullable=False, comment=\"Статус команды\"),",
+        "detail": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
+        "documentation": {}
+    },
+    {
+        "label": "downgrade",
+        "kind": 2,
+        "importPath": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
+        "description": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_constraint(op.f(\"fk_projects_team_id_teams\"), \"projects\", type_=\"foreignkey\")\n    op.drop_column(\"projects\", \"team_id\")\n    op.drop_constraint(\n        op.f(\"fk_dashboard_notifications_team_id_teams\"),\n        \"dashboard_notifications\",\n        type_=\"foreignkey\",\n    )",
+        "detail": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
+        "documentation": {}
+    },
+    {
         "label": "run_migrations_offline",
         "kind": 2,
         "importPath": "backend.alembic.env",
@@ -10194,6 +11060,15 @@
         "description": "backend.app.api.v1.endpoints.specifications",
         "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Spec])\nasync def get_specifications(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    project_id: Optional[int] = Query(None, description=\"Фильтр по ID проекта\"),\n    search: Optional[str] = Query(None, description=\"Поиск по названию или описанию\"),\n    db: AsyncSession = Depends(get_db),",
         "detail": "backend.app.api.v1.endpoints.specifications",
+        "documentation": {}
+    },
+    {
+        "label": "router",
+        "kind": 5,
+        "importPath": "backend.app.api.v1.endpoints.teams",
+        "description": "backend.app.api.v1.endpoints.teams",
+        "peekOfCode": "router = APIRouter()\n# Utility functions\nasync def get_team_or_404(db: AsyncSession, team_id: int, load_members: bool = False):\n    \"\"\"Получить команду или вернуть 404\"\"\"\n    if load_members:\n        team = await crud_team.get_with_members(db, team_id=team_id)\n    else:\n        team = await crud_team.get(db, id=team_id)\n    if not team:\n        raise NotFoundError(\"team\", team_id)",
+        "detail": "backend.app.api.v1.endpoints.teams",
         "documentation": {}
     },
     {
@@ -11052,6 +11927,42 @@
         "documentation": {}
     },
     {
+        "label": "CRUDTeam",
+        "kind": 6,
+        "importPath": "backend.app.crud.team",
+        "description": "backend.app.crud.team",
+        "peekOfCode": "class CRUDTeam(CRUDBase[Team, TeamCreate, TeamUpdate]):\n    \"\"\"CRUD operations for teams\"\"\"\n    async def get_by_code(self, db: AsyncSession, *, code: str) -> Optional[Team]:\n        \"\"\"Получить команду по коду\"\"\"\n        stmt = select(self.model).where(self.model.code == code)\n        result = await db.execute(stmt)\n        return result.scalar_one_or_none()\n    async def get_with_members(\n        self, db: AsyncSession, *, team_id: int\n    ) -> Optional[Team]:",
+        "detail": "backend.app.crud.team",
+        "documentation": {}
+    },
+    {
+        "label": "CRUDTeamMember",
+        "kind": 6,
+        "importPath": "backend.app.crud.team",
+        "description": "backend.app.crud.team",
+        "peekOfCode": "class CRUDTeamMember(CRUDBase[TeamMember, TeamMemberCreate, TeamMemberUpdate]):\n    \"\"\"CRUD operations for team members\"\"\"\n    async def get_by_team_and_user(\n        self, db: AsyncSession, *, team_id: int, user_id: int\n    ) -> Optional[TeamMember]:\n        \"\"\"Получить участника по команде и пользователю\"\"\"\n        stmt = select(self.model).where(\n            and_(self.model.team_id == team_id, self.model.user_id == user_id)\n        )\n        result = await db.execute(stmt)",
+        "detail": "backend.app.crud.team",
+        "documentation": {}
+    },
+    {
+        "label": "team",
+        "kind": 5,
+        "importPath": "backend.app.crud.team",
+        "description": "backend.app.crud.team",
+        "peekOfCode": "team = CRUDTeam(Team)\nteam_member = CRUDTeamMember(TeamMember)",
+        "detail": "backend.app.crud.team",
+        "documentation": {}
+    },
+    {
+        "label": "team_member",
+        "kind": 5,
+        "importPath": "backend.app.crud.team",
+        "description": "backend.app.crud.team",
+        "peekOfCode": "team_member = CRUDTeamMember(TeamMember)",
+        "detail": "backend.app.crud.team",
+        "documentation": {}
+    },
+    {
         "label": "CRUDTestResult",
         "kind": 6,
         "importPath": "backend.app.crud.test_result",
@@ -11524,7 +12435,34 @@
         "kind": 6,
         "importPath": "backend.app.models.constants",
         "description": "backend.app.models.constants",
-        "peekOfCode": "class DashboardLayout(str, Enum):\n    \"\"\"Dashboard layout options\"\"\"\n    DEFAULT = \"default\"\n    COMPACT = \"compact\"\n    DETAILED = \"detailed\"",
+        "peekOfCode": "class DashboardLayout(str, Enum):\n    \"\"\"Dashboard layout options\"\"\"\n    DEFAULT = \"default\"\n    COMPACT = \"compact\"\n    DETAILED = \"detailed\"\nclass TeamRole(str, Enum):\n    \"\"\"Team member role options\"\"\"\n    OWNER = \"owner\"\n    ADMIN = \"admin\"\n    LEAD = \"lead\"",
+        "detail": "backend.app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamRole",
+        "kind": 6,
+        "importPath": "backend.app.models.constants",
+        "description": "backend.app.models.constants",
+        "peekOfCode": "class TeamRole(str, Enum):\n    \"\"\"Team member role options\"\"\"\n    OWNER = \"owner\"\n    ADMIN = \"admin\"\n    LEAD = \"lead\"\n    DEVELOPER = \"developer\"\n    ANALYST = \"analyst\"\n    TESTER = \"tester\"\n    VIEWER = \"viewer\"\nclass TeamPermission(str, Enum):",
+        "detail": "backend.app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamPermission",
+        "kind": 6,
+        "importPath": "backend.app.models.constants",
+        "description": "backend.app.models.constants",
+        "peekOfCode": "class TeamPermission(str, Enum):\n    \"\"\"Team permission options\"\"\"\n    READ = \"read\"\n    WRITE = \"write\"\n    DELETE = \"delete\"\n    MANAGE_MEMBERS = \"manage_members\"\n    MANAGE_SETTINGS = \"manage_settings\"\n    FULL_ACCESS = \"full_access\"\nclass TeamStatus(str, Enum):\n    \"\"\"Team status options\"\"\"",
+        "detail": "backend.app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStatus",
+        "kind": 6,
+        "importPath": "backend.app.models.constants",
+        "description": "backend.app.models.constants",
+        "peekOfCode": "class TeamStatus(str, Enum):\n    \"\"\"Team status options\"\"\"\n    ACTIVE = \"active\"\n    INACTIVE = \"inactive\"\n    ARCHIVED = \"archived\"",
         "detail": "backend.app.models.constants",
         "documentation": {}
     },
@@ -11670,6 +12608,24 @@
         "description": "backend.app.models.spec",
         "peekOfCode": "class Spec(Base):\n    \"\"\"\n    Модель спецификации.\n    \"\"\"\n    __tablename__ = \"specs\"\n    id: Mapped[int] = mapped_column(Integer, primary_key=True)\n    project_id: Mapped[int] = mapped_column(\n        Integer, ForeignKey(\"projects.id\"), nullable=False\n    )\n    name: Mapped[str] = mapped_column(String(100), nullable=False)",
         "detail": "backend.app.models.spec",
+        "documentation": {}
+    },
+    {
+        "label": "Team",
+        "kind": 6,
+        "importPath": "backend.app.models.team",
+        "description": "backend.app.models.team",
+        "peekOfCode": "class Team(Base, TimestampedMixin):\n    \"\"\"\n    Модель команды.\n    Представляет команду разработчиков, аналитиков и других участников проекта.\n    Команда может быть привязана к одному или нескольким проектам.\n    \"\"\"\n    __tablename__ = \"teams\"\n    __table_args__ = (\n        Index(\"ix_teams_name\", \"name\"),\n        Index(\"ix_teams_code_unique\", \"code\", unique=True),",
+        "detail": "backend.app.models.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMember",
+        "kind": 6,
+        "importPath": "backend.app.models.team_member",
+        "description": "backend.app.models.team_member",
+        "peekOfCode": "class TeamMember(Base, TimestampedMixin):\n    \"\"\"\n    Модель участника команды.\n    Представляет связь между пользователем и командой с определенной ролью.\n    Включает информацию о роли, статусе и времени присоединения.\n    \"\"\"\n    __tablename__ = \"team_members\"\n    __table_args__ = (\n        Index(\"ix_team_members_team_user\", \"team_id\", \"user_id\", unique=True),\n        Index(\"ix_team_members_user_role\", \"user_id\", \"role\"),",
+        "detail": "backend.app.models.team_member",
         "documentation": {}
     },
     {
@@ -13056,6 +14012,195 @@
         "description": "backend.app.schemas.spec",
         "peekOfCode": "class SpecDetailed(Spec):\n    \"\"\"Детальная схема спецификации с дополнительной информацией.\"\"\"\n    project_name: Optional[str] = None\n    generated_by_name: Optional[str] = None\n    requirements_count: int = 0\n    @field_validator(\"requirements_count\")\n    def validate_requirements_count(cls, v):\n        \"\"\"Валидация количества требований\"\"\"\n        if v < 0:\n            raise ValueError(\"Requirements count cannot be negative\")",
         "detail": "backend.app.schemas.spec",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBase",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamBase(BaseModel):\n    \"\"\"Base team schema with common fields\"\"\"\n    name: str = Field(..., min_length=1, max_length=100, description=\"Название команды\")\n    code: str = Field(\n        ..., min_length=1, max_length=50, description=\"Уникальный код команды\"\n    )\n    description: Optional[str] = Field(\n        None, max_length=1000, description=\"Описание команды\"\n    )\n    is_public: bool = Field(False, description=\"Публичная ли команда\")",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamCreate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamCreate(TeamBase):\n    \"\"\"Schema for creating a new team\"\"\"\n    pass\nclass TeamUpdate(BaseModel):\n    \"\"\"Schema for updating an existing team\"\"\"\n    name: Optional[str] = Field(None, min_length=1, max_length=100)\n    description: Optional[str] = Field(None, max_length=1000)\n    is_public: Optional[bool] = None\n    max_members: Optional[int] = Field(None, ge=1, le=100)\n    status: Optional[TeamStatus] = None",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamUpdate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamUpdate(BaseModel):\n    \"\"\"Schema for updating an existing team\"\"\"\n    name: Optional[str] = Field(None, min_length=1, max_length=100)\n    description: Optional[str] = Field(None, max_length=1000)\n    is_public: Optional[bool] = None\n    max_members: Optional[int] = Field(None, ge=1, le=100)\n    status: Optional[TeamStatus] = None\n    @field_validator(\"name\")\n    def validate_name(cls, v):\n        if v is not None and not v.strip():",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBase",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberBase(BaseModel):\n    \"\"\"Base team member schema\"\"\"\n    role: TeamRole = Field(TeamRole.DEVELOPER, description=\"Роль участника в команде\")\n    title: Optional[str] = Field(\n        None, max_length=100, description=\"Должность участника\"\n    )\n    hourly_rate: Optional[float] = Field(None, ge=0, description=\"Почасовая ставка\")\n    notes: Optional[str] = Field(\n        None, max_length=500, description=\"Заметки о участнике\"\n    )",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberCreate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberCreate(TeamMemberBase):\n    \"\"\"Schema for adding a member to a team\"\"\"\n    user_id: int = Field(..., description=\"ID пользователя\")\nclass TeamMemberUpdate(BaseModel):\n    \"\"\"Schema for updating a team member\"\"\"\n    role: Optional[TeamRole] = None\n    title: Optional[str] = Field(None, max_length=100)\n    hourly_rate: Optional[float] = Field(None, ge=0)\n    notes: Optional[str] = Field(None, max_length=500)\n    is_active: Optional[bool] = None",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberUpdate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberUpdate(BaseModel):\n    \"\"\"Schema for updating a team member\"\"\"\n    role: Optional[TeamRole] = None\n    title: Optional[str] = Field(None, max_length=100)\n    hourly_rate: Optional[float] = Field(None, ge=0)\n    notes: Optional[str] = Field(None, max_length=500)\n    is_active: Optional[bool] = None\nclass TeamMemberResponse(TeamMemberBase):\n    \"\"\"Schema for team member response\"\"\"\n    id: int",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberResponse",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberResponse(TeamMemberBase):\n    \"\"\"Schema for team member response\"\"\"\n    id: int\n    user_id: int\n    team_id: int\n    is_active: bool\n    joined_at: datetime\n    left_at: Optional[datetime]\n    created_at: datetime\n    updated_at: datetime",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamResponse",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamResponse(TeamBase):\n    \"\"\"Schema for team response\"\"\"\n    id: int\n    status: TeamStatus\n    owner_id: int\n    created_at: datetime\n    updated_at: datetime\n    # Owner information\n    owner_name: Optional[str] = None\n    owner_username: Optional[str] = None",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamDetailResponse",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamDetailResponse(TeamResponse):\n    \"\"\"Schema for detailed team response with members\"\"\"\n    members: List[TeamMemberResponse] = []\n    # Additional computed fields\n    active_members_count: int = 0\n    roles_distribution: dict = {}\nclass TeamListResponse(BaseModel):\n    \"\"\"Schema for team list response\"\"\"\n    teams: List[TeamResponse]\n    total: int",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamListResponse",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamListResponse(BaseModel):\n    \"\"\"Schema for team list response\"\"\"\n    teams: List[TeamResponse]\n    total: int\n    page: int\n    per_page: int\n    total_pages: int\n    model_config = ConfigDict(from_attributes=True)\n# Bulk operations schemas\nclass TeamBulkCreate(BaseModel):",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBulkCreate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamBulkCreate(BaseModel):\n    \"\"\"Schema for bulk team creation\"\"\"\n    teams: List[TeamCreate] = Field(..., min_items=1, max_items=10)\nclass TeamBulkUpdate(BaseModel):\n    \"\"\"Schema for bulk team updates\"\"\"\n    team_ids: List[int] = Field(..., min_items=1, max_items=50)\n    updates: TeamUpdate\nclass TeamBulkDelete(BaseModel):\n    \"\"\"Schema for bulk team deletion\"\"\"\n    team_ids: List[int] = Field(..., min_items=1, max_items=50)",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBulkUpdate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamBulkUpdate(BaseModel):\n    \"\"\"Schema for bulk team updates\"\"\"\n    team_ids: List[int] = Field(..., min_items=1, max_items=50)\n    updates: TeamUpdate\nclass TeamBulkDelete(BaseModel):\n    \"\"\"Schema for bulk team deletion\"\"\"\n    team_ids: List[int] = Field(..., min_items=1, max_items=50)\n    confirm: bool = Field(True, description=\"Подтверждение удаления\")\n# Member management schemas\nclass TeamMemberBulkAdd(BaseModel):",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBulkDelete",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamBulkDelete(BaseModel):\n    \"\"\"Schema for bulk team deletion\"\"\"\n    team_ids: List[int] = Field(..., min_items=1, max_items=50)\n    confirm: bool = Field(True, description=\"Подтверждение удаления\")\n# Member management schemas\nclass TeamMemberBulkAdd(BaseModel):\n    \"\"\"Schema for bulk adding members to team\"\"\"\n    user_ids: List[int] = Field(..., min_items=1, max_items=20)\n    role: TeamRole = TeamRole.DEVELOPER\n    title: Optional[str] = None",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBulkAdd",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberBulkAdd(BaseModel):\n    \"\"\"Schema for bulk adding members to team\"\"\"\n    user_ids: List[int] = Field(..., min_items=1, max_items=20)\n    role: TeamRole = TeamRole.DEVELOPER\n    title: Optional[str] = None\nclass TeamMemberBulkRemove(BaseModel):\n    \"\"\"Schema for bulk removing members from team\"\"\"\n    user_ids: List[int] = Field(..., min_items=1, max_items=20)\n    confirm: bool = Field(True, description=\"Подтверждение удаления\")\nclass TeamMemberBulkUpdate(BaseModel):",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBulkRemove",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberBulkRemove(BaseModel):\n    \"\"\"Schema for bulk removing members from team\"\"\"\n    user_ids: List[int] = Field(..., min_items=1, max_items=20)\n    confirm: bool = Field(True, description=\"Подтверждение удаления\")\nclass TeamMemberBulkUpdate(BaseModel):\n    \"\"\"Schema for bulk updating team members\"\"\"\n    member_ids: List[int] = Field(..., min_items=1, max_items=50)\n    updates: TeamMemberUpdate\n# Search and filter schemas\nclass TeamSearchRequest(BaseModel):",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBulkUpdate",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberBulkUpdate(BaseModel):\n    \"\"\"Schema for bulk updating team members\"\"\"\n    member_ids: List[int] = Field(..., min_items=1, max_items=50)\n    updates: TeamMemberUpdate\n# Search and filter schemas\nclass TeamSearchRequest(BaseModel):\n    \"\"\"Schema for team search request\"\"\"\n    query: Optional[str] = Field(None, min_length=1, max_length=100)\n    status: Optional[TeamStatus] = None\n    is_public: Optional[bool] = None",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamSearchRequest",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamSearchRequest(BaseModel):\n    \"\"\"Schema for team search request\"\"\"\n    query: Optional[str] = Field(None, min_length=1, max_length=100)\n    status: Optional[TeamStatus] = None\n    is_public: Optional[bool] = None\n    owner_id: Optional[int] = None\n    has_member: Optional[int] = None  # user_id\n    min_members: Optional[int] = Field(None, ge=0)\n    max_members: Optional[int] = Field(None, ge=0)\n    # Pagination",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStats",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamStats(BaseModel):\n    \"\"\"Schema for team statistics\"\"\"\n    total_teams: int = 0\n    active_teams: int = 0\n    inactive_teams: int = 0\n    archived_teams: int = 0\n    total_members: int = 0\n    average_team_size: float = 0.0\n    teams_by_role: dict = {}\n    teams_by_status: dict = {}",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberStats",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamMemberStats(BaseModel):\n    \"\"\"Schema for team member statistics\"\"\"\n    total_members: int = 0\n    active_members: int = 0\n    inactive_members: int = 0\n    members_by_role: dict = {}\n    average_tenure_days: float = 0.0\n    model_config = ConfigDict(from_attributes=True)\n# Permission schemas\nclass TeamPermissionCheck(BaseModel):",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamPermissionCheck",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamPermissionCheck(BaseModel):\n    \"\"\"Schema for checking team permissions\"\"\"\n    user_id: int\n    team_id: int\n    permission: str = Field(..., description=\"Разрешение для проверки\")\nclass TeamPermissionResponse(BaseModel):\n    \"\"\"Schema for team permission response\"\"\"\n    has_permission: bool\n    user_role: Optional[TeamRole] = None\n    is_member: bool = False",
+        "detail": "backend.app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamPermissionResponse",
+        "kind": 6,
+        "importPath": "backend.app.schemas.team",
+        "description": "backend.app.schemas.team",
+        "peekOfCode": "class TeamPermissionResponse(BaseModel):\n    \"\"\"Schema for team permission response\"\"\"\n    has_permission: bool\n    user_role: Optional[TeamRole] = None\n    is_member: bool = False\n    is_owner: bool = False",
+        "detail": "backend.app.schemas.team",
         "documentation": {}
     },
     {

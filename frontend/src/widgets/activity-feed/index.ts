@@ -1,2 +1,2 @@
-export { ActivityFeed } from './ui/ActivityFeed';
-export type { ActivityFeedProps } from '../types'; 
+// Activity feed widget exports
+export * from './ui'; 

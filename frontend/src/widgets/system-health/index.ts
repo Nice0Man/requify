@@ -1,2 +1,2 @@
-export { SystemHealth } from './ui/SystemHealth';
-export type { SystemHealthProps } from '../types'; 
+// System health widget exports
+export * from './ui'; 

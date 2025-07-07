@@ -1,2 +1,2 @@
-export { QuickActions } from './ui/QuickActions';
-export type { QuickActionsProps } from '../types'; 
+// Quick actions widget exports
+export * from './ui'; 

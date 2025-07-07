@@ -1,1 +1,1 @@
-export { default as AdminPage } from './AdminPage'; 
+export { AdminPage as default } from "./AdminPage";

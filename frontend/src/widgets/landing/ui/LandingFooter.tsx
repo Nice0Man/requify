@@ -10,6 +10,7 @@ import {
   useTheme,
   alpha,
   Button,
+  Stack,
 } from "@mui/material";
 import {
   GitHub,
@@ -22,21 +23,19 @@ import {
   Security,
   Help,
   Info,
-  Policy,
-  Gavel,
-  RocketLaunch,
   Assignment,
   FolderOpen,
-  Dashboard,
   BugReport,
   Analytics,
   Extension,
   Work,
   ContactMail,
 } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 const LandingFooter: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
@@ -55,35 +54,83 @@ const LandingFooter: React.FC = () => {
 
   const productLinks = [
     {
-      title: "Requirements Management",
+      title: t("footer.product.requirements", "Requirements Management"),
       href: "#requirements",
       icon: <Assignment />,
     },
-    { title: "Project Management", href: "#projects", icon: <FolderOpen /> },
-    { title: "Testing & QA", href: "#testing", icon: <BugReport /> },
-    { title: "Analytics", href: "#analytics", icon: <Analytics /> },
-    { title: "Integrations", href: "#integrations", icon: <Extension /> },
+    {
+      title: t("footer.product.projects", "Project Management"),
+      href: "#projects",
+      icon: <FolderOpen />,
+    },
+    {
+      title: t("footer.product.testing", "Testing & QA"),
+      href: "#testing",
+      icon: <BugReport />,
+    },
+    {
+      title: t("footer.product.analytics", "Analytics"),
+      href: "#analytics",
+      icon: <Analytics />,
+    },
+    {
+      title: t("footer.product.integrations", "Integrations"),
+      href: "#integrations",
+      icon: <Extension />,
+    },
   ];
 
   const resourceLinks = [
-    { title: "Documentation", href: "/docs", icon: <Help /> },
-    { title: "API", href: "/api-overview", icon: <Business /> },
-    { title: "User Guide", href: "/guide", icon: <Info /> },
-    { title: "Security", href: "/security", icon: <Security /> },
+    {
+      title: t("footer.resources.documentation", "Documentation"),
+      href: "/docs",
+      icon: <Help />,
+    },
+    {
+      title: t("footer.resources.api", "API"),
+      href: "/api-overview",
+      icon: <Business />,
+    },
+    {
+      title: t("footer.resources.guide", "User Guide"),
+      href: "/guide",
+      icon: <Info />,
+    },
+    {
+      title: t("footer.resources.security", "Security"),
+      href: "/security",
+      icon: <Security />,
+    },
   ];
 
   const companyLinks = [
-    { title: "About Us", href: "/about", icon: <Info /> },
-    { title: "Security", href: "/security", icon: <Security /> },
-    { title: "Careers", href: "/careers", icon: <Work /> },
-    { title: "Contact", href: "/contact", icon: <ContactMail /> },
+    {
+      title: t("footer.company.about", "About Us"),
+      href: "/about",
+      icon: <Info />,
+    },
+    {
+      title: t("footer.company.security", "Security"),
+      href: "/security",
+      icon: <Security />,
+    },
+    {
+      title: t("footer.company.careers", "Careers"),
+      href: "/careers",
+      icon: <Work />,
+    },
+    {
+      title: t("footer.company.contact", "Contact"),
+      href: "/contact",
+      icon: <ContactMail />,
+    },
   ];
 
   const legalLinks = [
-    { title: "Privacy Policy", href: "/privacy" },
-    { title: "Terms of Use", href: "/terms" },
-    { title: "License", href: "/license" },
-    { title: "Cookies", href: "/cookies" },
+    { title: t("footer.legal.privacy", "Privacy Policy"), href: "/privacy" },
+    { title: t("footer.legal.terms", "Terms of Use"), href: "/terms" },
+    { title: t("footer.legal.license", "License"), href: "/license" },
+    { title: t("footer.legal.cookies", "Cookies"), href: "/cookies" },
   ];
 
   const contactInfo = [
@@ -93,7 +140,11 @@ const LandingFooter: React.FC = () => {
       href: "mailto:hello@requify.com",
     },
     { icon: <Phone />, text: "+7 (495) 123-45-67", href: "tel:+74951234567" },
-    { icon: <LocationOn />, text: "Moscow, Russia", href: "#" },
+    {
+      icon: <LocationOn />,
+      text: t("footer.contact.location", "Moscow, Russia"),
+      href: "#",
+    },
   ];
 
   return (
@@ -134,10 +185,16 @@ const LandingFooter: React.FC = () => {
               textShadow: "0 2px 4px rgba(0,0,0,0.3)",
             }}
           >
-            Ready to start managing requirements efficiently?
+            {t(
+              "footer.cta.title",
+              "Ready to start managing requirements efficiently?"
+            )}
           </Typography>
           <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-            Join thousands of teams that are already using Requify
+            {t(
+              "footer.cta.subtitle",
+              "Join thousands of teams that are already using Requify"
+            )}
           </Typography>
           <Box
             sx={{
@@ -165,7 +222,7 @@ const LandingFooter: React.FC = () => {
                 boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
               }}
             >
-              Start Free
+              {t("footer.cta.startFree", "Start Free")}
             </Button>
             <Button
               variant="outlined"
@@ -185,7 +242,7 @@ const LandingFooter: React.FC = () => {
                 fontWeight: "bold",
               }}
             >
-              Demo Version
+              {t("footer.cta.demo", "Demo Version")}
             </Button>
           </Box>
         </Box>
@@ -198,221 +255,236 @@ const LandingFooter: React.FC = () => {
             {/* Main Information */}
             <Grid item xs={12} md={4}>
               <Typography
-                variant="h5"
-                component="h3"
-                gutterBottom
-                sx={{ fontWeight: "bold", mb: 3 }}
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  mb: 3,
+                  color: theme.palette.common.white,
+                }}
               >
                 Requify
               </Typography>
               <Typography
                 variant="body1"
-                sx={{ mb: 3, opacity: 0.9, lineHeight: 1.7 }}
+                sx={{
+                  mb: 4,
+                  opacity: 0.9,
+                  lineHeight: 1.6,
+                }}
               >
-                Modern platform for requirements management that helps teams
-                create, track, and manage software requirements efficiently.
+                {t(
+                  "footer.description",
+                  "Professional requirements management platform that helps teams deliver better software faster."
+                )}
               </Typography>
 
-              {/* Social Networks */}
-              <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
-                {socialLinks.map((social) => (
-                  <IconButton
-                    key={social.label}
-                    component="a"
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    sx={{
-                      color: "white",
-                      backgroundColor: alpha("#ffffff", 0.1),
-                      "&:hover": {
-                        backgroundColor: alpha("#ffffff", 0.2),
-                        transform: "translateY(-2px)",
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    {social.icon}
-                  </IconButton>
-                ))}
-              </Box>
-
-              {/* Statistics */}
-              <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
-                <Box>
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    500+
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Active Teams
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    10k+
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Requirements Created
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    99.9%
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                    Uptime
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-
-            {/* Product */}
-            <Grid item xs={12} sm={6} md={2}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ fontWeight: "bold", mb: 2 }}
-              >
-                Product
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {productLinks.map((link) => (
-                  <Link
-                    key={link.title}
-                    href={link.href}
-                    color="inherit"
-                    underline="hover"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      opacity: 0.9,
-                      "&:hover": {
-                        opacity: 1,
-                        transform: "translateX(4px)",
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    {React.cloneElement(link.icon, { fontSize: "small" })}
-                    {link.title}
-                  </Link>
-                ))}
-              </Box>
-            </Grid>
-
-            {/* Resources */}
-            <Grid item xs={12} sm={6} md={2}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ fontWeight: "bold", mb: 2 }}
-              >
-                Resources
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {resourceLinks.map((link) => (
-                  <Link
-                    key={link.title}
-                    href={link.href}
-                    color="inherit"
-                    underline="hover"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      opacity: 0.9,
-                      "&:hover": {
-                        opacity: 1,
-                        transform: "translateX(4px)",
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    {React.cloneElement(link.icon, { fontSize: "small" })}
-                    {link.title}
-                  </Link>
-                ))}
-              </Box>
-            </Grid>
-
-            {/* Company */}
-            <Grid item xs={12} sm={6} md={2}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ fontWeight: "bold", mb: 2 }}
-              >
-                Company
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {companyLinks.map((link) => (
-                  <Link
-                    key={link.title}
-                    href={link.href}
-                    color="inherit"
-                    underline="hover"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      opacity: 0.9,
-                      "&:hover": {
-                        opacity: 1,
-                        transform: "translateX(4px)",
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
-                    {React.cloneElement(link.icon, { fontSize: "small" })}
-                    {link.title}
-                  </Link>
-                ))}
-              </Box>
-            </Grid>
-
-            {/* Contact */}
-            <Grid item xs={12} md={2}>
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{ fontWeight: "bold", mb: 2 }}
-              >
-                Contact
-              </Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+              {/* Contact Info */}
+              <Stack spacing={2} sx={{ mb: 4 }}>
                 {contactInfo.map((contact, index) => (
                   <Box
                     key={index}
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      gap: 1,
+                      gap: 1.5,
                       opacity: 0.9,
                     }}
                   >
-                    {React.cloneElement(contact.icon, { fontSize: "small" })}
-                    {contact.href.startsWith("mailto:") ||
-                    contact.href.startsWith("tel:") ? (
-                      <Link
-                        href={contact.href}
-                        color="inherit"
-                        underline="hover"
-                        sx={{
-                          "&:hover": { opacity: 1 },
-                        }}
-                      >
-                        {contact.text}
-                      </Link>
-                    ) : (
-                      <Typography variant="body2" color="inherit">
-                        {contact.text}
-                      </Typography>
-                    )}
+                    <Box
+                      sx={{
+                        color: theme.palette.common.white,
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      {contact.icon}
+                    </Box>
+                    <Link
+                      href={contact.href}
+                      color="inherit"
+                      underline="none"
+                      sx={{
+                        "&:hover": {
+                          opacity: 0.8,
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      {contact.text}
+                    </Link>
                   </Box>
                 ))}
+              </Stack>
+
+              {/* Social Links */}
+              <Box sx={{ display: "flex", gap: 1 }}>
+                {socialLinks.map((social, index) => (
+                  <IconButton
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: theme.palette.common.white,
+                      backgroundColor: alpha("#ffffff", 0.1),
+                      "&:hover": {
+                        backgroundColor: alpha("#ffffff", 0.2),
+                        transform: "translateY(-2px)",
+                      },
+                    }}
+                  >
+                    {social.icon}
+                  </IconButton>
+                ))}
               </Box>
+            </Grid>
+
+            {/* Product Links */}
+            <Grid item xs={12} sm={6} md={2}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  mb: 3,
+                  color: theme.palette.common.white,
+                }}
+              >
+                {t("footer.sections.product", "Product")}
+              </Typography>
+              <Stack spacing={1.5}>
+                {productLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    color="inherit"
+                    underline="none"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      opacity: 0.8,
+                      "&:hover": {
+                        opacity: 1,
+                        transform: "translateX(4px)",
+                      },
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {link.icon}
+                    {link.title}
+                  </Link>
+                ))}
+              </Stack>
+            </Grid>
+
+            {/* Resources Links */}
+            <Grid item xs={12} sm={6} md={2}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  mb: 3,
+                  color: theme.palette.common.white,
+                }}
+              >
+                {t("footer.sections.resources", "Resources")}
+              </Typography>
+              <Stack spacing={1.5}>
+                {resourceLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    color="inherit"
+                    underline="none"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      opacity: 0.8,
+                      "&:hover": {
+                        opacity: 1,
+                        transform: "translateX(4px)",
+                      },
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {link.icon}
+                    {link.title}
+                  </Link>
+                ))}
+              </Stack>
+            </Grid>
+
+            {/* Company Links */}
+            <Grid item xs={12} sm={6} md={2}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  mb: 3,
+                  color: theme.palette.common.white,
+                }}
+              >
+                {t("footer.sections.company", "Company")}
+              </Typography>
+              <Stack spacing={1.5}>
+                {companyLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    color="inherit"
+                    underline="none"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      opacity: 0.8,
+                      "&:hover": {
+                        opacity: 1,
+                        transform: "translateX(4px)",
+                      },
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {link.icon}
+                    {link.title}
+                  </Link>
+                ))}
+              </Stack>
+            </Grid>
+
+            {/* Legal Links */}
+            <Grid item xs={12} sm={6} md={2}>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  mb: 3,
+                  color: theme.palette.common.white,
+                }}
+              >
+                {t("footer.sections.legal", "Legal")}
+              </Typography>
+              <Stack spacing={1.5}>
+                {legalLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    color="inherit"
+                    underline="none"
+                    sx={{
+                      opacity: 0.8,
+                      "&:hover": {
+                        opacity: 1,
+                        transform: "translateX(4px)",
+                      },
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    {link.title}
+                  </Link>
+                ))}
+              </Stack>
             </Grid>
           </Grid>
         </Box>
@@ -420,80 +492,21 @@ const LandingFooter: React.FC = () => {
         <Divider sx={{ borderColor: alpha("#ffffff", 0.2) }} />
 
         {/* Bottom Section */}
-        <Box sx={{ py: 4 }}>
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                © {currentYear} Requify. All rights reserved.
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  flexWrap: "wrap",
-                  justifyContent: { xs: "flex-start", md: "flex-end" },
-                }}
-              >
-                {legalLinks.map((link) => (
-                  <Link
-                    key={link.title}
-                    href={link.href}
-                    color="inherit"
-                    underline="hover"
-                    sx={{
-                      fontSize: "0.875rem",
-                      opacity: 0.8,
-                      "&:hover": { opacity: 1 },
-                    }}
-                  >
-                    {link.title}
-                  </Link>
-                ))}
-              </Box>
-            </Grid>
-          </Grid>
-
-          {/* Additional Information */}
-          <Box sx={{ mt: 3, textAlign: "center" }}>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 3,
-                justifyContent: "center",
-                flexWrap: "wrap",
-                mb: 2,
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: "50%",
-                    backgroundColor: "#4caf50",
-                    animation: "pulse 2s infinite",
-                    "@keyframes pulse": {
-                      "0%": { opacity: 1 },
-                      "50%": { opacity: 0.5 },
-                      "100%": { opacity: 1 },
-                    },
-                  }}
-                />
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                  All systems operational
-                </Typography>
-              </Box>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                Version: 1.0.0
-              </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                Last updated: {new Date().toLocaleDateString("ru-RU")}
-              </Typography>
-            </Box>
-          </Box>
+        <Box
+          sx={{
+            pt: 4,
+            textAlign: "center",
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              opacity: 0.7,
+            }}
+          >
+            © {currentYear} Requify.{" "}
+            {t("footer.copyright", "All rights reserved.")}
+          </Typography>
         </Box>
       </Container>
     </Box>

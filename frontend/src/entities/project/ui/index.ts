@@ -1,5 +1,7 @@
 // Project UI components exports
-export { ProjectCard } from './ProjectCard';
-export { ProjectStatus } from './ProjectStatus';
-export { ProjectProgress } from './ProjectProgress';
-export { ProjectInfo } from './ProjectInfo'; 
+// TODO: Создать компоненты согласно FSD принципам
+// export * from './ProjectCard';
+// export * from './ProjectList';
+// export * from './ProjectForm';
+// export * from './ProjectStatusBadge';
+// export * from './ProjectPriorityBadge'; 

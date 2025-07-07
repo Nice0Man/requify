@@ -1,182 +1,168 @@
-import React, { useState } from 'react';
+import React from "react";
 import {
   Box,
-  Container,
-  Tabs,
-  Tab,
   Typography,
-  useTheme,
-  alpha,
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-
-// Using features according to FSD
-import { useAuth } from '@/features/auth';
-import { AdminDashboard } from '@/features/admin-panel';
-
-// Using widgets according to FSD
-import { SystemHealth, DashboardStats } from '@/widgets';
-
-// Using shared utilities
-import { toast } from '@/shared/ui';
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`admin-tabpanel-${index}`}
-      aria-labelledby={`admin-tab-${index}`}
-    >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
-    </div>
-  );
-};
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider,
+} from "@mui/material";
+import {
+  People,
+  Settings,
+  Security,
+  Assessment,
+  Notifications,
+  Storage,
+  AdminPanelSettings,
+} from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 const AdminPage: React.FC = () => {
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const { user, hasPermission } = useAuth();
-  
-  // Check admin permissions
-  const isAdmin = hasPermission('admin:read');
-  const canWrite = hasPermission('admin:write');
+  const { t } = useTranslation();
 
-  // State management
-  const [activeTab, setActiveTab] = useState(0);
-
-  // Redirect if not admin
-  React.useEffect(() => {
-    if (!isAdmin) {
-      navigate('/dashboard');
-      toast.error('Access denied. Admin privileges required.');
-      return;
-    }
-  }, [isAdmin, navigate]);
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
-
-  if (!isAdmin) {
-    return null; // Will redirect
-  }
+  const adminSections = [
+    {
+      title: t("admin.userManagement"),
+      description: t("admin.userManagementDesc"),
+      icon: <People />,
+      path: "/admin/users",
+    },
+    {
+      title: t("admin.systemSettings"),
+      description: t("admin.systemSettingsDesc"),
+      icon: <Settings />,
+      path: "/admin/settings",
+    },
+    {
+      title: t("admin.security"),
+      description: t("admin.securityDesc"),
+      icon: <Security />,
+      path: "/admin/security",
+    },
+    {
+      title: t("admin.analytics"),
+      description: t("admin.analyticsDesc"),
+      icon: <Assessment />,
+      path: "/admin/analytics",
+    },
+    {
+      title: t("admin.notifications"),
+      description: t("admin.notificationsDesc"),
+      icon: <Notifications />,
+      path: "/admin/notifications",
+    },
+    {
+      title: t("admin.database"),
+      description: t("admin.databaseDesc"),
+      icon: <Storage />,
+      path: "/admin/database",
+    },
+  ];
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            background: `linear-gradient(135deg, ${theme.palette.error.main}, ${theme.palette.warning.main})`,
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            color: 'transparent',
-            mb: 1,
-          }}
-        >
-          System Administration
-        </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ fontSize: '1.1rem' }}
-        >
-          Monitor system health, manage users, and configure settings
-        </Typography>
-      </Box>
-
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          aria-label="admin tabs"
-          sx={{
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontWeight: 600,
-              fontSize: '1rem',
-            },
-          }}
-        >
-          <Tab label="Dashboard" />
-          <Tab label="System Health" />
-          <Tab label="Users" />
-          <Tab label="Settings" />
-        </Tabs>
-      </Box>
-
-      {/* Tab Panels */}
-      <TabPanel value={activeTab} index={0}>
-        {/* Admin Dashboard using AdminDashboard feature component */}
-        <AdminDashboard />
-      </TabPanel>
-
-      <TabPanel value={activeTab} index={1}>
-        {/* System Health using SystemHealth widget */}
-        <SystemHealth
-          showDetails={true}
-          autoRefresh={true}
-          refreshInterval={15000}
-          onHealthClick={(component) => {
-            console.log('Health component clicked:', component);
-          }}
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+        <AdminPanelSettings
+          sx={{ mr: 2, fontSize: 32, color: "primary.main" }}
         />
-      </TabPanel>
+        <Typography variant="h4" component="h1">
+          {t("admin.title")}
+        </Typography>
+      </Box>
 
-      <TabPanel value={activeTab} index={2}>
-        {/* Users Management */}
-        <Box
-          sx={{
-            p: 4,
-            textAlign: 'center',
-            backgroundColor: alpha(theme.palette.info.main, 0.05),
-            borderRadius: 3,
-            border: `1px dashed ${alpha(theme.palette.info.main, 0.2)}`,
-          }}
-        >
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            User Management
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            User management feature will be implemented here.
-            This would use a UserManagement widget from @/widgets and 
-            user management features from @/features/user-management.
-          </Typography>
-        </Box>
-      </TabPanel>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        {t("admin.description")}
+      </Typography>
 
-      <TabPanel value={activeTab} index={3}>
-        {/* System Settings */}
-        <Box
-          sx={{
-            p: 4,
-            textAlign: 'center',
-            backgroundColor: alpha(theme.palette.warning.main, 0.05),
-            borderRadius: 3,
-            border: `1px dashed ${alpha(theme.palette.warning.main, 0.2)}`,
-          }}
-        >
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            System Settings
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            System settings feature will be implemented here.
-            This would use settings widgets and configuration features.
-          </Typography>
-        </Box>
-      </TabPanel>
-    </Container>
+      <Grid container spacing={3}>
+        {adminSections.map((section, index) => (
+          <Grid item xs={12} md={6} lg={4} key={index}>
+            <Card
+              sx={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: 3,
+                },
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  {React.cloneElement(section.icon, {
+                    sx: { mr: 2, color: "primary.main" },
+                  })}
+                  <Typography variant="h6" component="h2">
+                    {section.title}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  {section.description}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    // TODO: Implement navigation
+                    console.log("Navigate to:", section.path);
+                  }}
+                >
+                  {t("common.open")}
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Divider sx={{ my: 4 }} />
+
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        {t("admin.quickActions")}
+      </Typography>
+
+      <List>
+        <ListItem>
+          <ListItemIcon>
+            <People />
+          </ListItemIcon>
+          <ListItemText
+            primary={t("admin.viewAllUsers")}
+            secondary={t("admin.viewAllUsersDesc")}
+          />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <Assessment />
+          </ListItemIcon>
+          <ListItemText
+            primary={t("admin.systemReport")}
+            secondary={t("admin.systemReportDesc")}
+          />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <Security />
+          </ListItemIcon>
+          <ListItemText
+            primary={t("admin.auditLog")}
+            secondary={t("admin.auditLogDesc")}
+          />
+        </ListItem>
+      </List>
+    </Box>
   );
 };
 
-export default AdminPage;
+export { AdminPage };

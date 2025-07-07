@@ -1,0 +1,664 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "refresh": "Refresh",
+    "export": "Export",
+    "import": "Import",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "select": "Select",
+    "clear": "Clear",
+    "reset": "Reset",
+    "apply": "Apply",
+    "download": "Download",
+    "upload": "Upload",
+    "print": "Print",
+    "send": "Send",
+    "add": "Add",
+    "remove": "Remove",
+    "copy": "Copy",
+    "cut": "Cut",
+    "paste": "Paste",
+    "settings": "Settings",
+    "help": "Help",
+    "about": "About",
+    "yesterday": "Yesterday"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "requirements": "Requirements",
+    "releases": "Releases",
+    "testing": "Testing",
+    "reports": "Reports",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "new": "New",
+    "read": "Read",
+    "archived": "Archived",
+    "noNotifications": "No notifications",
+    "markAllAsRead": "Mark all as read",
+    "showAll": "Show all notifications",
+    "newProject": "New Project",
+    "newProjectMessage": "A new project has been created in the system",
+    "deadlineApproaching": "Deadline Approaching",
+    "deadlineApproachingMessage": "Task deadline expires tomorrow",
+    "requirementApproved": "Requirement Approved",
+    "requirementApprovedMessage": "Your requirement has been approved and accepted for work",
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    }
+  },
+  "landing": {
+    "hero": {
+      "certification1": "The best requirements management software",
+      "certification2": "Powerful and easy to use",
+      "feature1": {
+        "title": "AI-Powered Requirements Analysis",
+        "desc": "Intelligent automation for better quality"
+      },
+      "feature2": {
+        "title": "Real-time Team Collaboration",
+        "desc": "Seamless workflow coordination"
+      },
+      "feature3": {
+        "title": "Automated Testing Integration",
+        "desc": "Built-in quality assurance"
+      },
+      "feature4": {
+        "title": "Complete Audit Trail & Compliance",
+        "desc": "Full traceability and governance"
+      },
+      "metric1": "Faster Delivery",
+      "metric2": "Weekly Saved",
+      "metric3": "Uptime SLA",
+      "title": "Requify",
+      "subtitle": "Requirements Management",
+      "description": "Streamline your development process with intelligent requirements management, automated testing, and seamless team collaboration.",
+      "goToDashboard": "Go to Dashboard",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More",
+      "dashboardPreview": "Dashboard Preview"
+    },
+    "features": {
+      "title": "Everything you need to",
+      "titleHighlight": "manage requirements",
+      "subtitle": "Powerful features designed to simplify your workflow and enhance team productivity.",
+      "feature1": {
+        "title": "Smart Analysis",
+        "desc": "AI-powered requirements analysis with intelligent suggestions and automated quality checks."
+      },
+      "feature2": {
+        "title": "Fast Delivery",
+        "desc": "Streamlined workflows that accelerate your development process and reduce time-to-market."
+      },
+      "feature3": {
+        "title": "Enterprise Security",
+        "desc": "Bank-grade security with comprehensive audit trails and compliance management."
+      },
+      "feature4": {
+        "title": "Real-time Analytics",
+        "desc": "Comprehensive insights and reporting to track progress and measure success."
+      },
+      "feature5": {
+        "title": "Team Collaboration",
+        "desc": "Seamless collaboration tools that keep your entire team aligned and productive."
+      },
+      "feature6": {
+        "title": "Quality Assurance",
+        "desc": "Built-in quality controls and validation to ensure your requirements meet standards."
+      }
+    },
+    "metrics": {
+      "title": "Trusted by teams",
+      "titleHighlight": "worldwide",
+      "subtitle": "Real results from real teams who've transformed their development process.",
+      "metric1": {
+        "label": "Efficiency Boost",
+        "desc": "Average productivity increase"
+      },
+      "metric2": {
+        "label": "Time Saved",
+        "desc": "Weekly per development team"
+      },
+      "metric3": {
+        "label": "Active Teams",
+        "desc": "Using our platform daily"
+      },
+      "metric4": {
+        "label": "Uptime SLA",
+        "desc": "Enterprise-grade reliability"
+      },
+      "testimonialsTitle": "What our customers say",
+      "testimonial1": {
+        "quote": "Transformed our development process completely. We ship features 60% faster now.",
+        "author": "Sarah Chen",
+        "role": "Engineering Manager",
+        "company": "TechCorp"
+      },
+      "testimonial2": {
+        "quote": "The best investment we made this year. ROI was visible within the first month.",
+        "author": "Michael Rodriguez",
+        "role": "CTO",
+        "company": "StartupXYZ"
+      },
+      "testimonial3": {
+        "quote": "Finally, a tool that actually delivers on its promises. Our team loves it.",
+        "author": "Emma Thompson",
+        "role": "Product Lead",
+        "company": "InnovateLabs"
+      }
+    }
+  },
+  "business": {
+    "badge": "Business Solutions",
+    "title": "Solutions for Every Role in Your Team",
+    "subtitle": "From CTO to Product Manager — Requify solves specific challenges for every team member in development",
+    "audiences": {
+      "cto": {
+        "title": "CTO / Tech Lead",
+        "role": "Technical Leaders",
+        "challenges": [
+          "Complexity of coordination between teams",
+          "Lack of single source of truth",
+          "Process scalability issues",
+          "Technical debt in requirements"
+        ],
+        "solutions": [
+          "Centralized management platform",
+          "API for integration with existing systems",
+          "Automation of validation processes",
+          "Quality and performance metrics"
+        ]
+      },
+      "pm": {
+        "title": "Product Manager",
+        "role": "Product Managers",
+        "challenges": [
+          "Lost requirements in development process",
+          "No connection between business goals and features",
+          "Prioritization complexity",
+          "Lack of feedback from team"
+        ],
+        "solutions": [
+          "Link requirements to business metrics",
+          "Prioritization and planning tools",
+          "Requirements lifecycle tracking",
+          "Integrated product analytics"
+        ]
+      },
+      "ceo": {
+        "title": "CEO / Business Owner",
+        "role": "Business Leaders",
+        "challenges": [
+          "Low predictability of timelines",
+          "Project budget overruns",
+          "Unclear ROI from IT investments",
+          "Product-market fit risks"
+        ],
+        "solutions": [
+          "Transparent project reporting",
+          "Budget and resource control",
+          "ROI and business metrics",
+          "Product risk management"
+        ]
+      },
+      "lead": {
+        "title": "Team Lead / Scrum Master",
+        "role": "Team Leaders",
+        "challenges": [
+          "Ineffective retrospectives",
+          "Team communication issues",
+          "Lack of progress visibility",
+          "Sprint planning complexity"
+        ],
+        "solutions": [
+          "Agile process tools",
+          "Automated progress reports",
+          "Integration with popular ALM systems",
+          "Team analytics and velocity"
+        ]
+      }
+    },
+    "metrics": {
+      "time": {
+        "value": "60%",
+        "label": "Time Reduction",
+        "description": "in requirements management and planning"
+      },
+      "rework": {
+        "value": "40%",
+        "label": "Less Rework",
+        "description": "thanks to clear requirements from the start"
+      },
+      "launch": {
+        "value": "3x",
+        "label": "Faster Launch",
+        "description": "of new products and features to market"
+      },
+      "roi": {
+        "value": "ROI 300%",
+        "label": "Return on Investment",
+        "description": "within the first year of use"
+      }
+    },
+    "testimonials": {
+      "title": "Customer Testimonials",
+      "subtitle": "What industry leaders say",
+      "items": [
+        {
+          "quote": "Requify helped us reduce product time-to-market by 2x. Now we can quickly respond to market requirement changes.",
+          "author": "Alex Petrov",
+          "position": "CTO",
+          "company": "TechStartup"
+        },
+        {
+          "quote": "Thanks to Requify our team became much more synchronized. All requirements in one place, all processes transparent.",
+          "author": "Maria Sidorova",
+          "position": "Product Manager",
+          "company": "FinTech Corp"
+        },
+        {
+          "quote": "ROI from Requify implementation was 280% in the first year. Significantly reduced costs for rework and bug fixes.",
+          "author": "Dmitry Kozlov",
+          "position": "CEO",
+          "company": "Enterprise Solutions"
+        }
+      ]
+    },
+    "roi": {
+      "title": "Measurable Results",
+      "subtitle": "Our clients achieve concrete business outcomes"
+    },
+    "labels": {
+      "challenges": "Challenges",
+      "solutions": "Requify Solutions"
+    },
+    "cta": {
+      "title": "Ready to Transform Your Processes?",
+      "subtitle": "Start with a free consultation or demo for your team",
+      "start": "Start Free",
+      "contact": "Contact Sales"
+    }
+  },
+  "auth": {
+    "title": "Get Started",
+    "login": "Sign In",
+    "loginButton": "Sign In",
+    "loginSubtitle": "Sign in to your account",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "example@company.com",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "or": "or",
+    "noAccount": "Don't have an account?",
+    "register": "Sign Up",
+    "navigation": {
+      "hero": "Home",
+      "features": "Features",
+      "metrics": "Metrics",
+      "cta": "Solutions",
+      "footer": "Contact"
+    },
+    "tabs": {
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
+    },
+    "fields": {
+      "username": "Username",
+      "password": "Password",
+      "email": "Email",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "confirmPassword": "Confirm Password",
+      "rememberMe": "Remember me",
+      "acceptTerms": "I accept the",
+      "acceptPrivacy": "I accept the"
+    },
+    "links": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    },
+    "buttons": {
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "signingIn": "Signing in...",
+      "signingUp": "Signing up..."
+    },
+    "socialLogin": {
+      "google": "Continue with Google",
+      "github": "Continue with GitHub"
+    },
+    "divider": {
+      "or": "or"
+    },
+    "validation": {
+      "usernameRequired": "Username is required",
+      "usernameMinLength": "Username must be at least 3 characters",
+      "usernameFormat": "Username can only contain letters, numbers and underscores",
+      "emailRequired": "Email is required",
+      "emailFormat": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordMinLength8": "Password must be at least 8 characters",
+      "passwordStrength": "Password must contain at least one uppercase letter, one lowercase letter, and one number",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordMismatch": "Passwords do not match",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "termsRequired": "You must accept the terms of service",
+      "privacyRequired": "You must accept the privacy policy"
+    },
+    "errors": {
+      "loginFailed": "Login failed. Please try again.",
+      "registerFailed": "Registration failed. Please try again.",
+      "socialLoginFailed": "Social login failed"
+    }
+  },
+  "landing": {
+    "nav": {
+      "home": "Home",
+      "features": "Features",
+      "about": "About",
+      "contact": "Contact",
+      "solutions": "Solutions"
+    }
+  },
+  "cta": {
+    "badge": "Professional Platform",
+    "title": "Next Generation Requirements Management",
+    "subtitle": "Unite your team, accelerate development and create products that users really need",
+    "getStarted": "Get Started",
+    "watchDemo": "Watch Demo",
+    "trusted": "Trusted by more than",
+    "features": {
+      "launch": {
+        "title": "Quick Start",
+        "desc": "Get started in minutes with ready-made templates"
+      },
+      "security": {
+        "title": "Security",
+        "desc": "Enterprise-level data protection and compliance standards"
+      },
+      "performance": {
+        "title": "Performance",
+        "desc": "Lightning-fast operation even with large projects"
+      },
+      "integration": {
+        "title": "Integrations",
+        "desc": "Connect to popular tools and services"
+      }
+    },
+    "benefits": {
+      "time": "Reduce time by 60%",
+      "quality": "Improve product quality",
+      "collaboration": "Enhance team collaboration",
+      "visibility": "Get full visibility"
+    },
+    "stats": {
+      "users": "Users",
+      "companies": "Companies",
+      "requirements": "Requirements"
+    }
+  },
+  "footer": {
+    "cta": {
+      "title": "Ready to start managing requirements efficiently?",
+      "subtitle": "Join thousands of teams that are already using Requify",
+      "startFree": "Start Free",
+      "demo": "Demo Version"
+    },
+    "description": "Professional requirements management platform that helps teams deliver better software faster.",
+    "contact": {
+      "location": "Moscow, Russia"
+    },
+    "sections": {
+      "product": "Product",
+      "resources": "Resources",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "product": {
+      "requirements": "Requirements Management",
+      "projects": "Project Management",
+      "testing": "Testing & QA",
+      "analytics": "Analytics",
+      "integrations": "Integrations"
+    },
+    "resources": {
+      "documentation": "Documentation",
+      "api": "API",
+      "guide": "User Guide",
+      "security": "Security"
+    },
+    "company": {
+      "about": "About Us",
+      "security": "Security",
+      "careers": "Careers",
+      "contact": "Contact"
+    },
+    "legal": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Use",
+      "license": "License",
+      "cookies": "Cookies"
+    },
+    "copyright": "All rights reserved."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Welcome back! Here's what's happening with your projects.",
+    "metrics": {
+      "activeProjects": "Active Projects",
+      "projectsInDevelopment": "Projects in development",
+      "requirements": "Requirements",
+      "totalRequirementsTracked": "Total requirements tracked",
+      "completionRate": "Completion Rate",
+      "overallProjectCompletion": "Overall project completion",
+      "teamVelocity": "Team Velocity",
+      "storyPointsPerSprint": "Story points per sprint"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "newProject": "New Project",
+      "newProjectDesc": "Create a new project",
+      "kanbanBoard": "Kanban Board",
+      "kanbanBoardDesc": "View project kanban",
+      "addRequirement": "Add Requirement",
+      "addRequirementDesc": "Create new requirement",
+      "viewReports": "View Reports",
+      "viewReportsDesc": "Analytics & insights"
+    },
+    "recentActivity": "Recent Activity",
+    "noActivity": "No recent activity",
+    "systemHealth": "System Health"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Project management and lifecycle",
+    "createProject": "Create Project",
+    "createFirstProject": "Create first project",
+    "notFound": "No projects found",
+    "searchPlaceholder": "Search projects...",
+    "status": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "onHold": "On Hold",
+      "cancelled": "Cancelled"
+    },
+    "statusText": {
+      "active": "Active",
+      "completed": "Completed",
+      "onHold": "On Hold",
+      "cancelled": "Cancelled"
+    },
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "progress": "Progress",
+      "teamSize": "Team Size",
+      "requirements": "Requirements"
+    },
+    "stats": {
+      "participants": "participants",
+      "requirements": "requirements",
+      "completed": "completed"
+    },
+    "placeholders": {
+      "noDescription": "No description provided",
+      "noDate": "Not specified"
+    }
+  },
+  "requirements": {
+    "title": "Requirements",
+    "subtitle": "Project requirements management",
+    "createRequirement": "Create Requirement",
+    "createFirstRequirement": "Create first requirement",
+    "notFound": "No requirements found",
+    "searchPlaceholder": "Search requirements...",
+    "status": {
+      "all": "All",
+      "draft": "Draft",
+      "approved": "Approved",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "priority": {
+      "all": "All",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "fields": {
+      "title": "Title",
+      "description": "Description",
+      "status": "Status",
+      "priority": "Priority",
+      "project": "Project",
+      "createdAt": "Created At",
+      "progress": "Progress"
+    },
+    "placeholders": {
+      "noDescription": "No description provided",
+      "noProject": "No project assigned",
+      "noDate": "Date not specified"
+    }
+  },
+  "releases": {
+    "title": "Releases",
+    "subtitle": "Release and deployment management",
+    "createRelease": "Create Release",
+    "notFound": "No releases found",
+    "searchPlaceholder": "Search releases...",
+    "actions": {
+      "publish": "Publish",
+      "deploy": "Deploy",
+      "rollback": "Rollback"
+    },
+    "status": {
+      "all": "All",
+      "draft": "Draft",
+      "published": "Published",
+      "deployed": "Deployed",
+      "archived": "Archived"
+    },
+    "stats": {
+      "totalReleases": "Total Releases",
+      "plannedReleases": "Planned Releases",
+      "activeReleases": "Active Releases",
+      "completedReleases": "Completed Releases"
+    }
+  },
+  "testing": {
+    "title": "Testing",
+    "subtitle": "Testing and quality management",
+    "testCases": "Test Cases",
+    "testSuites": "Test Suites",
+    "stats": {
+      "totalTests": "Total Tests",
+      "passedTests": "Passed Tests",
+      "failedTests": "Failed Tests",
+      "coverage": "Coverage"
+    },
+    "actions": {
+      "run": "Run",
+      "execute": "Execute",
+      "generateReport": "Generate Report"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Analytics and insights",
+    "types": {
+      "project": "Project Reports",
+      "requirement": "Requirement Reports",
+      "testing": "Testing Reports",
+      "performance": "Performance Reports"
+    },
+    "actions": {
+      "generate": "Generate",
+      "schedule": "Schedule",
+      "export": "Export"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Application configuration",
+    "sections": {
+      "general": "General",
+      "security": "Security",
+      "notifications": "Notifications",
+      "integrations": "Integrations"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page Not Found",
+      "message": "The page you are looking for does not exist.",
+      "action": "Go to Dashboard"
+    },
+    "serverError": {
+      "title": "Server Error",
+      "message": "Something went wrong on our end.",
+      "action": "Try Again"
+    },
+    "networkError": {
+      "title": "Network Error",
+      "message": "Please check your internet connection.",
+      "action": "Retry"
+    }
+  }
+}

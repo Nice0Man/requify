@@ -1,6 +1,6 @@
-// Auth UI exports - user interface components for authentication
-export { LoginForm } from './LoginForm';
-export { RegisterForm } from './RegisterForm';
-export { PasswordResetForm } from './PasswordResetForm';
-export { AuthGuard } from './AuthGuard';
-export { AuthLayout } from './AuthLayout'; 
+// Auth UI components exports
+export * from "./LoginForm";
+export * from "./RegisterForm";
+export * from "./LogoutButton";
+export * from './ForgotPasswordForm'; // Created component
+export * from './ResetPasswordForm'; // Created component

@@ -1,52 +1,30 @@
 import React from 'react';
+import { Box, Container, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import {
-  Container,
-  Box,
-  Typography,
-  Button,
-  Paper
-} from '@mui/material';
-import { Home, ArrowBack } from '@mui/icons-material';
+import { Home } from '@mui/icons-material';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleGoHome = () => {
-    navigate('/start');
-  };
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <Container maxWidth="md">
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          textAlign: 'center'
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            p: 6,
-            maxWidth: 500,
-            width: '100%'
-          }}
-        >
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'background.default',
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box textAlign="center">
           <Typography
             variant="h1"
             sx={{
               fontSize: '6rem',
-              fontWeight: 'bold',
+              fontWeight: 800,
               color: 'primary.main',
-              mb: 2
+              mb: 2,
             }}
           >
             404
@@ -55,9 +33,9 @@ const NotFoundPage: React.FC = () => {
           <Typography
             variant="h4"
             sx={{
-              fontWeight: 'bold',
               mb: 2,
-              color: 'text.primary'
+              fontWeight: 600,
+              color: 'text.primary',
             }}
           >
             Page Not Found
@@ -68,32 +46,26 @@ const NotFoundPage: React.FC = () => {
             color="text.secondary"
             sx={{ mb: 4 }}
           >
-            The page you are looking for might have been removed, 
-            had its name changed, or is temporarily unavailable.
+            The page you are looking for doesn't exist or has been moved.
           </Typography>
           
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-            <Button
-              variant="contained"
-              startIcon={<Home />}
-              onClick={handleGoHome}
-              size="large"
-            >
-              Go Home
-            </Button>
-            
-            <Button
-              variant="outlined"
-              startIcon={<ArrowBack />}
-              onClick={handleGoBack}
-              size="large"
-            >
-              Go Back
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<Home />}
+            onClick={() => navigate('/')}
+            sx={{
+              px: 4,
+              py: 1.5,
+              borderRadius: 3,
+              fontWeight: 600,
+            }}
+          >
+            Go Home
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 

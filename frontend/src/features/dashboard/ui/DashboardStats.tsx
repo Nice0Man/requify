@@ -1,40 +1,15 @@
-import React from 'react';
-import { Card, Statistic, Row, Col } from 'antd';
-import { useDashboardStats } from '../model';
+import React from "react";
+import { Box, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
-export interface DashboardStatsProps {
-  projectId?: number;
-}
-
-export const DashboardStats: React.FC<DashboardStatsProps> = ({ projectId }) => {
-  const { stats, isLoading } = useDashboardStats(projectId);
-
-  if (isLoading || !stats) {
-    return <Card loading={true} />;
-  }
-
+const DashboardStats: React.FC = () => {
+  const { t } = useTranslation();
   return (
-    <Row gutter={16}>
-      <Col span={6}>
-        <Card>
-          <Statistic title="Projects" value={stats.total_projects} />
-        </Card>
-      </Col>
-      <Col span={6}>
-        <Card>
-          <Statistic title="Requirements" value={stats.total_requirements} />
-        </Card>
-      </Col>
-      <Col span={6}>
-        <Card>
-          <Statistic title="Releases" value={stats.total_releases} />
-        </Card>
-      </Col>
-      <Col span={6}>
-        <Card>
-          <Statistic title="Users" value={stats.total_users} />
-        </Card>
-      </Col>
-    </Row>
+    <Box>
+      <Typography variant="h6">{t("dashboard.statsTitle")}</Typography>
+      <Typography variant="body2">{t("dashboard.statsDescription")}</Typography>
+    </Box>
   );
-}; 
+};
+
+export { DashboardStats };

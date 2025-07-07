@@ -1,2 +1,2 @@
-export { Navigation } from './ui/Navigation';
-export type { NavigationProps } from '../types'; 
+// Navigation widget exports
+export * from './ui'; 

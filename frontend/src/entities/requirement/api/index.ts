@@ -1,2 +1,2 @@
-// Export requirement API
-export { RequirementsApi, requirementsApi } from './requirements.api'; 
+// Requirement API exports
+export * from "./requirementApi";

@@ -1,6 +1,7 @@
-import React from 'react';
-import { AppProviders } from './providers/AppProviders';
-import { AppRouter } from './router/AppRouter';
+import React from "react";
+import { AppProviders } from "./providers";
+import { AppRouter } from "./router";
+import "./styles/index.css";
 
 export const App: React.FC = () => {
   return (
@@ -8,4 +9,4 @@ export const App: React.FC = () => {
       <AppRouter />
     </AppProviders>
   );
-}; 
+};

@@ -1,1022 +1,346 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Typography,
-  Grid,
-  Card,
-  Button,
-  Chip,
-  LinearProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  IconButton,
-  Tooltip,
-  useTheme,
-  alpha,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  MenuItem,
-  Alert,
-  InputAdornment,
-  Fab,
   Paper,
+  Grid,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import {
-  RocketLaunch,
-  Add,
-  Edit,
-  Delete,
-  Schedule,
-  BugReport,
-  Refresh,
-  GetApp,
-  Visibility,
-  PlayArrow,
-  Pending,
-  CheckCircleOutline,
-  ErrorOutline,
-  CalendarToday,
-  Search,
-  FilterList,
-  Publish,
-  Sync,
-  Description,
-  Restore,
-  MoreVert,
+  Add as AddIcon,
+  ViewModule as ViewModuleIcon,
+  ViewList as ViewListIcon,
+  Search as SearchIcon,
 } from "@mui/icons-material";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
-import { useAuth } from "@/features/auth/model/auth.context";
-import { usePermissions } from "@/shared/hooks/usePermissions";
 import {
-  releasesApi,
-  ReleaseListParams,
+  useReleases,
+  useReleaseStats,
+  useUpdateRelease,
+} from "../../../features/release-management";
+import { LoadingSpinner } from "../../../shared/ui";
+import type {
   Release,
-  ReleaseStatus,
-  ReleaseCreate,
-  ReleaseUpdate,
-} from "@/features/release-management/api/releases.api";
-
-interface ReleaseStats {
-  total: number;
-  planning: number;
-  in_progress: number;
-  testing: number;
-  ready: number;
-  released: number;
-  cancelled: number;
-  overdue: number;
-}
+  ReleaseFilters,
+} from "../../../features/release-management/api/releaseApi";
 
 const ReleasesPage: React.FC = () => {
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const { id: projectId } = useParams(); // Get project ID from URL if accessed via /projects/:id/releases
-  const { } = useAuth();
-  const { } = usePermissions();
+  const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "draft" | "planned" | "in_progress" | "released" | "cancelled"
+  >("all");
+  const [selectedProject, setSelectedProject] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // State management
-  const [activeTab] = useState(0);
-  const [releases, setReleases] = useState<Release[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<ReleaseStats>({
-    total: 0,
-    planning: 0,
-    in_progress: 0,
-    testing: 0,
-    ready: 0,
-    released: 0,
-    cancelled: 0,
-    overdue: 0,
+  // Формируем фильтры для API
+  const filters: ReleaseFilters = {
+    search: searchTerm || undefined,
+    status: statusFilter === "all" ? undefined : statusFilter,
+    projectId: selectedProject === "all" ? undefined : selectedProject,
+  };
+
+  const {
+    data: releases = [],
+    isPending: releasesLoading,
+    error: releasesError,
+    refetch: refetchReleases,
+  } = useReleases(filters);
+
+  const {
+    data: releaseStats,
+    isPending: releaseStatsLoading,
+    error: releaseStatsError,
+  } = useReleaseStats();
+
+  const updateRelease = useUpdateRelease();
+
+  // Фильтрация релизов
+  const filteredReleases = releases.filter((release: Release) => {
+    const matchesSearch =
+      release.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      release.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || release.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
-  // Pagination and filtering
-  const [page, setPage] = useState(0);
-  const [pageSize] = useState(25);
-  const [totalCount] = useState(0);
-  const [filters, setFilters] = useState({
-    status: "",
-    search: "",
-    project_id: projectId || "", // Auto-fill project ID if accessed from project page
-    show_deleted: false,
-  });
-
-  // Dialog states
-  const [createDialog] = useState(false);
-  const [editDialog, setEditDialog] = useState(false);
-  const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
-  const [releaseForm, setReleaseForm] = useState<
-    Partial<ReleaseCreate & { status?: string }>
-  >({
-    name: "",
-    version: "",
-    description: "",
-    planned_date: "",
-    project_id: undefined,
-    status: "",
-  });
-
-  // Load data
-  useEffect(() => {
-    loadReleases();
-  }, [page, pageSize, filters]);
-
-  // Load releases
-  const loadReleases = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const params: ReleaseListParams = {
-        skip: page * pageSize,
-        limit: pageSize,
-        status: filters.status || undefined,
-        project_id: filters.project_id
-          ? parseInt(filters.project_id)
-          : undefined,
-        sort_by: "planned_date",
-        sort_order: "desc",
-      };
-
-      const response = await releasesApi.getReleases(params);
-      let fetchedReleases = response.data.items || [];
-
-      // Filter based on deleted status
-      if (!filters.show_deleted) {
-        fetchedReleases = fetchedReleases.filter(
-          (release) => release.status !== ReleaseStatus.DELETED
-        );
-      }
-
-      // Apply search filter
-      if (filters.search) {
-        fetchedReleases = fetchedReleases.filter(
-          (release) =>
-            release.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-            release.version
-              .toLowerCase()
-              .includes(filters.search.toLowerCase()) ||
-            release.description
-              ?.toLowerCase()
-              .includes(filters.search.toLowerCase())
-        );
-      }
-
-      setReleases(fetchedReleases);
-      setTotalCount(fetchedReleases.length);
-
-      // Calculate stats (exclude deleted releases from stats)
-      const activeReleases = fetchedReleases.filter(
-        (r) => r.status !== ReleaseStatus.DELETED
-      );
-      const releaseStats: ReleaseStats = {
-        total: activeReleases.length,
-        planning: activeReleases.filter(
-          (r) =>
-            r.status === ReleaseStatus.PLANNING ||
-            r.status === ReleaseStatus.PLANNED
-        ).length,
-        in_progress: activeReleases.filter(
-          (r) => r.status === ReleaseStatus.IN_PROGRESS
-        ).length,
-        testing: activeReleases.filter(
-          (r) => r.status === ReleaseStatus.TESTING
-        ).length,
-        ready: activeReleases.filter((r) => r.status === ReleaseStatus.READY)
-          .length,
-        released: activeReleases.filter(
-          (r) => r.status === ReleaseStatus.RELEASED
-        ).length,
-        cancelled: activeReleases.filter(
-          (r) => r.status === ReleaseStatus.CANCELLED
-        ).length,
-        overdue: activeReleases.filter((r) => {
-          const plannedDate = new Date(r.planned_date || "");
-          return (
-            plannedDate < new Date() && r.status !== ReleaseStatus.RELEASED
-          );
-        }).length,
-      };
-      setStats(releaseStats);
-    } catch (err: any) {
-      console.error("Failed to load releases:", err);
-      setError(err.message || "Failed to load releases");
-      setReleases([]);
-      setTotalCount(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle create release
-  const _handleCreateRelease = async () => {
-    try {
-      if (!releaseForm.name || !releaseForm.version) {
-        toast.error("Name and version are required");
-        return;
-      }
-
-      const createData: ReleaseCreate = {
-        name: releaseForm.name,
-        version: releaseForm.version,
-        description: releaseForm.description || "",
-        planned_date: releaseForm.planned_date || "",
-        project_id: releaseForm.project_id || 0,
-        status: ReleaseStatus.PLANNED,
-      };
-
-      await releasesApi.createRelease(createData);
-      toast.success("Release created successfully");
-      setCreateDialog(false);
-      setReleaseForm({
-        name: "",
-        version: "",
-        description: "",
-        planned_date: "",
-        project_id: undefined,
-        status: "",
-      });
-      loadReleases();
-    } catch (err: any) {
-      toast.error("Failed to create release: " + err.message);
-    }
-  };
-
-  // Handle edit release
-  const handleEditRelease = async () => {
-    try {
-      if (!selectedRelease || !releaseForm.name || !releaseForm.version) {
-        toast.error("Name and version are required");
-        return;
-      }
-
-      const updateData: ReleaseUpdate = {
-        name: releaseForm.name,
-        version: releaseForm.version,
-        description: releaseForm.description || "",
-        planned_date: releaseForm.planned_date || "",
-        status: releaseForm.status,
-      };
-
-      await releasesApi.updateRelease(selectedRelease.id, updateData);
-      toast.success("Release updated successfully");
-      setEditDialog(false);
-      setSelectedRelease(null);
-      setReleaseForm({
-        name: "",
-        version: "",
-        description: "",
-        planned_date: "",
-        project_id: undefined,
-        status: "",
-      });
-      loadReleases();
-    } catch (err: any) {
-      toast.error("Failed to update release: " + err.message);
-    }
-  };
-
-  // Handle delete release (soft delete)
-  const handleDeleteRelease = async (release: Release) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete "${release.name}"? This will mark it as deleted but not permanently remove it.`
-      )
-    ) {
-      try {
-        await releasesApi.deleteRelease(release.id);
-        toast.success("Release marked as deleted successfully");
-        loadReleases();
-      } catch (err: any) {
-        toast.error("Failed to delete release: " + err.message);
-      }
-    }
-  };
-
-  // Handle restore release
-  const handleRestoreRelease = async (release: Release) => {
-    if (window.confirm(`Are you sure you want to restore "${release.name}"?`)) {
-      try {
-        await releasesApi.restoreRelease(release.id, ReleaseStatus.DRAFT);
-        toast.success("Release restored successfully");
-        loadReleases();
-      } catch (err: any) {
-        toast.error("Failed to restore release: " + err.message);
-      }
-    }
-  };
-
-  // Handle publish release
-  const handlePublishRelease = async (release: Release) => {
-    if (
-      window.confirm(
-        `Are you sure you want to publish "${release.name}" v${release.version}?`
-      )
-    ) {
-      try {
-        const publishData = {
-          changelog: `Release ${release.version} published`,
-          notification_recipients: [],
-        };
-        await releasesApi.publishRelease(release.id, publishData);
-        toast.success("Release published successfully");
-        loadReleases();
-      } catch (err: any) {
-        toast.error("Failed to publish release: " + err.message);
-      }
-    }
-  };
-
-  // Handle sync requirements
-  const handleSyncRequirements = async (release: Release) => {
-    try {
-      const syncData = {
-        project_id: release.project_id,
-      };
-      const response = await releasesApi.syncProjectRequirementsToRelease(
-        release.id,
-        syncData
-      );
-      toast.success(
-        `Synced ${response.data.synced_requirements} requirements successfully`
-      );
-      loadReleases();
-    } catch (err: any) {
-      toast.error("Failed to sync requirements: " + err.message);
-    }
-  };
-
-  // Handle export releases
-  const handleExportReleases = () => {
-    try {
-      // Create CSV content
-      const headers = [
-        "ID",
-        "Name",
-        "Version",
-        "Status",
-        "Project ID",
-        "Description",
-        "Planned Date",
-        "Release Date",
-        "Created At",
-        "Updated At",
-      ];
-
-      const csvContent = [
-        headers.join(","),
-        ...releases.map((release) =>
-          [
-            release.id,
-            `"${release.name.replace(/"/g, '""')}"`,
-            `"${release.version.replace(/"/g, '""')}"`,
-            release.status,
-            release.project_id,
-            `"${(release.description || "").replace(/"/g, '""')}"`,
-            release.planned_date || "",
-            release.release_date || "",
-            release.created_at,
-            release.updated_at,
-          ].join(",")
-        ),
-      ].join("\n");
-
-      // Create and download file
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute(
-          "download",
-          `releases_export_${new Date().toISOString().split("T")[0]}.csv`
-        );
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        toast.success(`Exported ${releases.length} releases to CSV`);
-      }
-    } catch (error) {
-      console.error("Export failed:", error);
-      toast.error("Failed to export releases");
-    }
-  };
-
-  // Handle generate specification
-  const handleGenerateSpecification = async (release: Release) => {
-    try {
-      const specData = {
-        format: "pdf" as const,
-        language: "ru" as const,
-        include_requirements: true,
-        include_relationships: true,
-        include_changelog: true,
-        include_statistics: true,
-        template_style: "standard" as const,
-        auto_numbering: true,
-      };
-      const response = await releasesApi.generateReleaseSpecification(
-        release.id,
-        specData
-      );
-      toast.success("Specification generated successfully");
-      // You could open the download URL here
-      if (response.data.download_url) {
-        window.open(response.data.download_url, "_blank");
-      }
-    } catch (err: any) {
-      toast.error("Failed to generate specification: " + err.message);
-    }
-  };
-
-  // Get status color
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: Release["status"]) => {
     switch (status) {
-      case ReleaseStatus.PLANNING:
-      case ReleaseStatus.PLANNED:
-        return theme.palette.info.main;
-      case ReleaseStatus.IN_PROGRESS:
-        return theme.palette.warning.main;
-      case ReleaseStatus.TESTING:
-        return theme.palette.secondary.main;
-      case ReleaseStatus.READY:
-        return theme.palette.primary.main;
-      case ReleaseStatus.RELEASED:
-        return theme.palette.success.main;
-      case ReleaseStatus.CANCELLED:
-        return theme.palette.error.main;
+      case "draft":
+        return "default";
+      case "planned":
+        return "info";
+      case "in_progress":
+        return "warning";
+      case "released":
+        return "success";
+      case "cancelled":
+        return "error";
       default:
-        return theme.palette.grey[500];
+        return "default";
     }
   };
 
-  // Get status icon
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case ReleaseStatus.PLANNING:
-      case ReleaseStatus.PLANNED:
-        return <Schedule />;
-      case ReleaseStatus.IN_PROGRESS:
-        return <PlayArrow />;
-      case ReleaseStatus.TESTING:
-        return <BugReport />;
-      case ReleaseStatus.READY:
-        return <CheckCircleOutline />;
-      case ReleaseStatus.RELEASED:
-        return <RocketLaunch />;
-      case ReleaseStatus.CANCELLED:
-        return <ErrorOutline />;
-      default:
-        return <Pending />;
-    }
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return t("common.notSet");
+    return new Date(dateString).toLocaleDateString();
   };
 
-  // Check if release is overdue
-  const isOverdue = (release: Release) => {
-    const plannedDate = new Date(release.planned_date || "");
-    return (
-      plannedDate < new Date() && release.status !== ReleaseStatus.RELEASED
-    );
-  };
-
-  // Open edit dialog
-  const openEditDialog = (release: Release) => {
-    setSelectedRelease(release);
-    setReleaseForm({
-      name: release.name,
-      version: release.version,
-      description: release.description || "",
-      planned_date: release.planned_date || "",
-      project_id: release.project_id,
-      status: release.status,
-    });
-    setEditDialog(true);
-  };
-
-  return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <Box sx={{ p: { xs: 2, sm: 3 }, flexShrink: 0 }}>
-        {/* Header */}
+  const ReleaseCard = ({ release }: { release: Release }) => (
+    <Card
+      elevation={2}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: 2,
+        transition: "all 0.3s ease-in-out",
+        "&:hover": {
+          transform: "translateY(-2px)",
+          boxShadow: (theme) => theme.shadows[8],
+        },
+      }}
+    >
+      <CardContent sx={{ flexGrow: 1, p: 3 }}>
         <Box
           display="flex"
           justifyContent="space-between"
-          alignItems="center"
-          mb={3}
+          alignItems="flex-start"
+          mb={2}
         >
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Releases
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Manage product releases, versions, and deployment schedules.
-            </Typography>
-          </Box>
-
-          <Box display="flex" gap={2}>
-            <Tooltip title="Refresh Releases">
-              <span>
-                <IconButton onClick={loadReleases} disabled={loading}>
-                  <Refresh />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Button
-              variant="outlined"
-              startIcon={<GetApp />}
-              onClick={handleExportReleases}
-            >
-              Export
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => navigate("/releases/create")}
-            >
-              New Release
-            </Button>
-          </Box>
+          <Typography variant="h6" component="h2" fontWeight={700}>
+            {release.name}
+          </Typography>
+          <Chip
+            label={t(`releases.status.${release.status}`)}
+            color={getStatusColor(release.status)}
+            size="small"
+            sx={{ fontWeight: 600 }}
+          />
         </Box>
 
-        {/* Error Alert */}
-        {error && (
-          <Alert
-            severity="error"
-            onClose={() => setError(null)}
-            action={
-              <Button color="inherit" size="small" onClick={loadReleases}>
-                Retry
-              </Button>
-            }
-            sx={{ mb: 3 }}
-          >
-            {error}
-          </Alert>
-        )}
+        <Typography variant="body2" color="primary" fontWeight={600} mb={1}>
+          {t("releases.fields.version")}: {release.version}
+        </Typography>
 
-        {/* Stats Cards */}
+        <Typography variant="body2" color="text.secondary" mb={2}>
+          {release.description || t("releases.placeholders.noDescription")}
+        </Typography>
+
+        <Box display="flex" gap={2} mb={2}>
+          <Box>
+            <Typography variant="body2" color="text.secondary">
+              {t("releases.fields.releaseDate")}
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>
+              {formatDate(release.releaseDate)}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="body2" color="text.secondary">
+              {t("releases.fields.createdAt")}
+            </Typography>
+            <Typography variant="body2" fontWeight={500}>
+              {formatDate(release.createdAt)}
+            </Typography>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+
+  if (releasesLoading || releaseStatsLoading) {
+    return <LoadingSpinner fullScreen />;
+  }
+
+  if (releasesError || releaseStatsError) {
+    return (
+      <Box p={3} textAlign="center">
+        <Typography color="error">{t("errors.loadingError")}</Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box p={3}>
+      {/* Заголовок */}
+      <Box mb={3}>
+        <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
+          {t("releases.title")}
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary">
+          {t("releases.subtitle")}
+        </Typography>
+      </Box>
+
+      {/* Статистика */}
+      {releaseStats && (
         <Grid container spacing={3} mb={3}>
-          <Grid item xs={12} sm={6} md={2}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h5" color="primary.main">
-                {stats.total}
+          <Grid item xs={12} md={3}>
+            <Paper
+              elevation={1}
+              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+            >
+              <Typography variant="h4" color="primary" fontWeight={700}>
+                {releaseStats.totalReleases}
               </Typography>
-              <Typography variant="body2">Total Releases</Typography>
+              <Typography variant="body2" color="text.secondary" mb={1}>
+                {t("releases.stats.totalReleases")}
+              </Typography>
             </Paper>
           </Grid>
-
-          <Grid item xs={12} sm={6} md={2}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h5" color="info.main">
-                {stats.planning}
+          <Grid item xs={12} md={3}>
+            <Paper
+              elevation={1}
+              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+            >
+              <Typography variant="h4" color="info.main" fontWeight={700}>
+                {releaseStats.plannedReleases}
               </Typography>
-              <Typography variant="body2">Planned</Typography>
+              <Typography variant="body2" color="text.secondary" mb={1}>
+                {t("releases.stats.plannedReleases")}
+              </Typography>
             </Paper>
           </Grid>
-
-          <Grid item xs={12} sm={6} md={2}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h5" color="warning.main">
-                {stats.in_progress}
+          <Grid item xs={12} md={3}>
+            <Paper
+              elevation={1}
+              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+            >
+              <Typography variant="h4" color="warning.main" fontWeight={700}>
+                {releaseStats.inProgressReleases}
               </Typography>
-              <Typography variant="body2">In Progress</Typography>
+              <Typography variant="body2" color="text.secondary" mb={1}>
+                {t("releases.stats.inProgressReleases")}
+              </Typography>
             </Paper>
           </Grid>
-
-          <Grid item xs={12} sm={6} md={2}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h5" color="secondary.main">
-                {stats.testing}
+          <Grid item xs={12} md={3}>
+            <Paper
+              elevation={1}
+              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+            >
+              <Typography variant="h4" color="success.main" fontWeight={700}>
+                {releaseStats.releasedReleases}
               </Typography>
-              <Typography variant="body2">Testing</Typography>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={2}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h5" color="success.main">
-                {stats.released}
+              <Typography variant="body2" color="text.secondary" mb={1}>
+                {t("releases.stats.releasedReleases")}
               </Typography>
-              <Typography variant="body2">Released</Typography>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={2}>
-            <Paper sx={{ p: 2, textAlign: "center" }}>
-              <Typography variant="h5" color="error.main">
-                {stats.overdue}
-              </Typography>
-              <Typography variant="body2">Overdue</Typography>
             </Paper>
           </Grid>
         </Grid>
+      )}
 
-        {/* Filters */}
-        <Card sx={{ p: 3, mb: 3 }}>
-          <Box display="flex" alignItems="center" gap={2} mb={2}>
-            <FilterList color="primary" />
-            <Typography variant="h6">Filters</Typography>
-            {(filters.search || filters.status.length > 0) && (
-              <Button
-                size="small"
-                onClick={() =>
-                  setFilters({
-                    status: "",
-                    search: "",
-                    project_id: "",
-                    show_deleted: false,
-                  })
-                }
-              >
-                Clear All
-              </Button>
-            )}
-          </Box>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                placeholder="Search releases..."
-                value={filters.search}
-                onChange={(e) => {
-                  setFilters({ ...filters, search: e.target.value });
-                  // Reset page to 0 when filter changes
-                  setPage(0);
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <TextField
-                select
-                fullWidth
-                label="Status"
-                value={filters.status}
-                onChange={(e) => {
-                  setFilters({ ...filters, status: e.target.value });
-                  // Reset page to 0 when filter changes
-                  setPage(0);
-                }}
-              >
-                <MenuItem value="">All Statuses</MenuItem>
-                <MenuItem value={ReleaseStatus.DRAFT}>Draft</MenuItem>
-                <MenuItem value={ReleaseStatus.PLANNED}>Planned</MenuItem>
-                <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
-                <MenuItem value={ReleaseStatus.IN_PROGRESS}>
-                  In Progress
-                </MenuItem>
-                <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
-                <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
-                <MenuItem value={ReleaseStatus.PUBLISHED}>Published</MenuItem>
-                <MenuItem value={ReleaseStatus.RELEASED}>Released</MenuItem>
-                <MenuItem value={ReleaseStatus.CANCELLED}>Cancelled</MenuItem>
-                {filters.show_deleted && (
-                  <MenuItem value={ReleaseStatus.DELETED}>Deleted</MenuItem>
-                )}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                label="Project ID"
-                value={filters.project_id}
-                onChange={(e) => {
-                  setFilters({ ...filters, project_id: e.target.value });
-                  // Reset page to 0 when filter changes
-                  setPage(0);
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <TextField
-                select
-                fullWidth
-                label="Show Deleted"
-                value={filters.show_deleted}
-                onChange={(e) => {
-                  setFilters({
-                    ...filters,
-                    show_deleted: e.target.value === "true",
-                  });
-                  // Reset page to 0 when filter changes
-                  setPage(0);
-                }}
-              >
-                <MenuItem value="false">Hide Deleted</MenuItem>
-                <MenuItem value="true">Show Deleted</MenuItem>
-              </TextField>
-            </Grid>
+      {/* Фильтры и поиск */}
+      <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={3}>
+            <TextField
+              fullWidth
+              placeholder={t("releases.searchPlaceholder")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <SearchIcon sx={{ mr: 1, color: "action.active" }} />
+                ),
+              }}
+            />
           </Grid>
-        </Card>
-      </Box>
-
-      {/* Releases Table */}
-      <Box
-        sx={{
-          flex: 1,
-          overflow: "hidden",
-          px: { xs: 2, sm: 3 },
-          pb: { xs: 2, sm: 3 },
-        }}
-      >
-        <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-          <Box sx={{ overflow: "auto", flex: 1 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Version</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Planned Date</TableCell>
-                  <TableCell>Project</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      <LinearProgress />
-                    </TableCell>
-                  </TableRow>
-                ) : releases.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      <Typography color="text.secondary">
-                        No releases found
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  releases.map((release) => (
-                    <TableRow key={release.id} hover>
-                      <TableCell>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Typography variant="subtitle2" fontWeight={600}>
-                            {release.name}
-                          </Typography>
-                          {isOverdue(release) && (
-                            <Chip
-                              label="Overdue"
-                              size="small"
-                              color="error"
-                              variant="outlined"
-                            />
-                          )}
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontFamily="monospace">
-                          {release.version}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          icon={getStatusIcon(release.status)}
-                          label={release.status.replace("_", " ")}
-                          size="small"
-                          sx={{
-                            backgroundColor: alpha(
-                              getStatusColor(release.status),
-                              0.1
-                            ),
-                            color: getStatusColor(release.status),
-                            fontWeight: 600,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <CalendarToday fontSize="small" color="action" />
-                          <Typography variant="body2">
-                            {release.planned_date
-                              ? new Date(
-                                  release.planned_date
-                                ).toLocaleDateString()
-                              : "Not set"}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">
-                          {release.project_id || "N/A"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Box display="flex" gap={1} justifyContent="flex-end">
-                          <Tooltip title="View Details">
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              onClick={() =>
-                                navigate(`/releases/${release.id}`)
-                              }
-                            >
-                              <Visibility fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-
-                          {release.status !== ReleaseStatus.DELETED ? (
-                            <>
-                          <Tooltip title="Edit Release">
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              onClick={() => openEditDialog(release)}
-                            >
-                              <Edit fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-
-                              {release.status === ReleaseStatus.READY && (
-                                <Tooltip title="Publish Release">
-                                  <IconButton
-                                    size="small"
-                                    color="success"
-                                    onClick={() =>
-                                      handlePublishRelease(release)
-                                    }
-                                  >
-                                    <Publish fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-
-                              <Tooltip title="Sync Requirements">
-                                <IconButton
-                                  size="small"
-                                  color="info"
-                                  onClick={() =>
-                                    handleSyncRequirements(release)
-                                  }
-                                >
-                                  <Sync fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-
-                              <Tooltip title="Generate Specification">
-                                <IconButton
-                                  size="small"
-                                  color="secondary"
-                                  onClick={() =>
-                                    handleGenerateSpecification(release)
-                                  }
-                                >
-                                  <Description fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-
-                          <Tooltip title="Delete Release">
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => handleDeleteRelease(release)}
-                            >
-                              <Delete fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                            </>
-                          ) : (
-                            <Tooltip title="Restore Release">
-                              <IconButton
-                                size="small"
-                                color="success"
-                                onClick={() => handleRestoreRelease(release)}
-                              >
-                                <Restore fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </Box>
-        </Card>
-      </Box>
-
-      {/* Floating Action Button */}
-      <Fab
-        color="primary"
-        sx={{ position: "fixed", bottom: 24, right: 24 }}
-        onClick={() => navigate("/releases/create")}
-      >
-        <Add />
-      </Fab>
-
-      {/* Edit Release Dialog */}
-      <Dialog
-        open={editDialog}
-        onClose={() => setEditDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Edit Release</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Release Name"
-                value={releaseForm.name}
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>{t("releases.fields.status")}</InputLabel>
+              <Select
+                value={statusFilter}
+                label={t("releases.fields.status")}
                 onChange={(e) =>
-                  setReleaseForm({ ...releaseForm, name: e.target.value })
-                }
-                required
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Version"
-                value={releaseForm.version}
-                onChange={(e) =>
-                  setReleaseForm({ ...releaseForm, version: e.target.value })
-                }
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Description"
-                multiline
-                rows={3}
-                value={releaseForm.description}
-                onChange={(e) =>
-                  setReleaseForm({
-                    ...releaseForm,
-                    description: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Planned Date"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={releaseForm.planned_date}
-                onChange={(e) =>
-                  setReleaseForm({
-                    ...releaseForm,
-                    planned_date: e.target.value,
-                  })
-                }
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                fullWidth
-                label="Status"
-                value={releaseForm.status}
-                onChange={(e) =>
-                  setReleaseForm({ ...releaseForm, status: e.target.value })
+                  setStatusFilter(e.target.value as typeof statusFilter)
                 }
               >
-                <MenuItem value={ReleaseStatus.DRAFT}>Draft</MenuItem>
-                <MenuItem value={ReleaseStatus.PLANNED}>Planned</MenuItem>
-                <MenuItem value={ReleaseStatus.PLANNING}>Planning</MenuItem>
-                <MenuItem value={ReleaseStatus.IN_PROGRESS}>
-                  In Progress
+                <MenuItem value="all">{t("releases.status.all")}</MenuItem>
+                <MenuItem value="draft">{t("releases.status.draft")}</MenuItem>
+                <MenuItem value="planned">
+                  {t("releases.status.planned")}
                 </MenuItem>
-                <MenuItem value={ReleaseStatus.TESTING}>Testing</MenuItem>
-                <MenuItem value={ReleaseStatus.READY}>Ready</MenuItem>
-                <MenuItem value={ReleaseStatus.PUBLISHED}>Published</MenuItem>
-                <MenuItem value={ReleaseStatus.RELEASED}>Released</MenuItem>
-                <MenuItem value={ReleaseStatus.CANCELLED}>Cancelled</MenuItem>
-              </TextField>
-            </Grid>
+                <MenuItem value="in_progress">
+                  {t("releases.status.in_progress")}
+                </MenuItem>
+                <MenuItem value="released">
+                  {t("releases.status.released")}
+                </MenuItem>
+                <MenuItem value="cancelled">
+                  {t("releases.status.cancelled")}
+                </MenuItem>
+              </Select>
+            </FormControl>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialog(false)}>Cancel</Button>
-          <Button onClick={handleEditRelease} variant="contained">
-            Update Release
+          <Grid item xs={12} md={3}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(_, newViewMode) =>
+                newViewMode && setViewMode(newViewMode)
+              }
+              aria-label={t("common.view")}
+            >
+              <ToggleButton value="grid" aria-label="grid view">
+                <ViewModuleIcon />
+              </ToggleButton>
+              <ToggleButton value="list" aria-label="list view">
+                <ViewListIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <Button
+              fullWidth
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{ fontWeight: 600 }}
+            >
+              {t("releases.createRelease")}
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* Список релизов */}
+      {filteredReleases.length === 0 ? (
+        <Paper
+          elevation={1}
+          sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
+        >
+          <Typography variant="h6" color="text.secondary" mb={2}>
+            {t("releases.notFound")}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{ fontWeight: 600 }}
+          >
+            {t("releases.createFirstRelease")}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Paper>
+      ) : (
+        <Grid container spacing={3}>
+          {filteredReleases.map((release) => (
+            <Grid item xs={12} md={6} lg={4} key={release.id}>
+              <ReleaseCard release={release} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 };

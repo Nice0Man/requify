@@ -23,14 +23,14 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/app/*": ["./src/app/*"],
-      "@/pages/*": ["./src/pages/*"],
-      "@/widgets/*": ["./src/widgets/*"],
-      "@/features/*": ["./src/features/*"],
-      "@/entities/*": ["./src/entities/*"],
-      "@/shared/*": ["./src/shared/*"],
-      "@/assets/*": ["./src/shared/assets/*"]
+      "@/*": ["src/*"],
+      "@/app/*": ["src/app/*"],
+      "@/pages/*": ["src/pages/*"],
+      "@/widgets/*": ["src/widgets/*"],
+      "@/features/*": ["src/features/*"],
+      "@/entities/*": ["src/entities/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/assets/*": ["src/shared/assets/*"]
     },
 
     /* Type checking */

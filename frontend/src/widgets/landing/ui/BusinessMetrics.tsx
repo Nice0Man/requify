@@ -10,9 +10,11 @@ import {
   useTheme,
 } from "@mui/material";
 import { TrendingUp, Speed, People, Security } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 export const BusinessMetrics: React.FC = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const [animatedValues, setAnimatedValues] = useState({
     efficiency: 85,
     timeSaved: 40,
@@ -24,8 +26,11 @@ export const BusinessMetrics: React.FC = () => {
     {
       icon: <TrendingUp />,
       value: "85%",
-      label: "Efficiency Boost",
-      description: "Average productivity increase",
+      label: t("landing.metrics.metric1.label", "Efficiency Boost"),
+      description: t(
+        "landing.metrics.metric1.desc",
+        "Average productivity increase"
+      ),
       color: theme.palette.primary.main,
       animationKey: "efficiency",
       targetValue: 85,
@@ -33,8 +38,11 @@ export const BusinessMetrics: React.FC = () => {
     {
       icon: <Speed />,
       value: "40h",
-      label: "Time Saved",
-      description: "Weekly per development team",
+      label: t("landing.metrics.metric2.label", "Time Saved"),
+      description: t(
+        "landing.metrics.metric2.desc",
+        "Weekly per development team"
+      ),
       color: theme.palette.success.main,
       animationKey: "timeSaved",
       targetValue: 40,
@@ -42,8 +50,11 @@ export const BusinessMetrics: React.FC = () => {
     {
       icon: <People />,
       value: "500+",
-      label: "Active Teams",
-      description: "Using our platform daily",
+      label: t("landing.metrics.metric3.label", "Active Teams"),
+      description: t(
+        "landing.metrics.metric3.desc",
+        "Using our platform daily"
+      ),
       color: theme.palette.info.main,
       animationKey: "teamSize",
       targetValue: 500,
@@ -51,8 +62,11 @@ export const BusinessMetrics: React.FC = () => {
     {
       icon: <Security />,
       value: "99.9%",
-      label: "Uptime SLA",
-      description: "Enterprise-grade reliability",
+      label: t("landing.metrics.metric4.label", "Uptime SLA"),
+      description: t(
+        "landing.metrics.metric4.desc",
+        "Enterprise-grade reliability"
+      ),
       color: theme.palette.warning.main,
       animationKey: "uptime",
       targetValue: 99.9,
@@ -61,25 +75,31 @@ export const BusinessMetrics: React.FC = () => {
 
   const testimonials = [
     {
-      quote:
-        "Transformed our development process completely. We ship features 60% faster now.",
-      author: "Sarah Chen",
-      role: "Engineering Manager",
-      company: "TechCorp",
+      quote: t(
+        "landing.metrics.testimonial1.quote",
+        "Transformed our development process completely. We ship features 60% faster now."
+      ),
+      author: t("landing.metrics.testimonial1.author", "Sarah Chen"),
+      role: t("landing.metrics.testimonial1.role", "Engineering Manager"),
+      company: t("landing.metrics.testimonial1.company", "TechCorp"),
     },
     {
-      quote:
-        "The best investment we made this year. ROI was visible within the first month.",
-      author: "Michael Rodriguez",
-      role: "CTO",
-      company: "StartupXYZ",
+      quote: t(
+        "landing.metrics.testimonial2.quote",
+        "The best investment we made this year. ROI was visible within the first month."
+      ),
+      author: t("landing.metrics.testimonial2.author", "Michael Rodriguez"),
+      role: t("landing.metrics.testimonial2.role", "CTO"),
+      company: t("landing.metrics.testimonial2.company", "StartupXYZ"),
     },
     {
-      quote:
-        "Finally, a tool that actually delivers on its promises. Our team loves it.",
-      author: "Emma Thompson",
-      role: "Product Lead",
-      company: "InnovateLabs",
+      quote: t(
+        "landing.metrics.testimonial3.quote",
+        "Finally, a tool that actually delivers on its promises. Our team loves it."
+      ),
+      author: t("landing.metrics.testimonial3.author", "Emma Thompson"),
+      role: t("landing.metrics.testimonial3.role", "Product Lead"),
+      company: t("landing.metrics.testimonial3.company", "InnovateLabs"),
     },
   ];
 
@@ -141,7 +161,7 @@ export const BusinessMetrics: React.FC = () => {
                   textAlign: "center",
                 }}
               >
-                Trusted by teams
+                {t("landing.metrics.title", "Trusted by teams")}
                 <Box
                   component="span"
                   sx={{
@@ -153,7 +173,7 @@ export const BusinessMetrics: React.FC = () => {
                     mt: 1,
                   }}
                 >
-                  worldwide
+                  {t("landing.metrics.titleHighlight", "worldwide")}
                 </Box>
               </Typography>
 
@@ -169,8 +189,10 @@ export const BusinessMetrics: React.FC = () => {
                   mx: "auto",
                 }}
               >
-                Real results from real teams who've transformed their
-                development process.
+                {t(
+                  "landing.metrics.subtitle",
+                  "Real results from real teams who've transformed their development process."
+                )}
               </Typography>
             </Box>
           </Grid>
@@ -190,7 +212,8 @@ export const BusinessMetrics: React.FC = () => {
                       border: `2px solid ${theme.palette.divider}`,
                       backgroundColor: theme.palette.background.paper,
                       boxShadow: theme.shadows[4],
-                      transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                      transition:
+                        "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                       position: "relative",
                       overflow: "hidden",
                       "&:hover": {
@@ -198,52 +221,37 @@ export const BusinessMetrics: React.FC = () => {
                         boxShadow: theme.shadows[20],
                         borderColor: metric.color,
                         "& .metric-icon": {
-                          transform: "scale(1.1)",
+                          transform: "scale(1.2)",
                           backgroundColor: metric.color,
                           color: theme.palette.common.white,
                         },
-                        "& .metric-value": {
-                          transform: "scale(1.05)",
-                        },
-                        "&::before": {
-                          opacity: 1,
-                        },
-                      },
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: `linear-gradient(135deg, ${metric.color}08, ${metric.color}02)`,
-                        opacity: 0,
-                        transition: "opacity 0.3s ease",
                       },
                     }}
                   >
-                    <Stack 
-                      spacing={3} 
-                      alignItems="center" 
-                      justifyContent="center"
-                      sx={{ height: "100%", position: "relative", zIndex: 1 }}
+                    <Stack
+                      spacing={3}
+                      sx={{
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
                       {/* Icon */}
                       <Box
                         className="metric-icon"
                         sx={{
-                          width: 64,
-                          height: 64,
-                          borderRadius: 2,
+                          width: 80,
+                          height: 80,
+                          borderRadius: "50%",
                           backgroundColor: `${metric.color}15`,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           color: metric.color,
-                          transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                          "& svg": {
-                            fontSize: "2rem",
-                          },
+                          fontSize: "2.5rem",
+                          transition: "all 0.3s ease",
+                          mb: 2,
                         }}
                       >
                         {metric.icon}
@@ -251,14 +259,12 @@ export const BusinessMetrics: React.FC = () => {
 
                       {/* Value */}
                       <Typography
-                        className="metric-value"
                         variant="h2"
                         sx={{
-                          fontSize: { xs: "2.2rem", md: "2.8rem" },
-                          fontWeight: 800,
+                          fontSize: { xs: "2.5rem", md: "3rem" },
+                          fontWeight: 700,
                           color: metric.color,
                           lineHeight: 1,
-                          transition: "transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                         }}
                       >
                         {formatAnimatedValue(
@@ -269,31 +275,29 @@ export const BusinessMetrics: React.FC = () => {
                         )}
                       </Typography>
 
-                      {/* Label & Description */}
-                      <Stack spacing={1.5} textAlign="center" sx={{ maxWidth: "200px" }}>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 700,
-                            color: theme.palette.text.primary,
-                            fontSize: { xs: "1.1rem", md: "1.2rem" },
-                            lineHeight: 1.2,
-                          }}
-                        >
-                          {metric.label}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: { xs: "0.9rem", md: "1rem" },
-                            lineHeight: 1.4,
-                            fontWeight: 500,
-                          }}
-                        >
-                          {metric.description}
-                        </Typography>
-                      </Stack>
+                      {/* Label */}
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 600,
+                          color: theme.palette.text.primary,
+                          fontSize: { xs: "1.1rem", md: "1.3rem" },
+                        }}
+                      >
+                        {metric.label}
+                      </Typography>
+
+                      {/* Description */}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: theme.palette.text.secondary,
+                          fontSize: "0.9rem",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {metric.description}
+                      </Typography>
                     </Stack>
                   </Box>
                 </Grid>
@@ -301,94 +305,86 @@ export const BusinessMetrics: React.FC = () => {
             </Grid>
           </Grid>
 
-          {/* Testimonials */}
+          {/* Testimonials Section */}
           <Grid item xs={12}>
-            <Grid container spacing={6} sx={{ maxWidth: "1200px", mx: "auto" }}>
-              {testimonials.map((testimonial, index) => (
-                <Grid item xs={12} md={4} key={index}>
-                  <Box
-                    sx={{
-                      height: "100%",
-                      minHeight: "200px",
-                      p: { xs: 3, md: 4 },
-                      borderRadius: 3,
-                      border: `2px solid ${theme.palette.divider}`,
-                      backgroundColor: theme.palette.background.paper,
-                      boxShadow: theme.shadows[4],
-                      transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                      position: "relative",
-                      overflow: "hidden",
-                      "&:hover": {
-                        transform: "translateY(-6px) scale(1.01)",
-                        boxShadow: theme.shadows[16],
-                        borderColor: theme.palette.primary.main,
-                        "&::before": {
-                          opacity: 1,
+            <Box sx={{ mt: 8 }}>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontSize: { xs: "1.8rem", md: "2.5rem" },
+                  fontWeight: 600,
+                  color: theme.palette.text.primary,
+                  textAlign: "center",
+                  mb: 6,
+                }}
+              >
+                {t(
+                  "landing.metrics.testimonialsTitle",
+                  "What our customers say"
+                )}
+              </Typography>
+
+              <Grid
+                container
+                spacing={4}
+                sx={{ maxWidth: "1200px", mx: "auto" }}
+              >
+                {testimonials.map((testimonial, index) => (
+                  <Grid item xs={12} md={4} key={index}>
+                    <Card
+                      sx={{
+                        height: "100%",
+                        p: 3,
+                        borderRadius: 3,
+                        border: `1px solid ${theme.palette.divider}`,
+                        backgroundColor: theme.palette.background.paper,
+                        boxShadow: theme.shadows[2],
+                        "&:hover": {
+                          transform: "translateY(-4px)",
+                          boxShadow: theme.shadows[8],
                         },
-                      },
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}06, ${theme.palette.secondary.main}04)`,
-                        opacity: 0,
-                        transition: "opacity 0.3s ease",
-                      },
-                    }}
-                  >
-                    <Stack 
-                      spacing={3} 
-                      sx={{ 
-                        height: "100%", 
-                        position: "relative", 
-                        zIndex: 1,
-                        justifyContent: "space-between"
                       }}
                     >
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontStyle: "italic",
-                          lineHeight: 1.6,
-                          color: theme.palette.text.primary,
-                          fontSize: { xs: "1.1rem", md: "1.2rem" },
-                          fontWeight: 500,
-                          flex: 1,
-                        }}
-                      >
-                        "{testimonial.quote}"
-                      </Typography>
+                      <CardContent sx={{ p: 0 }}>
+                        <Stack spacing={3}>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              color: theme.palette.text.primary,
+                              fontStyle: "italic",
+                              lineHeight: 1.6,
+                              fontSize: "1.1rem",
+                            }}
+                          >
+                            "{testimonial.quote}"
+                          </Typography>
 
-                      <Stack spacing={0.5}>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontWeight: 700,
-                            color: theme.palette.text.primary,
-                            fontSize: { xs: "1rem", md: "1.1rem" },
-                          }}
-                        >
-                          {testimonial.author}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ 
-                            fontSize: { xs: "0.9rem", md: "1rem" },
-                            fontWeight: 500,
-                          }}
-                        >
-                          {testimonial.role} at {testimonial.company}
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
+                          <Box>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{
+                                fontWeight: 600,
+                                color: theme.palette.text.primary,
+                              }}
+                            >
+                              {testimonial.author}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: theme.palette.text.secondary,
+                              }}
+                            >
+                              {testimonial.role} at {testimonial.company}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
           </Grid>
         </Grid>
       </Container>

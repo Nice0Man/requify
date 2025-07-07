@@ -1,2 +1,3 @@
-// Export admin API
-export { AdminApi, adminApi } from './admin.api'; 
+// Admin API exports
+export * from "./adminApi";
+export * from "./mappers";

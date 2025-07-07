@@ -1,7 +1,2 @@
-// Requirements pages exports - в соответствии с принципами FSD
-
-// UI components
-// export * from './ui'; // TODO: Create ui/index.ts
-
-// Types (if needed on page level)
-// export * from './types'; // TODO: Fix types 
+// Requirements page exports
+export { default } from "./ui";

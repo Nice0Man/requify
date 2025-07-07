@@ -1,2 +1,3 @@
-// Export project API
-export { ProjectsApi, projectsApi } from './projects.api'; 
+// Project API exports
+export * from './projectApi';
+export * from './mappers'; 

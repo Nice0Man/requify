@@ -1,35 +1,12 @@
-// Pages exports - в соответствии с принципами FSD
-// Страницы приложения, объединяющие widgets, features и entities
-
-// Admin pages
-export * from './admin';
-
-// Auth pages
-export * from './auth';
-
-// Dashboard pages
-export * from './dashboard';
-
-// Not Found pages
-export * from './not-found';
-
-// Notifications pages
-export * from './notifications';
-
-// Projects pages
-export * from './projects';
-
-// Releases pages
-export * from './releases';
-
-// Reports pages
-export * from './reports';
-
-// Requirements pages
-export * from './requirements';
-
-// Settings pages
-export * from './settings';
-
-// Testing pages
-export * from './testing'; 
+// Pages exports
+export * from "./auth";
+export * from "./dashboard";
+export * from "./projects";
+export * from "./requirements";
+export * from "./releases";
+export * from "./testing";
+export * from "./reports";
+export * from "./settings";
+export * from "./not-found";
+export * from "./landing";
+// TODO: Add other pages here kanban, admin, user, etc.

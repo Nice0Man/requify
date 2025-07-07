@@ -17,79 +17,44 @@
     <!-- Title -->
     <title>Requify - Requirements Management System</title>
     
-    <!-- CRITICAL: Hide scrollbars immediately before any content loads -->
+    <!-- Clean base styles -->
     <style>
-      /* Hide scrollbars for all browsers - HIGHEST PRIORITY */
-      html, body, #root, *, div, section, main, article, aside, nav, header, footer {
-        scrollbar-width: none !important;
-        -ms-overflow-style: none !important;
-      }
-      
-      html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
-      *::-webkit-scrollbar, div::-webkit-scrollbar, section::-webkit-scrollbar,
-      main::-webkit-scrollbar, article::-webkit-scrollbar, aside::-webkit-scrollbar,
-      nav::-webkit-scrollbar, header::-webkit-scrollbar, footer::-webkit-scrollbar {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        background: transparent !important;
-        -webkit-appearance: none !important;
-      }
-      
-      html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, #root::-webkit-scrollbar-track,
-      *::-webkit-scrollbar-track {
-        display: none !important;
-        background: transparent !important;
-      }
-      
-      html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, #root::-webkit-scrollbar-thumb,
-      *::-webkit-scrollbar-thumb {
-        display: none !important;
-        background: transparent !important;
-      }
-      
-      html::-webkit-scrollbar-corner, body::-webkit-scrollbar-corner, #root::-webkit-scrollbar-corner,
-      *::-webkit-scrollbar-corner {
-        display: none !important;
-        background: transparent !important;
-      }
-      
-      /* Base styles */
+      /* Minimal base styles - Let CSS handle the rest */
       html {
         height: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
+        font-family: system-ui, -apple-system, sans-serif;
       }
       
       body {
         height: 100%;
         margin: 0;
         padding: 0;
-        overflow-x: hidden;
-        overflow-y: auto;
+        background-color: #ffffff;
       }
       
       #root {
         min-height: 100vh;
-        background-color: #ffffff;
-        overflow-x: hidden;
-        overflow-y: auto;
       }
       
-      /* Loading spinner for initial load */
+      /* Loading indicator */
       .initial-loading {
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #666;
+        font-size: 1.1rem;
       }
       
       .loading-spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #1976d2;
+        width: 32px;
+        height: 32px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #1976d2;
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
@@ -102,9 +67,10 @@
   </head>
   <body>
     <div id="root">
-      <!-- Fallback loading spinner -->
+      <!-- Fallback loading indicator -->
       <div class="initial-loading">
         <div class="loading-spinner"></div>
+        <span>Loading Requify...</span>
       </div>
     </div>
     

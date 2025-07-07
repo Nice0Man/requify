@@ -1,2 +1,4 @@
+// Requirement model exports
 export * from './types';
-export * from './hooks'; 
+// export * from './store'; // TODO: Создать при необходимости
+// export * from './validation'; // TODO: Создать при необходимости 

@@ -1,2 +1,2 @@
-export { DashboardStats } from './ui/DashboardStats';
-export type { DashboardStatsProps } from '../types'; 
+// Dashboard stats widget exports
+export * from './ui'; 

@@ -15,7 +15,10 @@ import {
   Group,
   Link,
   Timeline,
+  ArrowForward,
 } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
+import { ResponsiveImage } from "@/shared/ui";
 
 interface HeroSectionProps {
   onGetStarted?: () => void;
@@ -27,6 +30,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   isAuthenticated = false,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -49,45 +53,66 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   }, []);
 
   const certifications = [
-    "The best requirements management software",
-    "Powerful and easy to use",
+    t(
+      "landing.hero.certification1",
+      "The best requirements management software"
+    ),
+    t("landing.hero.certification2", "Powerful and easy to use"),
   ];
 
   const keyFeatures = [
     {
       icon: <AutoAwesome />,
-      title: "AI-Powered Requirements Analysis",
-      description: "Intelligent automation for better quality",
+      title: t(
+        "landing.hero.feature1.title",
+        "AI-Powered Requirements Analysis"
+      ),
+      description: t(
+        "landing.hero.feature1.desc",
+        "Intelligent automation for better quality"
+      ),
     },
     {
       icon: <Group />,
-      title: "Real-time Team Collaboration",
-      description: "Seamless workflow coordination",
+      title: t("landing.hero.feature2.title", "Real-time Team Collaboration"),
+      description: t(
+        "landing.hero.feature2.desc",
+        "Seamless workflow coordination"
+      ),
     },
     {
       icon: <Link />,
-      title: "Automated Testing Integration",
-      description: "Built-in quality assurance",
+      title: t("landing.hero.feature3.title", "Automated Testing Integration"),
+      description: t(
+        "landing.hero.feature3.desc",
+        "Built-in quality assurance"
+      ),
     },
     {
       icon: <Timeline />,
-      title: "Complete Audit Trail & Compliance",
-      description: "Full traceability and governance",
+      title: t(
+        "landing.hero.feature4.title",
+        "Complete Audit Trail & Compliance"
+      ),
+      description: t(
+        "landing.hero.feature4.desc",
+        "Full traceability and governance"
+      ),
     },
   ];
 
   const keyMetrics = [
     {
       value: "65%",
-      label: "Faster Delivery",
+      label: t("landing.hero.metric1", "Faster Delivery"),
     },
     {
       value: "40h",
-      label: "Weekly Saved",
+      label: t("landing.hero.metric2", "Weekly Saved"),
     },
     {
       value: "99.9%",
-      label: "Uptime SLA",
+      label: t("landing.hero.metric3", "Uptime SLA"),
     },
   ];
 
@@ -191,47 +216,50 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <Typography
                   variant="h1"
                   sx={{
-                    fontSize: { xs: "3rem", md: "4rem", lg: "4.5rem" },
+                    fontSize: { xs: "4rem", md: "5rem", lg: "5.5rem" },
                     fontWeight: 700,
                     lineHeight: 1.1,
                     letterSpacing: "-0.02em",
                     color: theme.palette.text.primary,
                   }}
                 >
-                  Requirements Management
+                  {t("landing.hero.title", "Requify")}
                   <Box
                     component="span"
                     sx={{
-                      display: "block",
+                      fontSize: { xs: "3rem", md: "4rem", lg: "4.5rem" },
                       background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      backgroundClip: "text",
                       WebkitBackgroundClip: "text",
-                      color: "transparent",
-                      mt: 1,
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                      display: "block",
                     }}
                   >
-                    Made Simple
+                    {t("landing.hero.subtitle", "Requirements Management")}
                   </Box>
                 </Typography>
 
                 <Typography
                   variant="h4"
                   sx={{
-                    fontSize: { xs: "1.4rem", md: "1.6rem" },
+                    fontSize: { xs: "1.2rem", md: "1.5rem" },
                     fontWeight: 400,
-                    lineHeight: 1.6,
                     color: theme.palette.text.secondary,
+                    lineHeight: 1.6,
                     maxWidth: "600px",
                   }}
                 >
-                  Transform your development process with intelligent
-                  requirements management. From concept to deployment, ensure
-                  nothing falls through the cracks.
+                  {t(
+                    "landing.hero.description",
+                    "Streamline your development process with intelligent requirements management, automated testing, and seamless team collaboration."
+                  )}
                 </Typography>
               </Stack>
 
-              {/* CTA Button */}
-              <Box
+              {/* CTA Buttons */}
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={3}
                 sx={{
                   opacity: 0,
                   transform: "translateY(40px)",
@@ -245,30 +273,53 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 <Button
                   variant="contained"
                   size="large"
+                  endIcon={<ArrowForward />}
                   onClick={onGetStarted}
                   sx={{
-                    py: 2.5,
-                    px: 6,
-                    fontSize: "1.3rem",
+                    py: 2,
+                    px: 4,
+                    fontSize: "1.1rem",
                     fontWeight: 600,
                     borderRadius: 3,
                     textTransform: "none",
-                    boxShadow: theme.shadows[8],
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                     "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: theme.shadows[16],
+                      transform: "translateY(-2px)",
+                      boxShadow: theme.shadows[8],
                     },
                   }}
                 >
-                  {isAuthenticated ? "Go to Dashboard" : "Get Started Free"}
+                  {isAuthenticated
+                    ? t("landing.hero.goToDashboard", "Go to Dashboard")
+                    : t("landing.hero.getStarted", "Get Started")}
                 </Button>
-              </Box>
+
+                <Button
+                  variant="outlined"
+                  size="large"
+                  sx={{
+                    py: 2,
+                    px: 4,
+                    fontSize: "1.1rem",
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    textTransform: "none",
+                    borderColor: theme.palette.primary.main,
+                    color: theme.palette.primary.main,
+                    "&:hover": {
+                      backgroundColor: `${theme.palette.primary.main}10`,
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  {t("landing.hero.learnMore", "Learn More")}
+                </Button>
+              </Stack>
 
               {/* Key Metrics */}
-              <Stack
-                direction="row"
-                spacing={6}
+              <Grid
+                container
+                spacing={4}
                 sx={{
                   opacity: 0,
                   transform: "translateY(40px)",
@@ -280,36 +331,36 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 }}
               >
                 {keyMetrics.map((metric, index) => (
-                  <Stack key={index} spacing={1} alignItems="center">
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        fontSize: { xs: "2rem", md: "2.5rem" },
-                        fontWeight: 700,
-                        color: theme.palette.primary.main,
-                        lineHeight: 1,
-                      }}
-                    >
-                      {metric.value}
-                    </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontSize: { xs: "1rem", md: "1.1rem" },
-                        color: theme.palette.text.secondary,
-                        textAlign: "center",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {metric.label}
-                    </Typography>
-                  </Stack>
+                  <Grid item xs={4} key={index}>
+                    <Stack spacing={1} alignItems="flex-start">
+                      <Typography
+                        variant="h3"
+                        sx={{
+                          fontSize: { xs: "1.8rem", md: "2.5rem" },
+                          fontWeight: 700,
+                          color: theme.palette.primary.main,
+                        }}
+                      >
+                        {metric.value}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: theme.palette.text.secondary,
+                          fontWeight: 500,
+                          textAlign: "left",
+                        }}
+                      >
+                        {metric.label}
+                      </Typography>
+                    </Stack>
+                  </Grid>
                 ))}
-              </Stack>
+              </Grid>
             </Stack>
           </Grid>
 
-          {/* Right Column - Features & Visual */}
+          {/* Right Column - Hero Image & Visual */}
           <Grid item xs={12} lg={6}>
             <Stack spacing={6}>
               {/* Hero Image/Visual */}
@@ -339,9 +390,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     borderRadius: 4,
                     background: `linear-gradient(135deg, ${theme.palette.primary.main}20, ${theme.palette.secondary.main}20)`,
                     border: `1px solid ${theme.palette.divider}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
                     position: "relative",
                     overflow: "hidden",
                     transition: "all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
@@ -359,20 +407,26 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                       bottom: 0,
                       background: `radial-gradient(circle at 30% 40%, ${theme.palette.primary.main}40, transparent 70%)`,
                       opacity: 0.3,
+                      zIndex: 1,
                     },
                   }}
                 >
-                  <img
+                  <ResponsiveImage
                     src="/assets/img/pannel/komp-uternaa-illustracia-3d-grafika-1600w.webp"
-                    alt="Dashboard Preview"
-                    style={{
+                    srcSet="/assets/img/pannel/komp-uternaa-illustracia-3d-grafika-800w.webp 800w, /assets/img/pannel/komp-uternaa-illustracia-3d-grafika-1200w.webp 1200w, /assets/img/pannel/komp-uternaa-illustracia-3d-grafika-1600w.webp 1600w"
+                    sizes="(max-width: 600px) 800px, (max-width: 1200px) 1200px, 1600px"
+                    alt={t(
+                      "landing.hero.dashboardPreview",
+                      "Dashboard Preview"
+                    )}
+                    sx={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover",
                       borderRadius: "inherit",
                       position: "relative",
-                      zIndex: 100,
+                      zIndex: 2,
                     }}
+                    priority={true}
                   />
                 </Box>
               </Box>

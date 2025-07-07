@@ -1,2 +1,3 @@
-// Export comment API  
-export { CommentsApi, commentsApi } from './comments.api'; 
+// Comment API exports
+export * from "./commentApi";
+export * from "./mappers";

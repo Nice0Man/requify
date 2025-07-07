@@ -1,6 +1,8 @@
 // Requirement UI components exports
-export { RequirementCard } from './RequirementCard';
-export { RequirementStatus } from './RequirementStatus';
-export { RequirementPriority } from './RequirementPriority';
-export { RequirementInfo } from './RequirementInfo';
-export { RequirementProgress } from './RequirementProgress'; 
+// TODO: Создать компоненты согласно FSD принципам
+// export * from "./RequirementCard";
+// export * from "./RequirementList";
+// export * from "./RequirementForm";
+// export * from "./RequirementStatusBadge";
+// export * from "./RequirementPriorityBadge";
+// export * from "./RequirementTypeBadge";

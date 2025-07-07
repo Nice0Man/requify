@@ -1,2 +1,2 @@
-export { RequirementList } from './ui/RequirementList';
-export type { RequirementListProps } from '../types'; 
+// Requirement list widget exports
+export * from './ui'; 

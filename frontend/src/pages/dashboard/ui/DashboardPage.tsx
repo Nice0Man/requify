@@ -1,541 +1,251 @@
-import React, { useState } from "react";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Container,
   Typography,
   Grid,
-  Paper,
-  Stack,
-  Chip,
-  IconButton,
-  useTheme,
-  alpha,
+  Card,
+  CardContent,
   Button,
-  Tooltip,
-} from "@mui/material";
+  Paper,
+  alpha,
+  useTheme,
+} from '@mui/material';
 import {
   TrendingUp,
-  TrendingDown,
   Assignment,
   CheckCircle,
-  Add,
-  ArrowForward,
-  Refresh,
-  Analytics,
-  Notifications,
-  Settings,
-  FolderOpen,
   Speed,
-  ViewColumn,
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+  Add,
+  ViewKanban,
+  PostAdd,
+  Assessment,
+} from '@mui/icons-material';
+import { useDashboardStats } from '../../../features/dashboard/model/useDashboardQuery';
+import { LoadingSpinner } from '../../../shared/ui';
 
-import { ActivityFeed } from "@/widgets/activity-feed";
-import { ProjectOverview } from "@/widgets/project-overview";
-import { SystemHealth } from "@/widgets/system-health";
-import { RequirementList } from "@/widgets/requirement-list";
-
-interface DashboardMetric {
-  id: string;
-  title: string;
-  value: string | number;
-  change: number;
-  trend: "up" | "down" | "stable";
-  icon: React.ReactNode;
-  color: string;
-  description: string;
-}
-
-interface QuickAction {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  color: string;
-  path: string;
-  badge?: string;
-}
-
-export const DashboardPage: React.FC = () => {
+const DashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: stats, isPending, error } = useDashboardStats();
 
-  // Minimalist metrics with key focus
-  const metrics: DashboardMetric[] = [
+  const quickActions = [
     {
-      id: "active-projects",
-      title: "Active Projects",
-      value: 12,
-      change: 8.5,
-      trend: "up",
-      icon: <FolderOpen />,
+      title: t('dashboard.quickActions.newProject'),
+      description: t('dashboard.quickActions.newProjectDesc'),
+      icon: Add,
       color: theme.palette.primary.main,
-      description: "Projects in development",
+      action: () => console.log('New project'),
     },
     {
-      id: "total-requirements",
-      title: "Requirements",
-      value: 247,
-      change: 12.3,
-      trend: "up",
-      icon: <Assignment />,
-      color: theme.palette.info.main,
-      description: "Total requirements tracked",
-    },
-    {
-      id: "completion-rate",
-      title: "Completion Rate",
-      value: "89%",
-      change: 4.2,
-      trend: "up",
-      icon: <CheckCircle />,
-      color: theme.palette.success.main,
-      description: "Overall project completion",
-    },
-    {
-      id: "team-velocity",
-      title: "Team Velocity",
-      value: 42,
-      change: -2.1,
-      trend: "down",
-      icon: <Speed />,
-      color: theme.palette.warning.main,
-      description: "Story points per sprint",
-    },
-  ];
-
-  // Minimalist quick actions
-  const quickActions: QuickAction[] = [
-    {
-      id: "new-project",
-      title: "New Project",
-      description: "Create a new project",
-      icon: <Add />,
-      color: theme.palette.primary.main,
-      path: "/projects/create",
-    },
-    {
-      id: "kanban-board",
-      title: "Kanban Board",
-      description: "View project kanban",
-      icon: <ViewColumn />,
+      title: t('dashboard.quickActions.kanbanBoard'),
+      description: t('dashboard.quickActions.kanbanBoardDesc'),
+      icon: ViewKanban,
       color: theme.palette.secondary.main,
-      path: "/kanban",
+      action: () => console.log('Kanban board'),
     },
     {
-      id: "new-requirement",
-      title: "Add Requirement",
-      description: "Create new requirement",
-      icon: <Assignment />,
-      color: theme.palette.info.main,
-      path: "/requirements/create",
+      title: t('dashboard.quickActions.addRequirement'),
+      description: t('dashboard.quickActions.addRequirementDesc'),
+      icon: PostAdd,
+      color: theme.palette.success.main,
+      action: () => console.log('Add requirement'),
     },
     {
-      id: "view-reports",
-      title: "View Reports",
-      description: "Analytics & insights",
-      icon: <Analytics />,
+      title: t('dashboard.quickActions.viewReports'),
+      description: t('dashboard.quickActions.viewReportsDesc'),
+      icon: Assessment,
       color: theme.palette.warning.main,
-      path: "/reports",
+      action: () => console.log('View reports'),
     },
   ];
 
-  const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
-  };
+  if (isPending) {
+    return <LoadingSpinner fullScreen />;
+  }
 
-  const handleQuickAction = (action: QuickAction) => {
-    navigate(action.path);
-  };
+  if (error) {
+    return (
+      <Box p={3} textAlign="center">
+        <Typography color="error">{t('errors.loadingError')}</Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      {/* Header Section - Minimalist */}
-      <Box
-        mb={4}
-        sx={{
-          opacity: 0,
-          transform: "translateY(20px)",
-          animation: "fadeInUp 0.6s ease-out 0.1s forwards",
-          "@keyframes fadeInUp": {
-            "0%": { opacity: 0, transform: "translateY(20px)" },
-            "100%": { opacity: 1, transform: "translateY(0)" },
-          },
-        }}
-      >
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
-          <Box>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 700,
-                color: theme.palette.text.primary,
-                mb: 0.5,
-              }}
-            >
-              Dashboard
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Welcome back! Here's what's happening with your projects.
-            </Typography>
-          </Box>
-          <Stack direction="row" spacing={1}>
-            <Tooltip title="Notifications">
-              <IconButton
-                sx={{
-                  borderRadius: 2,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                  },
-                }}
-              >
-                <Notifications />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Settings">
-              <IconButton
-                sx={{
-                  borderRadius: 2,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                  },
-                }}
-              >
-                <Settings />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Refresh">
-              <span>
-                <IconButton
-                  onClick={handleRefresh}
-                  disabled={isLoading}
+    <Box p={3}>
+      {/* Заголовок */}
+      <Box mb={4}>
+        <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
+          {t('dashboard.title')}
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary">
+          {t('dashboard.subtitle')}
+        </Typography>
+      </Box>
+
+      {/* Метрики */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} md={6} lg={3}>
+          <Card 
+            elevation={2} 
+            sx={{ 
+              height: '100%',
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            }}
+          >
+            <CardContent>
+              <Box display="flex" alignItems="center" mb={2}>
+                <TrendingUp sx={{ color: theme.palette.primary.main, mr: 1 }} />
+                <Typography variant="h6" fontWeight={600}>
+                  {t('dashboard.metrics.activeProjects')}
+                </Typography>
+              </Box>
+              <Typography variant="h3" fontWeight={700} color="primary">
+                {stats?.activeProjects || 0}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('dashboard.metrics.projectsInDevelopment')}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6} lg={3}>
+          <Card 
+            elevation={2} 
+            sx={{ 
+              height: '100%',
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            }}
+          >
+            <CardContent>
+              <Box display="flex" alignItems="center" mb={2}>
+                <Assignment sx={{ color: theme.palette.secondary.main, mr: 1 }} />
+                <Typography variant="h6" fontWeight={600}>
+                  {t('dashboard.metrics.requirements')}
+                </Typography>
+              </Box>
+              <Typography variant="h3" fontWeight={700} color="secondary">
+                {stats?.activeRequirements || 0}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('dashboard.metrics.totalRequirementsTracked')}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6} lg={3}>
+          <Card 
+            elevation={2} 
+            sx={{ 
+              height: '100%',
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            }}
+          >
+            <CardContent>
+              <Box display="flex" alignItems="center" mb={2}>
+                <CheckCircle sx={{ color: theme.palette.success.main, mr: 1 }} />
+                <Typography variant="h6" fontWeight={600}>
+                  {t('dashboard.metrics.completionRate')}
+                </Typography>
+              </Box>
+              <Typography variant="h3" fontWeight={700} color="success.main">
+                {stats?.completionRate || 0}%
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('dashboard.metrics.overallProjectCompletion')}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6} lg={3}>
+          <Card 
+            elevation={2} 
+            sx={{ 
+              height: '100%',
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+            }}
+          >
+            <CardContent>
+              <Box display="flex" alignItems="center" mb={2}>
+                <Speed sx={{ color: theme.palette.warning.main, mr: 1 }} />
+                <Typography variant="h6" fontWeight={600}>
+                  {t('dashboard.metrics.teamVelocity')}
+                </Typography>
+              </Box>
+              <Typography variant="h3" fontWeight={700} color="warning.main">
+                {stats?.teamVelocity || 0}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('dashboard.metrics.storyPointsPerSprint')}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Быстрые действия */}
+      <Paper elevation={1} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+        <Typography variant="h5" fontWeight={600} mb={3}>
+          {t('dashboard.quickActions.title')}
+        </Typography>
+        <Grid container spacing={2}>
+          {quickActions.map((action, index) => {
+            const Icon = action.icon;
+            return (
+              <Grid item xs={12} md={6} lg={3} key={index}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={action.action}
                   sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                    "&:hover": {
-                      backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    p: 2,
+                    height: 'auto',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    textAlign: 'left',
+                    border: `1px solid ${alpha(action.color, 0.3)}`,
+                    color: action.color,
+                    '&:hover': {
+                      backgroundColor: alpha(action.color, 0.05),
+                      border: `1px solid ${alpha(action.color, 0.5)}`,
                     },
                   }}
                 >
-                  <Refresh />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </Stack>
-        </Stack>
-      </Box>
-
-      {/* Key Metrics - Minimalist Cards */}
-      <Grid
-        container
-        spacing={3}
-        mb={4}
-        sx={{
-          opacity: 0,
-          transform: "translateY(20px)",
-          animation: "fadeInUp 0.6s ease-out 0.3s forwards",
-          "@keyframes fadeInUp": {
-            "0%": { opacity: 0, transform: "translateY(20px)" },
-            "100%": { opacity: 1, transform: "translateY(0)" },
-          },
-        }}
-      >
-        {metrics.map((metric, index) => (
-          <Grid item xs={12} sm={6} md={3} key={metric.id}>
-            <Box
-              sx={{
-                p: 2.5,
-                borderRadius: 3,
-                border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                background: theme.palette.background.paper,
-                transition: "all 0.3s ease",
-                opacity: 0,
-                transform: "translateY(20px)",
-                animation: `fadeInUp 0.6s ease-out ${
-                  0.5 + index * 0.1
-                }s forwards`,
-                "@keyframes fadeInUp": {
-                  "0%": { opacity: 0, transform: "translateY(20px)" },
-                  "100%": { opacity: 1, transform: "translateY(0)" },
-                },
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: `0 8px 24px ${alpha(metric.color, 0.12)}`,
-                  borderColor: alpha(metric.color, 0.2),
-                },
-              }}
-            >
-              <Stack direction="row" alignItems="center" spacing={2}>
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 2,
-                    background: alpha(metric.color, 0.1),
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: metric.color,
-                  }}
-                >
-                  {metric.icon}
-                </Box>
-                <Box flex={1}>
-                  <Typography
-                    variant="h4"
-                    sx={{
-                      fontWeight: 700,
-                      color: theme.palette.text.primary,
-                      mb: 0.5,
-                    }}
-                  >
-                    {metric.value}
+                  <Icon sx={{ mb: 1, color: action.color }} />
+                  <Typography variant="subtitle2" fontWeight={600} mb={0.5}>
+                    {action.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {metric.title}
+                    {action.description}
                   </Typography>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={0.5}
-                    mt={0.5}
-                  >
-                    {metric.trend === "up" ? (
-                      <TrendingUp
-                        sx={{
-                          fontSize: 16,
-                          color: theme.palette.success.main,
-                        }}
-                      />
-                    ) : (
-                      <TrendingDown
-                        sx={{
-                          fontSize: 16,
-                          color: theme.palette.error.main,
-                        }}
-                      />
-                    )}
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color:
-                          metric.trend === "up"
-                            ? theme.palette.success.main
-                            : theme.palette.error.main,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {metric.change > 0 ? "+" : ""}
-                      {metric.change}%
-                    </Typography>
-                  </Stack>
-                </Box>
-              </Stack>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Quick Actions - Minimalist */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-          background: theme.palette.background.paper,
-          mb: 4,
-          opacity: 0,
-          transform: "translateY(20px)",
-          animation: "fadeInUp 0.6s ease-out 0.9s forwards",
-          "@keyframes fadeInUp": {
-            "0%": { opacity: 0, transform: "translateY(20px)" },
-            "100%": { opacity: 1, transform: "translateY(0)" },
-          },
-        }}
-      >
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Quick Actions
-          </Typography>
-          <Button
-            variant="text"
-            endIcon={<ArrowForward />}
-            sx={{ fontSize: "0.875rem", textTransform: "none" }}
-          >
-            View All
-          </Button>
-        </Stack>
-        <Grid container spacing={2}>
-          {quickActions.map((action, index) => (
-            <Grid item xs={12} sm={6} md={3} key={action.id}>
-              <Box
-                onClick={() => handleQuickAction(action)}
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-                  background: alpha(action.color, 0.02),
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: `fadeInUp 0.6s ease-out ${
-                    1.1 + index * 0.1
-                  }s forwards`,
-                  "@keyframes fadeInUp": {
-                    "0%": { opacity: 0, transform: "translateY(20px)" },
-                    "100%": { opacity: 1, transform: "translateY(0)" },
-                  },
-                  "&:hover": {
-                    transform: "translateY(-1px)",
-                    boxShadow: `0 4px 16px ${alpha(action.color, 0.15)}`,
-                    borderColor: alpha(action.color, 0.2),
-                  },
-                }}
-              >
-                <Stack direction="row" alignItems="center" spacing={2}>
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 1.5,
-                      background: alpha(action.color, 0.1),
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: action.color,
-                    }}
-                  >
-                    {action.icon}
-                  </Box>
-                  <Box flex={1}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{ fontWeight: 600, mb: 0.5 }}
-                    >
-                      {action.title}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {action.description}
-                    </Typography>
-                    {action.badge && (
-                      <Chip
-                        label={action.badge}
-                        size="small"
-                        sx={{
-                          mt: 0.5,
-                          height: 20,
-                          fontSize: "0.6rem",
-                          backgroundColor: alpha(action.color, 0.1),
-                          color: action.color,
-                        }}
-                      />
-                    )}
-                  </Box>
-                </Stack>
-              </Box>
-            </Grid>
-          ))}
+                </Button>
+              </Grid>
+            );
+          })}
         </Grid>
       </Paper>
 
-      {/* Main Content Grid - Minimalist Layout */}
-      <Grid container spacing={3}>
-        {/* Left Column - Primary Content */}
-        <Grid item xs={12} lg={8}>
-          <Stack spacing={3}>
-            {/* Project Overview */}
-            <Box
-              sx={{
-                opacity: 0,
-                transform: "translateY(20px)",
-                animation: "fadeInUp 0.6s ease-out 1.5s forwards",
-                "@keyframes fadeInUp": {
-                  "0%": { opacity: 0, transform: "translateY(20px)" },
-                  "100%": { opacity: 1, transform: "translateY(0)" },
-                },
-              }}
-            >
-              <ProjectOverview variant="dashboard" />
-            </Box>
-
-            {/* Recent Requirements */}
-            <Box
-              sx={{
-                opacity: 0,
-                transform: "translateY(20px)",
-                animation: "fadeInUp 0.6s ease-out 1.7s forwards",
-                "@keyframes fadeInUp": {
-                  "0%": { opacity: 0, transform: "translateY(20px)" },
-                  "100%": { opacity: 1, transform: "translateY(0)" },
-                },
-              }}
-            >
-              <RequirementList
-                limit={5}
-                showFilters={false}
-                showStats={false}
-              />
-            </Box>
-          </Stack>
-        </Grid>
-
-        {/* Right Column - Secondary Content */}
-        <Grid item xs={12} lg={4}>
-          <Stack spacing={3}>
-            {/* System Health */}
-            <Box
-              sx={{
-                opacity: 0,
-                transform: "translateY(20px)",
-                animation: "fadeInUp 0.6s ease-out 1.9s forwards",
-                "@keyframes fadeInUp": {
-                  "0%": { opacity: 0, transform: "translateY(20px)" },
-                  "100%": { opacity: 1, transform: "translateY(0)" },
-                },
-              }}
-            >
-              <SystemHealth
-                variant="compact"
-                showDetails={false}
-                autoRefresh={true}
-              />
-            </Box>
-
-            {/* Activity Feed */}
-            <Box
-              sx={{
-                opacity: 0,
-                transform: "translateY(20px)",
-                animation: "fadeInUp 0.6s ease-out 2.1s forwards",
-                "@keyframes fadeInUp": {
-                  "0%": { opacity: 0, transform: "translateY(20px)" },
-                  "100%": { opacity: 1, transform: "translateY(0)" },
-                },
-              }}
-            >
-              <ActivityFeed limit={5} showFilters={false} />
-            </Box>
-          </Stack>
-        </Grid>
-      </Grid>
-    </Container>
+      {/* Недавняя активность */}
+      <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
+        <Typography variant="h5" fontWeight={600} mb={3}>
+          {t('dashboard.recentActivity')}
+        </Typography>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight={200}>
+          <Typography variant="body1" color="text.secondary">
+            {t('dashboard.noActivity')}
+          </Typography>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
-export default DashboardPage;
+export default DashboardPage; 

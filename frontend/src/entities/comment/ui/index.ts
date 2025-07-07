@@ -1,5 +1,6 @@
-export { CommentCard } from './CommentCard';
-
-// TODO: Add more comment UI components
-// export { CommentItem } from './CommentItem';
-// export { CommentForm } from './CommentForm'; 
+// Comment UI components exports
+// TODO: Создать компоненты согласно FSD принципам
+// export * from "./CommentCard";
+// export * from "./CommentList";
+// export * from "./CommentForm";
+// export * from "./CommentThread";

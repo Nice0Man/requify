@@ -1,4 +1,7 @@
-export { ReleaseCard } from './ReleaseCard';
-export { ReleaseStatus } from './ReleaseStatus';
-export { ReleaseProgress } from './ReleaseProgress';
-export { ReleaseInfo } from './ReleaseInfo'; 
+// Release UI components exports
+// TODO: Создать компоненты согласно FSD принципам
+// export * from "./ReleaseCard";
+// export * from "./ReleaseList";
+// export * from "./ReleaseForm";
+// export * from "./ReleaseStatusBadge";
+// export * from "./ReleaseProgress";
