@@ -19,7 +19,7 @@ import {
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
-export const SystemFeatures: React.FC = () => {
+export const SystemFeaturesSection: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
 
@@ -29,54 +29,48 @@ export const SystemFeatures: React.FC = () => {
       title: t("landing.features.feature1.title", "Smart Analysis"),
       description: t(
         "landing.features.feature1.desc",
-        "AI-powered requirements analysis with intelligent suggestions and automated quality checks."
+        "AI-powered requirements analysis with intelligent suggestions."
       ),
-      delay: 0,
     },
     {
       icon: <Speed />,
       title: t("landing.features.feature2.title", "Fast Delivery"),
       description: t(
         "landing.features.feature2.desc",
-        "Streamlined workflows that accelerate your development process and reduce time-to-market."
+        "Streamlined workflows that accelerate your development."
       ),
-      delay: 200,
     },
     {
       icon: <Security />,
       title: t("landing.features.feature3.title", "Enterprise Security"),
       description: t(
         "landing.features.feature3.desc",
-        "Bank-grade security with comprehensive audit trails and compliance management."
+        "Bank-grade security with comprehensive audit trails."
       ),
-      delay: 400,
     },
     {
       icon: <Analytics />,
       title: t("landing.features.feature4.title", "Real-time Analytics"),
       description: t(
         "landing.features.feature4.desc",
-        "Comprehensive insights and reporting to track progress and measure success."
+        "Comprehensive insights to track progress and measure success."
       ),
-      delay: 600,
     },
     {
       icon: <Group />,
       title: t("landing.features.feature5.title", "Team Collaboration"),
       description: t(
         "landing.features.feature5.desc",
-        "Seamless collaboration tools that keep your entire team aligned and productive."
+        "Seamless collaboration tools that keep your team aligned."
       ),
-      delay: 800,
     },
     {
       icon: <CheckCircle />,
       title: t("landing.features.feature6.title", "Quality Assurance"),
       description: t(
         "landing.features.feature6.desc",
-        "Built-in quality controls and validation to ensure your requirements meet standards."
+        "Built-in quality controls and validation for standards."
       ),
-      delay: 1000,
     },
   ];
 
@@ -85,9 +79,16 @@ export const SystemFeatures: React.FC = () => {
       sx={{
         height: "100%",
         minHeight: "100vh",
+        // Поддержка новых viewport units для мобильных устройств
+        "@supports (height: 100dvh)": {
+          minHeight: "100dvh",
+        },
+        // Fallback для старых браузеров
+        "@supports not (height: 100dvh)": {
+          minHeight: "calc(var(--vh, 1vh) * 100)",
+        },
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
         py: { xs: 4, md: 6 },
         background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${theme.palette.grey[50]} 100%)`,
         position: "relative",
@@ -109,24 +110,13 @@ export const SystemFeatures: React.FC = () => {
         maxWidth="xl"
         sx={{ position: "relative", zIndex: 1, height: "100%" }}
       >
-        <Grid
-          container
-          spacing={8}
-          alignItems="center"
-          sx={{ height: "100%", py: 4 }}
-        >
+        <Grid container spacing={8} alignItems="center" sx={{ height: "100%" }}>
           {/* Header Section */}
           <Grid item xs={12}>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
                 textAlign: "center",
-                width: "100%",
-                maxWidth: "1000px",
-                mx: "auto",
-                px: 2,
+                mb: { xs: 4, md: 6 },
               }}
             >
               <Typography
@@ -160,7 +150,7 @@ export const SystemFeatures: React.FC = () => {
                 color="text.secondary"
                 sx={{
                   fontWeight: 400,
-                  fontSize: { xs: "1.3rem", md: "1.5rem" },
+                  fontSize: { xs: "1.1rem", md: "1.3rem" },
                   lineHeight: 1.6,
                   maxWidth: "700px",
                   textAlign: "center",
@@ -179,8 +169,13 @@ export const SystemFeatures: React.FC = () => {
           <Grid item xs={12}>
             <Grid
               container
-              spacing={4}
-              sx={{ alignItems: "stretch", maxWidth: "1200px", mx: "auto" }}
+              spacing={3}
+              sx={{
+                alignItems: "stretch",
+                maxWidth: "1200px",
+                mx: "auto",
+                justifyContent: "center",
+              }}
             >
               {features.map((feature, index) => (
                 <Grid
@@ -195,76 +190,69 @@ export const SystemFeatures: React.FC = () => {
                     sx={{
                       height: "100%",
                       width: "100%",
-                      borderRadius: 4,
+                      borderRadius: 3,
                       border: `1px solid ${theme.palette.divider}`,
                       backgroundColor: theme.palette.background.paper,
-                      boxShadow: theme.shadows[3],
+                      boxShadow: theme.shadows[2],
+                      transition:
+                        "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                       "&:hover": {
-                        transform: "translateY(-12px)",
-                        boxShadow: theme.shadows[12],
+                        transform: "translateY(-4px)",
+                        boxShadow: theme.shadows[8],
                         borderColor: theme.palette.primary.main,
-                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                        "& .feature-icon": {
-                          transform: "scale(1.15)",
-                          backgroundColor: theme.palette.primary.main,
-                          color: theme.palette.common.white,
-                        },
                       },
                     }}
                   >
                     <CardContent
                       sx={{
-                        p: { xs: 3, md: 4 },
+                        p: 3,
                         height: "100%",
                         display: "flex",
                         flexDirection: "column",
+                        textAlign: "center",
                       }}
                     >
-                      <Stack spacing={4} height="100%">
-                        {/* Icon */}
-                        <Box
-                          className="feature-icon"
-                          sx={{
-                            width: 72,
-                            height: 72,
-                            borderRadius: 3,
-                            backgroundColor: `${theme.palette.primary.main}10`,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: theme.palette.primary.main,
-                            fontSize: "2rem",
-                            transition: "all 0.3s ease",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {feature.icon}
-                        </Box>
+                      <Box
+                        sx={{
+                          width: 56,
+                          height: 56,
+                          borderRadius: "50%",
+                          backgroundColor: `${theme.palette.primary.main}10`,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          margin: "0 auto",
+                          mb: 2,
+                          color: theme.palette.primary.main,
+                          fontSize: "1.5rem",
+                        }}
+                      >
+                        {feature.icon}
+                      </Box>
 
-                        {/* Content */}
-                        <Stack spacing={2} sx={{ flex: 1 }}>
-                          <Typography
-                            variant="h5"
-                            sx={{
-                              fontWeight: 600,
-                              color: theme.palette.text.primary,
-                              fontSize: { xs: "1.3rem", md: "1.5rem" },
-                            }}
-                          >
-                            {feature.title}
-                          </Typography>
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              color: theme.palette.text.secondary,
-                              lineHeight: 1.6,
-                              fontSize: "1rem",
-                            }}
-                          >
-                            {feature.description}
-                          </Typography>
-                        </Stack>
-                      </Stack>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 600,
+                          mb: 1.5,
+                          color: theme.palette.text.primary,
+                          fontSize: "1.1rem",
+                        }}
+                      >
+                        {feature.title}
+                      </Typography>
+
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: theme.palette.text.secondary,
+                          lineHeight: 1.6,
+                          fontSize: "0.9rem",
+                          flex: 1,
+                        }}
+                      >
+                        {feature.description}
+                      </Typography>
                     </CardContent>
                   </Card>
                 </Grid>

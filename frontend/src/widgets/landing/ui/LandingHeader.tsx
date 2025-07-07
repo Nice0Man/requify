@@ -60,18 +60,41 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
+      const scrollThreshold = 80; // Минимальный скролл для скрытия header
+      const scrollDelta = 50; // Минимальная дельта для реакции на скролл
 
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      // Скрываем header при скролле вниз на определенное расстояние
+      if (
+        currentScrollY > lastScrollY + scrollDelta && 
+        currentScrollY > scrollThreshold
+      ) {
         setIsVisible(false);
-      } else {
+      } 
+      // Показываем header при скролле вверх или в начале страницы
+      else if (
+        currentScrollY < lastScrollY - scrollDelta || 
+        currentScrollY <= scrollThreshold
+      ) {
         setIsVisible(true);
       }
 
       setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Дебаунс для оптимизации производительности
+    let ticking = false;
+    const throttledHandleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", throttledHandleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", throttledHandleScroll);
   }, [lastScrollY]);
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -109,24 +132,32 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   };
 
   return (
-    <Slide appear={false} direction="down" in={isVisible}>
+    <Slide 
+      appear={false} 
+      direction="down" 
+      in={isVisible}
+      timeout={{ enter: 300, exit: 200 }}
+    >
       <AppBar
         position="fixed"
         elevation={0}
         sx={{
           background: isScrolled
-            ? alpha(theme.palette.background.paper, 0.9)
-            : "transparent",
-          backdropFilter: isScrolled ? "blur(12px)" : "none",
+            ? alpha(theme.palette.background.paper, 0.95)
+            : theme.palette.background.paper,
+          backdropFilter: "blur(12px)",
           borderTopRightRadius: 0,
           borderTopLeftRadius: 0,
-          borderBottom: isScrolled
-            ? `1px solid ${alpha(theme.palette.divider, 0.08)}`
-            : "none",
-          transition: "all 0.2s ease",
+          borderBottom: `1px solid ${alpha(theme.palette.divider, isScrolled ? 0.12 : 0.08)}`,
+          transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
           width: "100%",
           left: 0,
           right: 0,
+          zIndex: 1100, // Выше чем scroll navigation (1000)
+          transform: isVisible ? "translateY(0)" : "translateY(-100%)",
+          boxShadow: isScrolled 
+            ? `0 4px 20px ${alpha(theme.palette.common.black, 0.08)}`
+            : "none",
         }}
       >
         <Toolbar

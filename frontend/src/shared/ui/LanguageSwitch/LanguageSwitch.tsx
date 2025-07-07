@@ -1,14 +1,14 @@
-import React from 'react';
-import { 
-  IconButton, 
-  Menu, 
-  MenuItem, 
-  ListItemIcon, 
-  ListItemText, 
-  Tooltip 
-} from '@mui/material';
-import { Language } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from "@mui/material";
+import { Language } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 interface LanguageOption {
   code: string;
@@ -17,8 +17,8 @@ interface LanguageOption {
 }
 
 const languages: LanguageOption[] = [
-  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
+  { code: "en", name: "English", flag: "🇺🇸" },
 ];
 
 export const LanguageSwitch: React.FC = () => {
@@ -39,17 +39,15 @@ export const LanguageSwitch: React.FC = () => {
     handleClose();
   };
 
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
-
   return (
     <>
       <Tooltip title="Выбрать язык / Select language">
         <IconButton
           onClick={handleClick}
           size="small"
-          aria-controls={open ? 'language-menu' : undefined}
+          aria-controls={open ? "language-menu" : undefined}
           aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
+          aria-expanded={open ? "true" : undefined}
         >
           <Language />
         </IconButton>
@@ -63,31 +61,31 @@ export const LanguageSwitch: React.FC = () => {
         PaperProps={{
           elevation: 0,
           sx: {
-            overflow: 'visible',
-            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
             mt: 1.5,
-            '& .MuiAvatar-root': {
+            "& .MuiAvatar-root": {
               width: 32,
               height: 32,
               ml: -0.5,
               mr: 1,
             },
-            '&:before': {
+            "&:before": {
               content: '""',
-              display: 'block',
-              position: 'absolute',
+              display: "block",
+              position: "absolute",
               top: 0,
               right: 14,
               width: 10,
               height: 10,
-              bgcolor: 'background.paper',
-              transform: 'translateY(-50%) rotate(45deg)',
+              bgcolor: "background.paper",
+              transform: "translateY(-50%) rotate(45deg)",
               zIndex: 0,
             },
           },
         }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {languages.map((language) => (
           <MenuItem
@@ -96,7 +94,7 @@ export const LanguageSwitch: React.FC = () => {
             selected={language.code === i18n.language}
           >
             <ListItemIcon>
-              <span style={{ fontSize: '18px' }}>{language.flag}</span>
+              <span style={{ fontSize: "18px" }}>{language.flag}</span>
             </ListItemIcon>
             <ListItemText>{language.name}</ListItemText>
           </MenuItem>
@@ -104,4 +102,4 @@ export const LanguageSwitch: React.FC = () => {
       </Menu>
     </>
   );
-}; 
+};

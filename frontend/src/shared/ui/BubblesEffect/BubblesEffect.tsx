@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo, useCallback } from "react";
 import { Box, useTheme, alpha } from "@mui/material";
 
 interface Bubble {
@@ -8,7 +8,7 @@ interface Bubble {
   size: number;
   speed: number;
   opacity: number;
-  delay: number;
+  hue: number;
 }
 
 interface BubblesEffectProps {
@@ -26,90 +26,73 @@ const BubblesEffect: React.FC<BubblesEffectProps> = ({
   minSize = 10,
   speed = 1,
   color,
-  zIndex = -1,
+  zIndex = -999, // Much lower z-index to ensure background position
 }) => {
   const theme = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
   const bubblesRef = useRef<Bubble[]>([]);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
+  const dimensionsRef = useRef({ width: 0, height: 0 });
 
-  // Правильная обработка цветов из темы
-  const getBubbleColor = () => {
-    if (!color) {
-      return theme.palette.primary.main;
-    }
+  // Memoized bubble color to prevent recalculation
+  const bubbleColor = useMemo(() => {
+    if (!color) return theme.palette.primary.main;
     
-    // Если цвет - это ключ из темы
-    if (color === "primary") {
-      return theme.palette.primary.main;
-    }
-    if (color === "secondary") {
-      return theme.palette.secondary.main;
-    }
-    if (color === "error") {
-      return theme.palette.error.main;
-    }
-    if (color === "warning") {
-      return theme.palette.warning.main;
-    }
-    if (color === "info") {
-      return theme.palette.info.main;
-    }
-    if (color === "success") {
-      return theme.palette.success.main;
-    }
+    const themeColors: Record<string, string> = {
+      primary: theme.palette.primary.main,
+      secondary: theme.palette.secondary.main,
+      error: theme.palette.error.main,
+      warning: theme.palette.warning.main,
+      info: theme.palette.info.main,
+      success: theme.palette.success.main,
+    };
     
-    // Если цвет - это уже hex/rgb строка
-    return color;
-  };
+    return themeColors[color] || color;
+  }, [color, theme.palette]);
 
-  const bubbleColor = getBubbleColor();
+  // Pure function to create initial bubbles
+  const createBubbles = useCallback(() => {
+    const { width, height } = dimensionsRef.current;
+    if (width === 0 || height === 0) return [];
+    
+    return Array.from({ length: count }, (_, i) => ({
+      id: i,
+      x: Math.random() * width,
+      y: height + Math.random() * 100,
+      size: Math.random() * (maxSize - minSize) + minSize,
+      speed: (Math.random() * 0.5 + 0.5) * speed,
+      opacity: Math.random() * 0.3 + 0.05, // Reduced opacity for better background effect
+      hue: Math.random() * 30 - 15,
+    }));
+  }, [count, maxSize, minSize, speed]);
 
-  // Создание пузырьков
-  const createBubbles = () => {
-    const bubbles: Bubble[] = [];
-    for (let i = 0; i < count; i++) {
-      bubbles.push({
-        id: i,
-        x: Math.random() * window.innerWidth,
-        y: window.innerHeight + Math.random() * 100,
-        size: Math.random() * (maxSize - minSize) + minSize,
-        speed: (Math.random() * 0.5 + 0.5) * speed,
-        opacity: Math.random() * 0.5 + 0.1,
-        delay: Math.random() * 2000,
-      });
-    }
-    return bubbles;
-  };
-
-  // Анимация пузырьков
-  const animateBubbles = () => {
-    if (!containerRef.current) return;
-
+  // Animation function with proper cleanup
+  const animateBubbles = useCallback(() => {
     const container = containerRef.current;
+    if (!container) return;
+
+    const { width, height } = dimensionsRef.current;
     const bubbleElements = container.children;
 
     bubblesRef.current.forEach((bubble, index) => {
-      // Движение вверх
+      // Update bubble position
       bubble.y -= bubble.speed;
+      bubble.x += Math.sin(Date.now() * 0.001 + bubble.id) * 0.3;
 
-      // Легкое покачивание по горизонтали
-      bubble.x += Math.sin(Date.now() * 0.001 + bubble.id) * 0.5;
-
-      // Если пузырек ушел за экран, создаем новый снизу
+      // Reset bubble if it goes off screen
       if (bubble.y < -bubble.size) {
-        bubble.y = window.innerHeight + bubble.size;
-        bubble.x = Math.random() * window.innerWidth;
+        bubble.y = height + bubble.size;
+        bubble.x = Math.random() * width;
         bubble.size = Math.random() * (maxSize - minSize) + minSize;
         bubble.speed = (Math.random() * 0.5 + 0.5) * speed;
-        bubble.opacity = Math.random() * 0.5 + 0.1;
+        bubble.opacity = Math.random() * 0.3 + 0.05;
       }
 
-      // Ограничиваем по горизонтали
-      if (bubble.x < -bubble.size) bubble.x = window.innerWidth + bubble.size;
-      if (bubble.x > window.innerWidth + bubble.size) bubble.x = -bubble.size;
+      // Wrap horizontally
+      if (bubble.x < -bubble.size) bubble.x = width + bubble.size;
+      if (bubble.x > width + bubble.size) bubble.x = -bubble.size;
 
-      // Применяем стили к элементу
+      // Update DOM element
       const element = bubbleElements[index] as HTMLElement;
       if (element) {
         element.style.transform = `translate(${bubble.x}px, ${bubble.y}px)`;
@@ -120,30 +103,70 @@ const BubblesEffect: React.FC<BubblesEffectProps> = ({
     });
 
     animationRef.current = requestAnimationFrame(animateBubbles);
-  };
+  }, [maxSize, minSize, speed]);
 
+  // Update dimensions safely
+  const updateDimensions = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      dimensionsRef.current = {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      };
+    }
+  }, []);
+
+  // Initialize and start animation
   useEffect(() => {
+    updateDimensions();
     bubblesRef.current = createBubbles();
 
-    // Запускаем анимацию с задержкой
-    const timer = setTimeout(() => {
-      animateBubbles();
+    // Start animation with delay
+    const startTimer = setTimeout(() => {
+      if (bubblesRef.current.length > 0) {
+        animateBubbles();
+      }
     }, 1000);
 
+    // Handle resize
     const handleResize = () => {
+      updateDimensions();
       bubblesRef.current = createBubbles();
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize, { passive: true });
 
+    // Cleanup function - Critical for StrictMode
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
-      clearTimeout(timer);
+      clearTimeout(startTimer);
       window.removeEventListener("resize", handleResize);
     };
-  }, [count, maxSize, minSize, speed]);
+  }, [createBubbles, animateBubbles, updateDimensions]);
+
+  // Memoized bubble elements to prevent unnecessary rerenders
+  const bubbleElements = useMemo(() => {
+    return Array.from({ length: count }).map((_, index) => (
+      <Box
+        key={index}
+        sx={{
+          position: "absolute",
+          borderRadius: "50%",
+          background: `radial-gradient(circle at 30% 30%, ${alpha(
+            bubbleColor,
+            0.4
+          )}, ${alpha(bubbleColor, 0.08)})`, // Reduced opacity for background effect
+          backdropFilter: "blur(0.5px)",
+          border: `1px solid ${alpha(bubbleColor, 0.1)}`,
+          boxShadow: `inset 0 0 6px ${alpha(bubbleColor, 0.08)}`,
+          willChange: "transform, opacity",
+          pointerEvents: "none",
+        }}
+      />
+    ));
+  }, [count, bubbleColor]);
 
   return (
     <Box
@@ -157,33 +180,11 @@ const BubblesEffect: React.FC<BubblesEffectProps> = ({
         pointerEvents: "none",
         zIndex: zIndex,
         overflow: "hidden",
+        // Ensure this is behind everything
+        isolation: "isolate",
       }}
     >
-      {Array.from({ length: count }).map((_, index) => (
-        <Box
-          key={index}
-          sx={{
-            position: "absolute",
-            borderRadius: "50%",
-            background: `radial-gradient(circle at 30% 30%, ${alpha(
-              bubbleColor,
-              0.8
-            )}, ${alpha(bubbleColor, 0.2)})`,
-            backdropFilter: "blur(1px)",
-            border: `1px solid ${alpha(bubbleColor, 0.3)}`,
-            boxShadow: `inset 0 0 10px ${alpha(bubbleColor, 0.2)}`,
-            animation: "bubble-float 3s infinite ease-in-out",
-            "@keyframes bubble-float": {
-              "0%, 100%": {
-                transform: "scale(1)",
-              },
-              "50%": {
-                transform: "scale(1.1)",
-              },
-            },
-          }}
-        />
-      ))}
+      {bubbleElements}
     </Box>
   );
 };

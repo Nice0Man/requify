@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { dashboardApi } from '../api';
 
 interface DashboardStats {
@@ -45,7 +45,7 @@ export const fetchRecentActivity = createAsyncThunk(
   'dashboard/fetchRecentActivity',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await dashboardApi.getRecentActivity();
+      const response = await dashboardApi.getActivity();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -57,7 +57,8 @@ export const fetchChartData = createAsyncThunk(
   'dashboard/fetchChartData',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await dashboardApi.getChartData();
+      // TODO: добавить метод getChartData в dashboardApi
+      const response = await dashboardApi.getStats();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -82,7 +83,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchDashboardStats.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.stats = action.payload;
+        state.stats = action.payload as any;
       })
       .addCase(fetchDashboardStats.rejected, (state, action) => {
         state.isLoading = false;
@@ -94,7 +95,7 @@ const dashboardSlice = createSlice({
       })
       // Fetch chart data
       .addCase(fetchChartData.fulfilled, (state, action) => {
-        state.chartData = action.payload;
+        state.chartData = action.payload as any;
       });
   },
 });

@@ -1,88 +1,162 @@
 import React from "react";
 import { Box } from "@mui/material";
 import { HeroSection } from "./HeroSection";
-import { SystemFeatures } from "./SystemFeatures";
-import { BusinessMetrics } from "./BusinessMetrics";
-import BusinessSolutionsSection from "./BusinessSolutionsSection";
-import LandingFooter from "./LandingFooter";
+import { SystemFeaturesSection } from "./SystemFeatures";
+import { IndustrySolutions } from "./IndustrySolutions";
+import { IntegrationsShowcase } from "./IntegrationsShowcase";
+import { CTASection } from "./CTASection";
+import { FooterSection } from "./FooterSection";
 import { LandingHeader } from "./LandingHeader";
-import { FullPageScroll, ScrollIndicator, BubblesEffect } from "@/shared/ui";
-import { useFullPageScroll } from "@/shared/hooks";
+import { ScrollNavigationWidget } from "@/widgets/scroll-navigation";
+import {
+  ScrollSection,
+  useScrollNavigation,
+} from "@/features/scroll-navigation";
 
-const SECTIONS = [
-  { id: "hero", component: HeroSection },
-  { id: "features", component: SystemFeatures },
-  { id: "metrics", component: BusinessMetrics },
-  { id: "cta", component: BusinessSolutionsSection },
-  { id: "footer", component: LandingFooter },
-] as const;
+// Базовая конфигурация секций без переводов
+const BASE_LANDING_SECTIONS: Omit<ScrollSection, 'title'>[] = [
+  {
+    id: "hero",
+    hash: "hero",
+    order: 0,
+  },
+  {
+    id: "features",
+    hash: "features",
+    order: 1,
+  },
+  {
+    id: "solutions",
+    hash: "solutions",
+    order: 2,
+  },
+  {
+    id: "integrations",
+    hash: "integrations",
+    order: 3,
+  },
+  {
+    id: "cta",
+    hash: "contact",
+    order: 4,
+  },
+  {
+    id: "footer",
+    hash: "footer",
+    order: 5,
+  },
+];
 
-const SECTION_IDS = SECTIONS.map((section) => section.id);
+// Компоненты секций в том же порядке
+const SECTION_COMPONENTS = [
+  HeroSection,
+  SystemFeaturesSection,
+  IndustrySolutions,
+  IntegrationsShowcase,
+  CTASection,
+  FooterSection,
+];
 
 export const LandingWidget: React.FC = () => {
-  const { activeSection, navigateToSection, progress } = useFullPageScroll({
-    totalSections: SECTIONS.length,
-    initialSection: 0,
-    enableHashSync: true,
-    sectionIds: SECTION_IDS,
-  });
+  // Создаем полные секции с заголовками по умолчанию внутри компонента
+  const LANDING_SECTIONS: ScrollSection[] = React.useMemo(() => BASE_LANDING_SECTIONS.map((section) => ({
+    ...section,
+    title: section.id.charAt(0).toUpperCase() + section.id.slice(1), // Простые заголовки
+  })), []);
 
-  const handleSectionChange = (sectionIndex: number) => {
-    console.log(
-      `LandingWidget: Section changed to ${sectionIndex} (${SECTIONS[sectionIndex]?.id})`
-    );
-  };
-
-  const handleSectionById = (sectionId: string) => {
-    const sectionIndex = SECTIONS.findIndex(
-      (section) => section.id === sectionId
-    );
-    if (sectionIndex !== -1) {
-      navigateToSection(sectionIndex);
+  // Используем хук scroll navigation для получения текущей секции
+  const { activeSection, currentSection, navigateToHash } = useScrollNavigation(
+    {
+      sections: LANDING_SECTIONS,
+      enableHashSync: true,
+      autoScrollToHash: true,
     }
-  };
+  );
+
+  // Обработчик изменения секции для обновления header
+  const handleSectionChange = React.useCallback(
+    (sectionIndex: number, sectionId: string) => {
+      console.log(
+        `Landing: Переключение на секцию ${sectionIndex} (${sectionId})`
+      );
+
+      // Можно добавить дополнительную логику, например аналитику
+      // analytics.track('landing_section_viewed', { section: sectionId, index: sectionIndex });
+    },
+    []
+  );
+
+  // Обработчик навигации из header
+  const handleHeaderSectionClick = React.useCallback(
+    (sectionId: string) => {
+      // Находим hash по id секции
+      const section = LANDING_SECTIONS.find((s) => s.id === sectionId);
+      if (section) {
+        navigateToHash(section.hash);
+      }
+    },
+    [navigateToHash, LANDING_SECTIONS]
+  );
 
   return (
-    <Box sx={{ position: "relative", height: "100vh", overflow: "hidden" }}>
-      {/* Header - Fixed position */}
+    <>
+      {/* Фиксированный заголовок с автоскрытием */}
       <LandingHeader
-        activeSection={SECTIONS[activeSection]?.id || "hero"}
-        onSectionClick={handleSectionById}
+        activeSection={currentSection?.id || "hero"}
+        onSectionClick={handleHeaderSectionClick}
         isScrolled={activeSection > 0}
       />
 
-      {/* Background Effects */}
-      <BubblesEffect
-        count={20}
-        maxSize={80}
-        speed={1.2}
-        color="primary"
-        zIndex={-1}
-      />
-
-      {/* Main Content with Smooth Scrolling */}
-      <FullPageScroll
-        activeSection={activeSection}
+      {/* Основной scroll контейнер с навигацией */}
+      <ScrollNavigationWidget
+        sections={LANDING_SECTIONS}
+        config={{
+          enableHashSync: true,
+          enableKeyboard: true,
+          enableWheel: true,
+          enableTouch: true,
+          animationDuration: 800,
+          autoScrollToHash: true,
+        }}
+        showNavigator={true}
+        navigatorPosition="right"
         onSectionChange={handleSectionChange}
-        animationDuration={0.8}
-        threshold={30}
       >
-        {SECTIONS.map(({ id, component: Component }) => (
-          <Box key={id} sx={{ height: "100vh", width: "100%" }}>
-            <Component />
-          </Box>
-        ))}
-      </FullPageScroll>
-
-      {/* Navigation Indicator */}
-      <ScrollIndicator
-        activeSection={activeSection}
-        totalSections={SECTIONS.length}
-        position="right"
-        showArrows={true}
-        showDots={true}
-        onNavigate={navigateToSection}
-      />
-    </Box>
+        {SECTION_COMPONENTS.map((Component, index) => {
+          const isFooter = LANDING_SECTIONS[index].id === "footer";
+          
+          return (
+            <Box
+              key={LANDING_SECTIONS[index].id}
+              id={LANDING_SECTIONS[index].id}
+              sx={{
+                height: "100%",
+                minHeight: isFooter ? "auto" : "100vh",
+                // Поддержка новых viewport units для мобильных устройств
+                "@supports (height: 100dvh)": {
+                  minHeight: isFooter ? "auto" : "100dvh",
+                },
+                // Fallback для старых браузеров
+                "@supports not (height: 100dvh)": {
+                  minHeight: isFooter ? "auto" : "calc(var(--vh, 1vh) * 100)",
+                },
+                display: "flex",
+                flexDirection: "column",
+                position: "relative",
+                // Компенсируем высоту фиксированного header для первой секции
+                paddingTop: index === 0 ? "80px" : 0,
+                // Footer занимает только необходимое пространство
+                ...(isFooter && {
+                  minHeight: "auto",
+                  height: "auto",
+                }),
+              }}
+            >
+              <Component />
+            </Box>
+          );
+        })}
+      </ScrollNavigationWidget>
+    </>
   );
 };

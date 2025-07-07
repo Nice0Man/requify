@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-const DashboardStats: React.FC = () => {
+const DashboardStatsFC: React.FC = () => {
   const { t } = useTranslation();
   return (
     <Box>
@@ -12,4 +12,4 @@ const DashboardStats: React.FC = () => {
   );
 };
 
-export { DashboardStats };
+export { DashboardStatsFC };

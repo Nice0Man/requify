@@ -1,5 +1,8 @@
 /* CSS Variables */
 :root {
+  /* Viewport Units Fix for Mobile */
+  --vh: 1vh;
+
   /* Colors */
   --color-primary: #1976d2;
   --color-primary-dark: #115293;
@@ -28,7 +31,7 @@
   --shadow-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   --shadow-3: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   --shadow-4: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
-  --shadow-5: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+  --shadow-5: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
 
   /* Typography */
   --font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -113,7 +116,12 @@ body {
 }
 
 /* ===== TYPOGRAPHY RESET ===== */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 0;
   font-weight: 600;
   line-height: 1.2;
@@ -141,14 +149,17 @@ a {
 }
 
 /* ===== LIST RESET ===== */
-ul, ol {
+ul,
+ol {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 /* ===== INPUT RESET ===== */
-input, textarea, select {
+input,
+textarea,
+select {
   font-family: inherit;
   font-size: inherit;
   border: none;
@@ -172,7 +183,9 @@ table {
 }
 
 /* ===== BOX SIZING ===== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
