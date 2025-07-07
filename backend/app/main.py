@@ -157,6 +157,10 @@ app = FastAPI(
 #     allow_headers=["*"],
 # )
 
+# Регистрация обработчиков исключений
+from app.core.exceptions import register_exception_handlers
+register_exception_handlers(app)
+
 # Подключение маршрутизатора API
 app.include_router(api_router, prefix=settings.app_config.api_v1_str)
 

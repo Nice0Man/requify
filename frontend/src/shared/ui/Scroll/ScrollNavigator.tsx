@@ -97,14 +97,27 @@ export const ScrollNavigator: React.FC<ScrollNavigatorProps> = memo(
             title="Предыдущая секция"
             placement={position === "right" ? "left" : "right"}
           >
-            <IconButton
-              onClick={handleNavigateUp}
-              disabled={disabled || activeSection <= 0}
-              sx={arrowStyles}
-              size="small"
-            >
-              <KeyboardArrowUp fontSize="small" />
-            </IconButton>
+            {disabled || activeSection <= 0 ? (
+              <span>
+                <IconButton
+                  onClick={handleNavigateUp}
+                  disabled={disabled || activeSection <= 0}
+                  sx={arrowStyles}
+                  size="small"
+                >
+                  <KeyboardArrowUp fontSize="small" />
+                </IconButton>
+              </span>
+            ) : (
+              <IconButton
+                onClick={handleNavigateUp}
+                disabled={disabled || activeSection <= 0}
+                sx={arrowStyles}
+                size="small"
+              >
+                <KeyboardArrowUp fontSize="small" />
+              </IconButton>
+            )}
           </Tooltip>
         )}
 
@@ -180,14 +193,27 @@ export const ScrollNavigator: React.FC<ScrollNavigatorProps> = memo(
             title="Следующая секция"
             placement={position === "right" ? "left" : "right"}
           >
-            <IconButton
-              onClick={handleNavigateDown}
-              disabled={disabled || activeSection >= totalSections - 1}
-              sx={arrowStyles}
-              size="small"
-            >
-              <KeyboardArrowDown fontSize="small" />
-            </IconButton>
+            {disabled || activeSection >= totalSections - 1 ? (
+              <span>
+                <IconButton
+                  onClick={handleNavigateDown}
+                  disabled={disabled || activeSection >= totalSections - 1}
+                  sx={arrowStyles}
+                  size="small"
+                >
+                  <KeyboardArrowDown fontSize="small" />
+                </IconButton>
+              </span>
+            ) : (
+              <IconButton
+                onClick={handleNavigateDown}
+                disabled={disabled || activeSection >= totalSections - 1}
+                sx={arrowStyles}
+                size="small"
+              >
+                <KeyboardArrowDown fontSize="small" />
+              </IconButton>
+            )}
           </Tooltip>
         )}
       </Box>

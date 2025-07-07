@@ -29,9 +29,7 @@ async def search_requirements(
     priority_id: Optional[int] = Query(None, description="Filter by priority ID"),
     type_id: Optional[int] = Query(None, description="Filter by type ID"),
     skip: int = Query(0, ge=0, description="Number of records to skip"),
-    limit: int = Query(
-        100, le=1000, description="Maximum number of returned records"
-    ),
+    limit: int = Query(100, le=1000, description="Maximum number of returned records"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_requirements_read_user),
 ):
@@ -152,7 +150,8 @@ async def create_requirement(
         req_type = await crud.requirement_type.get(db, id=requirement_in.type_id)
         if not req_type:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Requirement type not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Requirement type not found",
             )
 
     if requirement_in.priority_id:
@@ -174,7 +173,7 @@ async def create_requirement(
             )
 
     # Check release existence (if specified)
-    if hasattr(requirement_in, 'release_id') and requirement_in.release_id:
+    if hasattr(requirement_in, "release_id") and requirement_in.release_id:
         release = await crud.release.get(db, id=requirement_in.release_id)
         if not release:
             raise HTTPException(
@@ -183,7 +182,7 @@ async def create_requirement(
             )
 
     # Check specification existence (if specified)
-    if hasattr(requirement_in, 'spec_id') and requirement_in.spec_id:
+    if hasattr(requirement_in, "spec_id") and requirement_in.spec_id:
         spec = await crud.spec.get(db, id=requirement_in.spec_id)
         if not spec:
             raise HTTPException(
@@ -218,9 +217,7 @@ async def get_requirement(
     Raises:
         HTTPException: If requirement is not found
     """
-    requirement = await crud.requirement.get_with_details(
-        db, id=requirement_id
-    )
+    requirement = await crud.requirement.get_with_details(db, id=requirement_id)
     if not requirement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
@@ -261,7 +258,8 @@ async def update_requirement(
         req_type = await crud.requirement_type.get(db, id=requirement_in.type_id)
         if not req_type:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Requirement type not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Requirement type not found",
             )
 
     if (
@@ -286,9 +284,11 @@ async def update_requirement(
             )
 
     # Check release existence (if specified and changed)
-    if (hasattr(requirement_in, 'release_id') and 
-        requirement_in.release_id and 
-        requirement_in.release_id != requirement.release_id):
+    if (
+        hasattr(requirement_in, "release_id")
+        and requirement_in.release_id
+        and requirement_in.release_id != requirement.release_id
+    ):
         release = await crud.release.get(db, id=requirement_in.release_id)
         if not release:
             raise HTTPException(
@@ -296,10 +296,12 @@ async def update_requirement(
                 detail="Release not found",
             )
 
-    # Check specification existence (if specified and changed)  
-    if (hasattr(requirement_in, 'spec_id') and 
-        requirement_in.spec_id and 
-        requirement_in.spec_id != requirement.spec_id):
+    # Check specification existence (if specified and changed)
+    if (
+        hasattr(requirement_in, "spec_id")
+        and requirement_in.spec_id
+        and requirement_in.spec_id != requirement.spec_id
+    ):
         spec = await crud.spec.get(db, id=requirement_in.spec_id)
         if not spec:
             raise HTTPException(
@@ -386,7 +388,9 @@ async def change_requirement_status(
 @router.put("/{requirement_id}/progress", response_model=schemas.Requirement)
 async def update_requirement_progress(
     requirement_id: int,
-    progress: float = Query(..., ge=0.0, le=100.0, description="Progress percentage (0.0-100.0)"),
+    progress: float = Query(
+        ..., ge=0.0, le=100.0, description="Progress percentage (0.0-100.0)"
+    ),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_requirements_write_user),
 ):
@@ -525,9 +529,7 @@ async def create_requirement_relationship(
         )
 
     # Check target requirement existence
-    target_requirement = await crud.requirement.get(
-        db, id=relationship_in.target_id
-    )
+    target_requirement = await crud.requirement.get(db, id=relationship_in.target_id)
     if not target_requirement:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -535,9 +537,7 @@ async def create_requirement_relationship(
         )
 
     # Check relationship type existence
-    relationship_type = await crud.relationship_type.get(
-        db, id=relationship_in.type_id
-    )
+    relationship_type = await crud.relationship_type.get(db, id=relationship_in.type_id)
     if not relationship_type:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Relationship type not found"

@@ -11,7 +11,7 @@ import { useAuth } from "../model/hooks";
 import { RegisterData } from "../model/types";
 import { useTranslation } from "react-i18next";
 
-const RegisterForm: React.FC = () => {
+const RegisterForm: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const { t } = useTranslation();
   const { register, isPending, error } = useAuth();
   const [formData, setFormData] = useState<RegisterData>({
@@ -27,6 +27,7 @@ const RegisterForm: React.FC = () => {
       return;
     }
     await register(formData);
+    onLogin();
   };
 
   const handleChange =

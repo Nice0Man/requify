@@ -10,3 +10,6 @@ export * from "./kanban";
 export * from "./project-stats";
 export * from "./landing";
 export * from "./scroll-navigation";
+export * from "./sidebar";
+export * from "./header";
+export * from "./layout";

@@ -32,10 +32,10 @@ def upgrade() -> None:
             comment="Прогресс выполнения требования (0.0-100.0)",
         ),
     )
-    
+
     # Устанавливаем значение по умолчанию для существующих записей
     op.execute("UPDATE requirements SET progress = 0.0 WHERE progress IS NULL")
-    
+
     # Теперь делаем поле NOT NULL
     op.alter_column("requirements", "progress", nullable=False)
     # ### end Alembic commands ###

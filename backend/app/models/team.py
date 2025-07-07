@@ -52,7 +52,7 @@ class Team(Base, TimestampedMixin):
     max_members: Mapped[Optional[int]] = mapped_column(
         Integer, nullable=True, comment="Максимальное количество участников"
     )
-    
+
     # Владелец команды
     owner_id: Mapped[int] = mapped_column(
         Integer,
@@ -117,8 +117,10 @@ class Team(Base, TimestampedMixin):
         """Получить участника команды по ID пользователя."""
         if not self.members:
             return None
-        return next((member for member in self.members if member.user_id == user_id), None)
+        return next(
+            (member for member in self.members if member.user_id == user_id), None
+        )
 
     def has_member(self, user_id: int) -> bool:
         """Проверить, является ли пользователь участником команды."""
-        return self.get_member_by_user_id(user_id) is not None 
+        return self.get_member_by_user_id(user_id) is not None

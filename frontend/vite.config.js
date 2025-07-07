@@ -46,6 +46,7 @@ export default defineConfig({
     host: "0.0.0.0",
     cors: true,
     allowedHosts: [
+      "backend",
       "localhost",
       "127.0.0.1",
       "requify_frontend",
@@ -53,7 +54,7 @@ export default defineConfig({
     ],
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: "http://backend:8000",
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {

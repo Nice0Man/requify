@@ -1,7 +1,13 @@
-// Project UI components exports
-// TODO: Создать компоненты согласно FSD принципам
-// export * from './ProjectCard';
-// export * from './ProjectList';
-// export * from './ProjectForm';
-// export * from './ProjectStatusBadge';
-// export * from './ProjectPriorityBadge'; 
+/**
+ * Project UI components exports
+ * TODO: Создать компоненты для проектов
+ */
+
+// export { ProjectCard } from './ProjectCard';
+// export { ProjectList } from './ProjectList';
+// export { ProjectForm } from './ProjectForm';
+
+// Временная заглушка
+export const ProjectUIPlaceholder = {
+  // TODO: Добавить компоненты
+}; 

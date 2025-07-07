@@ -25,16 +25,32 @@ def upgrade() -> None:
     op.create_table(
         "teams",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(length=100), nullable=False, comment="Название команды"),
-        sa.Column("code", sa.String(length=50), nullable=False, comment="Уникальный код команды"),
-        sa.Column("description", sa.Text(), nullable=True, comment="Описание команды"),
-        sa.Column("status", sa.String(length=20), nullable=False, comment="Статус команды"),
-        sa.Column("is_public", sa.Boolean(), nullable=False, comment="Публичная ли команда"),
         sa.Column(
-            "max_members", sa.Integer(), nullable=True, comment="Максимальное количество участников"
+            "name", sa.String(length=100), nullable=False, comment="Название команды"
+        ),
+        sa.Column(
+            "code",
+            sa.String(length=50),
+            nullable=False,
+            comment="Уникальный код команды",
+        ),
+        sa.Column("description", sa.Text(), nullable=True, comment="Описание команды"),
+        sa.Column(
+            "status", sa.String(length=20), nullable=False, comment="Статус команды"
+        ),
+        sa.Column(
+            "is_public", sa.Boolean(), nullable=False, comment="Публичная ли команда"
+        ),
+        sa.Column(
+            "max_members",
+            sa.Integer(),
+            nullable=True,
+            comment="Максимальное количество участников",
         ),
         sa.Column("owner_id", sa.Integer(), nullable=False, comment="Владелец команды"),
-        sa.Column("created_at", sa.DateTime(), nullable=False, comment="Время создания записи"),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, comment="Время создания записи"
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(),
@@ -42,32 +58,63 @@ def upgrade() -> None:
             comment="Время последнего обновления записи",
         ),
         sa.ForeignKeyConstraint(
-            ["owner_id"], ["users.id"], name=op.f("fk_teams_owner_id_users"), ondelete="RESTRICT"
+            ["owner_id"],
+            ["users.id"],
+            name=op.f("fk_teams_owner_id_users"),
+            ondelete="RESTRICT",
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_teams")),
         sa.UniqueConstraint("code", name=op.f("uq_teams_code")),
     )
     op.create_index("ix_teams_code_unique", "teams", ["code"], unique=True)
     op.create_index("ix_teams_name", "teams", ["name"], unique=False)
-    op.create_index("ix_teams_owner_status", "teams", ["owner_id", "status"], unique=False)
-    op.create_index("ix_teams_status_created", "teams", ["status", "created_at"], unique=False)
+    op.create_index(
+        "ix_teams_owner_status", "teams", ["owner_id", "status"], unique=False
+    )
+    op.create_index(
+        "ix_teams_status_created", "teams", ["status", "created_at"], unique=False
+    )
     op.create_table(
         "team_members",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("team_id", sa.Integer(), nullable=False, comment="ID команды"),
         sa.Column("user_id", sa.Integer(), nullable=False, comment="ID пользователя"),
-        sa.Column("role", sa.String(length=20), nullable=False, comment="Роль участника в команде"),
-        sa.Column("is_active", sa.Boolean(), nullable=False, comment="Активен ли участник"),
         sa.Column(
-            "joined_at", sa.DateTime(), nullable=False, comment="Время присоединения к команде"
+            "role",
+            sa.String(length=20),
+            nullable=False,
+            comment="Роль участника в команде",
         ),
-        sa.Column("left_at", sa.DateTime(), nullable=True, comment="Время выхода из команды"),
         sa.Column(
-            "title", sa.String(length=100), nullable=True, comment="Должность участника в команде"
+            "is_active", sa.Boolean(), nullable=False, comment="Активен ли участник"
         ),
-        sa.Column("hourly_rate", sa.Float(), nullable=True, comment="Почасовая ставка участника"),
-        sa.Column("notes", sa.String(length=500), nullable=True, comment="Заметки о участнике"),
-        sa.Column("created_at", sa.DateTime(), nullable=False, comment="Время создания записи"),
+        sa.Column(
+            "joined_at",
+            sa.DateTime(),
+            nullable=False,
+            comment="Время присоединения к команде",
+        ),
+        sa.Column(
+            "left_at", sa.DateTime(), nullable=True, comment="Время выхода из команды"
+        ),
+        sa.Column(
+            "title",
+            sa.String(length=100),
+            nullable=True,
+            comment="Должность участника в команде",
+        ),
+        sa.Column(
+            "hourly_rate",
+            sa.Float(),
+            nullable=True,
+            comment="Почасовая ставка участника",
+        ),
+        sa.Column(
+            "notes", sa.String(length=500), nullable=True, comment="Заметки о участнике"
+        ),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, comment="Время создания записи"
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(),
@@ -88,14 +135,24 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_team_members")),
     )
-    op.create_index("ix_team_members_is_active", "team_members", ["is_active"], unique=False)
-    op.create_index("ix_team_members_joined_at", "team_members", ["joined_at"], unique=False)
-    op.create_index("ix_team_members_team_role", "team_members", ["team_id", "role"], unique=False)
+    op.create_index(
+        "ix_team_members_is_active", "team_members", ["is_active"], unique=False
+    )
+    op.create_index(
+        "ix_team_members_joined_at", "team_members", ["joined_at"], unique=False
+    )
+    op.create_index(
+        "ix_team_members_team_role", "team_members", ["team_id", "role"], unique=False
+    )
     op.create_index(
         "ix_team_members_team_user", "team_members", ["team_id", "user_id"], unique=True
     )
-    op.create_index("ix_team_members_user_role", "team_members", ["user_id", "role"], unique=False)
-    op.add_column("dashboard_activities", sa.Column("team_id", sa.Integer(), nullable=True))
+    op.create_index(
+        "ix_team_members_user_role", "team_members", ["user_id", "role"], unique=False
+    )
+    op.add_column(
+        "dashboard_activities", sa.Column("team_id", sa.Integer(), nullable=True)
+    )
     op.create_foreign_key(
         op.f("fk_dashboard_activities_team_id_teams"),
         "dashboard_activities",
@@ -103,7 +160,9 @@ def upgrade() -> None:
         ["team_id"],
         ["id"],
     )
-    op.add_column("dashboard_notifications", sa.Column("team_id", sa.Integer(), nullable=True))
+    op.add_column(
+        "dashboard_notifications", sa.Column("team_id", sa.Integer(), nullable=True)
+    )
     op.create_foreign_key(
         op.f("fk_dashboard_notifications_team_id_teams"),
         "dashboard_notifications",
@@ -112,7 +171,8 @@ def upgrade() -> None:
         ["id"],
     )
     op.add_column(
-        "projects", sa.Column("team_id", sa.Integer(), nullable=True, comment="Команда проекта")
+        "projects",
+        sa.Column("team_id", sa.Integer(), nullable=True, comment="Команда проекта"),
     )
     op.create_foreign_key(
         op.f("fk_projects_team_id_teams"),
@@ -128,7 +188,9 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_constraint(op.f("fk_projects_team_id_teams"), "projects", type_="foreignkey")
+    op.drop_constraint(
+        op.f("fk_projects_team_id_teams"), "projects", type_="foreignkey"
+    )
     op.drop_column("projects", "team_id")
     op.drop_constraint(
         op.f("fk_dashboard_notifications_team_id_teams"),
@@ -137,7 +199,9 @@ def downgrade() -> None:
     )
     op.drop_column("dashboard_notifications", "team_id")
     op.drop_constraint(
-        op.f("fk_dashboard_activities_team_id_teams"), "dashboard_activities", type_="foreignkey"
+        op.f("fk_dashboard_activities_team_id_teams"),
+        "dashboard_activities",
+        type_="foreignkey",
     )
     op.drop_column("dashboard_activities", "team_id")
     op.drop_index("ix_team_members_user_role", table_name="team_members")

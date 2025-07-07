@@ -12,7 +12,7 @@ export const client: AxiosInstance = axios.create({
 // Request interceptor for auth token
 client.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("auth_token");
+    const token = localStorage.getItem("access_token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,9 +30,11 @@ client.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem("auth_token");
-      window.location.href = "/auth/login";
+      // Handle unauthorized access - очищаем OAuth2 токены
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("token_expires_at");
+      window.location.href = "/auth";
     }
     return Promise.reject(error);
   }

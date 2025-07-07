@@ -21,6 +21,7 @@ class UserBase(BaseModel):
     department: Optional[str] = Field(None, description="Отдел пользователя")
     phone: Optional[str] = Field(None, description="Телефон пользователя")
 
+    
     @field_validator("username")
     def validate_username(cls, v):
         """Валидация имени пользователя"""

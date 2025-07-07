@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { store } from '../store';
-import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
-import { theme } from '@/app/styles/theme';
-import { ErrorBoundary } from '@/shared/ui';
+import { ThemeProvider } from './ThemeProvider';
+import { QueryProvider } from './QueryProvider';
+import { AuthProvider } from './AuthProvider';
+import { OAuth2Provider } from './OAuth2Provider';
+import { CircularProgress, Box } from '@mui/material';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-    },
-  },
-});
+// Глобальный fallback для Suspense
+const GlobalSuspenseFallback = () => (
+  <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    minHeight="100vh"
+    bgcolor="#f5f5f5"
+  >
+    <CircularProgress size={60} />
+  </Box>
+);
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -25,17 +27,29 @@ interface AppProvidersProps {
 
 export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
-    <ErrorBoundary>
+    <Suspense fallback={<GlobalSuspenseFallback />}>
       <Provider store={store}>
         <BrowserRouter>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              {children}
-            </ThemeProvider>
-          </QueryClientProvider>
+          <QueryProvider>
+            <OAuth2Provider
+              onAuthError={(error) => {
+                console.error('OAuth2 error:', error);
+                // Можно добавить глобальную обработку ошибок аутентификации
+              }}
+              onTokenRefreshed={() => {
+                console.log('Token refreshed successfully');
+                // Можно добавить логику при успешном обновлении токена
+              }}
+            >
+              <AuthProvider>
+                <ThemeProvider>
+                  {children}
+                </ThemeProvider>
+              </AuthProvider>
+            </OAuth2Provider>
+          </QueryProvider>
         </BrowserRouter>
       </Provider>
-    </ErrorBoundary>
+    </Suspense>
   );
-}; 
+};

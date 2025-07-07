@@ -84,6 +84,7 @@ class TokenData(BaseModel):
 
 class LoginRequest(BaseModel):
     """Схема для запроса аутентификации."""
+
     email: EmailStr = Field(..., description="Email")
     username: Optional[str] = Field(None, description="Username")
     password: str = Field(..., min_length=1, description="Пароль")

@@ -1,19 +1,50 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "@/app/store";
+import { CircularProgress, Box } from "@mui/material";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiredRole?: string;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+// Компонент загрузки для Suspense fallback
+const ProtectedRouteFallback = () => (
+  <Box
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    minHeight="100vh"
+  >
+    <CircularProgress size={40} />
+  </Box>
+);
+
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
+  children, 
+  requiredRole 
+}) => {
+  const { isAuthenticated, user, isLoading, isInitialized } = useAuth();
   const location = useLocation();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
+  // Показываем загрузку пока не завершена инициализация
+  if (!isInitialized || isLoading) {
+    return <ProtectedRouteFallback />;
   }
 
-  return <>{children}</>;
+  // Если пользователь не аутентифицирован, перенаправляем на логин
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // Проверяем роль пользователя, если требуется
+  if (requiredRole && user?.role !== requiredRole) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return (
+    <Suspense fallback={<ProtectedRouteFallback />}>
+      {children}
+    </Suspense>
+  );
 };

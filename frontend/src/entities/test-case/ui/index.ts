@@ -1,7 +1,13 @@
-// Test Case UI components exports
-// TODO: Создать компоненты согласно FSD принципам
-// export * from "./TestCaseCard";
-// export * from "./TestCaseList";
-// export * from "./TestCaseForm";
-// export * from "./TestCaseStatusBadge";
-// export * from "./TestCaseExecutionForm";
+/**
+ * TestCase UI components exports
+ * TODO: Создать компоненты для тест-кейсов
+ */
+
+// export { TestCaseCard } from './TestCaseCard';
+// export { TestCaseList } from './TestCaseList';
+// export { TestCaseForm } from './TestCaseForm';
+
+// Временная заглушка
+export const TestCaseUIPlaceholder = {
+  // TODO: Добавить компоненты
+};

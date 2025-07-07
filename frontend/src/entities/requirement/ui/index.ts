@@ -1,8 +1,13 @@
-// Requirement UI components exports
-// TODO: Создать компоненты согласно FSD принципам
-// export * from "./RequirementCard";
-// export * from "./RequirementList";
-// export * from "./RequirementForm";
-// export * from "./RequirementStatusBadge";
-// export * from "./RequirementPriorityBadge";
-// export * from "./RequirementTypeBadge";
+/**
+ * Requirement UI components exports
+ * TODO: Создать компоненты для требований
+ */
+
+// export { RequirementCard } from './RequirementCard';
+// export { RequirementList } from './RequirementList';
+// export { RequirementForm } from './RequirementForm';
+
+// Временная заглушка
+export const RequirementUIPlaceholder = {
+  // TODO: Добавить компоненты
+};

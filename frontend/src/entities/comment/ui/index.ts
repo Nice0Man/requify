@@ -1,6 +1,13 @@
-// Comment UI components exports
-// TODO: Создать компоненты согласно FSD принципам
-// export * from "./CommentCard";
-// export * from "./CommentList";
-// export * from "./CommentForm";
-// export * from "./CommentThread";
+/**
+ * Comment UI components exports
+ * TODO: Создать компоненты для комментариев
+ */
+
+// export { CommentList } from './CommentList';
+// export { CommentForm } from './CommentForm';
+// export { CommentItem } from './CommentItem';
+
+// Временная заглушка
+export const CommentUIPlaceholder = {
+  // TODO: Добавить компоненты
+};

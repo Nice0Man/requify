@@ -32,12 +32,8 @@ async def get_relationships(
     source_id: Optional[int] = Query(
         None, description="Фильтр по исходному требованию"
     ),
-    target_id: Optional[int] = Query(
-        None, description="Фильтр по целевому требованию"
-    ),
-    type_id: Optional[int] = Query(
-        None, description="Фильтр по типу связи"
-    ),
+    target_id: Optional[int] = Query(None, description="Фильтр по целевому требованию"),
+    type_id: Optional[int] = Query(None, description="Фильтр по типу связи"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_requirements_read_user),
 ):
@@ -94,9 +90,7 @@ async def create_relationship(
         HTTPException: Если требования или тип связи не найдены, или связь уже существует
     """
     # Проверяем существование исходного требования
-    source_req = await crud.requirement.get(
-        db, id=relationship_in.source_id
-    )
+    source_req = await crud.requirement.get(db, id=relationship_in.source_id)
     if not source_req:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -104,9 +98,7 @@ async def create_relationship(
         )
 
     # Проверяем существование целевого требования
-    target_req = await crud.requirement.get(
-        db, id=relationship_in.target_id
-    )
+    target_req = await crud.requirement.get(db, id=relationship_in.target_id)
     if not target_req:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -121,9 +113,7 @@ async def create_relationship(
         )
 
     # Проверяем существование типа связи
-    rel_type = await crud.relationship_type.get(
-        db, id=relationship_in.type_id
-    )
+    rel_type = await crud.relationship_type.get(db, id=relationship_in.type_id)
     if not rel_type:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -201,9 +191,7 @@ async def update_relationship(
 
     # Если меняется тип связи, проверяем его существование
     if relationship_in.type_id:
-        rel_type = await crud.relationship_type.get(
-            db, id=relationship_in.type_id
-        )
+        rel_type = await crud.relationship_type.get(db, id=relationship_in.type_id)
         if not rel_type:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

@@ -13,18 +13,10 @@ class SpecBase(BaseModel):
     name: str = Field(
         ..., min_length=1, max_length=100, description="Название спецификации"
     )
-    description: Optional[str] = Field(
-        None, description="Описание спецификации"
-    )
-    version: str = Field(
-        "1.0", description="Версия спецификации"
-    )
-    format: str = Field(
-        "pdf", description="Формат документа"
-    )
-    language: str = Field(
-        "ru", description="Язык спецификации"
-    )
+    description: Optional[str] = Field(None, description="Описание спецификации")
+    version: str = Field("1.0", description="Версия спецификации")
+    format: str = Field("pdf", description="Формат документа")
+    language: str = Field("ru", description="Язык спецификации")
 
     @field_validator("version")
     def validate_version(cls, v):
@@ -33,8 +25,11 @@ class SpecBase(BaseModel):
             raise ValueError("Specification version cannot be empty")
         # Простая проверка формата версии
         import re
-        if not re.match(r'^\d+\.\d+(\.\d+)?(-\w+)?$', v.strip()):
-            raise ValueError("Invalid version format. Use formats like 1.0, 1.0.0, 1.0.0-alpha")
+
+        if not re.match(r"^\d+\.\d+(\.\d+)?(-\w+)?$", v.strip()):
+            raise ValueError(
+                "Invalid version format. Use formats like 1.0, 1.0.0, 1.0.0-alpha"
+            )
         return v.strip()
 
     @field_validator("format")
@@ -61,9 +56,7 @@ class SpecCreate(SpecBase):
     content: Optional[Dict[str, Any]] = Field(
         None, description="Содержимое спецификации в JSON формате"
     )
-    status: str = Field(
-        "draft", description="Статус спецификации"
-    )
+    status: str = Field("draft", description="Статус спецификации")
     template_id: Optional[int] = Field(
         None, gt=0, description="ID шаблона спецификации"
     )
@@ -86,24 +79,14 @@ class SpecUpdate(BaseModel):
     name: Optional[str] = Field(
         None, min_length=1, max_length=100, description="Название спецификации"
     )
-    description: Optional[str] = Field(
-        None, description="Описание спецификации"
-    )
-    version: Optional[str] = Field(
-        None, description="Версия спецификации"
-    )
+    description: Optional[str] = Field(None, description="Описание спецификации")
+    version: Optional[str] = Field(None, description="Версия спецификации")
     content: Optional[Dict[str, Any]] = Field(
         None, description="Содержимое спецификации в JSON формате"
     )
-    format: Optional[str] = Field(
-        None, description="Формат документа"
-    )
-    language: Optional[str] = Field(
-        None, description="Язык спецификации"
-    )
-    status: Optional[str] = Field(
-        None, description="Статус спецификации"
-    )
+    format: Optional[str] = Field(None, description="Формат документа")
+    language: Optional[str] = Field(None, description="Язык спецификации")
+    status: Optional[str] = Field(None, description="Статус спецификации")
     template_id: Optional[int] = Field(
         None, gt=0, description="ID шаблона спецификации"
     )
@@ -152,11 +135,11 @@ class SpecInDB(SpecInDBBase):
 
 class SpecDetailed(Spec):
     """Детальная схема спецификации с дополнительной информацией."""
-    
+
     project_name: Optional[str] = None
     generated_by_name: Optional[str] = None
     requirements_count: int = 0
-    
+
     @field_validator("requirements_count")
     def validate_requirements_count(cls, v):
         """Валидация количества требований"""

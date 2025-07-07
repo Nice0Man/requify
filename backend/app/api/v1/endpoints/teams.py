@@ -148,7 +148,7 @@ async def create_team(
     allowed_roles = ["admin", "manager", "senior_developer", "product_manager", "owner"]
     if current_user.role not in allowed_roles:
         raise PermissionDeniedError("create_team", "user")
-    
+
     try:
         team = await crud_team.create_with_owner(
             db, obj_in=team_in, owner_id=current_user.id
@@ -424,7 +424,7 @@ async def bulk_create_teams(
     allowed_roles = ["admin", "manager", "product_manager"]
     if current_user.role not in allowed_roles:
         raise PermissionDeniedError("bulk_create_teams", "user")
-    
+
     created_teams = []
 
     for team_data in bulk_data.teams:

@@ -16,8 +16,9 @@ import {
   useTheme,
 } from "@mui/material";
 import { Email, Lock, Login } from "@mui/icons-material";
-import { useAuth } from "../model/hooks";
-import { LoginCredentials } from "../model/types";
+import { useOAuth2 } from "@/app/providers/OAuth2Provider";
+import { oauth2API } from "@/shared/api";
+import type { LoginRequest } from "@/shared/types/auth";
 import { useTranslation } from "react-i18next";
 import { FloatingLabelInput } from "@/shared/ui";
 
@@ -32,50 +33,63 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { login, isPending, error } = useAuth();
-  
-  const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: "",
+  const { refreshUser } = useOAuth2();
+
+  const [credentials, setCredentials] = useState<LoginRequest>({
+    username: "",
     password: "",
   });
-  
+
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string>("");
   const [rememberMe, setRememberMe] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
-    email?: string;
+    username?: string;
     password?: string;
   }>({});
-  
+
   const [touched, setTouched] = useState<{
-    email?: boolean;
+    username?: boolean;
     password?: boolean;
   }>({});
 
   // Валидация в реальном времени
-  const validateField = (field: keyof LoginCredentials, value: string) => {
+  const validateField = (field: keyof LoginRequest, value: string) => {
     switch (field) {
-      case "email":
-        if (!value) return t("auth.validation.emailRequired", "Email обязателен");
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-          return t("auth.validation.emailFormat", "Неверный формат email");
+      case "username":
+        if (!value)
+          return t(
+            "auth.validation.usernameRequired",
+            "Имя пользователя обязательно"
+          );
+        if (value.length < 3)
+          return t(
+            "auth.validation.usernameMinLength",
+            "Имя пользователя должно содержать не менее 3 символов"
+          );
         return "";
       case "password":
-        if (!value) return t("auth.validation.passwordRequired", "Пароль обязателен");
+        if (!value)
+          return t("auth.validation.passwordRequired", "Пароль обязателен");
         if (value.length < 6)
-          return t("auth.validation.passwordMinLength", "Пароль должен содержать не менее 6 символов");
+          return t(
+            "auth.validation.passwordMinLength",
+            "Пароль должен содержать не менее 6 символов"
+          );
         return "";
       default:
         return "";
     }
   };
 
-  // Валидация при изменении полей
+      // Валидация при изменении полей
   useEffect(() => {
     const newErrors: typeof fieldErrors = {};
     
-    Object.keys(credentials).forEach((key) => {
-      const field = key as keyof LoginCredentials;
+    const fieldsToValidate: Array<keyof typeof fieldErrors> = ['username', 'password'];
+    fieldsToValidate.forEach((field) => {
       if (touched[field]) {
-        const error = validateField(field, credentials[field]);
+        const error = validateField(field, credentials[field] || "");
         if (error) newErrors[field] = error;
       }
     });
@@ -87,14 +101,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
     e.preventDefault();
     
     // Проверяем все поля
-    const newTouched = { email: true, password: true };
+    const newTouched = { username: true, password: true };
     setTouched(newTouched);
     
     // Валидируем все поля
     const newErrors: typeof fieldErrors = {};
-    Object.keys(credentials).forEach((key) => {
-      const field = key as keyof LoginCredentials;
-      const error = validateField(field, credentials[field]);
+    const fieldsToValidate: Array<keyof typeof fieldErrors> = ['username', 'password'];
+    fieldsToValidate.forEach((field) => {
+      const error = validateField(field, credentials[field] || "");
       if (error) newErrors[field] = error;
     });
     
@@ -102,23 +116,76 @@ const LoginForm: React.FC<LoginFormProps> = ({
       setFieldErrors(newErrors);
       return;
     }
-    
-    await login(credentials);
+
+    try {
+      setIsPending(true);
+      setError("");
+
+      // Используем OAuth2API для логина
+      await oauth2API.login(credentials);
+
+      // Обновляем пользователя в AuthProvider
+      await refreshUser();
+
+      // Принудительный редирект на dashboard после успешного логина
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      console.error("Login failed:", err);
+
+      // Обрабатываем ошибки
+      if (err.response?.status === 401) {
+        setError(
+          t(
+            "auth.errors.invalidCredentials",
+            "Неверное имя пользователя или пароль"
+          )
+        );
+      } else if (err.response?.status === 403) {
+        setError(t("auth.errors.accountDisabled", "Аккаунт заблокирован"));
+      } else if (err.response?.status === 429) {
+        setError(
+          t(
+            "auth.errors.tooManyAttempts",
+            "Слишком много попыток входа. Попробуйте позже"
+          )
+        );
+      } else if (err.message?.includes("CORS")) {
+        setError(
+          t(
+            "auth.errors.connectionError",
+            "Ошибка подключения к серверу. Проверьте настройки CORS"
+          )
+        );
+      } else {
+        setError(
+          err.response?.data?.detail ||
+            err.message ||
+            t(
+              "auth.errors.loginFailed",
+              "Не удалось войти в систему. Попробуйте еще раз"
+            )
+        );
+      }
+    } finally {
+      setIsPending(false);
+    }
   };
 
-  const handleChange = (field: keyof LoginCredentials) => (value: string) => {
+  const handleChange = (field: keyof LoginRequest) => (value: string) => {
     setCredentials((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleBlur = (field: keyof LoginCredentials) => () => {
+  const handleBlur = (field: keyof LoginRequest) => () => {
     setTouched((prev) => ({ ...prev, [field]: true }));
   };
 
-  const isFormValid = !Object.keys(fieldErrors).length && 
-    credentials.email && credentials.password;
+  const isFormValid =
+    !Object.keys(fieldErrors).length &&
+    credentials.username &&
+    credentials.password;
 
   return (
     <Card
@@ -126,7 +193,10 @@ const LoginForm: React.FC<LoginFormProps> = ({
       sx={{
         maxWidth: 480,
         mx: "auto",
-        background: `linear-gradient(135deg, ${alpha(theme.palette.background.paper, 0.9)}, ${alpha(theme.palette.background.paper, 0.95)})`,
+        background: `linear-gradient(135deg, ${alpha(
+          theme.palette.background.paper,
+          0.9
+        )}, ${alpha(theme.palette.background.paper, 0.95)})`,
         backdropFilter: "blur(20px)",
         borderRadius: 4,
         border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
@@ -149,7 +219,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           >
             <Login sx={{ color: "white", fontSize: 28 }} />
           </Box>
-          
+
           <Typography
             variant="h4"
             component="h1"
@@ -164,7 +234,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           >
             {t("auth.login", "Вход в систему")}
           </Typography>
-          
+
           <Typography variant="body2" color="text.secondary">
             {t("auth.loginSubtitle", "Войдите в свою учетную запись")}
           </Typography>
@@ -186,23 +256,26 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <Stack spacing={3}>
             <FloatingLabelInput
-              label={t("auth.email", "Email")}
-              type="email"
-              value={credentials.email}
-              onChange={handleChange("email")}
-              onBlur={handleBlur("email")}
-              error={fieldErrors.email}
+              label={t("auth.username", "Имя пользователя")}
+              type="text"
+              value={credentials.username || ""}
+              onChange={handleChange("username")}
+              onBlur={handleBlur("username")}
+              error={fieldErrors.username}
               required
-              autoComplete="email"
+              autoComplete="username"
               autoFocus
               startIcon={<Email />}
-              placeholder={t("auth.emailPlaceholder", "example@company.com")}
+              placeholder={t(
+                "auth.usernamePlaceholder",
+                "Введите имя пользователя"
+              )}
             />
 
             <FloatingLabelInput
               label={t("auth.password", "Пароль")}
               type="password"
-              value={credentials.password}
+              value={credentials.password || ""}
               onChange={handleChange("password")}
               onBlur={handleBlur("password")}
               error={fieldErrors.password}
@@ -212,7 +285,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
               placeholder={t("auth.passwordPlaceholder", "Введите пароль")}
             />
 
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
               <FormControlLabel
                 control={
                   <Checkbox
@@ -232,7 +311,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   </Typography>
                 }
               />
-              
+
               {onForgotPassword && (
                 <Link
                   component="button"
@@ -266,11 +345,17 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 textTransform: "none",
                 fontSize: "1.1rem",
                 background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                boxShadow: `0 4px 20px ${alpha(
+                  theme.palette.primary.main,
+                  0.4
+                )}`,
                 "&:hover": {
                   background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
                   transform: "translateY(-2px)",
-                  boxShadow: `0 6px 24px ${alpha(theme.palette.primary.main, 0.5)}`,
+                  boxShadow: `0 6px 24px ${alpha(
+                    theme.palette.primary.main,
+                    0.5
+                  )}`,
                 },
                 "&:disabled": {
                   background: alpha(theme.palette.action.disabled, 0.3),
@@ -295,7 +380,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   </Typography>
                 </Divider>
 
-                <Typography variant="body2" color="text.secondary" textAlign="center">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  textAlign="center"
+                >
                   {t("auth.noAccount", "Нет аккаунта?")}{" "}
                   <Link
                     component="button"

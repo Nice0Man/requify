@@ -22,6 +22,7 @@ from app.db.db_helper import get_async_session
 from app.crud import user as crud_user
 from app.models.user import User
 from app.utils.logger import logger
+from app.core.exceptions import UserNotFoundError, PermissionDeniedError
 
 # OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(
@@ -816,8 +817,66 @@ def _validate_user_access(request: Request, user: User, token_payload: dict) -> 
         f"User {user.id} ({user.username}) validated successfully with scopes: {token_scopes}"
     )
 
+# === Helper Functions ===
 
-# === Backward Compatibility ===
+async def get_user_by_id_or_404(db: AsyncSession, user_id: int) -> User:
+    """
+    Получить пользователя по ID или вернуть 404 ошибку.
+    
+    Args:
+        db: Сессия базы данных
+        user_id: ID пользователя
+    
+    Returns:
+        User: Объект пользователя
+        
+    Raises:
+        UserNotFoundError: Если пользователь не найден
+    """
+    user = await crud_user.get(db, id=user_id)
+    if user is None:
+        raise UserNotFoundError(user_id)
+    return user
+
+
+async def get_user_by_email_or_404(db: AsyncSession, email: str) -> User:
+    """
+    Получить пользователя по email или вернуть 404 ошибку.
+    
+    Args:
+        db: Сессия базы данных
+        email: Email пользователя
+    
+    Returns:
+        User: Объект пользователя
+        
+    Raises:
+        UserNotFoundError: Если пользователь не найден
+    """
+    user = await crud_user.get_by_email(db, email=email)
+    if user is None:
+        raise UserNotFoundError(email)
+    return user
+
+
+async def get_user_by_username_or_404(db: AsyncSession, username: str) -> User:
+    """
+    Получить пользователя по username или вернуть 404 ошибку.
+    
+    Args:
+        db: Сессия базы данных
+        username: Имя пользователя
+    
+    Returns:
+        User: Объект пользователя
+        
+    Raises:
+        UserNotFoundError: Если пользователь не найден
+    """
+    user = await crud_user.get_by_username(db, username=username)
+    if user is None:
+        raise UserNotFoundError(username)
+    return user
 
 # Алиасы для обратной совместимости
 get_current_user_dep = get_current_user

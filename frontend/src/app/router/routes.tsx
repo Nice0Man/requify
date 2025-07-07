@@ -22,16 +22,41 @@ export interface RouteConfig {
 }
 
 export const routes: RouteConfig[] = [
+  // Landing page
   {
     path: "/",
     element: <LandingPage />,
     isProtected: false,
   },
+  
+  // Authentication routes - all public
   {
     path: "/auth/*",
     element: <AuthPage />,
     isProtected: false,
   },
+  {
+    path: "/login",
+    element: <AuthPage />,
+    isProtected: false,
+  },
+  {
+    path: "/register",
+    element: <AuthPage />,
+    isProtected: false,
+  },
+  {
+    path: "/forgot-password",
+    element: <AuthPage />,
+    isProtected: false,
+  },
+  {
+    path: "/reset-password",
+    element: <AuthPage />,
+    isProtected: false,
+  },
+  
+  // Protected routes
   {
     path: "/dashboard",
     element: <DashboardPage />,
@@ -73,6 +98,8 @@ export const routes: RouteConfig[] = [
     isProtected: true,
     requiredRole: UserRole.ADMIN,
   },
+  
+  // 404 page
   {
     path: "*",
     element: <NotFoundPage />,

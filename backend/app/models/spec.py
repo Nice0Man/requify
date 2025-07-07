@@ -51,11 +51,11 @@ class Spec(Base):
         DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), nullable=False
     )
     updated_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime, 
+        DateTime,
         default=lambda: datetime.now(UTC).replace(tzinfo=None),
         onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
         nullable=True,
-        comment="Время последнего обновления"
+        comment="Время последнего обновления",
     )
 
     # Отношения

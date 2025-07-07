@@ -10,6 +10,7 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from sqlalchemy.exc import SQLAlchemyError, NoResultFound, IntegrityError
 import logging
 
 logger = logging.getLogger(__name__)
@@ -135,6 +136,18 @@ class ReportGenerationError(RequifyException):
         )
 
 
+class UserNotFoundError(RequifyException):
+    """Исключение для случаев, когда пользователь не найден."""
+
+    def __init__(self, identifier: Any):
+        message = f"User with identifier '{identifier}' not found"
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_404_NOT_FOUND,
+            details={"resource": "user", "identifier": str(identifier)},
+        )
+
+
 # Обработчики исключений для FastAPI
 
 
@@ -203,7 +216,56 @@ async def http_exception_handler(
             "error": {
                 "type": "HTTPException",
                 "message": exc.detail,
-                "details": {},
+                "timestamp": datetime.now(UTC).isoformat(),
+                "path": request.url.path,
+            }
+        },
+    )
+
+
+async def sqlalchemy_exception_handler(
+    request: Request, exc: SQLAlchemyError
+) -> JSONResponse:
+    """
+    Обработчик исключений SQLAlchemy.
+
+    Args:
+        request: HTTP запрос
+        exc: SQLAlchemy исключение
+
+    Returns:
+        JSONResponse: JSON ответ с информацией об ошибке
+    """
+    # Определяем тип ошибки и статус код
+    if isinstance(exc, NoResultFound):
+        status_code = status.HTTP_404_NOT_FOUND
+        message = "Resource not found"
+        error_type = "NotFound"
+    elif isinstance(exc, IntegrityError):
+        status_code = status.HTTP_400_BAD_REQUEST
+        message = "Data integrity constraint violation"
+        error_type = "IntegrityError"
+    else:
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        message = "Database operation failed"
+        error_type = "DatabaseError"
+
+    logger.error(
+        f"SQLAlchemy Exception: {str(exc)}",
+        extra={
+            "status_code": status_code,
+            "path": request.url.path,
+            "method": request.method,
+            "exception_type": type(exc).__name__,
+        },
+    )
+
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "error": {
+                "type": error_type,
+                "message": message,
                 "timestamp": datetime.now(UTC).isoformat(),
                 "path": request.url.path,
             }
@@ -219,13 +281,13 @@ async def validation_exception_handler(
 
     Args:
         request: HTTP запрос
-        exc: Ошибка валидации
+        exc: Исключение валидации
 
     Returns:
         JSONResponse: JSON ответ с информацией об ошибке
     """
     logger.warning(
-        f"Validation Error: {exc.errors()}",
+        f"Validation error: {exc.errors()}",
         extra={
             "path": request.url.path,
             "method": request.method,
@@ -233,14 +295,15 @@ async def validation_exception_handler(
         },
     )
 
-    # Форматируем ошибки валидации
-    formatted_errors = []
+    # Преобразуем ошибки в более понятный формат
+    validation_errors = []
     for error in exc.errors():
-        formatted_errors.append(
+        validation_errors.append(
             {
-                "field": ".".join(str(x) for x in error["loc"]),
+                "field": ".".join(str(loc) for loc in error["loc"]),
                 "message": error["msg"],
                 "type": error["type"],
+                "input": error.get("input"),
             }
         )
 
@@ -249,8 +312,8 @@ async def validation_exception_handler(
         content={
             "error": {
                 "type": "ValidationError",
-                "message": "Validation failed",
-                "details": {"validation_errors": formatted_errors},
+                "message": "Request validation failed",
+                "details": {"validation_errors": validation_errors},
                 "timestamp": datetime.now(UTC).isoformat(),
                 "path": request.url.path,
             }
@@ -269,12 +332,35 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
     Returns:
         JSONResponse: JSON ответ с информацией об ошибке
     """
+    # Специальная обработка для AttributeError при обращении к None объектам
+    if isinstance(exc, AttributeError) and "NoneType" in str(exc):
+        logger.error(
+            f"AttributeError on None object: {str(exc)}",
+            extra={
+                "path": request.url.path,
+                "method": request.method,
+                "exception_type": type(exc).__name__,
+            },
+        )
+        
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "error": {
+                    "type": "NotFound",
+                    "message": "Requested resource not found",
+                    "timestamp": datetime.now(UTC).isoformat(),
+                    "path": request.url.path,
+                }
+            },
+        )
+
     logger.error(
-        f"Unhandled Exception: {str(exc)}",
+        f"Unhandled exception: {str(exc)}",
         extra={
             "path": request.url.path,
             "method": request.method,
-            "exception_type": exc.__class__.__name__,
+            "exception_type": type(exc).__name__,
         },
         exc_info=True,
     )
@@ -284,8 +370,7 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
         content={
             "error": {
                 "type": "InternalServerError",
-                "message": "An internal server error occurred",
-                "details": {"exception_type": exc.__class__.__name__},
+                "message": "An unexpected error occurred",
                 "timestamp": datetime.now(UTC).isoformat(),
                 "path": request.url.path,
             }
@@ -293,17 +378,24 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
     )
 
 
-# Функции для регистрации обработчиков
-
-
 def register_exception_handlers(app):
     """
-    Регистрация всех обработчиков исключений в FastAPI приложении.
+    Регистрирует все обработчики исключений в приложении FastAPI.
 
     Args:
         app: Экземпляр FastAPI приложения
     """
+    # Кастомные исключения Requify
     app.add_exception_handler(RequifyException, requify_exception_handler)
+    
+    # HTTP исключения
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+    
+    # SQLAlchemy исключения
+    app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
+    
+    # Ошибки валидации
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
+    
+    # Общие исключения (должен быть последним)
     app.add_exception_handler(Exception, general_exception_handler)

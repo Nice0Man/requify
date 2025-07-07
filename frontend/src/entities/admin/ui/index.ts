@@ -1,6 +1,13 @@
-// Admin UI components exports
-// TODO: Создать компоненты согласно FSD принципам
-// export * from "./AdminDashboard";
-// export * from "./AdminStats";
-// export * from "./AdminUserManagement";
-// export * from "./AdminSystemSettings";
+/**
+ * Admin UI components exports
+ * TODO: Создать компоненты для админ-панели
+ */
+
+// export { AdminPanel } from './AdminPanel';
+// export { UserManagement } from './UserManagement';
+// export { SystemSettings } from './SystemSettings';
+
+// Временная заглушка
+export const AdminUIPlaceholder = {
+  // TODO: Добавить компоненты
+};

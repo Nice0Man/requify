@@ -48,9 +48,12 @@ class Requirement(Base, TimestampedMixin):
         DateTime(timezone=True), nullable=True, comment="Срок выполнения требования"
     )
     progress: Mapped[float] = mapped_column(
-        Float, nullable=False, default=0.0, comment="Прогресс выполнения требования (0.0-100.0)"
+        Float,
+        nullable=False,
+        default=0.0,
+        comment="Прогресс выполнения требования (0.0-100.0)",
     )
-    
+
     # Внешние ключи для справочников
     type_id: Mapped[int] = mapped_column(
         Integer,

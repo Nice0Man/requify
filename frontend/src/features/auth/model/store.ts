@@ -13,7 +13,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   token: localStorage.getItem("authToken"),
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem("authToken"), // Устанавливаем true если токен есть
   isLoading: false,
   error: null,
 };
@@ -95,32 +95,32 @@ const authSlice = createSlice({
     builder
       // Login
       .addCase(loginUser.pending, (state) => {
-        state.isPending = true;
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.isPending = false;
+        state.isLoading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.isPending = false;
+        state.isLoading = false;
         state.error = action.payload as string;
       })
       // Register
       .addCase(registerUser.pending, (state) => {
-        state.isPending = true;
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.isPending = false;
+        state.isLoading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = true;
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.isPending = false;
+        state.isLoading = false;
         state.error = action.payload as string;
       })
       // Logout
@@ -131,15 +131,15 @@ const authSlice = createSlice({
       })
       // Get current user
       .addCase(getCurrentUser.pending, (state) => {
-        state.isPending = true;
+        state.isLoading = true;
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
-        state.isPending = false;
+        state.isLoading = false;
         state.user = action.payload;
         state.isAuthenticated = true;
       })
       .addCase(getCurrentUser.rejected, (state) => {
-        state.isPending = false;
+        state.isLoading = false;
         state.isAuthenticated = false;
         state.token = null;
         localStorage.removeItem("authToken");

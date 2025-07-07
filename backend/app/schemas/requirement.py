@@ -19,10 +19,10 @@ class RequirementBase(BaseModel):
     description: Optional[str] = Field(None, description="Описание требования")
     deadline: Optional[datetime] = None
     progress: float = Field(
-        default=0.0, 
-        ge=0.0, 
-        le=100.0, 
-        description="Прогресс выполнения требования (0.0-100.0)"
+        default=0.0,
+        ge=0.0,
+        le=100.0,
+        description="Прогресс выполнения требования (0.0-100.0)",
     )
 
     @field_validator("title")
@@ -56,10 +56,10 @@ class RequirementBase(BaseModel):
             # Если дата naive (без timezone), считаем её UTC
             if v.tzinfo is None:
                 v = v.replace(tzinfo=UTC)
-            
+
             # Получаем текущее время в UTC
             now_utc = datetime.now(UTC)
-            
+
             # Дедлайн не может быть в прошлом
             if v < now_utc:
                 raise ValueError("Deadline cannot be in the past")
@@ -114,10 +114,7 @@ class RequirementUpdate(BaseModel):
     )
     description: Optional[str] = Field(None, description="Описание требования")
     progress: Optional[float] = Field(
-        None, 
-        ge=0.0, 
-        le=100.0, 
-        description="Прогресс выполнения требования (0.0-100.0)"
+        None, ge=0.0, le=100.0, description="Прогресс выполнения требования (0.0-100.0)"
     )
     type_id: Optional[int] = Field(None, gt=0, description="ID типа требования")
     priority_id: Optional[int] = Field(
