@@ -16,6 +16,8 @@ import {
   useTheme,
   alpha,
   Tooltip,
+  InputBase,
+  Fade,
 } from '@mui/material';
 import {
   AccountCircle,
@@ -49,6 +51,7 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
   const [actionsMenuAnchor, setActionsMenuAnchor] = useState<null | HTMLElement>(null);
   const [notificationsAnchor, setNotificationsAnchor] = useState<null | HTMLElement>(null);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   const isUserMenuOpen = Boolean(userMenuAnchor);
   const isActionsMenuOpen = Boolean(actionsMenuAnchor);
@@ -104,9 +107,9 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
   ];
 
   const mockNotifications = [
-    { id: 1, title: 'Новое требование', message: 'REQ-123 требует вашего внимания' },
-    { id: 2, title: 'Обновление проекта', message: 'Проект Alpha обновлен' },
-    { id: 3, title: 'Релиз готов', message: 'Релиз v1.2.0 готов к развертыванию' },
+    { id: 1, title: 'Новое требование', message: 'REQ-123 требует вашего внимания', time: '5 мин назад' },
+    { id: 2, title: 'Обновление проекта', message: 'Проект Alpha обновлен', time: '1 час назад' },
+    { id: 3, title: 'Релиз готов', message: 'Релиз v1.2.0 готов к развертыванию', time: '2 часа назад' },
   ];
 
   return (
@@ -114,67 +117,114 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
       position="fixed"
       elevation={0}
       sx={{
-        backgroundColor: alpha(theme.palette.background.paper, 0.9),
+        backgroundColor: alpha(theme.palette.background.paper, 0.95),
         backdropFilter: 'blur(20px)',
-        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        borderBottom: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
         color: theme.palette.text.primary,
         zIndex: theme.zIndex.drawer + 1,
+        transition: 'all 0.3s ease',
+        boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.06)}`,
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', px: 3 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', px: 3, minHeight: 64 }}>
         {/* Левая часть - поиск */}
-        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-          <Box sx={{ ml: 10 }}> {/* Отступ для кнопки меню сайдбара */}
-            <Button
-              startIcon={<Search />}
-              variant="outlined"
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, maxWidth: 500 }}>
+          <Box 
+            sx={{ 
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              maxWidth: 400,
+            }}
+          >
+            <Box
               sx={{
+                position: 'relative',
                 borderRadius: 3,
-                textTransform: 'none',
-                color: theme.palette.text.secondary,
-                borderColor: alpha(theme.palette.divider, 0.3),
-                backgroundColor: alpha(theme.palette.background.default, 0.5),
-                minWidth: 250,
-                justifyContent: 'flex-start',
+                backgroundColor: alpha(theme.palette.background.default, 0.6),
+                border: `1px solid ${alpha(theme.palette.divider, searchFocused ? 0.3 : 0.1)}`,
                 '&:hover': {
                   backgroundColor: alpha(theme.palette.background.default, 0.8),
                 },
+                transition: 'all 0.2s ease',
+                width: '100%',
+                minWidth: 300,
               }}
             >
-              Поиск...
-            </Button>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  left: 16,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: theme.palette.text.secondary,
+                  zIndex: 1,
+                }}
+              >
+                <Search fontSize="small" />
+              </Box>
+              <InputBase
+                placeholder="Поиск проектов, требований, релизов..."
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                sx={{
+                  width: '100%',
+                  '& .MuiInputBase-input': {
+                    padding: '12px 16px 12px 48px',
+                    fontSize: '0.95rem',
+                    color: theme.palette.text.primary,
+                    '&::placeholder': {
+                      color: theme.palette.text.secondary,
+                      opacity: 0.8,
+                    },
+                  },
+                }}
+              />
+            </Box>
           </Box>
         </Box>
 
         {/* Правая часть - действия */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* Быстрое создание */}
+          <Tooltip title="Создать">
+            <IconButton
+              onClick={handleActionsMenuOpen}
+              sx={{
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                color: theme.palette.primary.main,
+                width: 40,
+                height: 40,
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                  transform: 'scale(1.05)',
+                },
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Add fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
           {/* Переключатель темы */}
           <Tooltip title={isDarkMode ? 'Светлая тема' : 'Темная тема'}>
             <IconButton 
               onClick={onThemeToggle}
               sx={{
                 color: theme.palette.text.secondary,
+                width: 40,
+                height: 40,
                 '&:hover': {
                   backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  transform: 'scale(1.05)',
                 },
+                transition: 'all 0.2s ease',
               }}
             >
-              {isDarkMode ? <LightMode /> : <DarkMode />}
-            </IconButton>
-          </Tooltip>
-
-          {/* Быстрые действия */}
-          <Tooltip title="Быстрые действия">
-            <IconButton
-              onClick={handleActionsMenuOpen}
-              sx={{
-                color: theme.palette.text.secondary,
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.action.hover, 0.1),
-                },
-              }}
-            >
-              <MoreVert />
+              {isDarkMode ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
             </IconButton>
           </Tooltip>
 
@@ -184,27 +234,46 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
               onClick={handleNotificationsOpen}
               sx={{
                 color: theme.palette.text.secondary,
+                width: 40,
+                height: 40,
                 '&:hover': {
                   backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                  transform: 'scale(1.05)',
                 },
+                transition: 'all 0.2s ease',
               }}
             >
-              <Badge badgeContent={mockNotifications.length} color="error">
-                <Notifications />
+              <Badge 
+                badgeContent={mockNotifications.length} 
+                color="error"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: '0.75rem',
+                    minWidth: 18,
+                    height: 18,
+                  },
+                }}
+              >
+                <Notifications fontSize="small" />
               </Badge>
             </IconButton>
           </Tooltip>
 
           {/* Аватар пользователя */}
           <Tooltip title="Профиль">
-            <IconButton onClick={handleUserMenuOpen} sx={{ p: 0.5 }}>
+            <IconButton onClick={handleUserMenuOpen} sx={{ p: 0.5, ml: 1 }}>
               <Avatar
                 sx={{
-                  width: 40,
-                  height: 40,
+                  width: 36,
+                  height: 36,
                   background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  fontSize: '1rem',
+                  fontSize: '0.9rem',
                   fontWeight: 600,
+                  border: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    transform: 'scale(1.05)',
+                  },
                 }}
               >
                 {user?.username?.charAt(0).toUpperCase() || 'U'}
@@ -220,53 +289,89 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
           onClose={handleMenuClose}
           onClick={handleMenuClose}
           PaperProps={{
-            elevation: 8,
+            elevation: 12,
             sx: {
               mt: 1.5,
-              minWidth: 220,
-              borderRadius: 2,
+              minWidth: 240,
+              borderRadius: 3,
               background: alpha(theme.palette.background.paper, 0.95),
               backdropFilter: 'blur(20px)',
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              boxShadow: `0 12px 32px ${alpha(theme.palette.common.black, 0.12)}`,
             },
           }}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
           {/* Информация о пользователе */}
-          <Box sx={{ px: 2, py: 1.5 }}>
-            <Typography variant="subtitle1" fontWeight={600}>
-              {user?.username || 'Пользователь'}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {user?.role || 'Роль не определена'}
-            </Typography>
+          <Box sx={{ px: 3, py: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Avatar
+                sx={{
+                  width: 48,
+                  height: 48,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  fontSize: '1.2rem',
+                  fontWeight: 600,
+                }}
+              >
+                {user?.username?.charAt(0).toUpperCase() || 'U'}
+              </Avatar>
+              <Box>
+                <Typography variant="subtitle1" fontWeight={600}>
+                  {user?.username || 'Пользователь'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {user?.role || 'Роль не определена'}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
           
           <Divider />
           
-          <MenuItem onClick={() => navigate('/settings/profile')}>
+          <MenuItem 
+            onClick={() => navigate('/settings/profile')}
+            sx={{ 
+              py: 1.5, 
+              px: 3,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
+          >
             <ListItemIcon>
               <AccountCircle fontSize="small" />
             </ListItemIcon>
             <ListItemText>Профиль</ListItemText>
           </MenuItem>
           
-          <MenuItem onClick={() => navigate('/settings')}>
+          <MenuItem 
+            onClick={() => navigate('/settings')}
+            sx={{ 
+              py: 1.5, 
+              px: 3,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
+          >
             <ListItemIcon>
               <Settings fontSize="small" />
             </ListItemIcon>
             <ListItemText>Настройки</ListItemText>
           </MenuItem>
           
-          <MenuItem>
-            <ListItemIcon>
-              <Language fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Язык</ListItemText>
-          </MenuItem>
-          
-          <MenuItem>
+          <MenuItem 
+            onClick={() => navigate('/help')}
+            sx={{ 
+              py: 1.5, 
+              px: 3,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.04),
+              },
+            }}
+          >
             <ListItemIcon>
               <Help fontSize="small" />
             </ListItemIcon>
@@ -275,7 +380,17 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
           
           <Divider />
           
-          <MenuItem onClick={handleLogout} sx={{ color: theme.palette.error.main }}>
+          <MenuItem 
+            onClick={handleLogout}
+            sx={{ 
+              py: 1.5, 
+              px: 3,
+              color: theme.palette.error.main,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.error.main, 0.04),
+              },
+            }}
+          >
             <ListItemIcon>
               <Logout fontSize="small" sx={{ color: theme.palette.error.main }} />
             </ListItemIcon>
@@ -290,14 +405,15 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
           onClose={handleMenuClose}
           onClick={handleMenuClose}
           PaperProps={{
-            elevation: 8,
+            elevation: 12,
             sx: {
               mt: 1.5,
-              minWidth: 200,
-              borderRadius: 2,
+              minWidth: 220,
+              borderRadius: 3,
               background: alpha(theme.palette.background.paper, 0.95),
               backdropFilter: 'blur(20px)',
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              boxShadow: `0 12px 32px ${alpha(theme.palette.common.black, 0.12)}`,
             },
           }}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
@@ -309,6 +425,13 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
               onClick={() => {
                 action.action();
                 handleMenuClose();
+              }}
+              sx={{ 
+                py: 1.5, 
+                px: 3,
+                '&:hover': {
+                  backgroundColor: alpha(action.color, 0.04),
+                },
               }}
             >
               <ListItemIcon>
@@ -325,46 +448,68 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
           open={isNotificationsOpen}
           onClose={handleMenuClose}
           PaperProps={{
-            elevation: 8,
+            elevation: 12,
             sx: {
               mt: 1.5,
-              minWidth: 320,
+              minWidth: 360,
               maxWidth: 400,
-              borderRadius: 2,
+              maxHeight: 480,
+              borderRadius: 3,
               background: alpha(theme.palette.background.paper, 0.95),
               backdropFilter: 'blur(20px)',
-              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              boxShadow: `0 12px 32px ${alpha(theme.palette.common.black, 0.12)}`,
             },
           }}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <Box sx={{ px: 2, py: 1.5 }}>
+          <Box sx={{ px: 3, py: 2, borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
             <Typography variant="h6" fontWeight={600}>
               Уведомления
             </Typography>
           </Box>
-          <Divider />
           
           {mockNotifications.map((notification) => (
-            <MenuItem key={notification.id} sx={{ py: 1.5 }}>
-              <Box>
-                <Typography variant="subtitle2" fontWeight={600}>
+            <MenuItem 
+              key={notification.id} 
+              sx={{ 
+                py: 2, 
+                px: 3, 
+                borderBottom: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+                alignItems: 'flex-start',
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.02),
+                },
+              }}
+            >
+              <Box sx={{ width: '100%' }}>
+                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
                   {notification.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" gutterBottom>
                   {notification.message}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {notification.time}
                 </Typography>
               </Box>
             </MenuItem>
           ))}
           
-          <Divider />
-          <MenuItem sx={{ justifyContent: 'center' }}>
-            <Typography variant="button" color="primary">
-              Показать все
-            </Typography>
-          </MenuItem>
+          <Box sx={{ p: 2, textAlign: 'center', borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
+            <Button 
+              variant="text" 
+              color="primary"
+              onClick={() => navigate('/notifications')}
+              sx={{ 
+                fontWeight: 600,
+                textTransform: 'none',
+              }}
+            >
+              Показать все уведомления
+            </Button>
+          </Box>
         </Menu>
       </Toolbar>
     </AppBar>

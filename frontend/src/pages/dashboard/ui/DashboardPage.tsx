@@ -11,6 +11,11 @@ import {
   useTheme,
   Chip,
   LinearProgress,
+  IconButton,
+  Fade,
+  Button,
+  Stack,
+  Container,
 } from '@mui/material';
 import {
   TrendingUp,
@@ -21,6 +26,11 @@ import {
   BugReport,
   RocketLaunch,
   People,
+  ArrowForward,
+  Refresh,
+  Timeline,
+  Analytics,
+  Add,
 } from '@mui/icons-material';
 import { DashboardLayout } from '@/widgets/layout';
 import { useDashboardStats } from '../../../features/dashboard/model/useDashboardQuery';
@@ -57,6 +67,8 @@ const DashboardPage: React.FC = () => {
       color: theme.palette.primary.main,
       trend: '+8%',
       subtitle: 'проектов в разработке',
+      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
+      iconBg: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
     },
     {
       title: 'Требования',
@@ -65,6 +77,8 @@ const DashboardPage: React.FC = () => {
       color: theme.palette.secondary.main,
       trend: '+12%',
       subtitle: 'активных требований',
+      background: `linear-gradient(135deg, ${alpha(theme.palette.secondary.main, 0.1)} 0%, ${alpha(theme.palette.secondary.light, 0.05)} 100%)`,
+      iconBg: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
     },
     {
       title: 'Завершенность',
@@ -73,6 +87,8 @@ const DashboardPage: React.FC = () => {
       color: theme.palette.success.main,
       trend: '+5%',
       subtitle: 'общая готовность',
+      background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.1)} 0%, ${alpha(theme.palette.success.light, 0.05)} 100%)`,
+      iconBg: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
     },
     {
       title: 'Команда',
@@ -81,209 +97,490 @@ const DashboardPage: React.FC = () => {
       color: theme.palette.info.main,
       trend: '+3%',
       subtitle: 'активных участников',
+      background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.1)} 0%, ${alpha(theme.palette.info.light, 0.05)} 100%)`,
+      iconBg: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
     },
   ];
 
   const recentActivity = [
-    { title: 'Создан новый проект "Mobile App"', time: '2 часа назад', type: 'project' },
-    { title: 'Обновлено требование REQ-145', time: '4 часа назад', type: 'requirement' },
-    { title: 'Релиз v2.1.0 развернут', time: '6 часов назад', type: 'release' },
-    { title: 'Исправлен баг BUG-89', time: '1 день назад', type: 'bug' },
+    { 
+      title: 'Создан новый проект "Mobile App"', 
+      time: '2 часа назад', 
+      type: 'project',
+      color: theme.palette.primary.main,
+      icon: FolderOpen,
+    },
+    { 
+      title: 'Обновлено требование REQ-145', 
+      time: '4 часа назад', 
+      type: 'requirement',
+      color: theme.palette.secondary.main,
+      icon: Assignment,
+    },
+    { 
+      title: 'Релиз v2.1.0 развернут', 
+      time: '6 часов назад', 
+      type: 'release',
+      color: theme.palette.success.main,
+      icon: RocketLaunch,
+    },
+    { 
+      title: 'Исправлен баг BUG-89', 
+      time: '1 день назад', 
+      type: 'bug',
+      color: theme.palette.warning.main,
+      icon: BugReport,
+    },
+  ];
+
+  const projects = ['CRM System', 'Mobile App', 'API Gateway', 'Dashboard UI'];
+
+  const quickActions = [
+    {
+      title: 'Создать проект',
+      description: 'Начать новый проект',
+      icon: Add,
+      color: theme.palette.primary.main,
+      action: '/projects/new',
+    },
+    {
+      title: 'Добавить требование',
+      description: 'Создать требование',
+      icon: Assignment,
+      color: theme.palette.secondary.main,
+      action: '/requirements/new',
+    },
+    {
+      title: 'Запланировать релиз',
+      description: 'Новый релиз',
+      icon: RocketLaunch,
+      color: theme.palette.info.main,
+      action: '/releases/new',
+    },
   ];
 
   return (
     <DashboardLayout>
-      <Box sx={{ p: 3 }}>
-        {/* Заголовок */}
-        <Box sx={{ mb: 4 }}>
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            gutterBottom 
-            fontWeight={700}
-            sx={{
-              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Панель управления
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Обзор ваших проектов и активности
-          </Typography>
-        </Box>
-
-        {/* Метрики */}
-        <Grid container spacing={3} mb={4}>
-          {metrics.map((metric, index) => {
-            const Icon = metric.icon;
-            return (
-              <Grid item xs={12} sm={6} lg={3} key={index}>
-                <Card 
-                  elevation={0}
-                  sx={{ 
-                    height: '100%',
-                    borderRadius: 3,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                    background: `linear-gradient(135deg, 
-                      ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                      ${alpha(theme.palette.background.default, 0.4)} 100%)`,
-                    backdropFilter: 'blur(10px)',
-                    transition: 'all 0.3s ease-in-out',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: theme.shadows[8],
-                      border: `1px solid ${alpha(metric.color, 0.2)}`,
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                      <Icon sx={{ color: metric.color, fontSize: 28 }} />
-                      <Chip 
-                        label={metric.trend} 
-                        size="small" 
-                        sx={{ 
-                          backgroundColor: alpha(theme.palette.success.main, 0.1),
-                          color: theme.palette.success.main,
-                          fontWeight: 600,
-                        }} 
-                      />
-                    </Box>
-                    
-                    <Typography variant="h3" fontWeight={700} color={metric.color} sx={{ mb: 0.5 }}>
-                      {metric.value}
-                    </Typography>
-                    
-                    <Typography variant="h6" fontWeight={600} sx={{ mb: 0.5 }}>
-                      {metric.title}
-                    </Typography>
-                    
-                    <Typography variant="body2" color="text.secondary">
-                      {metric.subtitle}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            );
-          })}
-        </Grid>
-
-        <Grid container spacing={3}>
-          {/* Прогресс проектов */}
-          <Grid item xs={12} lg={8}>
-            <Paper 
-              elevation={0}
-              sx={{ 
-                p: 3, 
-                borderRadius: 3,
-                border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                background: `linear-gradient(135deg, 
-                  ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                  ${alpha(theme.palette.background.default, 0.4)} 100%)`,
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <Typography variant="h6" fontWeight={600} mb={3}>
-                Прогресс проектов
-              </Typography>
-              
-              <Box sx={{ space: 'y', gap: 3 }}>
-                {['Alpha Platform', 'Beta Release', 'Mobile App', 'Dashboard v2'].map((project, index) => (
-                  <Box key={index} sx={{ mb: 3 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body1" fontWeight={500}>
-                        {project}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {65 + index * 10}%
-                      </Typography>
-                    </Box>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={65 + index * 10} 
-                      sx={{ 
-                        height: 8, 
-                        borderRadius: 4,
-                        backgroundColor: alpha(theme.palette.divider, 0.1),
-                        '& .MuiLinearProgress-bar': {
-                          borderRadius: 4,
-                          background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                        },
-                      }} 
-                    />
-                  </Box>
-                ))}
-              </Box>
-            </Paper>
-          </Grid>
-
-          {/* Недавняя активность */}
-          <Grid item xs={12} lg={4}>
-            <Paper 
-              elevation={0}
-              sx={{ 
-                p: 3, 
-                borderRadius: 3,
-                border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                background: `linear-gradient(135deg, 
-                  ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                  ${alpha(theme.palette.background.default, 0.4)} 100%)`,
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <Typography variant="h6" fontWeight={600} mb={3}>
-                Недавняя активность
-              </Typography>
-              
-              <Box sx={{ space: 'y', gap: 2 }}>
-                {recentActivity.map((activity, index) => {
-                  const getIcon = (type: string) => {
-                    switch (type) {
-                      case 'project': return <FolderOpen sx={{ fontSize: 20 }} />;
-                      case 'requirement': return <Assignment sx={{ fontSize: 20 }} />;
-                      case 'release': return <RocketLaunch sx={{ fontSize: 20 }} />;
-                      case 'bug': return <BugReport sx={{ fontSize: 20 }} />;
-                      default: return <CheckCircle sx={{ fontSize: 20 }} />;
-                    }
-                  };
-
-                  return (
-                    <Box 
-                      key={index} 
-                      sx={{ 
-                        display: 'flex', 
-                        alignItems: 'flex-start', 
-                        gap: 2, 
-                        p: 2,
-                        borderRadius: 2,
-                        border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-                        '&:hover': {
-                          backgroundColor: alpha(theme.palette.action.hover, 0.05),
-                        },
-                        mb: 1,
+      <Box 
+        sx={{ 
+          minHeight: '100vh',
+          background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${alpha(theme.palette.grey[50], 0.5)} 100%)`,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.02,
+            backgroundImage: `radial-gradient(circle at 20% 50%, ${theme.palette.primary.main} 0%, transparent 50%), 
+                             radial-gradient(circle at 80% 80%, ${theme.palette.secondary.main} 0%, transparent 50%)`,
+          },
+        }}
+      >
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ py: 4 }}>
+            {/* Заголовок с действиями */}
+            <Fade in timeout={800}>
+              <Box sx={{ mb: 6 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box>
+                    <Typography 
+                      variant="h3" 
+                      component="h1" 
+                      gutterBottom 
+                      fontWeight={700}
+                      sx={{
+                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontSize: { xs: '2rem', md: '2.5rem' },
+                        letterSpacing: '-0.02em',
                       }}
                     >
-                      <Box sx={{ color: theme.palette.primary.main, mt: 0.5 }}>
-                        {getIcon(activity.type)}
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="body2" fontWeight={500} sx={{ mb: 0.5 }}>
-                          {activity.title}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {activity.time}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  );
-                })}
+                      Панель управления
+                    </Typography>
+                    <Typography 
+                      variant="h6" 
+                      color="text.secondary"
+                      sx={{ 
+                        fontSize: '1.1rem',
+                        fontWeight: 400,
+                      }}
+                    >
+                      Добро пожаловать! Вот обзор ваших проектов и активности
+                    </Typography>
+                  </Box>
+                  <IconButton
+                    sx={{
+                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                      color: theme.palette.primary.main,
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                        transform: 'rotate(180deg)',
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <Refresh />
+                  </IconButton>
+                </Box>
+
+                {/* Быстрые действия */}
+                <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                  {quickActions.map((action, index) => (
+                    <Fade in timeout={1000 + index * 200} key={action.title}>
+                      <Button
+                        variant="outlined"
+                        startIcon={<action.icon />}
+                        sx={{
+                          borderRadius: 3,
+                          py: 1.5,
+                          px: 3,
+                          borderColor: alpha(action.color, 0.3),
+                          color: action.color,
+                          backgroundColor: alpha(action.color, 0.05),
+                          '&:hover': {
+                            backgroundColor: alpha(action.color, 0.1),
+                            borderColor: action.color,
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 8px 25px ${alpha(action.color, 0.15)}`,
+                          },
+                          transition: 'all 0.3s ease',
+                          textTransform: 'none',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {action.title}
+                      </Button>
+                    </Fade>
+                  ))}
+                </Stack>
               </Box>
-            </Paper>
-          </Grid>
-        </Grid>
+            </Fade>
+
+            {/* Метрики */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              {metrics.map((metric, index) => {
+                const Icon = metric.icon;
+                return (
+                  <Grid item xs={12} sm={6} lg={3} key={index}>
+                    <Fade in timeout={1200 + index * 200}>
+                      <Card
+                        elevation={0}
+                        sx={{
+                          borderRadius: 4,
+                          background: metric.background,
+                          border: `1px solid ${alpha(metric.color, 0.1)}`,
+                          position: 'relative',
+                          overflow: 'hidden',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            transform: 'translateY(-8px)',
+                            boxShadow: `0 20px 40px ${alpha(metric.color, 0.15)}`,
+                            border: `1px solid ${alpha(metric.color, 0.2)}`,
+                          },
+                          '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            width: '40%',
+                            height: '100%',
+                            background: `radial-gradient(circle at top right, ${alpha(metric.color, 0.1)} 0%, transparent 60%)`,
+                          },
+                        }}
+                      >
+                        <CardContent sx={{ p: 3, position: 'relative', zIndex: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                            <Box
+                              sx={{
+                                width: 56,
+                                height: 56,
+                                borderRadius: '50%',
+                                background: metric.iconBg,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: `0 8px 24px ${alpha(metric.color, 0.25)}`,
+                              }}
+                            >
+                              <Icon sx={{ color: 'white', fontSize: 28 }} />
+                            </Box>
+                            <Chip
+                              label={metric.trend}
+                              size="small"
+                              sx={{
+                                backgroundColor: alpha(theme.palette.success.main, 0.1),
+                                color: theme.palette.success.main,
+                                fontWeight: 600,
+                                fontSize: '0.8rem',
+                              }}
+                            />
+                          </Box>
+                          
+                          <Typography 
+                            variant="h4" 
+                            fontWeight={700}
+                            sx={{ 
+                              color: metric.color,
+                              mb: 0.5,
+                              fontSize: '2rem',
+                            }}
+                          >
+                            {metric.value}
+                          </Typography>
+                          
+                          <Typography 
+                            variant="h6" 
+                            fontWeight={600}
+                            sx={{ 
+                              color: theme.palette.text.primary,
+                              mb: 0.5,
+                              fontSize: '1rem',
+                            }}
+                          >
+                            {metric.title}
+                          </Typography>
+                          
+                          <Typography 
+                            variant="body2" 
+                            color="text.secondary"
+                            sx={{ fontSize: '0.85rem' }}
+                          >
+                            {metric.subtitle}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Fade>
+                  </Grid>
+                );
+              })}
+            </Grid>
+
+            {/* Основной контент */}
+            <Grid container spacing={4}>
+              {/* Прогресс проектов */}
+              <Grid item xs={12} lg={8}>
+                <Fade in timeout={1800}>
+                  <Paper 
+                    elevation={0}
+                    sx={{ 
+                      p: 4, 
+                      borderRadius: 4,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                      background: `linear-gradient(135deg, 
+                        ${alpha(theme.palette.background.paper, 0.9)} 0%, 
+                        ${alpha(theme.palette.background.default, 0.4)} 100%)`,
+                      backdropFilter: 'blur(20px)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: -50,
+                        right: -50,
+                        width: 100,
+                        height: 100,
+                        borderRadius: '50%',
+                        background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.05)} 0%, transparent 70%)`,
+                      },
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box
+                          sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: '50%',
+                            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Timeline sx={{ color: 'white', fontSize: 20 }} />
+                        </Box>
+                        <Typography variant="h5" fontWeight={700}>
+                          Прогресс проектов
+                        </Typography>
+                      </Box>
+                      <Button
+                        endIcon={<ArrowForward />}
+                        sx={{
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          color: theme.palette.primary.main,
+                        }}
+                      >
+                        Все проекты
+                      </Button>
+                    </Box>
+                    
+                    <Box sx={{ space: 'y', gap: 3 }}>
+                      {projects.map((project, index) => (
+                        <Box key={index} sx={{ mb: 4 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="h6" fontWeight={600}>
+                              {project}
+                            </Typography>
+                            <Typography 
+                              variant="h6" 
+                              fontWeight={700}
+                              sx={{ color: theme.palette.primary.main }}
+                            >
+                              {65 + index * 10}%
+                            </Typography>
+                          </Box>
+                          <LinearProgress 
+                            variant="determinate" 
+                            value={65 + index * 10} 
+                            sx={{ 
+                              height: 12, 
+                              borderRadius: 6,
+                              backgroundColor: alpha(theme.palette.divider, 0.08),
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 6,
+                                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                boxShadow: `0 2px 8px ${alpha(theme.palette.primary.main, 0.3)}`,
+                              },
+                            }} 
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  </Paper>
+                </Fade>
+              </Grid>
+
+              {/* Недавняя активность */}
+              <Grid item xs={12} lg={4}>
+                <Fade in timeout={2000}>
+                  <Paper 
+                    elevation={0}
+                    sx={{ 
+                      p: 4, 
+                      borderRadius: 4,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
+                      background: `linear-gradient(135deg, 
+                        ${alpha(theme.palette.background.paper, 0.9)} 0%, 
+                        ${alpha(theme.palette.background.default, 0.4)} 100%)`,
+                      backdropFilter: 'blur(20px)',
+                      height: 'fit-content',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                      <Box
+                        sx={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
+                          background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Analytics sx={{ color: 'white', fontSize: 20 }} />
+                      </Box>
+                      <Typography variant="h5" fontWeight={700}>
+                        Активность
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ space: 'y', gap: 2 }}>
+                      {recentActivity.map((activity, index) => {
+                        const Icon = activity.icon;
+                        return (
+                          <Box 
+                            key={index} 
+                            sx={{ 
+                              display: 'flex', 
+                              alignItems: 'flex-start', 
+                              gap: 2, 
+                              p: 2,
+                              borderRadius: 2,
+                              border: `1px solid ${alpha(activity.color, 0.1)}`,
+                              backgroundColor: alpha(activity.color, 0.03),
+                              mb: 2,
+                              transition: 'all 0.2s ease',
+                              '&:hover': {
+                                backgroundColor: alpha(activity.color, 0.06),
+                                transform: 'translateX(4px)',
+                              },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '50%',
+                                backgroundColor: alpha(activity.color, 0.1),
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                              }}
+                            >
+                              <Icon sx={{ fontSize: 16, color: activity.color }} />
+                            </Box>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography 
+                                variant="body1" 
+                                fontWeight={600}
+                                sx={{ 
+                                  mb: 0.5,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: 'vertical',
+                                }}
+                              >
+                                {activity.title}
+                              </Typography>
+                              <Typography 
+                                variant="caption" 
+                                color="text.secondary"
+                                sx={{ fontSize: '0.8rem' }}
+                              >
+                                {activity.time}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+
+                    <Button
+                      fullWidth
+                      endIcon={<ArrowForward />}
+                      sx={{
+                        mt: 3,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        borderRadius: 2,
+                        py: 1.5,
+                        backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                        color: theme.palette.primary.main,
+                        border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                        },
+                      }}
+                    >
+                      Вся активность
+                    </Button>
+                  </Paper>
+                </Fade>
+              </Grid>
+            </Grid>
+          </Box>
+        </Container>
       </Box>
     </DashboardLayout>
   );
