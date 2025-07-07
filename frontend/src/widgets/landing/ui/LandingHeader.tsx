@@ -49,11 +49,15 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   const [lastScrollY, setLastScrollY] = useState(0);
 
   const navItems = [
-    { id: "hero", label: t("landing.nav.home") },
-    { id: "features", label: t("landing.nav.features") },
-    { id: "metrics", label: t("landing.nav.about") },
-    { id: "cta", label: t("landing.nav.solutions") },
-    { id: "footer", label: t("landing.nav.contact") },
+    { id: "hero", hash: "hero", label: t("landing.nav.home") },
+    { id: "features", hash: "features", label: t("landing.nav.features") },
+    { id: "solutions", hash: "solutions", label: t("landing.nav.solutions") },
+    {
+      id: "integrations",
+      hash: "integrations",
+      label: t("landing.nav.integrations"),
+    },
+    { id: "cta", hash: "contact", label: t("landing.nav.contact") },
   ];
 
   // Скрытие/показ заголовка при скролле
@@ -65,14 +69,14 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
 
       // Скрываем header при скролле вниз на определенное расстояние
       if (
-        currentScrollY > lastScrollY + scrollDelta && 
+        currentScrollY > lastScrollY + scrollDelta &&
         currentScrollY > scrollThreshold
       ) {
         setIsVisible(false);
-      } 
+      }
       // Показываем header при скролле вверх или в начале страницы
       else if (
-        currentScrollY < lastScrollY - scrollDelta || 
+        currentScrollY < lastScrollY - scrollDelta ||
         currentScrollY <= scrollThreshold
       ) {
         setIsVisible(true);
@@ -118,8 +122,9 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     handleLangMenuClose();
   };
 
-  const handleNavClick = (sectionId: string) => {
-    onSectionClick(sectionId);
+  const handleNavClick = (sectionId: string, sectionHash?: string) => {
+    // Используем hash если он есть, иначе id
+    onSectionClick(sectionHash || sectionId);
     handleMobileMenuClose();
   };
 
@@ -132,9 +137,9 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
   };
 
   return (
-    <Slide 
-      appear={false} 
-      direction="down" 
+    <Slide
+      appear={false}
+      direction="down"
       in={isVisible}
       timeout={{ enter: 300, exit: 200 }}
     >
@@ -148,14 +153,17 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           backdropFilter: "blur(12px)",
           borderTopRightRadius: 0,
           borderTopLeftRadius: 0,
-          borderBottom: `1px solid ${alpha(theme.palette.divider, isScrolled ? 0.12 : 0.08)}`,
+          borderBottom: `1px solid ${alpha(
+            theme.palette.divider,
+            isScrolled ? 0.12 : 0.08
+          )}`,
           transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
           width: "100%",
           left: 0,
           right: 0,
           zIndex: 1100, // Выше чем scroll navigation (1000)
           transform: isVisible ? "translateY(0)" : "translateY(-100%)",
-          boxShadow: isScrolled 
+          boxShadow: isScrolled
             ? `0 4px 20px ${alpha(theme.palette.common.black, 0.08)}`
             : "none",
         }}
@@ -254,7 +262,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
                 {navItems.map((item) => (
                   <Button
                     key={item.id}
-                    onClick={() => handleNavClick(item.id)}
+                    onClick={() => handleNavClick(item.id, item.hash)}
                     sx={{
                       color: theme.palette.text.primary,
                       fontWeight: 500,
@@ -428,7 +436,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
           {navItems.map((item) => (
             <MenuItem
               key={item.id}
-              onClick={() => handleNavClick(item.id)}
+              onClick={() => handleNavClick(item.id, item.hash)}
               selected={activeSection === item.id}
               sx={{ fontSize: "0.9rem", py: 1 }}
             >

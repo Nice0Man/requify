@@ -39,7 +39,7 @@ export const hashUtils = {
   // Найти индекс секции по hash
   findSectionByHash: (sections: ScrollSection[], hash: string): number => {
     const sectionIndex = sections.findIndex((section) => section.hash === hash);
-    return sectionIndex >= 0 ? sectionIndex : 0;
+    return sectionIndex; // Возвращаем -1 если не найдено, иначе реальный индекс
   },
 
   // Получить hash по индексу секции

@@ -40,7 +40,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
         },
         display: "flex",
         alignItems: "center",
-        mt: -10,
+        mt: -5,
         py: { xs: 4, md: 6 },
         background: `linear-gradient(180deg, ${theme.palette.background.default} 0%, ${theme.palette.grey[50]} 100%)`,
         position: "relative",
@@ -332,7 +332,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
           width: "18px",
           height: "18px",
           borderRadius: "50%",
-          backgroundColor: alpha(theme.palette.secondary.main, 0.30),
+          backgroundColor: alpha(theme.palette.secondary.main, 0.3),
           zIndex: 0,
           animation: "smallFloat1 12s ease-in-out infinite 2s",
           "@keyframes smallFloat1": {
@@ -386,7 +386,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
           width: "46px",
           height: "46px",
           borderRadius: "50%",
-          backgroundColor: alpha(theme.palette.primary.main, 0.20),
+          backgroundColor: alpha(theme.palette.primary.main, 0.2),
           zIndex: 0,
           animation: "smallFloat4 20s ease-in-out infinite 11s",
           "@keyframes smallFloat4": {
@@ -570,6 +570,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
                 sx={{
                   position: "relative",
                   width: "100%",
+                  transform: "scale(1.3)",
                   maxWidth: { xs: "90%", md: "80%" },
                   borderRadius: 4,
                   overflow: "hidden",
@@ -677,26 +678,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
                   left: { xs: "-5%", md: "-10%" },
                   zIndex: 3,
                 }}
-              >
-                <Chip
-                  label={t("landing.hero.badge1", "AI-Powered")}
-                  sx={{
-                    color: "white",
-                    backgroundColor: theme.palette.primary.main,
-                    fontWeight: 600,
-                    fontSize: { xs: "1rem", md: "1.1rem" },
-                    px: 2.5,
-                    py: 0.8,
-                    height: { xs: 40, md: 44 },
-                    boxShadow: theme.shadows[8],
-                    animation: "float 3s ease-in-out infinite",
-                    "@keyframes float": {
-                      "0%, 100%": { transform: "translateY(0px)" },
-                      "50%": { transform: "translateY(-10px)" },
-                    },
-                  }}
-                />
-              </Box>
+              ></Box>
 
               <Box
                 sx={{
@@ -705,26 +687,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
                   right: { xs: "-5%", md: "-10%" },
                   zIndex: 3,
                 }}
-              >
-                <Chip
-                  label={t("landing.hero.badge2", "Real-time")}
-                  sx={{
-                    backgroundColor: theme.palette.primary.main,
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: { xs: "1rem", md: "1.1rem" },
-                    px: 2.5,
-                    py: 0.8,
-                    height: { xs: 40, md: 44 },
-                    boxShadow: theme.shadows[8],
-                    animation: "float2 3s ease-in-out infinite 1.5s",
-                    "@keyframes float2": {
-                      "0%, 100%": { transform: "translateY(0px)" },
-                      "50%": { transform: "translateY(-8px)" },
-                    },
-                  }}
-                />
-              </Box>
+              ></Box>
             </Box>
           </Grid>
         </Grid>

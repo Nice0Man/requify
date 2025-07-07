@@ -386,8 +386,8 @@
         "nav": {
             "home": "Главная",
             "features": "Возможности",
-            "about": "О нас",
             "solutions": "Решения",
+            "integrations": "Интеграции",
             "contact": "Контакты"
         }
     },

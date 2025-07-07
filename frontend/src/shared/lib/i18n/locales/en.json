@@ -386,9 +386,9 @@
     "nav": {
       "home": "Home",
       "features": "Features",
-      "about": "About",
-      "contact": "Contact",
-      "solutions": "Solutions"
+      "solutions": "Solutions",
+      "integrations": "Integrations",
+      "contact": "Contact"
     }
   },
   "cta": {

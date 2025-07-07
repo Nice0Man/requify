@@ -145,14 +145,24 @@ export const useScrollNavigation = ({
   // Навигация к секции по hash
   const navigateToHash = useCallback(
     (hash: string) => {
-      if (!enableHashSync) return;
+      console.log('navigateToHash called with:', hash);
+      
+      if (!enableHashSync) {
+        console.log('Hash sync disabled, skipping navigation');
+        return;
+      }
 
       const sectionIndex = hashUtils.findSectionByHash(
         sectionsRef.current,
         hash
       );
+      console.log('Found section index:', sectionIndex, 'for hash:', hash);
+      
       if (sectionIndex >= 0) {
+        console.log('Calling handleSectionChange with index:', sectionIndex);
         handleSectionChange(sectionIndex);
+      } else {
+        console.log('Section not found for hash:', hash);
       }
     },
     [enableHashSync, handleSectionChange]
