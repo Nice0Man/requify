@@ -13,6 +13,18 @@ import {
   Settings,
   AdminPanelSettings,
   AddCircle,
+  Person,
+  Archive,
+  ReviewsOutlined,
+  Schedule,
+  History,
+  Quiz,
+  AssignmentTurnedIn,
+  BarChart,
+  Notifications,
+  CalendarToday,
+  Group,
+  AccountTree,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
@@ -32,11 +44,21 @@ export const useSidebar = () => {
     const pathMap: Record<string, string> = {
       "/dashboard": "dashboard",
       "/projects": "projects-all",
+      "/projects/my": "projects-my",
       "/projects/new": "projects-new",
-      "/requirements": "requirements",
-      "/releases": "releases",
-      "/testing": "testing",
+      "/projects/archived": "projects-archived",
+      "/requirements/my": "requirements-my",
+      "/requirements/review": "requirements-review",
+      "/releases/upcoming": "releases-upcoming",
+      "/releases/history": "releases-history",
+      "/testing/cases": "testing-cases",
+      "/testing/results": "testing-results",
       "/reports": "reports",
+      "/analytics": "analytics",
+      "/notifications": "notifications",
+      "/calendar": "calendar",
+      "/team": "team",
+      "/workflow": "workflow",
       "/admin": "admin",
       "/settings": "settings",
     };
@@ -50,6 +72,21 @@ export const useSidebar = () => {
         store.toggleExpanded("projects");
       }
     }
+    if (location.pathname.startsWith("/requirements")) {
+      if (!store.expandedItems.includes("requirements")) {
+        store.toggleExpanded("requirements");
+      }
+    }
+    if (location.pathname.startsWith("/releases")) {
+      if (!store.expandedItems.includes("releases")) {
+        store.toggleExpanded("releases");
+      }
+    }
+    if (location.pathname.startsWith("/testing")) {
+      if (!store.expandedItems.includes("testing")) {
+        store.toggleExpanded("testing");
+      }
+    }
   }, [location.pathname]);
 
   return store;
@@ -60,9 +97,9 @@ export const useSidebarConfig = (): SidebarConfig => {
 
   return useMemo(
     () => ({
-      width: 280,
-      collapsedWidth: 72,
-      animationDuration: 300,
+      width: 240,
+      collapsedWidth: 60,
+      animationDuration: 250,
       showLabels: true,
       showBadges: true,
       enableTooltips: true,
@@ -88,7 +125,7 @@ export const useSidebarItems = (): SidebarItem[] => {
         label: t("sidebar.projects"),
         icon: FolderOpen,
         color: theme.palette.secondary.main,
-        badge: 3,
+        badge: 8,
         children: [
           {
             id: "projects-all",
@@ -98,10 +135,26 @@ export const useSidebarItems = (): SidebarItem[] => {
             color: theme.palette.secondary.main,
           },
           {
+            id: "projects-my",
+            label: t("sidebar.myProjects"),
+            icon: Person,
+            path: "/projects/my",
+            color: theme.palette.secondary.main,
+            badge: 3,
+          },
+          {
             id: "projects-new",
             label: t("sidebar.createProject"),
             icon: AddCircle,
             path: "/projects/new",
+            color: theme.palette.secondary.main,
+            isNew: true,
+          },
+          {
+            id: "projects-archived",
+            label: t("sidebar.archivedProjects"),
+            icon: Archive,
+            path: "/projects/archived",
             color: theme.palette.secondary.main,
           },
         ],
@@ -110,24 +163,74 @@ export const useSidebarItems = (): SidebarItem[] => {
         id: "requirements",
         label: t("sidebar.requirements"),
         icon: Assignment,
-        path: "/requirements",
         color: theme.palette.success.main,
-        badge: 12,
+        badge: 15,
+        children: [
+          {
+            id: "requirements-my",
+            label: t("sidebar.myRequirements"),
+            icon: Person,
+            path: "/requirements/my",
+            color: theme.palette.success.main,
+            badge: 7,
+          },
+          {
+            id: "requirements-review",
+            label: t("sidebar.reviewRequirements"),
+            icon: ReviewsOutlined,
+            path: "/requirements/review",
+            color: theme.palette.success.main,
+            badge: 8,
+          },
+        ],
       },
       {
         id: "releases",
         label: t("sidebar.releases"),
         icon: RocketLaunch,
-        path: "/releases",
         color: theme.palette.info.main,
+        children: [
+          {
+            id: "releases-upcoming",
+            label: t("sidebar.upcomingReleases"),
+            icon: Schedule,
+            path: "/releases/upcoming",
+            color: theme.palette.info.main,
+            badge: 2,
+          },
+          {
+            id: "releases-history",
+            label: t("sidebar.pastReleases"),
+            icon: History,
+            path: "/releases/history",
+            color: theme.palette.info.main,
+          },
+        ],
       },
       {
         id: "testing",
         label: t("sidebar.testing"),
         icon: BugReport,
-        path: "/testing",
         color: theme.palette.warning.main,
-        badge: 2,
+        badge: 5,
+        children: [
+          {
+            id: "testing-cases",
+            label: t("sidebar.testCases"),
+            icon: Quiz,
+            path: "/testing/cases",
+            color: theme.palette.warning.main,
+            badge: 3,
+          },
+          {
+            id: "testing-results",
+            label: t("sidebar.testResults"),
+            icon: AssignmentTurnedIn,
+            path: "/testing/results",
+            color: theme.palette.warning.main,
+            badge: 2,
+          },
+        ],
       },
       {
         id: "reports",
@@ -135,6 +238,43 @@ export const useSidebarItems = (): SidebarItem[] => {
         icon: Analytics,
         path: "/reports",
         color: theme.palette.error.main,
+      },
+      {
+        id: "analytics",
+        label: t("sidebar.analytics"),
+        icon: BarChart,
+        path: "/analytics",
+        color: theme.palette.info.main,
+        isNew: true,
+      },
+      {
+        id: "notifications",
+        label: t("sidebar.notifications"),
+        icon: Notifications,
+        path: "/notifications",
+        color: theme.palette.warning.main,
+        badge: 12,
+      },
+      {
+        id: "calendar",
+        label: t("sidebar.calendar"),
+        icon: CalendarToday,
+        path: "/calendar",
+        color: theme.palette.primary.main,
+      },
+      {
+        id: "team",
+        label: t("sidebar.team"),
+        icon: Group,
+        path: "/team",
+        color: theme.palette.secondary.main,
+      },
+      {
+        id: "workflow",
+        label: t("sidebar.workflow"),
+        icon: AccountTree,
+        path: "/workflow",
+        color: theme.palette.success.main,
       },
     ],
     [theme, t]
