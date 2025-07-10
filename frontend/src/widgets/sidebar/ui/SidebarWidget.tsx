@@ -24,7 +24,6 @@ import {
   Analytics,
   Settings,
   Home,
-  Logout,
   ExpandLess,
   ExpandMore,
   People,
@@ -33,7 +32,6 @@ import {
   AddCircle,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/app/providers/AuthProvider';
 
 interface SidebarItem {
   id: string;
@@ -52,7 +50,6 @@ export const SidebarWidget: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>(['projects']);
 
@@ -146,15 +143,6 @@ export const SidebarWidget: React.FC = () => {
       );
     } else if (item.path) {
       navigate(item.path);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/auth');
-    } catch (error) {
-      console.error('Logout failed:', error);
     }
   };
 
@@ -380,106 +368,6 @@ export const SidebarWidget: React.FC = () => {
         <List disablePadding sx={{ py: 1 }}>
           {bottomItems.map(item => renderSidebarItem(item))}
         </List>
-
-        {/* Кнопка выхода */}
-        <Box sx={{ p: 1 }}>
-          <Tooltip 
-            title={isCollapsed ? 'Выход' : ''}
-            placement="right"
-            disableHoverListener={!isCollapsed}
-          >
-            <ListItemButton
-              onClick={handleLogout}
-              sx={{
-                borderRadius: 2,
-                minHeight: 48,
-                mx: 1,
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.error.main, 0.08),
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  color: theme.palette.error.main,
-                  minWidth: 40,
-                }}
-              >
-                <Logout />
-              </ListItemIcon>
-              {!isCollapsed && (
-                <ListItemText
-                  primary="Выход"
-                  primaryTypographyProps={{
-                    color: theme.palette.error.main,
-                    fontWeight: 500,
-                    fontSize: '0.95rem',
-                  }}
-                />
-              )}
-            </ListItemButton>
-          </Tooltip>
-        </Box>
-
-        {/* Информация о пользователе */}
-        {!isCollapsed && user && (
-          <Box
-            sx={{
-              p: 2,
-              borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              <Box
-                sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: 'white',
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  {user.username?.charAt(0).toUpperCase() || 'U'}
-                </Typography>
-              </Box>
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    fontWeight: 600,
-                    fontSize: '0.85rem',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {user.username || 'Пользователь'}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: theme.palette.text.secondary,
-                    fontSize: '0.75rem',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {user.role || 'Роль не определена'}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        )}
       </Box>
     </Box>
   );

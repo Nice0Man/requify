@@ -53,6 +53,18 @@
         "profile": "Профиль",
         "logout": "Выход"
     },
+    "sidebar": {
+        "dashboard": "Панель управления",
+        "projects": "Проекты",
+        "allProjects": "Все проекты",
+        "createProject": "Создать проект",
+        "requirements": "Требования",
+        "releases": "Релизы",
+        "testing": "Тестирование",
+        "reports": "Отчеты",
+        "admin": "Панель администратора",
+        "settings": "Настройки"
+    },
     "notifications": {
         "title": "Уведомления",
         "new": "Новые",

@@ -53,6 +53,18 @@
     "profile": "Profile",
     "logout": "Logout"
   },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "allProjects": "All Projects",
+    "createProject": "Create Project",
+    "requirements": "Requirements",
+    "releases": "Releases",
+    "testing": "Testing",
+    "reports": "Reports",
+    "admin": "Admin Panel",
+    "settings": "Settings"
+  },
   "notifications": {
     "title": "Notifications",
     "new": "New",
