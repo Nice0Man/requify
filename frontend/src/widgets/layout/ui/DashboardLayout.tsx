@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Box, useTheme } from '@mui/material';
 import { HeaderWidget } from '@/widgets/header';
-import { SidebarWidget } from '@/widgets/sidebar';
+import { SidebarWidget, SidebarProvider, useSidebar, SIDEBAR_WIDTH, SIDEBAR_COLLAPSED_WIDTH } from '@/widgets/sidebar';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const SIDEBAR_WIDTH = 280;
-const SIDEBAR_COLLAPSED_WIDTH = 72;
 const HEADER_HEIGHT = 64;
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+// Внутренний компонент для использования контекста сайдбара
+const DashboardLayoutContent: React.FC<DashboardLayoutProps> = ({ children }) => {
   const theme = useTheme();
+  const { isCollapsed } = useSidebar();
   const [isDarkMode, setIsDarkMode] = useState(theme.palette.mode === 'dark');
 
   const handleThemeToggle = () => {
@@ -30,14 +30,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       <Box 
         sx={{ 
           flex: 1,
-          marginLeft: `${SIDEBAR_WIDTH}px`, // Начальный отступ для развернутой боковой панели
-          transition: 'margin-left 0.3s ease',
+          marginLeft: isCollapsed ? `${SIDEBAR_COLLAPSED_WIDTH}px` : `${SIDEBAR_WIDTH}px`,
+          transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100vh',
-          // Реагируем на изменение ширины sidebar через CSS переменные или медиазапросы
-          '@media (max-width: 1200px)': {
-            marginLeft: `${SIDEBAR_COLLAPSED_WIDTH}px`,
+          position: 'relative',
+          // Для мобильных устройств убираем отступ
+          '@media (max-width: 768px)': {
+            marginLeft: 0,
           },
         }}
       >
@@ -53,11 +54,45 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             backgroundColor: theme.palette.background.default,
             minHeight: `calc(100vh - ${HEADER_HEIGHT}px)`,
             position: 'relative',
+            overflow: 'hidden',
+            // Добавляем небольшой padding для контента
+            '@media (min-width: 768px)': {
+              pl: 2,
+              pr: 2,
+            },
           }}
         >
-          {children}
+          {/* Фоновые декоративные элементы */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              opacity: 0.02,
+              pointerEvents: 'none',
+              background: `radial-gradient(circle at 20% 20%, ${theme.palette.primary.main} 0%, transparent 50%), 
+                          radial-gradient(circle at 80% 80%, ${theme.palette.secondary.main} 0%, transparent 50%)`,
+              zIndex: 0,
+            }}
+          />
+          
+          {/* Контент */}
+          <Box sx={{ position: 'relative', zIndex: 1, height: '100%' }}>
+            {children}
+          </Box>
         </Box>
       </Box>
     </Box>
+  );
+};
+
+// Основной компонент с провайдером
+export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  return (
+    <SidebarProvider>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </SidebarProvider>
   );
 }; 

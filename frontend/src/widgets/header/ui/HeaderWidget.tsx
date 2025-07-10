@@ -18,6 +18,7 @@ import {
   Tooltip,
   InputBase,
   Fade,
+  useMediaQuery,
 } from '@mui/material';
 import {
   AccountCircle,
@@ -31,9 +32,11 @@ import {
   Add,
   Search,
   MoreVert,
+  Menu as MenuIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import { useSidebar } from '@/widgets/sidebar';
 
 interface HeaderWidgetProps {
   onThemeToggle?: () => void;
@@ -47,6 +50,8 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { toggleMobile } = useSidebar();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
   const [actionsMenuAnchor, setActionsMenuAnchor] = useState<null | HTMLElement>(null);
@@ -127,15 +132,31 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', px: 3, minHeight: 64 }}>
-        {/* Левая часть - поиск */}
+        {/* Левая часть - мобильное меню и поиск */}
         <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, maxWidth: 500 }}>
+          {/* Кнопка мобильного меню */}
+          {isMobile && (
+            <IconButton
+              onClick={toggleMobile}
+              sx={{
+                mr: 2,
+                color: theme.palette.text.secondary,
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.action.hover, 0.1),
+                },
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          
           <Box 
             sx={{ 
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
               width: '100%',
-              maxWidth: 400,
+              maxWidth: isMobile ? 300 : 400,
             }}
           >
             <Box
@@ -149,7 +170,7 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
                 },
                 transition: 'all 0.2s ease',
                 width: '100%',
-                minWidth: 300,
+                minWidth: isMobile ? 200 : 300,
               }}
             >
               <Box
@@ -167,7 +188,7 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
                 <Search fontSize="small" />
               </Box>
               <InputBase
-                placeholder="Поиск проектов, требований, релизов..."
+                placeholder={isMobile ? "Поиск..." : "Поиск проектов, требований, релизов..."}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
                 sx={{
@@ -189,25 +210,27 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = ({
 
         {/* Правая часть - действия */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {/* Быстрое создание */}
-          <Tooltip title="Создать">
-            <IconButton
-              onClick={handleActionsMenuOpen}
-              sx={{
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                color: theme.palette.primary.main,
-                width: 40,
-                height: 40,
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                  transform: 'scale(1.05)',
-                },
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <Add fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {/* Быстрое создание - скрываем на маленьких экранах */}
+          {!isMobile && (
+            <Tooltip title="Создать">
+              <IconButton
+                onClick={handleActionsMenuOpen}
+                sx={{
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  color: theme.palette.primary.main,
+                  width: 40,
+                  height: 40,
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                    transform: 'scale(1.05)',
+                  },
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <Add fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
 
           {/* Переключатель темы */}
           <Tooltip title={isDarkMode ? 'Светлая тема' : 'Темная тема'}>
