@@ -20,8 +20,8 @@ ENV POETRY_NO_INTERACTION=1 \
 WORKDIR /app
 
 # Копируем файлы зависимостей и конфигурации
-COPY config/pyproject.toml poetry.lock* ./
-COPY config/alembic.ini ./alembic.ini
+COPY backend/pyproject.toml backend/poetry.lock* ./
+COPY backend/alembic.ini ./alembic.ini
 
 # Устанавливаем зависимости с dev пакетами
 RUN poetry config virtualenvs.create false && \

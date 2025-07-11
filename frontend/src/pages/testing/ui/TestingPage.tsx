@@ -27,6 +27,7 @@ import {
   Assignment as AssignmentIcon,
   PlayArrow as PlayArrowIcon,
 } from "@mui/icons-material";
+import { DashboardLayout } from "@/widgets/layout";
 import {
   useTestCases,
   useTestStats,
@@ -209,19 +210,26 @@ const TestingPage: React.FC = () => {
   );
 
   if (testCasesLoading || testStatsLoading) {
-    return <LoadingSpinner fullScreen />;
+    return (
+      <DashboardLayout>
+        <LoadingSpinner fullScreen />
+      </DashboardLayout>
+    );
   }
 
   if (testCasesError || testStatsError) {
     return (
-      <Box p={3} textAlign="center">
-        <Typography color="error">{t("errors.loadingError")}</Typography>
-      </Box>
+      <DashboardLayout>
+        <Box p={3} textAlign="center">
+          <Typography color="error">{t("errors.loadingError")}</Typography>
+        </Box>
+      </DashboardLayout>
     );
   }
 
   return (
-    <Box p={3}>
+    <DashboardLayout>
+      <Box p={3}>
       {/* Заголовок */}
       <Box mb={3}>
         <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
@@ -403,7 +411,8 @@ const TestingPage: React.FC = () => {
           ))}
         </Grid>
       )}
-    </Box>
+      </Box>
+    </DashboardLayout>
   );
 };
 

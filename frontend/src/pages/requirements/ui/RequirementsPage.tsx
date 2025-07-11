@@ -27,6 +27,7 @@ import {
   Search as SearchIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
+import { DashboardLayout } from "@/widgets/layout";
 import { useRequirements } from "../../../features/requirement-management/model/useRequirementQuery";
 import { LoadingSpinner } from "../../../shared/ui";
 import type { Requirement } from "../../../entities/requirement";
@@ -192,19 +193,26 @@ const RequirementsPage: React.FC = () => {
   );
 
   if (isPending) {
-    return <LoadingSpinner fullScreen />;
+    return (
+      <DashboardLayout>
+        <LoadingSpinner fullScreen />
+      </DashboardLayout>
+    );
   }
 
   if (error) {
     return (
-      <Box p={3} textAlign="center">
-        <Typography color="error">{t("errors.loadingError")}</Typography>
-      </Box>
+      <DashboardLayout>
+        <Box p={3} textAlign="center">
+          <Typography color="error">{t("errors.loadingError")}</Typography>
+        </Box>
+      </DashboardLayout>
     );
   }
 
   return (
-    <Box p={3}>
+    <DashboardLayout>
+      <Box p={3}>
       {/* Заголовок */}
       <Box mb={3}>
         <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
@@ -340,7 +348,8 @@ const RequirementsPage: React.FC = () => {
           ))}
         </Grid>
       )}
-    </Box>
+      </Box>
+    </DashboardLayout>
   );
 };
 

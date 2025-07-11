@@ -16,7 +16,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { Email, Lock, Login } from "@mui/icons-material";
-import { useOAuth2 } from "@/app/providers/OAuth2Provider";
 import { oauth2API } from "@/shared/api";
 import type { LoginRequest } from "@/shared/types/auth";
 import { useTranslation } from "react-i18next";
@@ -33,7 +32,6 @@ const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { refreshUser } = useOAuth2();
 
   const [credentials, setCredentials] = useState<LoginRequest>({
     username: "",
@@ -82,36 +80,42 @@ const LoginForm: React.FC<LoginFormProps> = ({
     }
   };
 
-      // Валидация при изменении полей
+  // Валидация при изменении полей
   useEffect(() => {
     const newErrors: typeof fieldErrors = {};
-    
-    const fieldsToValidate: Array<keyof typeof fieldErrors> = ['username', 'password'];
+
+    const fieldsToValidate: Array<keyof typeof fieldErrors> = [
+      "username",
+      "password",
+    ];
     fieldsToValidate.forEach((field) => {
       if (touched[field]) {
         const error = validateField(field, credentials[field] || "");
         if (error) newErrors[field] = error;
       }
     });
-    
+
     setFieldErrors(newErrors);
   }, [credentials, touched, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Проверяем все поля
     const newTouched = { username: true, password: true };
     setTouched(newTouched);
-    
+
     // Валидируем все поля
     const newErrors: typeof fieldErrors = {};
-    const fieldsToValidate: Array<keyof typeof fieldErrors> = ['username', 'password'];
+    const fieldsToValidate: Array<keyof typeof fieldErrors> = [
+      "username",
+      "password",
+    ];
     fieldsToValidate.forEach((field) => {
       const error = validateField(field, credentials[field] || "");
       if (error) newErrors[field] = error;
     });
-    
+
     if (Object.keys(newErrors).length > 0) {
       setFieldErrors(newErrors);
       return;
@@ -121,11 +125,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
       setIsPending(true);
       setError("");
 
-      // Используем OAuth2API для логина
+      // Всегда используем OAuth2API для логина по форме
+      // Наши провайдеры подхватят изменения автоматически
       await oauth2API.login(credentials);
-
-      // Обновляем пользователя в AuthProvider
-      await refreshUser();
 
       // Принудительный редирект на dashboard после успешного логина
       window.location.href = "/dashboard";

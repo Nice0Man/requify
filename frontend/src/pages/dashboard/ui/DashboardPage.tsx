@@ -1,44 +1,65 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Box,
+  Container,
   Typography,
   Grid,
-  Card,
-  CardContent,
   Paper,
-  alpha,
-  useTheme,
-  Chip,
-  LinearProgress,
-  IconButton,
-  Fade,
-  Button,
   Stack,
-  Container,
+  Chip,
+  IconButton,
+  useTheme,
+  alpha,
+  Button,
+  Tooltip,
 } from "@mui/material";
 import {
   TrendingUp,
+  TrendingDown,
   Assignment,
   CheckCircle,
-  Speed,
-  FolderOpen,
-  BugReport,
-  RocketLaunch,
-  People,
+  Add,
   ArrowForward,
   Refresh,
-  Timeline,
   Analytics,
-  Add,
+  FolderOpen,
+  Speed,
+  ViewColumn,
+  BugReport,
+  RocketLaunch,
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/widgets/layout";
-import { useDashboardStats } from "../../../features/dashboard/model/useDashboardQuery";
-import { LoadingSpinner } from "../../../shared/ui";
+import { useDashboardStats } from "@/features/dashboard/model/useDashboardQuery";
+import { LoadingSpinner } from "@/shared/ui";
+
+interface DashboardMetric {
+  id: string;
+  title: string;
+  value: string | number;
+  change: number;
+  trend: "up" | "down" | "stable";
+  icon: React.ReactNode;
+  color: string;
+  description: string;
+}
+
+interface QuickAction {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  path: string;
+  badge?: string;
+}
 
 const DashboardPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const { data: stats, isPending, error } = useDashboardStats();
 
   if (isPending) {
@@ -59,622 +80,732 @@ const DashboardPage: React.FC = () => {
     );
   }
 
-  const metrics = [
+  // Minimalist metrics with key focus
+  const metrics: DashboardMetric[] = [
     {
+      id: "active-projects",
       title: t("dashboard.activeProjects"),
       value: stats?.activeProjects || 12,
-      icon: FolderOpen,
+      change: 8.5,
+      trend: "up",
+      icon: <FolderOpen />,
       color: theme.palette.primary.main,
-      trend: "+8%",
-      subtitle: t("dashboard.projectsInDevelopment"),
-      background: `linear-gradient(135deg, ${alpha(
-        theme.palette.primary.main,
-        0.1
-      )} 0%, ${alpha(theme.palette.primary.light, 0.05)} 100%)`,
-      iconBg: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+      description: t("dashboard.projectsInDevelopment"),
     },
     {
+      id: "total-requirements",
       title: t("dashboard.requirements"),
-      value: stats?.activeRequirements || 156,
-      icon: Assignment,
-      color: theme.palette.secondary.main,
-      trend: "+12%",
-      subtitle: t("dashboard.activeRequirements"),
-      background: `linear-gradient(135deg, ${alpha(
-        theme.palette.secondary.main,
-        0.1
-      )} 0%, ${alpha(theme.palette.secondary.light, 0.05)} 100%)`,
-      iconBg: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
-    },
-    {
-      title: t("dashboard.completionRate"),
-      value: `${stats?.completionRate || 78}%`,
-      icon: CheckCircle,
-      color: theme.palette.success.main,
-      trend: "+5%",
-      subtitle: t("dashboard.totalReadiness"),
-      background: `linear-gradient(135deg, ${alpha(
-        theme.palette.success.main,
-        0.1
-      )} 0%, ${alpha(theme.palette.success.light, 0.05)} 100%)`,
-      iconBg: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.success.dark})`,
-    },
-    {
-      title: t("dashboard.team"),
-      value: stats?.teamVelocity || 24,
-      icon: People,
+      value: stats?.activeRequirements || 247,
+      change: 12.3,
+      trend: "up",
+      icon: <Assignment />,
       color: theme.palette.info.main,
-      trend: "+3%",
-      subtitle: t("dashboard.activeParticipants"),
-      background: `linear-gradient(135deg, ${alpha(
-        theme.palette.info.main,
-        0.1
-      )} 0%, ${alpha(theme.palette.info.light, 0.05)} 100%)`,
-      iconBg: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
-    },
-  ];
-
-  const recentActivity = [
-    {
-      title: t("dashboard.newProject", { project: "Mobile App" }),
-      time: t("dashboard.2HoursAgo"),
-      type: t("dashboard.project"),
-      color: theme.palette.primary.main,
-      icon: FolderOpen,
+      description: t("dashboard.activeRequirements"),
     },
     {
-      title: t("dashboard.requirementUpdated", { requirement: "REQ-145" }),
-      time: t("dashboard.4HoursAgo"),
-      type: t("dashboard.requirement"),
-      color: theme.palette.secondary.main,
-      icon: Assignment,
-    },
-    {
-      title: t("dashboard.releaseDeployed", { release: "v2.1.0" }),
-      time: t("dashboard.6HoursAgo"),
-      type: t("dashboard.release"),
+      id: "completion-rate",
+      title: t("dashboard.completionRate"),
+      value: `${stats?.completionRate || 89}%`,
+      change: 4.2,
+      trend: "up",
+      icon: <CheckCircle />,
       color: theme.palette.success.main,
-      icon: RocketLaunch,
+      description: t("dashboard.totalReadiness"),
     },
     {
-      title: t("dashboard.bugFixed", { bug: "BUG-89" }),
-      time: t("dashboard.1DayAgo"),
-      type: t("dashboard.bug"),
+      id: "team-velocity",
+      title: t("dashboard.team"),
+      value: stats?.teamVelocity || 42,
+      change: -2.1,
+      trend: "down",
+      icon: <Speed />,
       color: theme.palette.warning.main,
-      icon: BugReport,
+      description: t("dashboard.activeParticipants"),
     },
   ];
 
-  const projects = [
-    t("dashboard.crmSystem"),
-    t("dashboard.mobileApp"),
-    t("dashboard.apiGateway"),
-    t("dashboard.dashboardUi"),
-  ];
-
-  const quickActions = [
+  // Minimalist quick actions
+  const quickActions: QuickAction[] = [
     {
+      id: "new-project",
       title: t("dashboard.createProject"),
       description: t("dashboard.startNewProject"),
-      icon: Add,
+      icon: <Add />,
       color: theme.palette.primary.main,
-      action: "/projects/new",
+      path: "/projects/new",
     },
     {
+      id: "kanban-board",
+      title: "Kanban Board",
+      description: "View project kanban",
+      icon: <ViewColumn />,
+      color: theme.palette.secondary.main,
+      path: "/kanban",
+    },
+    {
+      id: "new-requirement",
       title: t("dashboard.addRequirement"),
       description: t("dashboard.createRequirement"),
-      icon: Assignment,
-      color: theme.palette.secondary.main,
-      action: "/requirements/new",
+      icon: <Assignment />,
+      color: theme.palette.info.main,
+      path: "/requirements/new",
     },
     {
-      title: t("dashboard.scheduleRelease"),
-      description: t("dashboard.newRelease"),
-      icon: RocketLaunch,
-      color: theme.palette.info.main,
-      action: "/releases/new",
+      id: "view-reports",
+      title: "View Reports",
+      description: "Analytics & insights",
+      icon: <Analytics />,
+      color: theme.palette.warning.main,
+      path: "/reports",
     },
   ];
+
+  const handleRefresh = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 1000);
+  };
+
+  const handleQuickAction = (action: QuickAction) => {
+    navigate(action.path);
+  };
 
   return (
     <DashboardLayout>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: `linear-gradient(180deg, ${
-            theme.palette.background.default
-          } 0%, ${alpha(theme.palette.grey[50], 0.5)} 100%)`,
-          position: "relative",
-          overflow: "hidden",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            opacity: 0.02,
-            backgroundImage: `radial-gradient(circle at 20% 50%, ${theme.palette.primary.main} 0%, transparent 50%), 
-                             radial-gradient(circle at 80% 80%, ${theme.palette.secondary.main} 0%, transparent 50%)`,
-          },
-        }}
-      >
-        <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
-          <Box sx={{ py: 4 }}>
-            {/* Заголовок с действиями */}
-            <Fade in timeout={800}>
-              <Box sx={{ mb: 6 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    mb: 2,
-                  }}
-                >
-                  <Box>
-                    <Typography
-                      variant="h3"
-                      component="h1"
-                      gutterBottom
-                      fontWeight={700}
-                      sx={{
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                        backgroundClip: "text",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        fontSize: { xs: "2rem", md: "2.5rem" },
-                        letterSpacing: "-0.02em",
-                      }}
-                    >
-                      {t("dashboard.dashboard")}
-                    </Typography>
-                    <Typography
-                      variant="h6"
-                      color="text.secondary"
-                      sx={{
-                        fontSize: "1.1rem",
-                        fontWeight: 400,
-                      }}
-                    >
-                      {t("dashboard.welcomeMessage")}
-                    </Typography>
-                  </Box>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Header Section - Minimalist */}
+        <Box
+          mb={4}
+          sx={{
+            opacity: 0,
+            transform: "translateY(20px)",
+            animation: "fadeInUp 0.6s ease-out 0.1s forwards",
+            "@keyframes fadeInUp": {
+              "0%": { opacity: 0, transform: "translateY(20px)" },
+              "100%": { opacity: 1, transform: "translateY(0)" },
+            },
+          }}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Box>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 700,
+                  color: theme.palette.text.primary,
+                  mb: 0.5,
+                }}
+              >
+                {t("dashboard.title")}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                Welcome back! Here's what's happening with your projects.
+              </Typography>
+            </Box>
+            <Stack direction="row" spacing={1}>
+              <Tooltip title="Refresh">
+                <span>
                   <IconButton
+                    onClick={handleRefresh}
+                    disabled={isLoading}
                     sx={{
-                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                      color: theme.palette.primary.main,
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                       "&:hover": {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                        transform: "rotate(180deg)",
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.04
+                        ),
                       },
-                      transition: "all 0.3s ease",
                     }}
                   >
                     <Refresh />
                   </IconButton>
-                </Box>
+                </span>
+              </Tooltip>
+            </Stack>
+          </Stack>
+        </Box>
 
-                {/* Быстрые действия */}
-                <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                  {quickActions.map((action, index) => (
-                    <Fade in timeout={1000 + index * 200} key={action.title}>
-                      <Button
-                        variant="outlined"
-                        startIcon={<action.icon />}
+        {/* Key Metrics - Minimalist Cards */}
+        <Grid
+          container
+          spacing={3}
+          mb={4}
+          sx={{
+            opacity: 0,
+            transform: "translateY(20px)",
+            animation: "fadeInUp 0.6s ease-out 0.3s forwards",
+            "@keyframes fadeInUp": {
+              "0%": { opacity: 0, transform: "translateY(20px)" },
+              "100%": { opacity: 1, transform: "translateY(0)" },
+            },
+          }}
+        >
+          {metrics.map((metric, index) => (
+            <Grid item xs={12} sm={6} md={3} key={metric.id}>
+              <Box
+                sx={{
+                  p: 2.5,
+                  borderRadius: 3,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                  background: theme.palette.background.paper,
+                  transition: "all 0.3s ease",
+                  opacity: 0,
+                  transform: "translateY(20px)",
+                  animation: `fadeInUp 0.6s ease-out ${
+                    0.5 + index * 0.1
+                  }s forwards`,
+                  "@keyframes fadeInUp": {
+                    "0%": { opacity: 0, transform: "translateY(20px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                  },
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: `0 8px 24px ${alpha(metric.color, 0.12)}`,
+                    borderColor: alpha(metric.color, 0.2),
+                  },
+                }}
+              >
+                <Stack direction="row" alignItems="center" spacing={2}>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 2,
+                      background: alpha(metric.color, 0.1),
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: metric.color,
+                    }}
+                  >
+                    {metric.icon}
+                  </Box>
+                  <Box flex={1}>
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: 700,
+                        color: theme.palette.text.primary,
+                        mb: 0.5,
+                      }}
+                    >
+                      {metric.value}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {metric.title}
+                    </Typography>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={0.5}
+                      mt={0.5}
+                    >
+                      {metric.trend === "up" ? (
+                        <TrendingUp
+                          sx={{
+                            fontSize: 16,
+                            color: theme.palette.success.main,
+                          }}
+                        />
+                      ) : (
+                        <TrendingDown
+                          sx={{
+                            fontSize: 16,
+                            color: theme.palette.error.main,
+                          }}
+                        />
+                      )}
+                      <Typography
+                        variant="caption"
                         sx={{
-                          borderRadius: 3,
-                          py: 1.5,
-                          px: 3,
-                          borderColor: alpha(action.color, 0.3),
-                          color: action.color,
-                          backgroundColor: alpha(action.color, 0.05),
-                          "&:hover": {
-                            backgroundColor: alpha(action.color, 0.1),
-                            borderColor: action.color,
-                            transform: "translateY(-2px)",
-                            boxShadow: `0 8px 25px ${alpha(
-                              action.color,
-                              0.15
-                            )}`,
-                          },
-                          transition: "all 0.3s ease",
-                          textTransform: "none",
+                          color:
+                            metric.trend === "up"
+                              ? theme.palette.success.main
+                              : theme.palette.error.main,
                           fontWeight: 600,
                         }}
                       >
-                        {action.title}
-                      </Button>
-                    </Fade>
-                  ))}
+                        {metric.change > 0 ? "+" : ""}
+                        {metric.change}%
+                      </Typography>
+                    </Stack>
+                  </Box>
                 </Stack>
               </Box>
-            </Fade>
-
-            {/* Метрики */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              {metrics.map((metric, index) => {
-                const Icon = metric.icon;
-                return (
-                  <Grid item xs={12} sm={6} lg={3} key={index}>
-                    <Fade in timeout={1200 + index * 200}>
-                      <Card
-                        elevation={0}
-                        sx={{
-                          borderRadius: 4,
-                          background: metric.background,
-                          border: `1px solid ${alpha(metric.color, 0.1)}`,
-                          position: "relative",
-                          overflow: "hidden",
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            transform: "translateY(-8px)",
-                            boxShadow: `0 20px 40px ${alpha(
-                              metric.color,
-                              0.15
-                            )}`,
-                            border: `1px solid ${alpha(metric.color, 0.2)}`,
-                          },
-                          "&::before": {
-                            content: '""',
-                            position: "absolute",
-                            top: 0,
-                            right: 0,
-                            width: "40%",
-                            height: "100%",
-                            background: `radial-gradient(circle at top right, ${alpha(
-                              metric.color,
-                              0.1
-                            )} 0%, transparent 60%)`,
-                          },
-                        }}
-                      >
-                        <CardContent
-                          sx={{ p: 3, position: "relative", zIndex: 1 }}
-                        >
-                          <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: "flex-start",
-                              justifyContent: "space-between",
-                              mb: 2,
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                width: 56,
-                                height: 56,
-                                borderRadius: "50%",
-                                background: metric.iconBg,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                boxShadow: `0 8px 24px ${alpha(
-                                  metric.color,
-                                  0.25
-                                )}`,
-                              }}
-                            >
-                              <Icon sx={{ color: "white", fontSize: 28 }} />
-                            </Box>
-                            <Chip
-                              label={metric.trend}
-                              size="small"
-                              sx={{
-                                backgroundColor: alpha(
-                                  theme.palette.success.main,
-                                  0.1
-                                ),
-                                color: theme.palette.success.main,
-                                fontWeight: 600,
-                                fontSize: "0.8rem",
-                              }}
-                            />
-                          </Box>
-
-                          <Typography
-                            variant="h4"
-                            fontWeight={700}
-                            sx={{
-                              color: metric.color,
-                              mb: 0.5,
-                              fontSize: "2rem",
-                            }}
-                          >
-                            {metric.value}
-                          </Typography>
-
-                          <Typography
-                            variant="h6"
-                            fontWeight={600}
-                            sx={{
-                              color: theme.palette.text.primary,
-                              mb: 0.5,
-                              fontSize: "1rem",
-                            }}
-                          >
-                            {metric.title}
-                          </Typography>
-
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ fontSize: "0.85rem" }}
-                          >
-                            {metric.subtitle}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Fade>
-                  </Grid>
-                );
-              })}
             </Grid>
+          ))}
+        </Grid>
 
-            {/* Основной контент */}
-            <Grid container spacing={4}>
-              {/* Прогресс проектов */}
-              <Grid item xs={12} lg={8}>
-                <Fade in timeout={1800}>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 4,
-                      borderRadius: 4,
-                      border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
-                      background: `linear-gradient(135deg, 
-                        ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                        ${alpha(theme.palette.background.default, 0.4)} 100%)`,
-                      backdropFilter: "blur(20px)",
-                      position: "relative",
-                      overflow: "hidden",
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: -50,
-                        right: -50,
-                        width: 100,
-                        height: 100,
-                        borderRadius: "50%",
-                        background: `radial-gradient(circle, ${alpha(
-                          theme.palette.primary.main,
-                          0.05
-                        )} 0%, transparent 70%)`,
-                      },
-                    }}
-                  >
+        {/* Quick Actions - Minimalist */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            background: theme.palette.background.paper,
+            mb: 4,
+            opacity: 0,
+            transform: "translateY(20px)",
+            animation: "fadeInUp 0.6s ease-out 0.9s forwards",
+            "@keyframes fadeInUp": {
+              "0%": { opacity: 0, transform: "translateY(20px)" },
+              "100%": { opacity: 1, transform: "translateY(0)" },
+            },
+          }}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Quick Actions
+            </Typography>
+            <Button
+              variant="text"
+              endIcon={<ArrowForward />}
+              sx={{ fontSize: "0.875rem", textTransform: "none" }}
+            >
+              View All
+            </Button>
+          </Stack>
+          <Grid container spacing={2}>
+            {quickActions.map((action, index) => (
+              <Grid item xs={12} sm={6} md={3} key={action.id}>
+                <Box
+                  onClick={() => handleQuickAction(action)}
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
+                    background: alpha(action.color, 0.02),
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    opacity: 0,
+                    transform: "translateY(20px)",
+                    animation: `fadeInUp 0.6s ease-out ${
+                      1.1 + index * 0.1
+                    }s forwards`,
+                    "@keyframes fadeInUp": {
+                      "0%": { opacity: 0, transform: "translateY(20px)" },
+                      "100%": { opacity: 1, transform: "translateY(0)" },
+                    },
+                    "&:hover": {
+                      transform: "translateY(-1px)",
+                      boxShadow: `0 4px 16px ${alpha(action.color, 0.15)}`,
+                      borderColor: alpha(action.color, 0.2),
+                    },
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={2}>
                     <Box
                       sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 1.5,
+                        background: alpha(action.color, 0.1),
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
-                        mb: 4,
+                        justifyContent: "center",
+                        color: action.color,
                       }}
                     >
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                      {action.icon}
+                    </Box>
+                    <Box flex={1}>
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ fontWeight: 600, mb: 0.5 }}
+                      >
+                        {action.title}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {action.description}
+                      </Typography>
+                      {action.badge && (
+                        <Chip
+                          label={action.badge}
+                          size="small"
+                          sx={{
+                            mt: 0.5,
+                            height: 20,
+                            fontSize: "0.6rem",
+                            backgroundColor: alpha(action.color, 0.1),
+                            color: action.color,
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </Stack>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+
+        {/* Main Content Grid - Minimalist Layout */}
+        <Grid container spacing={3}>
+          {/* Left Column - Primary Content */}
+          <Grid item xs={12} lg={8}>
+            <Stack spacing={3}>
+              {/* Project Overview */}
+              <Box
+                sx={{
+                  opacity: 0,
+                  transform: "translateY(20px)",
+                  animation: "fadeInUp 0.6s ease-out 1.5s forwards",
+                  "@keyframes fadeInUp": {
+                    "0%": { opacity: 0, transform: "translateY(20px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                  },
+                }}
+              >
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    background: theme.palette.background.paper,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    Recent Projects
+                  </Typography>
+                  <Stack spacing={2}>
+                    {[
+                      { name: "CRM System", progress: 78, status: "active" },
+                      {
+                        name: "Mobile App",
+                        progress: 45,
+                        status: "development",
+                      },
+                      { name: "API Gateway", progress: 92, status: "testing" },
+                    ].map((project, index) => (
+                      <Box key={index}>
+                        <Stack
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          mb={1}
+                        >
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            {project.name}
+                          </Typography>
+                          <Chip
+                            label={project.status}
+                            size="small"
+                            sx={{
+                              height: 20,
+                              fontSize: "0.7rem",
+                              backgroundColor: alpha(
+                                theme.palette.primary.main,
+                                0.1
+                              ),
+                              color: theme.palette.primary.main,
+                            }}
+                          />
+                        </Stack>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <Box sx={{ width: "100%", mr: 1 }}>
+                            <Box
+                              sx={{
+                                height: 6,
+                                borderRadius: 3,
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                overflow: "hidden",
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: `${project.progress}%`,
+                                  height: "100%",
+                                  bgcolor: theme.palette.primary.main,
+                                  borderRadius: 3,
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ minWidth: 35 }}
+                          >
+                            {project.progress}%
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Paper>
+              </Box>
+
+              {/* Recent Requirements */}
+              <Box
+                sx={{
+                  opacity: 0,
+                  transform: "translateY(20px)",
+                  animation: "fadeInUp 0.6s ease-out 1.7s forwards",
+                  "@keyframes fadeInUp": {
+                    "0%": { opacity: 0, transform: "translateY(20px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                  },
+                }}
+              >
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    background: theme.palette.background.paper,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    Recent Requirements
+                  </Typography>
+                  <Stack spacing={1.5}>
+                    {[
+                      {
+                        id: "REQ-145",
+                        title: "User Authentication System",
+                        priority: "high",
+                      },
+                      {
+                        id: "REQ-146",
+                        title: "Payment Integration",
+                        priority: "medium",
+                      },
+                      {
+                        id: "REQ-147",
+                        title: "Email Notifications",
+                        priority: "low",
+                      },
+                      {
+                        id: "REQ-148",
+                        title: "Data Export Feature",
+                        priority: "medium",
+                      },
+                    ].map((req, index) => (
+                      <Stack
+                        key={index}
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            sx={{ fontWeight: 600 }}
+                          >
+                            {req.id}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {req.title}
+                          </Typography>
+                        </Box>
+                        <Chip
+                          label={req.priority}
+                          size="small"
+                          sx={{
+                            height: 20,
+                            fontSize: "0.7rem",
+                            backgroundColor: alpha(
+                              req.priority === "high"
+                                ? theme.palette.error.main
+                                : req.priority === "medium"
+                                ? theme.palette.warning.main
+                                : theme.palette.success.main,
+                              0.1
+                            ),
+                            color:
+                              req.priority === "high"
+                                ? theme.palette.error.main
+                                : req.priority === "medium"
+                                ? theme.palette.warning.main
+                                : theme.palette.success.main,
+                          }}
+                        />
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Paper>
+              </Box>
+            </Stack>
+          </Grid>
+
+          {/* Right Column - Secondary Content */}
+          <Grid item xs={12} lg={4}>
+            <Stack spacing={3}>
+              {/* System Health */}
+              <Box
+                sx={{
+                  opacity: 0,
+                  transform: "translateY(20px)",
+                  animation: "fadeInUp 0.6s ease-out 1.9s forwards",
+                  "@keyframes fadeInUp": {
+                    "0%": { opacity: 0, transform: "translateY(20px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                  },
+                }}
+              >
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    background: theme.palette.background.paper,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    System Health
+                  </Typography>
+                  <Stack spacing={2}>
+                    {[
+                      {
+                        name: "API Status",
+                        status: "operational",
+                        color: theme.palette.success.main,
+                      },
+                      {
+                        name: "Database",
+                        status: "operational",
+                        color: theme.palette.success.main,
+                      },
+                      {
+                        name: "Cache",
+                        status: "degraded",
+                        color: theme.palette.warning.main,
+                      },
+                      {
+                        name: "CDN",
+                        status: "operational",
+                        color: theme.palette.success.main,
+                      },
+                    ].map((service, index) => (
+                      <Stack
+                        key={index}
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Typography variant="body2">{service.name}</Typography>
+                        <Box
+                          sx={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            backgroundColor: service.color,
+                          }}
+                        />
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Paper>
+              </Box>
+
+              {/* Activity Feed */}
+              <Box
+                sx={{
+                  opacity: 0,
+                  transform: "translateY(20px)",
+                  animation: "fadeInUp 0.6s ease-out 2.1s forwards",
+                  "@keyframes fadeInUp": {
+                    "0%": { opacity: 0, transform: "translateY(20px)" },
+                    "100%": { opacity: 1, transform: "translateY(0)" },
+                  },
+                }}
+              >
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    background: theme.palette.background.paper,
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                    Recent Activity
+                  </Typography>
+                  <Stack spacing={2}>
+                    {[
+                      {
+                        title: "New project created",
+                        time: "2 hours ago",
+                        icon: FolderOpen,
+                        color: theme.palette.primary.main,
+                      },
+                      {
+                        title: "Requirement updated",
+                        time: "4 hours ago",
+                        icon: Assignment,
+                        color: theme.palette.secondary.main,
+                      },
+                      {
+                        title: "Release deployed",
+                        time: "6 hours ago",
+                        icon: RocketLaunch,
+                        color: theme.palette.success.main,
+                      },
+                      {
+                        title: "Bug fixed",
+                        time: "1 day ago",
+                        icon: BugReport,
+                        color: theme.palette.warning.main,
+                      },
+                    ].map((activity, index) => (
+                      <Stack
+                        key={index}
+                        direction="row"
+                        spacing={2}
+                        alignItems="center"
                       >
                         <Box
                           sx={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: "50%",
-                            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                            width: 32,
+                            height: 32,
+                            borderRadius: 1.5,
+                            background: alpha(activity.color, 0.1),
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            color: activity.color,
                           }}
                         >
-                          <Timeline sx={{ color: "white", fontSize: 20 }} />
+                          <activity.icon sx={{ fontSize: 16 }} />
                         </Box>
-                        <Typography variant="h5" fontWeight={700}>
-                          {t("dashboard.projectsProgress")}
-                        </Typography>
-                      </Box>
-                      <Button
-                        endIcon={<ArrowForward />}
-                        sx={{
-                          textTransform: "none",
-                          fontWeight: 600,
-                          color: theme.palette.primary.main,
-                        }}
-                      >
-                        {t("dashboard.allProjects")}
-                      </Button>
-                    </Box>
-
-                    <Box sx={{ space: "y", gap: 3 }}>
-                      {projects.map((project, index) => (
-                        <Box key={index} sx={{ mb: 4 }}>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                              mb: 2,
-                            }}
-                          >
-                            <Typography variant="h6" fontWeight={600}>
-                              {project}
-                            </Typography>
-                            <Typography
-                              variant="h6"
-                              fontWeight={700}
-                              sx={{ color: theme.palette.primary.main }}
-                            >
-                              {65 + index * 10}%
-                            </Typography>
-                          </Box>
-                          <LinearProgress
-                            variant="determinate"
-                            value={65 + index * 10}
-                            sx={{
-                              height: 12,
-                              borderRadius: 6,
-                              backgroundColor: alpha(
-                                theme.palette.divider,
-                                0.08
-                              ),
-                              "& .MuiLinearProgress-bar": {
-                                borderRadius: 6,
-                                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                                boxShadow: `0 2px 8px ${alpha(
-                                  theme.palette.primary.main,
-                                  0.3
-                                )}`,
-                              },
-                            }}
-                          />
+                        <Box flex={1}>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {activity.title}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {activity.time}
+                          </Typography>
                         </Box>
-                      ))}
-                    </Box>
-                  </Paper>
-                </Fade>
-              </Grid>
-
-              {/* Недавняя активность */}
-              <Grid item xs={12} lg={4}>
-                <Fade in timeout={2000}>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 4,
-                      borderRadius: 4,
-                      border: `1px solid ${alpha(theme.palette.divider, 0.06)}`,
-                      background: `linear-gradient(135deg, 
-                        ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                        ${alpha(theme.palette.background.default, 0.4)} 100%)`,
-                      backdropFilter: "blur(20px)",
-                      height: "fit-content",
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        mb: 4,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: "50%",
-                          background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.dark})`,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <Analytics sx={{ color: "white", fontSize: 20 }} />
-                      </Box>
-                      <Typography variant="h5" fontWeight={700}>
-                        {t("dashboard.activity")}
-                      </Typography>
-                    </Box>
-
-                    <Box sx={{ space: "y", gap: 2 }}>
-                      {recentActivity.map((activity, index) => {
-                        const Icon = activity.icon;
-                        return (
-                          <Box
-                            key={index}
-                            sx={{
-                              display: "flex",
-                              alignItems: "flex-start",
-                              gap: 2,
-                              p: 2,
-                              borderRadius: 2,
-                              border: `1px solid ${alpha(activity.color, 0.1)}`,
-                              backgroundColor: alpha(activity.color, 0.03),
-                              mb: 2,
-                              transition: "all 0.2s ease",
-                              "&:hover": {
-                                backgroundColor: alpha(activity.color, 0.06),
-                                transform: "translateX(4px)",
-                              },
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: "50%",
-                                backgroundColor: alpha(activity.color, 0.1),
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexShrink: 0,
-                              }}
-                            >
-                              <Icon
-                                sx={{ fontSize: 16, color: activity.color }}
-                              />
-                            </Box>
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                              <Typography
-                                variant="body1"
-                                fontWeight={600}
-                                sx={{
-                                  mb: 0.5,
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  display: "-webkit-box",
-                                  WebkitLineClamp: 2,
-                                  WebkitBoxOrient: "vertical",
-                                }}
-                              >
-                                {activity.title}
-                              </Typography>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ fontSize: "0.8rem" }}
-                              >
-                                {activity.time}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        );
-                      })}
-                    </Box>
-
-                    <Button
-                      fullWidth
-                      endIcon={<ArrowForward />}
-                      sx={{
-                        mt: 3,
-                        textTransform: "none",
-                        fontWeight: 600,
-                        borderRadius: 2,
-                        py: 1.5,
-                        backgroundColor: alpha(
-                          theme.palette.primary.main,
-                          0.05
-                        ),
-                        color: theme.palette.primary.main,
-                        border: `1px solid ${alpha(
-                          theme.palette.primary.main,
-                          0.1
-                        )}`,
-                        "&:hover": {
-                          backgroundColor: alpha(
-                            theme.palette.primary.main,
-                            0.1
-                          ),
-                        },
-                      }}
-                    >
-                      {t("dashboard.allActivity")}
-                    </Button>
-                  </Paper>
-                </Fade>
-              </Grid>
-            </Grid>
-          </Box>
-        </Container>
-      </Box>
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Paper>
+              </Box>
+            </Stack>
+          </Grid>
+        </Grid>
+      </Container>
     </DashboardLayout>
   );
 };

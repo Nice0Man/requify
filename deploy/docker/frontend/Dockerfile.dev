@@ -15,10 +15,11 @@ COPY --chown=frontend:frontend package*.json ./
 
 # Install dependencies as non-root user
 USER frontend
-RUN npm install
 
 # Copy application code with proper ownership
 COPY --chown=frontend:frontend . .
+RUN npm i
+RUN npm audit fix --force
 
 EXPOSE 3000
 

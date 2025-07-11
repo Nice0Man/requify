@@ -1,30 +1,27 @@
 /**
  * OAuth2 API Client
- * Основано на схемах из backend/app/schemas/auth.py
+ * Интегрирован с обновленным authApi
  */
 
 import { client } from "./client";
+import { authApi } from "@/features/auth/api/authApi";
 import type {
   LoginRequest,
   LoginResponse,
   RefreshTokenRequest,
-  RefreshTokenResponse,
-  LogoutRequest,
-  LogoutResponse,
-  PasswordChangeRequest,
-  PasswordResetRequest,
-  PasswordResetConfirm,
-  TokenValidationRequest,
-  TokenValidationResponse,
+  ChangePasswordRequest,
+  ResetPasswordRequest,
+  ResetPasswordConfirmRequest,
+  ValidateTokenRequest,
+  ValidateTokenResponse,
   EmailVerificationRequest,
-  EmailVerificationConfirm,
-  EmailVerificationResponse,
-  SessionListResponse,
-  RevokeSessionRequest,
-} from "@/shared/types/auth";
+  EmailVerificationConfirmRequest,
+  UserSession,
+} from "@/features/auth/api/authApi";
 
 /**
  * OAuth2 API класс для работы с аутентификацией
+ * Использует обновленный authApi
  */
 export class OAuth2API {
   private static instance: OAuth2API;
@@ -44,36 +41,31 @@ export class OAuth2API {
   /**
    * Логин пользователя
    */
-  async login(credentials: LoginRequest): Promise<LoginResponse> {
+  async login(credentials: { username: string; password: string }): Promise<LoginResponse> {
     try {
-      // OAuth2 требует application/x-www-form-urlencoded для логина
-      const formData = new URLSearchParams();
-      formData.append('username', credentials.username);
-      formData.append('password', credentials.password);
-      
-      const response = await client.post<LoginResponse>(
-        "/auth/login",
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        }
-      );
+      // Передаем данные как есть - бэкенд ожидает username и password
+      const loginData = {
+        username: credentials.username,
+        password: credentials.password,
+      };
 
-      // Сохраняем токены
-      if (response.data.access_token) {
-        localStorage.setItem("access_token", response.data.access_token);
+      const response = await authApi.login(loginData);
+
+      // Сохраняем токены в разных форматах для совместимости
+      if (response.token) {
+        localStorage.setItem("access_token", response.token);
+        localStorage.setItem("authToken", response.token);    // Для совместимости с API client
       }
-      if (response.data.refresh_token) {
-        localStorage.setItem("refresh_token", response.data.refresh_token);
+      if (response.refreshToken) {
+        localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("refreshToken", response.refreshToken);  // Для совместимости с API client
       }
 
-      // Сохраняем время истечения
-      const expiresAt = new Date(Date.now() + response.data.expires_in * 1000);
+      // Устанавливаем время истечения (предполагаем 1 час для access token)
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
       localStorage.setItem("token_expires_at", expiresAt.toISOString());
 
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -83,37 +75,31 @@ export class OAuth2API {
   /**
    * Обновление токенов
    */
-  async refreshTokens(
-    request?: RefreshTokenRequest
-  ): Promise<RefreshTokenResponse> {
+  async refreshTokens(refreshToken?: string): Promise<LoginResponse> {
     try {
-      const refreshToken =
-        request?.refresh_token || localStorage.getItem("refresh_token");
+      const token = refreshToken || localStorage.getItem("refresh_token");
 
-      if (!refreshToken) {
+      if (!token) {
         throw new Error("No refresh token available");
       }
 
-      const response = await client.post<RefreshTokenResponse>(
-        "/auth/refresh",
-        {
-          refresh_token: refreshToken,
-        }
-      );
+      const response = await authApi.refreshToken({ refreshToken: token });
 
-      // Обновляем токены
-      if (response.data.access_token) {
-        localStorage.setItem("access_token", response.data.access_token);
+      // Обновляем токены в разных форматах для совместимости
+      if (response.token) {
+        localStorage.setItem("access_token", response.token);
+        localStorage.setItem("authToken", response.token);    // Для совместимости с API client
       }
-      if (response.data.refresh_token) {
-        localStorage.setItem("refresh_token", response.data.refresh_token);
+      if (response.refreshToken) {
+        localStorage.setItem("refresh_token", response.refreshToken);
+        localStorage.setItem("refreshToken", response.refreshToken);  // Для совместимости с API client
       }
 
       // Обновляем время истечения
-      const expiresAt = new Date(Date.now() + response.data.expires_in * 1000);
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
       localStorage.setItem("token_expires_at", expiresAt.toISOString());
 
-      return response.data;
+      return response;
     } catch (error) {
       console.error("Token refresh failed:", error);
       // Очищаем токены при неудачном обновлении
@@ -125,38 +111,23 @@ export class OAuth2API {
   /**
    * Выход из системы
    */
-  async logout(request?: LogoutRequest): Promise<LogoutResponse> {
+  async logout(): Promise<void> {
     try {
-      const refreshToken = localStorage.getItem("refresh_token");
-
-      const logoutData: LogoutRequest = {
-        refresh_token: refreshToken || undefined,
-        logout_all: request?.logout_all || false,
-      };
-
-      const response = await client.post<LogoutResponse>(
-        "/auth/logout",
-        logoutData
-      );
-
-      // Очищаем локальные токены
-      this.clearTokens();
-
-      return response.data;
+      await authApi.logout();
     } catch (error) {
       console.error("Logout failed:", error);
-      // Всегда очищаем локальные токены даже при ошибке
+    } finally {
+      // Всегда очищаем локальные токены
       this.clearTokens();
-      throw error;
     }
   }
 
   /**
    * Смена пароля
    */
-  async changePassword(request: PasswordChangeRequest): Promise<void> {
+  async changePassword(request: ChangePasswordRequest): Promise<void> {
     try {
-      await client.post("/auth/change-password", request);
+      await authApi.changePassword(request);
     } catch (error) {
       console.error("Password change failed:", error);
       throw error;
@@ -166,9 +137,9 @@ export class OAuth2API {
   /**
    * Запрос сброса пароля
    */
-  async resetPassword(request: PasswordResetRequest): Promise<void> {
+  async resetPassword(request: ResetPasswordRequest): Promise<void> {
     try {
-      await client.post("/auth/reset-password", request);
+      await authApi.resetPassword(request);
     } catch (error) {
       console.error("Password reset request failed:", error);
       throw error;
@@ -178,9 +149,9 @@ export class OAuth2API {
   /**
    * Подтверждение сброса пароля
    */
-  async confirmPasswordReset(request: PasswordResetConfirm): Promise<void> {
+  async confirmPasswordReset(request: ResetPasswordConfirmRequest): Promise<void> {
     try {
-      await client.post("/auth/reset-password/confirm", request);
+      await authApi.confirmResetPassword(request);
     } catch (error) {
       console.error("Password reset confirmation failed:", error);
       throw error;
@@ -190,15 +161,9 @@ export class OAuth2API {
   /**
    * Валидация токена
    */
-  async validateToken(
-    request: TokenValidationRequest
-  ): Promise<TokenValidationResponse> {
+  async validateToken(request: ValidateTokenRequest): Promise<ValidateTokenResponse> {
     try {
-      const response = await client.post<TokenValidationResponse>(
-        "/auth/validate",
-        request
-      );
-      return response.data;
+      return await authApi.validateToken(request);
     } catch (error) {
       console.error("Token validation failed:", error);
       throw error;
@@ -208,11 +173,9 @@ export class OAuth2API {
   /**
    * Запрос верификации email
    */
-  async requestEmailVerification(
-    request: EmailVerificationRequest
-  ): Promise<void> {
+  async requestEmailVerification(request: EmailVerificationRequest): Promise<void> {
     try {
-      await client.post("/auth/verify-email", request);
+      await authApi.requestEmailVerification(request);
     } catch (error) {
       console.error("Email verification request failed:", error);
       throw error;
@@ -222,15 +185,9 @@ export class OAuth2API {
   /**
    * Подтверждение верификации email
    */
-  async confirmEmailVerification(
-    request: EmailVerificationConfirm
-  ): Promise<EmailVerificationResponse> {
+  async confirmEmailVerification(request: EmailVerificationConfirmRequest): Promise<void> {
     try {
-      const response = await client.post<EmailVerificationResponse>(
-        "/auth/verify-email/confirm",
-        request
-      );
-      return response.data;
+      await authApi.confirmEmailVerification(request);
     } catch (error) {
       console.error("Email verification confirmation failed:", error);
       throw error;
@@ -238,12 +195,11 @@ export class OAuth2API {
   }
 
   /**
-   * Получение списка активных сессий
+   * Получение списка сессий пользователя
    */
-  async getSessions(): Promise<SessionListResponse> {
+  async getSessions(): Promise<UserSession[]> {
     try {
-      const response = await client.get<SessionListResponse>("/auth/sessions");
-      return response.data;
+      return await authApi.getUserSessions();
     } catch (error) {
       console.error("Failed to get sessions:", error);
       throw error;
@@ -251,41 +207,49 @@ export class OAuth2API {
   }
 
   /**
-   * Отзыв сессии
+   * Отзыв сессий
    */
-  async revokeSession(request: RevokeSessionRequest): Promise<void> {
+  async revokeSession(sessionIds?: string[]): Promise<void> {
     try {
-      await client.post("/auth/sessions/revoke", request);
+      await authApi.revokeSessions(sessionIds);
     } catch (error) {
-      console.error("Session revocation failed:", error);
+      console.error("Failed to revoke sessions:", error);
       throw error;
     }
   }
 
   /**
-   * Проверка авторизации
+   * Проверка аутентификации
    */
   isAuthenticated(): boolean {
-    const token = localStorage.getItem("access_token");
+    // Проверяем различные варианты хранения токенов
+    const token = localStorage.getItem("access_token") || 
+                  localStorage.getItem("authToken");
     const expiresAt = localStorage.getItem("token_expires_at");
 
-    if (!token || !expiresAt) {
+    if (!token) {
       return false;
     }
 
-    // Проверяем не истек ли токен
-    const expires = new Date(expiresAt);
-    const now = new Date();
+    if (!expiresAt) {
+      // Если нет времени истечения, считаем токен валидным (для совместимости)
+      return true;
+    }
 
-    return now < expires;
+    // Проверяем, не истёк ли токен
+    const expiryDate = new Date(expiresAt);
+    return expiryDate > new Date();
   }
 
   /**
-   * Получение текущего токена
+   * Получение access token
    */
   getAccessToken(): string | null {
     if (this.isAuthenticated()) {
-      return localStorage.getItem("access_token");
+      // Проверяем различные варианты хранения токенов
+      return localStorage.getItem("access_token") || 
+             localStorage.getItem("authToken") || 
+             null;
     }
     return null;
   }
@@ -294,7 +258,10 @@ export class OAuth2API {
    * Получение refresh token
    */
   getRefreshToken(): string | null {
-    return localStorage.getItem("refresh_token");
+    // Проверяем различные варианты хранения токенов
+    return localStorage.getItem("refresh_token") || 
+           localStorage.getItem("refreshToken") || 
+           null;
   }
 
   /**
@@ -304,39 +271,62 @@ export class OAuth2API {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("token_expires_at");
+    // Очищаем также ключи для совместимости
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("refreshToken");
   }
 
   /**
-   * Проверка нужно ли обновить токен
+   * Проверка необходимости обновления токена
    */
   shouldRefreshToken(): boolean {
     const expiresAt = localStorage.getItem("token_expires_at");
     if (!expiresAt) return false;
 
-    const expires = new Date(expiresAt);
+    const expiryDate = new Date(expiresAt);
     const now = new Date();
-    const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+    const minutesUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60);
 
     // Обновляем токен за 5 минут до истечения
-    return expires <= fiveMinutesFromNow;
+    return minutesUntilExpiry <= 5;
   }
 
   /**
-   * Автоматическое обновление токена
+   * Автоматическое обновление токена при необходимости
    */
   async autoRefreshToken(): Promise<void> {
-    if (this.shouldRefreshToken() && this.getRefreshToken()) {
-      try {
-        await this.refreshTokens();
-      } catch (error) {
-        console.error("Auto refresh failed:", error);
-        // Если автообновление не удалось, очищаем токены
-        this.clearTokens();
-        throw error;
+    if (this.shouldRefreshToken()) {
+      const refreshToken = this.getRefreshToken();
+      if (refreshToken) {
+        await this.refreshTokens(refreshToken);
       }
+    }
+  }
+
+  /**
+   * Получение информации о текущем пользователе
+   */
+  async getCurrentUser(): Promise<LoginResponse["user"]> {
+    try {
+      return await authApi.getMe();
+    } catch (error) {
+      console.error("Failed to get current user:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Обновление информации о текущем пользователе
+   */
+  async updateCurrentUser(userData: Partial<LoginResponse["user"]>): Promise<LoginResponse["user"]> {
+    try {
+      return await authApi.updateMe(userData);
+    } catch (error) {
+      console.error("Failed to update current user:", error);
+      throw error;
     }
   }
 }
 
-// Экспортируем singleton instance
+// Singleton instance
 export const oauth2API = OAuth2API.getInstance();

@@ -72,6 +72,14 @@ services:
       - APP_CONFIG__EMAIL__SMTP_SSL=false
       - APP_CONFIG__EMAIL__FROM_EMAIL=noreply@requify.local
       - APP_CONFIG__EMAIL__FROM_NAME=Requify Development
+      # Auth0 OAuth2 Configuration (демо для разработки)
+      - APP_CONFIG__AUTH0__ENABLED=false
+      - APP_CONFIG__AUTH0__DOMAIN=localhost
+      - APP_CONFIG__AUTH0__CLIENT_ID=demo-local-client-id
+      - APP_CONFIG__AUTH0__CLIENT_SECRET=demo-local-client-secret
+      - APP_CONFIG__AUTH0__AUDIENCE=https://api.requify.com
+      - APP_CONFIG__AUTH0__MANAGEMENT_CLIENT_ID=demo-management-client-id
+      - APP_CONFIG__AUTH0__MANAGEMENT_CLIENT_SECRET=demo-management-client-secret
       - PYTHONPATH=/app
       - FASTAPI_ENV=development
       - DATABASE_URL=postgresql://requify_user:requify_password@postgres:5432/requify_dev
@@ -103,8 +111,12 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost/api/v1
+      - VITE_API_BASE_URL=http://localhost/api/v1
       - NODE_ENV=development
+      # Auth0 OAuth2 Configuration (демо для разработки - ОТКЛЮЧЕНО)
+      - REACT_APP_AUTH0_DOMAIN=localhost
+      - REACT_APP_AUTH0_CLIENT_ID=demo-local-client-id
+      - REACT_APP_AUTH0_AUDIENCE=https://api.requify.com
     networks:
       - requify-dev-network
     command: npm run dev -- --host 0.0.0.0

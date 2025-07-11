@@ -12,7 +12,12 @@ export const client: AxiosInstance = axios.create({
 // Request interceptor for auth token
 client.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access_token");
+    // Проверяем различные варианты хранения токенов
+    const token = 
+      localStorage.getItem("authToken") ||           // Стандартная аутентификация
+      localStorage.getItem("access_token") ||        // OAuth2 токены 
+      localStorage.getItem("token");                 // Legacy токены
+      
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,10 +35,15 @@ client.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access - очищаем OAuth2 токены
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("token_expires_at");
+      // Handle unauthorized access - очищаем все возможные токены
+      localStorage.removeItem("authToken");          // Стандартная аутентификация
+      localStorage.removeItem("refreshToken");       // Стандартная аутентификация
+      localStorage.removeItem("access_token");       // OAuth2 токены
+      localStorage.removeItem("refresh_token");      // OAuth2 токены  
+      localStorage.removeItem("token_expires_at");   // OAuth2 токены
+      localStorage.removeItem("token");              // Legacy токены
+      
+      // Перенаправляем на страницу аутентификации
       window.location.href = "/auth";
     }
     return Promise.reject(error);

@@ -1,50 +1,48 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { CircularProgress, Box } from "@mui/material";
-import { useAuth } from "@/app/providers/AuthProvider";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { useAuth } from "@/features/auth/model/useAuth";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
 }
 
-// Компонент загрузки для Suspense fallback
-const ProtectedRouteFallback = () => (
-  <Box
-    display="flex"
-    justifyContent="center"
-    alignItems="center"
-    minHeight="100vh"
-  >
-    <CircularProgress size={40} />
-  </Box>
-);
-
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requiredRole 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  requiredRole,
 }) => {
-  const { isAuthenticated, user, isLoading, isInitialized } = useAuth();
+  const { isLoading, isAuthenticated, user } = useAuth();
   const location = useLocation();
 
-  // Показываем загрузку пока не завершена инициализация
-  if (!isInitialized || isLoading) {
-    return <ProtectedRouteFallback />;
+  // Показываем загрузку пока Auth0 инициализируется
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+        gap={2}
+      >
+        <CircularProgress size={40} />
+        <Typography variant="body2" color="text.secondary">
+          Проверка аутентификации...
+        </Typography>
+      </Box>
+    );
   }
 
-  // Если пользователь не аутентифицирован, перенаправляем на логин
+  // Если не аутентифицирован, перенаправляем на страницу входа
   if (!isAuthenticated) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Проверяем роль пользователя, если требуется
+  // Проверяем роль, если требуется
   if (requiredRole && user?.role !== requiredRole) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return (
-    <Suspense fallback={<ProtectedRouteFallback />}>
-      {children}
-    </Suspense>
-  );
+  return <>{children}</>;
 };

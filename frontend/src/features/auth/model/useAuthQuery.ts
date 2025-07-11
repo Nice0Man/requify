@@ -5,6 +5,7 @@ import { authApi } from "../api/authApi";
 export const authQueryKeys = {
   currentUser: ["auth", "currentUser"] as const,
   profile: ["auth", "profile"] as const,
+  auth0Status: ["auth", "auth0", "status"] as const,
 };
 
 // Queries
@@ -15,6 +16,16 @@ export const useCurrentUser = () => {
     retry: false,
     staleTime: 30 * 60 * 1000, // 30 минут
     gcTime: 60 * 60 * 1000, // 1 час
+  });
+};
+
+export const useAuth0Status = () => {
+  return useQuery({
+    queryKey: authQueryKeys.auth0Status,
+    queryFn: authApi.getAuth0Status,
+    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 минут
+    gcTime: 10 * 60 * 1000, // 10 минут
   });
 };
 

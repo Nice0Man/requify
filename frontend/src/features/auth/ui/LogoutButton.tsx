@@ -1,28 +1,31 @@
 import React from "react";
 import { Button } from "@mui/material";
-import { LogoutOutlined } from "@mui/icons-material";
-import { useAuth } from "../model/hooks";
-import { useTranslation } from "react-i18next";
+import { ExitToApp } from "@mui/icons-material";
+import { useAuth } from "../model/useAuth";
 
-const LogoutButton: React.FC = () => {
-  const { t } = useTranslation();
-  const { logout, isPending } = useAuth();
+interface LogoutButtonProps {
+  variant?: "contained" | "outlined" | "text";
+  size?: "small" | "medium" | "large";
+  fullWidth?: boolean;
+}
 
-  const handleLogout = () => {
-    logout();
-  };
+export const LogoutButton: React.FC<LogoutButtonProps> = ({
+  variant = "outlined",
+  size = "medium",
+  fullWidth = false,
+}) => {
+  const { logout, isLoading } = useAuth();
 
   return (
     <Button
-      onClick={handleLogout}
-      disabled={isPending}
-      startIcon={<LogoutOutlined />}
-      variant="outlined"
-      color="error"
+      variant={variant}
+      size={size}
+      fullWidth={fullWidth}
+      startIcon={<ExitToApp />}
+      onClick={() => logout()}
+      disabled={isLoading}
     >
-      {t("common.logout")}
+      Выйти
     </Button>
   );
 };
-
-export { LogoutButton };

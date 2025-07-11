@@ -16,54 +16,6 @@
         "documentation": {}
     },
     {
-        "label": "Sequence",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Sequence",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Sequence",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "Union",
-        "importPath": "typing",
-        "description": "typing",
-        "isExtraImport": true,
-        "detail": "typing",
-        "documentation": {}
-    },
-    {
         "label": "Dict",
         "importPath": "typing",
         "description": "typing",
@@ -1576,6 +1528,30 @@
         "documentation": {}
     },
     {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "List",
         "importPath": "typing",
         "description": "typing",
@@ -1765,30 +1741,6 @@
         "description": "typing",
         "isExtraImport": true,
         "detail": "typing",
-        "documentation": {}
-    },
-    {
-        "label": "op",
-        "importPath": "alembic",
-        "description": "alembic",
-        "isExtraImport": true,
-        "detail": "alembic",
-        "documentation": {}
-    },
-    {
-        "label": "op",
-        "importPath": "alembic",
-        "description": "alembic",
-        "isExtraImport": true,
-        "detail": "alembic",
-        "documentation": {}
-    },
-    {
-        "label": "op",
-        "importPath": "alembic",
-        "description": "alembic",
-        "isExtraImport": true,
-        "detail": "alembic",
         "documentation": {}
     },
     {
@@ -4026,6 +3978,14 @@
         "documentation": {}
     },
     {
+        "label": "settings",
+        "importPath": "app.core.config",
+        "description": "app.core.config",
+        "isExtraImport": true,
+        "detail": "app.core.config",
+        "documentation": {}
+    },
+    {
         "label": "os",
         "kind": 6,
         "isExtraImport": true,
@@ -5662,6 +5622,14 @@
         "documentation": {}
     },
     {
+        "label": "get_user_from_auth0_token",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
         "label": "get_db",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
@@ -6595,6 +6563,30 @@
         "description": "fastapi.security",
         "isExtraImport": true,
         "detail": "fastapi.security",
+        "documentation": {}
+    },
+    {
+        "label": "auth0_service",
+        "importPath": "app.services.auth0_service",
+        "description": "app.services.auth0_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth0_service",
+        "documentation": {}
+    },
+    {
+        "label": "auth0_service",
+        "importPath": "app.services.auth0_service",
+        "description": "app.services.auth0_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth0_service",
+        "documentation": {}
+    },
+    {
+        "label": "Auth0UserInfo",
+        "importPath": "app.services.auth0_service",
+        "description": "app.services.auth0_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth0_service",
         "documentation": {}
     },
     {
@@ -8654,6 +8646,14 @@
         "documentation": {}
     },
     {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
         "label": "BaseSettings",
         "importPath": "pydantic_settings",
         "description": "pydantic_settings",
@@ -10596,6 +10596,23 @@
         "documentation": {}
     },
     {
+        "label": "jwt",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "jwt",
+        "description": "jwt",
+        "detail": "jwt",
+        "documentation": {}
+    },
+    {
+        "label": "PyJWKClient",
+        "importPath": "jwt",
+        "description": "jwt",
+        "isExtraImport": true,
+        "detail": "jwt",
+        "documentation": {}
+    },
+    {
         "label": "MIMEText",
         "importPath": "email.mime.text",
         "description": "email.mime.text",
@@ -10930,73 +10947,19 @@
     {
         "label": "upgrade",
         "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_04_1727-76bab077d1d1_init",
-        "description": "backend.alembic.versions.2025_07_04_1727-76bab077d1d1_init",
+        "importPath": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
+        "description": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
         "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.create_table(\n        \"relationship_types\",\n        sa.Column(\"id\", sa.Integer(), nullable=False),\n        sa.Column(\"name\", sa.String(length=50), nullable=False),\n        sa.PrimaryKeyConstraint(\"id\", name=op.f(\"pk_relationship_types\")),\n        sa.UniqueConstraint(\"name\", name=op.f(\"uq_relationship_types_name\")),\n    )",
-        "detail": "backend.alembic.versions.2025_07_04_1727-76bab077d1d1_init",
+        "detail": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
         "documentation": {}
     },
     {
         "label": "downgrade",
         "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_04_1727-76bab077d1d1_init",
-        "description": "backend.alembic.versions.2025_07_04_1727-76bab077d1d1_init",
-        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_table(\"test_results\")\n    op.drop_table(\"relationships\")\n    op.drop_index(\n        op.f(\"ix_dashboard_notifications_id\"), table_name=\"dashboard_notifications\"\n    )\n    op.drop_table(\"dashboard_notifications\")\n    op.drop_index(op.f(\"ix_dashboard_activities_id\"), table_name=\"dashboard_activities\")",
-        "detail": "backend.alembic.versions.2025_07_04_1727-76bab077d1d1_init",
-        "documentation": {}
-    },
-    {
-        "label": "upgrade",
-        "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_05_1922-d4c4c4e08f2b_add_progress_to_requirements",
-        "description": "backend.alembic.versions.2025_07_05_1922-d4c4c4e08f2b_add_progress_to_requirements",
-        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    # Добавляем поле как nullable сначала\n    op.add_column(\n        \"requirements\",\n        sa.Column(\n            \"progress\",\n            sa.Float(),\n            nullable=True,",
-        "detail": "backend.alembic.versions.2025_07_05_1922-d4c4c4e08f2b_add_progress_to_requirements",
-        "documentation": {}
-    },
-    {
-        "label": "downgrade",
-        "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_05_1922-d4c4c4e08f2b_add_progress_to_requirements",
-        "description": "backend.alembic.versions.2025_07_05_1922-d4c4c4e08f2b_add_progress_to_requirements",
-        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_column(\"requirements\", \"progress\")\n    # ### end Alembic commands ###",
-        "detail": "backend.alembic.versions.2025_07_05_1922-d4c4c4e08f2b_add_progress_to_requirements",
-        "documentation": {}
-    },
-    {
-        "label": "upgrade",
-        "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
-        "description": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
-        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.create_table(\n        \"teams\",\n        sa.Column(\"id\", sa.Integer(), nullable=False),\n        sa.Column(\n            \"name\", sa.String(length=100), nullable=False, comment=\"Название команды\"\n        ),\n        sa.Column(",
-        "detail": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
-        "documentation": {}
-    },
-    {
-        "label": "downgrade",
-        "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
-        "description": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
-        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_constraint(\n        op.f(\"fk_projects_team_id_teams\"), \"projects\", type_=\"foreignkey\"\n    )\n    op.drop_column(\"projects\", \"team_id\")\n    op.drop_constraint(\n        op.f(\"fk_dashboard_notifications_team_id_teams\"),\n        \"dashboard_notifications\",",
-        "detail": "backend.alembic.versions.2025_07_06_2008-74cecc91d56f_addteam_tables",
-        "documentation": {}
-    },
-    {
-        "label": "upgrade",
-        "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_07_1640-2e47ba22f656_add_team_functionality",
-        "description": "backend.alembic.versions.2025_07_07_1640-2e47ba22f656_add_team_functionality",
-        "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    pass\n    # ### end Alembic commands ###\ndef downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    pass\n    # ### end Alembic commands ###",
-        "detail": "backend.alembic.versions.2025_07_07_1640-2e47ba22f656_add_team_functionality",
-        "documentation": {}
-    },
-    {
-        "label": "downgrade",
-        "kind": 2,
-        "importPath": "backend.alembic.versions.2025_07_07_1640-2e47ba22f656_add_team_functionality",
-        "description": "backend.alembic.versions.2025_07_07_1640-2e47ba22f656_add_team_functionality",
-        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    pass\n    # ### end Alembic commands ###",
-        "detail": "backend.alembic.versions.2025_07_07_1640-2e47ba22f656_add_team_functionality",
+        "importPath": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
+        "description": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_table(\"test_results\")\n    op.drop_table(\"relationships\")\n    op.drop_index(op.f(\"ix_dashboard_notifications_id\"), table_name=\"dashboard_notifications\")\n    op.drop_table(\"dashboard_notifications\")\n    op.drop_index(op.f(\"ix_dashboard_activities_id\"), table_name=\"dashboard_activities\")\n    op.drop_table(\"dashboard_activities\")\n    op.drop_table(\"comments\")",
+        "detail": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
         "documentation": {}
     },
     {
@@ -11284,6 +11247,15 @@
         "importPath": "backend.app.core.config",
         "description": "backend.app.core.config",
         "peekOfCode": "class TestDatabaseConfig(BaseModel):\n    name: str = \"requify-test-db\"\n    password: str = \"postgres\"\n    user: str = \"postgres\"\n    host: str = \"localhost\"\n    port: int = 5432  # Use same port as main DB for testing\n    # Connection pool settings - smaller for testing\n    pool_size: int = 3\n    max_overflow: int = 2\n    pool_pre_ping: bool = True",
+        "detail": "backend.app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "Auth0Config",
+        "kind": 6,
+        "importPath": "backend.app.core.config",
+        "description": "backend.app.core.config",
+        "peekOfCode": "class Auth0Config(BaseModel):\n    \"\"\"Настройки Auth0 OAuth2.\"\"\"\n    domain: str = \"\"\n    client_id: str = \"\"\n    client_secret: str = \"\"\n    audience: str = \"https://api.requify.com\"\n    algorithms: list[str] = [\"RS256\"]\n    issuer: str = \"\"  # Will be set based on domain\n    # Настройки для управления пользователями\n    management_client_id: str = \"\"",
         "detail": "backend.app.core.config",
         "documentation": {}
     },
@@ -14696,6 +14668,42 @@
         "description": "backend.app.schemas.user",
         "peekOfCode": "class EmailVerificationConfirm(BaseModel):\n    \"\"\"Схема для подтверждения верификации email.\"\"\"\n    token: str = Field(..., description=\"Токен верификации email\")\n    @field_validator(\"token\")\n    def validate_token(cls, v):\n        \"\"\"Валидация токена\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Verification token cannot be empty\")\n        return v.strip()",
         "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "Auth0UserInfo",
+        "kind": 6,
+        "importPath": "backend.app.services.auth0_service",
+        "description": "backend.app.services.auth0_service",
+        "peekOfCode": "class Auth0UserInfo(BaseModel):\n    \"\"\"Модель информации о пользователе из Auth0.\"\"\"\n    sub: str  # Auth0 user ID\n    email: Optional[str] = None\n    email_verified: Optional[bool] = None\n    name: Optional[str] = None\n    picture: Optional[str] = None\n    given_name: Optional[str] = None\n    family_name: Optional[str] = None\n    nickname: Optional[str] = None",
+        "detail": "backend.app.services.auth0_service",
+        "documentation": {}
+    },
+    {
+        "label": "Auth0Service",
+        "kind": 6,
+        "importPath": "backend.app.services.auth0_service",
+        "description": "backend.app.services.auth0_service",
+        "peekOfCode": "class Auth0Service:\n    \"\"\"Сервис для работы с Auth0 OAuth2.\"\"\"\n    def __init__(self):\n        self.config = settings.auth0\n        self.domain = self.config.domain\n        self.client_id = self.config.client_id\n        self.client_secret = self.config.client_secret\n        self.audience = self.config.audience\n        self.algorithms = self.config.algorithms\n        self.issuer = self.config.issuer or f\"https://{self.domain}/\"",
+        "detail": "backend.app.services.auth0_service",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "backend.app.services.auth0_service",
+        "description": "backend.app.services.auth0_service",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass Auth0UserInfo(BaseModel):\n    \"\"\"Модель информации о пользователе из Auth0.\"\"\"\n    sub: str  # Auth0 user ID\n    email: Optional[str] = None\n    email_verified: Optional[bool] = None\n    name: Optional[str] = None\n    picture: Optional[str] = None\n    given_name: Optional[str] = None\n    family_name: Optional[str] = None",
+        "detail": "backend.app.services.auth0_service",
+        "documentation": {}
+    },
+    {
+        "label": "auth0_service",
+        "kind": 5,
+        "importPath": "backend.app.services.auth0_service",
+        "description": "backend.app.services.auth0_service",
+        "peekOfCode": "auth0_service = Auth0Service()",
+        "detail": "backend.app.services.auth0_service",
         "documentation": {}
     },
     {

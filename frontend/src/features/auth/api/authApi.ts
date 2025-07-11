@@ -1,6 +1,15 @@
-import { client } from "../../../shared/api/client";
+import { client } from "@/shared/api/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
+
+// === Базовые типы для аутентификации ===
 
 export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  name: string;
   email: string;
   password: string;
 }
@@ -16,48 +25,183 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
-export interface RegisterRequest {
-  name: string;
-  email: string;
-  password: string;
-}
-
 export interface RefreshTokenRequest {
   refreshToken: string;
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordConfirmRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface EmailVerificationRequest {
+  email: string;
+}
+
+export interface EmailVerificationConfirmRequest {
+  token: string;
+}
+
+export interface ValidateTokenRequest {
+  token: string;
+}
+
+export interface ValidateTokenResponse {
+  valid: boolean;
+  user?: LoginResponse["user"];
+}
+
+export interface UserSession {
+  id: string;
+  deviceInfo: string;
+  ipAddress: string;
+  createdAt: string;
+  lastUsed: string;
+  isActive: boolean;
+}
+
+export interface Auth0StatusResponse {
+  enabled: boolean;
+  domain: string | null;
+  audience: string | null;
+}
+
+export interface Auth0UserInfo {
+  sub: string;
+  name: string;
+  email: string;
+  picture?: string;
+  [key: string]: any;
+}
+
+// === Auth API ===
+
 export const authApi = {
+  // === Основная аутентификация ===
+
   async login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await client.post("/auth/login", data);
+    // OAuth2 API ожидает form data, не JSON
+    const formData = new URLSearchParams();
+    formData.append('username', data.username);
+    formData.append('password', data.password);
+    
+    const response = await client.post(API_ENDPOINTS.AUTH.LOGIN, formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
     return response.data;
   },
 
   async register(data: RegisterRequest): Promise<LoginResponse> {
-    const response = await client.post("/auth/register", data);
+    const response = await client.post(API_ENDPOINTS.AUTH.REGISTER, data);
     return response.data;
   },
 
   async logout(): Promise<void> {
-    await client.post("/auth/logout");
-  },
-
-  async getMe(): Promise<LoginResponse["user"]> {
-    const response = await client.get("/auth/me");
-    return response.data;
+    await client.post(API_ENDPOINTS.AUTH.LOGOUT);
   },
 
   async refreshToken(data: RefreshTokenRequest): Promise<LoginResponse> {
-    const response = await client.post("/auth/refresh", {
+    const response = await client.post(API_ENDPOINTS.AUTH.REFRESH, {
       refreshToken: data.refreshToken,
     });
     return response.data;
   },
 
-  async forgotPassword(email: string): Promise<void> {
-    await client.post("/auth/forgot-password", { email });
+  async validateToken(
+    data: ValidateTokenRequest
+  ): Promise<ValidateTokenResponse> {
+    const response = await client.post(API_ENDPOINTS.AUTH.VALIDATE_TOKEN, data);
+    return response.data;
   },
 
-  async resetPassword(token: string, password: string): Promise<void> {
-    await client.post("/auth/reset-password", { token, password });
+  // === Управление паролем ===
+
+  async changePassword(data: ChangePasswordRequest): Promise<void> {
+    await client.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
+  },
+
+  async resetPassword(data: ResetPasswordRequest): Promise<void> {
+    await client.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
+  },
+
+  async confirmResetPassword(data: ResetPasswordConfirmRequest): Promise<void> {
+    await client.post(API_ENDPOINTS.AUTH.RESET_PASSWORD_CONFIRM, data);
+  },
+
+  // === Верификация email ===
+
+  async requestEmailVerification(
+    data: EmailVerificationRequest
+  ): Promise<void> {
+    await client.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL_REQUEST, data);
+  },
+
+  async confirmEmailVerification(
+    data: EmailVerificationConfirmRequest
+  ): Promise<void> {
+    await client.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL_CONFIRM, data);
+  },
+
+  // === Управление сессиями ===
+
+  async getUserSessions(): Promise<UserSession[]> {
+    const response = await client.get(API_ENDPOINTS.AUTH.SESSIONS);
+    return response.data;
+  },
+
+  async revokeSessions(sessionIds?: string[]): Promise<void> {
+    await client.post(API_ENDPOINTS.AUTH.SESSIONS_REVOKE, { sessionIds });
+  },
+
+  // === Auth0 OAuth2 ===
+
+  async auth0Callback(code: string, state?: string): Promise<LoginResponse> {
+    const response = await client.post(API_ENDPOINTS.AUTH.OAUTH2_AUTH0, {
+      code,
+      state,
+    });
+    return response.data;
+  },
+
+  async getAuth0UserInfo(): Promise<Auth0UserInfo> {
+    const response = await client.get(API_ENDPOINTS.AUTH.OAUTH2_AUTH0_USERINFO);
+    return response.data;
+  },
+
+  async getAuth0Status(): Promise<Auth0StatusResponse> {
+    const response = await client.get(API_ENDPOINTS.AUTH.OAUTH2_AUTH0_STATUS);
+    return response.data;
+  },
+
+  // === Информация о пользователе ===
+
+  async getMe(): Promise<LoginResponse["user"]> {
+    const response = await client.get(API_ENDPOINTS.USERS.ME);
+    return response.data;
+  },
+
+  async updateMe(
+    userData: Partial<LoginResponse["user"]>
+  ): Promise<LoginResponse["user"]> {
+    const response = await client.put(API_ENDPOINTS.USERS.UPDATE_ME, userData);
+    return response.data;
+  },
+
+  // === Устаревшие методы (для обратной совместимости) ===
+
+  /** @deprecated Используйте resetPassword */
+  async forgotPassword(email: string): Promise<void> {
+    await this.resetPassword({ email });
   },
 };

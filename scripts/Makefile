@@ -75,6 +75,12 @@ help:	## Show this help message
 	@echo "  email-test         - Test email configuration"
 	@echo "  email-mailhog      - Test MailHog email setup"
 	@echo ""
+	@echo "AUTH0 CONFIGURATION:"
+	@echo "  auth0-demo         - Setup Auth0 demo mode (development)"
+	@echo "  auth0-status       - Check Auth0 configuration status"
+	@echo "  auth0-setup        - Display Auth0 setup instructions"
+	@echo "  auth0-test         - Test Auth0 configuration fixes"
+	@echo ""
 	@echo "UTILITIES:"
 	@echo "  shell-backend      - Open shell in backend container"
 	@echo "  shell-frontend     - Open shell in frontend container"
@@ -354,4 +360,63 @@ email-status:	## Show email service status and configuration
 	@echo "Backend API:    http://localhost:8000"
 	@echo ""
 	@echo "=== Container Status ==="
-	cd ../deploy/docker && docker compose -f docker-compose.dev.yml ps 
+	cd ../deploy/docker && docker compose -f docker-compose.dev.yml ps
+
+# =============================================================================
+# Auth0 Configuration
+# =============================================================================
+
+auth0-demo:	## Setup Auth0 demo mode (development)
+	@echo "=== Настройка Auth0 демо-режима ==="
+	@echo ""
+	@echo "Auth0 настроен в демо-режиме для локальной разработки:"
+	@echo "  - ENABLED: false (отключен)"
+	@echo "  - DOMAIN: localhost"
+	@echo "  - CLIENT_ID: demo-local-client-id"
+	@echo ""
+	@echo "Приложение будет работать со стандартной аутентификацией."
+	@echo "Для настройки реального Auth0 используйте: make auth0-setup"
+	@echo ""
+	@echo "Перезапуск сервисов для применения изменений..."
+	$(MAKE) restart-backend
+	$(MAKE) restart-frontend
+
+auth0-status:	## Check Auth0 configuration status
+	@echo "=== Auth0 Configuration Status ==="
+	@echo ""
+	@echo "Backend configuration:"
+	@cd ../deploy/docker && docker compose -f docker-compose.dev.yml exec backend env | grep -i auth0 || echo "  No Auth0 environment variables found"
+	@echo ""
+	@echo "Frontend configuration:"
+	@cd ../deploy/docker && docker compose -f docker-compose.dev.yml exec frontend env | grep -i auth0 || echo "  No Auth0 environment variables found"
+	@echo ""
+	@echo "Auth0 API status:"
+	@powershell -Command "try { $$response = Invoke-RestMethod -Uri 'http://localhost:8000/api/v1/auth/oauth2/auth0/status' -Method Get -TimeoutSec 5; Write-Host '  Enabled:' $$response.enabled; Write-Host '  Domain:' $$response.domain; Write-Host '  Audience:' $$response.audience } catch { Write-Host '  API не отвечает или Auth0 не настроен' }"
+
+auth0-setup:	## Display Auth0 setup instructions
+	@echo "==============================================="
+	@echo "          Настройка Auth0 для Requify"
+	@echo "==============================================="
+	@echo ""
+	@echo "📁 Инструкции находятся в файле:"
+	@echo "   frontend/AUTH0_SETUP_INSTRUCTIONS.md"
+	@echo ""
+	@echo "🚀 Быстрый старт для локальной разработки:"
+	@echo "   1. Создайте файл frontend/.env.local"
+	@echo "   2. Добавьте настройки из инструкции"
+	@echo "   3. Перезапустите сервисы: make restart-frontend"
+	@echo ""
+	@echo "🔧 Для продакшена:"
+	@echo "   1. Создайте Auth0 tenant на https://auth0.com"
+	@echo "   2. Настройте Single Page Application"
+	@echo "   3. Обновите конфигурацию в backend/env.production.auth0"
+	@echo ""
+	@echo "💡 Текущий режим: ДЕМО (Auth0 отключен)"
+	@echo "   Приложение работает со стандартной аутентификацией"
+	@echo ""
+	@echo "Открыть инструкции в браузере? (y/n)"
+	@powershell -Command "$$input = Read-Host; if ($$input -eq 'y' -or $$input -eq 'Y') { Start-Process 'https://github.com/auth0/auth0-react#readme' }"
+
+auth0-test:	## Test Auth0 configuration fixes
+	@echo "Запуск тестирования исправлений Auth0..."
+	@powershell -ExecutionPolicy Bypass -File test-auth0-fix.ps1 

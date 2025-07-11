@@ -4,6 +4,7 @@
  */
 
 import { client } from "@/shared/api/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
 import type {
   User,
   UserCreate,
@@ -162,7 +163,7 @@ export class UserDAO {
    */
   async getCurrentUserProfile(): Promise<UserProfile> {
     try {
-      const response = await client.get<UserProfile>("/users/me");
+      const response = await client.get<UserProfile>(API_ENDPOINTS.USERS.ME);
       return response.data;
     } catch (error) {
       console.error("Failed to get current user profile:", error);
@@ -175,7 +176,7 @@ export class UserDAO {
    */
   async updateCurrentUserProfile(userData: UserUpdate): Promise<UserProfile> {
     try {
-      const response = await client.put<UserProfile>("/users/me", userData);
+      const response = await client.put<UserProfile>(API_ENDPOINTS.USERS.UPDATE_ME, userData);
       return response.data;
     } catch (error) {
       console.error("Failed to update current user profile:", error);
@@ -203,7 +204,7 @@ export class UserDAO {
    */
   async changePassword(data: UserPasswordChange): Promise<void> {
     try {
-      await client.post("/users/me/change-password", data);
+      await client.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
     } catch (error) {
       console.error("Failed to change password:", error);
       throw error;
@@ -215,7 +216,7 @@ export class UserDAO {
    */
   async requestPasswordReset(data: UserPasswordReset): Promise<void> {
     try {
-      await client.post("/users/reset-password", data);
+      await client.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
     } catch (error) {
       console.error("Failed to request password reset:", error);
       throw error;
@@ -227,7 +228,7 @@ export class UserDAO {
    */
   async confirmPasswordReset(data: UserPasswordResetConfirm): Promise<void> {
     try {
-      await client.post("/users/reset-password/confirm", data);
+      await client.post(API_ENDPOINTS.AUTH.RESET_PASSWORD_CONFIRM, data);
     } catch (error) {
       console.error("Failed to confirm password reset:", error);
       throw error;
@@ -243,7 +244,7 @@ export class UserDAO {
     data: EmailVerificationRequest
   ): Promise<void> {
     try {
-      await client.post("/users/verify-email", data);
+      await client.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL_REQUEST, data);
     } catch (error) {
       console.error("Failed to request email verification:", error);
       throw error;
@@ -257,7 +258,7 @@ export class UserDAO {
     data: EmailVerificationConfirm
   ): Promise<void> {
     try {
-      await client.post("/users/verify-email/confirm", data);
+      await client.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL_CONFIRM, data);
     } catch (error) {
       console.error("Failed to confirm email verification:", error);
       throw error;

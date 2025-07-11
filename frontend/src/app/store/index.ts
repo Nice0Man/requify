@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { authSlice } from '@/features/auth';
 import { dashboardSlice } from '@/features/dashboard';
 import { projectManagementSlice } from '@/features/project-management';
 import { requirementManagementSlice } from '@/features/requirement-management';
@@ -11,7 +10,6 @@ import { adminPanelSlice } from '@/features/admin-panel';
 
 export const store = configureStore({
   reducer: {
-    auth: authSlice.reducer,
     dashboard: dashboardSlice.reducer,
     projectManagement: projectManagementSlice.reducer,
     requirementManagement: requirementManagementSlice.reducer,
