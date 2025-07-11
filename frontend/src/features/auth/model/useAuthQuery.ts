@@ -36,9 +36,18 @@ export const useLoginMutation = () => {
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
-      // Сохраняем токен в localStorage
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      // Сохраняем токены (проверяем оба формата для совместимости)
+      const accessToken = data.access_token || data.token;
+      const refreshToken = data.refresh_token || data.refreshToken;
+      
+      if (accessToken) {
+        localStorage.setItem("authToken", accessToken);
+        localStorage.setItem("access_token", accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("refresh_token", refreshToken);
+      }
 
       // Обновляем кэш пользователя
       queryClient.setQueryData(authQueryKeys.currentUser, data.user);
@@ -58,9 +67,18 @@ export const useRegisterMutation = () => {
   return useMutation({
     mutationFn: authApi.register,
     onSuccess: (data) => {
-      // Сохраняем токен в localStorage
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      // Сохраняем токены (проверяем оба формата для совместимости)
+      const accessToken = data.access_token || data.token;
+      const refreshToken = data.refresh_token || data.refreshToken;
+      
+      if (accessToken) {
+        localStorage.setItem("authToken", accessToken);
+        localStorage.setItem("access_token", accessToken);
+      }
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("refresh_token", refreshToken);
+      }
 
       // Обновляем кэш пользователя
       queryClient.setQueryData(authQueryKeys.currentUser, data.user);

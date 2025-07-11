@@ -21,8 +21,13 @@ export interface LoginResponse {
     name: string;
     role: string;
   };
-  token: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+  // Для обратной совместимости
+  token?: string;
+  refreshToken?: string;
 }
 
 export interface RefreshTokenRequest {
@@ -91,12 +96,12 @@ export const authApi = {
   async login(data: LoginRequest): Promise<LoginResponse> {
     // OAuth2 API ожидает form data, не JSON
     const formData = new URLSearchParams();
-    formData.append('username', data.username);
-    formData.append('password', data.password);
-    
+    formData.append("username", data.username);
+    formData.append("password", data.password);
+
     const response = await client.post(API_ENDPOINTS.AUTH.LOGIN, formData, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
       },
     });
     return response.data;

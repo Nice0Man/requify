@@ -93,13 +93,22 @@ export const useAuth = () => {
         }));
 
         const response = await authApi.login({
-          email: credentials.username, // В нашем API используется email
+          username: credentials.username,
           password: credentials.password,
         });
 
-        // Сохраняем токены
-        localStorage.setItem("authToken", response.token);
-        localStorage.setItem("refreshToken", response.refreshToken);
+        // Сохраняем токены (проверяем оба формата для совместимости)
+        const accessToken = response.access_token || response.token;
+        const refreshToken = response.refresh_token || response.refreshToken;
+        
+        if (accessToken) {
+          localStorage.setItem("authToken", accessToken);
+          localStorage.setItem("access_token", accessToken);
+        }
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+          localStorage.setItem("refresh_token", refreshToken);
+        }
 
         setStandardAuthState({
           user: response.user as unknown as User,
@@ -143,9 +152,18 @@ export const useAuth = () => {
           password: data.password,
         });
 
-        // Сохраняем токены
-        localStorage.setItem("authToken", response.token);
-        localStorage.setItem("refreshToken", response.refreshToken);
+        // Сохраняем токены (проверяем оба формата для совместимости)
+        const accessToken = response.access_token || response.token;
+        const refreshToken = response.refresh_token || response.refreshToken;
+        
+        if (accessToken) {
+          localStorage.setItem("authToken", accessToken);
+          localStorage.setItem("access_token", accessToken);
+        }
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+          localStorage.setItem("refresh_token", refreshToken);
+        }
 
         setStandardAuthState({
           user: response.user as unknown as User,

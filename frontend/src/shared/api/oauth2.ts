@@ -41,7 +41,10 @@ export class OAuth2API {
   /**
    * Логин пользователя
    */
-  async login(credentials: { username: string; password: string }): Promise<LoginResponse> {
+  async login(credentials: {
+    username: string;
+    password: string;
+  }): Promise<LoginResponse> {
     try {
       // Передаем данные как есть - бэкенд ожидает username и password
       const loginData = {
@@ -52,13 +55,16 @@ export class OAuth2API {
       const response = await authApi.login(loginData);
 
       // Сохраняем токены в разных форматах для совместимости
-      if (response.token) {
-        localStorage.setItem("access_token", response.token);
-        localStorage.setItem("authToken", response.token);    // Для совместимости с API client
+      const accessToken = response.access_token || response.token;
+      const refreshToken = response.refresh_token || response.refreshToken;
+
+      if (accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        localStorage.setItem("authToken", accessToken); // Для совместимости с API client
       }
-      if (response.refreshToken) {
-        localStorage.setItem("refresh_token", response.refreshToken);
-        localStorage.setItem("refreshToken", response.refreshToken);  // Для совместимости с API client
+      if (refreshToken) {
+        localStorage.setItem("refresh_token", refreshToken);
+        localStorage.setItem("refreshToken", refreshToken); // Для совместимости с API client
       }
 
       // Устанавливаем время истечения (предполагаем 1 час для access token)
@@ -75,9 +81,9 @@ export class OAuth2API {
   /**
    * Обновление токенов
    */
-  async refreshTokens(refreshToken?: string): Promise<LoginResponse> {
+  async refreshTokens(_refreshToken?: string): Promise<LoginResponse> {
     try {
-      const token = refreshToken || localStorage.getItem("refresh_token");
+      const token = _refreshToken || localStorage.getItem("refresh_token");
 
       if (!token) {
         throw new Error("No refresh token available");
@@ -86,13 +92,16 @@ export class OAuth2API {
       const response = await authApi.refreshToken({ refreshToken: token });
 
       // Обновляем токены в разных форматах для совместимости
-      if (response.token) {
-        localStorage.setItem("access_token", response.token);
-        localStorage.setItem("authToken", response.token);    // Для совместимости с API client
+      const accessToken = response.access_token || response.token;
+      const refreshToken = response.refresh_token || response.refreshToken;
+
+      if (accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        localStorage.setItem("authToken", accessToken); // Для совместимости с API client
       }
-      if (response.refreshToken) {
-        localStorage.setItem("refresh_token", response.refreshToken);
-        localStorage.setItem("refreshToken", response.refreshToken);  // Для совместимости с API client
+      if (refreshToken) {
+        localStorage.setItem("refresh_token", refreshToken);
+        localStorage.setItem("refreshToken", refreshToken); // Для совместимости с API client
       }
 
       // Обновляем время истечения
@@ -149,7 +158,9 @@ export class OAuth2API {
   /**
    * Подтверждение сброса пароля
    */
-  async confirmPasswordReset(request: ResetPasswordConfirmRequest): Promise<void> {
+  async confirmPasswordReset(
+    request: ResetPasswordConfirmRequest
+  ): Promise<void> {
     try {
       await authApi.confirmResetPassword(request);
     } catch (error) {
@@ -161,7 +172,9 @@ export class OAuth2API {
   /**
    * Валидация токена
    */
-  async validateToken(request: ValidateTokenRequest): Promise<ValidateTokenResponse> {
+  async validateToken(
+    request: ValidateTokenRequest
+  ): Promise<ValidateTokenResponse> {
     try {
       return await authApi.validateToken(request);
     } catch (error) {
@@ -173,7 +186,9 @@ export class OAuth2API {
   /**
    * Запрос верификации email
    */
-  async requestEmailVerification(request: EmailVerificationRequest): Promise<void> {
+  async requestEmailVerification(
+    request: EmailVerificationRequest
+  ): Promise<void> {
     try {
       await authApi.requestEmailVerification(request);
     } catch (error) {
@@ -185,7 +200,9 @@ export class OAuth2API {
   /**
    * Подтверждение верификации email
    */
-  async confirmEmailVerification(request: EmailVerificationConfirmRequest): Promise<void> {
+  async confirmEmailVerification(
+    request: EmailVerificationConfirmRequest
+  ): Promise<void> {
     try {
       await authApi.confirmEmailVerification(request);
     } catch (error) {
@@ -223,8 +240,8 @@ export class OAuth2API {
    */
   isAuthenticated(): boolean {
     // Проверяем различные варианты хранения токенов
-    const token = localStorage.getItem("access_token") || 
-                  localStorage.getItem("authToken");
+    const token =
+      localStorage.getItem("access_token") || localStorage.getItem("authToken");
     const expiresAt = localStorage.getItem("token_expires_at");
 
     if (!token) {
@@ -247,9 +264,11 @@ export class OAuth2API {
   getAccessToken(): string | null {
     if (this.isAuthenticated()) {
       // Проверяем различные варианты хранения токенов
-      return localStorage.getItem("access_token") || 
-             localStorage.getItem("authToken") || 
-             null;
+      return (
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("authToken") ||
+        null
+      );
     }
     return null;
   }
@@ -259,9 +278,11 @@ export class OAuth2API {
    */
   getRefreshToken(): string | null {
     // Проверяем различные варианты хранения токенов
-    return localStorage.getItem("refresh_token") || 
-           localStorage.getItem("refreshToken") || 
-           null;
+    return (
+      localStorage.getItem("refresh_token") ||
+      localStorage.getItem("refreshToken") ||
+      null
+    );
   }
 
   /**
@@ -285,7 +306,8 @@ export class OAuth2API {
 
     const expiryDate = new Date(expiresAt);
     const now = new Date();
-    const minutesUntilExpiry = (expiryDate.getTime() - now.getTime()) / (1000 * 60);
+    const minutesUntilExpiry =
+      (expiryDate.getTime() - now.getTime()) / (1000 * 60);
 
     // Обновляем токен за 5 минут до истечения
     return minutesUntilExpiry <= 5;
@@ -318,7 +340,9 @@ export class OAuth2API {
   /**
    * Обновление информации о текущем пользователе
    */
-  async updateCurrentUser(userData: Partial<LoginResponse["user"]>): Promise<LoginResponse["user"]> {
+  async updateCurrentUser(
+    userData: Partial<LoginResponse["user"]>
+  ): Promise<LoginResponse["user"]> {
     try {
       return await authApi.updateMe(userData);
     } catch (error) {
