@@ -423,3 +423,4 @@ class CRUDTeamMember(CRUDBase[TeamMember, TeamMemberCreate, TeamMemberUpdate]):
 # Создаем экземпляры CRUD
 team = CRUDTeam(Team)
 team_member = CRUDTeamMember(TeamMember)
+ 

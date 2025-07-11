@@ -20,6 +20,7 @@ class UserBase(BaseModel):
     last_name: Optional[str] = Field(None, description="Фамилия пользователя")
     department: Optional[str] = Field(None, description="Отдел пользователя")
     phone: Optional[str] = Field(None, description="Телефон пользователя")
+    auth0_id: Optional[str] = Field(None, description="Auth0 ID пользователя")
 
     
     @field_validator("username")
@@ -241,6 +242,7 @@ class UserUpdate(BaseModel):
     last_name: Optional[str] = Field(None, description="Фамилия пользователя")
     department: Optional[str] = Field(None, description="Отдел пользователя")
     phone: Optional[str] = Field(None, description="Телефон пользователя")
+    auth0_id: Optional[str] = Field(None, description="Auth0 ID пользователя")
 
     @field_validator("username")
     def validate_username(cls, v):

@@ -48,6 +48,23 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_auth0_id(
+        self, db: AsyncSession, *, auth0_id: str
+    ) -> Optional[User]:
+        """
+        Получить пользователя по Auth0 ID.
+
+        Args:
+            db: Сессия базы данных
+            auth0_id: Auth0 ID пользователя
+
+        Returns:
+            Пользователь или None если не найден
+        """
+        stmt = select(User).where(User.auth0_id == auth0_id)
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def create(self, db: AsyncSession, *, obj_in: UserCreate) -> User:
         """
         Создать нового пользователя с хэшированным паролем.

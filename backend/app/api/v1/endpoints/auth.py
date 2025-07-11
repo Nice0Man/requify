@@ -19,7 +19,9 @@ from app.api.deps import (
     get_current_user,
     get_current_active_user,
     get_optional_user,
+    get_user_from_auth0_token,
 )
+from app.services.auth0_service import auth0_service
 from app.core.config import settings
 from app.core.security import (
     JWTTokenManager,
@@ -903,3 +905,140 @@ def _get_user_scopes(user: User) -> list[str]:
         )
 
     return scopes
+
+
+# === Auth0 OAuth2 Endpoints ===
+
+
+@router.post("/oauth2/auth0", response_model=LoginResponse)
+async def auth0_oauth2_callback(
+    request: Request,
+    token: str,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """
+    Auth0 OAuth2 callback endpoint для обработки токенов от Auth0.
+
+    Args:
+        request: HTTP запрос
+        token: JWT токен от Auth0
+        db: Сессия базы данных
+
+    Returns:
+        LoginResponse: Токены доступа и информация о пользователе
+
+    Raises:
+        HTTPException: Если токен невалидный или произошла ошибка
+    """
+    if not auth0_service.is_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="Auth0 is not configured",
+        )
+
+    # Получаем пользователя из Auth0 токена
+    user = await get_user_from_auth0_token(token, db)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Auth0 token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Проверяем активность пользователя
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User account is deactivated",
+        )
+
+    # Получаем информацию о клиенте
+    ip_address = get_client_ip(request)
+    user_agent = get_user_agent(request)
+
+    # Создаем refresh токен в базе данных
+    refresh_token_expires = timedelta(days=settings.security.refresh_token_expire_days)
+    refresh_token_record = await crud_refresh_token.create_for_user(
+        db,
+        user_id=user.id,
+        expires_at=datetime.now(UTC).replace(tzinfo=None) + refresh_token_expires,
+        user_agent=user_agent,
+        ip_address=ip_address,
+    )
+
+    # Создаем JWT токены
+    access_token_expires = timedelta(
+        minutes=settings.security.access_token_expire_minutes
+    )
+
+    access_token = JWTTokenManager.create_access_token(
+        subject=user.email,
+        user_id=user.id,
+        scopes=_get_user_scopes(user),
+        expires_delta=access_token_expires,
+    )
+
+    refresh_token = JWTTokenManager.create_refresh_token(
+        subject=user.email,
+        user_id=user.id,
+        token_id=refresh_token_record.token,
+        expires_delta=refresh_token_expires,
+    )
+
+    # Обновляем время последнего входа
+    user.last_login = datetime.now(UTC).replace(tzinfo=None)
+    await db.commit()
+
+    logger.info(f"User {user.email} logged in via Auth0 from {ip_address}")
+
+    # Возвращаем токены и информацию о пользователе
+    return LoginResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        expires_in=int(access_token_expires.total_seconds()),
+        user=UserProfile.model_validate(user),
+        message="Successfully authenticated via Auth0",
+    )
+
+
+@router.get("/oauth2/auth0/userinfo")
+async def get_auth0_user_info(
+    current_user: User = Depends(get_current_active_user),
+) -> dict:
+    """
+    Получить информацию о пользователе для совместимости с Auth0.
+
+    Args:
+        current_user: Текущий пользователь
+
+    Returns:
+        dict: Информация о пользователе в формате Auth0
+    """
+    return {
+        "sub": current_user.auth0_id or str(current_user.id),
+        "email": current_user.email,
+        "email_verified": current_user.email_verified,
+        "name": current_user.name or f"{current_user.first_name} {current_user.last_name}".strip(),
+        "given_name": current_user.first_name,
+        "family_name": current_user.last_name,
+        "nickname": current_user.username,
+        "picture": None,  # Можно добавить поддержку аватаров в будущем
+        "updated_at": current_user.updated_at.isoformat() if current_user.updated_at else None,
+        "locale": "ru-RU",  # По умолчанию русская локаль
+    }
+
+
+@router.get("/oauth2/auth0/status")
+async def get_auth0_status() -> dict:
+    """
+    Получить статус конфигурации Auth0.
+
+    Returns:
+        dict: Статус Auth0 интеграции
+    """
+    return {
+        "enabled": auth0_service.is_enabled,
+        "domain": settings.auth0.domain if auth0_service.is_enabled else None,
+        "audience": settings.auth0.audience if auth0_service.is_enabled else None,
+    }

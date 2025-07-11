@@ -35,6 +35,7 @@ class User(Base, TimestampedMixin):
     __table_args__ = (
         Index("ix_users_email_unique", "email", unique=True),
         Index("ix_users_username_unique", "username", unique=True),
+        Index("ix_users_auth0_id_unique", "auth0_id", unique=True),
         Index("ix_users_role_created", "role", "created_at"),
         Index("ix_users_is_active", "is_active"),
         Index("ix_users_last_login", "last_login"),
@@ -50,6 +51,11 @@ class User(Base, TimestampedMixin):
     )
     hashed_password: Mapped[str] = mapped_column(
         String(128), nullable=False, comment="Хэшированный пароль"
+    )
+    
+    # Auth0 integration
+    auth0_id: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=True, nullable=True, comment="Auth0 user ID для интеграции"
     )
 
     # Профиль пользователя

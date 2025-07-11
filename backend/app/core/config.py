@@ -131,6 +131,29 @@ class TestDatabaseConfig(BaseModel):
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}?command_timeout={self.command_timeout}"
 
 
+class Auth0Config(BaseModel):
+    """Настройки Auth0 OAuth2."""
+
+    domain: str = ""
+    client_id: str = ""
+    client_secret: str = ""
+    audience: str = "https://api.requify.com"
+    algorithms: list[str] = ["RS256"]
+    issuer: str = ""  # Will be set based on domain
+
+    # Настройки для управления пользователями
+    management_client_id: str = ""
+    management_client_secret: str = ""
+
+    # Включение/выключение Auth0
+    enabled: bool = False
+
+    def model_post_init(self, __context):
+        """Автоматически устанавливает issuer на основе domain."""
+        if self.domain and not self.issuer:
+            self.issuer = f"https://{self.domain}/"
+
+
 class SecurityConfig(BaseModel):
     """Настройки безопасности."""
 
@@ -259,6 +282,9 @@ class Settings(BaseSettings):
 
     # Security
     security: SecurityConfig = Field(default_factory=SecurityConfig)
+
+    # Auth0 OAuth2
+    auth0: Auth0Config = Field(default_factory=Auth0Config)
 
     # CORS origins
     cors_origins: List[str] = [

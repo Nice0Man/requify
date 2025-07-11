@@ -23,6 +23,7 @@ from app.crud import user as crud_user
 from app.models.user import User
 from app.utils.logger import logger
 from app.core.exceptions import UserNotFoundError, PermissionDeniedError
+from app.services.auth0_service import auth0_service, Auth0UserInfo
 
 # OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(
@@ -72,6 +73,58 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 # === Authentication Dependencies ===
 
 
+async def get_user_from_auth0_token(
+    token: str,
+    db: AsyncSession,
+) -> Optional[User]:
+    """
+    Получает пользователя из Auth0 токена.
+
+    Args:
+        token: Auth0 JWT токен
+        db: Database session
+
+    Returns:
+        User объект или None если токен невалидный
+    """
+    if not auth0_service.is_enabled:
+        return None
+
+    # Валидируем токен и получаем информацию о пользователе
+    user_info = auth0_service.get_user_info(token)
+    if not user_info:
+        return None
+
+    # Ищем пользователя в локальной базе данных по Auth0 ID
+    user = await crud_user.get_by_auth0_id(db, auth0_id=user_info.sub)
+
+    # Если пользователь не найден, создаем нового
+    if not user and user_info.email:
+        # Проверяем, есть ли пользователь с таким email
+        existing_user = await crud_user.get_by_email(db, email=user_info.email)
+
+        if existing_user:
+            # Обновляем существующего пользователя Auth0 ID
+            user = await crud_user.update(
+                db, db_obj=existing_user, obj_in={"auth0_id": user_info.sub}
+            )
+        else:
+            # Создаем нового пользователя
+            from app.schemas.user import UserCreate
+
+            user_data = UserCreate(
+                email=user_info.email,
+                name=user_info.name or user_info.email.split("@")[0],
+                username=user_info.nickname or user_info.email.split("@")[0],
+                password="",  # Пароль не нужен для Auth0 пользователей
+                is_active=True,
+                auth0_id=user_info.sub,
+            )
+            user = await crud_user.create(db, obj_in=user_data)
+
+    return user
+
+
 async def get_current_user(
     security_scopes: SecurityScopes,
     request: Request,
@@ -106,27 +159,39 @@ async def get_current_user(
         headers={"WWW-Authenticate": authenticate_value},
     )
 
-    # Verify and decode access token
-    payload = JWTTokenManager.verify_token(token, TokenType.ACCESS)
-    if payload is None:
-        raise credentials_exception
+    # Попытка аутентификации через Auth0 (если включен)
+    user = None
+    token_scopes = []
 
-    # Extract data from token
-    user_id = payload.get("user_id")
-    email = payload.get("sub")
-    token_scopes = payload.get("scopes", [])
+    if auth0_service.is_enabled:
+        user = await get_user_from_auth0_token(token, db)
+        if user:
+            # Для Auth0 пользователей используем базовые права
+            token_scopes = ["me", "projects:read", "requirements:read", "releases:read"]
 
-    if user_id is None or email is None:
-        raise credentials_exception
+    # Если Auth0 не дал результата, пробуем обычную JWT аутентификацию
+    if not user:
+        # Verify and decode access token
+        payload = JWTTokenManager.verify_token(token, TokenType.ACCESS)
+        if payload is None:
+            raise credentials_exception
 
-    # Get user from database
-    user = await crud_user.get(db, id=user_id)
-    if user is None:
-        raise credentials_exception
+        # Extract data from token
+        user_id = payload.get("user_id")
+        email = payload.get("sub")
+        token_scopes = payload.get("scopes", [])
 
-    # Additional email verification for security
-    if user.email != email:
-        raise credentials_exception
+        if user_id is None or email is None:
+            raise credentials_exception
+
+        # Get user from database
+        user = await crud_user.get(db, id=user_id)
+        if user is None:
+            raise credentials_exception
+
+        # Additional email verification for security
+        if user.email != email:
+            raise credentials_exception
 
     # Check user activity
     if not user.is_active:
@@ -817,19 +882,21 @@ def _validate_user_access(request: Request, user: User, token_payload: dict) -> 
         f"User {user.id} ({user.username}) validated successfully with scopes: {token_scopes}"
     )
 
+
 # === Helper Functions ===
+
 
 async def get_user_by_id_or_404(db: AsyncSession, user_id: int) -> User:
     """
     Получить пользователя по ID или вернуть 404 ошибку.
-    
+
     Args:
         db: Сессия базы данных
         user_id: ID пользователя
-    
+
     Returns:
         User: Объект пользователя
-        
+
     Raises:
         UserNotFoundError: Если пользователь не найден
     """
@@ -842,14 +909,14 @@ async def get_user_by_id_or_404(db: AsyncSession, user_id: int) -> User:
 async def get_user_by_email_or_404(db: AsyncSession, email: str) -> User:
     """
     Получить пользователя по email или вернуть 404 ошибку.
-    
+
     Args:
         db: Сессия базы данных
         email: Email пользователя
-    
+
     Returns:
         User: Объект пользователя
-        
+
     Raises:
         UserNotFoundError: Если пользователь не найден
     """
@@ -862,14 +929,14 @@ async def get_user_by_email_or_404(db: AsyncSession, email: str) -> User:
 async def get_user_by_username_or_404(db: AsyncSession, username: str) -> User:
     """
     Получить пользователя по username или вернуть 404 ошибку.
-    
+
     Args:
         db: Сессия базы данных
         username: Имя пользователя
-    
+
     Returns:
         User: Объект пользователя
-        
+
     Raises:
         UserNotFoundError: Если пользователь не найден
     """
@@ -877,6 +944,7 @@ async def get_user_by_username_or_404(db: AsyncSession, username: str) -> User:
     if user is None:
         raise UserNotFoundError(username)
     return user
+
 
 # Алиасы для обратной совместимости
 get_current_user_dep = get_current_user
