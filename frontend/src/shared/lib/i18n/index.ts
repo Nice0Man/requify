@@ -1,10 +1,10 @@
+import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 // Import translation resources
 import en from "./locales/en.json";
 import ru from "./locales/ru.json";
-import { createInstance } from "i18next";
 
 const resources = {
   en: {
@@ -15,8 +15,7 @@ const resources = {
   },
 };
 
-const i18n = createInstance();
-
+// Используем глобальный экземпляр i18n (не createInstance)
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)

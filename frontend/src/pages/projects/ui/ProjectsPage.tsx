@@ -182,7 +182,7 @@ const ProjectsPage: React.FC = () => {
             </Box>
             <LinearProgress
               variant="determinate"
-              value={project.progress}
+              value={project.progress || 0}
               sx={{
                 height: 6,
                 borderRadius: 3,

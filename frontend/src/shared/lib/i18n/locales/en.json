@@ -9,6 +9,7 @@
     "edit": "Edit",
     "create": "Create",
     "view": "View",
+    "open": "Open",
     "search": "Search",
     "filter": "Filter",
     "refresh": "Refresh",
@@ -76,7 +77,24 @@
     "team": "Team",
     "workflow": "Workflow",
     "admin": "Admin Panel",
-    "settings": "Settings"
+    "settings": "Settings",
+    "dragTooltip": "Drag to reorder",
+    "draggingTooltip": "Dragging...",
+    "dragInstructions": "Drag elements to reorder",
+    "discoverTitle": "Manage Order",
+    "discoverDescription": "Hold an element to change its order",
+    "longPressHint": "Long press",
+    "dragHint": "Drag",
+    "hold": "Hold",
+    "drag": "Drag",
+    "editMode": "Edit Mode",
+    "editModeTitle": "Configure Element Order",
+    "editModeDescription": "Drag elements to change their order",
+    "enterEditMode": "Edit",
+    "applyChanges": "Apply",
+    "cancelChanges": "Cancel",
+    "resetToDefault": "Reset to Default",
+    "unsavedChanges": "Unsaved changes"
   },
   "notifications": {
     "title": "Notifications",
@@ -523,7 +541,8 @@
     },
     "recentActivity": "Recent Activity",
     "noActivity": "No recent activity",
-    "systemHealth": "System Health"
+    "systemHealth": "System Health",
+    "createRequirement": "Create Requirement"
   },
   "projects": {
     "title": "Projects",
@@ -543,7 +562,8 @@
       "active": "Active",
       "completed": "Completed",
       "onHold": "On Hold",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "planning": "Planning"
     },
     "fields": {
       "name": "Name",
@@ -684,6 +704,7 @@
       "title": "Network Error",
       "message": "Please check your internet connection.",
       "action": "Retry"
-    }
+    },
+    "loadingError": "Loading Error"
   }
 }

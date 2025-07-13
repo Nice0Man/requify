@@ -285,7 +285,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
             </Box>
             <LinearProgress
               variant="determinate"
-              value={progress}
+              value={progress || 0}
               sx={{
                 height: 6,
                 borderRadius: 3,

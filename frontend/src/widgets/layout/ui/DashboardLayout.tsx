@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { HeaderWidget } from "@/widgets/header";
-import { SidebarWidget } from "@/features/sidebar/ui";
-import { useSidebar, useSidebarConfig } from "@/features/sidebar/model";
+import { SidebarWidget } from "@/widgets/sidebar";
+import { useSidebarState, useSidebarConfig } from "@/widgets/sidebar/model";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -24,7 +24,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const theme = useTheme();
   const config = useSidebarConfig();
-  const { isCollapsed, isMobile, isOpen, setOpen } = useSidebar();
+  const { isCollapsed, isMobile, isOpen, setOpen } = useSidebarState();
   const [isDarkMode, setIsDarkMode] = useState(theme.palette.mode === "dark");
 
   const handleThemeToggle = () => {

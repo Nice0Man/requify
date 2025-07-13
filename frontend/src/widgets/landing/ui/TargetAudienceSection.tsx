@@ -15,7 +15,6 @@ import {
   Zoom,
   Paper,
   Avatar,
-  LinearProgress,
 } from "@mui/material";
 import {
   Business,
@@ -463,10 +462,7 @@ const TargetAudienceSection: React.FC = () => {
           "audience.developers.challenges.2",
           "Проблемы с тестированием и валидацией"
         ),
-        t(
-          "audience.developers.challenges.3",
-          "Сложности с документированием"
-        ),
+        t("audience.developers.challenges.3", "Сложности с документированием"),
       ],
       solutions: [
         t(
@@ -477,10 +473,7 @@ const TargetAudienceSection: React.FC = () => {
           "audience.developers.solutions.1",
           "Интеграция с системами контроля версий"
         ),
-        t(
-          "audience.developers.solutions.2",
-          "Автоматическая генерация тестов"
-        ),
+        t("audience.developers.solutions.2", "Автоматическая генерация тестов"),
         t(
           "audience.developers.solutions.3",
           "API для интеграции с IDE и инструментами"
@@ -497,10 +490,7 @@ const TargetAudienceSection: React.FC = () => {
           "audience.analysts.challenges.0",
           "Сложности с документированием бизнес-процессов"
         ),
-        t(
-          "audience.analysts.challenges.1",
-          "Проблемы с валидацией требований"
-        ),
+        t("audience.analysts.challenges.1", "Проблемы с валидацией требований"),
         t(
           "audience.analysts.challenges.2",
           "Отсутствие связи между бизнес- и техническими требованиями"
@@ -511,14 +501,8 @@ const TargetAudienceSection: React.FC = () => {
         ),
       ],
       solutions: [
-        t(
-          "audience.analysts.solutions.0",
-          "Шаблоны для бизнес-требований"
-        ),
-        t(
-          "audience.analysts.solutions.1",
-          "Инструменты валидации и проверки"
-        ),
+        t("audience.analysts.solutions.0", "Шаблоны для бизнес-требований"),
+        t("audience.analysts.solutions.1", "Инструменты валидации и проверки"),
         t(
           "audience.analysts.solutions.2",
           "Автоматическая трассировка требований"
@@ -556,20 +540,14 @@ const TargetAudienceSection: React.FC = () => {
     {
       value: "90%",
       label: t("roi.transparency.label", "Прозрачность"),
-      description: t(
-        "roi.transparency.description",
-        "процесса разработки"
-      ),
+      description: t("roi.transparency.description", "процесса разработки"),
       color: theme.palette.info.main,
       delay: 1200,
     },
     {
       value: "$50K",
       label: t("roi.savings.label", "Экономия в год"),
-      description: t(
-        "roi.savings.description",
-        "для команды из 10 человек"
-      ),
+      description: t("roi.savings.description", "для команды из 10 человек"),
       color: theme.palette.secondary.main,
       delay: 1400,
     },
@@ -838,8 +816,7 @@ const TargetAudienceSection: React.FC = () => {
                       transform: "translateY(-2px)",
                       boxShadow: theme.shadows[16],
                     },
-                    transition:
-                      "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                    transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                   }}
                 >
                   Начать бесплатно
@@ -861,8 +838,7 @@ const TargetAudienceSection: React.FC = () => {
                       borderWidth: 2,
                       transform: "translateY(-2px)",
                     },
-                    transition:
-                      "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                    transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
                   }}
                 >
                   Связаться с продажами
@@ -876,4 +852,4 @@ const TargetAudienceSection: React.FC = () => {
   );
 };
 
-export default TargetAudienceSection; 
+export default TargetAudienceSection;

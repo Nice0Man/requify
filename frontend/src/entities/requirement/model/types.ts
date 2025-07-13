@@ -12,6 +12,7 @@ export interface Requirement {
   updatedAt: Date;
   tags: string[];
   isActive: boolean;
+  progress: number;
 }
 
 export enum RequirementType {

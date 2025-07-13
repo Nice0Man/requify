@@ -1091,6 +1091,7 @@ const AuthPage: React.FC = () => {
             {/* Loading Progress */}
             {isLoading && (
               <LinearProgress
+                variant="indeterminate"
                 sx={{
                   height: 2,
                   backgroundColor: alpha(theme.palette.primary.main, 0.1),
