@@ -37,7 +37,7 @@ const BubblesEffect: React.FC<BubblesEffectProps> = ({
   // Memoized bubble color to prevent recalculation
   const bubbleColor = useMemo(() => {
     if (!color) return theme.palette.primary.main;
-    
+
     const themeColors: Record<string, string> = {
       primary: theme.palette.primary.main,
       secondary: theme.palette.secondary.main,
@@ -46,7 +46,7 @@ const BubblesEffect: React.FC<BubblesEffectProps> = ({
       info: theme.palette.info.main,
       success: theme.palette.success.main,
     };
-    
+
     return themeColors[color] || color;
   }, [color, theme.palette]);
 
@@ -54,7 +54,7 @@ const BubblesEffect: React.FC<BubblesEffectProps> = ({
   const createBubbles = useCallback(() => {
     const { width, height } = dimensionsRef.current;
     if (width === 0 || height === 0) return [];
-    
+
     return Array.from({ length: count }, (_, i) => ({
       id: i,
       x: Math.random() * width,
