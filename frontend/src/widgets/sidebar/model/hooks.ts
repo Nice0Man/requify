@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useTheme, useMediaQuery } from "@mui/material";
+import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSidebarStore } from "./store";
 import { sidebarConfig } from "./config";
 import { SidebarItem } from "./types";
@@ -47,7 +48,7 @@ export const useSidebar = () => {
     const pathSegments = currentPath.split("/").filter(Boolean);
 
     if (pathSegments.length > 0) {
-      const activeItemId = pathSegments[0];
+      const activeItemId = pathSegments[0] as UniqueIdentifier;
       store.setActiveItem(activeItemId);
     }
   }, [location.pathname]);
@@ -74,6 +75,9 @@ export const useSidebarItems = (): SidebarItem[] => {
         color: theme.palette.primary.main,
         order: 1,
         isDraggable: true,
+        data: {
+          type: "sidebar-item",
+        },
       },
       reports: {
         id: "reports",
@@ -83,6 +87,9 @@ export const useSidebarItems = (): SidebarItem[] => {
         color: theme.palette.error.main,
         order: 2,
         isDraggable: true,
+        data: {
+          type: "sidebar-item",
+        },
       },
       analytics: {
         id: "analytics",
@@ -92,17 +99,23 @@ export const useSidebarItems = (): SidebarItem[] => {
         color: theme.palette.info.main,
         order: 3,
         isDraggable: true,
+        data: {
+          type: "sidebar-item",
+        },
       },
-      notifications: {
-        id: "notifications",
-        label: t("sidebar.notifications"),
-        icon: Notifications,
-        path: "/notifications",
-        color: theme.palette.warning.main,
-        order: 4,
-        isDraggable: true,
-        badge: 12,
-      },
+      // notifications: {
+      //   id: "notifications",
+      //   label: t("sidebar.notifications"),
+      //   icon: Notifications,
+      //   path: "/notifications",
+      //   color: theme.palette.warning.main,
+      //   order: 4,
+      //   isDraggable: true,
+      //   badge: 12,
+      //   data: {
+      //     type: "sidebar-item",
+      //   },
+      // },
       calendar: {
         id: "calendar",
         label: t("sidebar.calendar"),
@@ -111,6 +124,9 @@ export const useSidebarItems = (): SidebarItem[] => {
         color: theme.palette.primary.main,
         order: 5,
         isDraggable: true,
+        data: {
+          type: "sidebar-item",
+        },
       },
       team: {
         id: "team",
@@ -120,6 +136,9 @@ export const useSidebarItems = (): SidebarItem[] => {
         color: theme.palette.secondary.main,
         order: 6,
         isDraggable: true,
+        data: {
+          type: "sidebar-item",
+        },
       },
       processes: {
         id: "processes",
@@ -129,6 +148,9 @@ export const useSidebarItems = (): SidebarItem[] => {
         color: theme.palette.success.main,
         order: 7,
         isDraggable: true,
+        data: {
+          type: "sidebar-item",
+        },
       },
       projects: {
         id: "projects",
@@ -139,6 +161,9 @@ export const useSidebarItems = (): SidebarItem[] => {
         order: 8,
         isDraggable: true,
         badge: 8,
+        data: {
+          type: "sidebar-item",
+        },
       },
       requirements: {
         id: "requirements",
@@ -149,6 +174,9 @@ export const useSidebarItems = (): SidebarItem[] => {
         order: 9,
         isDraggable: true,
         badge: 15,
+        data: {
+          type: "sidebar-item",
+        },
       },
       releases: {
         id: "releases",
@@ -158,14 +186,19 @@ export const useSidebarItems = (): SidebarItem[] => {
         color: theme.palette.info.main,
         order: 10,
         isDraggable: true,
+        data: {
+          type: "sidebar-item",
+        },
       },
     }),
-    [theme]
+    [theme, t]
   );
 
   // Возвращаем элементы в пользовательском порядке
   return useMemo(() => {
-    return itemOrder.map((itemId) => allItems[itemId]).filter(Boolean);
+    return itemOrder
+      .map((itemId) => allItems[itemId as string])
+      .filter(Boolean);
   }, [itemOrder, allItems]);
 };
 
@@ -183,6 +216,9 @@ export const useSidebarBottomItems = (): SidebarItem[] => {
         color: theme.palette.warning.main,
         order: 1,
         isDraggable: false,
+        data: {
+          type: "sidebar-item",
+        },
       },
       {
         id: "settings",
@@ -192,9 +228,12 @@ export const useSidebarBottomItems = (): SidebarItem[] => {
         color: theme.palette.grey[600],
         order: 2,
         isDraggable: false,
+        data: {
+          type: "sidebar-item",
+        },
       },
     ],
-    [theme]
+    [theme, t]
   );
 };
 
@@ -208,23 +247,46 @@ export const useSidebarState = () => {
   return { isCollapsed, isMobile, isOpen, setOpen };
 };
 
-export const useSidebarDragAndDrop = () => {
-  const { reorderItems, setDragging, saveOrder, resetToDefaultOrder } =
-    useSidebarStore();
+// Новый упрощенный хук для DND операций
+export const useSidebarDnd = () => {
+  const { 
+    reorderItems, 
+    setDragging, 
+    saveOrder, 
+    resetToDefaultOrder,
+    setActiveId,
+    setOverId,
+    activeId,
+    overId,
+    isDragging
+  } = useSidebarStore();
 
-  const handleDragStart = (itemId: string) => {
-    setDragging(true, itemId);
+  const handleDragStart = (id: UniqueIdentifier) => {
+    setActiveId(id);
+    setDragging(true, id);
   };
 
-  const handleDragEnd = () => {
-    setDragging(false);
-    if (sidebarConfig.persistOrder) {
-      saveOrder();
+  const handleDragOver = (overId: UniqueIdentifier | null) => {
+    setOverId(overId);
+  };
+
+  const handleDragEnd = (activeId: UniqueIdentifier, overId: UniqueIdentifier | null) => {
+    if (overId && activeId !== overId) {
+      reorderItems(activeId, overId);
+      if (sidebarConfig.persistOrder) {
+        saveOrder();
+      }
     }
+    
+    setActiveId(null);
+    setOverId(null);
+    setDragging(false);
   };
 
-  const handleDrop = (dragIndex: number, hoverIndex: number) => {
-    reorderItems(dragIndex, hoverIndex);
+  const handleDragCancel = () => {
+    setActiveId(null);
+    setOverId(null);
+    setDragging(false);
   };
 
   const handleResetOrder = () => {
@@ -233,8 +295,12 @@ export const useSidebarDragAndDrop = () => {
 
   return {
     handleDragStart,
+    handleDragOver,
     handleDragEnd,
-    handleDrop,
+    handleDragCancel,
     handleResetOrder,
+    activeId,
+    overId,
+    isDragging,
   };
 };

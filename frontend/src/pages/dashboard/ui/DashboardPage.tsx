@@ -1,36 +1,42 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import {
-  Box,
   Container,
-  Typography,
   Grid,
   Paper,
-  Stack,
-  Chip,
+  Typography,
+  Box,
   IconButton,
+  Stack,
   useTheme,
   alpha,
   Button,
+  Chip,
   Tooltip,
 } from "@mui/material";
 import {
   TrendingUp,
-  TrendingDown,
   Assignment,
-  CheckCircle,
-  Add,
-  ArrowForward,
+  RocketLaunch,
+  BugReport,
+  People,
+  Speed,
   Refresh,
+  ArrowForward,
+  Insights,
+  Add,
+  ViewColumn,
   Analytics,
   FolderOpen,
-  Speed,
-  ViewColumn,
-  BugReport,
-  RocketLaunch,
+  CheckCircle,
+  TrendingDown,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/widgets/layout";
+import { DashboardStatsWidget } from "@/widgets/dashboard-stats";
+import { ProjectOverviewWidget } from "@/widgets/project-overview";
+import { ActivityFeedWidget } from "@/widgets/activity-feed";
+import { QuickActions } from "@/features/dashboard/ui/QuickActions";
 import { useDashboardStats } from "@/features/dashboard/model/useDashboardQuery";
 import { LoadingSpinner } from "@/shared/ui";
 
@@ -43,16 +49,6 @@ interface DashboardMetric {
   icon: React.ReactNode;
   color: string;
   description: string;
-}
-
-interface QuickAction {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  color: string;
-  path: string;
-  badge?: string;
 }
 
 const DashboardPage: React.FC = () => {
@@ -124,49 +120,9 @@ const DashboardPage: React.FC = () => {
     },
   ];
 
-  // Minimalist quick actions
-  const quickActions: QuickAction[] = [
-    {
-      id: "new-project",
-      title: t("dashboard.createProject"),
-      description: t("dashboard.startNewProject"),
-      icon: <Add />,
-      color: theme.palette.primary.main,
-      path: "/projects/new",
-    },
-    {
-      id: "kanban-board",
-      title: "Kanban Board",
-      description: "View project kanban",
-      icon: <ViewColumn />,
-      color: theme.palette.secondary.main,
-      path: "/kanban",
-    },
-    {
-      id: "new-requirement",
-      title: t("dashboard.addRequirement"),
-      description: t("dashboard.createRequirement"),
-      icon: <Assignment />,
-      color: theme.palette.info.main,
-      path: "/requirements/new",
-    },
-    {
-      id: "view-reports",
-      title: "View Reports",
-      description: "Analytics & insights",
-      icon: <Analytics />,
-      color: theme.palette.warning.main,
-      path: "/reports",
-    },
-  ];
-
   const handleRefresh = () => {
     setIsLoading(true);
     setTimeout(() => setIsLoading(false), 1000);
-  };
-
-  const handleQuickAction = (action: QuickAction) => {
-    navigate(action.path);
   };
 
   return (
@@ -342,14 +298,9 @@ const DashboardPage: React.FC = () => {
           ))}
         </Grid>
 
-        {/* Quick Actions - Minimalist */}
-        <Paper
-          elevation={0}
+        {/* Quick Actions - with Drag & Drop Support */}
+        <Box
           sx={{
-            p: 3,
-            borderRadius: 3,
-            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-            background: theme.palette.background.paper,
             mb: 4,
             opacity: 0,
             transform: "translateY(20px)",
@@ -360,96 +311,8 @@ const DashboardPage: React.FC = () => {
             },
           }}
         >
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              Quick Actions
-            </Typography>
-            <Button
-              variant="text"
-              endIcon={<ArrowForward />}
-              sx={{ fontSize: "0.875rem", textTransform: "none" }}
-            >
-              View All
-            </Button>
-          </Stack>
-          <Grid container spacing={2}>
-            {quickActions.map((action, index) => (
-              <Grid item xs={12} sm={6} md={3} key={action.id}>
-                <Box
-                  onClick={() => handleQuickAction(action)}
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.05)}`,
-                    background: alpha(action.color, 0.02),
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    opacity: 0,
-                    transform: "translateY(20px)",
-                    animation: `fadeInUp 0.6s ease-out ${
-                      1.1 + index * 0.1
-                    }s forwards`,
-                    "@keyframes fadeInUp": {
-                      "0%": { opacity: 0, transform: "translateY(20px)" },
-                      "100%": { opacity: 1, transform: "translateY(0)" },
-                    },
-                    "&:hover": {
-                      transform: "translateY(-1px)",
-                      boxShadow: `0 4px 16px ${alpha(action.color, 0.15)}`,
-                      borderColor: alpha(action.color, 0.2),
-                    },
-                  }}
-                >
-                  <Stack direction="row" alignItems="center" spacing={2}>
-                    <Box
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 1.5,
-                        background: alpha(action.color, 0.1),
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: action.color,
-                      }}
-                    >
-                      {action.icon}
-                    </Box>
-                    <Box flex={1}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ fontWeight: 600, mb: 0.5 }}
-                      >
-                        {action.title}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {action.description}
-                      </Typography>
-                      {action.badge && (
-                        <Chip
-                          label={action.badge}
-                          size="small"
-                          sx={{
-                            mt: 0.5,
-                            height: 20,
-                            fontSize: "0.6rem",
-                            backgroundColor: alpha(action.color, 0.1),
-                            color: action.color,
-                          }}
-                        />
-                      )}
-                    </Box>
-                  </Stack>
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
+          <QuickActions />
+        </Box>
 
         {/* Main Content Grid - Minimalist Layout */}
         <Grid container spacing={3}>

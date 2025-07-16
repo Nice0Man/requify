@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { UniqueIdentifier } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 import { SidebarStore } from "./types";
 
-const DEFAULT_ITEM_ORDER = [
+const DEFAULT_ITEM_ORDER: UniqueIdentifier[] = [
   "dashboard",
   "reports",
   "analytics",
@@ -27,7 +29,8 @@ export const useSidebarStore = create<SidebarStore>()(
       activeItem: null,
       itemOrder: DEFAULT_ITEM_ORDER,
       isDragging: false,
-      dragItemId: null,
+      activeId: null,
+      overId: null,
 
       // Actions
       toggleCollapse: () =>
@@ -44,18 +47,19 @@ export const useSidebarStore = create<SidebarStore>()(
           activeItem: null,
           itemOrder: DEFAULT_ITEM_ORDER,
           isDragging: false,
-          dragItemId: null,
+          activeId: null,
+          overId: null,
         });
       },
 
-      toggleExpanded: (itemId: string) =>
+      toggleExpanded: (itemId: UniqueIdentifier) =>
         set((state) => ({
           expandedItems: state.expandedItems.includes(itemId)
             ? state.expandedItems.filter((id) => id !== itemId)
             : [...state.expandedItems, itemId],
         })),
 
-      setActiveItem: (itemId: string | null) => set({ activeItem: itemId }),
+      setActiveItem: (itemId: UniqueIdentifier | null) => set({ activeItem: itemId }),
 
       setOpen: (isOpen: boolean) => set({ isOpen }),
 
@@ -63,19 +67,23 @@ export const useSidebarStore = create<SidebarStore>()(
 
       setMobile: (isMobile: boolean) => set({ isMobile }),
 
-      reorderItems: (dragIndex: number, hoverIndex: number) => {
+      reorderItems: (activeId: UniqueIdentifier, overId: UniqueIdentifier) => {
         const { itemOrder } = get();
-        const newOrder = [...itemOrder];
-        const draggedItem = newOrder[dragIndex];
-
-        newOrder.splice(dragIndex, 1);
-        newOrder.splice(hoverIndex, 0, draggedItem);
-
-        set({ itemOrder: newOrder });
+        const oldIndex = itemOrder.indexOf(activeId);
+        const newIndex = itemOrder.indexOf(overId);
+        
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newOrder = arrayMove(itemOrder, oldIndex, newIndex);
+          set({ itemOrder: newOrder });
+        }
       },
 
-      setDragging: (isDragging: boolean, dragItemId?: string) =>
-        set({ isDragging, dragItemId: dragItemId || null }),
+      setDragging: (isDragging: boolean, activeId?: UniqueIdentifier | null) =>
+        set({ isDragging, activeId: activeId || null }),
+
+      setActiveId: (activeId: UniqueIdentifier | null) => set({ activeId }),
+
+      setOverId: (overId: UniqueIdentifier | null) => set({ overId }),
 
       resetOrder: () => set({ itemOrder: DEFAULT_ITEM_ORDER }),
 
@@ -88,7 +96,7 @@ export const useSidebarStore = create<SidebarStore>()(
         const savedOrder = localStorage.getItem("sidebar-item-order");
         if (savedOrder) {
           try {
-            const order = JSON.parse(savedOrder);
+            const order: UniqueIdentifier[] = JSON.parse(savedOrder);
             // Проверяем, что порядок содержит все необходимые элементы
             const hasAllItems = DEFAULT_ITEM_ORDER.every((itemId) =>
               order.includes(itemId)
