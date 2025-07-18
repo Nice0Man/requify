@@ -35,7 +35,7 @@ import {
   useSidebarDnd,
 } from "../model";
 import { SidebarItem as SidebarItemType } from "../model/types";
-import { SIDEBAR_CONSTANTS } from "../model/config";
+import { SIDEBAR_CONSTANTS, SIDEBAR_Z_INDEX } from "../model/config";
 import { SortableSidebarItem } from "./SortableSidebarItem";
 import { SidebarDragOverlay } from "./SidebarDragOverlay";
 import { SortableDropIndicator } from "./SortableDropIndicator";
@@ -162,7 +162,7 @@ export const SidebarWidget: React.FC = () => {
               right: 0,
               bottom: 0,
               backgroundColor: alpha(theme.palette.common.black, 0.4),
-              zIndex: theme.zIndex.drawer - 1,
+              zIndex: SIDEBAR_Z_INDEX.mobileBackdrop,
             }}
             onClick={() => setOpen(false)}
           />
@@ -194,7 +194,7 @@ export const SidebarWidget: React.FC = () => {
               isOpen && isMobileDevice
                 ? `0 0 16px ${alpha(theme.palette.common.black, 0.1)}`
                 : "none",
-            zIndex: theme.zIndex.drawer,
+            zIndex: SIDEBAR_Z_INDEX.sidebar,
             transition: `all ${config.animationDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`,
             display: "flex",
             flexDirection: "column",

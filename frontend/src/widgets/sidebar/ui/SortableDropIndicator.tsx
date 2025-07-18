@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, useTheme, alpha } from "@mui/material";
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface SortableDropIndicatorProps {
   isVisible: boolean;
@@ -28,6 +29,7 @@ export const SortableDropIndicator: React.FC<SortableDropIndicatorProps> = ({
         transform: isVisible ? "scaleX(1)" : "scaleX(0)",
         transformOrigin: "left",
         transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+        zIndex: SIDEBAR_Z_INDEX.dropIndicator,
         
         // Основная линия индикатора
         backgroundColor: alpha(theme.palette.primary.main, 0.3),

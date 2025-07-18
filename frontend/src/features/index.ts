@@ -8,5 +8,4 @@ export * from "./release-management";
 export * from "./test-management";
 export * from "./notification-management";
 export * from "./admin-panel";
-export * from "./sidebar";
 export * from "./kanban-management";

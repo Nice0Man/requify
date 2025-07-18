@@ -17,6 +17,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useTranslation } from "react-i18next";
 import { SidebarItem } from "../model/types";
 import { DragData } from "../model/types";
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface SortableSidebarItemProps {
   item: SidebarItem;
@@ -364,7 +365,7 @@ export const SortableSidebarItem = forwardRef<
       sx={{
         position: "relative",
         mb: 0.5,
-        zIndex: isDragging ? 1000 : 1,
+        zIndex: isDragging ? SIDEBAR_Z_INDEX.draggingItem : 1,
         opacity: isDragOverlay ? 1 : undefined,
       }}
       {...props}

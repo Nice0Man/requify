@@ -3,6 +3,7 @@ import { Box, Button, Typography, useTheme, alpha, Fade } from "@mui/material";
 import { RestartAlt, Edit } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useSidebarStore } from "../model/store";
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface SidebarResetButtonProps {
   isVisible: boolean;
@@ -37,7 +38,7 @@ export const SidebarResetButton: React.FC<SidebarResetButtonProps> = ({
           bottom: 80, // Выше админ кнопки
           left: 8,
           right: 8,
-          zIndex: 1000,
+          zIndex: SIDEBAR_Z_INDEX.resetButton,
           display: isVisible ? "block" : "none",
         }}
       >

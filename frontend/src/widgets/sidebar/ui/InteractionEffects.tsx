@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, useTheme, alpha, keyframes } from "@mui/material";
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface InteractionEffectsProps {
   isLifting: boolean;
@@ -185,7 +186,7 @@ export const InteractionEffects: React.FC<InteractionEffectsProps> = ({
         transition: "all 0.2s ease",
         transformOrigin: "center",
         willChange: "transform, box-shadow",
-        zIndex: isDragging ? 1000 : isLifting ? 100 : 1,
+        zIndex: isDragging ? SIDEBAR_Z_INDEX.draggingItem : isLifting ? 100 : 1,
         ...getBackgroundEffect(),
       }}
       onAnimationEnd={handleAnimationEnd}

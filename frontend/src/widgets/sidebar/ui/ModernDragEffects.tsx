@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, useTheme, alpha } from "@mui/material";
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface ModernDragEffectsProps {
   isDragging: boolean;
@@ -29,7 +30,7 @@ export const ModernDragEffects: React.FC<ModernDragEffectsProps> = ({
           backgroundColor: alpha(theme.palette.primary.main, 0.02),
           backdropFilter: "blur(1px)",
           pointerEvents: "none",
-          zIndex: 999,
+          zIndex: SIDEBAR_Z_INDEX.dragEffects,
           transition: "all 0.3s ease",
         }}
       />
@@ -46,7 +47,7 @@ export const ModernDragEffects: React.FC<ModernDragEffectsProps> = ({
             borderRadius: "50%",
             backgroundColor: alpha(theme.palette.primary.main, 0.3),
             pointerEvents: "none",
-            zIndex: 1001,
+            zIndex: SIDEBAR_Z_INDEX.dragOverlay,
             animation: "cursorPulse 1s ease-in-out infinite",
             "@keyframes cursorPulse": {
               "0%, 100%": { 

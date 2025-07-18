@@ -38,10 +38,34 @@ export const SIDEBAR_CONSTANTS = {
   },
   ANNOUNCEMENTS: {
     onDragStart: (itemName: string) => `Перетаскивание ${itemName} начато`,
-    onDragOver: (itemName: string, overName?: string) => 
+    onDragOver: (itemName: string, overName?: string) =>
       overName ? `${itemName} над ${overName}` : `Перетаскивание ${itemName}`,
-    onDragEnd: (itemName: string, overName?: string) => 
-      overName ? `${itemName} размещен над ${overName}` : `Перетаскивание ${itemName} завершено`,
+    onDragEnd: (itemName: string, overName?: string) =>
+      overName
+        ? `${itemName} размещен над ${overName}`
+        : `Перетаскивание ${itemName} завершено`,
     onDragCancel: (itemName: string) => `Перетаскивание ${itemName} отменено`,
   },
+} as const;
+
+// Z-index hierarchy for sidebar components
+export const SIDEBAR_Z_INDEX = {
+  // Основной сайдбар (должен быть выше обычного контента, но ниже модалов)
+  sidebar: 1200, // Используем стандартное значение drawer из Material-UI
+
+  // Мобильная заглушка (ниже сайдбара)
+  mobileBackdrop: 1199,
+
+  // DND элементы (выше сайдбара во время перетаскивания)
+  dragOverlay: 1300,
+  draggingItem: 1250,
+  dropIndicator: 1260,
+  dragEffects: 1210,
+
+  // Контролы редактирования (выше сайдбара, но ниже DND)
+  editControls: 1220,
+  resetButton: 1220,
+
+  // Tooltip'ы (самый высокий приоритет)
+  tooltip: 1500,
 } as const;

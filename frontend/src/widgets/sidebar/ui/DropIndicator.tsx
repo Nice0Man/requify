@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, useTheme, alpha, Fade, keyframes } from '@mui/material';
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 // Анимация появления
 const dropAppear = keyframes`
@@ -31,7 +32,7 @@ export const DropIndicator: React.FC = () => {
             ${theme.palette.primary.main}, 
             ${alpha(theme.palette.primary.main, 0.8)}
           )`,
-          zIndex: 1000,
+          zIndex: SIDEBAR_Z_INDEX.dropIndicator,
           animation: `${dropAppear} 0.3s ease-out`,
           boxShadow: `0 0 12px ${alpha(theme.palette.primary.main, 0.6)}`,
           transform: 'scaleX(1)',

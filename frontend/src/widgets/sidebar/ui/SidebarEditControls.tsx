@@ -11,6 +11,7 @@ import {
 import { RestartAlt, Edit, Check, Close } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSidebarStore } from '../model/store';
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface SidebarEditControlsProps {
   isVisible: boolean;
@@ -65,7 +66,7 @@ export const SidebarEditControls: React.FC<SidebarEditControlsProps> = ({
             bottom: 80,
             left: 8,
             right: 8,
-            zIndex: 1000,
+            zIndex: SIDEBAR_Z_INDEX.editControls,
             display: isVisible ? 'block' : 'none',
           }}
         >

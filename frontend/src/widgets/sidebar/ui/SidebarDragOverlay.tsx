@@ -12,6 +12,7 @@ import {
 import { DragOverlay } from "@dnd-kit/core";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { SidebarItem } from "../model/types";
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface SidebarDragOverlayProps {
   activeId: UniqueIdentifier | null;
@@ -43,6 +44,7 @@ export const SidebarDragOverlay: React.FC<SidebarDragOverlayProps> = ({
       }}
       style={{
         cursor: "grabbing",
+        zIndex: SIDEBAR_Z_INDEX.dragOverlay,
       }}
     >
       <Paper

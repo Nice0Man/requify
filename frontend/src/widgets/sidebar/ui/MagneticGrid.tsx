@@ -5,6 +5,7 @@ import {
   alpha,
   keyframes,
 } from "@mui/material";
+import { SIDEBAR_Z_INDEX } from "../model/config";
 
 interface MagneticGridProps {
   children: React.ReactNode;
