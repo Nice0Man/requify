@@ -6,7 +6,6 @@ import {
   Grid,
   Card,
   CardContent,
-  Stack,
   useTheme,
 } from "@mui/material";
 import {

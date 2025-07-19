@@ -9,7 +9,6 @@ import {
   Dashboard,
   Analytics,
   BarChart,
-  Notifications,
   CalendarToday,
   Group,
   AccountTree,
@@ -18,9 +17,6 @@ import {
   RocketLaunch,
   Settings,
   AdminPanelSettings,
-  AddCircle,
-  Person,
-  Archive,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 

@@ -1,10 +1,9 @@
 // === UI exports ===
-export * from './ui';
+export * from "./ui";
 
 // === API exports ===
-export { projectDAO } from './api/projectDAO';
+export { projectDAO } from "./api/projectDAO";
+export * from "./api/projectApi";
 
 // === Model exports ===
-// Note: Model exports are temporarily disabled to avoid conflicts
-// TODO: Create proper model types and resolve conflicts
-// export * from './model'; 
+export * from "./model/types";

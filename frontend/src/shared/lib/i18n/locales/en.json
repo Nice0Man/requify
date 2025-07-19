@@ -40,7 +40,27 @@
     "settings": "Settings",
     "help": "Help",
     "about": "About",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "minimal": "Minimal",
+    "compact": "Compact",
+    "detailed": "Detailed",
+    "noSearchResults": "No search results",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "filters": "Filters",
+    "loadMore": "Load More",
+    "clearFilters": "Clear Filters",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "addToFavorites": "Add to Favorites",
+    "removeFromFavorites": "Remove from Favorites",
+    "exportAs": "Export as",
+    "unknown": "Unknown"
+  },
+  "actions": {
+    "newProject": "New Project",
+    "addRequirement": "Add Requirement",
+    "createRelease": "Create Release"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -518,18 +538,41 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Welcome back! Here's what's happening with your projects.",
+    "upToDate": "Up to date",
+    "activeProjects": "active projects",
+    "lastUpdate": "Last updated 2 min ago",
+    "layoutMode": "Toggle layout mode",
     "metrics": {
+      "title": "Key Metrics",
+      "subtitle": "Real-time project statistics",
+      "totalProjects": "Total Projects",
       "activeProjects": "Active Projects",
       "projectsInDevelopment": "Projects in development",
+      "totalRequirements": "Total Requirements",
       "requirements": "Requirements",
       "totalRequirementsTracked": "Total requirements tracked",
       "completionRate": "Completion Rate",
       "overallProjectCompletion": "Overall project completion",
+      "teamMembers": "Team Members",
       "teamVelocity": "Team Velocity",
       "storyPointsPerSprint": "Story points per sprint"
     },
+    "status": {
+      "planning": "Planning",
+      "in_progress": "In Progress", 
+      "testing": "Testing",
+      "completed": "Completed",
+      "on_hold": "On Hold"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High", 
+      "critical": "Critical"
+    },
     "quickActions": {
       "title": "Quick Actions",
+      "subtitle": "Frequently used functions",
       "newProject": "New Project",
       "newProjectDesc": "Create a new project",
       "kanbanBoard": "Kanban Board",
@@ -539,18 +582,57 @@
       "viewReports": "View Reports",
       "viewReportsDesc": "Analytics & insights"
     },
+    "categories": {
+      "create": "Create",
+      "analyze": "Analyze",
+      "manage": "Manage"
+    },
     "recentActivity": "Recent Activity",
     "noActivity": "No recent activity",
-    "systemHealth": "System Health",
-    "createRequirement": "Create Requirement"
+    "createRequirement": "Create Requirement",
+    "systemHealth": {
+      "title": "System Health",
+      "status": {
+        "healthy": "Healthy",
+        "warning": "Warning",
+        "critical": "Critical",
+        "unknown": "Unknown"
+      }
+    }
+  },
+  "system": {
+    "error": "Error loading system health",
+    "memory": "Memory",
+    "cpu": "CPU",
+    "disk": "Disk",
+    "activeUsers": "Active Users",
+    "services": "Services",
+    "uptime": "Uptime",
+    "lastCheck": "Last Check"
   },
   "projects": {
     "title": "Projects",
     "subtitle": "Project management and lifecycle",
+    "overview": {
+      "title": "Project Overview"
+    },
+    "create": "Create Project",
     "createProject": "Create Project",
     "createFirstProject": "Create first project",
     "notFound": "No projects found",
     "searchPlaceholder": "Search projects...",
+    "search": {
+      "placeholder": "Search projects..."
+    },
+    "filters": {
+      "status": "Status",
+      "priority": "Priority"
+    },
+    "progress": "Progress",
+    "requirements": "Requirements",
+    "tests": "Tests",
+    "team": "Team",
+    "started": "Started",
     "status": {
       "all": "All",
       "active": "Active",

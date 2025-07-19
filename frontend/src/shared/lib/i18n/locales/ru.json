@@ -40,7 +40,27 @@
         "settings": "Настройки",
         "help": "Помощь",
         "about": "О программе",
-        "yesterday": "Вчера"
+        "yesterday": "Вчера",
+        "minimal": "Минимальный",
+        "compact": "Компактный",
+        "detailed": "Подробный",
+        "noSearchResults": "Нет результатов поиска",
+        "collapse": "Свернуть",
+        "expand": "Развернуть",
+        "filters": "Фильтры",
+        "loadMore": "Загрузить ещё",
+        "clearFilters": "Очистить фильтры",
+        "fullscreen": "Полноэкранный режим",
+        "exitFullscreen": "Выйти из полноэкранного режима",
+        "addToFavorites": "Добавить в избранное",
+        "removeFromFavorites": "Убрать из избранного",
+        "exportAs": "Экспорт как",
+        "unknown": "Неизвестно"
+    },
+    "actions": {
+        "newProject": "Новый проект",
+        "addRequirement": "Добавить требование",
+        "createRelease": "Создать релиз"
     },
     "navigation": {
         "dashboard": "Панель управления",
@@ -516,18 +536,41 @@
     "dashboard": {
         "title": "Панель управления",
         "subtitle": "Добро пожаловать! Вот что происходит с вашими проектами.",
+        "upToDate": "Актуально",
+        "activeProjects": "активных проектов",
+        "lastUpdate": "Обновлено 2 минуты назад",
+        "layoutMode": "Переключить режим отображения",
         "metrics": {
+            "title": "Ключевые метрики",
+            "subtitle": "Статистика проектов в реальном времени",
+            "totalProjects": "Всего проектов",
             "activeProjects": "Активные проекты",
             "projectsInDevelopment": "Проекты в разработке",
+            "totalRequirements": "Всего требований",
             "requirements": "Требования",
             "totalRequirementsTracked": "Всего требований отслеживается",
             "completionRate": "Процент завершения",
             "overallProjectCompletion": "Общее завершение проекта",
+            "teamMembers": "Участники команды",
             "teamVelocity": "Скорость команды",
             "storyPointsPerSprint": "Очки истории за спринт"
         },
+        "status": {
+            "planning": "Планирование",
+            "in_progress": "В работе",
+            "testing": "Тестирование",
+            "completed": "Завершен",
+            "on_hold": "Приостановлен"
+        },
+        "priority": {
+            "low": "Низкий",
+            "medium": "Средний",
+            "high": "Высокий",
+            "critical": "Критический"
+        },
         "quickActions": {
             "title": "Быстрые действия",
+            "subtitle": "Часто используемые функции",
             "newProject": "Новый проект",
             "newProjectDesc": "Создать новый проект",
             "kanbanBoard": "Канбан доска",
@@ -537,18 +580,57 @@
             "viewReports": "Посмотреть отчеты",
             "viewReportsDesc": "Аналитика и инсайты"
         },
+        "categories": {
+            "create": "Создание",
+            "analyze": "Анализ",
+            "manage": "Управление"
+        },
         "recentActivity": "Недавняя активность",
         "noActivity": "Нет недавней активности",
-        "systemHealth": "Состояние системы",
-        "createRequirement": "Создать требование"
+        "createRequirement": "Создать требование",
+        "systemHealth": {
+            "title": "Состояние системы",
+            "status": {
+                "healthy": "Здоровое",
+                "warning": "Предупреждение",
+                "critical": "Критическое",
+                "unknown": "Неизвестно"
+            }
+        }
+    },
+    "system": {
+        "error": "Ошибка загрузки состояния системы",
+        "memory": "Память",
+        "cpu": "Процессор",
+        "disk": "Диск",
+        "activeUsers": "Активные пользователи",
+        "services": "Сервисы",
+        "uptime": "Время работы",
+        "lastCheck": "Последняя проверка"
     },
     "projects": {
         "title": "Проекты",
         "subtitle": "Управление проектами и их жизненным циклом",
+        "overview": {
+            "title": "Обзор проектов"
+        },
+        "create": "Создать проект",
         "createProject": "Создать проект",
         "createFirstProject": "Создать первый проект",
         "notFound": "Проекты не найдены",
         "searchPlaceholder": "Поиск проектов...",
+        "search": {
+            "placeholder": "Поиск проектов..."
+        },
+        "filters": {
+            "status": "Статус",
+            "priority": "Приоритет"
+        },
+        "progress": "Прогресс",
+        "requirements": "Требования",
+        "tests": "Тесты",
+        "team": "Команда",
+        "started": "Начат",
         "status": {
             "all": "Все",
             "active": "Активные",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Container,
@@ -15,12 +15,12 @@ import { useTranslation } from "react-i18next";
 export const BusinessMetrics: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const [animatedValues, setAnimatedValues] = useState({
+  const animatedValues = {
     efficiency: 85,
     timeSaved: 40,
     teamSize: 500,
     uptime: 99.9,
-  });
+  };
 
   const metrics = [
     {

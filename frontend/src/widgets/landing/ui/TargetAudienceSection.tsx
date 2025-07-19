@@ -20,19 +20,8 @@ import {
   Business,
   Engineering,
   ManageAccounts,
-  Analytics,
-  TrendingUp,
   CheckCircle,
   ArrowForward,
-  Groups,
-  AccessTime,
-  AttachMoney,
-  Star,
-  FormatQuote,
-  DeviceHub,
-  Speed,
-  Security,
-  Support,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";

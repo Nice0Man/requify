@@ -5,12 +5,12 @@ import {
   alpha,
   keyframes,
 } from "@mui/material";
-import { SIDEBAR_Z_INDEX } from "../model/config";
+
 
 interface MagneticGridProps {
   children: React.ReactNode;
   isActive: boolean;
-  onDrop: (fromIndex: number, toIndex: number) => void;
+  _onDrop: (fromIndex: number, toIndex: number) => void;
   onSnapPreview: (targetIndex: number) => void;
   onSnapClear: () => void;
   itemCount: number;
@@ -33,7 +33,7 @@ interface GridSlot {
 export const MagneticGrid: React.FC<MagneticGridProps> = ({
   children,
   isActive,
-  onDrop,
+  _onDrop,
   onSnapPreview,
   onSnapClear,
   itemCount,

@@ -1,14 +1,14 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, memo, startTransition } from "react";
 import {
   Box,
   List,
   Typography,
   Divider,
-  useTheme,
   alpha,
   IconButton,
   Fade,
   Paper,
+  useTheme,
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -39,9 +39,25 @@ import { SIDEBAR_CONSTANTS, SIDEBAR_Z_INDEX } from "../model/config";
 import { SortableSidebarItem } from "./SortableSidebarItem";
 import { SidebarDragOverlay } from "./SidebarDragOverlay";
 import { SortableDropIndicator } from "./SortableDropIndicator";
+import { 
+  useTheme as useThemeValue, 
+  usePerformanceMonitor
+} from "@/shared/contexts/PerformanceContext";
+import { 
+  useRenderTracker,
+  usePerformanceMeasure,
+  useThrottledCallback 
+} from "@/shared/hooks/usePerformanceOptimizations";
 
-export const SidebarWidget: React.FC = () => {
-  const theme = useTheme();
+// Optimized Sidebar Widget with performance monitoring and memoization
+export const SidebarWidget: React.FC = memo(() => {
+  // Performance monitoring
+  useRenderTracker('SidebarWidget');
+  usePerformanceMeasure('SidebarWidget');
+  
+  // Use both Material-UI theme for palette and optimized theme value
+  const muiTheme = useTheme();
+  const themeMode = useThemeValue();
   const navigate = useNavigate();
 
   const {
@@ -84,32 +100,41 @@ export const SidebarWidget: React.FC = () => {
   );
 
   // Обработчики drag events
-  const onDragStart = useCallback((event: DragStartEvent) => {
-    const { active } = event;
-    console.log("🚀 Drag start:", active.id);
-    handleDragStart(active.id);
-  }, [handleDragStart]);
+  const onDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const { active } = event;
+      console.log("🚀 Drag start:", active.id);
+      handleDragStart(active.id);
+    },
+    [handleDragStart]
+  );
 
-  const onDragOver = useCallback((event: DragOverEvent) => {
-    const { over } = event;
-    handleDragOver(over?.id || null);
-  }, [handleDragOver]);
+  const onDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { over } = event;
+      handleDragOver(over?.id || null);
+    },
+    [handleDragOver]
+  );
 
-  const onDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
-    console.log("🏁 Drag end:", active.id, "over:", over?.id);
-    
-    if (over && active.id !== over.id) {
-      const oldIndex = items.findIndex((item) => item.id === active.id);
-      const newIndex = items.findIndex((item) => item.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        console.log("📦 Reordering from", oldIndex, "to", newIndex);
+  const onDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      console.log("🏁 Drag end:", active.id, "over:", over?.id);
+
+      if (over && active.id !== over.id) {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          console.log("📦 Reordering from", oldIndex, "to", newIndex);
+        }
       }
-    }
-    
-    handleDragEnd(active.id, over?.id || null);
-  }, [handleDragEnd, items]);
+
+      handleDragEnd(active.id, over?.id || null);
+    },
+    [handleDragEnd, items]
+  );
 
   const onDragCancel = useCallback(() => {
     console.log("❌ Drag cancel");
@@ -117,34 +142,48 @@ export const SidebarWidget: React.FC = () => {
   }, [handleDragCancel]);
 
   // Обработчик клика по элементу
-  const handleItemClick = useCallback((item: SidebarItemType) => {
-    if (item.children) {
-      if (isCollapsed) {
-        toggleCollapse();
-        setTimeout(() => {
-          if (!expandedItems.includes(item.id)) {
-            toggleExpanded(item.id);
-          }
-        }, 150);
-      } else {
-        toggleExpanded(item.id);
+  const handleItemClick = useCallback(
+    (item: SidebarItemType) => {
+      if (item.children) {
+        if (isCollapsed) {
+          toggleCollapse();
+          setTimeout(() => {
+            if (!expandedItems.includes(item.id)) {
+              toggleExpanded(item.id);
+            }
+          }, 150);
+        } else {
+          toggleExpanded(item.id);
+        }
+      } else if (item.path) {
+        navigate(item.path);
+        if (isMobileDevice) {
+          setOpen(false);
+        }
       }
-    } else if (item.path) {
-      navigate(item.path);
-      if (isMobileDevice) {
-        setOpen(false);
-      }
-    }
-  }, [isCollapsed, expandedItems, toggleCollapse, toggleExpanded, navigate, isMobileDevice, setOpen]);
+    },
+    [
+      isCollapsed,
+      expandedItems,
+      toggleCollapse,
+      toggleExpanded,
+      navigate,
+      isMobileDevice,
+      setOpen,
+    ]
+  );
 
   // Определение активного элемента
-  const isItemActive = useCallback((item: SidebarItemType): boolean => {
-    if (activeItem === item.id) return true;
-    if (item.children) {
-      return item.children.some((child) => activeItem === child.id);
-    }
-    return false;
-  }, [activeItem]);
+  const isItemActive = useCallback(
+    (item: SidebarItemType): boolean => {
+      if (activeItem === item.id) return true;
+      if (item.children) {
+        return item.children.some((child) => activeItem === child.id);
+      }
+      return false;
+    },
+    [activeItem]
+  );
 
   // Массив ID для SortableContext
   const itemIds = useMemo(() => items.map((item) => item.id), [items]);
@@ -161,7 +200,7 @@ export const SidebarWidget: React.FC = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: alpha(theme.palette.common.black, 0.4),
+              backgroundColor: alpha(muiTheme.palette.common.black, 0.4),
               zIndex: SIDEBAR_Z_INDEX.mobileBackdrop,
             }}
             onClick={() => setOpen(false)}
@@ -188,11 +227,11 @@ export const SidebarWidget: React.FC = () => {
             left: isMobileDevice ? (isOpen ? 0 : -sidebarWidth) : 0,
             bottom: 0,
             width: sidebarWidth,
-            backgroundColor: theme.palette.background.paper,
-            borderRight: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            backgroundColor: muiTheme.palette.background.paper,
+            borderRight: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
             boxShadow:
               isOpen && isMobileDevice
-                ? `0 0 16px ${alpha(theme.palette.common.black, 0.1)}`
+                ? `0 0 16px ${alpha(muiTheme.palette.common.black, 0.1)}`
                 : "none",
             zIndex: SIDEBAR_Z_INDEX.sidebar,
             transition: `all ${config.animationDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`,
@@ -203,13 +242,19 @@ export const SidebarWidget: React.FC = () => {
         >
           {/* Header с логотипом */}
           <Box
+            onDoubleClick={toggleCollapse}
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               p: 2,
-              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              borderBottom: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
               minHeight: 64,
+              cursor: "pointer",
+              transition: "background-color 0.2s ease",
+              "&:hover": {
+                backgroundColor: alpha(muiTheme.palette.action.hover, 0.04),
+              },
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -219,7 +264,7 @@ export const SidebarWidget: React.FC = () => {
                     variant="h6"
                     sx={{
                       fontWeight: 600,
-                      color: theme.palette.text.primary,
+                      color: muiTheme.palette.text.primary,
                       fontSize: "1.1rem",
                       letterSpacing: "0.02em",
                     }}
@@ -229,7 +274,7 @@ export const SidebarWidget: React.FC = () => {
                   <Typography
                     variant="caption"
                     sx={{
-                      color: theme.palette.text.secondary,
+                      color: muiTheme.palette.text.secondary,
                       fontSize: "0.7rem",
                       fontWeight: 400,
                       opacity: 0.8,
@@ -244,9 +289,15 @@ export const SidebarWidget: React.FC = () => {
               onClick={toggleCollapse}
               size="small"
               sx={{
-                color: theme.palette.text.secondary,
+                color: muiTheme.palette.text.secondary,
+                transition: "all 0.2s ease",
                 "&:hover": {
-                  backgroundColor: alpha(theme.palette.action.hover, 0.08),
+                  backgroundColor: alpha(muiTheme.palette.action.hover, 0.08),
+                  color: muiTheme.palette.text.primary,
+                  transform: "scale(1.1)",
+                },
+                "&:active": {
+                  transform: "scale(0.95)",
                 },
               }}
             >
@@ -256,8 +307,8 @@ export const SidebarWidget: React.FC = () => {
 
           {/* Индикатор режима перетаскивания */}
           {isDragging && !isCollapsed && (
-            <SortableDropIndicator 
-              isVisible={isDragging} 
+            <SortableDropIndicator
+              isVisible={isDragging}
               isCollapsed={isCollapsed}
             />
           )}
@@ -275,7 +326,7 @@ export const SidebarWidget: React.FC = () => {
                 backgroundColor: "transparent",
               },
               "&::-webkit-scrollbar-thumb": {
-                backgroundColor: alpha(theme.palette.divider, 0.2),
+                backgroundColor: alpha(muiTheme.palette.divider, 0.2),
                 borderRadius: 1,
               },
             }}
@@ -304,10 +355,10 @@ export const SidebarWidget: React.FC = () => {
 
           {/* Разделитель */}
           <Divider
-            sx={{ 
-              mx: 2, 
-              my: 1, 
-              borderColor: alpha(theme.palette.divider, 0.08) 
+            sx={{
+              mx: 2,
+              my: 1,
+              borderColor: alpha(muiTheme.palette.divider, 0.08),
             }}
           />
 
@@ -339,4 +390,6 @@ export const SidebarWidget: React.FC = () => {
       </DndContext>
     </>
   );
-};
+});
+
+SidebarWidget.displayName = 'SidebarWidget';

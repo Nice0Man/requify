@@ -1,2 +1,2 @@
-// Quick actions widget exports
-export * from './ui'; 
+// Quick Actions Widget
+export * from "./ui"; 

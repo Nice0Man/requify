@@ -1,11 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
-import { dashboardApi } from '../api/dashboardApi';
+import { useQuery } from "@tanstack/react-query";
+import { dashboardApi } from "../api/dashboardApi";
 
 // Query Keys
 export const dashboardQueryKeys = {
-  stats: ['dashboard', 'stats'] as const,
-  activity: ['dashboard', 'activity'] as const,
-  chartData: ['dashboard', 'chartData'] as const,
+  stats: ["dashboard", "stats"] as const,
+  activity: ["dashboard", "activity"] as const,
+  chartData: ["dashboard", "chartData"] as const,
 };
 
 // Queries
@@ -22,19 +22,19 @@ export const useDashboardStats = () => {
 export const useRecentActivity = () => {
   return useQuery({
     queryKey: dashboardQueryKeys.activity,
-    queryFn: dashboardApi.getRecentActivity,
+    queryFn: () => dashboardApi.getActivity(10),
     staleTime: 2 * 60 * 1000, // 2 минуты
     gcTime: 10 * 60 * 1000, // 10 минут
     refetchInterval: 30 * 1000, // Обновляем каждые 30 секунд
   });
 };
 
-export const useChartData = (period: 'week' | 'month' | 'year' = 'week') => {
+export const useChartData = (period: "week" | "month" | "year" = "week") => {
   return useQuery({
     queryKey: [...dashboardQueryKeys.chartData, period],
-    queryFn: () => dashboardApi.getChartData(period),
+    queryFn: () => dashboardApi.getStats(),
     staleTime: 10 * 60 * 1000, // 10 минут
     gcTime: 30 * 60 * 1000, // 30 минут
     enabled: !!period,
   });
-}; 
+};

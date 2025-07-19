@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import {
   Box,
   Container,
@@ -20,6 +20,10 @@ import {
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { 
+  useRenderTracker,
+  usePerformanceMeasure 
+} from "@/shared/hooks/usePerformanceOptimizations";
 
 interface CTAVariant {
   id: 'standard' | 'professional';
@@ -38,23 +42,27 @@ interface CTAVariant {
   };
 }
 
-export const CTASection: React.FC = () => {
+export const CTASection: React.FC = memo(() => {
+  // Performance monitoring
+  useRenderTracker('CTASection');
+  usePerformanceMeasure('CTASection');
+  
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const handleGetStarted = () => {
+  const handleGetStarted = useCallback(() => {
     navigate("/auth?mode=register");
-  };
+  }, [navigate]);
 
-  const handleContactSales = () => {
+  const handleContactSales = useCallback(() => {
     navigate("/contact");
-  };
+  }, [navigate]);
 
-  const handleScheduleDemo = () => {
+  const handleScheduleDemo = useCallback(() => {
     // Можно открыть календарь бронирования или форму
     window.open("https://calendly.com/requify-demo", "_blank");
-  };
+  }, []);
 
   const ctaVariants: CTAVariant[] = [
     {
@@ -408,4 +416,6 @@ export const CTASection: React.FC = () => {
       </Container>
     </Box>
   );
-}; 
+});
+
+CTASection.displayName = 'CTASection'; 

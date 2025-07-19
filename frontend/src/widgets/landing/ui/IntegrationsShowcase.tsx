@@ -10,12 +10,10 @@ import {
 } from "@mui/material";
 import {
   GitHub,
-  CloudQueue,
   Business,
   IntegrationInstructions,
   Api,
   WebhookOutlined,
-  Settings,
   Security,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";

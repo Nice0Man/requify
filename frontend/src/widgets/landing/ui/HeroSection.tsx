@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import {
   Box,
   Container,
@@ -11,19 +11,31 @@ import {
 import { useTheme, alpha } from "@mui/material/styles";
 import { Verified, ArrowForward } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+import {
+  useRenderTracker,
+  usePerformanceMeasure
+} from "@/shared/hooks/usePerformanceOptimizations";
 
 interface HeroSectionProps {
   onGetStarted?: () => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
+export const HeroSection: React.FC<HeroSectionProps> = memo(({ onGetStarted }) => {
+  // Performance monitoring
+  useRenderTracker('HeroSection');
+  usePerformanceMeasure('HeroSection');
+  
   const theme = useTheme();
   const { t } = useTranslation();
 
   const certifications = [
-    t("landing.hero.certification1", "Best requirements management"),
-    t("landing.hero.certification2", "Powerful and easy to use"),
+    t("landing.hero.certification1"),
+    t("landing.hero.certification2"),
   ];
+
+  const handleGetStarted = useCallback(() => {
+    onGetStarted?.();
+  }, [onGetStarted]);
 
   return (
     <Box
@@ -519,7 +531,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
                   variant="contained"
                   size="large"
                   endIcon={<ArrowForward />}
-                  onClick={onGetStarted}
+                  onClick={handleGetStarted}
                   sx={{
                     py: 2,
                     px: 5,
@@ -694,4 +706,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStarted }) => {
       </Container>
     </Box>
   );
-};
+});
+
+HeroSection.displayName = 'HeroSection';

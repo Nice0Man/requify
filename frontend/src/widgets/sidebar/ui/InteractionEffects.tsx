@@ -9,7 +9,7 @@ interface InteractionEffectsProps {
   isSnapping: boolean;
   children: React.ReactNode;
   color?: string;
-  liftDuration?: number;
+  _liftDuration?: number;
   onLiftComplete?: () => void;
   onSnapComplete?: () => void;
 }
@@ -25,7 +25,7 @@ export const InteractionEffects: React.FC<InteractionEffectsProps> = ({
   isSnapping,
   children,
   color,
-  liftDuration = 0,
+  _liftDuration = 0,
   onLiftComplete,
   onSnapComplete,
 }) => {

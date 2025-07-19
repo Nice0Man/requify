@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
+import i18n from "@/shared/lib/i18n";
 
 const DashboardCharts: React.FC = () => {
-  const { t } = useTranslation();
+  const t = i18n.t;
   return (
     <Box>
       <Typography variant="h6">{t("dashboard.chartsTitle")}</Typography>

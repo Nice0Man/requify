@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from "react";
+import React, { memo, useMemo } from "react";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { SidebarItem as SidebarItemType } from "../model/types";
 
@@ -24,7 +24,7 @@ export const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = memo(({
   // Мемоизация видимых элементов
   const visibleItems = useMemo(() => {
     // Возвращаем только необходимые элементы для рендера
-    return items.filter((item) => {
+    return items.filter((_item) => {
       // Логика фильтрации (например, виртуализация при большом количестве элементов)
       return true; // Пока возвращаем все элементы
     });

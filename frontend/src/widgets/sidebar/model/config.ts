@@ -4,7 +4,7 @@ import { SidebarConfig } from "./types";
 export const sidebarConfig: SidebarConfig = {
   width: 280,
   collapsedWidth: 72,
-  animationDuration: 300,
+  animationDuration: 250, // Быстрее для более отзывчивого UI
   iconSize: "large",
   allowReorder: true,
   persistOrder: true,

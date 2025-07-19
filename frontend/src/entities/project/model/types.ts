@@ -16,19 +16,19 @@ export interface Project {
 }
 
 export enum ProjectStatus {
-  PLANNING = 'planning',
-  IN_PROGRESS = 'in_progress',
-  TESTING = 'testing',
-  COMPLETED = 'completed',
-  ON_HOLD = 'on_hold',
-  CANCELLED = 'cancelled'
+  PLANNING = "planning",
+  IN_PROGRESS = "in_progress",
+  TESTING = "testing",
+  COMPLETED = "completed",
+  ON_HOLD = "on_hold",
+  CANCELLED = "cancelled",
 }
 
 export enum ProjectPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical'
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+  CRITICAL = "critical",
 }
 
 export interface ProjectDTO {
@@ -48,6 +48,20 @@ export interface ProjectDTO {
   is_active: boolean;
 }
 
+// API Filters
+export interface ProjectFilters {
+  search?: string;
+  status?: string;
+  priority?: string;
+  ownerId?: string;
+  isActive?: boolean;
+  tags?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+  period?: string;
+}
+
+// API Request/Response types
 export interface CreateProjectRequest {
   name: string;
   description: string;
@@ -59,6 +73,9 @@ export interface CreateProjectRequest {
   teamMembers?: string[];
   tags?: string[];
 }
+
+// Aliases for API compatibility
+export type ProjectCreateData = CreateProjectRequest;
 
 export interface UpdateProjectRequest {
   name?: string;
@@ -74,9 +91,37 @@ export interface UpdateProjectRequest {
   isActive?: boolean;
 }
 
+// Aliases for API compatibility
+export type ProjectUpdateData = UpdateProjectRequest;
+
 export interface ProjectListResponse {
   projects: ProjectDTO[];
   total: number;
   page: number;
   limit: number;
-} 
+}
+
+// Stats and Analytics types
+export interface ProjectStats {
+  id: string;
+  name: string;
+  totalRequirements: number;
+  completedRequirements: number;
+  inProgressRequirements: number;
+  totalTestCases: number;
+  passedTestCases: number;
+  failedTestCases: number;
+  teamMembersCount: number;
+  progressPercentage: number;
+  budget?: {
+    allocated: number;
+    spent: number;
+    currency: string;
+  };
+}
+
+export interface ProjectStatusDistribution {
+  status: ProjectStatus;
+  count: number;
+  percentage: number;
+}

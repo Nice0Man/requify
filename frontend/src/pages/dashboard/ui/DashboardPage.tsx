@@ -1,676 +1,1068 @@
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import React, {
+  memo,
+  useState,
+  useCallback,
+  useMemo,
+  startTransition,
+} from "react";
 import {
   Container,
   Grid,
-  Paper,
-  Typography,
   Box,
-  IconButton,
+  Typography,
   Stack,
+  IconButton,
+  Tooltip,
   useTheme,
   alpha,
-  Button,
+  Fade,
+  Skeleton,
+  Alert,
+  Card,
+  CardContent,
+  Paper,
   Chip,
-  Tooltip,
 } from "@mui/material";
 import {
-  TrendingUp,
-  Assignment,
-  RocketLaunch,
-  BugReport,
-  People,
-  Speed,
   Refresh,
-  ArrowForward,
-  Insights,
-  Add,
-  ViewColumn,
-  Analytics,
-  FolderOpen,
-  CheckCircle,
-  TrendingDown,
+  Settings,
+  Fullscreen,
+  FullscreenExit,
+  ViewModule,
+  ViewQuilt,
+  Tune,
+  TrendingUp,
+  Speed,
+  Update,
 } from "@mui/icons-material";
-import { DashboardLayout } from "@/widgets/layout";
-import { DashboardStatsWidget } from "@/widgets/dashboard-stats";
-import { ProjectOverviewWidget } from "@/widgets/project-overview";
-import { ActivityFeedWidget } from "@/widgets/activity-feed";
-import { QuickActions } from "@/features/dashboard/ui/QuickActions";
-import { useDashboardStats } from "@/features/dashboard/model/useDashboardQuery";
-import { LoadingSpinner } from "@/shared/ui";
+import i18n from "@/shared/lib/i18n";
+import { useQueryClient } from "@tanstack/react-query";
 
-interface DashboardMetric {
-  id: string;
-  title: string;
-  value: string | number;
-  change: number;
-  trend: "up" | "down" | "stable";
-  icon: React.ReactNode;
-  color: string;
-  description: string;
+import { DashboardLayout } from "@/widgets/layout";
+import { DashboardStatsWidget, QuickActionsWidget } from "@/widgets";
+import { ActivityFeedWidget } from "@/widgets/dashboard-activity-feed";
+import { ProjectOverviewWidget } from "@/widgets/project-overview";
+import { SystemHealthWidget } from "@/widgets/system-health";
+import {
+  useDashboardOverview,
+  useRefreshDashboard,
+  dashboardKeys,
+} from "@/features/dashboard";
+import {
+  useTheme as useThemeMode,
+  useLayoutMode,
+  useLoadingState,
+  usePerformanceMonitor,
+} from "@/shared/contexts/PerformanceContext";
+import {
+  useRenderTracker,
+  usePerformanceMeasure,
+  useDebounced,
+  useBatchedUpdates,
+} from "@/shared/hooks/usePerformanceOptimizations";
+import type {
+  DashboardWidget,
+  WidgetType,
+  DashboardMetric,
+  ActivityItem as ActivityItemType,
+  MetricCategory,
+} from "@/entities/dashboard";
+
+interface DashboardPageProps {
+  // Для будущего расширения
 }
 
-const DashboardPage: React.FC = () => {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const { data: stats, isPending, error } = useDashboardStats();
+/**
+ * Dashboard Page - Context7 Design System Implementation
+ * Features: 8px grid system, smooth 60fps animations, collision-free layouts, mobile-first responsive design
+ */
+const DashboardPage = memo<DashboardPageProps>(() => {
+  // Performance monitoring
+  useRenderTracker("DashboardPage");
+  usePerformanceMeasure("DashboardPage");
 
-  if (isPending) {
+  // Hooks and services
+  const t = i18n.t;
+  const muiTheme = useTheme();
+  const themeMode = useThemeMode();
+  const { mode: globalLayoutMode, setMode: setGlobalLayoutMode } =
+    useLayoutMode();
+  const { isLoading: globalLoading } = useLoadingState();
+  const queryClient = useQueryClient();
+
+  // Local state with batched updates for performance
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [localLayoutMode, setLocalLayoutMode] = useState<"grid" | "list">(
+    globalLayoutMode === "grid" ? "grid" : "list"
+  );
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Batched updates for better performance
+  const [batchedState, updateBatchedState] = useBatchedUpdates({
+    isFullscreen: false,
+    refreshing: false,
+  });
+
+  // Queries
+  const {
+    data: overview,
+    isLoading,
+    error,
+    isError,
+    isFetching,
+  } = useDashboardOverview();
+
+  const refreshMutation = useRefreshDashboard({
+    onMutate: () => setRefreshing(true),
+    onSettled: () => setRefreshing(false),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
+    },
+  });
+
+  // Event handlers
+  const handleRefresh = useCallback(() => {
+    refreshMutation.mutate();
+  }, [refreshMutation]);
+
+  const handleFullscreen = useCallback(() => {
+    if (!isFullscreen) {
+      document.documentElement.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+    setIsFullscreen(!isFullscreen);
+  }, [isFullscreen]);
+
+  const handleLayoutModeChange = useCallback(() => {
+    const newMode = localLayoutMode === "grid" ? "list" : "grid";
+    setLocalLayoutMode(newMode);
+    setGlobalLayoutMode(newMode);
+  }, [localLayoutMode, setGlobalLayoutMode]);
+
+  const handleMetricClick = useCallback((metric: any) => {
+    // Handle metric click - navigate to detailed view
+    console.log("Metric clicked:", metric);
+  }, []);
+
+  const handleActivityClick = useCallback((activity: ActivityItemType) => {
+    // Handle activity click - navigate to activity detail
+    console.log("Activity clicked:", activity);
+  }, []);
+
+  // Context7 Design System - 8px grid spacing
+  const spacing = useMemo(
+    () => ({
+      xs: 8, // 8px
+      sm: 16, // 16px
+      md: 24, // 24px
+      lg: 32, // 32px
+      xl: 40, // 40px
+      xxl: 48, // 48px
+    }),
+    []
+  );
+
+  // Context7 Animation System
+  const animations = useMemo(
+    () => ({
+      // Fast micro-interactions
+      fast: {
+        duration: 150,
+        easing: "cubic-bezier(0.4, 0.0, 0.2, 1)", // Material Design standard
+      },
+      // Standard transitions
+      standard: {
+        duration: 300,
+        easing: "cubic-bezier(0.4, 0.0, 0.2, 1)",
+      },
+      // Complex animations
+      complex: {
+        duration: 500,
+        easing: "cubic-bezier(0.4, 0.0, 0.2, 1)",
+      },
+      // Entrance animations
+      entrance: {
+        duration: 400,
+        easing: "cubic-bezier(0.0, 0.0, 0.2, 1)",
+      },
+    }),
+    []
+  );
+
+  // Memoized computed values
+  const isCompactMode = useMemo(
+    () => localLayoutMode === "list",
+    [localLayoutMode]
+  );
+  const gridSpacing = useMemo(
+    () => (isCompactMode ? spacing.sm : spacing.md),
+    [isCompactMode, spacing]
+  );
+  const containerSpacing = useMemo(
+    () => (isCompactMode ? spacing.lg : spacing.xl),
+    [isCompactMode, spacing]
+  );
+
+  // Context7 Color System
+  const colors = useMemo(
+    () => ({
+      surface: {
+        primary: muiTheme.palette.background.paper,
+        secondary: alpha(muiTheme.palette.background.paper, 0.6),
+        elevated: alpha(muiTheme.palette.background.paper, 0.9),
+      },
+      accent: {
+        primary: muiTheme.palette.primary.main,
+        secondary: muiTheme.palette.secondary.main,
+        success: muiTheme.palette.success.main,
+        warning: muiTheme.palette.warning.main,
+        error: muiTheme.palette.error.main,
+        info: muiTheme.palette.info.main,
+      },
+      elevation: {
+        subtle: `0 2px 8px ${alpha(muiTheme.palette.common.black, 0.04)}`,
+        medium: `0 4px 16px ${alpha(muiTheme.palette.common.black, 0.08)}`,
+        high: `0 8px 32px ${alpha(muiTheme.palette.common.black, 0.12)}`,
+        extreme: `0 16px 64px ${alpha(muiTheme.palette.common.black, 0.16)}`,
+      },
+    }),
+    [muiTheme.palette]
+  );
+
+  // Loading state with Context7 design
+  if (isLoading) {
     return (
       <DashboardLayout>
-        <LoadingSpinner fullScreen />
-      </DashboardLayout>
-    );
-  }
+        <Box
+          sx={{
+            minHeight: "100vh",
+            background: `linear-gradient(135deg, 
+              ${alpha(colors.accent.primary, 0.02)} 0%, 
+              ${alpha(colors.accent.secondary, 0.015)} 50%,
+              ${alpha(colors.accent.success, 0.01)} 100%)`,
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          {/* Context7 Loading Animation */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: -200,
+              right: -200,
+              width: 400,
+              height: 400,
+              borderRadius: "50%",
+              background: `radial-gradient(circle, 
+                ${alpha(colors.accent.primary, 0.06)} 0%, 
+                transparent 70%)`,
+              animation: "contextFloat 8s ease-in-out infinite",
+              "@keyframes contextFloat": {
+                "0%, 100%": {
+                  transform: "translateY(0px) scale(1)",
+                  opacity: 0.6,
+                },
+                "50%": {
+                  transform: "translateY(-20px) scale(1.05)",
+                  opacity: 0.8,
+                },
+              },
+            }}
+          />
 
-  if (error) {
-    return (
-      <DashboardLayout>
-        <Box p={3} textAlign="center">
-          <Typography color="error">{t("errors.loadingError")}</Typography>
+          <Container
+            maxWidth="xl"
+            sx={{
+              py: containerSpacing / 8,
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
+            <Stack spacing={gridSpacing / 8}>
+              {/* Header Skeleton with Context7 design */}
+              <Box sx={{ mb: spacing.lg / 8 }}>
+                <Skeleton
+                  variant="text"
+                  width="min(400px, 80vw)"
+                  height={64}
+                  sx={{
+                    borderRadius: spacing.xs / 8,
+                    transform: "scale(1)",
+                    animation: "contextPulse 2s ease-in-out infinite",
+                    "@keyframes contextPulse": {
+                      "0%, 100%": { opacity: 0.3 },
+                      "50%": { opacity: 0.6 },
+                    },
+                  }}
+                />
+                <Skeleton
+                  variant="text"
+                  width="min(600px, 90vw)"
+                  height={24}
+                  sx={{
+                    mt: spacing.xs / 8,
+                    borderRadius: spacing.xs / 8,
+                    animation: "contextPulse 2s ease-in-out infinite 0.3s",
+                  }}
+                />
+              </Box>
+
+              {/* Stats Skeleton Grid */}
+              <Grid container spacing={gridSpacing / 8}>
+                {[1, 2, 3, 4].map((i) => (
+                  <Grid item xs={12} sm={6} lg={3} key={i}>
+                    <Skeleton
+                      variant="rectangular"
+                      height={isCompactMode ? 120 : 160}
+                      sx={{
+                        borderRadius: spacing.sm / 8,
+                        animation: `contextSlideIn 0.6s ease-out ${
+                          i * 0.1
+                        }s both`,
+                        "@keyframes contextSlideIn": {
+                          "0%": {
+                            opacity: 0,
+                            transform: "translateY(20px)",
+                          },
+                          "100%": {
+                            opacity: 1,
+                            transform: "translateY(0)",
+                          },
+                        },
+                      }}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+
+              {/* Content Skeleton */}
+              <Grid container spacing={gridSpacing / 8}>
+                <Grid item xs={12} lg={8}>
+                  <Skeleton
+                    variant="rectangular"
+                    height={isCompactMode ? 300 : 400}
+                    sx={{
+                      borderRadius: spacing.sm / 8,
+                      animation: "contextSlideIn 0.6s ease-out 0.5s both",
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} lg={4}>
+                  <Skeleton
+                    variant="rectangular"
+                    height={isCompactMode ? 300 : 400}
+                    sx={{
+                      borderRadius: spacing.sm / 8,
+                      animation: "contextSlideIn 0.6s ease-out 0.6s both",
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Stack>
+          </Container>
         </Box>
       </DashboardLayout>
     );
   }
 
-  // Minimalist metrics with key focus
-  const metrics: DashboardMetric[] = [
-    {
-      id: "active-projects",
-      title: t("dashboard.activeProjects"),
-      value: stats?.activeProjects || 12,
-      change: 8.5,
-      trend: "up",
-      icon: <FolderOpen />,
-      color: theme.palette.primary.main,
-      description: t("dashboard.projectsInDevelopment"),
-    },
-    {
-      id: "total-requirements",
-      title: t("dashboard.requirements"),
-      value: stats?.activeRequirements || 247,
-      change: 12.3,
-      trend: "up",
-      icon: <Assignment />,
-      color: theme.palette.info.main,
-      description: t("dashboard.activeRequirements"),
-    },
-    {
-      id: "completion-rate",
-      title: t("dashboard.completionRate"),
-      value: `${stats?.completionRate || 89}%`,
-      change: 4.2,
-      trend: "up",
-      icon: <CheckCircle />,
-      color: theme.palette.success.main,
-      description: t("dashboard.totalReadiness"),
-    },
-    {
-      id: "team-velocity",
-      title: t("dashboard.team"),
-      value: stats?.teamVelocity || 42,
-      change: -2.1,
-      trend: "down",
-      icon: <Speed />,
-      color: theme.palette.warning.main,
-      description: t("dashboard.activeParticipants"),
-    },
-  ];
-
-  const handleRefresh = () => {
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
-  };
-
-  return (
-    <DashboardLayout>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        {/* Header Section - Minimalist */}
+  // Error state with Context7 design
+  if (isError) {
+    return (
+      <DashboardLayout>
         <Box
-          mb={4}
           sx={{
-            opacity: 0,
-            transform: "translateY(20px)",
-            animation: "fadeInUp 0.6s ease-out 0.1s forwards",
-            "@keyframes fadeInUp": {
-              "0%": { opacity: 0, transform: "translateY(20px)" },
-              "100%": { opacity: 1, transform: "translateY(0)" },
-            },
+            minHeight: "100vh",
+            background: `linear-gradient(135deg, 
+              ${alpha(colors.accent.error, 0.02)} 0%, 
+              ${alpha(colors.accent.error, 0.005)} 100%)`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: spacing.md / 8,
           }}
         >
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
-            <Box>
-              <Typography
-                variant="h4"
+          <Container maxWidth="md">
+            <Paper
+              elevation={0}
+              sx={{
+                p: spacing.xl / 8,
+                borderRadius: spacing.md / 8,
+                textAlign: "center",
+                background: colors.surface.elevated,
+                border: `1px solid ${alpha(colors.accent.error, 0.1)}`,
+                backdropFilter: "blur(20px)",
+                boxShadow: colors.elevation.high,
+                animation: "contextErrorIn 0.5s ease-out",
+                "@keyframes contextErrorIn": {
+                  "0%": {
+                    opacity: 0,
+                    transform: "scale(0.9) translateY(20px)",
+                  },
+                  "100%": {
+                    opacity: 1,
+                    transform: "scale(1) translateY(0)",
+                  },
+                },
+              }}
+            >
+              <Alert
+                severity="error"
                 sx={{
-                  fontWeight: 700,
-                  color: theme.palette.text.primary,
-                  mb: 0.5,
+                  borderRadius: spacing.sm / 8,
+                  border: `1px solid ${alpha(colors.accent.error, 0.2)}`,
+                  background: `linear-gradient(135deg, 
+                    ${alpha(colors.accent.error, 0.05)} 0%, 
+                    ${alpha(colors.accent.error, 0.02)} 100%)`,
+                  "& .MuiAlert-icon": {
+                    fontSize: 32,
+                  },
                 }}
-              >
-                {t("dashboard.title")}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Welcome back! Here's what's happening with your projects.
-              </Typography>
-            </Box>
-            <Stack direction="row" spacing={1}>
-              <Tooltip title="Refresh">
-                <span>
+                action={
                   <IconButton
+                    color="inherit"
+                    size="large"
                     onClick={handleRefresh}
-                    disabled={isLoading}
+                    disabled={refreshing}
                     sx={{
-                      borderRadius: 2,
-                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      borderRadius: spacing.sm / 8,
+                      transition: `all ${animations.fast.duration}ms ${animations.fast.easing}`,
                       "&:hover": {
-                        backgroundColor: alpha(
-                          theme.palette.primary.main,
-                          0.04
-                        ),
+                        transform: "scale(1.05)",
+                        background: alpha(colors.accent.error, 0.1),
                       },
                     }}
                   >
                     <Refresh />
                   </IconButton>
-                </span>
-              </Tooltip>
-            </Stack>
-          </Stack>
-        </Box>
-
-        {/* Key Metrics - Minimalist Cards */}
-        <Grid
-          container
-          spacing={3}
-          mb={4}
-          sx={{
-            opacity: 0,
-            transform: "translateY(20px)",
-            animation: "fadeInUp 0.6s ease-out 0.3s forwards",
-            "@keyframes fadeInUp": {
-              "0%": { opacity: 0, transform: "translateY(20px)" },
-              "100%": { opacity: 1, transform: "translateY(0)" },
-            },
-          }}
-        >
-          {metrics.map((metric, index) => (
-            <Grid item xs={12} sm={6} md={3} key={metric.id}>
-              <Box
-                sx={{
-                  p: 2.5,
-                  borderRadius: 3,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                  background: theme.palette.background.paper,
-                  transition: "all 0.3s ease",
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: `fadeInUp 0.6s ease-out ${
-                    0.5 + index * 0.1
-                  }s forwards`,
-                  "@keyframes fadeInUp": {
-                    "0%": { opacity: 0, transform: "translateY(20px)" },
-                    "100%": { opacity: 1, transform: "translateY(0)" },
-                  },
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: `0 8px 24px ${alpha(metric.color, 0.12)}`,
-                    borderColor: alpha(metric.color, 0.2),
-                  },
-                }}
+                }
               >
-                <Stack direction="row" alignItems="center" spacing={2}>
-                  <Box
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 2,
-                      background: alpha(metric.color, 0.1),
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: metric.color,
-                    }}
-                  >
-                    {metric.icon}
-                  </Box>
-                  <Box flex={1}>
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: 700,
-                        color: theme.palette.text.primary,
-                        mb: 0.5,
-                      }}
-                    >
-                      {metric.value}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {metric.title}
-                    </Typography>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={0.5}
-                      mt={0.5}
-                    >
-                      {metric.trend === "up" ? (
-                        <TrendingUp
-                          sx={{
-                            fontSize: 16,
-                            color: theme.palette.success.main,
-                          }}
-                        />
-                      ) : (
-                        <TrendingDown
-                          sx={{
-                            fontSize: 16,
-                            color: theme.palette.error.main,
-                          }}
-                        />
-                      )}
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color:
-                            metric.trend === "up"
-                              ? theme.palette.success.main
-                              : theme.palette.error.main,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {metric.change > 0 ? "+" : ""}
-                        {metric.change}%
-                      </Typography>
-                    </Stack>
-                  </Box>
-                </Stack>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                  {t("errors.loadingError")}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                  {error?.message || "Неизвестная ошибка"}
+                </Typography>
+              </Alert>
+            </Paper>
+          </Container>
+        </Box>
+      </DashboardLayout>
+    );
+  }
 
-        {/* Quick Actions - with Drag & Drop Support */}
+  return (
+    <DashboardLayout>
+      {/* Context7 Gradient Background System */}
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: `linear-gradient(135deg, 
+            ${alpha(colors.accent.primary, 0.025)} 0%, 
+            ${alpha(colors.accent.secondary, 0.015)} 25%,
+            ${alpha(colors.accent.success, 0.02)} 50%,
+            ${alpha(colors.accent.info, 0.015)} 75%,
+            ${alpha(colors.accent.primary, 0.01)} 100%)`,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        {/* Context7 Floating Elements */}
         <Box
           sx={{
-            mb: 4,
-            opacity: 0,
-            transform: "translateY(20px)",
-            animation: "fadeInUp 0.6s ease-out 0.9s forwards",
-            "@keyframes fadeInUp": {
-              "0%": { opacity: 0, transform: "translateY(20px)" },
-              "100%": { opacity: 1, transform: "translateY(0)" },
+            position: "absolute",
+            top: -300,
+            right: -300,
+            width: 600,
+            height: 600,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, 
+              ${alpha(colors.accent.primary, 0.06)} 0%, 
+              transparent 70%)`,
+            animation: "contextPrimaryFloat 12s ease-in-out infinite",
+            "@keyframes contextPrimaryFloat": {
+              "0%, 100%": {
+                transform: "translateY(0px) rotate(0deg) scale(1)",
+                opacity: 0.4,
+              },
+              "50%": {
+                transform: "translateY(-40px) rotate(180deg) scale(1.1)",
+                opacity: 0.6,
+              },
             },
           }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: -200,
+            left: -200,
+            width: 400,
+            height: 400,
+            borderRadius: "50%",
+            background: `radial-gradient(circle, 
+              ${alpha(colors.accent.secondary, 0.04)} 0%, 
+              transparent 70%)`,
+            animation: "contextSecondaryFloat 15s ease-in-out infinite reverse",
+            "@keyframes contextSecondaryFloat": {
+              "0%, 100%": {
+                transform: "translateX(0px) scale(1)",
+                opacity: 0.3,
+              },
+              "50%": {
+                transform: "translateX(30px) scale(1.15)",
+                opacity: 0.5,
+              },
+            },
+          }}
+        />
+
+        <Container
+          maxWidth="xl"
+          sx={{
+            py: containerSpacing / 8,
+            position: "relative",
+            zIndex: 1,
+          }}
         >
-          <QuickActions />
-        </Box>
-
-        {/* Main Content Grid - Minimalist Layout */}
-        <Grid container spacing={3}>
-          {/* Left Column - Primary Content */}
-          <Grid item xs={12} lg={8}>
-            <Stack spacing={3}>
-              {/* Project Overview */}
-              <Box
-                sx={{
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: "fadeInUp 0.6s ease-out 1.5s forwards",
-                  "@keyframes fadeInUp": {
-                    "0%": { opacity: 0, transform: "translateY(20px)" },
-                    "100%": { opacity: 1, transform: "translateY(0)" },
-                  },
-                }}
+          {/* Context7 Hero Header */}
+          <Fade in timeout={animations.entrance.duration}>
+            <Box mb={spacing.xl / 8}>
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", md: "center" }}
+                spacing={spacing.md / 8}
+                mb={spacing.md / 8}
               >
-                <Paper
-                  elevation={0}
+                {/* Title Section with Context7 Typography */}
+                <Box>
+                  <Typography
+                    variant="h1"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: {
+                        xs: "2rem",
+                        sm: "2.5rem",
+                        md: "3rem",
+                        lg: "3.5rem",
+                      },
+                      lineHeight: { xs: 1.2, md: 1.1 },
+                      background: `linear-gradient(135deg, 
+                        ${colors.accent.primary} 0%, 
+                        ${colors.accent.secondary} 50%,
+                        ${colors.accent.success} 100%)`,
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      mb: spacing.xs / 8,
+                      letterSpacing: "-0.02em",
+                      animation: "contextTitleIn 0.8s ease-out",
+                      "@keyframes contextTitleIn": {
+                        "0%": {
+                          opacity: 0,
+                          transform: "translateY(30px)",
+                        },
+                        "100%": {
+                          opacity: 1,
+                          transform: "translateY(0)",
+                        },
+                      },
+                    }}
+                  >
+                    {t("dashboard.title", "Dashboard")}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: muiTheme.palette.text.secondary,
+                      fontWeight: 400,
+                      maxWidth: { xs: "100%", md: 600 },
+                      lineHeight: 1.6,
+                      opacity: 0.9,
+                      animation: "contextSubtitleIn 0.8s ease-out 0.2s both",
+                      "@keyframes contextSubtitleIn": {
+                        "0%": {
+                          opacity: 0,
+                          transform: "translateY(20px)",
+                        },
+                        "100%": {
+                          opacity: 0.9,
+                          transform: "translateY(0)",
+                        },
+                      },
+                    }}
+                  >
+                    {t(
+                      "dashboard.subtitle",
+                      "Welcome back! Here's what's happening with your projects."
+                    )}
+                  </Typography>
+                </Box>
+
+                {/* Context7 Action Controls */}
+                <Stack
+                  direction="row"
+                  spacing={spacing.sm / 8}
                   sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                    background: theme.palette.background.paper,
+                    animation: "contextActionsIn 0.8s ease-out 0.4s both",
+                    "@keyframes contextActionsIn": {
+                      "0%": {
+                        opacity: 0,
+                        transform: "translateX(20px)",
+                      },
+                      "100%": {
+                        opacity: 1,
+                        transform: "translateX(0)",
+                      },
+                    },
                   }}
                 >
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Recent Projects
-                  </Typography>
-                  <Stack spacing={2}>
-                    {[
-                      { name: "CRM System", progress: 78, status: "active" },
-                      {
-                        name: "Mobile App",
-                        progress: 45,
-                        status: "development",
-                      },
-                      { name: "API Gateway", progress: 92, status: "testing" },
-                    ].map((project, index) => (
-                      <Box key={index}>
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                          mb={1}
+                  {[
+                    {
+                      icon:
+                        localLayoutMode === "grid" ? (
+                          <ViewQuilt />
+                        ) : (
+                          <ViewModule />
+                        ),
+                      onClick: handleLayoutModeChange,
+                      tooltip: t("dashboard.layoutMode"),
+                      color: colors.accent.primary,
+                    },
+                    {
+                      icon: <Refresh />,
+                      onClick: handleRefresh,
+                      tooltip: t("common.refresh"),
+                      color: colors.accent.success,
+                      disabled: refreshing || isFetching,
+                      loading: refreshing,
+                    },
+                    {
+                      icon: isFullscreen ? <FullscreenExit /> : <Fullscreen />,
+                      onClick: handleFullscreen,
+                      tooltip: isFullscreen
+                        ? t("common.exitFullscreen")
+                        : t("common.fullscreen"),
+                      color: colors.accent.info,
+                    },
+                  ].map((action, index) => (
+                    <Tooltip key={index} title={action.tooltip}>
+                      <Box>
+                        <IconButton
+                          onClick={action.onClick}
+                          disabled={action.disabled}
+                          sx={{
+                            width: { xs: 48, md: 56 },
+                            height: { xs: 48, md: 56 },
+                            borderRadius: spacing.sm / 8,
+                            border: `1px solid ${alpha(action.color, 0.15)}`,
+                            background: `linear-gradient(135deg, 
+                              ${colors.surface.elevated} 0%, 
+                              ${alpha(colors.surface.elevated, 0.8)} 100%)`,
+                            backdropFilter: "blur(20px)",
+                            boxShadow: colors.elevation.subtle,
+                            transition: `all ${animations.standard.duration}ms ${animations.standard.easing}`,
+                            color: action.color,
+
+                            "&:hover": {
+                              transform: "translateY(-2px) scale(1.02)",
+                              boxShadow: `${
+                                colors.elevation.medium
+                              }, 0 0 20px ${alpha(action.color, 0.2)}`,
+                              borderColor: alpha(action.color, 0.3),
+                              background: `linear-gradient(135deg, 
+                                ${colors.surface.elevated} 0%, 
+                                ${alpha(action.color, 0.05)} 100%)`,
+                            },
+
+                            "&:active": {
+                              transform: "translateY(0) scale(0.98)",
+                              transition: `all ${animations.fast.duration}ms ${animations.fast.easing}`,
+                            },
+
+                            ...(action.loading && {
+                              animation: "contextSpin 1s linear infinite",
+                              "@keyframes contextSpin": {
+                                "0%": { transform: "rotate(0deg)" },
+                                "100%": { transform: "rotate(360deg)" },
+                              },
+                            }),
+                          }}
                         >
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 600 }}
-                          >
-                            {project.name}
-                          </Typography>
-                          <Chip
-                            label={project.status}
-                            size="small"
-                            sx={{
-                              height: 20,
-                              fontSize: "0.7rem",
-                              backgroundColor: alpha(
-                                theme.palette.primary.main,
-                                0.1
-                              ),
-                              color: theme.palette.primary.main,
-                            }}
-                          />
-                        </Stack>
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <Box sx={{ width: "100%", mr: 1 }}>
-                            <Box
-                              sx={{
-                                height: 6,
-                                borderRadius: 3,
-                                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                overflow: "hidden",
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  width: `${project.progress}%`,
-                                  height: "100%",
-                                  bgcolor: theme.palette.primary.main,
-                                  borderRadius: 3,
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ minWidth: 35 }}
-                          >
-                            {project.progress}%
-                          </Typography>
-                        </Box>
+                          {action.icon}
+                        </IconButton>
                       </Box>
-                    ))}
-                  </Stack>
-                </Paper>
-              </Box>
+                    </Tooltip>
+                  ))}
+                </Stack>
+              </Stack>
 
-              {/* Recent Requirements */}
-              <Box
+              {/* Context7 Status Indicators */}
+              <Stack
+                direction="row"
+                spacing={spacing.sm / 8}
+                flexWrap="wrap"
+                gap={spacing.xs / 8}
                 sx={{
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: "fadeInUp 0.6s ease-out 1.7s forwards",
-                  "@keyframes fadeInUp": {
-                    "0%": { opacity: 0, transform: "translateY(20px)" },
-                    "100%": { opacity: 1, transform: "translateY(0)" },
+                  animation: "contextChipsIn 0.8s ease-out 0.6s both",
+                  "@keyframes contextChipsIn": {
+                    "0%": {
+                      opacity: 0,
+                      transform: "translateY(15px)",
+                    },
+                    "100%": {
+                      opacity: 1,
+                      transform: "translateY(0)",
+                    },
                   },
                 }}
               >
-                <Paper
-                  elevation={0}
+                {[
+                  {
+                    icon: <TrendingUp />,
+                    label: t("dashboard.upToDate"),
+                    color: colors.accent.success,
+                  },
+                  {
+                    icon: <Speed />,
+                    label: `${overview?.stats?.activeProjects || 0} ${t(
+                      "dashboard.activeProjects"
+                    )}`,
+                    color: colors.accent.primary,
+                  },
+                  {
+                    icon: <Update />,
+                    label: t("dashboard.lastUpdate", "Last updated 2 min ago"),
+                    color: muiTheme.palette.text.secondary,
+                  },
+                ].map((chip, index) => (
+                  <Chip
+                    key={index}
+                    icon={chip.icon}
+                    label={chip.label}
+                    size="medium"
+                    sx={{
+                      borderRadius: spacing.sm / 8,
+                      px: spacing.sm / 8,
+                      py: spacing.xs / 8,
+                      height: 36,
+                      background: `linear-gradient(135deg, 
+                        ${alpha(chip.color, 0.1)} 0%, 
+                        ${alpha(chip.color, 0.05)} 100%)`,
+                      border: `1px solid ${alpha(chip.color, 0.2)}`,
+                      color: chip.color,
+                      fontWeight: 600,
+                      fontSize: "0.875rem",
+                      transition: `all ${animations.fast.duration}ms ${animations.fast.easing}`,
+
+                      "& .MuiChip-icon": {
+                        color: chip.color,
+                        fontSize: 18,
+                      },
+
+                      "&:hover": {
+                        transform: "translateY(-1px)",
+                        boxShadow: `0 4px 12px ${alpha(chip.color, 0.2)}`,
+                        borderColor: alpha(chip.color, 0.3),
+                      },
+                    }}
+                  />
+                ))}
+              </Stack>
+            </Box>
+          </Fade>
+
+          {/* Context7 Grid Layout System */}
+          <Grid container spacing={gridSpacing}>
+            {/* Key Metrics - Full Width */}
+            <Grid item xs={12}>
+              <Fade
+                in
+                timeout={animations.entrance.duration}
+                style={{ transitionDelay: "100ms" }}
+              >
+                <Box
                   sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                    background: theme.palette.background.paper,
+                    animation: "contextMetricsIn 0.8s ease-out 0.1s both",
+                    "@keyframes contextMetricsIn": {
+                      "0%": {
+                        opacity: 0,
+                        transform: "translateY(30px)",
+                      },
+                      "100%": {
+                        opacity: 1,
+                        transform: "translateY(0)",
+                      },
+                    },
                   }}
                 >
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Recent Requirements
-                  </Typography>
-                  <Stack spacing={1.5}>
-                    {[
-                      {
-                        id: "REQ-145",
-                        title: "User Authentication System",
-                        priority: "high",
+                  <DashboardStatsWidget
+                    variant={isCompactMode ? "compact" : "detailed"}
+                    onMetricClick={handleMetricClick}
+                    showExport
+                    showRefresh
+                  />
+                </Box>
+              </Fade>
+            </Grid>
+
+            {/* Main Content Area */}
+            <Grid item xs={12} lg={8}>
+              <Stack spacing={gridSpacing / 8}>
+                {/* Quick Actions */}
+                <Fade
+                  in
+                  timeout={animations.entrance.duration}
+                  style={{ transitionDelay: "200ms" }}
+                >
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: { xs: spacing.md / 8, md: spacing.lg / 8 },
+                      borderRadius: spacing.md / 8,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.06
+                      )}`,
+                      background: colors.surface.elevated,
+                      backdropFilter: "blur(20px)",
+                      position: "relative",
+                      overflow: "hidden",
+                      boxShadow: colors.elevation.medium,
+                      transition: `all ${animations.standard.duration}ms ${animations.standard.easing}`,
+
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: colors.elevation.high,
                       },
-                      {
-                        id: "REQ-146",
-                        title: "Payment Integration",
-                        priority: "medium",
+
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 3,
+                        background: `linear-gradient(90deg, 
+                          ${colors.accent.primary} 0%, 
+                          ${colors.accent.secondary} 50%,
+                          ${colors.accent.success} 100%)`,
                       },
-                      {
-                        id: "REQ-147",
-                        title: "Email Notifications",
-                        priority: "low",
+
+                      animation:
+                        "contextQuickActionsIn 0.8s ease-out 0.2s both",
+                      "@keyframes contextQuickActionsIn": {
+                        "0%": {
+                          opacity: 0,
+                          transform: "translateY(30px) translateX(-10px)",
+                        },
+                        "100%": {
+                          opacity: 1,
+                          transform: "translateY(0) translateX(0)",
+                        },
                       },
-                      {
-                        id: "REQ-148",
-                        title: "Data Export Feature",
-                        priority: "medium",
+                    }}
+                  >
+                    <QuickActionsWidget
+                      variant={isCompactMode ? "compact" : "detailed"}
+                      maxActions={isCompactMode ? 4 : 8}
+                      showCategories={!isCompactMode}
+                      showShortcuts={!isCompactMode}
+                      showFavorites
+                    />
+                  </Paper>
+                </Fade>
+
+                {/* Project Overview */}
+                <Fade
+                  in
+                  timeout={animations.entrance.duration}
+                  style={{ transitionDelay: "300ms" }}
+                >
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: { xs: spacing.md / 8, md: spacing.lg / 8 },
+                      borderRadius: spacing.md / 8,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.06
+                      )}`,
+                      background: colors.surface.elevated,
+                      backdropFilter: "blur(20px)",
+                      position: "relative",
+                      overflow: "hidden",
+                      boxShadow: colors.elevation.medium,
+                      transition: `all ${animations.standard.duration}ms ${animations.standard.easing}`,
+
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: colors.elevation.high,
                       },
-                    ].map((req, index) => (
-                      <Stack
-                        key={index}
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Box>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 600 }}
-                          >
-                            {req.id}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {req.title}
-                          </Typography>
-                        </Box>
-                        <Chip
-                          label={req.priority}
-                          size="small"
-                          sx={{
-                            height: 20,
-                            fontSize: "0.7rem",
-                            backgroundColor: alpha(
-                              req.priority === "high"
-                                ? theme.palette.error.main
-                                : req.priority === "medium"
-                                ? theme.palette.warning.main
-                                : theme.palette.success.main,
-                              0.1
-                            ),
-                            color:
-                              req.priority === "high"
-                                ? theme.palette.error.main
-                                : req.priority === "medium"
-                                ? theme.palette.warning.main
-                                : theme.palette.success.main,
-                          }}
-                        />
-                      </Stack>
-                    ))}
-                  </Stack>
-                </Paper>
-              </Box>
-            </Stack>
+
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 3,
+                        background: `linear-gradient(90deg, 
+                          ${colors.accent.info} 0%, 
+                          ${colors.accent.warning} 100%)`,
+                      },
+
+                      animation: "contextProjectIn 0.8s ease-out 0.3s both",
+                      "@keyframes contextProjectIn": {
+                        "0%": {
+                          opacity: 0,
+                          transform: "translateY(30px) translateX(-15px)",
+                        },
+                        "100%": {
+                          opacity: 1,
+                          transform: "translateY(0) translateX(0)",
+                        },
+                      },
+                    }}
+                  >
+                    <ProjectOverviewWidget />
+                  </Paper>
+                </Fade>
+              </Stack>
+            </Grid>
+
+            {/* Sidebar Content */}
+            <Grid item xs={12} lg={4}>
+              <Stack spacing={gridSpacing / 8}>
+                {/* Recent Activity */}
+                <Fade
+                  in
+                  timeout={animations.entrance.duration}
+                  style={{ transitionDelay: "400ms" }}
+                >
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: { xs: spacing.md / 8, md: spacing.lg / 8 },
+                      borderRadius: spacing.md / 8,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.06
+                      )}`,
+                      background: colors.surface.elevated,
+                      backdropFilter: "blur(20px)",
+                      position: "relative",
+                      overflow: "hidden",
+                      boxShadow: colors.elevation.medium,
+                      transition: `all ${animations.standard.duration}ms ${animations.standard.easing}`,
+
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: colors.elevation.high,
+                      },
+
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 3,
+                        background: `linear-gradient(90deg, 
+                          ${colors.accent.secondary} 0%, 
+                          ${colors.accent.error} 100%)`,
+                      },
+
+                      animation: "contextActivityIn 0.8s ease-out 0.4s both",
+                      "@keyframes contextActivityIn": {
+                        "0%": {
+                          opacity: 0,
+                          transform: "translateY(30px) translateX(15px)",
+                        },
+                        "100%": {
+                          opacity: 1,
+                          transform: "translateY(0) translateX(0)",
+                        },
+                      },
+                    }}
+                  >
+                    <ActivityFeedWidget
+                      variant={isCompactMode ? "compact" : "detailed"}
+                      maxItems={isCompactMode ? 5 : 8}
+                      showFilters={!isCompactMode}
+                      showSearch={!isCompactMode}
+                      autoRefresh
+                      refreshInterval={30000}
+                      onActivityClick={handleActivityClick}
+                    />
+                  </Paper>
+                </Fade>
+
+                {/* System Health */}
+                <Fade
+                  in
+                  timeout={animations.entrance.duration}
+                  style={{ transitionDelay: "500ms" }}
+                >
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: { xs: spacing.md / 8, md: spacing.lg / 8 },
+                      borderRadius: spacing.md / 8,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.06
+                      )}`,
+                      background: colors.surface.elevated,
+                      backdropFilter: "blur(20px)",
+                      position: "relative",
+                      overflow: "hidden",
+                      boxShadow: colors.elevation.medium,
+                      transition: `all ${animations.standard.duration}ms ${animations.standard.easing}`,
+
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: colors.elevation.high,
+                      },
+
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 3,
+                        background: `linear-gradient(90deg, 
+                          ${colors.accent.success} 0%, 
+                          ${colors.accent.info} 100%)`,
+                      },
+
+                      animation: "contextHealthIn 0.8s ease-out 0.5s both",
+                      "@keyframes contextHealthIn": {
+                        "0%": {
+                          opacity: 0,
+                          transform: "translateY(30px) translateX(20px)",
+                        },
+                        "100%": {
+                          opacity: 1,
+                          transform: "translateY(0) translateX(0)",
+                        },
+                      },
+                    }}
+                  >
+                    <SystemHealthWidget />
+                  </Paper>
+                </Fade>
+              </Stack>
+            </Grid>
           </Grid>
-
-          {/* Right Column - Secondary Content */}
-          <Grid item xs={12} lg={4}>
-            <Stack spacing={3}>
-              {/* System Health */}
-              <Box
-                sx={{
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: "fadeInUp 0.6s ease-out 1.9s forwards",
-                  "@keyframes fadeInUp": {
-                    "0%": { opacity: 0, transform: "translateY(20px)" },
-                    "100%": { opacity: 1, transform: "translateY(0)" },
-                  },
-                }}
-              >
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                    background: theme.palette.background.paper,
-                  }}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    System Health
-                  </Typography>
-                  <Stack spacing={2}>
-                    {[
-                      {
-                        name: "API Status",
-                        status: "operational",
-                        color: theme.palette.success.main,
-                      },
-                      {
-                        name: "Database",
-                        status: "operational",
-                        color: theme.palette.success.main,
-                      },
-                      {
-                        name: "Cache",
-                        status: "degraded",
-                        color: theme.palette.warning.main,
-                      },
-                      {
-                        name: "CDN",
-                        status: "operational",
-                        color: theme.palette.success.main,
-                      },
-                    ].map((service, index) => (
-                      <Stack
-                        key={index}
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                      >
-                        <Typography variant="body2">{service.name}</Typography>
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: "50%",
-                            backgroundColor: service.color,
-                          }}
-                        />
-                      </Stack>
-                    ))}
-                  </Stack>
-                </Paper>
-              </Box>
-
-              {/* Activity Feed */}
-              <Box
-                sx={{
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                  animation: "fadeInUp 0.6s ease-out 2.1s forwards",
-                  "@keyframes fadeInUp": {
-                    "0%": { opacity: 0, transform: "translateY(20px)" },
-                    "100%": { opacity: 1, transform: "translateY(0)" },
-                  },
-                }}
-              >
-                <Paper
-                  elevation={0}
-                  sx={{
-                    p: 3,
-                    borderRadius: 3,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                    background: theme.palette.background.paper,
-                  }}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                    Recent Activity
-                  </Typography>
-                  <Stack spacing={2}>
-                    {[
-                      {
-                        title: "New project created",
-                        time: "2 hours ago",
-                        icon: FolderOpen,
-                        color: theme.palette.primary.main,
-                      },
-                      {
-                        title: "Requirement updated",
-                        time: "4 hours ago",
-                        icon: Assignment,
-                        color: theme.palette.secondary.main,
-                      },
-                      {
-                        title: "Release deployed",
-                        time: "6 hours ago",
-                        icon: RocketLaunch,
-                        color: theme.palette.success.main,
-                      },
-                      {
-                        title: "Bug fixed",
-                        time: "1 day ago",
-                        icon: BugReport,
-                        color: theme.palette.warning.main,
-                      },
-                    ].map((activity, index) => (
-                      <Stack
-                        key={index}
-                        direction="row"
-                        spacing={2}
-                        alignItems="center"
-                      >
-                        <Box
-                          sx={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 1.5,
-                            background: alpha(activity.color, 0.1),
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            color: activity.color,
-                          }}
-                        >
-                          <activity.icon sx={{ fontSize: 16 }} />
-                        </Box>
-                        <Box flex={1}>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {activity.title}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {activity.time}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    ))}
-                  </Stack>
-                </Paper>
-              </Box>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Container>
+        </Container>
+      </Box>
     </DashboardLayout>
   );
-};
+});
+
+DashboardPage.displayName = "DashboardPage";
 
 export default DashboardPage;

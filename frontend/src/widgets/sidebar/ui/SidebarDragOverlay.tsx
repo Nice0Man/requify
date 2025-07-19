@@ -62,34 +62,6 @@ export const SidebarDragOverlay: React.FC<SidebarDragOverlayProps> = ({
           minWidth: isCollapsed ? 56 : 200,
           maxWidth: isCollapsed ? 56 : 280,
           minHeight: isCollapsed ? 56 : 48,
-          
-          // Анимация floating эффекта
-          transform: "rotate(2deg) scale(1.05)",
-          transformOrigin: "center",
-          animation: "dragFloat 2s ease-in-out infinite",
-          
-          "@keyframes dragFloat": {
-            "0%, 100%": {
-              transform: "rotate(2deg) scale(1.05)",
-            },
-            "50%": {
-              transform: "rotate(-1deg) scale(1.08)",
-            },
-          },
-          
-          // Glow effect
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: -1,
-            left: -1,
-            right: -1,
-            bottom: -1,
-            background: `linear-gradient(45deg, ${alpha(theme.palette.primary.main, 0.3)}, ${alpha(theme.palette.secondary.main, 0.3)})`,
-            borderRadius: "inherit",
-            zIndex: -1,
-            filter: "blur(4px)",
-          },
         }}
       >
         {/* Icon */}
@@ -100,14 +72,22 @@ export const SidebarDragOverlay: React.FC<SidebarDragOverlayProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            ...(isCollapsed ? {
-              width: 40,
-              height: 40,
-              borderRadius: 2,
-              backgroundColor: alpha(theme.palette.primary.main, 0.15),
-              border: `1px solid ${alpha(theme.palette.primary.main, 0.25)}`,
-              boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.2)}`,
-            } : {}),
+            ...(isCollapsed
+              ? {
+                  width: 44, // Обновлено с 40 до 44 для соответствия новому размеру
+                  height: 44, // Обновлено с 40 до 44 для соответствия новому размеру
+                  borderRadius: 2,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                  border: `1px solid ${alpha(
+                    theme.palette.primary.main,
+                    0.25
+                  )}`,
+                  boxShadow: `0 4px 12px ${alpha(
+                    theme.palette.primary.main,
+                    0.2
+                  )}`,
+                }
+              : {}),
           }}
         >
           <Badge
@@ -131,7 +111,7 @@ export const SidebarDragOverlay: React.FC<SidebarDragOverlayProps> = ({
           >
             <Icon
               sx={{
-                fontSize: isCollapsed ? 24 : 20,
+                fontSize: isCollapsed ? 22 : 20, // Уменьшил с 24 до 22 для лучших пропорций в 44x44 контейнере
                 color: theme.palette.primary.main,
                 filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
               }}
@@ -149,13 +129,16 @@ export const SidebarDragOverlay: React.FC<SidebarDragOverlayProps> = ({
                 fontWeight: 600,
                 color: theme.palette.primary.main,
                 letterSpacing: "0.01em",
-                textShadow: `0 1px 2px ${alpha(theme.palette.common.black, 0.1)}`,
+                textShadow: `0 1px 2px ${alpha(
+                  theme.palette.common.black,
+                  0.1
+                )}`,
               },
             }}
           />
         )}
 
-        {/* Пульсирующий индикатор */}
+        {/* Оставляем простой статичный индикатор */}
         <Box
           sx={{
             position: "absolute",
@@ -165,29 +148,11 @@ export const SidebarDragOverlay: React.FC<SidebarDragOverlayProps> = ({
             height: 8,
             backgroundColor: theme.palette.primary.main,
             borderRadius: "50%",
-            animation: "pulse 1s ease-in-out infinite",
-            
-            "@keyframes pulse": {
-              "0%": { 
-                opacity: 0.8, 
-                transform: "scale(1)",
-                boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0.4)}`,
-              },
-              "50%": { 
-                opacity: 1, 
-                transform: "scale(1.2)",
-                boxShadow: `0 0 0 4px ${alpha(theme.palette.primary.main, 0.1)}`,
-              },
-              "100%": { 
-                opacity: 0.8, 
-                transform: "scale(1)",
-                boxShadow: `0 0 0 0 ${alpha(theme.palette.primary.main, 0.4)}`,
-              },
-            },
+            opacity: 0.8,
           }}
         />
       </Paper>
     </DragOverlay>,
     document.body
   );
-}; 
+};

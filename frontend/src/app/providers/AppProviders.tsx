@@ -1,14 +1,15 @@
-import React, { Suspense } from "react";
+import React, { Suspense, memo } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "../store";
 import { ThemeProvider } from "./ThemeProvider";
-import { QueryProvider } from "./QueryProvider";
+import { TanStackQueryProvider } from "./TanStackQueryProvider";
 import { Auth0Provider } from "./Auth0Provider";
 import { CircularProgress, Box } from "@mui/material";
+import { PerformanceOptimizedProviders } from "@/shared/contexts/PerformanceContext";
 
-// Глобальный fallback для Suspense
-const GlobalSuspenseFallback = () => (
+// Optimized fallback component with memoization
+const GlobalSuspenseFallback = memo(() => (
   <Box
     display="flex"
     justifyContent="center"
@@ -18,13 +19,16 @@ const GlobalSuspenseFallback = () => (
   >
     <CircularProgress size={60} />
   </Box>
-);
+));
+
+GlobalSuspenseFallback.displayName = 'GlobalSuspenseFallback';
 
 interface AppProvidersProps {
   children: React.ReactNode;
 }
 
-export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
+// Memoized App Providers for optimal performance
+export const AppProviders: React.FC<AppProvidersProps> = memo(({ children }) => {
   return (
     <Suspense fallback={<GlobalSuspenseFallback />}>
       <Provider store={store}>
@@ -34,13 +38,17 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
             v7_relativeSplatPath: true,
           }}
         >
-          <QueryProvider>
+          <TanStackQueryProvider>
             <Auth0Provider>
-              <ThemeProvider>{children}</ThemeProvider>
+              <PerformanceOptimizedProviders>
+                <ThemeProvider>{children}</ThemeProvider>
+              </PerformanceOptimizedProviders>
             </Auth0Provider>
-          </QueryProvider>
+          </TanStackQueryProvider>
         </BrowserRouter>
       </Provider>
     </Suspense>
   );
-};
+});
+
+AppProviders.displayName = 'AppProviders';

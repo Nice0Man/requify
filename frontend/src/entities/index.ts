@@ -5,4 +5,5 @@ export * from './requirement';
 export * from './release';
 export * from './test-case';
 export * from './comment';
-export * from './admin'; 
+export * from './admin';
+export * from './dashboard'; 

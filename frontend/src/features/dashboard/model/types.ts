@@ -27,3 +27,54 @@ export interface QuickAction {
   path: string;
   color?: string;
 }
+
+export interface DashboardMetricCategory {
+  id: string;
+  title: string;
+  icon: string;
+  color?: string;
+}
+
+export interface DashboardMetric {
+  id: string;
+  title: string;
+  value: number;
+  icon: string;
+  color?: string;
+}
+
+export interface DashboardActivity {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color?: string;
+}
+
+export interface DashboardActivityItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color?: string;
+}
+
+export interface DashboardActivityFilters {
+  type: string;
+  status: string;
+}
+
+export interface DashboardMetricFilters {
+  category: string;
+  period: string;
+}
+
+export interface DashboardActivityFilters {
+  type: string;
+  status: string;
+}
+
+export interface DashboardMetricFilters {
+  category: string;
+  period: string;
+}

@@ -12,9 +12,10 @@ import {
   ScrollSection,
   useScrollNavigation,
 } from "@/features/scroll-navigation";
+import { useState } from "react";
 
 // Базовая конфигурация секций без переводов
-const BASE_LANDING_SECTIONS: Omit<ScrollSection, 'title'>[] = [
+const BASE_LANDING_SECTIONS: Omit<ScrollSection, "title">[] = [
   {
     id: "hero",
     hash: "hero",
@@ -59,52 +60,55 @@ const SECTION_COMPONENTS = [
 
 export const LandingWidget: React.FC = () => {
   // Создаем полные секции с заголовками по умолчанию внутри компонента
-  const LANDING_SECTIONS: ScrollSection[] = React.useMemo(() => BASE_LANDING_SECTIONS.map((section) => ({
-    ...section,
-    title: section.id.charAt(0).toUpperCase() + section.id.slice(1), // Простые заголовки
-  })), []);
-
-  // Состояние для отслеживания активной секции в header
-  const [headerActiveSection, setHeaderActiveSection] = React.useState("hero");
-
-  // Используем хук scroll navigation для получения текущей секции
-  const { activeSection, currentSection, navigateToHash } = useScrollNavigation(
-    {
-      sections: LANDING_SECTIONS,
-      enableHashSync: true,
-      autoScrollToHash: true,
-    }
+  const LANDING_SECTIONS: ScrollSection[] = React.useMemo(
+    () =>
+      BASE_LANDING_SECTIONS.map((section) => ({
+        ...section,
+        title: section.id.charAt(0).toUpperCase() + section.id.slice(1), // Простые заголовки
+      })),
+    []
   );
 
-  // Обновляем активную секцию header на основе текущего hash
+  // Состояние для отслеживания активной секции в header
+  const [headerActiveSection, setHeaderActiveSection] = useState("hero");
+  const [_isScrolled, _setIsScrolled] = useState(false);
+
+  // Используем хук scroll navigation для получения текущей секции
+  const { activeSection, navigateToHash } = useScrollNavigation({
+    sections: LANDING_SECTIONS,
+    enableHashSync: true,
+    autoScrollToHash: true,
+  });
+
+  // Обновление активной секции при скролле
+  const updateActiveSection = () => {
+    const currentHash = window.location.hash.slice(1);
+
+    if (!currentHash) {
+      setHeaderActiveSection("hero");
+      return;
+    }
+
+    // Находим секцию по hash
+    const section = LANDING_SECTIONS.find((s) => s.hash === currentHash);
+    if (section) {
+      setHeaderActiveSection(section.id);
+    } else {
+      // Fallback: ищем по прямому соответствию
+      const directSection = LANDING_SECTIONS.find((s) => s.id === currentHash);
+      setHeaderActiveSection(directSection?.id || "hero");
+    }
+  };
+
+  // Обновляем при загрузке
   React.useEffect(() => {
-    const updateActiveSection = () => {
-      const currentHash = window.location.hash.slice(1);
-      
-      if (!currentHash) {
-        setHeaderActiveSection("hero");
-        return;
-      }
-
-      // Находим секцию по hash
-      const section = LANDING_SECTIONS.find(s => s.hash === currentHash);
-      if (section) {
-        setHeaderActiveSection(section.id);
-      } else {
-        // Fallback: ищем по прямому соответствию
-        const directSection = LANDING_SECTIONS.find(s => s.id === currentHash);
-        setHeaderActiveSection(directSection?.id || "hero");
-      }
-    };
-
-    // Обновляем при загрузке
     updateActiveSection();
 
     // Слушаем изменения hash
-    window.addEventListener('hashchange', updateActiveSection);
-    
+    window.addEventListener("hashchange", updateActiveSection);
+
     return () => {
-      window.removeEventListener('hashchange', updateActiveSection);
+      window.removeEventListener("hashchange", updateActiveSection);
     };
   }, [LANDING_SECTIONS]);
 
@@ -127,57 +131,65 @@ export const LandingWidget: React.FC = () => {
   // Обработчик навигации из header
   const handleHeaderSectionClick = React.useCallback(
     (hashOrId: string) => {
-      console.log('Header navigation clicked:', hashOrId);
-      
+      console.log("Header navigation clicked:", hashOrId);
+
       // Прямая навигация через scrollIntoView для тестирования
-      const element = document.getElementById(hashOrId) || document.querySelector(`[id="${hashOrId}"]`);
+      const element =
+        document.getElementById(hashOrId) ||
+        document.querySelector(`[id="${hashOrId}"]`);
       if (element) {
-        console.log('Found element, scrolling to:', element);
-        element.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
+        console.log("Found element, scrolling to:", element);
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
         });
-        
+
         // Обновляем hash в URL
         window.history.replaceState(null, "", `#${hashOrId}`);
-        
+
         // Сразу обновляем активную секцию в header
-        const section = LANDING_SECTIONS.find(s => s.hash === hashOrId || s.id === hashOrId);
+        const section = LANDING_SECTIONS.find(
+          (s) => s.hash === hashOrId || s.id === hashOrId
+        );
         if (section) {
           setHeaderActiveSection(section.id);
         }
         return;
       }
-      
+
       // Если это уже hash, используем его напрямую
       // Иначе ищем hash по id секции
-      const section = LANDING_SECTIONS.find((s) => s.hash === hashOrId || s.id === hashOrId);
-      console.log('Found section:', section);
-      
+      const section = LANDING_SECTIONS.find(
+        (s) => s.hash === hashOrId || s.id === hashOrId
+      );
+      console.log("Found section:", section);
+
       if (section) {
         // Ищем элемент по hash или id секции
-        const sectionElement = document.getElementById(section.id) || document.getElementById(section.hash);
+        const sectionElement =
+          document.getElementById(section.id) ||
+          document.getElementById(section.hash);
         if (sectionElement) {
-          console.log('Found section element, scrolling to:', sectionElement);
-          sectionElement.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
+          console.log("Found section element, scrolling to:", sectionElement);
+          sectionElement.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
           });
-          
+
           // Обновляем hash в URL
           window.history.replaceState(null, "", `#${section.hash}`);
-          
+
           // Сразу обновляем активную секцию в header
           setHeaderActiveSection(section.id);
         } else {
-          console.log('Section element not found for:', section);
+          console.log("Section element not found for:", section);
           // Fallback к scroll navigation
-          console.log('Navigating to hash:', section.hash);
+          console.log("Navigating to hash:", section.hash);
           navigateToHash(section.hash);
         }
       } else {
         // Fallback: используем переданное значение как hash
-        console.log('Fallback navigation to:', hashOrId);
+        console.log("Fallback navigation to:", hashOrId);
         navigateToHash(hashOrId);
       }
     },
@@ -210,7 +222,7 @@ export const LandingWidget: React.FC = () => {
       >
         {SECTION_COMPONENTS.map((Component, index) => {
           const isFooter = LANDING_SECTIONS[index].id === "footer";
-          
+
           return (
             <Box
               key={LANDING_SECTIONS[index].id}

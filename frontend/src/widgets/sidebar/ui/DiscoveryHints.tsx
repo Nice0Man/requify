@@ -8,7 +8,7 @@ import {
   useTheme,
   alpha,
 } from "@mui/material";
-import { TouchApp, SwipeVertical, DragIndicator } from "@mui/icons-material";
+import { TouchApp, DragIndicator } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
 interface DiscoveryHintsProps {
