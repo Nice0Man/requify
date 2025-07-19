@@ -174,6 +174,66 @@ class QuickAccess(BaseModel):
     )
 
 
+class SystemMetrics(BaseModel):
+    """System performance metrics for dashboard monitoring"""
+
+    cpuUsage: float = Field(
+        ..., description="CPU usage percentage", ge=0, le=100, alias="cpu_usage"
+    )
+    memoryUsage: float = Field(
+        ..., description="Memory usage percentage", ge=0, le=100, alias="memory_usage"
+    )
+    diskUsage: float = Field(
+        ..., description="Disk usage percentage", ge=0, le=100, alias="disk_usage"
+    )
+    networkLatency: float = Field(
+        ...,
+        description="Network latency in milliseconds",
+        ge=0,
+        alias="network_latency",
+    )
+    uptime: int = Field(..., description="System uptime in seconds", ge=0)
+    activeUsers: int = Field(
+        ..., description="Number of active users", ge=0, alias="active_users"
+    )
+    responseTime: float = Field(
+        ...,
+        description="Average response time in milliseconds",
+        ge=0,
+        alias="response_time",
+    )
+    errorRate: float = Field(
+        ..., description="Error rate percentage", ge=0, le=100, alias="error_rate"
+    )
+    throughput: float = Field(
+        ..., description="Requests per second throughput", ge=0, alias="throughput"
+    )
+    availability: float = Field(
+        ..., description="System availability percentage", ge=0, le=100
+    )
+    lastUpdated: Optional[str] = Field(
+        None, description="Last update timestamp", alias="last_updated"
+    )
+
+    class Config:
+        allow_population_by_field_name = True
+        json_schema_extra = {
+            "example": {
+                "cpuUsage": 25.5,
+                "memoryUsage": 65.2,
+                "diskUsage": 45.8,
+                "networkLatency": 15.3,
+                "uptime": 86400,
+                "activeUsers": 12,
+                "responseTime": 120.5,
+                "errorRate": 0.5,
+                "throughput": 150.0,
+                "availability": 99.9,
+                "lastUpdated": "2024-01-15T14:30:00Z",
+            }
+        }
+
+
 class DashboardStats(BaseModel):
     """Comprehensive dashboard statistics matching frontend expectations"""
 
