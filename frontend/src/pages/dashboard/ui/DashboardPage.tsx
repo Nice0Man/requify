@@ -15,7 +15,6 @@ import {
   useTheme,
   alpha,
   Alert,
-  Paper,
   Chip,
   Skeleton,
 } from "@mui/material";
@@ -146,14 +145,17 @@ DashboardSkeleton.displayName = "DashboardSkeleton";
  * Activity Feed with Error Boundary
  */
 const DeferredActivityFeed = memo(() => {
+  const theme = useTheme();
+  
   return (
-    <Paper
+    <Box
       sx={{
         p: 3,
         borderRadius: 2,
         height: "100%",
         minHeight: 200,
-        border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+        border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+        backgroundColor: theme.palette.background.paper,
       }}
     >
       <Typography variant="h6" gutterBottom>
@@ -162,7 +164,7 @@ const DeferredActivityFeed = memo(() => {
       <Typography variant="body2" color="text.secondary">
         Activity feed is loading...
       </Typography>
-    </Paper>
+    </Box>
   );
 });
 
@@ -382,14 +384,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
           }}
         >
           {/* Quick Actions */}
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-              flex: "0 0 auto",
-            }}
-          >
+          <Box sx={{ flex: "0 0 auto" }}>
             <QuickActionsWidget
               variant="detailed"
               maxActions={8}
@@ -397,20 +392,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
               showShortcuts
               showFavorites
             />
-          </Paper>
+          </Box>
 
           {/* Project Overview */}
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-              flex: "1 1 auto",
-              minHeight: 200,
-            }}
-          >
+          <Box sx={{ flex: "1 1 auto", minHeight: 200 }}>
             <ProjectOverviewWidget />
-          </Paper>
+          </Box>
         </Box>
 
         {/* Sidebar Area */}
@@ -429,16 +416,9 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
           </Box>
 
           {/* System Health */}
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-              flex: "0 0 auto",
-            }}
-          >
+          <Box sx={{ flex: "0 0 auto" }}>
             <SystemHealthWidget />
-          </Paper>
+          </Box>
         </Box>
       </Box>
     </DashboardLayout>

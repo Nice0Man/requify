@@ -5,6 +5,7 @@ import {
   CardHeader,
   Typography,
   Box,
+  Stack,
   LinearProgress,
   alpha,
   Chip,
@@ -499,70 +500,133 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
 
     if (error) {
       return (
-        <Card className={className}>
-          <CardContent>
-            <Alert
-              severity="error"
-              action={
-                <IconButton size="small" onClick={handleRefresh}>
-                  <Refresh />
-                </IconButton>
-              }
-            >
-              {t("projects.error", "Ошибка загрузки проектов")}: {error.message}
-            </Alert>
-          </CardContent>
-        </Card>
+        <Box className={className} sx={{ width: "100%" }}>
+          {/* Container with same styling as Key Metrics */}
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              backgroundColor: theme.palette.background.paper,
+              width: "100%",
+            }}
+          >
+            <Stack spacing={2} alignItems="center" sx={{ py: 4 }}>
+              <FolderOpen
+                sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
+              />
+              <Typography color="error" variant="body2" textAlign="center">
+                {t("projects.error", "Ошибка загрузки проектов")}:{" "}
+                {error.message}
+              </Typography>
+              <Alert
+                severity="error"
+                sx={{ width: "100%", textAlign: "center" }}
+                action={
+                  <IconButton size="small" onClick={handleRefresh}>
+                    <Refresh />
+                  </IconButton>
+                }
+              >
+                {t(
+                  "projects.overview.errorMessage",
+                  "Project overview temporarily unavailable"
+                )}
+              </Alert>
+            </Stack>
+          </Box>
+        </Box>
       );
     }
 
     return (
-      <Card
-        className={className}
-        sx={{
-          borderRadius: 3,
-          border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-          boxShadow: `0 2px 20px ${alpha(theme.palette.common.black, 0.04)}`,
-          background: theme.palette.background.paper,
-          overflow: "hidden",
-        }}
-      >
-        <CardHeader
-          avatar={
+      <Box className={className} sx={{ width: "100%" }}>
+        {/* Container with same styling as Key Metrics */}
+        <Box
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            backgroundColor: theme.palette.background.paper,
+            width: "100%",
+          }}
+        >
+          <Stack spacing={3}>
+            {/* Header Section - matching Key Metrics pattern */}
             <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
             >
-              <FolderOpen sx={{ color: "white", fontSize: 20 }} />
-            </Box>
-          }
-          title={
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 600,
-                fontSize: "1.1rem",
-                color: theme.palette.text.primary,
-              }}
-            >
-              {t("projects.overview.title", "Обзор проектов")}
-            </Typography>
-          }
-          action={
-            showActions && (
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Tooltip title={t("common.refresh", "Обновить")}>
-                  <span>
+              <Stack spacing={1}>
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Box
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 2,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <FolderOpen sx={{ color: "white", fontSize: 18 }} />
+                  </Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                      fontSize: "1.5rem",
+                    }}
+                  >
+                    {t("projects.overview.title", "Обзор проектов")}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: "0.875rem",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {t(
+                    "projects.overview.subtitle",
+                    "Активные проекты и их статус"
+                  )}
+                </Typography>
+              </Stack>
+
+              {showActions && (
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Tooltip title={t("common.refresh", "Обновить")}>
+                    <span>
+                      <IconButton
+                        onClick={handleRefresh}
+                        disabled={isLoading}
+                        size="small"
+                        sx={{
+                          borderRadius: 2,
+                          border: `1px solid ${alpha(
+                            theme.palette.divider,
+                            0.1
+                          )}`,
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.primary.main,
+                              0.04
+                            ),
+                            borderColor: alpha(theme.palette.primary.main, 0.2),
+                          },
+                        }}
+                      >
+                        <Refresh />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                  <Tooltip title={t("projects.create", "Создать проект")}>
                     <IconButton
-                      onClick={handleRefresh}
-                      disabled={isLoading}
                       size="small"
                       sx={{
                         borderRadius: 2,
@@ -579,178 +643,167 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
                         },
                       }}
                     >
-                      <Refresh />
+                      <Add />
                     </IconButton>
-                  </span>
-                </Tooltip>
-                <Tooltip title={t("projects.create", "Создать проект")}>
-                  <IconButton
-                    size="small"
-                    sx={{
-                      borderRadius: 2,
-                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                      "&:hover": {
-                        backgroundColor: alpha(
-                          theme.palette.primary.main,
-                          0.04
-                        ),
-                        borderColor: alpha(theme.palette.primary.main, 0.2),
-                      },
+                  </Tooltip>
+                </Box>
+              )}
+            </Box>
+
+            {/* Content Section */}
+            <Box>
+              {/* Filters */}
+              {showFilters && (
+                <Box sx={{ mb: 3 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        placeholder={t(
+                          "projects.search.placeholder",
+                          "Поиск проектов..."
+                        )}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Search />
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={6} md={3}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>
+                          {t("projects.filters.status", "Статус")}
+                        </InputLabel>
+                        <Select
+                          value={statusFilter}
+                          onChange={handleStatusChange}
+                        >
+                          <MenuItem value="all">
+                            {t("common.all", "Все")}
+                          </MenuItem>
+                          <MenuItem value="planning">
+                            {t("status.planning", "Планирование")}
+                          </MenuItem>
+                          <MenuItem value="in_progress">
+                            {t("status.in_progress", "В работе")}
+                          </MenuItem>
+                          <MenuItem value="testing">
+                            {t("status.testing", "Тестирование")}
+                          </MenuItem>
+                          <MenuItem value="completed">
+                            {t("status.completed", "Завершен")}
+                          </MenuItem>
+                          <MenuItem value="on_hold">
+                            {t("status.on_hold", "Приостановлен")}
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6} md={3}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>
+                          {t("projects.filters.priority", "Приоритет")}
+                        </InputLabel>
+                        <Select
+                          value={priorityFilter}
+                          onChange={handlePriorityChange}
+                        >
+                          <MenuItem value="all">
+                            {t("common.all", "Все")}
+                          </MenuItem>
+                          <MenuItem value="low">
+                            {t("priority.low", "Низкий")}
+                          </MenuItem>
+                          <MenuItem value="medium">
+                            {t("priority.medium", "Средний")}
+                          </MenuItem>
+                          <MenuItem value="high">
+                            {t("priority.high", "Высокий")}
+                          </MenuItem>
+                          <MenuItem value="critical">
+                            {t("priority.critical", "Критический")}
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+
+              {/* Content */}
+              {isLoading ? (
+                <Grid container spacing={2}>
+                  {Array.from({ length: limit }).map((_, index) => (
+                    <Grid item xs={12} md={6} lg={4} key={index}>
+                      <Card>
+                        <CardHeader
+                          title={<Skeleton variant="text" width="60%" />}
+                          subheader={<Skeleton variant="text" width="80%" />}
+                        />
+                        <CardContent>
+                          <Skeleton
+                            variant="rectangular"
+                            height={60}
+                            sx={{ mb: 2 }}
+                          />
+                          <Grid container spacing={1}>
+                            <Grid item xs={6}>
+                              <Skeleton variant="rectangular" height={40} />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Skeleton variant="rectangular" height={40} />
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              ) : displayProjects.length === 0 ? (
+                <EmptyStatePlaceholder />
+              ) : (
+                <Fade in={!isLoading}>
+                  <Grid container spacing={2}>
+                    {displayProjects.map((project) => (
+                      <Grid item xs={12} md={6} lg={4} key={project.id}>
+                        <ProjectCard
+                          project={project}
+                          _onEdit={handleEditProject}
+                        />
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Fade>
+              )}
+
+              {/* Show more link */}
+              {projects.length > limit && (
+                <Box sx={{ textAlign: "center", mt: 3 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      window.dispatchEvent(
+                        new CustomEvent("navigate-to", {
+                          detail: { path: "/projects" },
+                        })
+                      );
                     }}
                   >
-                    <Add />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )
-          }
-          sx={{ pb: 1 }}
-        />
-
-        <CardContent sx={{ pt: 0 }}>
-          {/* Filters */}
-          {showFilters && (
-            <Box sx={{ mb: 3 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    placeholder={t(
-                      "projects.search.placeholder",
-                      "Поиск проектов..."
-                    )}
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Search />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={6} md={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>
-                      {t("projects.filters.status", "Статус")}
-                    </InputLabel>
-                    <Select value={statusFilter} onChange={handleStatusChange}>
-                      <MenuItem value="all">{t("common.all", "Все")}</MenuItem>
-                      <MenuItem value="planning">
-                        {t("status.planning", "Планирование")}
-                      </MenuItem>
-                      <MenuItem value="in_progress">
-                        {t("status.in_progress", "В работе")}
-                      </MenuItem>
-                      <MenuItem value="testing">
-                        {t("status.testing", "Тестирование")}
-                      </MenuItem>
-                      <MenuItem value="completed">
-                        {t("status.completed", "Завершен")}
-                      </MenuItem>
-                      <MenuItem value="on_hold">
-                        {t("status.on_hold", "Приостановлен")}
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={6} md={3}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>
-                      {t("projects.filters.priority", "Приоритет")}
-                    </InputLabel>
-                    <Select
-                      value={priorityFilter}
-                      onChange={handlePriorityChange}
-                    >
-                      <MenuItem value="all">{t("common.all", "Все")}</MenuItem>
-                      <MenuItem value="low">
-                        {t("priority.low", "Низкий")}
-                      </MenuItem>
-                      <MenuItem value="medium">
-                        {t("priority.medium", "Средний")}
-                      </MenuItem>
-                      <MenuItem value="high">
-                        {t("priority.high", "Высокий")}
-                      </MenuItem>
-                      <MenuItem value="critical">
-                        {t("priority.critical", "Критический")}
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
+                    {t("projects.view_all", "Показать все проекты")} (
+                    {projects.length})
+                  </Button>
+                </Box>
+              )}
             </Box>
-          )}
-
-          {/* Content */}
-          {isLoading ? (
-            <Grid container spacing={2}>
-              {Array.from({ length: limit }).map((_, index) => (
-                <Grid item xs={12} md={6} lg={4} key={index}>
-                  <Card>
-                    <CardHeader
-                      title={<Skeleton variant="text" width="60%" />}
-                      subheader={<Skeleton variant="text" width="80%" />}
-                    />
-                    <CardContent>
-                      <Skeleton
-                        variant="rectangular"
-                        height={60}
-                        sx={{ mb: 2 }}
-                      />
-                      <Grid container spacing={1}>
-                        <Grid item xs={6}>
-                          <Skeleton variant="rectangular" height={40} />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Skeleton variant="rectangular" height={40} />
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          ) : displayProjects.length === 0 ? (
-            <EmptyStatePlaceholder />
-          ) : (
-            <Fade in={!isLoading}>
-              <Grid container spacing={2}>
-                {displayProjects.map((project) => (
-                  <Grid item xs={12} md={6} lg={4} key={project.id}>
-                    <ProjectCard
-                      project={project}
-                      _onEdit={handleEditProject}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Fade>
-          )}
-
-          {/* Show more link */}
-          {projects.length > limit && (
-            <Box sx={{ textAlign: "center", mt: 3 }}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  window.dispatchEvent(
-                    new CustomEvent("navigate-to", {
-                      detail: { path: "/projects" },
-                    })
-                  );
-                }}
-              >
-                {t("projects.view_all", "Показать все проекты")} (
-                {projects.length})
-              </Button>
-            </Box>
-          )}
-        </CardContent>
-      </Card>
+          </Stack>
+        </Box>
+      </Box>
     );
   }
 );

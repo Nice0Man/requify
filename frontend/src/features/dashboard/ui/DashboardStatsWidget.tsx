@@ -183,90 +183,135 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
     // Backup-style loading state
     if (isLoading) {
       return (
-        <Box className={className}>
-          {/* Header skeleton */}
-          <Stack spacing={3} mb={4}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Stack spacing={1}>
-                <Box display="flex" alignItems="center" gap={1.5}>
-                  <Skeleton variant="rounded" width={32} height={32} />
-                  <Skeleton variant="text" width={200} height={32} />
-                </Box>
-                <Skeleton variant="text" width={300} height={20} />
-              </Stack>
-              <Skeleton variant="rounded" width={40} height={40} />
-            </Box>
-          </Stack>
+        <Box className={className} sx={{ width: "100%" }}>
+          {/* Container with same styling as Quick Actions */}
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              backgroundColor: theme.palette.background.paper,
+              width: "100%",
+            }}
+          >
+            <Stack spacing={3}>
+              {/* Header skeleton */}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Stack spacing={1}>
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <Skeleton variant="rounded" width={32} height={32} />
+                    <Skeleton variant="text" width={200} height={32} />
+                  </Box>
+                  <Skeleton variant="text" width={300} height={20} />
+                </Stack>
+                <Skeleton variant="rounded" width={40} height={40} />
+              </Box>
 
-          {/* Metrics grid skeleton */}
-          <Grid container spacing={2}>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <Grid item xs={12} sm={6} md={4} xl={2} key={index}>
-                <Card
+              {/* Centered metrics grid skeleton */}
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Grid 
+                  container 
+                  spacing={3} 
+                  alignItems="stretch"
+                  justifyContent="center"
                   sx={{
-                    borderRadius: 3,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    maxWidth: "100%",
+                    width: "100%",
                   }}
                 >
-                  <CardContent sx={{ p: 3 }}>
-                    <Stack spacing={2}>
-                      <Box
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                      >
-                        <Skeleton variant="rounded" width={48} height={48} />
-                        <Skeleton variant="rounded" width={60} height={24} />
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <Grid 
+                      item 
+                      xs={12} 
+                      sm={6} 
+                      md={4} 
+                      lg={3} 
+                      xl={2} 
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Box sx={{ width: "100%", maxWidth: 280 }}>
+                        <Card
+                          sx={{
+                            borderRadius: 3,
+                            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                            height: "100%",
+                          }}
+                        >
+                          <CardContent sx={{ p: 3 }}>
+                            <Stack spacing={2}>
+                              <Box
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="space-between"
+                              >
+                                <Skeleton variant="rounded" width={48} height={48} />
+                                <Skeleton variant="rounded" width={60} height={24} />
+                              </Box>
+                              <Stack spacing={0.5} alignItems="flex-start">
+                                <Skeleton variant="text" width="80%" height={40} />
+                                <Skeleton variant="text" width="60%" height={20} />
+                              </Stack>
+                            </Stack>
+                          </CardContent>
+                        </Card>
                       </Box>
-                      <Stack spacing={0.5} alignItems="flex-start">
-                        <Skeleton variant="text" width="80%" height={40} />
-                        <Skeleton variant="text" width="60%" height={20} />
-                      </Stack>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            </Stack>
+          </Box>
         </Box>
       );
     }
 
-    // Backup-style error state
+    // Error state with consistent styling
     if (isError) {
       return (
-        <Box className={className}>
-          <Card
+        <Box className={className} sx={{ width: "100%" }}>
+          {/* Container with same styling as Quick Actions */}
+          <Box
             sx={{
-              borderRadius: 3,
+              p: 3,
+              borderRadius: 2,
               border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              backgroundColor: theme.palette.background.paper,
+              width: "100%",
             }}
           >
-            <CardContent sx={{ p: 3 }}>
-              <Stack spacing={2} alignItems="center">
-                <Assessment
-                  sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
-                />
-                <Typography color="error" variant="body2" textAlign="center">
-                  {t("errors.loadingError")}:{" "}
-                  {error?.message || "Unknown error"}
-                </Typography>
-                <Button
-                  onClick={() => refetch()}
-                  size="small"
-                  variant="outlined"
-                  sx={{ textTransform: "none" }}
-                  disabled={isFetching}
-                >
-                  {t("common.retry", "Try Again")}
-                </Button>
-              </Stack>
-            </CardContent>
-          </Card>
+            <Stack spacing={2} alignItems="center" sx={{ py: 4 }}>
+              <Assessment
+                sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
+              />
+              <Typography color="error" variant="body2" textAlign="center">
+                {t("errors.loadingError")}:{" "}
+                {error?.message || "Unknown error"}
+              </Typography>
+              <Button
+                onClick={() => refetch()}
+                size="small"
+                variant="outlined"
+                sx={{ textTransform: "none" }}
+                disabled={isFetching}
+              >
+                {t("common.retry", "Try Again")}
+              </Button>
+            </Stack>
+          </Box>
         </Box>
       );
     }
@@ -409,86 +454,128 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
     );
 
     return (
-      <Box className={className}>
-        <Stack spacing={4}>
-          {/* Backup-style header */}
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Stack spacing={1}>
-              <Box display="flex" alignItems="center" gap={1.5}>
-                <Box
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 2,
-                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Assessment sx={{ color: "white", fontSize: 18 }} />
+      <Box className={className} sx={{ width: "100%" }}>
+        {/* Container with same styling as Quick Actions */}
+        <Box
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            backgroundColor: theme.palette.background.paper,
+            width: "100%",
+          }}
+        >
+          <Stack spacing={3}>
+            {/* Header Section */}
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Stack spacing={1}>
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Box
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 2,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Assessment sx={{ color: "white", fontSize: 18 }} />
+                  </Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                      fontSize: isCompact ? "1.25rem" : "1.5rem",
+                    }}
+                  >
+                    {t("dashboard.metrics.title", "Key Metrics")}
+                  </Typography>
                 </Box>
                 <Typography
-                  variant="h5"
+                  variant="body2"
                   sx={{
-                    fontWeight: 700,
-                    color: theme.palette.text.primary,
-                    fontSize: isCompact ? "1.25rem" : "1.5rem",
+                    fontSize: "0.875rem",
+                    color: theme.palette.text.secondary,
                   }}
                 >
-                  {t("dashboard.metrics.title", "Key Metrics")}
+                  {t(
+                    "dashboard.metrics.subtitle",
+                    "Real-time project statistics"
+                  )}
                 </Typography>
-              </Box>
-              <Typography
-                variant="body2"
+              </Stack>
+
+              <IconButton
+                onClick={() => refetch()}
+                disabled={isFetching}
                 sx={{
-                  fontSize: "0.875rem",
-                  color: theme.palette.text.secondary,
+                  borderRadius: 2,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                  "&:hover": {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                  },
+                  ...(isFetching && {
+                    animation: "spin 1s linear infinite",
+                    "@keyframes spin": {
+                      "0%": { transform: "rotate(0deg)" },
+                      "100%": { transform: "rotate(360deg)" },
+                    },
+                  }),
                 }}
               >
-                {t(
-                  "dashboard.metrics.subtitle",
-                  "Real-time project statistics"
-                )}
-              </Typography>
-            </Stack>
+                <Refresh />
+              </IconButton>
+            </Box>
 
-            <IconButton
-              onClick={() => refetch()}
-              disabled={isFetching}
+            {/* Centered metrics grid with full container width */}
+            <Box
               sx={{
-                borderRadius: 2,
-                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                "&:hover": {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                  borderColor: alpha(theme.palette.primary.main, 0.2),
-                },
-                ...(isFetching && {
-                  animation: "spin 1s linear infinite",
-                  "@keyframes spin": {
-                    "0%": { transform: "rotate(0deg)" },
-                    "100%": { transform: "rotate(360deg)" },
-                  },
-                }),
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
               }}
             >
-              <Refresh />
-            </IconButton>
-          </Box>
-
-          {/* Fixed metrics grid with consistent spacing */}
-          <Grid container spacing={2} alignItems="stretch">
-            {metrics.map((metric) => (
-              <Grid item xs={12} sm={6} md={4} xl={2} key={metric.id}>
-                <MetricCard metric={metric} />
+              <Grid
+                container
+                spacing={3}
+                alignItems="stretch"
+                justifyContent="center"
+                sx={{
+                  maxWidth: "100%",
+                  width: "100%",
+                }}
+              >
+                {metrics.map((metric) => (
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    lg={3}
+                    xl={2}
+                    key={metric.id}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Box sx={{ width: "100%", maxWidth: 280 }}>
+                      <MetricCard metric={metric} />
+                    </Box>
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-        </Stack>
+            </Box>
+          </Stack>
+        </Box>
       </Box>
     );
   }
