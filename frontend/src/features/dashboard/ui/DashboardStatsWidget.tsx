@@ -219,9 +219,9 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
                   justifyContent: "center",
                 }}
               >
-                <Grid 
-                  container 
-                  spacing={3} 
+                <Grid
+                  container
+                  spacing={3}
                   alignItems="stretch"
                   justifyContent="center"
                   sx={{
@@ -230,13 +230,13 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
                   }}
                 >
                   {Array.from({ length: 6 }).map((_, index) => (
-                    <Grid 
-                      item 
-                      xs={12} 
-                      sm={6} 
-                      md={4} 
-                      lg={3} 
-                      xl={2} 
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      lg={3}
+                      xl={2}
                       key={index}
                       sx={{
                         display: "flex",
@@ -247,7 +247,10 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
                         <Card
                           sx={{
                             borderRadius: 3,
-                            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                            border: `1px solid ${alpha(
+                              theme.palette.divider,
+                              0.08
+                            )}`,
                             height: "100%",
                           }}
                         >
@@ -258,12 +261,28 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
                                 alignItems="center"
                                 justifyContent="space-between"
                               >
-                                <Skeleton variant="rounded" width={48} height={48} />
-                                <Skeleton variant="rounded" width={60} height={24} />
+                                <Skeleton
+                                  variant="rounded"
+                                  width={48}
+                                  height={48}
+                                />
+                                <Skeleton
+                                  variant="rounded"
+                                  width={60}
+                                  height={24}
+                                />
                               </Box>
                               <Stack spacing={0.5} alignItems="flex-start">
-                                <Skeleton variant="text" width="80%" height={40} />
-                                <Skeleton variant="text" width="60%" height={20} />
+                                <Skeleton
+                                  variant="text"
+                                  width="80%"
+                                  height={40}
+                                />
+                                <Skeleton
+                                  variant="text"
+                                  width="60%"
+                                  height={20}
+                                />
                               </Stack>
                             </Stack>
                           </CardContent>
@@ -298,8 +317,7 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
                 sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
               />
               <Typography color="error" variant="body2" textAlign="center">
-                {t("errors.loadingError")}:{" "}
-                {error?.message || "Unknown error"}
+                {t("errors.loadingError")}: {error?.message || "Unknown error"}
               </Typography>
               <Button
                 onClick={() => refetch()}
@@ -522,16 +540,19 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
                     backgroundColor: alpha(theme.palette.primary.main, 0.04),
                     borderColor: alpha(theme.palette.primary.main, 0.2),
                   },
-                  ...(isFetching && {
-                    animation: "spin 1s linear infinite",
-                    "@keyframes spin": {
-                      "0%": { transform: "rotate(0deg)" },
-                      "100%": { transform: "rotate(360deg)" },
-                    },
-                  }),
                 }}
               >
-                <Refresh />
+                <Refresh
+                  sx={{
+                    ...(isFetching && {
+                      animation: "spin 1s linear infinite",
+                      "@keyframes spin": {
+                        "0%": { transform: "rotate(0deg)" },
+                        "100%": { transform: "rotate(360deg)" },
+                      },
+                    }),
+                  }}
+                />
               </IconButton>
             </Box>
 

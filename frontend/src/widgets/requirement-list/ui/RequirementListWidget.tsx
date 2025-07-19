@@ -543,9 +543,11 @@ export const RequirementListWidget = memo<RequirementListWidgetProps>(
             showActions && (
               <Box sx={{ display: "flex", gap: 1 }}>
                 <Tooltip title={t("common.refresh", "Обновить")}>
-                  <IconButton onClick={handleRefresh} disabled={isLoading}>
-                    <Refresh />
-                  </IconButton>
+                  <span>
+                    <IconButton onClick={handleRefresh} disabled={isLoading}>
+                      <Refresh />
+                    </IconButton>
+                  </span>
                 </Tooltip>
                 <Tooltip title={t("requirements.create", "Создать требование")}>
                   <IconButton>

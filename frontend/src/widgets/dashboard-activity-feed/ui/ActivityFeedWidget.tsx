@@ -213,23 +213,52 @@ export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
 
     // Normalize data to always be an array
     const activities = useMemo((): ActivityItemType[] => {
-      if (!rawData) return [];
+      try {
+        if (!rawData) return [];
 
-      if (infiniteScroll) {
-        // For infinite query, flatten pages
-        const infiniteData = rawData as any;
-        const pages = infiniteData?.pages;
-        if (!Array.isArray(pages)) return [];
+        if (infiniteScroll) {
+          // For infinite query, flatten pages
+          const infiniteData = rawData as any;
+          const pages = infiniteData?.pages;
 
-        return pages.flatMap((page: any) => {
-          if (!page || !Array.isArray(page.data)) return [];
-          return page.data;
-        });
+          if (!pages || !Array.isArray(pages)) {
+            console.warn(
+              "ActivityFeedWidget: Invalid pages structure in infinite query"
+            );
+            return [];
+          }
+
+          return pages.flatMap((page: any) => {
+            if (!page || typeof page !== "object") return [];
+
+            // Handle different response structures
+            const pageData = page.data || page;
+            if (!Array.isArray(pageData)) return [];
+
+            return pageData.filter(
+              (item: any) => item && typeof item === "object"
+            );
+          });
+        }
+
+        // For regular query, data is already an array
+        if (!Array.isArray(rawData)) {
+          console.warn(
+            "ActivityFeedWidget: Invalid data structure in regular query"
+          );
+          return [];
+        }
+
+        return (rawData as ActivityItemType[]).filter(
+          (item: any) => item && typeof item === "object"
+        );
+      } catch (error) {
+        console.error(
+          "ActivityFeedWidget: Error processing activities data:",
+          error
+        );
+        return [];
       }
-
-      // For regular query, data is already an array
-      if (!Array.isArray(rawData)) return [];
-      return rawData as ActivityItemType[];
     }, [rawData, infiniteScroll]);
 
     // Auto refresh
@@ -255,7 +284,7 @@ export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
         (activity) =>
           activity?.title?.toLowerCase().includes(query) ||
           activity?.description?.toLowerCase().includes(query) ||
-          activity?.user?.name?.toLowerCase().includes(query)
+          activity?.userName?.toLowerCase().includes(query)
       );
     }, [activities, debouncedSearchQuery]);
 
@@ -604,16 +633,19 @@ export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
                             0.2
                           ),
                         },
-                        ...(isFetching && {
-                          animation: "spin 1s linear infinite",
-                          "@keyframes spin": {
-                            "0%": { transform: "rotate(0deg)" },
-                            "100%": { transform: "rotate(360deg)" },
-                          },
-                        }),
                       }}
                     >
-                      <Refresh />
+                      <Refresh 
+                        sx={{
+                          ...(isFetching && {
+                            animation: "spin 1s linear infinite",
+                            "@keyframes spin": {
+                              "0%": { transform: "rotate(0deg)" },
+                              "100%": { transform: "rotate(360deg)" },
+                            },
+                          }),
+                        }}
+                      />
                     </IconButton>
                   </span>
                 </Tooltip>

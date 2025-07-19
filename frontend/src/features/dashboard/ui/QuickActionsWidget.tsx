@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback, useState } from "react";
+import React, { memo, useMemo, useCallback } from "react";
 import {
   Box,
   Grid,
@@ -20,20 +20,15 @@ import {
   Analytics,
   Assessment,
   TrendingUp,
-  Speed,
   Upload,
-  Dashboard as DashboardIcon,
-  InsertChart,
-  BarChart,
   FileDownload,
-  Settings,
-  ImportExport,
 } from "@mui/icons-material";
 import i18n from "@/shared/lib/i18n";
 import { useNavigate } from "react-router-dom";
 
 import type { QuickAction } from "@/entities/dashboard";
 import { ActionCategory } from "@/entities/dashboard";
+import { useQuickActions } from "../model/queries";
 
 interface QuickActionsWidgetProps {
   variant?: "minimal" | "detailed" | "compact";
@@ -59,98 +54,14 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
 
     const isCompact = variant === "compact" || variant === "minimal";
 
-    // Mock actions data with balanced Create, Analyze, and Manage categories
-    const mockActions: QuickAction[] = useMemo(() => [
-      // Create Actions
-      {
-        id: "create-project",
-        title: "Создать проект",
-        description: "Создать новый проект",
-        icon: "Add",
-        path: "/projects/create",
-        category: ActionCategory.CREATE,
-        shortcut: "Ctrl+P",
-      },
-      {
-        id: "create-requirement",
-        title: "Создать требование", 
-        description: "Добавить новое требование",
-        icon: "Assignment",
-        path: "/requirements/create",
-        category: ActionCategory.CREATE,
-        shortcut: "Ctrl+R",
-      },
-      {
-        id: "create-release",
-        title: "Создать релиз",
-        description: "Создать новый релиз",
-        icon: "RocketLaunch",
-        path: "/releases/create", 
-        category: ActionCategory.CREATE,
-        shortcut: "Ctrl+L",
-      },
-      {
-        id: "create-test-case",
-        title: "Создать тест-кейс",
-        description: "Создать новый тест-кейс",
-        icon: "BugReport",
-        path: "/testing/create",
-        category: ActionCategory.CREATE,
-        shortcut: "Ctrl+T",
-      },
-      // Analyze Actions
-      {
-        id: "analytics-dashboard",
-        title: "Аналитика",
-        description: "Просмотр аналитики и отчетов",
-        icon: "Analytics",
-        path: "/analytics",
-        category: ActionCategory.ANALYZE,
-        shortcut: "Ctrl+A",
-      },
-      {
-        id: "project-metrics",
-        title: "Метрики проекта",
-        description: "Анализ показателей проекта",
-        icon: "Assessment",
-        path: "/analytics/projects",
-        category: ActionCategory.ANALYZE,
-        shortcut: "Ctrl+M",
-      },
-      {
-        id: "progress-reports",
-        title: "Отчеты прогресса",
-        description: "Просмотр отчетов о прогрессе",
-        icon: "TrendingUp",
-        path: "/reports/progress",
-        category: ActionCategory.ANALYZE,
-        shortcut: "Ctrl+G",
-      },
-      // Manage Actions
-      {
-        id: "import-requirements",
-        title: "Импорт требований",
-        description: "Импортировать требования из файла",
-        icon: "Upload",
-        path: "/requirements/import",
-        category: ActionCategory.MANAGE,
-        shortcut: "Ctrl+I",
-      },
-      {
-        id: "export-data",
-        title: "Экспорт данных",
-        description: "Экспорт проектных данных",
-        icon: "FileDownload",
-        path: "/export",
-        category: ActionCategory.MANAGE,
-        shortcut: "Ctrl+E",
-      },
-    ], []);
+    // Use real API data
+    const { data: actions, isLoading, error, isError } = useQuickActions();
 
     // Filter and categorize actions
     const filteredActions = useMemo(() => {
-      return mockActions.slice(0, maxActions);
-    }, [mockActions, maxActions]);
+      if (!actions) return [];
+      return actions.slice(0, maxActions);
+    }, [actions, maxActions]);
 
     const groupedActions = useMemo(() => {
       if (!showCategories) return {};
@@ -205,8 +116,6 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
         TrendingUp: <TrendingUp />,
         Upload: <Upload />,
         FileDownload: <FileDownload />,
-        Settings: <Settings />,
-        ImportExport: <ImportExport />,
       };
       return iconMap[iconName] || <Add />;
     }, []);
@@ -385,6 +294,90 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
         getCategoryColor,
       ]
     );
+
+    // Loading state
+    if (isLoading) {
+      return (
+        <Box className={className} sx={{ width: "100%" }}>
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              backgroundColor: theme.palette.background.paper,
+              width: "100%",
+            }}
+          >
+            <Stack spacing={3}>
+              {/* Header skeleton */}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Stack spacing={1}>
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <Skeleton variant="rounded" width={32} height={32} />
+                    <Skeleton variant="text" width={150} height={32} />
+                  </Box>
+                  <Skeleton variant="text" width={200} height={20} />
+                </Stack>
+              </Box>
+
+              {/* Content skeleton */}
+              <Box>
+                <Grid container spacing={3}>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                      <Skeleton
+                        variant="rectangular"
+                        height={180}
+                        sx={{ borderRadius: 3 }}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            </Stack>
+          </Box>
+        </Box>
+      );
+    }
+
+    // Error state
+    if (isError) {
+      return (
+        <Box className={className} sx={{ width: "100%" }}>
+          <Box
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              backgroundColor: theme.palette.background.paper,
+              width: "100%",
+            }}
+          >
+            <Stack spacing={2} alignItems="center" sx={{ py: 4 }}>
+              <RocketLaunch
+                sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
+              />
+              <Typography color="error" variant="body2" textAlign="center">
+                {t("errors.loadingError")}: {error?.message || "Unknown error"}
+              </Typography>
+              <Alert
+                severity="error"
+                sx={{ width: "100%", textAlign: "center" }}
+              >
+                {t(
+                  "dashboard.quickActions.errorMessage",
+                  "Quick Actions temporarily unavailable"
+                )}
+              </Alert>
+            </Stack>
+          </Box>
+        </Box>
+      );
+    }
 
     return (
       <Box className={className} sx={{ width: "100%" }}>

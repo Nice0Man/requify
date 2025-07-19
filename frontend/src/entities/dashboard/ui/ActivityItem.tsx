@@ -57,8 +57,8 @@ export const ActivityItem = memo<ActivityItemProps>(
   }) => {
     const theme = useTheme();
 
-    const getActivityIcon = (type: ActivityType) => {
-      const iconMap = {
+    const getActivityIcon = (type: string) => {
+      const iconMap: Record<string, any> = {
         project_created: FolderOpen,
         project_updated: FolderOpen,
         requirement_created: Assignment,
@@ -75,8 +75,8 @@ export const ActivityItem = memo<ActivityItemProps>(
       return <IconComponent fontSize="small" />;
     };
 
-    const getActivityColor = (type: ActivityType) => {
-      const colorMap = {
+    const getActivityColor = (type: string) => {
+      const colorMap: Record<string, string> = {
         project_created: theme.palette.primary.main,
         project_updated: theme.palette.primary.main,
         requirement_created: theme.palette.info.main,
@@ -92,8 +92,8 @@ export const ActivityItem = memo<ActivityItemProps>(
       return colorMap[type] || theme.palette.text.secondary;
     };
 
-    const getStatusColor = (status: ActivityStatus) => {
-      const colorMap = {
+    const getStatusColor = (status: string) => {
+      const colorMap: Record<string, string> = {
         pending: theme.palette.warning.main,
         in_progress: theme.palette.info.main,
         completed: theme.palette.success.main,
@@ -103,8 +103,8 @@ export const ActivityItem = memo<ActivityItemProps>(
       return colorMap[status];
     };
 
-    const getPriorityColor = (priority: Priority) => {
-      const colorMap = {
+    const getPriorityColor = (priority: string) => {
+      const colorMap: Record<string, string> = {
         low: theme.palette.success.main,
         medium: theme.palette.warning.main,
         high: theme.palette.error.main,
@@ -188,15 +188,20 @@ export const ActivityItem = memo<ActivityItemProps>(
           {showAvatar && (
             <Box sx={{ position: "relative" }}>
               <Avatar
-                src={activity.user.avatar}
+                src={activity.user?.avatar || activity.userAvatar}
                 sx={{
                   width: variant === "compact" ? 32 : 40,
                   height: variant === "compact" ? 32 : 40,
-                  bgcolor: alpha(getActivityColor(activity.type), 0.1),
-                  color: getActivityColor(activity.type),
+                  bgcolor: alpha(
+                    getActivityColor(activity.type as ActivityType),
+                    0.1
+                  ),
+                  color: getActivityColor(activity.type as ActivityType),
                 }}
               >
-                {activity.user.avatar ? null : getActivityIcon(activity.type)}
+                {activity.user?.avatar || activity.userAvatar
+                  ? null
+                  : getActivityIcon(activity.type as ActivityType)}
               </Avatar>
 
               {/* Activity type indicator */}
@@ -256,7 +261,7 @@ export const ActivityItem = memo<ActivityItemProps>(
                       fontWeight: 500,
                     }}
                   >
-                    {activity.user.name}
+                    {activity.user?.name || activity.userName}
                   </Typography>
                 </Box>
 

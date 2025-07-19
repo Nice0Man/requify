@@ -17,6 +17,7 @@ import {
   Alert,
   Chip,
   Skeleton,
+  CircularProgress,
 } from "@mui/material";
 import {
   Refresh,
@@ -30,13 +31,19 @@ import i18n from "@/shared/lib/i18n";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { DashboardLayout } from "@/widgets/layout";
-import { DashboardStatsWidget, QuickActionsWidget } from "@/widgets";
+import { QuickActionsWidget } from "@/widgets";
 import { ProjectOverviewWidget } from "@/widgets/project-overview";
 import { SystemHealthWidget } from "@/widgets/system-health";
+import { ActivityFeedWidget } from "@/widgets/dashboard-activity-feed";
+
+// Import our enhanced chart components
+import { EnhancedDashboardStatsWidget } from "@/features/dashboard/ui/EnhancedDashboardStatsWidget";
+import { DashboardChartsGrid } from "@/features/charts";
 
 import {
   useDashboardOverview,
   useRefreshDashboard,
+  useSystemMetrics,
   dashboardKeys,
 } from "@/features/dashboard";
 import type { DashboardMetric } from "@/features/dashboard";
@@ -142,33 +149,49 @@ const DashboardSkeleton = memo(() => (
 DashboardSkeleton.displayName = "DashboardSkeleton";
 
 /**
- * Activity Feed with Error Boundary
+ * Activity Feed with Loading Fallback
  */
-const DeferredActivityFeed = memo(() => {
-  const theme = useTheme();
-  
+const ActivityFeedSection = memo(() => {
   return (
-    <Box
-      sx={{
-        p: 3,
-        borderRadius: 2,
-        height: "100%",
-        minHeight: 200,
-        border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-        backgroundColor: theme.palette.background.paper,
-      }}
+    <Suspense
+      fallback={
+        <Box
+          sx={{
+            p: 3,
+            borderRadius: 2,
+            height: "100%",
+            minHeight: 200,
+            border: (theme) =>
+              `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            backgroundColor: (theme) => theme.palette.background.paper,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Box sx={{ textAlign: "center" }}>
+            <CircularProgress size={32} sx={{ mb: 2 }} />
+            <Typography variant="body2" color="text.secondary">
+              Loading activity feed...
+            </Typography>
+          </Box>
+        </Box>
+      }
     >
-      <Typography variant="h6" gutterBottom>
-        Recent Activity
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        Activity feed is loading...
-      </Typography>
-    </Box>
+      <ActivityFeedWidget
+        variant="detailed"
+        maxItems={10}
+        showFilters={false}
+        showSearch={true}
+        showHeader={true}
+        autoRefresh={true}
+        refreshInterval={30000}
+      />
+    </Suspense>
   );
 });
 
-DeferredActivityFeed.displayName = "DeferredActivityFeed";
+ActivityFeedSection.displayName = "ActivityFeedSection";
 
 /**
  * Main Dashboard Page Component
@@ -184,15 +207,16 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Data fetching
-  const {
-    data: overview,
-    isError,
-    error,
-    isFetching,
-  } = useDashboardOverview();
+  const { data: overview, isError, error, isFetching } = useDashboardOverview();
+  const { 
+    data: systemMetrics, 
+    isLoading: isSystemMetricsLoading, 
+    isError: isSystemMetricsError 
+  } = useSystemMetrics();
 
   // Performance optimization with useDeferredValue
   const deferredOverview = useDeferredValue(overview);
+  const deferredSystemMetrics = useDeferredValue(systemMetrics);
 
   // Mutation for refresh
   const refreshMutation = useRefreshDashboard({
@@ -219,6 +243,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
 
   const handleMetricClick = useCallback((metric: DashboardMetric) => {
     console.log("Metric clicked:", metric);
+  }, []);
+
+  // Handler for chart metrics (compatible with ChartMetric type)
+  const handleChartMetricClick = useCallback((metric: any) => {
+    console.log("Chart metric clicked:", metric);
   }, []);
 
   // Error state
@@ -259,14 +288,15 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
             xl: "2fr 1fr",
           },
           gridTemplateRows: {
-            xs: "auto auto auto auto auto",
-            lg: "auto auto 1fr",
+            xs: "auto auto auto auto auto auto",
+            lg: "auto auto auto 1fr",
           },
           gridTemplateAreas: {
             xs: `
               "header"
               "status"
               "stats"
+              "charts"
               "main"
               "sidebar"
             `,
@@ -274,6 +304,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
               "header header"
               "status status"
               "stats stats"
+              "charts charts"
               "main sidebar"
             `,
           },
@@ -327,16 +358,19 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
                 sx={{
                   border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                   borderRadius: 2,
-                  ...(isFetching && {
-                    animation: "spin 1s linear infinite",
-                    "@keyframes spin": {
-                      "0%": { transform: "rotate(0deg)" },
-                      "100%": { transform: "rotate(360deg)" },
-                    },
-                  }),
                 }}
               >
-                <Refresh />
+                <Refresh
+                  sx={{
+                    ...(isFetching && {
+                      animation: "spin 1s linear infinite",
+                      "@keyframes spin": {
+                        "0%": { transform: "rotate(0deg)" },
+                        "100%": { transform: "rotate(360deg)" },
+                      },
+                    }),
+                  }}
+                />
               </IconButton>
             </Tooltip>
 
@@ -363,15 +397,79 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
           <StatusChips overview={deferredOverview} />
         </Box>
 
-        {/* Stats Widget Area */}
+        {/* Enhanced Stats Widget with Charts */}
         <Box sx={{ gridArea: "stats" }}>
-          <DashboardStatsWidget
+          <EnhancedDashboardStatsWidget
             variant="detailed"
-            onMetricClick={handleMetricClick}
-            showExport
-            showRefresh
+            showCharts={true}
+            showTrends={true}
+            onMetricClick={handleChartMetricClick}
           />
         </Box>
+
+        {/* Interactive Charts Grid - Only if we have valid data */}
+        {deferredOverview?.stats && (
+          <Box sx={{ gridArea: "charts", mt: 3 }}>
+            <DashboardChartsGrid
+              projectMetrics={{
+                totalProjects: deferredOverview.stats.totalProjects || 0,
+                activeProjects: deferredOverview.stats.activeProjects || 0,
+                completedProjects: deferredOverview.stats.completedTasks || 0,
+                inProgressProjects: deferredOverview.stats.activeProjects || 0,
+                avgProgress: deferredOverview.stats.completionRate || 0,
+                statusDistribution: [
+                  {
+                    status: "active",
+                    count: deferredOverview.stats.activeProjects || 0,
+                    percentage: Math.round(
+                      ((deferredOverview.stats.activeProjects || 0) /
+                        Math.max(deferredOverview.stats.totalProjects || 1, 1)) *
+                        100
+                    ),
+                    color: theme.palette.primary.main,
+                  },
+                  {
+                    status: "completed",
+                    count: deferredOverview.stats.completedTasks || 0,
+                    percentage: Math.round(
+                      ((deferredOverview.stats.completedTasks || 0) /
+                        Math.max(deferredOverview.stats.totalRequirements || 1, 1)) *
+                        100
+                    ),
+                    color: theme.palette.success.main,
+                  },
+                ],
+                timeline: [],
+                trends: [],
+              }}
+              teamMetrics={{
+                totalMembers: deferredOverview.stats.teamMembers || 0,
+                activeMembers: deferredOverview.stats.teamMembers || 0,
+                productivity: deferredOverview.stats.completionRate || 0,
+                velocity: Math.round(deferredOverview.stats.teamVelocity || 0),
+                workload: [],
+                performance: [],
+              }}
+              systemMetrics={{
+                cpuUsage: deferredSystemMetrics?.cpuUsage || 0,
+                memoryUsage: deferredSystemMetrics?.memoryUsage || 0,
+                diskUsage: deferredSystemMetrics?.diskUsage || 0,
+                networkLatency: deferredSystemMetrics?.networkLatency || 0,
+                uptime: deferredSystemMetrics?.uptime || 0,
+                activeUsers: deferredSystemMetrics?.activeUsers || deferredOverview?.stats?.teamMembers || 0,
+                responseTime: deferredSystemMetrics?.responseTime || 0,
+                errorRate: deferredSystemMetrics?.errorRate || 0,
+                throughput: deferredSystemMetrics?.throughput || 0,
+                availability: deferredSystemMetrics?.availability || 0,
+              }}
+              loading={isFetching || isSystemMetricsLoading}
+              error={
+                isError ? (error as any)?.message || "Error loading charts" : 
+                isSystemMetricsError ? "Error loading system metrics" : null
+              }
+            />
+          </Box>
+        )}
 
         {/* Main Content Area */}
         <Box
@@ -412,7 +510,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
         >
           {/* Activity Feed - Deferred for performance */}
           <Box sx={{ flex: "1 1 auto", minHeight: 200 }}>
-            <DeferredActivityFeed />
+            <ActivityFeedSection />
           </Box>
 
           {/* System Health */}

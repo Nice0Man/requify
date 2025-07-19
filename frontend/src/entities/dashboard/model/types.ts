@@ -41,18 +41,20 @@ export interface TrendData {
 
 export interface ActivityItem {
   id: string;
-  type: ActivityType;
+  type: string; // ActivityType equivalent
   title: string;
   description: string;
   timestamp: string;
-  user: {
-    id: string;
+  userName: string; // Maps to user_name from backend
+  userAvatar?: string; // Maps to user_avatar from backend
+  projectName?: string; // Maps to project_name from backend
+  status?: string;
+  priority?: string;
+  // Nested user object for component compatibility
+  user?: {
     name: string;
     avatar?: string;
   };
-  metadata?: Record<string, any>;
-  status?: ActivityStatus;
-  priority?: Priority;
 }
 
 export interface SystemHealth {
@@ -228,11 +230,38 @@ export enum NotificationType {
   DEADLINE_REMINDERS = "deadline_reminders",
 }
 
-// Response Types
+// Response Types - Updated to match backend schema
 export interface DashboardStatsResponse {
-  data: DashboardStats;
-  success: boolean;
-  timestamp: string;
+  overview: {
+    total_projects: number;
+    active_projects: number;
+    completed_projects: number;
+    total_requirements: number;
+    pending_requirements: number;
+    approved_requirements: number;
+    total_users: number;
+    active_users: number;
+  };
+  project_performance: {
+    completion_rate: number;
+    on_time_delivery: number;
+    quality_score: number;
+    team_productivity: number;
+  };
+  trending_metrics: {
+    requirements_this_week: number;
+    requirements_last_week: number;
+    releases_this_month: number;
+    releases_last_month: number;
+    active_teams: number;
+    avg_project_duration: number;
+  };
+  recent_activity: ActivityItem[];
+  quick_access: {
+    my_projects: any[];
+    my_requirements: any[];
+    pending_approvals: any[];
+  };
 }
 
 export interface ActivityResponse {
@@ -264,4 +293,4 @@ export interface MetricsFilters {
   category?: MetricCategory[];
   period?: "1h" | "24h" | "7d" | "30d" | "90d";
   includeComparisons?: boolean;
-} 
+}

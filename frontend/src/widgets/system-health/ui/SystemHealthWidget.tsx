@@ -199,44 +199,53 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
     }, []);
 
     // Get system status icon
-    const getSystemStatusIcon = useCallback((status: SystemHealth["status"]) => {
-      switch (status) {
-        case "healthy":
-          return <CheckCircle fontSize="small" />;
-        case "warning":
-          return <Warning fontSize="small" />;
-        case "critical":
-          return <Error fontSize="small" />;
-        default:
-          return <Error fontSize="small" />;
-      }
-    }, []);
+    const getSystemStatusIcon = useCallback(
+      (status: SystemHealth["status"]) => {
+        switch (status) {
+          case "healthy":
+            return <CheckCircle fontSize="small" />;
+          case "warning":
+            return <Warning fontSize="small" />;
+          case "critical":
+            return <Error fontSize="small" />;
+          default:
+            return <Error fontSize="small" />;
+        }
+      },
+      []
+    );
 
-    // Get system status color  
-    const getSystemStatusColor = useCallback((status: SystemHealth["status"]) => {
-      switch (status) {
-        case "healthy":
-          return muiTheme.palette.success.main;
-        case "warning":
-          return muiTheme.palette.warning.main;
-        case "critical":
-          return muiTheme.palette.error.main;
-        default:
-          return muiTheme.palette.grey[500];
-      }
-    }, [muiTheme.palette]);
+    // Get system status color
+    const getSystemStatusColor = useCallback(
+      (status: SystemHealth["status"]) => {
+        switch (status) {
+          case "healthy":
+            return muiTheme.palette.success.main;
+          case "warning":
+            return muiTheme.palette.warning.main;
+          case "critical":
+            return muiTheme.palette.error.main;
+          default:
+            return muiTheme.palette.grey[500];
+        }
+      },
+      [muiTheme.palette]
+    );
 
     // Backup-style loading state
     if (isLoading) {
       return (
-        <Card 
+        <Card
           className={className}
           sx={{
             borderRadius: 3,
             border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-            boxShadow: `0 2px 20px ${alpha(muiTheme.palette.common.black, 0.04)}`,
+            boxShadow: `0 2px 20px ${alpha(
+              muiTheme.palette.common.black,
+              0.04
+            )}`,
             background: muiTheme.palette.background.paper,
-            overflow: 'hidden',
+            overflow: "hidden",
           }}
         >
           <CardHeader
@@ -247,28 +256,34 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                   height: 40,
                   borderRadius: 2,
                   background: `linear-gradient(135deg, ${muiTheme.palette.success.main}, ${muiTheme.palette.primary.main})`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <HealthAndSafety sx={{ color: 'white', fontSize: 20 }} />
+                <HealthAndSafety sx={{ color: "white", fontSize: 20 }} />
               </Box>
             }
             title={
-              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, fontSize: "1.1rem" }}
+              >
                 {t("dashboard.systemHealth.title")}
               </Typography>
             }
             action={
               showRefresh && (
-                <IconButton 
+                <IconButton
                   size="small"
-                  sx={{ 
+                  sx={{
                     borderRadius: 2,
                     border: `1px solid ${alpha(muiTheme.palette.divider, 0.1)}`,
-                    '&:hover': {
-                      backgroundColor: alpha(muiTheme.palette.primary.main, 0.04),
+                    "&:hover": {
+                      backgroundColor: alpha(
+                        muiTheme.palette.primary.main,
+                        0.04
+                      ),
                       borderColor: alpha(muiTheme.palette.primary.main, 0.2),
                     },
                   }}
@@ -279,7 +294,7 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
             }
             sx={{ pb: 1 }}
           />
-          
+
           <CardContent sx={{ pt: 0 }}>
             <Stack spacing={2}>
               {Array.from({ length: 4 }).map((_, index) => (
@@ -288,7 +303,10 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                   sx={{
                     p: 2,
                     borderRadius: 2,
-                    border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
+                    border: `1px solid ${alpha(
+                      muiTheme.palette.divider,
+                      0.08
+                    )}`,
                     background: muiTheme.palette.background.paper,
                   }}
                 >
@@ -296,7 +314,12 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                     <Skeleton variant="circular" width={32} height={32} />
                     <Box sx={{ flex: 1 }}>
                       <Skeleton variant="text" width="80%" height={20} />
-                      <Skeleton variant="text" width="60%" height={16} sx={{ mt: 0.5 }} />
+                      <Skeleton
+                        variant="text"
+                        width="60%"
+                        height={16}
+                        sx={{ mt: 0.5 }}
+                      />
                     </Box>
                     <Skeleton variant="rounded" width={60} height={24} />
                   </Stack>
@@ -333,7 +356,8 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
               }
             >
               <Typography variant="body2">
-                {t("system.error", "System health check failed")}: {error?.message || "Unknown error"}
+                {t("system.error", "System health check failed")}:{" "}
+                {error?.message || "Unknown error"}
               </Typography>
             </Alert>
           </CardContent>
@@ -346,7 +370,9 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
     }
 
     const isHealthy = health.status === "healthy";
-    const statusColor = isHealthy ? muiTheme.palette.success.main : muiTheme.palette.error.main;
+    const statusColor = isHealthy
+      ? muiTheme.palette.success.main
+      : muiTheme.palette.error.main;
 
     return (
       <Grow in timeout={600}>
@@ -355,7 +381,10 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
           sx={{
             borderRadius: 3,
             border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-            boxShadow: `0 4px 24px ${alpha(muiTheme.palette.common.black, 0.06)}`,
+            boxShadow: `0 4px 24px ${alpha(
+              muiTheme.palette.common.black,
+              0.06
+            )}`,
             background: muiTheme.palette.background.paper,
             overflow: "hidden",
           }}
@@ -381,7 +410,7 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                 >
                   <HealthAndSafety sx={{ fontSize: 24 }} />
                 </Box>
-                
+
                 {/* Context7 Status Pulse */}
                 <Box
                   sx={{
@@ -393,7 +422,9 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                     borderRadius: "50%",
                     background: statusColor,
                     border: `2px solid ${muiTheme.palette.background.paper}`,
-                    animation: isHealthy ? "contextPulse 2s ease-in-out infinite" : "none",
+                    animation: isHealthy
+                      ? "contextPulse 2s ease-in-out infinite"
+                      : "none",
                     "@keyframes contextPulse": {
                       "0%, 100%": { transform: "scale(1)", opacity: 1 },
                       "50%": { transform: "scale(1.2)", opacity: 0.8 },
@@ -404,19 +435,19 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
             }
             title={
               <Box>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
+                <Typography
+                  variant="h6"
+                  sx={{
                     fontWeight: 700,
-                    fontSize: isCompact ? '1rem' : '1.25rem',
+                    fontSize: isCompact ? "1rem" : "1.25rem",
                   }}
                 >
                   {t("dashboard.systemHealth.title")}
                 </Typography>
-                <Typography 
-                  variant="body2" 
+                <Typography
+                  variant="body2"
                   color="text.secondary"
-                  sx={{ fontSize: '0.875rem' }}
+                  sx={{ fontSize: "0.875rem" }}
                 >
                   System Status: {health.status}
                 </Typography>
@@ -427,21 +458,29 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                 <Chip
                   label={health.status}
                   size="small"
-                  icon={getSystemStatusIcon(health.status as SystemHealth["status"])}
+                  icon={getSystemStatusIcon(
+                    health.status as SystemHealth["status"]
+                  )}
                   sx={{
-                    background: `linear-gradient(135deg, ${alpha(getSystemStatusColor(health.status), 0.1)}, ${alpha(getSystemStatusColor(health.status), 0.05)})`,
-                    border: `1px solid ${alpha(getSystemStatusColor(health.status), 0.2)}`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      getSystemStatusColor(health.status),
+                      0.1
+                    )}, ${alpha(getSystemStatusColor(health.status), 0.05)})`,
+                    border: `1px solid ${alpha(
+                      getSystemStatusColor(health.status),
+                      0.2
+                    )}`,
                     color: getSystemStatusColor(health.status),
                     fontWeight: 600,
-                    fontSize: '0.75rem',
+                    fontSize: "0.75rem",
                     height: 28,
-                    '& .MuiChip-icon': {
+                    "& .MuiChip-icon": {
                       color: getSystemStatusColor(health.status),
                       fontSize: 16,
                     },
                   }}
                 />
-                
+
                 {showRefresh && (
                   <Tooltip title={t("common.refresh", "Обновить")}>
                     <span>
@@ -451,21 +490,34 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                         disabled={isFetching}
                         sx={{
                           borderRadius: 2,
-                          border: `1px solid ${alpha(muiTheme.palette.divider, 0.1)}`,
-                          '&:hover': {
-                            backgroundColor: alpha(muiTheme.palette.primary.main, 0.04),
-                            borderColor: alpha(muiTheme.palette.primary.main, 0.2),
+                          border: `1px solid ${alpha(
+                            muiTheme.palette.divider,
+                            0.1
+                          )}`,
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              muiTheme.palette.primary.main,
+                              0.04
+                            ),
+                            borderColor: alpha(
+                              muiTheme.palette.primary.main,
+                              0.2
+                            ),
                           },
-                          ...(isFetching && {
-                            animation: "spin 1s linear infinite",
-                            "@keyframes spin": {
-                              "0%": { transform: "rotate(0deg)" },
-                              "100%": { transform: "rotate(360deg)" },
-                            },
-                          }),
                         }}
                       >
-                        <Refresh fontSize="small" />
+                        <Refresh
+                          fontSize="small"
+                          sx={{
+                            ...(isFetching && {
+                              animation: "spin 1s linear infinite",
+                              "@keyframes spin": {
+                                "0%": { transform: "rotate(0deg)" },
+                                "100%": { transform: "rotate(360deg)" },
+                              },
+                            }),
+                          }}
+                        />
                       </IconButton>
                     </span>
                   </Tooltip>
@@ -486,19 +538,31 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                       sx={{
                         p: 1.5,
                         borderRadius: 2,
-                        border: `1px solid ${alpha(getServiceColor(service.status), 0.2)}`,
-                        background: `linear-gradient(135deg, ${alpha(getServiceColor(service.status), 0.05)}, transparent)`,
-                        cursor: onHealthClick ? 'pointer' : 'default',
-                        transition: 'all 0.2s ease-in-out',
-                        '&:hover': onHealthClick ? {
-                          transform: 'translateY(-2px)',
-                          boxShadow: muiTheme.shadows[4],
-                        } : {},
+                        border: `1px solid ${alpha(
+                          getServiceColor(service.status),
+                          0.2
+                        )}`,
+                        background: `linear-gradient(135deg, ${alpha(
+                          getServiceColor(service.status),
+                          0.05
+                        )}, transparent)`,
+                        cursor: onHealthClick ? "pointer" : "default",
+                        transition: "all 0.2s ease-in-out",
+                        "&:hover": onHealthClick
+                          ? {
+                              transform: "translateY(-2px)",
+                              boxShadow: muiTheme.shadows[4],
+                            }
+                          : {},
                       }}
                     >
                       <Stack direction="row" spacing={1} alignItems="center">
                         {getStatusIcon(service.status)}
-                        <Typography variant="body2" fontWeight={500} sx={{ flex: 1 }}>
+                        <Typography
+                          variant="body2"
+                          fontWeight={500}
+                          sx={{ flex: 1 }}
+                        >
                           {service.name}
                         </Typography>
                       </Stack>
@@ -515,10 +579,15 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                       onClick={() => onHealthClick?.(service.name)}
                       sx={{
                         borderRadius: 2,
-                        cursor: onHealthClick ? 'pointer' : 'default',
-                        '&:hover': onHealthClick ? {
-                          backgroundColor: alpha(muiTheme.palette.primary.main, 0.04),
-                        } : {},
+                        cursor: onHealthClick ? "pointer" : "default",
+                        "&:hover": onHealthClick
+                          ? {
+                              backgroundColor: alpha(
+                                muiTheme.palette.primary.main,
+                                0.04
+                              ),
+                            }
+                          : {},
                       }}
                     >
                       <ListItemIcon>
@@ -527,17 +596,26 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                             width: 32,
                             height: 32,
                             borderRadius: 2,
-                            background: `linear-gradient(135deg, ${alpha(getServiceColor(service.status), 0.1)}, ${alpha(getServiceColor(service.status), 0.05)})`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: `1px solid ${alpha(getServiceColor(service.status), 0.2)}`,
+                            background: `linear-gradient(135deg, ${alpha(
+                              getServiceColor(service.status),
+                              0.1
+                            )}, ${alpha(
+                              getServiceColor(service.status),
+                              0.05
+                            )})`,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            border: `1px solid ${alpha(
+                              getServiceColor(service.status),
+                              0.2
+                            )}`,
                           }}
                         >
                           {getStatusIcon(service.status)}
                         </Box>
                       </ListItemIcon>
-                      
+
                       <ListItemText
                         primary={
                           <Typography variant="subtitle2" fontWeight={600}>
@@ -546,32 +624,41 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                         }
                         secondary={
                           <Typography variant="caption" color="text.secondary">
-                            Last check: {new Date(service.lastCheck).toLocaleTimeString()}
+                            Last check:{" "}
+                            {new Date(service.lastCheck).toLocaleTimeString()}
                           </Typography>
                         }
                       />
-                      
+
                       <Box textAlign="right">
                         <Chip
                           label={service.status}
                           size="small"
                           variant="outlined"
                           sx={{
-                            fontSize: '0.7rem',
+                            fontSize: "0.7rem",
                             height: 24,
-                            borderColor: alpha(getServiceColor(service.status), 0.3),
+                            borderColor: alpha(
+                              getServiceColor(service.status),
+                              0.3
+                            ),
                             color: getServiceColor(service.status),
                             fontWeight: 600,
                           }}
                         />
                         {service.responseTime && (
-                          <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            display="block"
+                            color="text.secondary"
+                            sx={{ mt: 0.5 }}
+                          >
                             Response: {service.responseTime}ms
                           </Typography>
                         )}
                       </Box>
                     </ListItem>
-                    
+
                     {index < (health.services?.length || 0) - 1 && (
                       <Divider sx={{ mx: 2 }} />
                     )}
@@ -591,9 +678,12 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                     sx={{
                       p: 1.5,
                       borderRadius: 2,
-                      border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.08
+                      )}`,
                       background: muiTheme.palette.background.paper,
-                      textAlign: 'center',
+                      textAlign: "center",
                     }}
                   >
                     <Typography variant="h6" fontWeight={700} color="primary">
@@ -609,9 +699,12 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                     sx={{
                       p: 1.5,
                       borderRadius: 2,
-                      border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.08
+                      )}`,
                       background: muiTheme.palette.background.paper,
-                      textAlign: 'center',
+                      textAlign: "center",
                     }}
                   >
                     <Typography variant="h6" fontWeight={700} color="primary">
@@ -627,9 +720,12 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                     sx={{
                       p: 1.5,
                       borderRadius: 2,
-                      border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.08
+                      )}`,
                       background: muiTheme.palette.background.paper,
-                      textAlign: 'center',
+                      textAlign: "center",
                     }}
                   >
                     <Typography variant="h6" fontWeight={700} color="primary">
@@ -645,9 +741,12 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                     sx={{
                       p: 1.5,
                       borderRadius: 2,
-                      border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
+                      border: `1px solid ${alpha(
+                        muiTheme.palette.divider,
+                        0.08
+                      )}`,
                       background: muiTheme.palette.background.paper,
-                      textAlign: 'center',
+                      textAlign: "center",
                     }}
                   >
                     <Typography variant="h6" fontWeight={700} color="primary">

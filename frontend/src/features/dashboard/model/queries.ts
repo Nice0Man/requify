@@ -140,17 +140,41 @@ export const useActivityFeed = (
       }
     },
     getNextPageParam: (lastPage, allPages) => {
-      // Enhanced safety checks for TanStack Query edge cases
-      if (!lastPage || !lastPage.hasMore) {
+      try {
+        // Enhanced safety checks for TanStack Query edge cases
+        if (!lastPage || typeof lastPage !== "object" || !lastPage.hasMore) {
+          return undefined;
+        }
+
+        // Ensure allPages is a valid array with comprehensive checks
+        if (
+          !allPages ||
+          typeof allPages !== "object" ||
+          !Array.isArray(allPages) ||
+          typeof allPages.length !== "number"
+        ) {
+          console.warn(
+            "getNextPageParam: allPages is not a valid array, returning 0",
+            { allPages: typeof allPages, isArray: Array.isArray(allPages) }
+          );
+          return 0;
+        }
+
+        const pagesLength = allPages.length;
+        if (pagesLength === 0) {
+          console.warn("getNextPageParam: allPages is empty, returning 0");
+          return 0;
+        }
+
+        return pagesLength;
+      } catch (error) {
+        console.error("getNextPageParam error:", error, {
+          lastPage: typeof lastPage,
+          allPages: typeof allPages,
+          isArrayAllPages: Array.isArray(allPages),
+        });
         return undefined;
       }
-      
-      if (!Array.isArray(allPages)) {
-        console.warn('getNextPageParam: allPages is not an array, defaulting to 0');
-        return 0;
-      }
-      
-      return allPages.length;
     },
     initialPageParam: 0,
     staleTime: 2 * 60 * 1000, // 2 минуты
@@ -253,6 +277,119 @@ export const useSystemHealth = (
     gcTime: 5 * 60 * 1000, // 5 минут
     refetchInterval: 30 * 1000, // Обновляем каждые 30 секунд
     refetchIntervalInBackground: false, // Не обновляем в фоне
+    ...options,
+  });
+};
+
+// System Metrics Query - for detailed system performance data
+export const useSystemMetrics = (
+  options?: Omit<
+    UseQueryOptions<
+      {
+        cpuUsage: number;
+        memoryUsage: number;
+        diskUsage: number;
+        networkLatency: number;
+        uptime: number;
+        activeUsers: number;
+        responseTime: number;
+        errorRate: number;
+        throughput: number;
+        availability: number;
+      },
+      Error,
+      {
+        cpuUsage: number;
+        memoryUsage: number;
+        diskUsage: number;
+        networkLatency: number;
+        uptime: number;
+        activeUsers: number;
+        responseTime: number;
+        errorRate: number;
+        throughput: number;
+        availability: number;
+      },
+      ["dashboard", "system-metrics"]
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  return useQuery({
+    queryKey: ["dashboard", "system-metrics"] as const,
+    queryFn: DashboardApi.getSystemMetrics,
+    staleTime: 30 * 1000, // 30 секунд
+    gcTime: 2 * 60 * 1000, // 2 минуты
+    refetchInterval: 30 * 1000, // Обновляем каждые 30 секунд
+    refetchIntervalInBackground: false, // Не обновляем в фоне
+    retry: (failureCount, error: any) => {
+      // Не повторяем при 404 или 401 (возможно нет доступа к admin endpoints)
+      if (
+        error?.status === 404 ||
+        error?.status === 401 ||
+        error?.status === 403
+      ) {
+        return false;
+      }
+      return failureCount < 2; // Меньше попыток для системных метрик
+    },
+    throwOnError: false,
+    ...options,
+  });
+};
+
+// Admin System Info Query
+export const useAdminSystemInfo = (
+  options?: Omit<
+    UseQueryOptions<any, Error, any, ["dashboard", "admin-system-info"]>,
+    "queryKey" | "queryFn"
+  >
+) => {
+  return useQuery({
+    queryKey: ["dashboard", "admin-system-info"] as const,
+    queryFn: DashboardApi.getAdminSystemInfo,
+    staleTime: 5 * 60 * 1000, // 5 минут
+    gcTime: 15 * 60 * 1000, // 15 минут
+    retry: (failureCount, error: any) => {
+      if (
+        error?.status === 404 ||
+        error?.status === 401 ||
+        error?.status === 403
+      ) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    throwOnError: false,
+    ...options,
+  });
+};
+
+// Admin Health Query
+export const useAdminHealth = (
+  options?: Omit<
+    UseQueryOptions<any, Error, any, ["dashboard", "admin-health"]>,
+    "queryKey" | "queryFn"
+  >
+) => {
+  return useQuery({
+    queryKey: ["dashboard", "admin-health"] as const,
+    queryFn: DashboardApi.getAdminHealth,
+    staleTime: 1 * 60 * 1000, // 1 минута
+    gcTime: 5 * 60 * 1000, // 5 минут
+    refetchInterval: 60 * 1000, // Обновляем каждую минуту
+    refetchIntervalInBackground: false,
+    retry: (failureCount, error: any) => {
+      if (
+        error?.status === 404 ||
+        error?.status === 401 ||
+        error?.status === 403
+      ) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+    throwOnError: false,
     ...options,
   });
 };

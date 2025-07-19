@@ -201,6 +201,18 @@ const StatCard = memo<{
   );
 });
 
+const TrendsChart = memo<{
+  data: any[];
+}>(({ data }) => {
+  return <div>TrendsChart</div>;
+});
+
+const TimelineChart = memo<{
+  data: any[];
+}>(({ data }) => {
+  return <div>TimelineChart</div>;
+});
+
 const StatusDistributionChart = memo<{
   data: ProjectStatusDistribution[];
 }>(({ data }) => {
@@ -414,9 +426,11 @@ export const ProjectStatsWidget = memo<ProjectStatsWidgetProps>(
             <Box sx={{ display: "flex", gap: 1 }}>
               {showActions && (
                 <Tooltip title={t("common.refresh", "Обновить")}>
-                  <IconButton onClick={handleRefresh} disabled={isLoading}>
-                    <Refresh />
-                  </IconButton>
+                  <span>
+                    <IconButton onClick={handleRefresh} disabled={isLoading}>
+                      <Refresh />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               )}
             </Box>
@@ -525,175 +539,26 @@ export const ProjectStatsWidget = memo<ProjectStatsWidgetProps>(
                         "Средний прогресс"
                       )}
                       value={`${overviewStats.avgProgress}%`}
-                      icon={
-                        <CircularProgress
-                          variant="determinate"
-                          value={overviewStats.avgProgress}
-                          size={24}
-                        />
-                      }
-                      color="#8b5cf6"
+                      icon={<BarChart />}
+                      color="#3b82f6"
                     />
                   </Grid>
                 </Grid>
 
-                {/* Detailed Stats */}
+                {/* Detailed View */}
                 {viewMode === "detailed" && (
                   <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader
-                          title={
-                            <Typography variant="h6">
-                              {t(
-                                "projects.stats.requirements",
-                                "Статистика требований"
-                              )}
-                            </Typography>
-                          }
-                        />
-                        <CardContent>
-                          <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                              <Box
-                                sx={{
-                                  textAlign: "center",
-                                  p: 2,
-                                  bgcolor: "background.default",
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <Typography
-                                  variant="h5"
-                                  color="primary"
-                                  fontWeight={600}
-                                >
-                                  {overviewStats.totalRequirements}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {t("requirements.total", "Всего требований")}
-                                </Typography>
-                              </Box>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Box
-                                sx={{
-                                  textAlign: "center",
-                                  p: 2,
-                                  bgcolor: "background.default",
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <Typography
-                                  variant="h5"
-                                  color="success.main"
-                                  fontWeight={600}
-                                >
-                                  {overviewStats.completedRequirements}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {t("requirements.completed", "Завершено")}
-                                </Typography>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
+                    <Grid item xs={12}>
+                      <StatusDistributionChart
+                        data={stats?.statusDistribution || []}
+                      />
                     </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader
-                          title={
-                            <Typography variant="h6">
-                              {t("projects.stats.tests", "Статистика тестов")}
-                            </Typography>
-                          }
-                        />
-                        <CardContent>
-                          <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                              <Box
-                                sx={{
-                                  textAlign: "center",
-                                  p: 2,
-                                  bgcolor: "background.default",
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <Typography
-                                  variant="h5"
-                                  color="primary"
-                                  fontWeight={600}
-                                >
-                                  {overviewStats.totalTestCases}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {t("tests.total", "Всего тестов")}
-                                </Typography>
-                              </Box>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Box
-                                sx={{
-                                  textAlign: "center",
-                                  p: 2,
-                                  bgcolor: "background.default",
-                                  borderRadius: 1,
-                                }}
-                              >
-                                <Typography
-                                  variant="h5"
-                                  color="success.main"
-                                  fontWeight={600}
-                                >
-                                  {overviewStats.passedTestCases}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                >
-                                  {t("tests.passed", "Пройдено")}
-                                </Typography>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
+                    <Grid item xs={12}>
+                      <TimelineChart data={stats?.timeline || []} />
                     </Grid>
-
-                    {/* Status Distribution */}
-                    {stats?.statusDistribution &&
-                      stats.statusDistribution.length > 0 && (
-                        <Grid item xs={12}>
-                          <Card>
-                            <CardHeader
-                              title={
-                                <Typography variant="h6">
-                                  {t(
-                                    "projects.stats.status_distribution",
-                                    "Распределение по статусам"
-                                  )}
-                                </Typography>
-                              }
-                            />
-                            <CardContent>
-                              <StatusDistributionChart
-                                data={stats.statusDistribution}
-                              />
-                            </CardContent>
-                          </Card>
-                        </Grid>
-                      )}
+                    <Grid item xs={12}>
+                      <TrendsChart data={stats?.trends || []} />
+                    </Grid>
                   </Grid>
                 )}
               </Box>
@@ -705,4 +570,4 @@ export const ProjectStatsWidget = memo<ProjectStatsWidgetProps>(
   }
 );
 
-ProjectStatsWidget.displayName = "ProjectStatsWidget";
+export default ProjectStatsWidget;

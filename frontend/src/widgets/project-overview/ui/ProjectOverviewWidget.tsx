@@ -126,38 +126,45 @@ const useProjects = (filters: ProjectFilters) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     select: (data: Project[]) => {
       // Transform data to include additional fields for display
-      return data.map(
-        (project): ExtendedProject => ({
+      return data.map((project): ExtendedProject => {
+        const projectWithStats = project as any; // Cast to allow additional properties
+        return {
           ...project,
-          progress: Math.floor(Math.random() * 100), // TODO: Get from API
+          // Use real progress from API or calculate from requirements if available
+          progress: projectWithStats.progress || 0,
           requirements: {
-            total: Math.floor(Math.random() * 50) + 10,
-            completed: Math.floor(Math.random() * 30) + 5,
-            approved: Math.floor(Math.random() * 25) + 3,
+            total: projectWithStats.totalRequirements || 0,
+            completed: projectWithStats.completedRequirements || 0,
+            approved: projectWithStats.approvedRequirements || 0,
           },
           testCases: {
-            total: Math.floor(Math.random() * 20) + 5,
-            passed: Math.floor(Math.random() * 15) + 3,
-            failed: Math.floor(Math.random() * 3),
+            total: projectWithStats.totalTestCases || 0,
+            passed: projectWithStats.passedTestCases || 0,
+            failed: projectWithStats.failedTestCases || 0,
           },
-          team: [
+          team: projectWithStats.team || [
             {
               id: "1",
-              name: "Команда проекта",
+              name: i18n.t("projects.defaultTeam", "Project Team"),
               avatar: "",
               role: "Developer",
             },
           ],
-          budget: {
-            allocated: Math.floor(Math.random() * 500000) + 100000,
-            spent: Math.floor(Math.random() * 300000) + 50000,
+          budget: projectWithStats.budget || {
+            allocated: 0,
+            spent: 0,
             currency: "₽",
           },
-          lastActivity: new Date().toISOString(),
-        })
-      );
+          lastActivity:
+            projectWithStats.updatedAt ||
+            projectWithStats.createdAt ||
+            new Date().toISOString(),
+        };
+      });
     },
   });
 };
