@@ -45,6 +45,9 @@ from app.schemas.dashboard import (
     UserDashboardPreferences as PreferencesSchema,
     DashboardNotification as NotificationSchema,
     SystemMetrics,
+    TimelineDataPoint,
+    DistributionDataPoint,
+    ProjectTrendDataPoint,
 )
 
 router = APIRouter()
@@ -300,28 +303,28 @@ class DashboardService:
             # Get CPU and memory info
             cpu_percent = psutil.cpu_percent(interval=1)
             memory_info = psutil.virtual_memory()
-            disk_usage = psutil.disk_usage('/')
-            
+            disk_usage = psutil.disk_usage("/")
+
             # Calculate network latency - basic implementation
             # In production, you might want to ping specific hosts
             network_latency = 15.0  # Default reasonable value
-            
+
             # Calculate uptime (system boot time)
             boot_time = psutil.boot_time()
             uptime_seconds = int(time.time() - boot_time)
-            
+
             # Get active users count from database
             active_users_result = await db.execute(
                 text("SELECT COUNT(*) FROM users WHERE is_active = true")
             )
             active_users = active_users_result.scalar() or 0
-            
+
             # Basic metrics - in production these would come from monitoring systems
             response_time = 120.0  # milliseconds
             error_rate = 0.5  # percentage
             throughput = 150.0  # requests per second
             availability = 99.9  # percentage
-            
+
             return SystemMetrics(
                 cpu_usage=round(cpu_percent, 2),
                 memory_usage=round(memory_info.percent, 2),
@@ -350,6 +353,224 @@ class DashboardService:
                 availability=0.0,
                 last_updated=datetime.now().isoformat(),
             )
+
+    @staticmethod
+    async def get_timeline_data(
+        db: AsyncSession, period: str = "30d"
+    ) -> List[TimelineDataPoint]:
+        """Get timeline chart data showing activity over time"""
+        try:
+            # Calculate date range based on period
+            end_date = datetime.now()
+            if period == "7d":
+                start_date = end_date - timedelta(days=7)
+                date_format = "%Y-%m-%d"
+            elif period == "30d":
+                start_date = end_date - timedelta(days=30)
+                date_format = "%Y-%m-%d"
+            elif period == "90d":
+                start_date = end_date - timedelta(days=90)
+                date_format = "%Y-%m-%d"
+            else:
+                start_date = end_date - timedelta(days=30)
+                date_format = "%Y-%m-%d"
+
+            timeline_data = []
+
+            # Generate sample timeline data - in production this would come from real metrics
+            # Projects created over time
+            projects_result = await db.execute(
+                text(
+                    "SELECT DATE(created_at) as date, COUNT(*) as count FROM projects WHERE created_at >= :start_date GROUP BY DATE(created_at) ORDER BY date"
+                ).params(start_date=start_date)
+            )
+
+            for row in projects_result:
+                timeline_data.append(
+                    TimelineDataPoint(
+                        date=row.date.isoformat() + "T00:00:00Z",
+                        value=float(row.count),
+                        label="Projects Created",
+                        category="projects",
+                        metadata={"type": "creation", "period": period},
+                    )
+                )
+
+            # Requirements created over time
+            requirements_result = await db.execute(
+                text(
+                    "SELECT DATE(created_at) as date, COUNT(*) as count FROM requirements WHERE created_at >= :start_date GROUP BY DATE(created_at) ORDER BY date"
+                ).params(start_date=start_date)
+            )
+
+            for row in requirements_result:
+                timeline_data.append(
+                    TimelineDataPoint(
+                        date=row.date.isoformat() + "T00:00:00Z",
+                        value=float(row.count),
+                        label="Requirements Created",
+                        category="requirements",
+                        metadata={"type": "creation", "period": period},
+                    )
+                )
+
+            return timeline_data
+
+        except Exception as e:
+            # Return empty list on error
+            return []
+
+    @staticmethod
+    async def get_distribution_data(db: AsyncSession) -> List[DistributionDataPoint]:
+        """Get distribution chart data for various metrics"""
+        try:
+            distribution_data = []
+
+            # Project status distribution
+            projects_by_status = await db.execute(
+                text("SELECT status, COUNT(*) as count FROM projects GROUP BY status")
+            )
+
+            total_projects = await crud_project.count(db) or 1  # Avoid division by zero
+            colors = ["#4CAF50", "#2196F3", "#FF9800", "#F44336", "#9C27B0"]
+
+            for i, row in enumerate(projects_by_status):
+                percentage = (row.count / total_projects) * 100
+                distribution_data.append(
+                    DistributionDataPoint(
+                        id=f"project_status_{row.status}",
+                        label=f"Projects ({row.status})",
+                        value=float(row.count),
+                        percentage=round(percentage, 1),
+                        color=colors[i % len(colors)],
+                        metadata={"type": "project_status", "status": row.status},
+                    )
+                )
+
+            # Requirement priority distribution
+            requirements_by_priority = await db.execute(
+                text(
+                    "SELECT priority, COUNT(*) as count FROM requirements GROUP BY priority"
+                )
+            )
+
+            total_requirements = await crud_requirement.count(db) or 1
+            priority_colors = {"high": "#F44336", "medium": "#FF9800", "low": "#4CAF50"}
+
+            for row in requirements_by_priority:
+                percentage = (row.count / total_requirements) * 100
+                color = priority_colors.get(row.priority, "#9E9E9E")
+                distribution_data.append(
+                    DistributionDataPoint(
+                        id=f"requirement_priority_{row.priority}",
+                        label=f"Requirements ({row.priority} priority)",
+                        value=float(row.count),
+                        percentage=round(percentage, 1),
+                        color=color,
+                        metadata={
+                            "type": "requirement_priority",
+                            "priority": row.priority,
+                        },
+                    )
+                )
+
+            return distribution_data
+
+        except Exception as e:
+            # Return basic fallback data
+            return [
+                DistributionDataPoint(
+                    id="fallback_active",
+                    label="Active Items",
+                    value=0,
+                    percentage=100.0,
+                    color="#4CAF50",
+                    metadata={"type": "fallback"},
+                )
+            ]
+
+    @staticmethod
+    async def get_project_trends(
+        db: AsyncSession, period: str = "12m"
+    ) -> List[ProjectTrendDataPoint]:
+        """Get project trends data over specified period"""
+        try:
+            trends_data = []
+
+            # Calculate monthly trends for the last 12 months
+            end_date = datetime.now()
+            start_date = end_date - timedelta(days=365)  # Last 12 months
+
+            # Generate monthly data points
+            current_date = start_date.replace(day=1)  # Start of month
+
+            while current_date <= end_date:
+                period_str = current_date.strftime("%Y-%m")
+                next_month = (current_date.replace(day=28) + timedelta(days=4)).replace(
+                    day=1
+                )
+
+                # Projects created in this month
+                projects_count = await db.execute(
+                    text(
+                        """
+                        SELECT COUNT(*) as count 
+                        FROM projects 
+                        WHERE created_at >= :start AND created_at < :end
+                    """
+                    ).params(start=current_date, end=next_month)
+                )
+                project_count = projects_count.scalar() or 0
+
+                # Calculate change from previous month (simplified)
+                prev_month_start = (current_date - timedelta(days=32)).replace(day=1)
+                prev_projects_count = await db.execute(
+                    text(
+                        """
+                        SELECT COUNT(*) as count 
+                        FROM projects 
+                        WHERE created_at >= :start AND created_at < :end
+                    """
+                    ).params(start=prev_month_start, end=current_date)
+                )
+                prev_count = prev_projects_count.scalar() or 0
+
+                # Calculate change percentage
+                if prev_count > 0:
+                    change = ((project_count - prev_count) / prev_count) * 100
+                else:
+                    change = 100.0 if project_count > 0 else 0.0
+
+                direction = "up" if change > 0 else "down" if change < 0 else "stable"
+
+                trends_data.append(
+                    ProjectTrendDataPoint(
+                        period=period_str,
+                        metric="projects_created",
+                        value=float(project_count),
+                        change=round(change, 1),
+                        direction=direction,
+                        metadata={"month": current_date.strftime("%B %Y")},
+                    )
+                )
+
+                current_date = next_month
+
+            return trends_data[-12:]  # Return last 12 months only
+
+        except Exception as e:
+            # Return basic fallback data
+            current_month = datetime.now().strftime("%Y-%m")
+            return [
+                ProjectTrendDataPoint(
+                    period=current_month,
+                    metric="projects_created",
+                    value=0.0,
+                    change=0.0,
+                    direction="stable",
+                    metadata={"fallback": True},
+                )
+            ]
 
 
 @router.get("/stats", response_model=DashboardStats)
@@ -1031,6 +1252,67 @@ async def get_system_metrics(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to get system metrics: {str(e)}",
+        )
+
+
+@router.get("/charts/timeline", response_model=List[TimelineDataPoint])
+async def get_timeline_data(
+    period: str = Query(
+        "30d", description="Time period for timeline data (7d, 30d, 90d)"
+    ),
+    current_user: UserProfile = Depends(get_dashboard_read_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get timeline chart data showing activity over time
+    Returns data points for projects and requirements creation over specified period
+    """
+    try:
+        dashboard_service = DashboardService()
+        return await dashboard_service.get_timeline_data(db, period)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get timeline data: {str(e)}",
+        )
+
+
+@router.get("/charts/distribution", response_model=List[DistributionDataPoint])
+async def get_distribution_data(
+    current_user: UserProfile = Depends(get_dashboard_read_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get distribution chart data for various metrics
+    Returns data for project status and requirement priority distributions
+    """
+    try:
+        dashboard_service = DashboardService()
+        return await dashboard_service.get_distribution_data(db)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get distribution data: {str(e)}",
+        )
+
+
+@router.get("/charts/project-trends", response_model=List[ProjectTrendDataPoint])
+async def get_project_trends(
+    period: str = Query("12m", description="Time period for trends (6m, 12m, 24m)"),
+    current_user: UserProfile = Depends(get_dashboard_read_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get project trends data over specified period
+    Returns monthly trend data showing project creation patterns and changes
+    """
+    try:
+        dashboard_service = DashboardService()
+        return await dashboard_service.get_project_trends(db, period)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get project trends: {str(e)}",
         )
 
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
 
@@ -178,41 +178,71 @@ class SystemMetrics(BaseModel):
     """System performance metrics for dashboard monitoring"""
 
     cpuUsage: float = Field(
-        ..., description="CPU usage percentage", ge=0, le=100, alias="cpu_usage"
+        ...,
+        description="CPU usage percentage",
+        ge=0,
+        le=100,
+        alias="cpu_usage"
     )
     memoryUsage: float = Field(
-        ..., description="Memory usage percentage", ge=0, le=100, alias="memory_usage"
+        ...,
+        description="Memory usage percentage",
+        ge=0,
+        le=100,
+        alias="memory_usage"
     )
     diskUsage: float = Field(
-        ..., description="Disk usage percentage", ge=0, le=100, alias="disk_usage"
+        ...,
+        description="Disk usage percentage",
+        ge=0,
+        le=100,
+        alias="disk_usage"
     )
     networkLatency: float = Field(
         ...,
         description="Network latency in milliseconds",
         ge=0,
-        alias="network_latency",
+        alias="network_latency"
     )
-    uptime: int = Field(..., description="System uptime in seconds", ge=0)
+    uptime: int = Field(
+        ...,
+        description="System uptime in seconds",
+        ge=0
+    )
     activeUsers: int = Field(
-        ..., description="Number of active users", ge=0, alias="active_users"
+        ...,
+        description="Number of active users",
+        ge=0,
+        alias="active_users"
     )
     responseTime: float = Field(
         ...,
         description="Average response time in milliseconds",
         ge=0,
-        alias="response_time",
+        alias="response_time"
     )
     errorRate: float = Field(
-        ..., description="Error rate percentage", ge=0, le=100, alias="error_rate"
+        ...,
+        description="Error rate percentage",
+        ge=0,
+        le=100,
+        alias="error_rate"
     )
     throughput: float = Field(
-        ..., description="Requests per second throughput", ge=0, alias="throughput"
+        ...,
+        description="Requests per second throughput",
+        ge=0
     )
     availability: float = Field(
-        ..., description="System availability percentage", ge=0, le=100
+        ...,
+        description="System availability percentage",
+        ge=0,
+        le=100
     )
     lastUpdated: Optional[str] = Field(
-        None, description="Last update timestamp", alias="last_updated"
+        None,
+        description="Last update timestamp",
+        alias="last_updated"
     )
 
     class Config:
@@ -229,7 +259,74 @@ class SystemMetrics(BaseModel):
                 "errorRate": 0.5,
                 "throughput": 150.0,
                 "availability": 99.9,
-                "lastUpdated": "2024-01-15T14:30:00Z",
+                "lastUpdated": "2024-01-15T14:30:00Z"
+            }
+        }
+
+
+class TimelineDataPoint(BaseModel):
+    """Timeline chart data point for dashboard charts"""
+
+    date: str = Field(..., description="Date in ISO format")
+    value: float = Field(..., description="Numeric value for the data point")
+    label: str = Field(..., description="Label for the data point")
+    category: Optional[str] = Field(None, description="Category for grouping")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "date": "2024-01-15T00:00:00Z",
+                "value": 42.5,
+                "label": "Requirements Created",
+                "category": "requirements",
+                "metadata": {"project_id": 1, "user_id": 5}
+            }
+        }
+
+
+class DistributionDataPoint(BaseModel):
+    """Distribution chart data point for dashboard charts"""
+
+    id: str = Field(..., description="Unique identifier for the data point")
+    label: str = Field(..., description="Label for the data point")
+    value: float = Field(..., description="Numeric value", ge=0)
+    percentage: Optional[float] = Field(None, description="Percentage of total", ge=0, le=100)
+    color: str = Field(..., description="Color for visualization")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": "active_projects",
+                "label": "Active Projects",
+                "value": 15,
+                "percentage": 75.0,
+                "color": "#4CAF50",
+                "metadata": {"status": "active", "priority": "high"}
+            }
+        }
+
+
+class ProjectTrendDataPoint(BaseModel):
+    """Project trend data point for project trends analysis"""
+
+    period: str = Field(..., description="Time period (e.g., '2024-01', 'Q1 2024')")
+    metric: str = Field(..., description="Metric name (e.g., 'projects_created', 'completion_rate')")
+    value: float = Field(..., description="Metric value")
+    change: float = Field(..., description="Change from previous period")
+    direction: str = Field(..., description="Trend direction", pattern="^(up|down|stable)$")
+    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional trend metadata")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "period": "2024-01",
+                "metric": "projects_created",
+                "value": 8,
+                "change": 25.0,
+                "direction": "up",
+                "metadata": {"department": "development", "team_size": 12}
             }
         }
 
