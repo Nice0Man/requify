@@ -481,17 +481,7 @@ export const DashboardStatsWidget = memo<DashboardStatsWidgetProps>(
           </Box>
 
           {/* Fixed metrics grid with consistent spacing */}
-          <Grid
-            container
-            spacing={2}
-            alignItems="stretch"
-            sx={{
-              "& .MuiGrid-item": {
-                paddingTop: "8px",
-                paddingLeft: "8px",
-              },
-            }}
-          >
+          <Grid container spacing={2} alignItems="stretch">
             {metrics.map((metric) => (
               <Grid item xs={12} sm={6} md={4} xl={2} key={metric.id}>
                 <MetricCard metric={metric} />
