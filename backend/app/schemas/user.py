@@ -3,7 +3,7 @@
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field, EmailStr, field_validator, model_validator
 import re
 
@@ -22,7 +22,6 @@ class UserBase(BaseModel):
     phone: Optional[str] = Field(None, description="Телефон пользователя")
     auth0_id: Optional[str] = Field(None, description="Auth0 ID пользователя")
 
-    
     @field_validator("username")
     def validate_username(cls, v):
         """Валидация имени пользователя"""
@@ -668,3 +667,88 @@ class EmailVerificationConfirm(BaseModel):
         if not v or not v.strip():
             raise ValueError("Verification token cannot be empty")
         return v.strip()
+
+
+class UserStats(BaseModel):
+    """Схема статистики пользователя."""
+
+    user_id: int = Field(..., description="ID пользователя")
+    projects_count: int = Field(0, description="Количество проектов", ge=0)
+    requirements_count: int = Field(0, description="Количество требований", ge=0)
+    comments_count: int = Field(0, description="Количество комментариев", ge=0)
+    last_login: Optional[str] = Field(None, description="Последний вход")
+    created_at: str = Field(..., description="Дата создания")
+    is_active: bool = Field(..., description="Активен ли пользователь")
+    role: str = Field(..., description="Роль пользователя")
+
+    class Config:
+        from_attributes = True
+
+
+class UserActivity(BaseModel):
+    """Схема активности пользователя."""
+
+    id: str = Field(..., description="ID активности")
+    type: str = Field(..., description="Тип активности")
+    title: str = Field(..., description="Заголовок активности")
+    description: Optional[str] = Field(None, description="Описание")
+    timestamp: str = Field(..., description="Временная метка")
+    entity_type: Optional[str] = Field(None, description="Тип сущности")
+    entity_id: Optional[int] = Field(None, description="ID сущности")
+
+    class Config:
+        from_attributes = True
+
+
+class UserSettings(BaseModel):
+    """Схема настроек пользователя."""
+
+    user_id: int = Field(..., description="ID пользователя")
+    theme: str = Field("light", description="Тема интерфейса")
+    language: str = Field("ru", description="Язык интерфейса")
+    timezone: str = Field("UTC", description="Часовой пояс")
+    notifications: Dict[str, bool] = Field(
+        default_factory=lambda: {"email": True, "push": True, "sms": False},
+        description="Настройки уведомлений",
+    )
+    privacy: Dict[str, bool] = Field(
+        default_factory=lambda: {"profile_visible": True, "activity_visible": False},
+        description="Настройки приватности",
+    )
+    updated_at: Optional[str] = Field(None, description="Дата обновления")
+
+    class Config:
+        from_attributes = True
+
+
+class UserValidation(BaseModel):
+    """Схема результата валидации данных пользователя."""
+
+    valid: bool = Field(..., description="Результат валидации")
+    errors: List[str] = Field(default_factory=list, description="Список ошибок")
+
+    class Config:
+        from_attributes = True
+
+
+class UserAvailability(BaseModel):
+    """Схема проверки доступности username/email."""
+
+    available: bool = Field(..., description="Доступность")
+
+    class Config:
+        from_attributes = True
+
+
+class UserAudit(BaseModel):
+    """Схема записи аудита пользователя."""
+
+    id: str = Field(..., description="ID записи аудита")
+    action: str = Field(..., description="Действие")
+    timestamp: str = Field(..., description="Временная метка")
+    details: Optional[Dict[str, Any]] = Field(None, description="Детали")
+    ip_address: Optional[str] = Field(None, description="IP адрес")
+    user_agent: Optional[str] = Field(None, description="User Agent")
+
+    class Config:
+        from_attributes = True

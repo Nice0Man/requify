@@ -23,7 +23,7 @@ from app.crud import user as crud_user
 from app.models.user import User
 from app.utils.logger import logger
 from app.core.exceptions import UserNotFoundError, PermissionDeniedError
-from app.services.auth0_service import auth0_service, Auth0UserInfo
+from app.services import auth0_service, Auth0UserInfo
 
 # OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(

@@ -1,28 +1,36 @@
 """
 Сервис для работы с Auth0 OAuth2.
 """
+
 import logging
 from typing import Optional, Dict, Any
 
 import jwt
+
 try:
     from auth0.management import Auth0
     from auth0.authentication import GetToken
     from auth0.exceptions import Auth0Error
+
     AUTH0_AVAILABLE = True
 except ImportError:
     # Auth0 не установлен, создаем заглушки
     AUTH0_AVAILABLE = False
+
     class Auth0:
         def __init__(self, *args, **kwargs):
             pass
+
     class GetToken:
         def __init__(self, *args, **kwargs):
             pass
+
         def client_credentials(self, *args, **kwargs):
             return {"access_token": "mock"}
+
     class Auth0Error(Exception):
         pass
+
 
 from jwt import PyJWKClient
 from pydantic import BaseModel

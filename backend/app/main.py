@@ -159,6 +159,7 @@ app = FastAPI(
 
 # Регистрация обработчиков исключений
 from app.core.exceptions import register_exception_handlers
+
 register_exception_handlers(app)
 
 # Подключение маршрутизатора API

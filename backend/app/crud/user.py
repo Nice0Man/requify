@@ -3,7 +3,7 @@ CRUD операции для модели User.
 """
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -249,6 +249,116 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             await db.commit()
             await db.refresh(user)
         return user
+
+    async def get_user_stats(self, db: AsyncSession, *, user_id: int) -> Dict[str, Any]:
+        """Получить статистику пользователя"""
+        try:
+            # Получаем базовую информацию о пользователе
+            user = await self.get(db, id=user_id)
+            if not user:
+                return {}
+
+            # Простая статистика - можно расширить
+            return {
+                "user_id": user_id,
+                "projects_count": 0,  # TODO: реализовать подсчет проектов
+                "requirements_count": 0,  # TODO: реализовать подсчет требований
+                "comments_count": 0,  # TODO: реализовать подсчет комментариев
+                "last_login": user.last_login.isoformat() if user.last_login else None,
+                "created_at": user.created_at.isoformat(),
+                "is_active": user.is_active,
+                "role": user.role,
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
+    async def get_user_activity(
+        self, db: AsyncSession, *, user_id: int, limit: int = 20
+    ) -> List[Dict[str, Any]]:
+        """Получить активность пользователя"""
+        try:
+            # Базовая реализация - возвращаем пустой список
+            # TODO: реализовать получение активности из таблицы активности
+            return []
+        except Exception as e:
+            return [{"error": str(e)}]
+
+    async def validate_user_data(
+        self, db: AsyncSession, *, user_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Валидация данных пользователя"""
+        try:
+            validation_result = {"valid": True, "errors": []}
+
+            # Проверяем email
+            if "email" in user_data:
+                email = user_data["email"]
+                if await self.is_email_taken(db, email=email):
+                    validation_result["errors"].append("Email уже используется")
+                    validation_result["valid"] = False
+
+            # Проверяем username
+            if "username" in user_data:
+                username = user_data["username"]
+                if await self.is_username_taken(db, username=username):
+                    validation_result["errors"].append("Username уже используется")
+                    validation_result["valid"] = False
+
+            return validation_result
+        except Exception as e:
+            return {"valid": False, "errors": [str(e)]}
+
+    async def get_user_audit_log(
+        self, db: AsyncSession, *, user_id: int, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """Получить журнал аудита пользователя"""
+        try:
+            # Базовая реализация - возвращаем пустой список
+            # TODO: реализовать получение из таблицы аудита
+            return []
+        except Exception as e:
+            return [{"error": str(e)}]
+
+    async def get_user_settings(
+        self, db: AsyncSession, *, user_id: int
+    ) -> Dict[str, Any]:
+        """Получить настройки пользователя"""
+        try:
+            # Базовые настройки по умолчанию
+            return {
+                "user_id": user_id,
+                "theme": "light",
+                "language": "ru",
+                "timezone": "UTC",
+                "notifications": {
+                    "email": True,
+                    "push": True,
+                    "sms": False,
+                },
+                "privacy": {
+                    "profile_visible": True,
+                    "activity_visible": False,
+                },
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
+    async def update_user_settings(
+        self, db: AsyncSession, *, user_id: int, settings_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Обновить настройки пользователя"""
+        try:
+            # Базовая реализация - возвращаем обновленные настройки
+            # TODO: реализовать сохранение в БД
+            current_settings = await self.get_user_settings(db, user_id=user_id)
+
+            # Обновляем настройки (shallow merge)
+            current_settings.update(settings_data)
+            current_settings["updated_at"] = datetime.now().isoformat()
+
+            return current_settings
+        except Exception as e:
+            return {"error": str(e)}
 
 
 # Создаем экземпляр CRUD для использования в API

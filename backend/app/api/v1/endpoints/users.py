@@ -4,7 +4,7 @@ API эндпоинты для работы с пользователями.
 Включает операции CRUD для пользователей системы.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,7 +17,7 @@ from app.api.deps import (
     get_superuser,
 )
 from app.core.config import settings
-from app import crud, schemas
+from app import crud, schemas, models
 from app.models.user import User
 
 router = APIRouter()
@@ -342,3 +342,251 @@ async def deactivate_user(
 
     user = await crud.user.deactivate(db, user_id=user_id)
     return user
+
+
+@router.get("/username/{username}", response_model=schemas.User)
+async def get_user_by_username(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Получить пользователя по username.
+    """
+    user = await crud.user.get_by_username(db, username=username)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+    return user
+
+
+@router.get("/email/{email}", response_model=schemas.User)
+async def get_user_by_email(
+    email: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Получить пользователя по email.
+    """
+    user = await crud.user.get_by_email(db, email=email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+    return user
+
+
+@router.get("/{user_id}/profile", response_model=schemas.UserProfile)
+async def get_user_profile(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Получить профиль пользователя.
+    """
+    user = await crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+
+    return user
+
+
+@router.get("/{user_id}/stats", response_model=schemas.UserStats)
+async def get_user_stats(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Получить статистику пользователя.
+    """
+    user = await crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+
+    # Получаем статистику пользователя
+    stats = await crud.user.get_user_stats(db, user_id=user_id)
+    return stats
+
+
+@router.get("/{user_id}/activity", response_model=List[schemas.UserActivity])
+async def get_user_activity(
+    user_id: int,
+    limit: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Получить активность пользователя.
+    """
+    user = await crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+
+    # Получаем активность пользователя
+    activity = await crud.user.get_user_activity(db, user_id=user_id, limit=limit)
+    return activity
+
+
+@router.post("/validate", response_model=schemas.UserValidation)
+async def validate_user_data(
+    user_data: Dict[str, Any],
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Валидация данных пользователя.
+    """
+    result = await crud.user.validate_user_data(db, user_data=user_data)
+    return result
+
+
+@router.get("/check-username/{username}", response_model=schemas.UserAvailability)
+async def check_username_availability(
+    username: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Проверить доступность username.
+    """
+    user = await crud.user.get_by_username(db, username=username)
+    return {"available": user is None}
+
+
+@router.get("/check-email/{email}", response_model=schemas.UserAvailability)
+async def check_email_availability(
+    email: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Проверить доступность email.
+    """
+    user = await crud.user.get_by_email(db, email=email)
+    return {"available": user is None}
+
+
+@router.get("/{user_id}/audit", response_model=List[schemas.UserAudit])
+async def get_user_audit_log(
+    user_id: int,
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_superuser),
+):
+    """
+    Получить журнал аудита пользователя (только для админов).
+    """
+    user = await crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+
+    # Получаем журнал аудита пользователя
+    audit_log = await crud.user.get_user_audit_log(db, user_id=user_id, limit=limit)
+    return audit_log
+
+
+@router.get("/{user_id}/settings", response_model=schemas.UserSettings)
+async def get_user_settings(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Получить настройки пользователя.
+    """
+    # Проверяем, что пользователь может видеть настройки
+    if current_user.id != user_id and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Недостаточно прав для просмотра настроек",
+        )
+
+    user = await crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+
+    # Получаем настройки пользователя
+    settings = await crud.user.get_user_settings(db, user_id=user_id)
+    return settings
+
+
+@router.put("/{user_id}/settings", response_model=schemas.UserSettings)
+async def update_user_settings(
+    user_id: int,
+    settings_data: Dict[str, Any],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Обновить настройки пользователя.
+    """
+    # Проверяем, что пользователь может изменять настройки
+    if current_user.id != user_id and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Недостаточно прав для изменения настроек",
+        )
+
+    user = await crud.user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+        )
+
+    # Обновляем настройки пользователя
+    settings = await crud.user.update_user_settings(
+        db, user_id=user_id, settings_data=settings_data
+    )
+    return settings
+
+
+@router.get("/me/settings", response_model=schemas.UserSettings)
+async def get_my_settings(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Получить мои настройки.
+    """
+    settings = await crud.user.get_user_settings(db, user_id=current_user.id)
+    return settings
+
+
+@router.put("/me/settings", response_model=schemas.UserSettings)
+async def update_my_settings(
+    settings_data: Dict[str, Any],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Обновить мои настройки.
+    """
+    settings = await crud.user.update_user_settings(
+        db, user_id=current_user.id, settings_data=settings_data
+    )
+    return settings
+
+
+@router.get("/search", response_model=List[schemas.User])
+async def search_users(
+    q: str = Query(..., min_length=1),
+    limit: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_users_read_user),
+):
+    """
+    Поиск пользователей.
+    """
+    users = await crud.user.search_users(db, query=q, limit=limit)
+    return users

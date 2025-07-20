@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Literal
 from datetime import datetime
 from enum import Enum
 
@@ -178,71 +178,39 @@ class SystemMetrics(BaseModel):
     """System performance metrics for dashboard monitoring"""
 
     cpuUsage: float = Field(
-        ...,
-        description="CPU usage percentage",
-        ge=0,
-        le=100,
-        alias="cpu_usage"
+        ..., description="CPU usage percentage", ge=0, le=100, alias="cpu_usage"
     )
     memoryUsage: float = Field(
-        ...,
-        description="Memory usage percentage",
-        ge=0,
-        le=100,
-        alias="memory_usage"
+        ..., description="Memory usage percentage", ge=0, le=100, alias="memory_usage"
     )
     diskUsage: float = Field(
-        ...,
-        description="Disk usage percentage",
-        ge=0,
-        le=100,
-        alias="disk_usage"
+        ..., description="Disk usage percentage", ge=0, le=100, alias="disk_usage"
     )
     networkLatency: float = Field(
         ...,
         description="Network latency in milliseconds",
         ge=0,
-        alias="network_latency"
+        alias="network_latency",
     )
-    uptime: int = Field(
-        ...,
-        description="System uptime in seconds",
-        ge=0
-    )
+    uptime: int = Field(..., description="System uptime in seconds", ge=0)
     activeUsers: int = Field(
-        ...,
-        description="Number of active users",
-        ge=0,
-        alias="active_users"
+        ..., description="Number of active users", ge=0, alias="active_users"
     )
     responseTime: float = Field(
         ...,
         description="Average response time in milliseconds",
         ge=0,
-        alias="response_time"
+        alias="response_time",
     )
     errorRate: float = Field(
-        ...,
-        description="Error rate percentage",
-        ge=0,
-        le=100,
-        alias="error_rate"
+        ..., description="Error rate percentage", ge=0, le=100, alias="error_rate"
     )
-    throughput: float = Field(
-        ...,
-        description="Requests per second throughput",
-        ge=0
-    )
+    throughput: float = Field(..., description="Requests per second throughput", ge=0)
     availability: float = Field(
-        ...,
-        description="System availability percentage",
-        ge=0,
-        le=100
+        ..., description="System availability percentage", ge=0, le=100
     )
     lastUpdated: Optional[str] = Field(
-        None,
-        description="Last update timestamp",
-        alias="last_updated"
+        None, description="Last update timestamp", alias="last_updated"
     )
 
     class Config:
@@ -259,7 +227,7 @@ class SystemMetrics(BaseModel):
                 "errorRate": 0.5,
                 "throughput": 150.0,
                 "availability": 99.9,
-                "lastUpdated": "2024-01-15T14:30:00Z"
+                "lastUpdated": "2024-01-15T14:30:00Z",
             }
         }
 
@@ -280,7 +248,7 @@ class TimelineDataPoint(BaseModel):
                 "value": 42.5,
                 "label": "Requirements Created",
                 "category": "requirements",
-                "metadata": {"project_id": 1, "user_id": 5}
+                "metadata": {"project_id": 1, "user_id": 5},
             }
         }
 
@@ -291,7 +259,9 @@ class DistributionDataPoint(BaseModel):
     id: str = Field(..., description="Unique identifier for the data point")
     label: str = Field(..., description="Label for the data point")
     value: float = Field(..., description="Numeric value", ge=0)
-    percentage: Optional[float] = Field(None, description="Percentage of total", ge=0, le=100)
+    percentage: Optional[float] = Field(
+        None, description="Percentage of total", ge=0, le=100
+    )
     color: str = Field(..., description="Color for visualization")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
 
@@ -303,7 +273,7 @@ class DistributionDataPoint(BaseModel):
                 "value": 15,
                 "percentage": 75.0,
                 "color": "#4CAF50",
-                "metadata": {"status": "active", "priority": "high"}
+                "metadata": {"status": "active", "priority": "high"},
             }
         }
 
@@ -312,11 +282,17 @@ class ProjectTrendDataPoint(BaseModel):
     """Project trend data point for project trends analysis"""
 
     period: str = Field(..., description="Time period (e.g., '2024-01', 'Q1 2024')")
-    metric: str = Field(..., description="Metric name (e.g., 'projects_created', 'completion_rate')")
+    metric: str = Field(
+        ..., description="Metric name (e.g., 'projects_created', 'completion_rate')"
+    )
     value: float = Field(..., description="Metric value")
     change: float = Field(..., description="Change from previous period")
-    direction: str = Field(..., description="Trend direction", pattern="^(up|down|stable)$")
-    metadata: Optional[Dict[str, Any]] = Field(None, description="Additional trend metadata")
+    direction: str = Field(
+        ..., description="Trend direction", pattern="^(up|down|stable)$"
+    )
+    metadata: Optional[Dict[str, Any]] = Field(
+        None, description="Additional trend metadata"
+    )
 
     class Config:
         json_schema_extra = {
@@ -326,9 +302,100 @@ class ProjectTrendDataPoint(BaseModel):
                 "value": 8,
                 "change": 25.0,
                 "direction": "up",
-                "metadata": {"department": "development", "team_size": 12}
+                "metadata": {"department": "development", "team_size": 12},
             }
         }
+
+
+# Query Parameter Models for Chart Endpoints
+class TimelineQueryParams(BaseModel):
+    """Query parameters for timeline chart endpoint"""
+
+    period: Optional[Literal["7d", "30d", "90d", "6m", "1y"]] = Field(
+        default="30d", description="Time period for timeline data"
+    )
+    project_id: Optional[str] = Field(
+        default=None, description="Filter by specific project ID"
+    )
+    status: Optional[Literal["draft", "active", "completed", "cancelled"]] = Field(
+        default=None, description="Filter by requirement status"
+    )
+    priority: Optional[Literal["low", "medium", "high", "critical"]] = Field(
+        default=None, description="Filter by priority level"
+    )
+    type: Optional[Literal["functional", "non_functional", "constraint"]] = Field(
+        default=None, description="Filter by requirement type", alias="requirement_type"
+    )
+    assignee_id: Optional[str] = Field(
+        default=None, description="Filter by assignee user ID"
+    )
+    team_id: Optional[str] = Field(default=None, description="Filter by team ID")
+    granularity: Optional[Literal["day", "week", "month"]] = Field(
+        default="day", description="Timeline granularity"
+    )
+    include_archived: Optional[bool] = Field(
+        default=False, description="Include archived requirements"
+    )
+
+
+class DistributionQueryParams(BaseModel):
+    """Query parameters for distribution chart endpoint"""
+
+    period: Optional[Literal["7d", "30d", "90d", "1y"]] = Field(
+        default="30d", description="Time period for stats"
+    )
+    status: Optional[Literal["active", "completed", "on_hold", "cancelled"]] = Field(
+        default=None, description="Filter by project status"
+    )
+    team_id: Optional[str] = Field(default=None, description="Filter by team ID")
+    user_id: Optional[str] = Field(default=None, description="Filter by user/owner ID")
+    page: Optional[int] = Field(default=1, description="Pagination page number", ge=1)
+    limit: Optional[int] = Field(default=20, description="Items per page", ge=1, le=100)
+    sort: Optional[Literal["created_at", "updated_at", "name", "progress"]] = Field(
+        default="created_at", description="Sort field"
+    )
+    order: Optional[Literal["asc", "desc"]] = Field(
+        default="desc", description="Sort order"
+    )
+
+
+class ProjectTrendsQueryParams(BaseModel):
+    """Query parameters for project trends chart endpoint"""
+
+    period: Optional[Literal["7d", "30d", "90d", "1y"]] = Field(
+        default="90d", description="Time period for trend analysis"
+    )
+    status: Optional[Literal["active", "completed", "on_hold", "cancelled"]] = Field(
+        default=None, description="Filter by project status"
+    )
+    limit: Optional[int] = Field(
+        default=10, description="Number of recent projects", ge=1, le=50
+    )
+    progress_min: Optional[int] = Field(
+        default=None, description="Minimum progress percentage", ge=0, le=100
+    )
+    progress_max: Optional[int] = Field(
+        default=None, description="Maximum progress percentage", ge=0, le=100
+    )
+    team_id: Optional[str] = Field(default=None, description="Filter by team ID")
+    owner_id: Optional[str] = Field(
+        default=None, description="Filter by project owner/manager ID"
+    )
+    priority: Optional[Literal["low", "medium", "high", "critical"]] = Field(
+        default=None, description="Filter by project priority"
+    )
+    sort: Optional[
+        Literal["progress", "updated_at", "created_at", "name", "deadline"]
+    ] = Field(default="updated_at", description="Sort field")
+    order: Optional[Literal["asc", "desc"]] = Field(
+        default="desc", description="Sort order"
+    )
+    include_archived: Optional[bool] = Field(
+        default=False, description="Include archived projects"
+    )
+    has_deadline: Optional[bool] = Field(
+        default=None, description="Filter projects with/without deadlines"
+    )
 
 
 class DashboardStats(BaseModel):

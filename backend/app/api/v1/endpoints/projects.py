@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import (
     get_db,
+    get_current_active_user,
     get_projects_read_user,
     get_projects_write_user,
     get_projects_delete_user,
@@ -415,3 +416,178 @@ async def get_project_stats(
     )
 
     return stats
+
+
+@router.delete("/{project_id}/team/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_team_member_from_project(
+    project_id: int,
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_write_user),
+):
+    """
+    Удалить участника команды из проекта.
+    """
+    project = await crud.project.get(db, id=project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+        )
+
+    # Удаляем участника из проекта
+    success = await crud.project.remove_team_member(
+        db, project_id=project_id, user_id=user_id
+    )
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Участник не найден в проекте"
+        )
+
+
+@router.post("/bulk", response_model=List[schemas.Project])
+async def bulk_create_projects(
+    projects_data: List[schemas.ProjectCreate],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_write_user),
+):
+    """
+    Массовое создание проектов.
+    """
+    created_projects = []
+    for project_data in projects_data:
+        project = await crud.project.create(
+            db, obj_in=project_data, owner_id=current_user.id
+        )
+        created_projects.append(project)
+
+    return created_projects
+
+
+@router.put("/bulk", response_model=List[schemas.Project])
+async def bulk_update_projects(
+    projects_data: List[Dict[str, Any]],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_write_user),
+):
+    """
+    Массовое обновление проектов.
+    """
+    updated_projects = []
+    for project_update in projects_data:
+        project_id = project_update.get("id")
+        if not project_id:
+            continue
+
+        project = await crud.project.get(db, id=project_id)
+        if project:
+            updated_project = await crud.project.update(
+                db, db_obj=project, obj_in=project_update
+            )
+            updated_projects.append(updated_project)
+
+    return updated_projects
+
+
+@router.delete("/bulk", status_code=status.HTTP_204_NO_CONTENT)
+async def bulk_delete_projects(
+    project_ids: List[int],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_delete_user),
+):
+    """
+    Массовое удаление проектов.
+    """
+    for project_id in project_ids:
+        project = await crud.project.get(db, id=project_id)
+        if project:
+            await crud.project.remove(db, id=project_id)
+
+
+@router.post("/import", response_model=List[schemas.Project])
+async def import_projects(
+    import_data: Dict[str, Any],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_write_user),
+):
+    """
+    Импорт проектов из файла/данных.
+    """
+    imported_projects = await crud.project.import_projects(
+        db, import_data=import_data, owner_id=current_user.id
+    )
+    return imported_projects
+
+
+@router.get("/export", response_model=Dict[str, Any])
+async def export_projects(
+    format: str = Query("json", regex="^(json|csv|xlsx)$"),
+    project_ids: Optional[List[int]] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_read_user),
+):
+    """
+    Экспорт проектов в различных форматах.
+    """
+    export_data = await crud.project.export_projects(
+        db, format=format, project_ids=project_ids, user_id=current_user.id
+    )
+    return export_data
+
+
+@router.post("/{project_id}/archive", response_model=schemas.Project)
+async def archive_project(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_write_user),
+):
+    """
+    Архивировать проект.
+    """
+    project = await crud.project.get(db, id=project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+        )
+
+    archived_project = await crud.project.archive(db, project_id=project_id)
+    return archived_project
+
+
+@router.post("/{project_id}/unarchive", response_model=schemas.Project)
+async def unarchive_project(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_projects_write_user),
+):
+    """
+    Разархивировать проект.
+    """
+    project = await crud.project.get(db, id=project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+        )
+
+    unarchived_project = await crud.project.unarchive(db, project_id=project_id)
+    return unarchived_project
+
+
+@router.post("/{project_id}/favorite", response_model=Dict[str, Any])
+async def toggle_project_favorite(
+    project_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Добавить/убрать проект из избранного.
+    """
+    project = await crud.project.get(db, id=project_id)
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Проект не найден"
+        )
+
+    is_favorite = await crud.project.toggle_favorite(
+        db, project_id=project_id, user_id=current_user.id
+    )
+    return {"project_id": project_id, "is_favorite": is_favorite}

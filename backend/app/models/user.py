@@ -52,7 +52,7 @@ class User(Base, TimestampedMixin):
     hashed_password: Mapped[str] = mapped_column(
         String(128), nullable=False, comment="Хэшированный пароль"
     )
-    
+
     # Auth0 integration
     auth0_id: Mapped[Optional[str]] = mapped_column(
         String(255), unique=True, nullable=True, comment="Auth0 user ID для интеграции"

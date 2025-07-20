@@ -21,7 +21,7 @@ from app.api.deps import (
     get_optional_user,
     get_user_from_auth0_token,
 )
-from app.services.auth0_service import auth0_service
+from app.services import auth0_service
 from app.core.config import settings
 from app.core.security import (
     JWTTokenManager,
@@ -33,7 +33,7 @@ from app.core.security import (
 )
 from app.crud import user as crud_user, crud_refresh_token
 from app.models.user import User
-from app.services.email_service import email_service
+from app.services import email_service
 from app.utils.logger import logger
 from app.schemas.auth import (
     LoginRequest,
@@ -1019,12 +1019,15 @@ async def get_auth0_user_info(
         "sub": current_user.auth0_id or str(current_user.id),
         "email": current_user.email,
         "email_verified": current_user.email_verified,
-        "name": current_user.name or f"{current_user.first_name} {current_user.last_name}".strip(),
+        "name": current_user.name
+        or f"{current_user.first_name} {current_user.last_name}".strip(),
         "given_name": current_user.first_name,
         "family_name": current_user.last_name,
         "nickname": current_user.username,
         "picture": None,  # Можно добавить поддержку аватаров в будущем
-        "updated_at": current_user.updated_at.isoformat() if current_user.updated_at else None,
+        "updated_at": (
+            current_user.updated_at.isoformat() if current_user.updated_at else None
+        ),
         "locale": "ru-RU",  # По умолчанию русская локаль
     }
 
