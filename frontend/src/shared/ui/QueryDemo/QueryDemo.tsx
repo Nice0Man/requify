@@ -25,7 +25,7 @@ import {
   NetworkCheck,
   Speed,
 } from "@mui/icons-material";
-import { useDashboardStats, useRecentActivity } from "@/shared/hooks";
+import { useDashboardStats, useDashboardActivity } from "@/shared/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { dashboardQueryKeys } from "@/features/dashboard/model/useDashboardQuery";
 
@@ -34,7 +34,7 @@ export const QueryDemo = () => {
   const [demoMode, setDemoMode] = useState(false);
 
   const statsQuery = useDashboardStats();
-  const activityQuery = useRecentActivity();
+  const activityQuery = useDashboardActivity();
 
   const handleInvalidateStats = () => {
     queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.stats });
@@ -267,7 +267,7 @@ export const QueryDemo = () => {
                         </Typography>
                         {activityQuery.data
                           ?.slice(0, 3)
-                          .map((activity, index) => (
+                          .map((activity: any, index: number) => (
                             <Typography key={index} variant="body2">
                               • {activity.title}
                             </Typography>

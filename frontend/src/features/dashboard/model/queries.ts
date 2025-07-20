@@ -152,26 +152,27 @@ export const useActivityFeed = (
       }
     },
     getNextPageParam: (lastPage, allPages) => {
-      // Простая и надежная реализация без зависимости от allPages.length
-      if (!lastPage || typeof lastPage !== 'object') {
+      // Безопасная проверка на undefined и null
+      if (!lastPage || typeof lastPage !== "object") {
         return undefined;
       }
 
+      // Если нет больше данных, останавливаем пагинацию
       if (!lastPage.hasMore) {
         return undefined;
       }
 
-      // Используем page из lastPage или вычисляем из allPages
-      if (lastPage.page && typeof lastPage.page === 'number') {
+      // Используем page из lastPage
+      if (lastPage.page && typeof lastPage.page === "number") {
         return lastPage.page; // next page number
       }
 
-      // Fallback: если allPages доступен и является массивом, используем его длину
-      if (allPages && Array.isArray(allPages) && typeof allPages.length === 'number') {
+      // Безопасный fallback: проверяем allPages на существование и тип
+      if (allPages && Array.isArray(allPages) && allPages.length > 0) {
         return allPages.length;
       }
 
-      // Last resort: начинаем с 1 если ничего не работает
+      // Last resort: если ничего не доступно, начинаем с первой страницы
       return 1;
     },
     initialPageParam: 0,
@@ -234,6 +235,9 @@ export const useRecentActivity = (
     ...options,
   });
 };
+
+// Алиас для обратной совместимости
+export const useDashboardActivity = useRecentActivity;
 
 // Quick Actions Query
 export const useQuickActions = (
@@ -718,9 +722,14 @@ export const useSystemMetrics = (
     refetchOnWindowFocus: true,
     retry: (failureCount, error: any) => {
       // Don't retry on auth errors (401/403) or not found (404)
-      if (error?.status === 404 || error?.response?.status === 404 ||
-          error?.status === 401 || error?.response?.status === 401 ||
-          error?.status === 403 || error?.response?.status === 403) {
+      if (
+        error?.status === 404 ||
+        error?.response?.status === 404 ||
+        error?.status === 401 ||
+        error?.response?.status === 401 ||
+        error?.status === 403 ||
+        error?.response?.status === 403
+      ) {
         return false;
       }
       return failureCount < 2; // Reduced retries for system metrics

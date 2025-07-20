@@ -56,8 +56,7 @@ export const TestingKanbanPage: React.FC = () => {
         setRequirementsLoading(true);
         try {
           const data = await requirementDAO.getRequirements({ 
-            project_id: projectId,
-            limit: 100 
+            project_id: projectId
           });
           setRequirements(data);
         } catch (error) {

@@ -1,21 +1,11 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { dashboardApi } from '../api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { DashboardApi } from '@/entities/dashboard';
 
-interface DashboardStats {
-  totalProjects: number;
-  totalRequirements: number;
-  totalReleases: number;
-  totalTestCases: number;
-  activeProjects: number;
-  completedProjects: number;
-  pendingRequirements: number;
-  completedRequirements: number;
-}
-
+// Types
 interface DashboardState {
-  stats: DashboardStats | null;
+  stats: any;
   recentActivity: any[];
-  chartData: any[];
+  chartData: any;
   isLoading: boolean;
   error: string | null;
 }
@@ -23,7 +13,7 @@ interface DashboardState {
 const initialState: DashboardState = {
   stats: null,
   recentActivity: [],
-  chartData: [],
+  chartData: null,
   isLoading: false,
   error: null,
 };
@@ -33,7 +23,7 @@ export const fetchDashboardStats = createAsyncThunk(
   'dashboard/fetchStats',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await dashboardApi.getStats();
+      const response = await DashboardApi.getStats();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -45,7 +35,7 @@ export const fetchRecentActivity = createAsyncThunk(
   'dashboard/fetchRecentActivity',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await dashboardApi.getActivity();
+      const response = await DashboardApi.getActivity();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -58,7 +48,7 @@ export const fetchChartData = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // TODO: добавить метод getChartData в dashboardApi
-      const response = await dashboardApi.getStats();
+      const response = await DashboardApi.getStats();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -91,7 +81,7 @@ const dashboardSlice = createSlice({
       })
       // Fetch recent activity
       .addCase(fetchRecentActivity.fulfilled, (state, action) => {
-        state.recentActivity = action.payload;
+        state.recentActivity = action.payload.data || [];
       })
       // Fetch chart data
       .addCase(fetchChartData.fulfilled, (state, action) => {

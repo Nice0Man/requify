@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { projectApi } from '../api/projectApi';
-import type { Project, CreateProjectRequest, UpdateProjectRequest } from '@/entities/project';
+import type { UpdateProjectRequest } from '../api/projectApi';
 
 // Query Keys
 export const projectQueryKeys = {

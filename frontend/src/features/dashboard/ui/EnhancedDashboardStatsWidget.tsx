@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import { memo, useMemo, useState, useCallback, startTransition } from "react";
 import {
   Box,
   Typography,
@@ -7,36 +7,33 @@ import {
   IconButton,
   useTheme,
   alpha,
-  Skeleton,
   Alert,
   Card,
   CardContent,
   CardHeader,
-  Button,
+  Collapse,
+  Tooltip,
+  Fade,
 } from "@mui/material";
 import {
   Refresh,
   Assessment,
-  TrendingUp,
-  Group,
-  Speed,
   RocketLaunch,
   Assignment,
+  Group,
+  Speed,
+  TrendingUp,
+  ExpandMore,
+  ShowChart,
 } from "@mui/icons-material";
 import i18n from "@/shared/lib/i18n";
 
 import { MetricCard, LineChart, BarChart } from "@/entities/charts";
-import type {
-  ChartMetric,
-  TimeSeriesDataPoint,
-  ChartDataPoint,
-  ProjectMetrics,
-  TeamMetrics,
-} from "@/entities/charts";
+import type { ChartMetric, TimeSeriesDataPoint } from "@/entities/charts";
 import {
   useDashboardStats,
-  useRefreshDashboard,
-  dashboardQueryKeys,
+  useTimelineData,
+  useDistributionData,
 } from "../model/queries";
 import {
   useRenderTracker,
@@ -49,8 +46,347 @@ interface EnhancedDashboardStatsWidgetProps {
   showTrends?: boolean;
   className?: string;
   onMetricClick?: (metric: ChartMetric) => void;
-  layout?: "grid" | "list";
 }
+
+/**
+ * Collapsible Charts Section Component
+ */
+const CollapsibleChartsSection = memo<{
+  timelineData: TimeSeriesDataPoint[];
+  distributionData: any[];
+  isTimelineLoading: boolean;
+  isDistributionLoading: boolean;
+  timelineError: Error | null;
+  distributionError: Error | null;
+  defaultExpanded?: boolean;
+}>(
+  ({
+    timelineData,
+    distributionData,
+    isTimelineLoading,
+    isDistributionLoading,
+    timelineError,
+    distributionError,
+    defaultExpanded = true,
+  }) => {
+    const theme = useTheme();
+    const t = i18n.t;
+    const [expanded, setExpanded] = useState(defaultExpanded);
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    // Count visible charts
+    const chartCount = 2; // Timeline and Distribution
+
+    // Responsive chart height
+    const getChartHeight = () => {
+      if (
+        theme.breakpoints.values.md &&
+        window.innerWidth >= theme.breakpoints.values.md
+      ) {
+        return 300;
+      }
+      if (
+        theme.breakpoints.values.sm &&
+        window.innerWidth >= theme.breakpoints.values.sm
+      ) {
+        return 280;
+      }
+      return 260;
+    };
+
+    const chartHeight = getChartHeight();
+
+    const handleToggle = useCallback(() => {
+      if (isAnimating) return;
+
+      setIsAnimating(true);
+      startTransition(() => {
+        setExpanded(!expanded);
+        setTimeout(() => setIsAnimating(false), 400);
+      });
+    }, [expanded, isAnimating]);
+
+    return (
+      <Box>
+        {/* Charts Section Header */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: { xs: 2, sm: 2.5 }, // Responsive margin
+            px: 1,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: 2,
+                background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "transform 0.2s ease",
+                ...(expanded && {
+                  transform: { xs: "none", sm: "scale(1.05)" }, // No transform on mobile
+                }),
+              }}
+            >
+              <ShowChart sx={{ color: "white", fontSize: 18 }} />
+            </Box>
+            <Box>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  color: theme.palette.text.primary,
+                  fontSize: "1.125rem",
+                  userSelect: "none",
+                }}
+              >
+                {t("dashboard.charts.title", "Activity Charts")}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontSize: "0.8rem",
+                }}
+              >
+                {expanded
+                  ? t(
+                      "dashboard.charts.subtitle.expanded",
+                      `${chartCount} charts visible`
+                    )
+                  : t(
+                      "dashboard.charts.subtitle.collapsed",
+                      `${chartCount} charts hidden`
+                    )}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Tooltip
+            title={
+              expanded
+                ? t("dashboard.charts.collapse", "Collapse Charts")
+                : t("dashboard.charts.expand", "Expand Charts")
+            }
+            arrow
+            enterDelay={300}
+          >
+            <IconButton
+              onClick={handleToggle}
+              disabled={isAnimating}
+              aria-label={expanded ? "Collapse charts" : "Expand charts"}
+              aria-expanded={expanded}
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: 2.5,
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  backgroundColor: alpha(theme.palette.info.main, 0.08),
+                  borderColor: alpha(theme.palette.info.main, 0.2),
+                  transform: { xs: "none", sm: "scale(1.05)" }, // No transform on mobile
+                },
+                "&:active": {
+                  transform: "scale(0.95)",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transform: expanded ? "rotate(0deg)" : "rotate(180deg)",
+                  color: expanded
+                    ? theme.palette.info.main
+                    : theme.palette.text.secondary,
+                }}
+              >
+                <ExpandMore fontSize="small" />
+              </Box>
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <Collapse
+          in={expanded}
+          timeout={400}
+          easing={{
+            enter: "cubic-bezier(0.4, 0, 0.2, 1)",
+            exit: "cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+          unmountOnExit={false}
+        >
+          <Fade in={expanded} timeout={300}>
+            <Grid
+              container
+              spacing={{ xs: 2, sm: 2.5, md: 3 }} // Responsive spacing
+              sx={{
+                "& .MuiGrid-item": {
+                  display: "flex",
+                  flexDirection: "column",
+                },
+              }}
+            >
+              {/* Timeline Chart */}
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    boxShadow: `0 2px 20px ${alpha(
+                      theme.palette.common.black,
+                      0.04
+                    )}`,
+                    background: theme.palette.background.paper,
+                    overflow: "hidden",
+                    height: "100%", // Consistent height
+                    display: "flex",
+                    flexDirection: "column",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      transform: { xs: "none", sm: "translateY(-1px)" }, // No transform on mobile
+                      boxShadow: `0 4px 24px ${alpha(
+                        theme.palette.common.black,
+                        0.06
+                      )}`,
+                    },
+                  }}
+                >
+                  <CardHeader
+                    title={t(
+                      "dashboard.charts.projectTimeline",
+                      "Project Activity Timeline"
+                    )}
+                    titleTypographyProps={{
+                      variant: "subtitle1",
+                      fontWeight: 600,
+                      fontSize: "1rem",
+                      color: theme.palette.text.primary,
+                    }}
+                    sx={{
+                      pb: 1,
+                      px: { xs: 2, sm: 3 }, // Responsive padding
+                      pt: { xs: 2, sm: 2.5 },
+                      flexShrink: 0,
+                      "& .MuiCardHeader-content": {
+                        display: "flex",
+                        alignItems: "center",
+                        overflow: "hidden",
+                      },
+                    }}
+                  />
+                  <CardContent
+                    sx={{
+                      pt: 0,
+                      pb: { xs: 2, sm: 3 }, // Responsive padding
+                      px: { xs: 2, sm: 3 },
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Box sx={{ height: "100%", minHeight: 0 }}>
+                      <LineChart
+                        data={timelineData}
+                        height={chartHeight}
+                        showPoints
+                        showGrid
+                        smooth
+                        area
+                        loading={isTimelineLoading}
+                        error={(timelineError as any)?.message || null}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Status Distribution Chart */}
+              <Grid item xs={12} md={6}>
+                <Card
+                  sx={{
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                    boxShadow: `0 2px 20px ${alpha(
+                      theme.palette.common.black,
+                      0.04
+                    )}`,
+                    background: theme.palette.background.paper,
+                    overflow: "hidden",
+                    height: "100%", // Consistent height
+                    display: "flex",
+                    flexDirection: "column",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      transform: { xs: "none", sm: "translateY(-1px)" }, // No transform on mobile
+                      boxShadow: `0 4px 24px ${alpha(
+                        theme.palette.common.black,
+                        0.06
+                      )}`,
+                    },
+                  }}
+                >
+                  <CardHeader
+                    title={t(
+                      "dashboard.charts.statusDistribution",
+                      "Project Status Distribution"
+                    )}
+                    titleTypographyProps={{
+                      variant: "subtitle1",
+                      fontWeight: 600,
+                      fontSize: "1rem",
+                      color: theme.palette.text.primary,
+                    }}
+                    sx={{
+                      pb: 1,
+                      px: { xs: 2, sm: 3 }, // Responsive padding
+                      pt: { xs: 2, sm: 2.5 },
+                      flexShrink: 0,
+                      "& .MuiCardHeader-content": {
+                        display: "flex",
+                        alignItems: "center",
+                        overflow: "hidden",
+                      },
+                    }}
+                  />
+                  <CardContent
+                    sx={{
+                      pt: 0,
+                      pb: { xs: 2, sm: 3 }, // Responsive padding
+                      px: { xs: 2, sm: 3 },
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <Box sx={{ height: "100%", minHeight: 0 }}>
+                      <BarChart
+                        data={distributionData}
+                        height={chartHeight}
+                        loading={isDistributionLoading}
+                        error={(distributionError as any)?.message || null}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Fade>
+        </Collapse>
+      </Box>
+    );
+  }
+);
+
+CollapsibleChartsSection.displayName = "CollapsibleChartsSection";
 
 export const EnhancedDashboardStatsWidget =
   memo<EnhancedDashboardStatsWidgetProps>(
@@ -60,7 +396,6 @@ export const EnhancedDashboardStatsWidget =
       showTrends = true,
       className,
       onMetricClick,
-      layout = "grid",
     }) => {
       // Performance monitoring
       useRenderTracker("EnhancedDashboardStatsWidget");
@@ -71,15 +406,35 @@ export const EnhancedDashboardStatsWidget =
       const t = i18n.t;
       const isCompact = variant === "compact";
 
-      // Query
+      // API Queries
       const {
         data: stats,
-        isLoading,
-        error,
-        isError,
-        refetch,
-        isFetching,
+        isLoading: isStatsLoading,
+        error: statsError,
+        isError: isStatsError,
+        refetch: refetchStats,
+        isFetching: isStatsFetching,
       } = useDashboardStats();
+
+      // Chart data queries
+      const {
+        data: timelineData,
+        isLoading: isTimelineLoading,
+        error: timelineError,
+      } = useTimelineData();
+
+      const {
+        data: distributionData,
+        isLoading: isDistributionLoading,
+        error: distributionError,
+      } = useDistributionData();
+
+      // Combine loading states
+      const isLoading =
+        isStatsLoading || isTimelineLoading || isDistributionLoading;
+      const isFetching = isStatsFetching;
+      const combinedError = statsError || timelineError || distributionError;
+      const isError = isStatsError || !!timelineError || !!distributionError;
 
       // Transform data to chart format
       const { keyMetrics, chartData } = useMemo(() => {
@@ -124,9 +479,28 @@ export const EnhancedDashboardStatsWidget =
               : undefined,
           },
           {
+            id: "totalRequirements",
+            title: t(
+              "dashboard.metrics.totalRequirements",
+              "Total Requirements"
+            ),
+            value: stats.totalRequirements || 0,
+            icon: <Assignment />,
+            color: theme.palette.secondary.main,
+            format: "number",
+            trend: stats.trends?.totalRequirements
+              ? {
+                  direction: stats.trends.totalRequirements.direction,
+                  value: stats.trends.totalRequirements.current,
+                  percentage: stats.trends.totalRequirements.percentage,
+                  label: "vs last week",
+                }
+              : undefined,
+          },
+          {
             id: "completionRate",
             title: t("dashboard.metrics.completionRate", "Completion Rate"),
-            value: Math.round(stats.completionRate || 0),
+            value: stats.completionRate || 0,
             icon: <TrendingUp />,
             color: theme.palette.success.main,
             format: "percentage",
@@ -136,7 +510,7 @@ export const EnhancedDashboardStatsWidget =
                   direction: stats.trends.completionRate.direction,
                   value: stats.trends.completionRate.current,
                   percentage: stats.trends.completionRate.percentage,
-                  label: "vs target",
+                  label: "vs last month",
                 }
               : undefined,
           },
@@ -147,14 +521,6 @@ export const EnhancedDashboardStatsWidget =
             icon: <Group />,
             color: theme.palette.warning.main,
             format: "number",
-            trend: stats.trends?.teamMembers
-              ? {
-                  direction: stats.trends.teamMembers.direction,
-                  value: stats.trends.teamMembers.current,
-                  percentage: stats.trends.teamMembers.percentage,
-                  label: "vs last month",
-                }
-              : undefined,
           },
           {
             id: "teamVelocity",
@@ -163,62 +529,41 @@ export const EnhancedDashboardStatsWidget =
             icon: <Speed />,
             color: theme.palette.error.main,
             format: "number",
-            unit: "pts/sprint",
             trend: stats.trends?.teamVelocity
               ? {
                   direction: stats.trends.teamVelocity.direction,
                   value: stats.trends.teamVelocity.current,
                   percentage: stats.trends.teamVelocity.percentage,
-                  label: "vs avg velocity",
+                  label: "vs last month",
                 }
               : undefined,
           },
         ];
 
-        // Generate sample timeline data (replace with real API data)
-        const timeline: TimeSeriesDataPoint[] = Array.from(
-          { length: 30 },
-          (_, i) => ({
-            date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-            value:
-              Math.floor(Math.random() * 50) + (stats.activeProjects || 0) - 25,
-            label: `Day ${i + 1}`,
-          })
-        );
+        // Transform timeline data for LineChart
+        const timeline = (timelineData || []).map((point) => ({
+          id: `timeline_${point.date}_${point.value}`,
+          label: point.label,
+          value: point.value,
+          date: point.date,
+          category: point.category,
+          metadata: point.metadata,
+        }));
 
-        // Generate sample distribution data
-        const distribution: ChartDataPoint[] = [
-          {
-            id: "planning",
-            label: "Planning",
-            value: Math.floor((stats.totalProjects || 0) * 0.2),
-            color: theme.palette.info.main,
-          },
-          {
-            id: "development",
-            label: "Development",
-            value: Math.floor((stats.totalProjects || 0) * 0.5),
-            color: theme.palette.warning.main,
-          },
-          {
-            id: "testing",
-            label: "Testing",
-            value: Math.floor((stats.totalProjects || 0) * 0.2),
-            color: theme.palette.error.main,
-          },
-          {
-            id: "completed",
-            label: "Completed",
-            value: Math.floor((stats.totalProjects || 0) * 0.1),
-            color: theme.palette.success.main,
-          },
-        ];
+        // Transform distribution data for BarChart
+        const distribution = (distributionData || []).map((point) => ({
+          id: point.id,
+          label: point.label,
+          value: point.value,
+          color: point.color,
+          metadata: point.metadata,
+        }));
 
         return {
           keyMetrics: metrics,
           chartData: { timeline, distribution },
         };
-      }, [stats, theme.palette, t]);
+      }, [stats, timelineData, distributionData, theme.palette, t]);
 
       // Loading state
       if (isLoading) {
@@ -227,65 +572,38 @@ export const EnhancedDashboardStatsWidget =
             <Box
               sx={{
                 p: 3,
-                borderRadius: 2,
+                borderRadius: 3,
                 border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
                 backgroundColor: theme.palette.background.paper,
+                boxShadow: `0 2px 20px ${alpha(
+                  theme.palette.common.black,
+                  0.04
+                )}`,
                 width: "100%",
               }}
             >
-              <Stack spacing={3}>
-                {/* Header skeleton */}
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Stack spacing={1}>
-                    <Box display="flex" alignItems="center" gap={1.5}>
-                      <Skeleton variant="rounded" width={32} height={32} />
-                      <Skeleton variant="text" width={150} height={32} />
-                    </Box>
-                    <Skeleton variant="text" width={200} height={20} />
-                  </Stack>
+              <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+                <Box sx={{ textAlign: "center" }}>
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      border: `3px solid ${theme.palette.primary.main}`,
+                      borderTopColor: "transparent",
+                      animation: "spin 1s linear infinite",
+                      mb: 2,
+                      "@keyframes spin": {
+                        "0%": { transform: "rotate(0deg)" },
+                        "100%": { transform: "rotate(360deg)" },
+                      },
+                    }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {t("common.loading", "Loading...")}
+                  </Typography>
                 </Box>
-
-                {/* Metrics skeleton */}
-                <Box>
-                  <Grid container spacing={3}>
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <Grid item xs={12} sm={6} md={4} lg={2.4} key={index}>
-                        <Skeleton
-                          variant="rectangular"
-                          height={160}
-                          sx={{ borderRadius: 3 }}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Box>
-
-                {/* Charts skeleton */}
-                {showCharts && (
-                  <Box>
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} md={6}>
-                        <Skeleton
-                          variant="rectangular"
-                          height={300}
-                          sx={{ borderRadius: 2 }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Skeleton
-                          variant="rectangular"
-                          height={300}
-                          sx={{ borderRadius: 2 }}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                )}
-              </Stack>
+              </Box>
             </Box>
           </Box>
         );
@@ -295,34 +613,25 @@ export const EnhancedDashboardStatsWidget =
       if (isError) {
         return (
           <Box className={className} sx={{ width: "100%" }}>
-            <Box
+            <Alert
+              severity="error"
+              action={
+                <IconButton
+                  color="inherit"
+                  size="small"
+                  onClick={() => refetchStats()}
+                >
+                  <Refresh />
+                </IconButton>
+              }
               sx={{
-                p: 3,
-                borderRadius: 2,
-                border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                backgroundColor: theme.palette.background.paper,
-                width: "100%",
+                borderRadius: 3,
+                border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
               }}
             >
-              <Stack spacing={2} alignItems="center" sx={{ py: 4 }}>
-                <Assessment
-                  sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
-                />
-                <Typography color="error" variant="body2" textAlign="center">
-                  {t("errors.loadingError")}:{" "}
-                  {error?.message || "Unknown error"}
-                </Typography>
-                <Button
-                  onClick={() => refetch()}
-                  size="small"
-                  variant="outlined"
-                  sx={{ textTransform: "none" }}
-                  disabled={isFetching}
-                >
-                  {t("common.retry", "Try Again")}
-                </Button>
-              </Stack>
-            </Box>
+              {(combinedError as any)?.message ||
+                t("dashboard.error", "Error loading dashboard data")}
+            </Alert>
           </Box>
         );
       }
@@ -332,9 +641,13 @@ export const EnhancedDashboardStatsWidget =
           <Box
             sx={{
               p: 3,
-              borderRadius: 2,
+              borderRadius: 3,
               border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
               backgroundColor: theme.palette.background.paper,
+              boxShadow: `0 2px 20px ${alpha(
+                theme.palette.common.black,
+                0.04
+              )}`,
               width: "100%",
             }}
           >
@@ -386,7 +699,7 @@ export const EnhancedDashboardStatsWidget =
                 </Stack>
 
                 <IconButton
-                  onClick={() => refetch()}
+                  onClick={() => refetchStats()}
                   disabled={isFetching}
                   sx={{
                     borderRadius: 2,
@@ -411,7 +724,7 @@ export const EnhancedDashboardStatsWidget =
               <Box>
                 <Grid container spacing={3}>
                   {keyMetrics.map((metric) => (
-                    <Grid item xs={12} sm={6} md={4} lg={2.4} key={metric.id}>
+                    <Grid item xs={12} sm={6} md={4} lg={2} key={metric.id}>
                       <MetricCard
                         metric={metric}
                         variant={variant === "minimal" ? "compact" : variant}
@@ -424,53 +737,17 @@ export const EnhancedDashboardStatsWidget =
                 </Grid>
               </Box>
 
-              {/* Charts Section */}
+              {/* Collapsible Charts Section */}
               {showCharts && (
-                <Box>
-                  <Grid container spacing={3}>
-                    {/* Timeline Chart */}
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader
-                          title="Project Activity Timeline"
-                          titleTypographyProps={{
-                            variant: "h6",
-                            fontWeight: 600,
-                          }}
-                        />
-                        <CardContent>
-                          <LineChart
-                            data={chartData.timeline}
-                            height={280}
-                            showPoints
-                            showGrid
-                            smooth
-                            area
-                          />
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    {/* Status Distribution Chart */}
-                    <Grid item xs={12} md={6}>
-                      <Card>
-                        <CardHeader
-                          title="Project Status Distribution"
-                          titleTypographyProps={{
-                            variant: "h6",
-                            fontWeight: 600,
-                          }}
-                        />
-                        <CardContent>
-                          <BarChart
-                            data={chartData.distribution}
-                            height={280}
-                          />
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-                </Box>
+                <CollapsibleChartsSection
+                  timelineData={chartData.timeline}
+                  distributionData={chartData.distribution}
+                  isTimelineLoading={isTimelineLoading}
+                  isDistributionLoading={isDistributionLoading}
+                  timelineError={timelineError}
+                  distributionError={distributionError}
+                  defaultExpanded={variant !== "compact"}
+                />
               )}
             </Stack>
           </Box>

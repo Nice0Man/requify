@@ -168,8 +168,9 @@ export const API_ENDPOINTS = {
     STATISTICS: "/comments/statistics",
   },
 
-  // Dashboard endpoints
+  // Dashboard endpoints - ИСПРАВЛЕНО для правильных API v1 путей
   DASHBOARD: {
+    ROOT: "/dashboard",
     STATS: "/dashboard/stats",
     OVERVIEW: "/dashboard/overview",
     MY_PROJECTS: "/dashboard/my-projects",
@@ -194,6 +195,12 @@ export const API_ENDPOINTS = {
     NOTIFICATIONS: "/dashboard/notifications",
     MARK_NOTIFICATION_READ: (id: string) =>
       `/dashboard/notifications/${id}/read`,
+    // System metrics
+    SYSTEM_METRICS: "/dashboard/metrics/system",
+    // Chart data endpoints
+    TIMELINE_DATA: "/dashboard/charts/timeline",
+    DISTRIBUTION_DATA: "/dashboard/charts/distribution",
+    PROJECT_TRENDS: "/dashboard/charts/project-trends",
   },
 
   // Teams endpoints
@@ -222,6 +229,6 @@ export const API_ENDPOINTS = {
 
   // Root endpoints
   ROOT: "/",
-  API_ROOT: "/api/v1/",
-  HEALTH_CHECK: "/api/v1/health",
+  API_ROOT: "/",
+  HEALTH_CHECK: "/health",
 } as const;

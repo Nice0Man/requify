@@ -6,4 +6,7 @@ export * from './release';
 export * from './test-case';
 export * from './comment';
 export * from './admin';
-export * from './dashboard'; 
+export * from './dashboard';
+export * from './charts';
+export * from './kanban';
+export * from './team'; 

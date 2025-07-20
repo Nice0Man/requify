@@ -1,1 +1,0 @@
-﻿export { FullPageScroll } from './FullPageScroll';

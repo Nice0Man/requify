@@ -1224,6 +1224,22 @@
         "documentation": {}
     },
     {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Optional",
         "importPath": "typing",
         "description": "typing",
@@ -1818,6 +1834,14 @@
     },
     {
         "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -7206,6 +7230,15 @@
         "documentation": {}
     },
     {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
         "label": "Project",
         "importPath": "app.models.project",
         "description": "app.models.project",
@@ -7407,6 +7440,38 @@
     },
     {
         "label": "DashboardNotification",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "SystemMetrics",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "TimelineDataPoint",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DistributionDataPoint",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectTrendDataPoint",
         "importPath": "app.schemas.dashboard",
         "description": "app.schemas.dashboard",
         "isExtraImport": true,
@@ -10854,15 +10919,6 @@
         "documentation": {}
     },
     {
-        "label": "time",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "time",
-        "description": "time",
-        "detail": "time",
-        "documentation": {}
-    },
-    {
         "label": "click",
         "kind": 6,
         "isExtraImport": true,
@@ -13119,6 +13175,42 @@
         "importPath": "backend.app.schemas.dashboard",
         "description": "backend.app.schemas.dashboard",
         "peekOfCode": "class QuickAccess(BaseModel):\n    \"\"\"Quick access items\"\"\"\n    my_projects: List[QuickProject] = Field(\n        default_factory=list, description=\"User's projects\"\n    )\n    my_requirements: List[QuickRequirement] = Field(\n        default_factory=list, description=\"User's requirements\"\n    )\n    pending_approvals: List[PendingApproval] = Field(\n        default_factory=list, description=\"Pending approvals\"",
+        "detail": "backend.app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "SystemMetrics",
+        "kind": 6,
+        "importPath": "backend.app.schemas.dashboard",
+        "description": "backend.app.schemas.dashboard",
+        "peekOfCode": "class SystemMetrics(BaseModel):\n    \"\"\"System performance metrics for dashboard monitoring\"\"\"\n    cpuUsage: float = Field(\n        ...,\n        description=\"CPU usage percentage\",\n        ge=0,\n        le=100,\n        alias=\"cpu_usage\"\n    )\n    memoryUsage: float = Field(",
+        "detail": "backend.app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "TimelineDataPoint",
+        "kind": 6,
+        "importPath": "backend.app.schemas.dashboard",
+        "description": "backend.app.schemas.dashboard",
+        "peekOfCode": "class TimelineDataPoint(BaseModel):\n    \"\"\"Timeline chart data point for dashboard charts\"\"\"\n    date: str = Field(..., description=\"Date in ISO format\")\n    value: float = Field(..., description=\"Numeric value for the data point\")\n    label: str = Field(..., description=\"Label for the data point\")\n    category: Optional[str] = Field(None, description=\"Category for grouping\")\n    metadata: Optional[Dict[str, Any]] = Field(None, description=\"Additional metadata\")\n    class Config:\n        json_schema_extra = {\n            \"example\": {",
+        "detail": "backend.app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DistributionDataPoint",
+        "kind": 6,
+        "importPath": "backend.app.schemas.dashboard",
+        "description": "backend.app.schemas.dashboard",
+        "peekOfCode": "class DistributionDataPoint(BaseModel):\n    \"\"\"Distribution chart data point for dashboard charts\"\"\"\n    id: str = Field(..., description=\"Unique identifier for the data point\")\n    label: str = Field(..., description=\"Label for the data point\")\n    value: float = Field(..., description=\"Numeric value\", ge=0)\n    percentage: Optional[float] = Field(None, description=\"Percentage of total\", ge=0, le=100)\n    color: str = Field(..., description=\"Color for visualization\")\n    metadata: Optional[Dict[str, Any]] = Field(None, description=\"Additional metadata\")\n    class Config:\n        json_schema_extra = {",
+        "detail": "backend.app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectTrendDataPoint",
+        "kind": 6,
+        "importPath": "backend.app.schemas.dashboard",
+        "description": "backend.app.schemas.dashboard",
+        "peekOfCode": "class ProjectTrendDataPoint(BaseModel):\n    \"\"\"Project trend data point for project trends analysis\"\"\"\n    period: str = Field(..., description=\"Time period (e.g., '2024-01', 'Q1 2024')\")\n    metric: str = Field(..., description=\"Metric name (e.g., 'projects_created', 'completion_rate')\")\n    value: float = Field(..., description=\"Metric value\")\n    change: float = Field(..., description=\"Change from previous period\")\n    direction: str = Field(..., description=\"Trend direction\", pattern=\"^(up|down|stable)$\")\n    metadata: Optional[Dict[str, Any]] = Field(None, description=\"Additional trend metadata\")\n    class Config:\n        json_schema_extra = {",
         "detail": "backend.app.schemas.dashboard",
         "documentation": {}
     },

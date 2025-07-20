@@ -166,6 +166,8 @@ export interface PieChartProps extends BaseChartProps {
   outerRadius?: number;
   showLabels?: boolean;
   showLegend?: boolean;
+  donut?: boolean;
+  onSliceClick?: (data: ChartDataPoint, index: number) => void;
 }
 
 export interface RadarChartProps extends BaseChartProps {

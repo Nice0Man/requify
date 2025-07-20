@@ -1,6 +1,6 @@
 // UI Components
 export { BubblesEffect } from "./BubblesEffect";
-export { ErrorBoundary } from "./ErrorBoundary";
+export { ErrorBoundary, DashboardErrorBoundary } from "./ErrorBoundary";
 export { FloatingLabelInput } from "./FloatingLabelInput";
 export { LanguageSwitch } from "./LanguageSwitch";
 export { LoadingSpinner } from "./LoadingSpinner";
@@ -11,3 +11,6 @@ export { TooltipButton } from "./TooltipButton/TooltipButton";
 
 // Scroll Components (FSD-compliant)
 export { ScrollContainer, ScrollNavigator } from "./Scroll";
+
+// Placeholders
+export { EmptyStateChart } from "./placeholders";

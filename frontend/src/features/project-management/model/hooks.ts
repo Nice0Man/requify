@@ -2,14 +2,15 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/app/store";
 
 export const useProjectManagement = () => {
-  const { projects, selectedProject, isPending, error } = useSelector(
+  const { isLoading, error } = useSelector(
     (state: RootState) => state.projectManagement
   );
 
   return {
-    projects,
-    selectedProject,
-    isPending,
+    isLoading,
     error,
+    // TODO: Add projects and selectedProject to store when needed
+    projects: [],
+    selectedProject: null,
   };
 };

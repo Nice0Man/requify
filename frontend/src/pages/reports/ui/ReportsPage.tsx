@@ -24,7 +24,7 @@ import {
   Fade,
   Slide,
 } from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
   Analytics,
   Download,
@@ -125,7 +125,10 @@ export const ReportsPage: React.FC = () => {
           },
         }}
       >
-        <Container maxWidth="xl" sx={{ py: 4, position: "relative", zIndex: 1 }}>
+        <Container
+          maxWidth="xl"
+          sx={{ py: 4, position: "relative", zIndex: 1 }}
+        >
           {/* Header */}
           <Fade in={true} timeout={600}>
             <Box sx={{ mb: 4 }}>
@@ -146,7 +149,10 @@ export const ReportsPage: React.FC = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       mr: 3,
-                      boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.3)}`,
+                      boxShadow: `0 8px 24px ${alpha(
+                        theme.palette.primary.main,
+                        0.3
+                      )}`,
                     }}
                   >
                     <Analytics sx={{ color: "white", fontSize: 24 }} />
@@ -165,14 +171,24 @@ export const ReportsPage: React.FC = () => {
                     >
                       Отчеты и Аналитика
                     </Typography>
-                    <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    <Typography
+                      variant="h6"
+                      color="text.secondary"
+                      sx={{ fontWeight: 500 }}
+                    >
                       Генерация отчетов и анализ данных проекта
                     </Typography>
                   </Box>
                 </Box>
                 <Button
                   variant="contained"
-                  startIcon={isGenerating ? <CircularProgress size={20} color="inherit" /> : <Analytics />}
+                  startIcon={
+                    isGenerating ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : (
+                      <Analytics />
+                    )
+                  }
                   onClick={handleGenerateReport}
                   disabled={isGenerating}
                   sx={{
@@ -182,10 +198,16 @@ export const ReportsPage: React.FC = () => {
                     px: 3,
                     py: 1.5,
                     background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                    boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.3)}`,
+                    boxShadow: `0 4px 16px ${alpha(
+                      theme.palette.primary.main,
+                      0.3
+                    )}`,
                     "&:hover": {
                       background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
-                      boxShadow: `0 6px 20px ${alpha(theme.palette.primary.main, 0.4)}`,
+                      boxShadow: `0 6px 20px ${alpha(
+                        theme.palette.primary.main,
+                        0.4
+                      )}`,
                       transform: "translateY(-2px)",
                     },
                     "&:disabled": {
@@ -214,12 +236,19 @@ export const ReportsPage: React.FC = () => {
                       ${alpha(theme.palette.background.default, 0.6)} 100%)`,
                     backdropFilter: "blur(20px)",
                     height: "fit-content",
-                    boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.06)}`,
+                    boxShadow: `0 8px 32px ${alpha(
+                      theme.palette.common.black,
+                      0.06
+                    )}`,
                   }}
                 >
                   <Typography
                     variant="h5"
-                    sx={{ fontWeight: 700, mb: 3, color: theme.palette.text.primary }}
+                    sx={{
+                      fontWeight: 700,
+                      mb: 3,
+                      color: theme.palette.text.primary,
+                    }}
                   >
                     Настройки отчета
                   </Typography>
@@ -284,7 +313,10 @@ export const ReportsPage: React.FC = () => {
                           color: theme.palette.error.main,
                           "&:hover": {
                             borderColor: theme.palette.error.main,
-                            backgroundColor: alpha(theme.palette.error.main, 0.04),
+                            backgroundColor: alpha(
+                              theme.palette.error.main,
+                              0.04
+                            ),
                           },
                         }}
                       >
@@ -302,7 +334,10 @@ export const ReportsPage: React.FC = () => {
                           color: theme.palette.success.main,
                           "&:hover": {
                             borderColor: theme.palette.success.main,
-                            backgroundColor: alpha(theme.palette.success.main, 0.04),
+                            backgroundColor: alpha(
+                              theme.palette.success.main,
+                              0.04
+                            ),
                           },
                         }}
                       >
@@ -320,7 +355,10 @@ export const ReportsPage: React.FC = () => {
                           color: theme.palette.info.main,
                           "&:hover": {
                             borderColor: theme.palette.info.main,
-                            backgroundColor: alpha(theme.palette.info.main, 0.04),
+                            backgroundColor: alpha(
+                              theme.palette.info.main,
+                              0.04
+                            ),
                           },
                         }}
                       >
@@ -338,7 +376,11 @@ export const ReportsPage: React.FC = () => {
                 <Box>
                   <Typography
                     variant="h5"
-                    sx={{ fontWeight: 700, mb: 3, color: theme.palette.text.primary }}
+                    sx={{
+                      fontWeight: 700,
+                      mb: 3,
+                      color: theme.palette.text.primary,
+                    }}
                   >
                     Доступные отчеты
                   </Typography>
@@ -356,15 +398,28 @@ export const ReportsPage: React.FC = () => {
                               height: "100%",
                               cursor: "pointer",
                               borderRadius: 3,
-                              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                              border: `1px solid ${alpha(
+                                theme.palette.divider,
+                                0.1
+                              )}`,
                               background: `linear-gradient(135deg, 
-                                ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                                ${alpha(theme.palette.background.default, 0.6)} 100%)`,
+                                ${alpha(
+                                  theme.palette.background.paper,
+                                  0.9
+                                )} 0%, 
+                                ${alpha(
+                                  theme.palette.background.default,
+                                  0.6
+                                )} 100%)`,
                               backdropFilter: "blur(20px)",
-                              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                              transition:
+                                "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                               "&:hover": {
                                 transform: "translateY(-8px) scale(1.02)",
-                                boxShadow: `0 20px 40px ${alpha(type.color, 0.15)}`,
+                                boxShadow: `0 20px 40px ${alpha(
+                                  type.color,
+                                  0.15
+                                )}`,
                                 border: `1px solid ${alpha(type.color, 0.3)}`,
                               },
                             }}
@@ -376,12 +431,17 @@ export const ReportsPage: React.FC = () => {
                                   width: 48,
                                   height: 48,
                                   borderRadius: 2,
-                                  background: `linear-gradient(135deg, ${type.color}, ${alpha(type.color, 0.8)})`,
+                                  background: `linear-gradient(135deg, ${
+                                    type.color
+                                  }, ${alpha(type.color, 0.8)})`,
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
                                   mb: 2,
-                                  boxShadow: `0 8px 16px ${alpha(type.color, 0.3)}`,
+                                  boxShadow: `0 8px 16px ${alpha(
+                                    type.color,
+                                    0.3
+                                  )}`,
                                 }}
                               >
                                 {React.cloneElement(type.icon, {

@@ -13,6 +13,7 @@
     "search": "Search",
     "filter": "Filter",
     "refresh": "Refresh",
+    "retry": "Try Again",
     "export": "Export",
     "import": "Import",
     "close": "Close",
@@ -557,9 +558,23 @@
       "teamVelocity": "Team Velocity",
       "storyPointsPerSprint": "Story points per sprint"
     },
+    "charts": {
+      "title": "Activity Charts",
+      "subtitle": {
+        "expanded": "charts visible",
+        "collapsed": "charts hidden"
+      },
+      "projectTimeline": "Project Activity Timeline",
+      "statusDistribution": "Project Status Distribution",
+      "requirementsTimeline": "Requirements Timeline",
+      "projectProgress": "Project Progress Timeline",
+      "teamWorkload": "Team Workload Distribution",
+      "teamPerformance": "Team Performance Trend",
+      "projectStatus": "Project Status Distribution"
+    },
     "status": {
       "planning": "Planning",
-      "in_progress": "In Progress", 
+      "in_progress": "In Progress",
       "testing": "Testing",
       "completed": "Completed",
       "on_hold": "On Hold"
@@ -567,7 +582,7 @@
     "priority": {
       "low": "Low",
       "medium": "Medium",
-      "high": "High", 
+      "high": "High",
       "critical": "Critical"
     },
     "quickActions": {
@@ -598,6 +613,17 @@
         "critical": "Critical",
         "unknown": "Unknown"
       }
+    },
+    "error": {
+      "title": "Dashboard Component Error",
+      "description": "An unexpected error occurred while displaying the dashboard. Try refreshing the component.",
+      "retry": "Retry",
+      "details": "Details",
+      "technical": "Technical Information",
+      "message": "Error Message",
+      "stack": "Call Stack",
+      "component": "Component",
+      "unknown": "Unknown error"
     }
   },
   "system": {
@@ -613,8 +639,10 @@
   "projects": {
     "title": "Projects",
     "subtitle": "Project management and lifecycle",
+    "defaultTeam": "Project Team",
     "overview": {
-      "title": "Project Overview"
+      "title": "Project Overview",
+      "subtitle": "Active projects and their status"
     },
     "create": "Create Project",
     "createProject": "Create Project",
@@ -788,5 +816,36 @@
       "action": "Retry"
     },
     "loadingError": "Loading Error"
+  },
+  "status": {
+    "planning": "Planning",
+    "in_progress": "In Progress",
+    "testing": "Testing",
+    "completed": "Completed",
+    "on_hold": "On Hold"
+  },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "chart": {
+    "loading": "Loading data...",
+    "loading.desc": "Please wait",
+    "error": "Loading error",
+    "error.desc": "Failed to load chart data",
+    "empty": "No data",
+    "empty.desc": "No data available to display chart"
+  },
+  "projects": {
+    "defaultTeam": "Project Team",
+    "overview": {
+      "subtitle": "Active projects and their status"
+    }
+  },
+  "charts": {
+    "expand": "Expand",
+    "collapse": "Collapse"
   }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -13,10 +13,10 @@ import {
   MenuItem,
   Alert,
   CircularProgress,
-} from '@mui/material';
-import { useCreateProject } from '../model/useProjectQuery';
-import { useQueryUtils } from '@/shared/hooks/useQueryUtils';
-import { projectQueryKeys } from '../model/useProjectQuery';
+} from "@mui/material";
+import { useCreateProject } from "../model/useProjectQuery";
+import { useQueryUtils } from "@/shared/hooks/useQueryUtils";
+import { projectQueryKeys } from "../model/useProjectQuery";
 
 interface CreateProjectFormProps {
   open: boolean;
@@ -26,31 +26,34 @@ interface CreateProjectFormProps {
 interface ProjectFormData {
   name: string;
   description: string;
-  status: 'planning' | 'active' | 'completed';
-  priority: 'low' | 'medium' | 'high';
+  status: "planning" | "active" | "completed";
+  priority: "low" | "medium" | "high";
 }
 
-export const CreateProjectForm = ({ open, onClose }: CreateProjectFormProps) => {
+export const CreateProjectForm = ({
+  open,
+  onClose,
+}: CreateProjectFormProps) => {
   const [formData, setFormData] = useState<ProjectFormData>({
-    name: '',
-    description: '',
-    status: 'planning',
-    priority: 'medium',
+    name: "",
+    description: "",
+    status: "planning",
+    priority: "medium",
   });
   const [errors, setErrors] = useState<Partial<ProjectFormData>>({});
 
-  const { performOptimisticUpdate } = useQueryUtils();
+  const { invalidateQueries } = useQueryUtils();
   const createProjectMutation = useCreateProject();
 
   const validateForm = (): boolean => {
     const newErrors: Partial<ProjectFormData> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Название проекта обязательно';
+      newErrors.name = "Название проекта обязательно";
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Описание проекта обязательно';
+      newErrors.description = "Описание проекта обязательно";
     }
 
     setErrors(newErrors);
@@ -62,68 +65,53 @@ export const CreateProjectForm = ({ open, onClose }: CreateProjectFormProps) => 
 
     try {
       // Оптимистическое обновление - сразу показываем новый проект в списке
-      const optimisticProject = {
-        id: `temp-${Date.now()}`,
-        ...formData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      const { rollback, invalidate } = performOptimisticUpdate(
-        projectQueryKeys.lists(),
-        (oldData: any) => {
-          if (!oldData) return [optimisticProject];
-          return [optimisticProject, ...oldData];
-        }
-      );
-
       // Создаем проект на сервере
       await createProjectMutation.mutateAsync(formData);
 
       // Инвалидируем кэш для получения актуальных данных
-      invalidate();
+      await invalidateQueries(projectQueryKeys.lists() as any);
 
       // Закрываем форму и очищаем данные
       onClose();
       setFormData({
-        name: '',
-        description: '',
-        status: 'planning',
-        priority: 'medium',
+        name: "",
+        description: "",
+        status: "planning",
+        priority: "medium",
       });
       setErrors({});
-
     } catch (error) {
       // При ошибке откатываем оптимистическое обновление
-      console.error('Failed to create project:', error);
+      console.error("Failed to create project:", error);
     }
   };
 
   const handleChange = (field: keyof ProjectFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Очищаем ошибку при изменении поля
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Создать новый проект</DialogTitle>
-      
+
       <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           {createProjectMutation.isError && (
             <Alert severity="error">
-              Ошибка при создании проекта: {createProjectMutation.error?.message}
+              Ошибка при создании проекта:{" "}
+              {createProjectMutation.error?.message}
             </Alert>
           )}
 
           <TextField
             label="Название проекта"
             value={formData.name}
-            onChange={(e) => handleChange('name', e.target.value)}
+            onChange={(e) => handleChange("name", e.target.value)}
             error={!!errors.name}
             helperText={errors.name}
             fullWidth
@@ -133,7 +121,7 @@ export const CreateProjectForm = ({ open, onClose }: CreateProjectFormProps) => 
           <TextField
             label="Описание"
             value={formData.description}
-            onChange={(e) => handleChange('description', e.target.value)}
+            onChange={(e) => handleChange("description", e.target.value)}
             error={!!errors.description}
             helperText={errors.description}
             multiline
@@ -146,7 +134,7 @@ export const CreateProjectForm = ({ open, onClose }: CreateProjectFormProps) => 
             <InputLabel>Статус</InputLabel>
             <Select
               value={formData.status}
-              onChange={(e) => handleChange('status', e.target.value)}
+              onChange={(e) => handleChange("status", e.target.value)}
               label="Статус"
             >
               <MenuItem value="planning">Планирование</MenuItem>
@@ -159,7 +147,7 @@ export const CreateProjectForm = ({ open, onClose }: CreateProjectFormProps) => 
             <InputLabel>Приоритет</InputLabel>
             <Select
               value={formData.priority}
-              onChange={(e) => handleChange('priority', e.target.value)}
+              onChange={(e) => handleChange("priority", e.target.value)}
               label="Приоритет"
             >
               <MenuItem value="low">Низкий</MenuItem>
@@ -171,21 +159,22 @@ export const CreateProjectForm = ({ open, onClose }: CreateProjectFormProps) => 
       </DialogContent>
 
       <DialogActions>
-        <Button 
-          onClick={onClose} 
-          disabled={createProjectMutation.isPending}
-        >
+        <Button onClick={onClose} disabled={createProjectMutation.isPending}>
           Отмена
         </Button>
-        <Button 
-          onClick={handleSubmit} 
-          variant="contained" 
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
           disabled={createProjectMutation.isPending}
-          startIcon={createProjectMutation.isPending ? <CircularProgress size={20} /> : null}
+          startIcon={
+            createProjectMutation.isPending ? (
+              <CircularProgress size={20} />
+            ) : null
+          }
         >
-          {createProjectMutation.isPending ? 'Создание...' : 'Создать'}
+          {createProjectMutation.isPending ? "Создание..." : "Создать"}
         </Button>
       </DialogActions>
     </Dialog>
   );
-}; 
+};

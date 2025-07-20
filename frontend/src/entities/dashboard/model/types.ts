@@ -294,3 +294,49 @@ export interface MetricsFilters {
   period?: "1h" | "24h" | "7d" | "30d" | "90d";
   includeComparisons?: boolean;
 }
+
+// Chart Data Types
+export interface TimelineDataPoint {
+  date: Date | string;
+  value: number;
+  label: string;
+  category?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface DistributionDataPoint {
+  id: string;
+  label: string;
+  value: number;
+  percentage?: number;
+  color: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ChartData {
+  timeline: TimelineDataPoint[];
+  distribution: DistributionDataPoint[];
+  trends?: TrendDataPoint[];
+}
+
+export interface TrendDataPoint {
+  period: string;
+  metric: string;
+  value: number;
+  change: number;
+  direction: "up" | "down" | "stable";
+}
+
+export interface SystemMetrics {
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+  networkLatency: number;
+  uptime: number;
+  activeUsers: number;
+  responseTime: number;
+  errorRate: number;
+  throughput: number;
+  availability: number;
+  lastUpdated?: string;
+}

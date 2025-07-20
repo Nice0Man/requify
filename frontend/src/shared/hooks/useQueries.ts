@@ -50,7 +50,7 @@ export {
 // Dashboard queries
 export {
   useDashboardStats,
-  useRecentActivity,
+  useDashboardActivity,
   dashboardQueryKeys,
 } from "@/features/dashboard/model/useDashboardQuery";
 

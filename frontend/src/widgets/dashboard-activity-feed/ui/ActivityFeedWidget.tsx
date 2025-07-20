@@ -1,206 +1,278 @@
-import React, {
-  memo,
-  useState,
-  useCallback,
-  useMemo,
-  startTransition,
-} from "react";
+import React, { memo, useMemo, useState, useCallback } from "react";
 import {
   Box,
   Typography,
-  Stack,
-  IconButton,
-  Tooltip,
-  Skeleton,
-  Alert,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  CircularProgress,
   Button,
   Chip,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  useTheme,
-  alpha,
-  Fade,
-  Divider,
-  Collapse,
   TextField,
-  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
   Card,
-  CardHeader,
   CardContent,
+  Skeleton,
+  Divider,
 } from "@mui/material";
 import {
   Refresh,
   FilterList,
-  ExpandMore,
-  ExpandLess,
   Search,
-  ClearAll,
-  Timeline,
-  ViewList,
+  Person,
+  Business,
+  Assignment,
+  CheckCircle,
 } from "@mui/icons-material";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  useTheme as useThemeMode,
-  useLoadingState,
-} from "@/shared/contexts/PerformanceContext";
-import {
-  useRenderTracker,
-  usePerformanceMeasure,
-  useDebounced,
-} from "@/shared/hooks/usePerformanceOptimizations";
-import i18n from "@/shared/lib/i18n";
-
-import {
-  type ActivityItem as ActivityItemType,
-  type ActivityFilters,
-  ActivityType,
-  ActivityStatus,
-  Priority,
-} from "@/entities/dashboard";
-import { ActivityItem } from "@/entities/dashboard/ui/ActivityItem";
 import {
   useActivityFeedWithFilters,
-  useRecentActivity,
-  dashboardQueryKeys,
-} from "@/features/dashboard/model/queries";
+  useDashboardActivity,
+} from "@/features/dashboard";
+import type { ActivityItem, ActivityFilters } from "@/entities/dashboard";
+import { useDebounced } from "@/shared/hooks/usePerformanceOptimizations";
 
-interface ActivityFeedWidgetProps {
-  variant?: "minimal" | "detailed" | "compact";
-  maxItems?: number;
-  showFilters?: boolean;
-  showSearch?: boolean;
-  showHeader?: boolean;
-  showLoadMore?: boolean;
-  infiniteScroll?: boolean;
-  autoRefresh?: boolean;
-  refreshInterval?: number;
-  filters?: ActivityFilters;
-  onActivityClick?: (activity: ActivityItemType) => void;
-  className?: string;
+// Safe activity item type with all fields optional
+interface SafeActivityItem {
+  id?: string | number;
+  type?: string;
+  title?: string;
+  description?: string;
+  user?: {
+    id?: string | number;
+    name?: string;
+    avatar?: string;
+  };
+  timestamp?: string;
+  status?: string;
+  projectId?: string | number;
+  metadata?: Record<string, any>;
 }
 
+// Props interface
+interface ActivityFeedWidgetProps {
+  maxItems?: number;
+  infiniteScroll?: boolean;
+  showFilters?: boolean;
+  className?: string;
+  title?: string;
+  emptyMessage?: string;
+  refreshable?: boolean;
+  externalFilters?: Partial<ActivityFilters>;
+}
+
+// Safe data transformation function
+const transformActivityData = (rawData: any): SafeActivityItem[] => {
+  if (!rawData) return [];
+
+  // Handle infinite query data
+  if (rawData.pages && Array.isArray(rawData.pages)) {
+    return rawData.pages
+      .filter((page: any) => page && typeof page === "object")
+      .flatMap((page: any) => {
+        const items = page.items || page.data || page.activities || [];
+        return Array.isArray(items) ? items : [];
+      })
+      .filter((item: any) => item && typeof item === "object")
+      .map(transformSingleItem);
+  }
+
+  // Handle regular query data
+  if (rawData.items && Array.isArray(rawData.items)) {
+    return rawData.items
+      .filter((item: any) => item && typeof item === "object")
+      .map(transformSingleItem);
+  }
+
+  // Handle direct array
+  if (Array.isArray(rawData)) {
+    return rawData
+      .filter((item: any) => item && typeof item === "object")
+      .map(transformSingleItem);
+  }
+
+  return [];
+};
+
+// Transform single activity item safely
+const transformSingleItem = (item: any): SafeActivityItem => {
+  if (!item || typeof item !== "object") {
+    return { id: Math.random(), title: "Unknown Activity", type: "unknown" };
+  }
+
+  return {
+    id: item.id || item._id || Math.random(),
+    type: typeof item.type === "string" ? item.type : "unknown",
+    title: typeof item.title === "string" ? item.title : "Untitled Activity",
+    description: typeof item.description === "string" ? item.description : "",
+    user:
+      item.user && typeof item.user === "object"
+        ? {
+            id: item.user.id || item.user._id,
+            name:
+              typeof item.user.name === "string"
+                ? item.user.name
+                : "Unknown User",
+            avatar:
+              typeof item.user.avatar === "string"
+                ? item.user.avatar
+                : undefined,
+          }
+        : undefined,
+    timestamp:
+      typeof item.timestamp === "string"
+        ? item.timestamp
+        : typeof item.createdAt === "string"
+        ? item.createdAt
+        : new Date().toISOString(),
+    status: typeof item.status === "string" ? item.status : "active",
+    projectId: item.projectId || item.project_id,
+    metadata:
+      item.metadata && typeof item.metadata === "object" ? item.metadata : {},
+  };
+};
+
+// Loading skeleton component
+const ActivitySkeleton = memo(() => (
+  <List>
+    {Array.from({ length: 5 }, (_, index) => (
+      <ListItem key={index}>
+        <ListItemAvatar>
+          <Skeleton variant="circular" width={40} height={40} />
+        </ListItemAvatar>
+        <ListItemText
+          primary={<Skeleton variant="text" width="60%" />}
+          secondary={<Skeleton variant="text" width="80%" />}
+        />
+      </ListItem>
+    ))}
+  </List>
+));
+
+// Activity item component
+const ActivityItemComponent = memo<{ item: SafeActivityItem }>(({ item }) => {
+  const getIcon = () => {
+    switch (item.type) {
+      case "user":
+        return <Person />;
+      case "project":
+        return <Business />;
+      case "requirement":
+        return <Assignment />;
+      case "completed":
+        return <CheckCircle />;
+      default:
+        return <Person />;
+    }
+  };
+
+  const formatTimestamp = (timestamp?: string) => {
+    if (!timestamp) return "";
+    try {
+      return new Date(timestamp).toLocaleString();
+    } catch {
+      return "";
+    }
+  };
+
+  return (
+    <ListItem divider>
+      <ListItemAvatar>
+        <Avatar src={item.user?.avatar}>
+          {item.user?.name?.[0] || getIcon()}
+        </Avatar>
+      </ListItemAvatar>
+      <ListItemText
+        primary={
+          <Box component="span" display="flex" alignItems="center" gap={1}>
+            <Typography component="span" variant="body2" fontWeight="medium">
+              {item.title}
+            </Typography>
+            {item.status && (
+              <Chip
+                label={item.status}
+                size="small"
+                color={item.status === "completed" ? "success" : "default"}
+              />
+            )}
+          </Box>
+        }
+        secondary={
+          <Box component="span" display="block">
+            {item.description && (
+              <Typography component="span" variant="body2" color="text.secondary" display="block">
+                {item.description}
+              </Typography>
+            )}
+            <Typography component="span" variant="caption" color="text.secondary" display="block">
+              {item.user?.name && `${item.user.name} • `}
+              {formatTimestamp(item.timestamp)}
+            </Typography>
+          </Box>
+        }
+      />
+    </ListItem>
+  );
+});
+
+// Main component
 export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
   ({
-    variant = "detailed",
     maxItems = 10,
-    showFilters = true,
-    showSearch = true,
-    showHeader = true,
-    showLoadMore = false,
     infiniteScroll = false,
-    autoRefresh = false,
-    refreshInterval = 30000,
-    filters: externalFilters,
-    onActivityClick,
+    showFilters = true,
     className,
+    title = "Recent Activity",
+    emptyMessage = "No recent activity",
+    refreshable = true,
+    externalFilters,
   }) => {
-    // Performance monitoring
-    useRenderTracker("ActivityFeedWidget");
-    usePerformanceMeasure("ActivityFeedWidget");
+    // Local state
+    const [searchTerm, setSearchTerm] = useState("");
+    const [typeFilter, setTypeFilter] = useState<string>("all");
+    const [statusFilter, setStatusFilter] = useState<string>("all");
 
-    // Hooks and services
-    const t = i18n.t;
-    const muiTheme = useTheme();
-    const uthemeMode = useThemeMode();
-    const { isLoading: globalLoading } = useLoadingState();
-    const queryClient = useQueryClient();
+    // Debounced search
+    const debouncedSearch = useDebounced(searchTerm, 300);
 
-    // Context7 Design System - 8px grid spacing
-    const spacing = useMemo(
-      () => ({
-        xs: 8, // 8px
-        sm: 16, // 16px
-        md: 24, // 24px
-        lg: 32, // 32px
-        xl: 40, // 40px
-        xxl: 48, // 48px
-      }),
-      []
-    );
-
-    // Context7 Animation System
-    const animations = useMemo(
-      () => ({
-        fast: {
-          duration: 150,
-          easing: "cubic-bezier(0.4, 0.0, 0.2, 1)",
-        },
-        standard: {
-          duration: 300,
-          easing: "cubic-bezier(0.4, 0.0, 0.2, 1)",
-        },
-        complex: {
-          duration: 500,
-          easing: "cubic-bezier(0.4, 0.0, 0.2, 1)",
-        },
-        entrance: {
-          duration: 400,
-          easing: "cubic-bezier(0.0, 0.0, 0.2, 1)",
-        },
-      }),
-      []
-    );
-
-    // Context7 Color System
-    const colors = useMemo(
-      () => ({
-        surface: {
-          primary: muiTheme.palette.background.paper,
-          secondary: alpha(muiTheme.palette.background.paper, 0.6),
-          elevated: alpha(muiTheme.palette.background.paper, 0.9),
-        },
-        accent: {
-          primary: muiTheme.palette.primary.main,
-          secondary: muiTheme.palette.secondary.main,
-          success: muiTheme.palette.success.main,
-          warning: muiTheme.palette.warning.main,
-          error: muiTheme.palette.error.main,
-          info: muiTheme.palette.info.main,
-        },
-        elevation: {
-          subtle: `0 2px 8px ${alpha(muiTheme.palette.common.black, 0.04)}`,
-          medium: `0 4px 16px ${alpha(muiTheme.palette.common.black, 0.08)}`,
-          high: `0 8px 32px ${alpha(muiTheme.palette.common.black, 0.12)}`,
-          extreme: `0 16px 64px ${alpha(muiTheme.palette.common.black, 0.16)}`,
-        },
-      }),
-      [muiTheme.palette]
-    );
-
-    // Responsive breakpoints for Context7
-    const isCompact = variant === "compact" || variant === "minimal";
-
-    // Local state with optimized handling
-    const [isExpanded, setIsExpanded] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [localFilters, setLocalFilters] = useState<ActivityFilters>({});
-    const [filterMenuAnchor, setFilterMenuAnchor] =
-      useState<null | HTMLElement>(null);
-    const [viewMode, setViewMode] = useState<"list" | "timeline">("list");
-
-    // Debounced search for better performance
-    const debouncedSearchQuery = useDebounced(searchQuery, 300);
-
-    // Combine external and local filters
-    const combinedFilters = useMemo(
-      () => ({
+    // Combine filters safely
+    const combinedFilters = useMemo(() => {
+      const filters: ActivityFilters = {
         ...externalFilters,
-        ...localFilters,
         limit: infiniteScroll ? undefined : maxItems,
-      }),
-      [externalFilters, localFilters, infiniteScroll, maxItems]
+      };
+
+      // Note: ActivityFilters doesn't have search property
+      // Search will be handled client-side in the component
+
+      if (typeFilter !== "all") {
+        // Convert string to ActivityType array
+        filters.type = [typeFilter as any];
+      }
+
+      if (statusFilter !== "all") {
+        // Convert string to ActivityStatus array
+        filters.status = [statusFilter as any];
+      }
+
+      return filters;
+    }, [externalFilters, typeFilter, statusFilter, infiniteScroll, maxItems]);
+
+    // Fetch data with safe error handling
+    const infiniteQuery = useActivityFeedWithFilters(
+      infiniteScroll ? combinedFilters : undefined
+    );
+    const regularQuery = useDashboardActivity(
+      !infiniteScroll ? combinedFilters : undefined
     );
 
-    // Queries - always call hooks in the same order
-    const infiniteQueryResult = useActivityFeedWithFilters(combinedFilters);
-    const regularQueryResult = useRecentActivity(combinedFilters);
-
-    // Choose which result to use based on infiniteScroll prop
-    const queryResult = infiniteScroll
-      ? infiniteQueryResult
-      : regularQueryResult;
+    // Choose appropriate query result
+    const queryResult = infiniteScroll ? infiniteQuery : regularQuery;
 
     const {
       data: rawData,
@@ -209,674 +281,193 @@ export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
       isError,
       refetch,
       isFetching,
-    } = queryResult;
+    } = queryResult || {};
 
-    // Normalize data to always be an array
-    const activities = useMemo((): ActivityItemType[] => {
+    // Transform data safely and apply client-side filtering
+    const activities = useMemo(() => {
       try {
-        if (!rawData) return [];
+        let items = transformActivityData(rawData);
 
-        if (infiniteScroll) {
-          // For infinite query, flatten pages
-          const infiniteData = rawData as any;
-          const pages = infiniteData?.pages;
-
-          if (!pages || !Array.isArray(pages)) {
-            console.warn(
-              "ActivityFeedWidget: Invalid pages structure in infinite query"
-            );
-            return [];
-          }
-
-          return pages.flatMap((page: any) => {
-            if (!page || typeof page !== "object") return [];
-
-            // Handle different response structures
-            const pageData = page.data || page;
-            if (!Array.isArray(pageData)) return [];
-
-            return pageData.filter(
-              (item: any) => item && typeof item === "object"
-            );
-          });
-        }
-
-        // For regular query, data is already an array
-        if (!Array.isArray(rawData)) {
-          console.warn(
-            "ActivityFeedWidget: Invalid data structure in regular query"
+        // Apply client-side search filter
+        if (debouncedSearch && debouncedSearch.trim()) {
+          const searchTerm = debouncedSearch.toLowerCase();
+          items = items.filter(
+            (item) =>
+              item.title?.toLowerCase().includes(searchTerm) ||
+              item.description?.toLowerCase().includes(searchTerm) ||
+              item.user?.name?.toLowerCase().includes(searchTerm)
           );
-          return [];
         }
 
-        return (rawData as ActivityItemType[]).filter(
-          (item: any) => item && typeof item === "object"
-        );
-      } catch (error) {
-        console.error(
-          "ActivityFeedWidget: Error processing activities data:",
-          error
-        );
+        return items;
+      } catch (err) {
+        console.error("Error transforming activity data:", err);
         return [];
       }
-    }, [rawData, infiniteScroll]);
+    }, [rawData, debouncedSearch]);
 
-    // Auto refresh
-    React.useEffect(() => {
-      if (!autoRefresh || !refreshInterval) return;
-
-      const interval = setInterval(() => {
-        refetch();
-      }, refreshInterval);
-
-      return () => clearInterval(interval);
-    }, [autoRefresh, refreshInterval, refetch]);
-
-    // Filter activities by debounced search query for performance
-    const filteredActivities = useMemo(() => {
-      // Ensure activities is always an array
-      const safeActivities = Array.isArray(activities) ? activities : [];
-
-      if (!debouncedSearchQuery.trim()) return safeActivities;
-
-      const query = debouncedSearchQuery.toLowerCase();
-      return safeActivities.filter(
-        (activity) =>
-          activity?.title?.toLowerCase().includes(query) ||
-          activity?.description?.toLowerCase().includes(query) ||
-          activity?.userName?.toLowerCase().includes(query)
-      );
-    }, [activities, debouncedSearchQuery]);
-
-    // Optimized event handlers with memoization
+    // Handle refresh
     const handleRefresh = useCallback(() => {
-      startTransition(() => {
+      if (refetch && typeof refetch === "function") {
         refetch();
-        // Инвалидируем кэш для более полного обновления
-        queryClient.invalidateQueries({
-          queryKey: dashboardQueryKeys.activity(),
-        });
-      });
-    }, [refetch, queryClient]);
+      }
+    }, [refetch]);
 
-    const handleToggleExpanded = useCallback(() => {
-      startTransition(() => {
-        setIsExpanded((prev) => !prev);
-      });
-    }, []);
+    // Handle load more for infinite scroll
+    const handleLoadMore = useCallback(() => {
+      if (
+        infiniteScroll &&
+        infiniteQuery?.fetchNextPage &&
+        infiniteQuery?.hasNextPage
+      ) {
+        infiniteQuery.fetchNextPage();
+      }
+    }, [infiniteScroll, infiniteQuery]);
 
-    const handleFilterMenuOpen = useCallback(
-      (event: React.MouseEvent<HTMLElement>) => {
-        setFilterMenuAnchor(event.currentTarget);
-      },
-      []
-    );
-
-    const handleFilterMenuClose = useCallback(() => {
-      setFilterMenuAnchor(null);
-    }, []);
-
-    const handleFilterChange = useCallback(
-      (key: keyof ActivityFilters, value: any) => {
-        setLocalFilters((prev) => ({
-          ...prev,
-          [key]: value,
-        }));
-        handleFilterMenuClose();
-      },
-      [handleFilterMenuClose]
-    );
-
-    const handleClearFilters = useCallback(() => {
-      setLocalFilters({});
-      setSearchQuery("");
-      handleFilterMenuClose();
-    }, [handleFilterMenuClose]);
-
-    const handleSearchChange = useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(event.target.value);
-      },
-      []
-    );
-
-    // Filter stats
-    const filterStats = useMemo(() => {
-      const hasFilters =
-        Object.keys(localFilters).length > 0 || searchQuery.trim().length > 0;
-      const activeFiltersCount =
-        Object.values(localFilters).filter(Boolean).length;
-
-      return { hasFilters, activeFiltersCount };
-    }, [localFilters, searchQuery]);
-
-    // Context7 Loading States
-    if (isLoading) {
-      return (
-        <Card
-          className={className}
-          sx={{
-            borderRadius: 3,
-            border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-            boxShadow: `0 2px 20px ${alpha(
-              muiTheme.palette.common.black,
-              0.04
-            )}`,
-            background: muiTheme.palette.background.paper,
-            overflow: "hidden",
-          }}
-        >
-          {showHeader && (
-            <CardHeader
-              avatar={
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 2,
-                    background: `linear-gradient(135deg, ${muiTheme.palette.primary.main}, ${muiTheme.palette.secondary.main})`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Timeline sx={{ color: "white", fontSize: 20 }} />
-                </Box>
-              }
-              title={
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, fontSize: "1.1rem" }}
-                >
-                  {t("dashboard.recentActivity")}
-                </Typography>
-              }
-              action={
-                <IconButton
-                  size="small"
-                  sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(muiTheme.palette.divider, 0.1)}`,
-                    "&:hover": {
-                      backgroundColor: alpha(
-                        muiTheme.palette.primary.main,
-                        0.04
-                      ),
-                      borderColor: alpha(muiTheme.palette.primary.main, 0.2),
-                    },
-                  }}
-                >
-                  <Refresh />
-                </IconButton>
-              }
-              sx={{ pb: 1 }}
-            />
-          )}
-
-          <CardContent sx={{ pt: showHeader ? 0 : 3 }}>
-            <Stack spacing={2}>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(
-                      muiTheme.palette.divider,
-                      0.08
-                    )}`,
-                    background: muiTheme.palette.background.paper,
-                  }}
-                >
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Skeleton
-                      variant="circular"
-                      width={isCompact ? 32 : 40}
-                      height={isCompact ? 32 : 40}
-                    />
-                    <Box sx={{ flex: 1 }}>
-                      <Skeleton variant="text" width="80%" height={20} />
-                      <Skeleton
-                        variant="text"
-                        width="60%"
-                        height={16}
-                        sx={{ mt: 0.5 }}
-                      />
-                    </Box>
-                    <Skeleton variant="text" width={60} height={16} />
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    // Context7 Error State
+    // Render error state
     if (isError) {
       return (
-        <Card
-          className={className}
-          sx={{
-            borderRadius: 3,
-            border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-            boxShadow: `0 2px 20px ${alpha(
-              muiTheme.palette.common.black,
-              0.04
-            )}`,
-            background: muiTheme.palette.background.paper,
-          }}
-        >
-          <CardContent sx={{ p: 3 }}>
-            <Stack spacing={2} alignItems="center">
-              <Timeline
-                sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
-              />
-              <Typography color="error" variant="body2" textAlign="center">
-                {t("errors.loadingError")}:{" "}
+        <Card className={className}>
+          <CardContent>
+            <Box textAlign="center" py={3}>
+              <Typography color="error" gutterBottom>
+                Ошибка загрузки активности
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
                 {error?.message || "Неизвестная ошибка"}
               </Typography>
+              {refreshable && (
               <Button
+                  startIcon={<Refresh />}
                 onClick={handleRefresh}
+                  variant="outlined"
                 size="small"
-                variant="outlined"
-                sx={{ textTransform: "none" }}
-                disabled={isFetching}
               >
-                {t("common.retry", "Try Again")}
+                  Повторить
               </Button>
-            </Stack>
+              )}
+            </Box>
           </CardContent>
         </Card>
       );
     }
 
     return (
-      <Card
-        className={className}
-        sx={{
-          borderRadius: 3,
-          border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-          boxShadow: `0 2px 20px ${alpha(muiTheme.palette.common.black, 0.04)}`,
-          background: muiTheme.palette.background.paper,
-          overflow: "hidden",
-        }}
-      >
-        {/* Context7 Modern Header */}
-        {showHeader && (
-          <CardHeader
-            avatar={
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 2,
-                  background: `linear-gradient(135deg, ${muiTheme.palette.primary.main}, ${muiTheme.palette.secondary.main})`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Timeline sx={{ color: "white", fontSize: 20 }} />
-              </Box>
-            }
-            title={
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 600, fontSize: "1.1rem" }}
-                >
-                  {t("dashboard.recentActivity")}
-                </Typography>
-                {filterStats.hasFilters && (
-                  <Chip
-                    label={filterStats.activeFiltersCount}
-                    size="small"
-                    color="primary"
-                    sx={{ fontSize: "0.7rem", height: 20 }}
-                  />
-                )}
-              </Box>
-            }
-            action={
-              <Stack direction="row" spacing={1}>
-                {/* View mode toggle */}
-                <Tooltip
-                  title={viewMode === "list" ? "Timeline view" : "List view"}
-                >
-                  <IconButton
-                    size="small"
-                    onClick={() =>
-                      setViewMode((prev) =>
-                        prev === "list" ? "timeline" : "list"
-                      )
-                    }
-                    sx={{
-                      borderRadius: 2,
-                      border: `1px solid ${alpha(
-                        muiTheme.palette.divider,
-                        0.1
-                      )}`,
-                      "&:hover": {
-                        backgroundColor: alpha(
-                          muiTheme.palette.primary.main,
-                          0.04
-                        ),
-                        borderColor: alpha(muiTheme.palette.primary.main, 0.2),
-                      },
-                    }}
-                  >
-                    {viewMode === "list" ? <Timeline /> : <ViewList />}
-                  </IconButton>
-                </Tooltip>
-
-                {/* Filters */}
-                {showFilters && (
-                  <Tooltip title={t("common.filters")}>
-                    <IconButton
-                      size="small"
-                      onClick={handleFilterMenuOpen}
-                      sx={{
-                        borderRadius: 2,
-                        border: `1px solid ${alpha(
-                          muiTheme.palette.divider,
-                          0.1
-                        )}`,
-                        "&:hover": {
-                          backgroundColor: alpha(
-                            muiTheme.palette.primary.main,
-                            0.04
-                          ),
-                          borderColor: alpha(
-                            muiTheme.palette.primary.main,
-                            0.2
-                          ),
-                        },
-                        ...(filterStats.hasFilters && {
-                          backgroundColor: alpha(
-                            muiTheme.palette.primary.main,
-                            0.04
-                          ),
-                          borderColor: alpha(
-                            muiTheme.palette.primary.main,
-                            0.2
-                          ),
-                        }),
-                      }}
-                    >
-                      <FilterList />
-                    </IconButton>
-                  </Tooltip>
-                )}
-
-                {/* Refresh */}
-                <Tooltip title={t("common.refresh")}>
-                  <span>
-                    <IconButton
-                      size="small"
-                      onClick={handleRefresh}
-                      disabled={isFetching}
-                      sx={{
-                        borderRadius: 2,
-                        border: `1px solid ${alpha(
-                          muiTheme.palette.divider,
-                          0.1
-                        )}`,
-                        "&:hover": {
-                          backgroundColor: alpha(
-                            muiTheme.palette.primary.main,
-                            0.04
-                          ),
-                          borderColor: alpha(
-                            muiTheme.palette.primary.main,
-                            0.2
-                          ),
-                        },
-                      }}
-                    >
-                      <Refresh 
-                        sx={{
-                          ...(isFetching && {
-                            animation: "spin 1s linear infinite",
-                            "@keyframes spin": {
-                              "0%": { transform: "rotate(0deg)" },
-                              "100%": { transform: "rotate(360deg)" },
-                            },
-                          }),
-                        }}
-                      />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-
-                {/* Expand/Collapse */}
-                <Tooltip
-                  title={isExpanded ? t("common.collapse") : t("common.expand")}
-                >
-                  <IconButton
-                    size="small"
-                    onClick={handleToggleExpanded}
-                    sx={{
-                      borderRadius: 2,
-                      border: `1px solid ${alpha(
-                        muiTheme.palette.divider,
-                        0.1
-                      )}`,
-                      "&:hover": {
-                        backgroundColor: alpha(
-                          muiTheme.palette.primary.main,
-                          0.04
-                        ),
-                        borderColor: alpha(muiTheme.palette.primary.main, 0.2),
-                      },
-                    }}
-                  >
-                    {isExpanded ? <ExpandLess /> : <ExpandMore />}
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            }
-            sx={{ pb: 1 }}
-          />
-        )}
-
-        <CardContent sx={{ pt: showHeader ? 0 : 3 }}>
-          {/* Context7 Enhanced Search */}
-          {showSearch && isExpanded && (
-            <Box mb={2}>
-              <TextField
+      <Card className={className}>
+        <CardContent>
+          {/* Header */}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography variant="h6" component="h2">
+              {title}
+            </Typography>
+            {refreshable && (
+              <Button
+                startIcon={<Refresh />}
+                onClick={handleRefresh}
+                disabled={isLoading || isFetching}
                 size="small"
-                placeholder={t("common.search")}
-                value={searchQuery}
-                onChange={handleSearchChange}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search fontSize="small" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                    "&:hover": {
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: alpha(muiTheme.palette.primary.main, 0.3),
-                      },
-                    },
-                    "&.Mui-focused": {
-                      "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: muiTheme.palette.primary.main,
-                      },
-                    },
-                  },
-                }}
-              />
+              >
+                Обновить
+              </Button>
+                )}
+              </Box>
+
+          {/* Filters */}
+          {showFilters && (
+            <Box mb={2}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="Поиск активности..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    InputProps={{
+                      startAdornment: <Search fontSize="small" />,
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Тип</InputLabel>
+                    <Select
+                      value={typeFilter}
+                      onChange={(e) => setTypeFilter(e.target.value)}
+                      label="Тип"
+                    >
+                      <MenuItem value="all">Все</MenuItem>
+                      <MenuItem value="user">Пользователи</MenuItem>
+                      <MenuItem value="project">Проекты</MenuItem>
+                      <MenuItem value="requirement">Требования</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Статус</InputLabel>
+                    <Select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      label="Статус"
+                    >
+                      <MenuItem value="all">Все</MenuItem>
+                      <MenuItem value="active">Активные</MenuItem>
+                      <MenuItem value="completed">Завершенные</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
             </Box>
           )}
 
-          {/* Context7 Enhanced Content */}
-          <Collapse in={isExpanded} timeout={300}>
-            {filteredActivities.length === 0 ? (
-              <Box
-                sx={{
-                  textAlign: "center",
-                  py: 4,
-                  color: muiTheme.palette.text.secondary,
-                }}
-              >
-                <Timeline sx={{ fontSize: 48, opacity: 0.5, mb: 1 }} />
-                <Typography variant="body2">
-                  {searchQuery
-                    ? t("common.noSearchResults")
-                    : t("dashboard.noActivity")}
-                </Typography>
+          {/* Content */}
+          {isLoading ? (
+            <ActivitySkeleton />
+          ) : activities.length === 0 ? (
+            <Box textAlign="center" py={4}>
+              <Typography color="text.secondary">{emptyMessage}</Typography>
               </Box>
             ) : (
-              <Stack spacing={1}>
-                {filteredActivities.map((activity, index) => (
-                  <Fade
-                    key={activity.id}
-                    in
-                    timeout={400}
-                    style={{ transitionDelay: `${index * 50}ms` }}
-                  >
-                    <Box
-                      sx={{
-                        p: 2,
-                        borderRadius: 2,
-                        border: `1px solid ${alpha(
-                          muiTheme.palette.divider,
-                          0.05
-                        )}`,
-                        background: muiTheme.palette.background.paper,
-                        transition: "all 0.2s ease-in-out",
-                        cursor: onActivityClick ? "pointer" : "default",
-                        "&:hover": onActivityClick
-                          ? {
-                              boxShadow: muiTheme.shadows[4],
-                              transform: "translateY(-2px)",
-                              borderColor: alpha(
-                                muiTheme.palette.primary.main,
-                                0.2
-                              ),
-                            }
-                          : {},
-                      }}
-                      onClick={() => onActivityClick?.(activity)}
-                    >
-                      <ActivityItem
-                        activity={activity}
-                        variant={variant}
-                        onClick={onActivityClick}
-                        showAvatar={variant !== "minimal"}
-                        showStatus={variant === "detailed"}
-                        showPriority={variant === "detailed"}
-                      />
-                    </Box>
-                  </Fade>
+            <>
+              <List disablePadding>
+                {activities.slice(0, maxItems).map((activity) => (
+                  <ActivityItemComponent key={activity.id} item={activity} />
                 ))}
+              </List>
 
-                {/* Load more button */}
-                {showLoadMore && filteredActivities.length >= maxItems && (
+              {/* Load more button for infinite scroll */}
+              {infiniteScroll && infiniteQuery?.hasNextPage && (
                   <Box textAlign="center" mt={2}>
                     <Button
-                      variant="outlined"
-                      onClick={() => {
-                        /* TODO: Implement load more */
-                      }}
-                      disabled={isFetching}
-                      sx={{
-                        textTransform: "none",
-                        borderRadius: 2,
-                      }}
-                    >
-                      {t("common.loadMore", "Загрузить ещё")}
+                    onClick={handleLoadMore}
+                    disabled={infiniteQuery?.isFetchingNextPage}
+                    startIcon={
+                      infiniteQuery?.isFetchingNextPage ? (
+                        <CircularProgress size={16} />
+                      ) : undefined
+                    }
+                  >
+                    {infiniteQuery?.isFetchingNextPage
+                      ? "Загрузка..."
+                      : "Загрузить ещё"}
                     </Button>
                   </Box>
                 )}
-              </Stack>
+            </>
             )}
-          </Collapse>
         </CardContent>
-
-        {/* Context7 Enhanced Filter Menu */}
-        <Menu
-          anchorEl={filterMenuAnchor}
-          open={Boolean(filterMenuAnchor)}
-          onClose={handleFilterMenuClose}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-          PaperProps={{
-            sx: {
-              borderRadius: 2,
-              border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-              boxShadow: muiTheme.shadows[8],
-              minWidth: 200,
-            },
-          }}
-        >
-          {[
-            {
-              label: "Проекты",
-              value: [ActivityType.PROJECT_CREATED],
-              key: "type",
-            },
-            {
-              label: "Требования",
-              value: [ActivityType.REQUIREMENT_CREATED],
-              key: "type",
-            },
-            {
-              label: "Релизы",
-              value: [ActivityType.RELEASE_CREATED],
-              key: "type",
-            },
-            {
-              label: "Завершённые",
-              value: [ActivityStatus.COMPLETED],
-              key: "status",
-            },
-            {
-              label: "Высокий приоритет",
-              value: [Priority.HIGH],
-              key: "priority",
-            },
-          ].map((filter, index) => (
-            <MenuItem
-              key={index}
-              onClick={() =>
-                handleFilterChange(
-                  filter.key as keyof ActivityFilters,
-                  filter.value
-                )
-              }
-              sx={{
-                "&:hover": {
-                  backgroundColor: alpha(muiTheme.palette.primary.main, 0.04),
-                },
-              }}
-            >
-              <ListItemText>{filter.label}</ListItemText>
-            </MenuItem>
-          ))}
-
-          <Divider />
-
-          <MenuItem onClick={handleClearFilters}>
-            <ListItemIcon>
-              <ClearAll fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>
-              {t("common.clearFilters", "Очистить фильтры")}
-            </ListItemText>
-          </MenuItem>
-        </Menu>
       </Card>
     );
   }
 );
 
 ActivityFeedWidget.displayName = "ActivityFeedWidget";
+ActivityItemComponent.displayName = "ActivityItemComponent";
+
+export default ActivityFeedWidget;

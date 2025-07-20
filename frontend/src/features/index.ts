@@ -1,11 +1,13 @@
-// Feature exports
+// Feature exports - using specific exports to avoid clearError conflicts
 export * from "./auth";
 export * from "./dashboard";
 export * from "./navigation";
-export * from "./project-management";
-export * from "./requirement-management";
-export * from "./release-management";
-export * from "./test-management";
-export * from "./notification-management";
-export * from "./admin-panel";
 export * from "./kanban-management";
+
+// Specific exports to avoid clearError naming conflicts
+export { useProjectManagement } from "./project-management";
+// export { useRequirementManagement } from "./requirement-management";
+// export { useReleaseManagement } from "./release-management";
+// export { useTestManagement } from "./test-management";
+export { useNotificationManagement } from "./notification-management";
+export { useAdminPanel } from "./admin-panel";

@@ -5,32 +5,31 @@ import React, {
   startTransition,
   Suspense,
   useDeferredValue,
+  useEffect,
 } from "react";
 import {
   Box,
   Typography,
-  Stack,
+  Grid,
   IconButton,
   Tooltip,
   useTheme,
   alpha,
   Alert,
-  Chip,
-  Skeleton,
   CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
-import {
-  Refresh,
-  ViewModule,
-  ViewQuilt,
-  TrendingUp,
-  Speed,
-  Update,
-} from "@mui/icons-material";
+import { Refresh } from "@mui/icons-material";
 import i18n from "@/shared/lib/i18n";
 import { useQueryClient } from "@tanstack/react-query";
+import { DashboardErrorBoundary } from "@/shared/ui";
 
 import { DashboardLayout } from "@/widgets/layout";
+import {
+  DashboardContainer,
+  DashboardMode,
+  DashboardLayout as DashboardLayoutType,
+} from "@/widgets/dashboard-container";
 import { QuickActionsWidget } from "@/widgets";
 import { ProjectOverviewWidget } from "@/widgets/project-overview";
 import { SystemHealthWidget } from "@/widgets/system-health";
@@ -44,9 +43,10 @@ import {
   useDashboardOverview,
   useRefreshDashboard,
   useSystemMetrics,
+  useTimelineData,
+  useDistributionData,
   dashboardKeys,
 } from "@/features/dashboard";
-import type { DashboardMetric } from "@/features/dashboard";
 import { useLayoutMode } from "@/shared/contexts/PerformanceContext";
 
 export interface DashboardPageProps {
@@ -54,147 +54,30 @@ export interface DashboardPageProps {
 }
 
 /**
- * Status Chips Component - Memoized for performance
+ * Activity Feed Section Component
  */
-const StatusChips = memo<{ overview: any }>(({ overview }) => {
-  const t = i18n.t;
-
-  if (!overview?.stats) return null;
-
-  const chipData = [
-    {
-      label: `${overview.stats.totalProjects || 0} ${t(
-        "projects",
-        "projects"
-      )}`,
-      color: "primary" as const,
-      icon: <Speed sx={{ fontSize: 16 }} />,
-    },
-    {
-      label: `${overview.stats.totalRequirements || 0} ${t(
-        "requirements",
-        "requirements"
-      )}`,
-      color: "secondary" as const,
-      icon: <TrendingUp sx={{ fontSize: 16 }} />,
-    },
-    {
-      label: `${overview.stats.completedTasks || 0} ${t(
-        "completed",
-        "completed"
-      )}`,
-      color: "success" as const,
-      icon: <Update sx={{ fontSize: 16 }} />,
-    },
-  ];
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 1,
-        mb: 2,
-      }}
-    >
-      {chipData.map((chip) => (
-        <Chip
-          key={chip.label}
-          icon={chip.icon}
-          label={chip.label}
-          color={chip.color}
-          variant="outlined"
-          size="small"
-          sx={{
-            height: 28,
-            "& .MuiChip-icon": {
-              fontSize: 16,
-            },
-          }}
-        />
-      ))}
-    </Box>
-  );
-});
-
-StatusChips.displayName = "StatusChips";
-
-/**
- * Dashboard Loading Skeleton
- */
-const DashboardSkeleton = memo(() => (
-  <DashboardLayout>
-    <Box sx={{ p: 3 }}>
-      <Skeleton variant="text" width="30%" height={40} sx={{ mb: 2 }} />
-      <Skeleton
-        variant="rectangular"
-        width="100%"
-        height={120}
-        sx={{ mb: 3 }}
-      />
-      <Box sx={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 3 }}>
-        <Box>
-          <Skeleton variant="rectangular" height={200} sx={{ mb: 2 }} />
-          <Skeleton variant="rectangular" height={200} />
-        </Box>
-        <Box>
-          <Skeleton variant="rectangular" height={150} sx={{ mb: 2 }} />
-          <Skeleton variant="rectangular" height={250} />
-        </Box>
+const ActivityFeedSection = memo(() => (
+  <Suspense
+    fallback={
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: 200,
+        }}
+      >
+        <CircularProgress size={32} />
       </Box>
-    </Box>
-  </DashboardLayout>
+    }
+  >
+    <ActivityFeedWidget maxItems={8} showFilters infiniteScroll={false} />
+  </Suspense>
 ));
-
-DashboardSkeleton.displayName = "DashboardSkeleton";
-
-/**
- * Activity Feed with Loading Fallback
- */
-const ActivityFeedSection = memo(() => {
-  return (
-    <Suspense
-      fallback={
-        <Box
-          sx={{
-            p: 3,
-            borderRadius: 2,
-            height: "100%",
-            minHeight: 200,
-            border: (theme) =>
-              `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-            backgroundColor: (theme) => theme.palette.background.paper,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Box sx={{ textAlign: "center" }}>
-            <CircularProgress size={32} sx={{ mb: 2 }} />
-            <Typography variant="body2" color="text.secondary">
-              Loading activity feed...
-            </Typography>
-          </Box>
-        </Box>
-      }
-    >
-      <ActivityFeedWidget
-        variant="detailed"
-        maxItems={10}
-        showFilters={false}
-        showSearch={true}
-        showHeader={true}
-        autoRefresh={true}
-        refreshInterval={30000}
-      />
-    </Suspense>
-  );
-});
-
 ActivityFeedSection.displayName = "ActivityFeedSection";
 
 /**
- * Main Dashboard Page Component
+ * Main Dashboard Page Component with Context7 Design
  */
 const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
   // Hooks
@@ -203,16 +86,39 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
   const queryClient = useQueryClient();
   const { mode: layoutMode, setMode: setLayoutMode } = useLayoutMode();
 
+  // Responsive
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
   // State
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [dashboardMode, setDashboardMode] = useState<DashboardMode>(
+    isMobile ? "compact" : "detailed"
+  );
+  const [dashboardLayout, setDashboardLayout] = useState<DashboardLayoutType>(
+    isMobile ? "list" : "grid"
+  );
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Handle mounting to prevent Fade errors
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Data fetching
   const { data: overview, isError, error, isFetching } = useDashboardOverview();
-  const { 
-    data: systemMetrics, 
-    isLoading: isSystemMetricsLoading, 
-    isError: isSystemMetricsError 
+  const {
+    data: systemMetrics,
+    isLoading: isSystemMetricsLoading,
+    isError: isSystemMetricsError,
   } = useSystemMetrics();
+
+  // Chart data from API
+  const { data: timelineData, isLoading: isTimelineLoading } =
+    useTimelineData();
+  const { data: distributionData, isLoading: isDistributionLoading } =
+    useDistributionData();
 
   // Performance optimization with useDeferredValue
   const deferredOverview = useDeferredValue(overview);
@@ -234,27 +140,73 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
     }
   }, [refreshMutation, isRefreshing]);
 
-  const handleLayoutToggle = useCallback(() => {
+  const handleModeChange = useCallback((mode: DashboardMode) => {
     startTransition(() => {
-      const newMode = layoutMode === "grid" ? "list" : "grid";
-      setLayoutMode(newMode);
+      setDashboardMode(mode);
     });
-  }, [layoutMode, setLayoutMode]);
-
-  const handleMetricClick = useCallback((metric: DashboardMetric) => {
-    console.log("Metric clicked:", metric);
   }, []);
+
+  const handleLayoutChange = useCallback(
+    (layout: DashboardLayoutType) => {
+      startTransition(() => {
+        setDashboardLayout(layout);
+        // Sync with legacy layout mode
+        if (layout === "grid") {
+          setLayoutMode("grid");
+        } else {
+          setLayoutMode("list");
+        }
+      });
+    },
+    [setLayoutMode]
+  );
+
+  // Helper function to get compatible mode for components
+  const getCompatibleMode = useCallback(
+    (mode: DashboardMode): "minimal" | "compact" | "detailed" => {
+      if (mode === "fullscreen") return "detailed";
+      return mode;
+    },
+    []
+  );
 
   // Handler for chart metrics (compatible with ChartMetric type)
   const handleChartMetricClick = useCallback((metric: any) => {
     console.log("Chart metric clicked:", metric);
   }, []);
 
+  // Show minimal loading if not mounted to prevent Fade errors
+  if (!isMounted) {
+    return (
+      <DashboardLayout>
+        <DashboardContainer showModeControls={false}>
+          <Box
+            sx={{
+              p: { xs: 2.5, sm: 3, md: 3.5 },
+              borderRadius: 4,
+              border: (theme) =>
+                `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              backgroundColor: (theme) => theme.palette.background.paper,
+              opacity: 0.7,
+            }}
+          >
+            <Typography variant="h1" sx={{ fontWeight: 800, mb: 0.5 }}>
+              {t("dashboard.title", "Dashboard")}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              {t("dashboard.subtitle", "Loading...")}
+            </Typography>
+          </Box>
+        </DashboardContainer>
+      </DashboardLayout>
+    );
+  }
+
   // Error state
   if (isError) {
     return (
       <DashboardLayout>
-        <Box sx={{ p: 3 }}>
+        <DashboardContainer showModeControls={false}>
           <Alert
             severity="error"
             action={
@@ -262,274 +214,406 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
                 <Refresh />
               </IconButton>
             }
+            sx={{
+              borderRadius: 3,
+              border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+              background: `linear-gradient(135deg, 
+                ${alpha(theme.palette.error.light, 0.1)} 0%, 
+                ${alpha(theme.palette.error.main, 0.05)} 100%)`,
+            }}
           >
             {error?.message || "Error loading dashboard"}
           </Alert>
-        </Box>
+        </DashboardContainer>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <Box
+      <DashboardContainer
         className={className}
-        sx={{
-          minHeight: "100vh",
-          backgroundColor: theme.palette.background.default,
-          p: 3,
-          // CSS Grid Layout for modern responsive design
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            sm: "1fr",
-            md: "1fr",
-            lg: "2fr 1fr",
-            xl: "2fr 1fr",
-          },
-          gridTemplateRows: {
-            xs: "auto auto auto auto auto auto",
-            lg: "auto auto auto 1fr",
-          },
-          gridTemplateAreas: {
-            xs: `
-              "header"
-              "status"
-              "stats"
-              "charts"
-              "main"
-              "sidebar"
-            `,
-            lg: `
-              "header header"
-              "status status"
-              "stats stats"
-              "charts charts"
-              "main sidebar"
-            `,
-          },
-          gap: 3,
-          maxWidth: 1400,
-          margin: "0 auto",
-        }}
+        defaultMode={dashboardMode}
+        defaultLayout={dashboardLayout}
+        onModeChange={handleModeChange}
+        onLayoutChange={handleLayoutChange}
+        showModeControls={!isMobile} // Hide controls on mobile for cleaner UI
       >
-        {/* Header Area */}
+        {/* Header Section with Context7 styling */}
         <Box
           sx={{
-            gridArea: "header",
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            justifyContent: "space-between",
-            alignItems: { xs: "flex-start", sm: "center" },
-            gap: 2,
+            animation: "fadeInDown 0.6s ease-out",
+            "@keyframes fadeInDown": {
+              "0%": {
+                opacity: 0,
+                transform: "translateY(-20px)",
+              },
+              "100%": {
+                opacity: 1,
+                transform: "translateY(0)",
+              },
+            },
           }}
         >
-          {/* Title Section */}
-          <Box>
-            <Typography
-              variant="h1"
+          <Box
+            sx={{
+              p: { xs: 2.5, sm: 3, md: 3.5 },
+              borderRadius: 4,
+              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+              background: `linear-gradient(135deg, 
+                ${alpha(theme.palette.background.paper, 0.95)} 0%, 
+                ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
+              backdropFilter: "blur(20px)",
+              boxShadow: `0 8px 40px ${alpha(
+                theme.palette.common.black,
+                0.06
+              )}`,
+              position: "relative",
+              overflow: "hidden",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background: `linear-gradient(90deg, 
+                  ${theme.palette.primary.main} 0%, 
+                  ${theme.palette.secondary.main} 50%, 
+                  ${theme.palette.info.main} 100%)`,
+              },
+            }}
+          >
+            <Box
               sx={{
-                fontWeight: 700,
-                fontSize: { xs: "1.75rem", sm: "2rem", md: "2.5rem" },
-                lineHeight: 1.2,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                mb: 0.5,
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                justifyContent: "space-between",
+                alignItems: { xs: "flex-start", sm: "center" },
+                gap: { xs: 2, sm: 1.5, md: 2 },
               }}
             >
-              {t("dashboard.title", "Dashboard")}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {t(
-                "dashboard.subtitle",
-                "Welcome back! Here's what's happening with your projects."
-              )}
-            </Typography>
-          </Box>
-
-          {/* Action Buttons */}
-          <Stack direction="row" spacing={1}>
-            <Tooltip title="Refresh Dashboard">
-              <IconButton
-                onClick={handleRefresh}
-                disabled={isFetching || isRefreshing}
-                sx={{
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 2,
-                }}
-              >
-                <Refresh
+              {/* Title Section */}
+              <Box>
+                <Typography
+                  variant="h1"
                   sx={{
-                    ...(isFetching && {
-                      animation: "spin 1s linear infinite",
-                      "@keyframes spin": {
-                        "0%": { transform: "rotate(0deg)" },
-                        "100%": { transform: "rotate(360deg)" },
-                      },
-                    }),
+                    fontWeight: 800,
+                    fontSize: {
+                      xs: "1.75rem",
+                      sm: "2rem",
+                      md: dashboardMode === "detailed" ? "2.5rem" : "2rem",
+                    },
+                    lineHeight: 1.1,
+                    background: `linear-gradient(135deg, 
+                      ${theme.palette.primary.main} 0%, 
+                      ${theme.palette.secondary.main} 70%, 
+                      ${theme.palette.info.main} 100%)`,
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    mb: 0.5,
+                    letterSpacing: "-0.02em",
                   }}
-                />
-              </IconButton>
-            </Tooltip>
+                >
+                  {t("dashboard.title", "Dashboard")}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: { xs: "0.875rem", sm: "1rem" },
+                    color: theme.palette.text.secondary,
+                    fontWeight: 400,
+                  }}
+                >
+                  {t(
+                    "dashboard.subtitle",
+                    "Welcome back! Here's what's happening with your projects."
+                  )}
+                </Typography>
+              </Box>
 
-            <Tooltip
-              title={`Switch to ${
-                layoutMode === "grid" ? "list" : "grid"
-              } view`}
-            >
-              <IconButton
-                onClick={handleLayoutToggle}
-                sx={{
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 2,
-                }}
-              >
-                {layoutMode === "grid" ? <ViewModule /> : <ViewQuilt />}
-              </IconButton>
-            </Tooltip>
-          </Stack>
+              {/* Refresh Button with Context7 styling */}
+              <Tooltip title="Refresh Dashboard" arrow>
+                <IconButton
+                  onClick={handleRefresh}
+                  disabled={isFetching || isRefreshing}
+                  sx={{
+                    width: { xs: 44, sm: 48 },
+                    height: { xs: 44, sm: 48 },
+                    borderRadius: 3,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    background: `linear-gradient(135deg, 
+                      ${alpha(theme.palette.primary.main, 0.1)} 0%, 
+                      ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                      transform: {
+                        xs: "none",
+                        sm: "translateY(-2px) scale(1.02)",
+                      },
+                      borderColor: alpha(theme.palette.primary.main, 0.3),
+                      background: `linear-gradient(135deg, 
+                        ${alpha(theme.palette.primary.main, 0.15)} 0%, 
+                        ${alpha(theme.palette.primary.main, 0.1)} 100%)`,
+                      boxShadow: `0 8px 25px ${alpha(
+                        theme.palette.primary.main,
+                        0.2
+                      )}`,
+                    },
+                    "&:active": {
+                      transform: "scale(0.95)",
+                    },
+                  }}
+                >
+                  <Refresh
+                    sx={{
+                      fontSize: { xs: 22, sm: 24 },
+                      color: theme.palette.primary.main,
+                      ...(isFetching && {
+                        animation: "spin 1s linear infinite",
+                        "@keyframes spin": {
+                          "0%": { transform: "rotate(0deg)" },
+                          "100%": { transform: "rotate(360deg)" },
+                        },
+                      }),
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
         </Box>
 
-        {/* Status Chips Area */}
-        <Box sx={{ gridArea: "status" }}>
-          <StatusChips overview={deferredOverview} />
-        </Box>
-
-        {/* Enhanced Stats Widget with Charts */}
-        <Box sx={{ gridArea: "stats" }}>
+        {/* Key Metrics Section */}
+        <Box
+          sx={{
+            animation: "fadeInUp 0.8s ease-out",
+            "@keyframes fadeInUp": {
+              "0%": {
+                opacity: 0,
+                transform: "translateY(20px)",
+              },
+              "100%": {
+                opacity: 1,
+                transform: "translateY(0)",
+              },
+            },
+          }}
+        >
           <EnhancedDashboardStatsWidget
-            variant="detailed"
-            showCharts={true}
-            showTrends={true}
+            variant={getCompatibleMode(dashboardMode)}
+            showCharts={dashboardMode !== "minimal"}
+            showTrends={dashboardMode === "detailed"}
             onMetricClick={handleChartMetricClick}
           />
         </Box>
 
-        {/* Interactive Charts Grid - Only if we have valid data */}
-        {deferredOverview?.stats && (
-          <Box sx={{ gridArea: "charts", mt: 3 }}>
+        {/* Charts Section - адаптивное отображение */}
+        {dashboardMode !== "minimal" && (
+          <Box
+            sx={{
+              animation: "fadeIn 1.0s ease-out",
+              "@keyframes fadeIn": {
+                "0%": { opacity: 0 },
+                "100%": { opacity: 1 },
+              },
+            }}
+          >
             <DashboardChartsGrid
               projectMetrics={{
-                totalProjects: deferredOverview.stats.totalProjects || 0,
-                activeProjects: deferredOverview.stats.activeProjects || 0,
-                completedProjects: deferredOverview.stats.completedTasks || 0,
-                inProgressProjects: deferredOverview.stats.activeProjects || 0,
-                avgProgress: deferredOverview.stats.completionRate || 0,
-                statusDistribution: [
-                  {
-                    status: "active",
-                    count: deferredOverview.stats.activeProjects || 0,
-                    percentage: Math.round(
-                      ((deferredOverview.stats.activeProjects || 0) /
-                        Math.max(deferredOverview.stats.totalProjects || 1, 1)) *
-                        100
-                    ),
-                    color: theme.palette.primary.main,
-                  },
-                  {
-                    status: "completed",
-                    count: deferredOverview.stats.completedTasks || 0,
-                    percentage: Math.round(
-                      ((deferredOverview.stats.completedTasks || 0) /
-                        Math.max(deferredOverview.stats.totalRequirements || 1, 1)) *
-                        100
-                    ),
-                    color: theme.palette.success.main,
-                  },
-                ],
-                timeline: [],
+                totalProjects: deferredOverview?.stats?.totalProjects || 0,
+                activeProjects: deferredOverview?.stats?.activeProjects || 0,
+                completedProjects: deferredOverview?.stats?.completedTasks || 0,
+                inProgressProjects:
+                  deferredOverview?.stats?.activeProjects || 0,
+                avgProgress: deferredOverview?.stats?.completionRate || 0,
+                statusDistribution: distributionData
+                  ? distributionData.map((item) => ({
+                      status: item.id,
+                      label: item.label,
+                      count: item.value,
+                      percentage: item.percentage || 0,
+                      color: item.color,
+                    }))
+                  : [],
+                timeline: timelineData || [],
                 trends: [],
               }}
+              requirementMetrics={{
+                totalRequirements:
+                  deferredOverview?.stats?.totalRequirements || 0,
+                completedRequirements:
+                  deferredOverview?.stats?.completedTasks || 0,
+                pendingRequirements:
+                  deferredOverview?.stats?.activeRequirements || 0,
+                approvedRequirements: 0,
+                rejectedRequirements: 0,
+                velocity: Math.round(
+                  deferredOverview?.stats?.teamVelocity || 0
+                ),
+                burndown: [],
+                timeline: timelineData || [],
+                statusDistribution: distributionData
+                  ? distributionData.map((item) => ({
+                      status: item.id,
+                      label: item.label,
+                      count: item.value,
+                      percentage: item.percentage || 0,
+                      color: item.color,
+                    }))
+                  : [],
+              }}
               teamMetrics={{
-                totalMembers: deferredOverview.stats.teamMembers || 0,
-                activeMembers: deferredOverview.stats.teamMembers || 0,
-                productivity: deferredOverview.stats.completionRate || 0,
-                velocity: Math.round(deferredOverview.stats.teamVelocity || 0),
+                totalMembers: deferredOverview?.stats?.teamMembers || 0,
+                activeMembers: deferredOverview?.stats?.teamMembers || 0,
+                productivity: deferredOverview?.stats?.completionRate || 0,
+                velocity: Math.round(
+                  deferredOverview?.stats?.teamVelocity || 0
+                ),
                 workload: [],
                 performance: [],
               }}
-              systemMetrics={{
-                cpuUsage: deferredSystemMetrics?.cpuUsage || 0,
-                memoryUsage: deferredSystemMetrics?.memoryUsage || 0,
-                diskUsage: deferredSystemMetrics?.diskUsage || 0,
-                networkLatency: deferredSystemMetrics?.networkLatency || 0,
-                uptime: deferredSystemMetrics?.uptime || 0,
-                activeUsers: deferredSystemMetrics?.activeUsers || deferredOverview?.stats?.teamMembers || 0,
-                responseTime: deferredSystemMetrics?.responseTime || 0,
-                errorRate: deferredSystemMetrics?.errorRate || 0,
-                throughput: deferredSystemMetrics?.throughput || 0,
-                availability: deferredSystemMetrics?.availability || 0,
-              }}
-              loading={isFetching || isSystemMetricsLoading}
+              loading={
+                isFetching ||
+                isSystemMetricsLoading ||
+                isTimelineLoading ||
+                isDistributionLoading
+              }
               error={
-                isError ? (error as any)?.message || "Error loading charts" : 
-                isSystemMetricsError ? "Error loading system metrics" : null
+                isError
+                  ? (error as any)?.message || "Error loading charts"
+                  : isSystemMetricsError
+                  ? "Error loading system metrics"
+                  : null
               }
             />
           </Box>
         )}
 
-        {/* Main Content Area */}
+        {/* Main Content Grid - адаптивная сетка */}
         <Box
           sx={{
-            gridArea: "main",
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            minHeight: 0, // Important for proper grid sizing
+            animation: "slideIn 1.2s ease-out",
+            "@keyframes slideIn": {
+              "0%": {
+                opacity: 0,
+                transform: "translateY(30px)",
+              },
+              "100%": {
+                opacity: 1,
+                transform: "translateY(0)",
+              },
+            },
           }}
         >
-          {/* Quick Actions */}
-          <Box sx={{ flex: "0 0 auto" }}>
-            <QuickActionsWidget
-              variant="detailed"
-              maxActions={8}
-              showCategories
-              showShortcuts
-              showFavorites
-            />
-          </Box>
+          <Grid
+            container
+            spacing={{ xs: 2.5, sm: 3, md: 3.5 }}
+            sx={{
+              "& .MuiGrid-item": {
+                display: "flex",
+                flexDirection: "column",
+              },
+            }}
+          >
+            {/* Main Content Column */}
+            <Grid
+              item
+              xs={12}
+              lg={dashboardLayout === "list" ? 12 : 8}
+              sx={{
+                order: { xs: 2, lg: 1 },
+              }}
+            >
+              <Grid container spacing={{ xs: 2.5, sm: 3, md: 3 }}>
+                {/* Quick Actions */}
+                <Grid item xs={12}>
+                  <QuickActionsWidget
+                    variant={getCompatibleMode(dashboardMode)}
+                    maxActions={dashboardMode === "minimal" ? 4 : 8}
+                    showCategories={dashboardMode === "detailed"}
+                    showShortcuts
+                    showFavorites={dashboardMode !== "minimal"}
+                  />
+                </Grid>
 
-          {/* Project Overview */}
-          <Box sx={{ flex: "1 1 auto", minHeight: 200 }}>
-            <ProjectOverviewWidget />
-          </Box>
+                {/* Project Overview */}
+                <Grid item xs={12}>
+                  <ProjectOverviewWidget />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            {/* Sidebar Column */}
+            {dashboardLayout === "grid" && (
+              <Grid
+                item
+                xs={12}
+                lg={4}
+                sx={{
+                  order: { xs: 1, lg: 2 },
+                }}
+              >
+                <Grid container spacing={{ xs: 2.5, sm: 3, md: 3 }}>
+                  {/* Activity Feed */}
+                  <Grid item xs={12}>
+                    <ActivityFeedSection />
+                  </Grid>
+
+                  {/* System Health */}
+                  {dashboardMode !== "minimal" && (
+                    <Grid item xs={12}>
+                      <SystemHealthWidget />
+                    </Grid>
+                  )}
+                </Grid>
+              </Grid>
+            )}
+
+            {/* Full-width components for list layout */}
+            {dashboardLayout === "list" && (
+              <>
+                <Grid item xs={12}>
+                  <ActivityFeedSection />
+                </Grid>
+                {dashboardMode !== "minimal" && (
+                  <Grid item xs={12}>
+                    <SystemHealthWidget />
+                  </Grid>
+                )}
+              </>
+            )}
+          </Grid>
         </Box>
-
-        {/* Sidebar Area */}
-        <Box
-          sx={{
-            gridArea: "sidebar",
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            minHeight: 0, // Important for proper grid sizing
-          }}
-        >
-          {/* Activity Feed - Deferred for performance */}
-          <Box sx={{ flex: "1 1 auto", minHeight: 200 }}>
-            <ActivityFeedSection />
-          </Box>
-
-          {/* System Health */}
-          <Box sx={{ flex: "0 0 auto" }}>
-            <SystemHealthWidget />
-          </Box>
-        </Box>
-      </Box>
+      </DashboardContainer>
     </DashboardLayout>
   );
 };
 
-// Export with Suspense wrapper
-const DashboardPageWithSuspense: React.FC<DashboardPageProps> = (props) => {
-  return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardPage {...props} />
+export const DashboardPageWithSuspense = () => (
+  <DashboardErrorBoundary>
+    <Suspense
+      fallback={
+        <DashboardLayout>
+          <DashboardContainer showModeControls={false}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "50vh",
+              }}
+            >
+              <CircularProgress size={48} thickness={4} />
+            </Box>
+          </DashboardContainer>
+        </DashboardLayout>
+      }
+    >
+      <DashboardPage />
     </Suspense>
-  );
-};
+  </DashboardErrorBoundary>
+);
 
-export default DashboardPageWithSuspense;
+export default memo(DashboardPageWithSuspense);
