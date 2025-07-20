@@ -159,9 +159,7 @@ async def delete_team(
     Только владелец команды может удалить её.
     """
     try:
-        return await team_service.delete_team(
-            db=db, team_id=team_id, user=current_user
-        )
+        return await team_service.delete_team(db=db, team_id=team_id, user=current_user)
     except (NotFoundError, PermissionDeniedError):
         raise
     except ServiceError as e:
@@ -183,13 +181,17 @@ async def archive_team(
     Архивировать команду.
     Требует права управления настройками команды.
     """
-    await require_team_permission(db, team_id, current_user.id, "manage_settings")
-
-    team = await crud_team.archive_team(db, team_id=team_id)
-    if not team:
-        raise NotFoundError("team", team_id)
-
-    return team
+    try:
+        return await team_service.archive_team(
+            db=db, team_id=team_id, user=current_user
+        )
+    except (NotFoundError, PermissionDeniedError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.post(
@@ -204,13 +206,17 @@ async def restore_team(
     Восстановить команду из архива.
     Требует права управления настройками команды.
     """
-    await require_team_permission(db, team_id, current_user.id, "manage_settings")
-
-    team = await crud_team.restore_team(db, team_id=team_id)
-    if not team:
-        raise NotFoundError("team", team_id)
-
-    return team
+    try:
+        return await team_service.restore_team(
+            db=db, team_id=team_id, user=current_user
+        )
+    except (NotFoundError, PermissionDeniedError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 # Team member endpoints
@@ -228,17 +234,17 @@ async def get_team_members(
     """
     Получить список участников команды.
     """
-    team = await get_team_or_404(db, team_id)
-
-    # Проверяем права доступа
-    if not team.is_public:
-        await require_team_permission(db, team_id, current_user.id, "read")
-
-    members = await crud_team_member.get_team_members(
-        db, team_id=team_id, active_only=active_only
-    )
-
-    return members
+    try:
+        return await team_service.get_team_members(
+            db=db, team_id=team_id, user=current_user, active_only=active_only
+        )
+    except (NotFoundError, PermissionDeniedError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.post(
@@ -256,23 +262,17 @@ async def add_team_member(
     Добавить участника в команду.
     Требует права управления участниками.
     """
-    team = await get_team_or_404(db, team_id)
-    await require_team_permission(db, team_id, current_user.id, "manage_members")
-
-    # Проверяем ограничения команды
-    if not team.can_add_member():
-        if team.status != TeamStatus.ACTIVE:
-            raise BusinessLogicError("Нельзя добавить участника в неактивную команду")
-        if team.is_full:
-            raise BusinessLogicError("Команда уже заполнена до максимума")
-
     try:
-        member = await crud_team_member.add_member(
-            db, team_id=team_id, user_id=member_in.user_id, role=member_in.role
+        return await team_service.add_team_member(
+            db=db, team_id=team_id, member_data=member_in, user=current_user
         )
-        return member
-    except ValueError as e:
-        raise BusinessLogicError(str(e))
+    except (NotFoundError, PermissionDeniedError, BusinessLogicError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.put(
@@ -291,16 +291,21 @@ async def update_team_member(
     Обновить информацию об участнике команды.
     Требует права управления участниками.
     """
-    await require_team_permission(db, team_id, current_user.id, "manage_members")
-
-    member = await crud_team_member.get_by_team_and_user(
-        db, team_id=team_id, user_id=user_id
-    )
-    if not member:
-        raise NotFoundError("team_member", f"team_id={team_id}, user_id={user_id}")
-
-    updated_member = await crud_team_member.update(db, db_obj=member, obj_in=member_in)
-    return updated_member
+    try:
+        return await team_service.update_team_member(
+            db=db,
+            team_id=team_id,
+            user_id=user_id,
+            member_data=member_in,
+            current_user=current_user,
+        )
+    except (NotFoundError, PermissionDeniedError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.delete("/{team_id}/members/{user_id}", summary="Удалить участника из команды")
@@ -314,21 +319,17 @@ async def remove_team_member(
     Удалить участника из команды.
     Требует права управления участниками или пользователь удаляет себя.
     """
-    team = await get_team_or_404(db, team_id)
-
-    # Проверяем права
-    if user_id != current_user.id:
-        await require_team_permission(db, team_id, current_user.id, "manage_members")
-
-    # Нельзя удалить владельца команды
-    if user_id == team.owner_id:
-        raise BusinessLogicError("Нельзя удалить владельца команды")
-
-    member = await crud_team_member.remove_member(db, team_id=team_id, user_id=user_id)
-    if not member:
-        raise NotFoundError("team_member", f"team_id={team_id}, user_id={user_id}")
-
-    return {"message": "Участник успешно удален из команды"}
+    try:
+        return await team_service.remove_team_member(
+            db=db, team_id=team_id, user_id=user_id, current_user=current_user
+        )
+    except (NotFoundError, PermissionDeniedError, BusinessLogicError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.post(
@@ -347,20 +348,21 @@ async def change_member_role(
     Изменить роль участника команды.
     Требует права управления участниками.
     """
-    await require_team_permission(db, team_id, current_user.id, "manage_members")
-
-    # Нельзя изменить роль владельца команды
-    team = await get_team_or_404(db, team_id)
-    if user_id == team.owner_id and role != TeamRole.OWNER:
-        raise BusinessLogicError("Нельзя изменить роль владельца команды")
-
-    member = await crud_team_member.update_member_role(
-        db, team_id=team_id, user_id=user_id, role=role
-    )
-    if not member:
-        raise NotFoundError("team_member", f"team_id={team_id}, user_id={user_id}")
-
-    return member
+    try:
+        return await team_service.change_member_role(
+            db=db,
+            team_id=team_id,
+            user_id=user_id,
+            role=role,
+            current_user=current_user,
+        )
+    except (NotFoundError, PermissionDeniedError, BusinessLogicError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 # Bulk operations
@@ -378,24 +380,17 @@ async def bulk_create_teams(
     Создать несколько команд одновременно.
     Требует роль manager или выше.
     """
-    # Проверяем права на массовое создание команд (более строгие права)
-    allowed_roles = ["admin", "manager", "product_manager"]
-    if current_user.role not in allowed_roles:
-        raise PermissionDeniedError("bulk_create_teams", "user")
-
-    created_teams = []
-
-    for team_data in bulk_data.teams:
-        try:
-            team = await crud_team.create_with_owner(
-                db, obj_in=team_data, owner_id=current_user.id
-            )
-            created_teams.append(team)
-        except ValueError as e:
-            # Пропускаем команды с ошибками
-            continue
-
-    return created_teams
+    try:
+        return await team_service.bulk_create_teams(
+            db=db, bulk_data=bulk_data, owner=current_user
+        )
+    except PermissionDeniedError:
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 @router.post(
@@ -412,22 +407,17 @@ async def bulk_add_members(
     """
     Добавить несколько участников в команду одновременно.
     """
-    team = await get_team_or_404(db, team_id)
-    await require_team_permission(db, team_id, current_user.id, "manage_members")
-
-    added_members = []
-
-    for user_id in bulk_data.user_ids:
-        try:
-            member = await crud_team_member.add_member(
-                db, team_id=team_id, user_id=user_id, role=bulk_data.role
-            )
-            added_members.append(member)
-        except ValueError:
-            # Пропускаем пользователей с ошибками
-            continue
-
-    return added_members
+    try:
+        return await team_service.bulk_add_members(
+            db=db, team_id=team_id, bulk_data=bulk_data, current_user=current_user
+        )
+    except (NotFoundError, PermissionDeniedError):
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 # Statistics endpoints
@@ -442,27 +432,16 @@ async def get_team_stats(
     """
     Получить общую статистику команд.
     """
-    logger.info(
-        f"User {current_user.username} (role: {current_user.role}) requesting team stats with period: {period}"
-    )
-
-    # Проверка прав - только администраторы и пользователи могут видеть общую статистику
-    # Временно расширяем доступ для отладки
-    allowed_roles = ["admin", "manager", "analyst", "developer", "user"]
-    if current_user.role not in allowed_roles:
-        logger.warning(
-            f"User {current_user.username} with role {current_user.role} tried to access team stats"
-        )
-        raise PermissionDeniedError("view_team_stats", "team")
-
     try:
-        stats = await crud_team.get_team_stats(db)
-        return stats
-    except Exception as e:
-        logger.error(f"Error getting team stats: {e}")
+        return await team_service.get_team_stats(
+            db=db, user=current_user, period=period
+        )
+    except PermissionDeniedError:
+        raise
+    except ServiceError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get team stats: {str(e)}",
+            detail=str(e),
         )
 
 
@@ -479,10 +458,17 @@ async def get_team_member_stats(
     """
     Получить статистику участников команды.
     """
-    await require_team_permission(db, team_id, current_user.id, "read")
-
-    stats = await crud_team_member.get_member_stats(db, team_id=team_id)
-    return stats
+    try:
+        return await team_service.get_team_member_stats(
+            db=db, team_id=team_id, user=current_user
+        )
+    except PermissionDeniedError:
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 # Permission endpoints
@@ -499,28 +485,14 @@ async def check_permission(
     """
     Проверить права доступа пользователя к команде.
     """
-    # Можно проверить только свои права или права других (если есть соответствующие разрешения)
-    if permission_check.user_id != current_user.id:
-        await require_team_permission(
-            db, permission_check.team_id, current_user.id, "manage_members"
+    try:
+        return await team_service.check_permission(
+            db=db, permission_check=permission_check, current_user=current_user
         )
-
-    has_permission = await check_team_permission(
-        db,
-        permission_check.team_id,
-        permission_check.user_id,
-        permission_check.permission,
-    )
-
-    # Получаем дополнительную информацию
-    team = await get_team_or_404(db, permission_check.team_id)
-    member = await crud_team_member.get_by_team_and_user(
-        db, team_id=permission_check.team_id, user_id=permission_check.user_id
-    )
-
-    return TeamPermissionResponse(
-        has_permission=has_permission,
-        user_role=member.role if member else None,
-        is_member=member is not None and member.is_active,
-        is_owner=team.owner_id == permission_check.user_id,
-    )
+    except PermissionDeniedError:
+        raise
+    except ServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )

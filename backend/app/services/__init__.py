@@ -18,6 +18,7 @@ __all__ = [
     "notification_service",
     "reporting_service",
     "auth0_service",
+    "Auth0UserInfo",
     "dashboard_service",
     "team_service",
 ]

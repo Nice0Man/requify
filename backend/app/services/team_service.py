@@ -61,15 +61,15 @@ class TeamService:
     ) -> Any:
         """
         Получить команду или выбросить исключение 404.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             load_members: Загружать ли участников команды
-            
+
         Returns:
             Объект команды
-            
+
         Raises:
             NotFoundError: Если команда не найдена
         """
@@ -94,13 +94,13 @@ class TeamService:
     ) -> bool:
         """
         Проверить разрешение пользователя для команды.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user_id: ID пользователя
             permission: Требуемое разрешение
-            
+
         Returns:
             True если разрешение есть, False иначе
         """
@@ -130,13 +130,13 @@ class TeamService:
     ) -> None:
         """
         Требовать разрешение для команды или выбросить исключение.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user_id: ID пользователя
             permission: Требуемое разрешение
-            
+
         Raises:
             PermissionDeniedError: Если нет разрешения
         """
@@ -150,14 +150,20 @@ class TeamService:
     async def check_create_team_permission(user: User) -> None:
         """
         Проверить права на создание команды.
-        
+
         Args:
             user: Пользователь
-            
+
         Raises:
             PermissionDeniedError: Если нет прав
         """
-        allowed_roles = ["admin", "manager", "senior_developer", "product_manager", "owner"]
+        allowed_roles = [
+            "admin",
+            "manager",
+            "senior_developer",
+            "product_manager",
+            "owner",
+        ]
         if user.role not in allowed_roles:
             raise PermissionDeniedError("create_team", "user")
 
@@ -165,10 +171,10 @@ class TeamService:
     async def check_bulk_create_permission(user: User) -> None:
         """
         Проверить права на массовое создание команд.
-        
+
         Args:
             user: Пользователь
-            
+
         Raises:
             PermissionDeniedError: Если нет прав
         """
@@ -180,17 +186,19 @@ class TeamService:
     async def check_view_stats_permission(user: User) -> None:
         """
         Проверить права на просмотр статистики команд.
-        
+
         Args:
             user: Пользователь
-            
+
         Raises:
             PermissionDeniedError: Если нет прав
         """
         # Временно расширяем доступ для отладки
         allowed_roles = ["admin", "manager", "analyst", "developer", "user"]
         if user.role not in allowed_roles:
-            logger.warning(f"User {user.username} with role {user.role} tried to access team stats")
+            logger.warning(
+                f"User {user.username} with role {user.role} tried to access team stats"
+            )
             raise PermissionDeniedError("view_team_stats", "team")
 
     @staticmethod
@@ -207,7 +215,7 @@ class TeamService:
     ) -> TeamListResponse:
         """
         Получить список команд с фильтрацией.
-        
+
         Args:
             db: Сессия базы данных
             user: Текущий пользователь
@@ -218,7 +226,7 @@ class TeamService:
             is_public: Фильтр по публичности
             owner_id: Фильтр по владельцу
             my_teams: Только команды пользователя
-            
+
         Returns:
             Список команд с пагинацией
         """
@@ -264,15 +272,15 @@ class TeamService:
     ) -> TeamResponse:
         """
         Создать новую команду.
-        
+
         Args:
             db: Сессия базы данных
             team_data: Данные команды
             owner: Владелец команды
-            
+
         Returns:
             Созданная команда
-            
+
         Raises:
             ServiceError: При ошибке создания
             PermissionDeniedError: Если нет прав
@@ -299,12 +307,12 @@ class TeamService:
     ) -> TeamDetailResponse:
         """
         Получить детальную информацию о команде.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user: Текущий пользователь
-            
+
         Returns:
             Детальная информация о команде
         """
@@ -328,19 +336,21 @@ class TeamService:
     ) -> TeamResponse:
         """
         Обновить команду.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             team_data: Данные для обновления
             user: Текущий пользователь
-            
+
         Returns:
             Обновленная команда
         """
         try:
             team = await TeamService.get_team_or_404(db, team_id)
-            await TeamService.require_team_permission(db, team_id, user.id, "manage_settings")
+            await TeamService.require_team_permission(
+                db, team_id, user.id, "manage_settings"
+            )
 
             updated_team = await crud_team.update(db, db_obj=team, obj_in=team_data)
             return updated_team
@@ -354,12 +364,12 @@ class TeamService:
     async def delete_team(db: AsyncSession, team_id: int, user: User) -> Dict[str, str]:
         """
         Удалить команду.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user: Текущий пользователь
-            
+
         Returns:
             Сообщение об успешном удалении
         """
@@ -378,22 +388,22 @@ class TeamService:
             raise ServiceError("team", f"Failed to delete team: {str(e)}")
 
     @staticmethod
-    async def archive_team(
-        db: AsyncSession, team_id: int, user: User
-    ) -> TeamResponse:
+    async def archive_team(db: AsyncSession, team_id: int, user: User) -> TeamResponse:
         """
         Архивировать команду.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user: Текущий пользователь
-            
+
         Returns:
             Архивированная команда
         """
         try:
-            await TeamService.require_team_permission(db, team_id, user.id, "manage_settings")
+            await TeamService.require_team_permission(
+                db, team_id, user.id, "manage_settings"
+            )
 
             team = await crud_team.archive_team(db, team_id=team_id)
             if not team:
@@ -407,22 +417,22 @@ class TeamService:
             raise ServiceError("team", f"Failed to archive team: {str(e)}")
 
     @staticmethod
-    async def restore_team(
-        db: AsyncSession, team_id: int, user: User
-    ) -> TeamResponse:
+    async def restore_team(db: AsyncSession, team_id: int, user: User) -> TeamResponse:
         """
         Восстановить команду из архива.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user: Текущий пользователь
-            
+
         Returns:
             Восстановленная команда
         """
         try:
-            await TeamService.require_team_permission(db, team_id, user.id, "manage_settings")
+            await TeamService.require_team_permission(
+                db, team_id, user.id, "manage_settings"
+            )
 
             team = await crud_team.restore_team(db, team_id=team_id)
             if not team:
@@ -441,13 +451,13 @@ class TeamService:
     ) -> List[TeamMemberResponse]:
         """
         Получить участников команды.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user: Текущий пользователь
             active_only: Только активные участники
-            
+
         Returns:
             Список участников команды
         """
@@ -475,24 +485,28 @@ class TeamService:
     ) -> TeamMemberResponse:
         """
         Добавить участника в команду.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             member_data: Данные участника
             user: Текущий пользователь
-            
+
         Returns:
             Добавленный участник
         """
         try:
             team = await TeamService.get_team_or_404(db, team_id)
-            await TeamService.require_team_permission(db, team_id, user.id, "manage_members")
+            await TeamService.require_team_permission(
+                db, team_id, user.id, "manage_members"
+            )
 
             # Проверяем ограничения команды
             if not team.can_add_member():
                 if team.status != TeamStatus.ACTIVE:
-                    raise BusinessLogicError("Нельзя добавить участника в неактивную команду")
+                    raise BusinessLogicError(
+                        "Нельзя добавить участника в неактивную команду"
+                    )
                 if team.is_full:
                     raise BusinessLogicError("Команда уже заполнена до максимума")
 
@@ -518,27 +532,33 @@ class TeamService:
     ) -> TeamMemberResponse:
         """
         Обновить участника команды.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user_id: ID пользователя-участника
             member_data: Данные для обновления
             current_user: Текущий пользователь
-            
+
         Returns:
             Обновленный участник
         """
         try:
-            await TeamService.require_team_permission(db, team_id, current_user.id, "manage_members")
+            await TeamService.require_team_permission(
+                db, team_id, current_user.id, "manage_members"
+            )
 
             member = await crud_team_member.get_by_team_and_user(
                 db, team_id=team_id, user_id=user_id
             )
             if not member:
-                raise NotFoundError("team_member", f"team_id={team_id}, user_id={user_id}")
+                raise NotFoundError(
+                    "team_member", f"team_id={team_id}, user_id={user_id}"
+                )
 
-            updated_member = await crud_team_member.update(db, db_obj=member, obj_in=member_data)
+            updated_member = await crud_team_member.update(
+                db, db_obj=member, obj_in=member_data
+            )
             return updated_member
         except (NotFoundError, PermissionDeniedError):
             raise
@@ -552,13 +572,13 @@ class TeamService:
     ) -> Dict[str, str]:
         """
         Удалить участника из команды.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user_id: ID пользователя-участника
             current_user: Текущий пользователь
-            
+
         Returns:
             Сообщение об успешном удалении
         """
@@ -567,15 +587,21 @@ class TeamService:
 
             # Проверяем права
             if user_id != current_user.id:
-                await TeamService.require_team_permission(db, team_id, current_user.id, "manage_members")
+                await TeamService.require_team_permission(
+                    db, team_id, current_user.id, "manage_members"
+                )
 
             # Нельзя удалить владельца команды
             if user_id == team.owner_id:
                 raise BusinessLogicError("Нельзя удалить владельца команды")
 
-            member = await crud_team_member.remove_member(db, team_id=team_id, user_id=user_id)
+            member = await crud_team_member.remove_member(
+                db, team_id=team_id, user_id=user_id
+            )
             if not member:
-                raise NotFoundError("team_member", f"team_id={team_id}, user_id={user_id}")
+                raise NotFoundError(
+                    "team_member", f"team_id={team_id}, user_id={user_id}"
+                )
 
             return {"message": "Участник успешно удален из команды"}
         except (NotFoundError, PermissionDeniedError, BusinessLogicError):
@@ -590,19 +616,21 @@ class TeamService:
     ) -> TeamMemberResponse:
         """
         Изменить роль участника команды.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user_id: ID пользователя-участника
             role: Новая роль
             current_user: Текущий пользователь
-            
+
         Returns:
             Участник с новой ролью
         """
         try:
-            await TeamService.require_team_permission(db, team_id, current_user.id, "manage_members")
+            await TeamService.require_team_permission(
+                db, team_id, current_user.id, "manage_members"
+            )
 
             # Нельзя изменить роль владельца команды
             team = await TeamService.get_team_or_404(db, team_id)
@@ -613,7 +641,9 @@ class TeamService:
                 db, team_id=team_id, user_id=user_id, role=role
             )
             if not member:
-                raise NotFoundError("team_member", f"team_id={team_id}, user_id={user_id}")
+                raise NotFoundError(
+                    "team_member", f"team_id={team_id}, user_id={user_id}"
+                )
 
             return member
         except (NotFoundError, PermissionDeniedError, BusinessLogicError):
@@ -628,12 +658,12 @@ class TeamService:
     ) -> List[TeamResponse]:
         """
         Массовое создание команд.
-        
+
         Args:
             db: Сессия базы данных
             bulk_data: Данные для массового создания
             owner: Владелец команд
-            
+
         Returns:
             Список созданных команд
         """
@@ -665,19 +695,21 @@ class TeamService:
     ) -> List[TeamMemberResponse]:
         """
         Массовое добавление участников.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             bulk_data: Данные для массового добавления
             current_user: Текущий пользователь
-            
+
         Returns:
             Список добавленных участников
         """
         try:
             team = await TeamService.get_team_or_404(db, team_id)
-            await TeamService.require_team_permission(db, team_id, current_user.id, "manage_members")
+            await TeamService.require_team_permission(
+                db, team_id, current_user.id, "manage_members"
+            )
 
             added_members = []
 
@@ -704,12 +736,12 @@ class TeamService:
     ) -> TeamStats:
         """
         Получить статистику команд.
-        
+
         Args:
             db: Сессия базы данных
             user: Текущий пользователь
             period: Период для статистики
-            
+
         Returns:
             Статистика команд
         """
@@ -734,12 +766,12 @@ class TeamService:
     ) -> TeamMemberStats:
         """
         Получить статистику участников команды.
-        
+
         Args:
             db: Сессия базы данных
             team_id: ID команды
             user: Текущий пользователь
-            
+
         Returns:
             Статистика участников
         """
@@ -760,12 +792,12 @@ class TeamService:
     ) -> TeamPermissionResponse:
         """
         Проверить права доступа пользователя к команде.
-        
+
         Args:
             db: Сессия базы данных
             permission_check: Параметры проверки
             current_user: Текущий пользователь
-            
+
         Returns:
             Результат проверки прав
         """
@@ -803,4 +835,4 @@ class TeamService:
 
 
 # Создаем экземпляр сервиса для использования в API
-team_service = TeamService() 
+team_service = TeamService()
