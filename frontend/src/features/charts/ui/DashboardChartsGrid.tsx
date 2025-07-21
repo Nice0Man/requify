@@ -11,7 +11,6 @@ import {
   IconButton,
   Collapse,
   Tooltip,
-  Fade,
 } from "@mui/material";
 import {
   ExpandMore,
@@ -52,7 +51,7 @@ interface CollapsibleChartCardProps {
 }
 
 /**
- * Collapsible Chart Card with smooth animations and best UX practices
+ * Collapsible Chart Card with balanced styling and smooth animations
  */
 const CollapsibleChartCard = memo<CollapsibleChartCardProps>(
   ({
@@ -70,17 +69,14 @@ const CollapsibleChartCard = memo<CollapsibleChartCardProps>(
     const [isAnimating, setIsAnimating] = useState(false);
 
     const handleToggle = useCallback(() => {
-      if (isAnimating) return; // Prevent rapid clicks during animation
+      if (isAnimating) return;
 
       setIsAnimating(true);
-
       startTransition(() => {
         const newExpanded = !expanded;
         setExpanded(newExpanded);
         onToggle?.(newExpanded);
-
-        // Reset animation state after transition
-        setTimeout(() => setIsAnimating(false), 300);
+        setTimeout(() => setIsAnimating(false), 350);
       });
     }, [expanded, onToggle, isAnimating]);
 
@@ -92,24 +88,27 @@ const CollapsibleChartCard = memo<CollapsibleChartCardProps>(
           boxShadow: `0 2px 20px ${alpha(theme.palette.common.black, 0.04)}`,
           background: theme.palette.background.paper,
           overflow: "hidden",
-          height: "100%", // Consistent height for all cards
+          // Fixed consistent height structure
+          minHeight: expanded ? 420 : 80,
+          maxHeight: expanded ? "none" : 80,
           display: "flex",
           flexDirection: "column",
-          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           "&:hover": {
-            transform: { xs: "none", sm: "translateY(-2px)" }, // No transform on mobile
+            transform: { xs: "none", sm: "translateY(-2px)" },
             boxShadow: `0 8px 40px ${alpha(theme.palette.common.black, 0.08)}`,
             borderColor: alpha(color, 0.2),
           },
         }}
       >
+        {/* Header - always visible with consistent styling */}
         <CardHeader
           title={
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
               <Box
                 sx={{
-                  width: 28,
-                  height: 28,
+                  width: 32,
+                  height: 32,
                   borderRadius: 2,
                   background: `linear-gradient(135deg, ${color}, ${alpha(
                     color,
@@ -122,7 +121,7 @@ const CollapsibleChartCard = memo<CollapsibleChartCardProps>(
                   fontSize: 16,
                   transition: "transform 0.2s ease",
                   ...(expanded && {
-                    transform: { xs: "none", sm: "scale(1.1)" }, // No transform on mobile
+                    transform: { xs: "none", sm: "scale(1.1)" },
                   }),
                 }}
               >
@@ -135,6 +134,9 @@ const CollapsibleChartCard = memo<CollapsibleChartCardProps>(
                   fontSize: "1rem",
                   color: theme.palette.text.primary,
                   userSelect: "none",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {title}
@@ -166,7 +168,7 @@ const CollapsibleChartCard = memo<CollapsibleChartCardProps>(
                   "&:hover": {
                     backgroundColor: alpha(color, 0.08),
                     borderColor: alpha(color, 0.2),
-                    transform: { xs: "none", sm: "scale(1.05)" }, // No transform on mobile
+                    transform: { xs: "none", sm: "scale(1.05)" },
                   },
                   "&:active": {
                     transform: "scale(0.95)",
@@ -187,47 +189,69 @@ const CollapsibleChartCard = memo<CollapsibleChartCardProps>(
           }
           sx={{
             pb: 1,
-            px: { xs: 2, sm: 3 }, // Responsive padding
+            px: { xs: 2, sm: 3 },
             pt: { xs: 2, sm: 2.5 },
+            cursor: "pointer",
+            userSelect: "none",
+            flexShrink: 0,
+            // Fixed header height
+            minHeight: 76,
             "& .MuiCardHeader-content": {
               display: "flex",
               alignItems: "center",
-              overflow: "hidden", // Prevent text overflow
+              overflow: "hidden",
             },
-            cursor: "pointer",
-            userSelect: "none",
-            flexShrink: 0, // Prevent header from shrinking
           }}
           onClick={handleToggle}
         />
 
+        {/* Content - collapsible with CSS-only animations */}
         <Collapse
           in={expanded}
-          timeout={300}
+          timeout={{
+            enter: 350,
+            exit: 300,
+          }}
           easing={{
             enter: "cubic-bezier(0.4, 0, 0.2, 1)",
             exit: "cubic-bezier(0.4, 0, 0.2, 1)",
           }}
-          unmountOnExit={false} // Keep content mounted for better performance
-          sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+          unmountOnExit={false}
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
           <CardContent
             id={`chart-content-${chartId}`}
             sx={{
               pt: 0,
-              pb: { xs: 2, sm: 3 }, // Responsive bottom padding
-              px: { xs: 2, sm: 3 }, // Responsive horizontal padding
+              pb: { xs: 2, sm: 3 },
+              px: { xs: 2, sm: 3 },
               flexGrow: 1,
               display: "flex",
               flexDirection: "column",
+              overflow: "hidden",
+              // Fixed content height for consistency
+              minHeight: 320,
+              // CSS-only transition instead of problematic Fade
               opacity: expanded ? 1 : 0,
-              transition: "opacity 0.2s ease",
-              overflow: "hidden", // Prevent content overflow
+              transform: expanded ? "translateY(0)" : "translateY(-10px)",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
-            <Fade in={expanded} timeout={200}>
-              <Box sx={{ height: "100%", minHeight: 0 }}>{children}</Box>
-            </Fade>
+            <Box
+              sx={{
+                height: "100%",
+                minHeight: 0,
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {children}
+            </Box>
           </CardContent>
         </Collapse>
       </Card>
@@ -249,68 +273,73 @@ export const DashboardChartsGrid = memo<DashboardChartsGridProps>(
     const theme = useTheme();
     const t = i18n.t;
 
-    // Responsive chart height based on screen size
+    // Responsive chart height - consistent for all charts
     const getChartHeight = () => {
-      if (
-        theme.breakpoints.values.md &&
-        window.innerWidth >= theme.breakpoints.values.md
-      ) {
-        return 340;
-      }
-      if (
-        theme.breakpoints.values.sm &&
-        window.innerWidth >= theme.breakpoints.values.sm
-      ) {
-        return 320;
-      }
-      return 280;
+      if (window.innerWidth >= 1280) return 280; // xl
+      if (window.innerWidth >= 960) return 260; // lg/md
+      if (window.innerWidth >= 600) return 240; // sm
+      return 220; // xs
     };
 
     const chartHeight = getChartHeight();
 
-    // State for tracking which charts are expanded
+    // State for tracking which charts are expanded - better defaults
     const [chartStates, setChartStates] = useState({
-      projectStatus: true,
-      requirementsTimeline: true,
-      projectProgress: true,
-      teamWorkload: false, // Less important chart starts collapsed
+      projectStatus: true, // Most important - always visible
+      requirementsTimeline: true, // Important data - visible
+      projectProgress: false, // Secondary - collapsed by default
+      teamWorkload: false, // Less important - collapsed by default
     });
 
-    // Handle chart toggle with analytics
+    // Handle chart toggle with better state management
     const handleChartToggle = useCallback(
       (chartId: string) => (expanded: boolean) => {
         setChartStates((prev) => ({
           ...prev,
           [chartId]: expanded,
         }));
-
-        // Analytics tracking (optional)
-        console.log(`Chart ${chartId} ${expanded ? "expanded" : "collapsed"}`);
       },
       []
     );
 
-    // Helper function to check if data is empty
+    // Helper function to check if data is available
     const hasData = (data: any) => {
       return data && Array.isArray(data) && data.length > 0;
     };
 
+    // Unified chart rendering with consistent error handling
     const renderChart = (
       chartComponent: React.ReactNode,
       hasDataCheck: boolean
     ) => {
       if (loading) {
-        return <EmptyStateChart variant="loading" height={300} />;
+        return (
+          <EmptyStateChart
+            variant="loading"
+            height={chartHeight}
+            description={t("charts.loading", "Loading chart data...")}
+          />
+        );
       }
 
       if (error) {
         return (
-          <EmptyStateChart variant="error" height={300} description={error} />
+          <EmptyStateChart
+            variant="error"
+            height={chartHeight}
+            description={error}
+          />
         );
       }
 
       if (!hasDataCheck) {
-        return <EmptyStateChart variant="empty" height={300} />;
+        return (
+          <EmptyStateChart
+            variant="empty"
+            height={chartHeight}
+            description={t("charts.noData", "No data available")}
+          />
+        );
       }
 
       return chartComponent;
@@ -318,20 +347,22 @@ export const DashboardChartsGrid = memo<DashboardChartsGridProps>(
 
     return (
       <Box className={className}>
-        {/* Charts Grid - Responsive layout with consistent spacing */}
+        {/* Balanced Grid Layout - consistent spacing and alignment */}
         <Grid
           container
-          spacing={{ xs: 2, sm: 2.5, md: 3 }} // Responsive spacing
+          spacing={{ xs: 2, sm: 2.5, md: 3 }}
           sx={{
-            // Ensure consistent alignment
+            // Force equal height items in each row
             "& .MuiGrid-item": {
               display: "flex",
               flexDirection: "column",
             },
+            // Ensure proper alignment on all screen sizes
+            alignItems: "stretch",
           }}
         >
-          {/* First Row */}
-          <Grid item xs={12} md={6} xl={6}>
+          {/* Row 1: Primary Charts - always 2 columns */}
+          <Grid item xs={12} lg={6}>
             <CollapsibleChartCard
               title={t(
                 "dashboard.charts.projectStatus",
@@ -364,7 +395,7 @@ export const DashboardChartsGrid = memo<DashboardChartsGridProps>(
             </CollapsibleChartCard>
           </Grid>
 
-          <Grid item xs={12} md={6} xl={6}>
+          <Grid item xs={12} lg={6}>
             <CollapsibleChartCard
               title={t(
                 "dashboard.charts.requirementsTimeline",
@@ -391,8 +422,8 @@ export const DashboardChartsGrid = memo<DashboardChartsGridProps>(
             </CollapsibleChartCard>
           </Grid>
 
-          {/* Second Row */}
-          <Grid item xs={12} md={6} xl={6}>
+          {/* Row 2: Secondary Charts - 2 columns */}
+          <Grid item xs={12} lg={6}>
             <CollapsibleChartCard
               title={t(
                 "dashboard.charts.projectProgress",
@@ -420,7 +451,7 @@ export const DashboardChartsGrid = memo<DashboardChartsGridProps>(
             </CollapsibleChartCard>
           </Grid>
 
-          <Grid item xs={12} md={6} xl={6}>
+          <Grid item xs={12} lg={6}>
             <CollapsibleChartCard
               title={t(
                 "dashboard.charts.teamWorkload",
@@ -445,16 +476,16 @@ export const DashboardChartsGrid = memo<DashboardChartsGridProps>(
             </CollapsibleChartCard>
           </Grid>
 
-          {/* Optional Third Row - Performance charts */}
+          {/* Row 3: Optional Performance Chart - only show if data exists */}
           {hasData(teamMetrics?.performance) && (
-            <Grid item xs={12} lg={6} xl={6}>
+            <Grid item xs={12} lg={8} xl={6}>
               <CollapsibleChartCard
                 title={t(
                   "dashboard.charts.teamPerformance",
                   "Team Performance Trend"
                 )}
                 icon={<Speed />}
-                color={theme.palette.error.main}
+                color={theme.palette.warning.main}
                 chartId="teamPerformance"
                 defaultExpanded={false}
                 onToggle={handleChartToggle("teamPerformance")}

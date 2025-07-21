@@ -118,7 +118,7 @@ export const authApi = {
 
   async refreshToken(data: RefreshTokenRequest): Promise<LoginResponse> {
     const response = await client.post(API_ENDPOINTS.AUTH.REFRESH, {
-      refreshToken: data.refreshToken,
+      refresh_token: data.refreshToken,  // Используем snake_case как ожидает backend
     });
     return response.data;
   },
@@ -203,10 +203,7 @@ export const authApi = {
     return response.data;
   },
 
-  // === Устаревшие методы (для обратной совместимости) ===
-
-  /** @deprecated Используйте resetPassword */
   async forgotPassword(email: string): Promise<void> {
-    await this.resetPassword({ email });
+    await client.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
   },
 };

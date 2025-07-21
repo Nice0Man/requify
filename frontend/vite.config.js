@@ -3,9 +3,43 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { fileURLToPath, URL } from "node:url";
 
+// Plugin для CSP в зависимости от среды
+const cspPlugin = () => {
+  return {
+    name: 'csp-plugin',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html, context) {
+        // В production используем более строгую CSP политику
+        if (context.server) {
+          // Development CSP - более разрешающая
+          return html.replace(
+            /script-src 'self' 'unsafe-inline' 'unsafe-eval'/,
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+          );
+        } else {
+          // Production CSP - более строгая, без unsafe-eval
+          return html.replace(
+            /<meta http-equiv="Content-Security-Policy"[^>]*>/,
+            `<meta http-equiv="Content-Security-Policy" content="
+              default-src 'self';
+              script-src 'self' 'unsafe-inline';
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
+              font-src 'self' https://fonts.gstatic.com;
+              img-src 'self' data: blob:;
+              connect-src 'self' https:;
+              worker-src 'self' blob:;
+            ">`
+          );
+        }
+      }
+    }
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), cspPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(path.dirname(fileURLToPath(import.meta.url)), "./src"),

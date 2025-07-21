@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useRef, useEffect, useState } from 'react';
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -82,8 +82,72 @@ export const LineChart = memo<LineChartProps>(({
   area = false,
   onPointClick,
   config,
+  // New responsive props
+  responsive = true,
+  minHeight = 200,
+  maxHeight = 600,
+  aspectRatio = 16 / 9,
+  debounceMs = 150,
 }) => {
   const theme = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+  // Responsive values based on screen size and container
+  const getResponsiveValues = () => {
+    const isSmall = containerSize.width < 600;
+    const isMedium = containerSize.width < 960;
+    
+    return {
+      margin: {
+        top: isSmall ? 10 : 20,
+        right: isSmall ? 15 : 30,
+        left: isSmall ? 10 : 20,
+        bottom: isSmall ? 10 : 20,
+      },
+      fontSize: isSmall ? 11 : isMedium ? 12 : 13,
+      axisHeight: isSmall ? 50 : 60,
+      axisWidth: isSmall ? 50 : 60,
+      strokeWidth: isSmall ? 2 : 3,
+      dotRadius: isSmall ? 3 : 5,
+      activeDotRadius: isSmall ? 5 : 7,
+    };
+  };
+
+  const responsiveValues = getResponsiveValues();
+
+  // Debounced resize observer
+  useEffect(() => {
+    if (!responsive || !containerRef.current) return;
+
+    let timeoutId: NodeJS.Timeout;
+    
+    const resizeObserver = new ResizeObserver((entries) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        for (const entry of entries) {
+          const { width, height: observedHeight } = entry.contentRect;
+          
+          // Calculate adaptive height based on container width and aspect ratio
+          let adaptiveHeight = responsive 
+            ? Math.max(minHeight, Math.min(maxHeight, width / aspectRatio))
+            : height;
+            
+          setContainerSize({ 
+            width, 
+            height: adaptiveHeight 
+          });
+        }
+      }, debounceMs);
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      clearTimeout(timeoutId);
+      resizeObserver.disconnect();
+    };
+  }, [responsive, minHeight, maxHeight, aspectRatio, height, debounceMs]);
 
   // Transform data for Recharts format
   const chartData = data.map((point, _index) => ({
@@ -105,12 +169,15 @@ export const LineChart = memo<LineChartProps>(({
     theme.palette.error.main,
   ];
 
+  const finalHeight = responsive ? containerSize.height || height : height;
+
   if (loading) {
     return (
       <Box
+        ref={containerRef}
         className={className}
         sx={{
-          height,
+          height: finalHeight,
           width: width || '100%',
           display: 'flex',
           alignItems: 'center',
@@ -132,7 +199,11 @@ export const LineChart = memo<LineChartProps>(({
 
   if (error) {
     return (
-      <Box className={className} sx={{ height, width: width || '100%' }}>
+      <Box 
+        ref={containerRef}
+        className={className} 
+        sx={{ height: finalHeight, width: width || '100%' }}
+      >
         <Alert 
           severity="error" 
           sx={{ 
@@ -154,27 +225,42 @@ export const LineChart = memo<LineChartProps>(({
 
   return (
     <Box 
+      ref={containerRef}
       className={className} 
       sx={{ 
-        height, 
+        height: finalHeight, 
         width: width || '100%',
+        overflow: "hidden",
         '& .recharts-cartesian-grid-horizontal line': {
           stroke: alpha(theme.palette.divider, 0.08),
         },
         '& .recharts-cartesian-grid-vertical line': {
           stroke: alpha(theme.palette.divider, 0.08),
         },
+        '& .recharts-line': {
+          filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.common.black, 0.1)})`,
+        },
+        '& .recharts-area': {
+          filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.common.black, 0.1)})`,
+        },
+        '& .recharts-tooltip-wrapper': {
+          zIndex: 1000,
+        },
+        '& .recharts-wrapper': {
+          width: "100% !important",
+          height: "100% !important",
+        },
       }}
     >
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer 
+        width="100%" 
+        height="100%"
+        minHeight={minHeight}
+        maxHeight={responsive ? maxHeight : undefined}
+      >
         <ChartComponent
           data={chartData}
-          margin={{ 
-            top: 20, 
-            right: 30, 
-            left: 20, 
-            bottom: 20 
-          }}
+          margin={responsiveValues.margin}
         >
           {showGrid && (
             <CartesianGrid
@@ -187,7 +273,7 @@ export const LineChart = memo<LineChartProps>(({
             dataKey="name"
             tick={{ 
               fill: theme.palette.text.secondary, 
-              fontSize: 12,
+              fontSize: responsiveValues.fontSize,
               fontWeight: 500,
               fontFamily: theme.typography.fontFamily,
             }}
@@ -200,12 +286,12 @@ export const LineChart = memo<LineChartProps>(({
               strokeWidth: 1,
             }}
             tickMargin={12}
-            height={60}
+            height={responsiveValues.axisHeight}
           />
           <YAxis
             tick={{ 
               fill: theme.palette.text.secondary, 
-              fontSize: 12,
+              fontSize: responsiveValues.fontSize,
               fontWeight: 500,
               fontFamily: theme.typography.fontFamily,
             }}
@@ -218,13 +304,13 @@ export const LineChart = memo<LineChartProps>(({
               strokeWidth: 1,
             }}
             tickMargin={12}
-            width={60}
+            width={responsiveValues.axisWidth}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend 
             wrapperStyle={{
               paddingTop: '16px',
-              fontSize: '13px',
+              fontSize: `${responsiveValues.fontSize}px`,
               fontWeight: 500,
               fontFamily: theme.typography.fontFamily,
               color: theme.palette.text.secondary,
@@ -237,18 +323,18 @@ export const LineChart = memo<LineChartProps>(({
               dataKey="value"
               stroke={primaryColor}
               fill={`url(#gradient-${primaryColor.replace('#', '')})`}
-              strokeWidth={3}
+              strokeWidth={responsiveValues.strokeWidth}
               dot={showPoints ? { 
                 fill: theme.palette.background.paper, 
                 stroke: primaryColor,
-                strokeWidth: 3, 
-                r: 5,
+                strokeWidth: responsiveValues.strokeWidth, 
+                r: responsiveValues.dotRadius,
                 filter: `drop-shadow(0 2px 4px ${alpha(primaryColor, 0.3)})`,
               } : false}
               activeDot={{ 
-                r: 7, 
+                r: responsiveValues.activeDotRadius, 
                 stroke: primaryColor, 
-                strokeWidth: 3, 
+                strokeWidth: responsiveValues.strokeWidth, 
                 fill: theme.palette.background.paper,
                 filter: `drop-shadow(0 4px 8px ${alpha(primaryColor, 0.4)})`,
               }}
@@ -259,18 +345,18 @@ export const LineChart = memo<LineChartProps>(({
               type={smooth ? "monotone" : "linear"}
               dataKey="value"
               stroke={primaryColor}
-              strokeWidth={3}
+              strokeWidth={responsiveValues.strokeWidth}
               dot={showPoints ? { 
                 fill: theme.palette.background.paper, 
                 stroke: primaryColor,
-                strokeWidth: 3, 
-                r: 5,
+                strokeWidth: responsiveValues.strokeWidth, 
+                r: responsiveValues.dotRadius,
                 filter: `drop-shadow(0 2px 4px ${alpha(primaryColor, 0.3)})`,
               } : false}
               activeDot={{ 
-                r: 7, 
+                r: responsiveValues.activeDotRadius, 
                 stroke: primaryColor, 
-                strokeWidth: 3, 
+                strokeWidth: responsiveValues.strokeWidth, 
                 fill: theme.palette.background.paper,
                 filter: `drop-shadow(0 4px 8px ${alpha(primaryColor, 0.4)})`,
               }}

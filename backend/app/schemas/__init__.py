@@ -11,6 +11,12 @@ from .user import (
     UserBase,
     UserInDBBase,
     UserWithStats,
+    UserStats,
+    UserActivity,
+    UserValidation,
+    UserAvailability,
+    UserAudit,
+    UserSettings,
 )
 
 # Team schemas
@@ -284,6 +290,12 @@ __all__ = [
     "UserBase",
     "UserInDBBase",
     "UserWithStats",
+    "UserStats",
+    "UserActivity",
+    "UserValidation",
+    "UserAvailability",
+    "UserAudit",
+    "UserSettings",
     # Team
     "TeamBase",
     "TeamCreate",

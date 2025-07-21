@@ -3,6 +3,7 @@ export interface ChartDataPoint {
   label: string;
   value: number;
   color?: string;
+  percentage?: number;
   trend?: TrendData;
   metadata?: Record<string, any>;
 }
@@ -25,7 +26,7 @@ export interface ChartMetric {
   id: string;
   title: string;
   value: number | string;
-  format?: 'number' | 'percentage' | 'currency' | 'duration';
+  format?: "number" | "percentage" | "currency" | "duration";
   color?: string;
   icon?: React.ReactNode;
   trend?: TrendData;
@@ -117,19 +118,19 @@ export interface ChartConfig {
   rtl?: boolean;
 }
 
-export type ChartType = 
-  | 'line' 
-  | 'bar' 
-  | 'pie' 
-  | 'doughnut' 
-  | 'area' 
-  | 'radar' 
-  | 'scatter' 
-  | 'treemap' 
-  | 'heatmap'
-  | 'funnel'
-  | 'gauge'
-  | 'waterfall';
+export type ChartType =
+  | "line"
+  | "bar"
+  | "pie"
+  | "doughnut"
+  | "area"
+  | "radar"
+  | "scatter"
+  | "treemap"
+  | "heatmap"
+  | "funnel"
+  | "gauge"
+  | "waterfall";
 
 export interface BaseChartProps {
   data: ChartDataPoint[] | TimeSeriesDataPoint[];
@@ -142,6 +143,12 @@ export interface BaseChartProps {
   className?: string;
   onPointClick?: (point: ChartDataPoint | TimeSeriesDataPoint) => void;
   onLegendClick?: (legend: string) => void;
+  // New responsive props
+  responsive?: boolean;
+  minHeight?: number;
+  maxHeight?: number;
+  aspectRatio?: number;
+  debounceMs?: number;
 }
 
 // Chart-specific props
@@ -162,8 +169,8 @@ export interface BarChartProps extends BaseChartProps {
 
 export interface PieChartProps extends BaseChartProps {
   data: ChartDataPoint[];
-  innerRadius?: number;
-  outerRadius?: number;
+  innerRadius?: number | string;
+  outerRadius?: number | string;
   showLabels?: boolean;
   showLegend?: boolean;
   donut?: boolean;
@@ -179,7 +186,7 @@ export interface RadarChartProps extends BaseChartProps {
 
 export interface MetricCardProps {
   metric: ChartMetric;
-  variant?: 'default' | 'compact' | 'detailed';
+  variant?: "default" | "compact" | "detailed";
   showTrend?: boolean;
   showProgress?: boolean;
   onClick?: (metric: ChartMetric) => void;
@@ -194,4 +201,4 @@ export interface DashboardChart {
   metrics?: ChartMetric[];
   refreshInterval?: number;
   lastUpdated?: Date;
-} 
+}

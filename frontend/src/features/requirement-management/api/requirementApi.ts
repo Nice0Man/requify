@@ -1,69 +1,127 @@
-import { client } from '../../../shared/api/client';
-import type { Requirement, CreateRequirementRequest, UpdateRequirementRequest } from '../../../entities/requirement';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { client } from "@/shared/api/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
+import type {
+  Requirement,
+  RequirementFilters,
+  RequirementStats,
+  CreateRequirementData,
+  UpdateRequirementData,
+} from "../model/types";
 
-export interface RequirementFilters {
-  search?: string;
-  status?: string;
-  priority?: string;
-  projectId?: string;
-}
+// Query Keys
+export const requirementKeys = {
+  all: ["requirements"] as const,
+  lists: () => [...requirementKeys.all, "list"] as const,
+  list: (filters: RequirementFilters) =>
+    [...requirementKeys.lists(), filters] as const,
+  details: () => [...requirementKeys.all, "detail"] as const,
+  detail: (id: string) => [...requirementKeys.details(), id] as const,
+  stats: () => [...requirementKeys.all, "stats"] as const,
+};
 
-export interface RequirementStats {
-  totalRequirements: number;
-  draftRequirements: number;
-  approvedRequirements: number;
-  inProgressRequirements: number;
-  completedRequirements: number;
-  rejectedRequirements: number;
-  changes: {
-    totalRequirements: number;
-    draftRequirements: number;
-    approvedRequirements: number;
-    inProgressRequirements: number;
-    completedRequirements: number;
-    rejectedRequirements: number;
-  };
-}
-
+// API Functions
 export const requirementApi = {
-  // Get all requirements with optional filters
-  getRequirements: async (filters?: RequirementFilters): Promise<Requirement[]> => {
+  getRequirements: async (filters: RequirementFilters = {}) => {
     const params = new URLSearchParams();
-    if (filters?.search) params.append('search', filters.search);
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.priority) params.append('priority', filters.priority);
-    if (filters?.projectId) params.append('projectId', filters.projectId);
-
-    const response = await client.get(`/requirements?${params}`);
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        params.append(key, value.toString());
+      }
+    });
+    const response = await client.get(
+      `${API_ENDPOINTS.REQUIREMENTS.LIST}?${params}`
+    );
     return response.data;
   },
 
-  // Get single requirement by ID
   getRequirement: async (id: string): Promise<Requirement> => {
-    const response = await client.get(`/requirements/${id}`);
+    const response = await client.get(API_ENDPOINTS.REQUIREMENTS.GET(id));
     return response.data;
   },
 
-  // Create new requirement
-  createRequirement: async (data: CreateRequirementRequest): Promise<Requirement> => {
-    const response = await client.post('/requirements', data);
+  createRequirement: async (data: CreateRequirementData): Promise<Requirement> => {
+    const response = await client.post(API_ENDPOINTS.REQUIREMENTS.CREATE, data);
     return response.data;
   },
 
-  // Update existing requirement
-  updateRequirement: async (id: string, data: UpdateRequirementRequest): Promise<Requirement> => {
-    const response = await client.put(`/requirements/${id}`, data);
+  updateRequirement: async (
+    id: string,
+    data: UpdateRequirementData
+  ): Promise<Requirement> => {
+    const response = await client.put(API_ENDPOINTS.REQUIREMENTS.UPDATE(id), data);
     return response.data;
   },
 
-  // Delete requirement
   deleteRequirement: async (id: string): Promise<void> => {
-    await client.delete(`/requirements/${id}`);
+    await client.delete(API_ENDPOINTS.REQUIREMENTS.DELETE(id));
   },
 
-  // Get requirement statistics
   getRequirementStats: async (): Promise<RequirementStats> => {
-    const response = await client.get('/requirements/stats');
+    const response = await client.get(API_ENDPOINTS.REQUIREMENTS.SEARCH); // Using search endpoint for stats
     return response.data;
   },
+};
+
+// Hooks
+export const useRequirements = (filters: RequirementFilters = {}) => {
+  return useQuery({
+    queryKey: requirementKeys.list(filters),
+    queryFn: () => requirementApi.getRequirements(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useRequirement = (id: string) => {
+  return useQuery({
+    queryKey: requirementKeys.detail(id),
+    queryFn: () => requirementApi.getRequirement(id),
+    enabled: !!id,
+  });
+};
+
+export const useCreateRequirement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: requirementApi.createRequirement,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: requirementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.stats() });
+    },
+  });
+};
+
+export const useUpdateRequirement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateRequirementData }) =>
+      requirementApi.updateRequirement(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: requirementKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.stats() });
+    },
+  });
+};
+
+export const useDeleteRequirement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: requirementApi.deleteRequirement,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: requirementKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: requirementKeys.stats() });
+    },
+  });
+};
+
+export const useRequirementStats = () => {
+  return useQuery({
+    queryKey: requirementKeys.stats(),
+    queryFn: requirementApi.getRequirementStats,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
 }; 

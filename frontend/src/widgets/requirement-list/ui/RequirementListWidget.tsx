@@ -174,8 +174,10 @@ const StatusChip = memo<{ status: string }>(({ status }) => {
   );
 });
 
-const PriorityChip = memo<{ priority: string }>(({ priority }) => {
-  const getPriorityConfig = useCallback((priority: string) => {
+const PriorityChip = memo<{ priority?: string }>(({ priority }) => {
+  const getPriorityConfig = useCallback((priority?: string) => {
+    if (!priority) return { label: "Не указан", color: "#6b7280" };
+    
     const configs = {
       low: { label: "Низкий", color: "#10b981" },
       medium: { label: "Средний", color: "#f59e0b" },

@@ -288,6 +288,22 @@
         "documentation": {}
     },
     {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "AsyncGenerator",
         "importPath": "typing",
         "description": "typing",
@@ -536,6 +552,14 @@
         "documentation": {}
     },
     {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Optional",
         "importPath": "typing",
         "description": "typing",
@@ -648,6 +672,22 @@
         "documentation": {}
     },
     {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "List",
         "importPath": "typing",
         "description": "typing",
@@ -817,6 +857,22 @@
     },
     {
         "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -1240,6 +1296,14 @@
         "documentation": {}
     },
     {
+        "label": "Literal",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Optional",
         "importPath": "typing",
         "description": "typing",
@@ -1520,6 +1584,62 @@
         "documentation": {}
     },
     {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Optional",
         "importPath": "typing",
         "description": "typing",
@@ -1641,6 +1761,46 @@
     },
     {
         "label": "Union",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Tuple",
         "importPath": "typing",
         "description": "typing",
         "isExtraImport": true,
@@ -1817,6 +1977,14 @@
         "documentation": {}
     },
     {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "func",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -1825,7 +1993,135 @@
         "documentation": {}
     },
     {
+        "label": "delete",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "update",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "desc",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "or_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "or_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "desc",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "update",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "delete",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "or_",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -1857,158 +2153,6 @@
         "documentation": {}
     },
     {
-        "label": "func",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "delete",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "update",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "select",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "desc",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "func",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "and_",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "or_",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "select",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "and_",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "or_",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "desc",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "func",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "update",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "delete",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "select",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "func",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "or_",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "select",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
         "label": "delete",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -2122,6 +2266,22 @@
     },
     {
         "label": "or_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -3161,6 +3321,46 @@
         "documentation": {}
     },
     {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "or_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "text",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -3563,6 +3763,22 @@
     },
     {
         "label": "create_async_engine",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
         "importPath": "sqlalchemy.ext.asyncio",
         "description": "sqlalchemy.ext.asyncio",
         "isExtraImport": true,
@@ -4110,14 +4326,6 @@
         "documentation": {}
     },
     {
-        "label": "timedelta",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -4286,14 +4494,6 @@
         "documentation": {}
     },
     {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -4302,47 +4502,7 @@
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
+        "label": "timedelta",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4382,6 +4542,22 @@
         "documentation": {}
     },
     {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -4407,6 +4583,14 @@
     },
     {
         "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4534,22 +4718,6 @@
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "UTC",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
         "label": "UTC",
         "importPath": "datetime",
         "description": "datetime",
@@ -4566,39 +4734,7 @@
         "documentation": {}
     },
     {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "datetime",
+        "label": "UTC",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4631,6 +4767,14 @@
     },
     {
         "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4702,6 +4846,54 @@
         "documentation": {}
     },
     {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
@@ -4727,6 +4919,62 @@
     },
     {
         "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -4775,6 +5023,14 @@
     },
     {
         "label": "UTC",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
         "importPath": "datetime",
         "description": "datetime",
         "isExtraImport": true,
@@ -5742,6 +5998,14 @@
         "documentation": {}
     },
     {
+        "label": "get_current_active_user",
+        "importPath": "app.api.deps",
+        "description": "app.api.deps",
+        "isExtraImport": true,
+        "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
         "label": "get_projects_read_user",
         "importPath": "app.api.deps",
         "description": "app.api.deps",
@@ -6043,6 +6307,14 @@
         "description": "app.api.deps",
         "isExtraImport": true,
         "detail": "app.api.deps",
+        "documentation": {}
+    },
+    {
+        "label": "User",
+        "importPath": "app.models.user",
+        "description": "app.models.user",
+        "isExtraImport": true,
+        "detail": "app.models.user",
         "documentation": {}
     },
     {
@@ -6526,6 +6798,22 @@
         "documentation": {}
     },
     {
+        "label": "models",
+        "importPath": "app",
+        "description": "app",
+        "isExtraImport": true,
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "__version__",
+        "importPath": "app",
+        "description": "app",
+        "isExtraImport": true,
+        "detail": "app",
+        "documentation": {}
+    },
+    {
         "label": "crud",
         "importPath": "app",
         "description": "app",
@@ -6591,26 +6879,34 @@
     },
     {
         "label": "auth0_service",
-        "importPath": "app.services.auth0_service",
-        "description": "app.services.auth0_service",
+        "importPath": "app.services",
+        "description": "app.services",
         "isExtraImport": true,
-        "detail": "app.services.auth0_service",
+        "detail": "app.services",
+        "documentation": {}
+    },
+    {
+        "label": "email_service",
+        "importPath": "app.services",
+        "description": "app.services",
+        "isExtraImport": true,
+        "detail": "app.services",
         "documentation": {}
     },
     {
         "label": "auth0_service",
-        "importPath": "app.services.auth0_service",
-        "description": "app.services.auth0_service",
+        "importPath": "app.services",
+        "description": "app.services",
         "isExtraImport": true,
-        "detail": "app.services.auth0_service",
+        "detail": "app.services",
         "documentation": {}
     },
     {
         "label": "Auth0UserInfo",
-        "importPath": "app.services.auth0_service",
-        "description": "app.services.auth0_service",
+        "importPath": "app.services",
+        "description": "app.services",
         "isExtraImport": true,
-        "detail": "app.services.auth0_service",
+        "detail": "app.services",
         "documentation": {}
     },
     {
@@ -6766,6 +7062,38 @@
         "documentation": {}
     },
     {
+        "label": "user_preferences",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "notification",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "activity",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
+        "label": "user",
+        "importPath": "app.crud",
+        "description": "app.crud",
+        "isExtraImport": true,
+        "detail": "app.crud",
+        "documentation": {}
+    },
+    {
         "label": "project",
         "importPath": "app.crud",
         "description": "app.crud",
@@ -6831,14 +7159,6 @@
     },
     {
         "label": "team_member",
-        "importPath": "app.crud",
-        "description": "app.crud",
-        "isExtraImport": true,
-        "detail": "app.crud",
-        "documentation": {}
-    },
-    {
-        "label": "user",
         "importPath": "app.crud",
         "description": "app.crud",
         "isExtraImport": true,
@@ -7094,14 +7414,6 @@
         "documentation": {}
     },
     {
-        "label": "email_service",
-        "importPath": "app.services.email_service",
-        "description": "app.services.email_service",
-        "isExtraImport": true,
-        "detail": "app.services.email_service",
-        "documentation": {}
-    },
-    {
         "label": "logger",
         "importPath": "app.utils.logger",
         "description": "app.utils.logger",
@@ -7230,132 +7542,323 @@
         "documentation": {}
     },
     {
-        "label": "time",
-        "kind": 6,
+        "label": "dashboard_service",
+        "importPath": "app.services.dashboard_service",
+        "description": "app.services.dashboard_service",
         "isExtraImport": true,
-        "importPath": "time",
-        "description": "time",
-        "detail": "time",
+        "detail": "app.services.dashboard_service",
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "dashboard_service",
+        "importPath": "app.services.dashboard_service",
+        "description": "app.services.dashboard_service",
         "isExtraImport": true,
-        "detail": "app.models.project",
+        "detail": "app.services.dashboard_service",
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "ServiceError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.project",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "ServiceError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.project",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "ServiceError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.project",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "NotFoundError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.project",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "PermissionDeniedError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.project",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Project",
-        "importPath": "app.models.project",
-        "description": "app.models.project",
+        "label": "BusinessLogicError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.project",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "ValidationError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "UserNotFoundError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "PermissionDeniedError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "ExternalSystemError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "ExternalServiceError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "ServiceError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "NotificationError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
         "documentation": {}
     },
     {
-        "label": "Requirement",
-        "importPath": "app.models.requirement",
-        "description": "app.models.requirement",
+        "label": "ReportGenerationError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
         "isExtraImport": true,
-        "detail": "app.models.requirement",
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ServiceError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "NotFoundError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "PermissionDeniedError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "BusinessLogicError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationError",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "register_exception_handlers",
+        "importPath": "app.core.exceptions",
+        "description": "app.core.exceptions",
+        "isExtraImport": true,
+        "detail": "app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "DashboardStats",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DashboardOverviewStats",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "QuickProject",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "QuickRequirement",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "ActivityItem",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "MyDashboardResponse",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DashboardNotification",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "SystemMetrics",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "TimelineDataPoint",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DistributionDataPoint",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectTrendDataPoint",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "TimelineQueryParams",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DistributionQueryParams",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "UserDashboardPreferences",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DashboardNotification",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "ActivityItem",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "QuickProject",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "QuickRequirement",
+        "importPath": "app.schemas.dashboard",
+        "description": "app.schemas.dashboard",
+        "isExtraImport": true,
+        "detail": "app.schemas.dashboard",
         "documentation": {}
     },
     {
@@ -7479,7 +7982,7 @@
         "documentation": {}
     },
     {
-        "label": "UserDashboardPreferences",
+        "label": "TimelineQueryParams",
         "importPath": "app.schemas.dashboard",
         "description": "app.schemas.dashboard",
         "isExtraImport": true,
@@ -7487,7 +7990,7 @@
         "documentation": {}
     },
     {
-        "label": "DashboardNotification",
+        "label": "DistributionQueryParams",
         "importPath": "app.schemas.dashboard",
         "description": "app.schemas.dashboard",
         "isExtraImport": true,
@@ -7495,7 +7998,7 @@
         "documentation": {}
     },
     {
-        "label": "ActivityItem",
+        "label": "ProjectTrendsQueryParams",
         "importPath": "app.schemas.dashboard",
         "description": "app.schemas.dashboard",
         "isExtraImport": true,
@@ -7503,19 +8006,67 @@
         "documentation": {}
     },
     {
-        "label": "QuickProject",
-        "importPath": "app.schemas.dashboard",
-        "description": "app.schemas.dashboard",
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
         "isExtraImport": true,
-        "detail": "app.schemas.dashboard",
+        "detail": "app.models.requirement",
         "documentation": {}
     },
     {
-        "label": "QuickRequirement",
-        "importPath": "app.schemas.dashboard",
-        "description": "app.schemas.dashboard",
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
         "isExtraImport": true,
-        "detail": "app.schemas.dashboard",
+        "detail": "app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
+        "isExtraImport": true,
+        "detail": "app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
+        "isExtraImport": true,
+        "detail": "app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
+        "isExtraImport": true,
+        "detail": "app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
+        "isExtraImport": true,
+        "detail": "app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
+        "isExtraImport": true,
+        "detail": "app.models.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "Requirement",
+        "importPath": "app.models.requirement",
+        "description": "app.models.requirement",
+        "isExtraImport": true,
+        "detail": "app.models.requirement",
         "documentation": {}
     },
     {
@@ -7639,6 +8190,15 @@
         "documentation": {}
     },
     {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
         "label": "TeamRole",
         "importPath": "app.models.constants",
         "description": "app.models.constants",
@@ -7732,6 +8292,190 @@
         "description": "app.models.constants",
         "isExtraImport": true,
         "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamRole",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStatus",
+        "importPath": "app.models.constants",
+        "description": "app.models.constants",
+        "isExtraImport": true,
+        "detail": "app.models.constants",
+        "documentation": {}
+    },
+    {
+        "label": "TeamCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamDetailResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamListResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamBulkCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberBulkAdd",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamPermissionCheck",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamPermissionResponse",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberCreate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberUpdate",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamSearchRequest",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
+        "documentation": {}
+    },
+    {
+        "label": "TeamMemberStats",
+        "importPath": "app.schemas.team",
+        "description": "app.schemas.team",
+        "isExtraImport": true,
+        "detail": "app.schemas.team",
         "documentation": {}
     },
     {
@@ -7831,39 +8575,7 @@
         "documentation": {}
     },
     {
-        "label": "TeamBulkUpdate",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamBulkDelete",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
         "label": "TeamMemberBulkAdd",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamMemberBulkRemove",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamMemberBulkUpdate",
         "importPath": "app.schemas.team",
         "description": "app.schemas.team",
         "isExtraImport": true,
@@ -7887,147 +8599,11 @@
         "documentation": {}
     },
     {
-        "label": "TeamCreate",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
+        "label": "team_service",
+        "importPath": "app.services.team_service",
+        "description": "app.services.team_service",
         "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamUpdate",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamMemberCreate",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamMemberUpdate",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamSearchRequest",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamStats",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "TeamMemberStats",
-        "importPath": "app.schemas.team",
-        "description": "app.schemas.team",
-        "isExtraImport": true,
-        "detail": "app.schemas.team",
-        "documentation": {}
-    },
-    {
-        "label": "NotFoundError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "PermissionDeniedError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "BusinessLogicError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "ValidationError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "UserNotFoundError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "PermissionDeniedError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "ExternalSystemError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "ExternalServiceError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "NotificationError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "ReportGenerationError",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
-        "documentation": {}
-    },
-    {
-        "label": "register_exception_handlers",
-        "importPath": "app.core.exceptions",
-        "description": "app.core.exceptions",
-        "isExtraImport": true,
-        "detail": "app.core.exceptions",
+        "detail": "app.services.team_service",
         "documentation": {}
     },
     {
@@ -8804,15 +9380,6 @@
         "description": "sqlalchemy.exc",
         "isExtraImport": true,
         "detail": "sqlalchemy.exc",
-        "documentation": {}
-    },
-    {
-        "label": "logging",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "logging",
-        "description": "logging",
-        "detail": "logging",
         "documentation": {}
     },
     {
@@ -9827,6 +10394,70 @@
         "documentation": {}
     },
     {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
+        "label": "Project",
+        "importPath": "app.models.project",
+        "description": "app.models.project",
+        "isExtraImport": true,
+        "detail": "app.models.project",
+        "documentation": {}
+    },
+    {
         "label": "ProjectCreate",
         "importPath": "app.schemas.project",
         "description": "app.schemas.project",
@@ -10678,6 +11309,15 @@
         "documentation": {}
     },
     {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
         "label": "MIMEText",
         "importPath": "email.mime.text",
         "description": "email.mime.text",
@@ -11014,7 +11654,7 @@
         "kind": 2,
         "importPath": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
         "description": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
-        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_table(\"test_results\")\n    op.drop_table(\"relationships\")\n    op.drop_index(op.f(\"ix_dashboard_notifications_id\"), table_name=\"dashboard_notifications\")\n    op.drop_table(\"dashboard_notifications\")\n    op.drop_index(op.f(\"ix_dashboard_activities_id\"), table_name=\"dashboard_activities\")\n    op.drop_table(\"dashboard_activities\")\n    op.drop_table(\"comments\")",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_table(\"test_results\")\n    op.drop_table(\"relationships\")\n    op.drop_index(\n        op.f(\"ix_dashboard_notifications_id\"), table_name=\"dashboard_notifications\"\n    )\n    op.drop_table(\"dashboard_notifications\")\n    op.drop_index(op.f(\"ix_dashboard_activities_id\"), table_name=\"dashboard_activities\")",
         "detail": "backend.alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
         "documentation": {}
     },
@@ -11091,20 +11731,11 @@
         "documentation": {}
     },
     {
-        "label": "DashboardService",
-        "kind": 6,
-        "importPath": "backend.app.api.v1.endpoints.dashboard",
-        "description": "backend.app.api.v1.endpoints.dashboard",
-        "peekOfCode": "class DashboardService:\n    \"\"\"Service class for dashboard operations\"\"\"\n    @staticmethod\n    async def get_overview_stats(db: AsyncSession) -> DashboardOverviewStats:\n        \"\"\"Get overview statistics efficiently\"\"\"\n        # Get counts with single queries\n        total_projects = await crud_project.count(db) or 0\n        total_requirements = await crud_requirement.count(db) or 0\n        total_users = await crud_user.count(db) or 0\n        # Get project status distribution (if status tracking is implemented)",
-        "detail": "backend.app.api.v1.endpoints.dashboard",
-        "documentation": {}
-    },
-    {
         "label": "router",
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.dashboard",
         "description": "backend.app.api.v1.endpoints.dashboard",
-        "peekOfCode": "router = APIRouter()\nclass DashboardService:\n    \"\"\"Service class for dashboard operations\"\"\"\n    @staticmethod\n    async def get_overview_stats(db: AsyncSession) -> DashboardOverviewStats:\n        \"\"\"Get overview statistics efficiently\"\"\"\n        # Get counts with single queries\n        total_projects = await crud_project.count(db) or 0\n        total_requirements = await crud_requirement.count(db) or 0\n        total_users = await crud_user.count(db) or 0",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/stats\", response_model=DashboardStats)\nasync def get_dashboard_stats(\n    current_user: UserProfile = Depends(get_stats_read_user),\n    db: AsyncSession = Depends(get_db),\n):\n    \"\"\"Get comprehensive dashboard statistics\"\"\"\n    try:\n        return await dashboard_service.get_comprehensive_dashboard_data(\n            db, current_user.id",
         "detail": "backend.app.api.v1.endpoints.dashboard",
         "documentation": {}
     },
@@ -11176,7 +11807,16 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.teams",
         "description": "backend.app.api.v1.endpoints.teams",
-        "peekOfCode": "router = APIRouter()\n# Utility functions\nasync def get_team_or_404(db: AsyncSession, team_id: int, load_members: bool = False):\n    \"\"\"Получить команду или вернуть 404\"\"\"\n    if load_members:\n        team = await crud_team.get_with_members(db, team_id=team_id)\n    else:\n        team = await crud_team.get(db, id=team_id)\n    if not team:\n        raise NotFoundError(\"team\", team_id)",
+        "peekOfCode": "router = APIRouter()\nlogger = logging.getLogger(__name__)\n# Utility functions removed - business logic moved to team_service\n# Team endpoints\n@router.get(\"/\", response_model=TeamListResponse, summary=\"Получить список команд\")\nasync def get_teams(\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_current_user),\n    skip: int = Query(0, ge=0),\n    limit: int = Query(20, ge=1, le=100),",
+        "detail": "backend.app.api.v1.endpoints.teams",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "backend.app.api.v1.endpoints.teams",
+        "description": "backend.app.api.v1.endpoints.teams",
+        "peekOfCode": "logger = logging.getLogger(__name__)\n# Utility functions removed - business logic moved to team_service\n# Team endpoints\n@router.get(\"/\", response_model=TeamListResponse, summary=\"Получить список команд\")\nasync def get_teams(\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_current_user),\n    skip: int = Query(0, ge=0),\n    limit: int = Query(20, ge=1, le=100),\n    query: Optional[str] = Query(None),",
         "detail": "backend.app.api.v1.endpoints.teams",
         "documentation": {}
     },
@@ -11509,7 +12149,16 @@
         "kind": 6,
         "importPath": "backend.app.core.exceptions",
         "description": "backend.app.core.exceptions",
-        "peekOfCode": "class UserNotFoundError(RequifyException):\n    \"\"\"Исключение для случаев, когда пользователь не найден.\"\"\"\n    def __init__(self, identifier: Any):\n        message = f\"User with identifier '{identifier}' not found\"\n        super().__init__(\n            message=message,\n            status_code=status.HTTP_404_NOT_FOUND,\n            details={\"resource\": \"user\", \"identifier\": str(identifier)},\n        )\n# Обработчики исключений для FastAPI",
+        "peekOfCode": "class UserNotFoundError(RequifyException):\n    \"\"\"Исключение для случаев, когда пользователь не найден.\"\"\"\n    def __init__(self, identifier: Any):\n        message = f\"User with identifier '{identifier}' not found\"\n        super().__init__(\n            message=message,\n            status_code=status.HTTP_404_NOT_FOUND,\n            details={\"resource\": \"user\", \"identifier\": str(identifier)},\n        )\nclass ServiceError(RequifyException):",
+        "detail": "backend.app.core.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ServiceError",
+        "kind": 6,
+        "importPath": "backend.app.core.exceptions",
+        "description": "backend.app.core.exceptions",
+        "peekOfCode": "class ServiceError(RequifyException):\n    \"\"\"Исключение для ошибок внутренних сервисов.\"\"\"\n    def __init__(\n        self, service_name: str, message: str, error_code: Optional[str] = None\n    ):\n        super().__init__(\n            message=f\"Service '{service_name}' error: {message}\",\n            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,\n            details={\n                \"service\": service_name,",
         "detail": "backend.app.core.exceptions",
         "documentation": {}
     },
@@ -11847,6 +12496,15 @@
         "documentation": {}
     },
     {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "backend.app.crud.project",
+        "description": "backend.app.crud.project",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass CRUDProject(CRUDBase[Project, ProjectCreate, ProjectUpdate]):\n    \"\"\"CRUD операции для модели Project.\"\"\"\n    async def get_by_code(self, db: AsyncSession, *, code: str) -> Optional[Project]:\n        \"\"\"\n        Получить проект по коду.\n        Args:\n            db: Сессия базы данных\n            code: Код проекта\n        Returns:",
+        "detail": "backend.app.crud.project",
+        "documentation": {}
+    },
+    {
         "label": "project",
         "kind": 5,
         "importPath": "backend.app.crud.project",
@@ -11933,6 +12591,15 @@
         "importPath": "backend.app.crud.requirement",
         "description": "backend.app.crud.requirement",
         "peekOfCode": "class CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate]):\n    \"\"\"CRUD операции для модели Requirement.\"\"\"\n    async def get_with_details(\n        self, db: AsyncSession, *, id: int\n    ) -> Optional[Requirement]:\n        \"\"\"\n        Получить требование с подробной информацией.\n        Args:\n            db: Сессия базы данных\n            id: ID требования",
+        "detail": "backend.app.crud.requirement",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "backend.app.crud.requirement",
+        "description": "backend.app.crud.requirement",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass CRUDRequirement(CRUDBase[Requirement, RequirementCreate, RequirementUpdate]):\n    \"\"\"CRUD операции для модели Requirement.\"\"\"\n    async def get_with_details(\n        self, db: AsyncSession, *, id: int\n    ) -> Optional[Requirement]:\n        \"\"\"\n        Получить требование с подробной информацией.\n        Args:\n            db: Сессия базы данных",
         "detail": "backend.app.crud.requirement",
         "documentation": {}
     },
@@ -13183,7 +13850,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.dashboard",
         "description": "backend.app.schemas.dashboard",
-        "peekOfCode": "class SystemMetrics(BaseModel):\n    \"\"\"System performance metrics for dashboard monitoring\"\"\"\n    cpuUsage: float = Field(\n        ...,\n        description=\"CPU usage percentage\",\n        ge=0,\n        le=100,\n        alias=\"cpu_usage\"\n    )\n    memoryUsage: float = Field(",
+        "peekOfCode": "class SystemMetrics(BaseModel):\n    \"\"\"System performance metrics for dashboard monitoring\"\"\"\n    cpuUsage: float = Field(\n        ..., description=\"CPU usage percentage\", ge=0, le=100, alias=\"cpu_usage\"\n    )\n    memoryUsage: float = Field(\n        ..., description=\"Memory usage percentage\", ge=0, le=100, alias=\"memory_usage\"\n    )\n    diskUsage: float = Field(\n        ..., description=\"Disk usage percentage\", ge=0, le=100, alias=\"disk_usage\"",
         "detail": "backend.app.schemas.dashboard",
         "documentation": {}
     },
@@ -13201,7 +13868,7 @@
         "kind": 6,
         "importPath": "backend.app.schemas.dashboard",
         "description": "backend.app.schemas.dashboard",
-        "peekOfCode": "class DistributionDataPoint(BaseModel):\n    \"\"\"Distribution chart data point for dashboard charts\"\"\"\n    id: str = Field(..., description=\"Unique identifier for the data point\")\n    label: str = Field(..., description=\"Label for the data point\")\n    value: float = Field(..., description=\"Numeric value\", ge=0)\n    percentage: Optional[float] = Field(None, description=\"Percentage of total\", ge=0, le=100)\n    color: str = Field(..., description=\"Color for visualization\")\n    metadata: Optional[Dict[str, Any]] = Field(None, description=\"Additional metadata\")\n    class Config:\n        json_schema_extra = {",
+        "peekOfCode": "class DistributionDataPoint(BaseModel):\n    \"\"\"Distribution chart data point for dashboard charts\"\"\"\n    id: str = Field(..., description=\"Unique identifier for the data point\")\n    label: str = Field(..., description=\"Label for the data point\")\n    value: float = Field(..., description=\"Numeric value\", ge=0)\n    percentage: Optional[float] = Field(\n        None, description=\"Percentage of total\", ge=0, le=100\n    )\n    color: str = Field(..., description=\"Color for visualization\")\n    metadata: Optional[Dict[str, Any]] = Field(None, description=\"Additional metadata\")",
         "detail": "backend.app.schemas.dashboard",
         "documentation": {}
     },
@@ -13210,7 +13877,34 @@
         "kind": 6,
         "importPath": "backend.app.schemas.dashboard",
         "description": "backend.app.schemas.dashboard",
-        "peekOfCode": "class ProjectTrendDataPoint(BaseModel):\n    \"\"\"Project trend data point for project trends analysis\"\"\"\n    period: str = Field(..., description=\"Time period (e.g., '2024-01', 'Q1 2024')\")\n    metric: str = Field(..., description=\"Metric name (e.g., 'projects_created', 'completion_rate')\")\n    value: float = Field(..., description=\"Metric value\")\n    change: float = Field(..., description=\"Change from previous period\")\n    direction: str = Field(..., description=\"Trend direction\", pattern=\"^(up|down|stable)$\")\n    metadata: Optional[Dict[str, Any]] = Field(None, description=\"Additional trend metadata\")\n    class Config:\n        json_schema_extra = {",
+        "peekOfCode": "class ProjectTrendDataPoint(BaseModel):\n    \"\"\"Project trend data point for project trends analysis\"\"\"\n    period: str = Field(..., description=\"Time period (e.g., '2024-01', 'Q1 2024')\")\n    metric: str = Field(\n        ..., description=\"Metric name (e.g., 'projects_created', 'completion_rate')\"\n    )\n    value: float = Field(..., description=\"Metric value\")\n    change: float = Field(..., description=\"Change from previous period\")\n    direction: str = Field(\n        ..., description=\"Trend direction\", pattern=\"^(up|down|stable)$\"",
+        "detail": "backend.app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "TimelineQueryParams",
+        "kind": 6,
+        "importPath": "backend.app.schemas.dashboard",
+        "description": "backend.app.schemas.dashboard",
+        "peekOfCode": "class TimelineQueryParams(BaseModel):\n    \"\"\"Query parameters for timeline chart endpoint\"\"\"\n    period: Optional[Literal[\"7d\", \"30d\", \"90d\", \"6m\", \"1y\"]] = Field(\n        default=\"30d\", description=\"Time period for timeline data\"\n    )\n    project_id: Optional[str] = Field(\n        default=None, description=\"Filter by specific project ID\"\n    )\n    status: Optional[Literal[\"draft\", \"active\", \"completed\", \"cancelled\"]] = Field(\n        default=None, description=\"Filter by requirement status\"",
+        "detail": "backend.app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "DistributionQueryParams",
+        "kind": 6,
+        "importPath": "backend.app.schemas.dashboard",
+        "description": "backend.app.schemas.dashboard",
+        "peekOfCode": "class DistributionQueryParams(BaseModel):\n    \"\"\"Query parameters for distribution chart endpoint\"\"\"\n    period: Optional[Literal[\"7d\", \"30d\", \"90d\", \"1y\"]] = Field(\n        default=\"30d\", description=\"Time period for stats\"\n    )\n    status: Optional[Literal[\"active\", \"completed\", \"on_hold\", \"cancelled\"]] = Field(\n        default=None, description=\"Filter by project status\"\n    )\n    team_id: Optional[str] = Field(default=None, description=\"Filter by team ID\")\n    user_id: Optional[str] = Field(default=None, description=\"Filter by user/owner ID\")",
+        "detail": "backend.app.schemas.dashboard",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectTrendsQueryParams",
+        "kind": 6,
+        "importPath": "backend.app.schemas.dashboard",
+        "description": "backend.app.schemas.dashboard",
+        "peekOfCode": "class ProjectTrendsQueryParams(BaseModel):\n    \"\"\"Query parameters for project trends chart endpoint\"\"\"\n    period: Optional[Literal[\"7d\", \"30d\", \"90d\", \"1y\"]] = Field(\n        default=\"90d\", description=\"Time period for trend analysis\"\n    )\n    status: Optional[Literal[\"active\", \"completed\", \"on_hold\", \"cancelled\"]] = Field(\n        default=None, description=\"Filter by project status\"\n    )\n    limit: Optional[int] = Field(\n        default=10, description=\"Number of recent projects\", ge=1, le=50",
         "detail": "backend.app.schemas.dashboard",
         "documentation": {}
     },
@@ -14758,7 +15452,61 @@
         "kind": 6,
         "importPath": "backend.app.schemas.user",
         "description": "backend.app.schemas.user",
-        "peekOfCode": "class EmailVerificationConfirm(BaseModel):\n    \"\"\"Схема для подтверждения верификации email.\"\"\"\n    token: str = Field(..., description=\"Токен верификации email\")\n    @field_validator(\"token\")\n    def validate_token(cls, v):\n        \"\"\"Валидация токена\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Verification token cannot be empty\")\n        return v.strip()",
+        "peekOfCode": "class EmailVerificationConfirm(BaseModel):\n    \"\"\"Схема для подтверждения верификации email.\"\"\"\n    token: str = Field(..., description=\"Токен верификации email\")\n    @field_validator(\"token\")\n    def validate_token(cls, v):\n        \"\"\"Валидация токена\"\"\"\n        if not v or not v.strip():\n            raise ValueError(\"Verification token cannot be empty\")\n        return v.strip()\nclass UserStats(BaseModel):",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserStats",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserStats(BaseModel):\n    \"\"\"Схема статистики пользователя.\"\"\"\n    user_id: int = Field(..., description=\"ID пользователя\")\n    projects_count: int = Field(0, description=\"Количество проектов\", ge=0)\n    requirements_count: int = Field(0, description=\"Количество требований\", ge=0)\n    comments_count: int = Field(0, description=\"Количество комментариев\", ge=0)\n    last_login: Optional[str] = Field(None, description=\"Последний вход\")\n    created_at: str = Field(..., description=\"Дата создания\")\n    is_active: bool = Field(..., description=\"Активен ли пользователь\")\n    role: str = Field(..., description=\"Роль пользователя\")",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserActivity",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserActivity(BaseModel):\n    \"\"\"Схема активности пользователя.\"\"\"\n    id: str = Field(..., description=\"ID активности\")\n    type: str = Field(..., description=\"Тип активности\")\n    title: str = Field(..., description=\"Заголовок активности\")\n    description: Optional[str] = Field(None, description=\"Описание\")\n    timestamp: str = Field(..., description=\"Временная метка\")\n    entity_type: Optional[str] = Field(None, description=\"Тип сущности\")\n    entity_id: Optional[int] = Field(None, description=\"ID сущности\")\n    class Config:",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserSettings",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserSettings(BaseModel):\n    \"\"\"Схема настроек пользователя.\"\"\"\n    user_id: int = Field(..., description=\"ID пользователя\")\n    theme: str = Field(\"light\", description=\"Тема интерфейса\")\n    language: str = Field(\"ru\", description=\"Язык интерфейса\")\n    timezone: str = Field(\"UTC\", description=\"Часовой пояс\")\n    notifications: Dict[str, bool] = Field(\n        default_factory=lambda: {\"email\": True, \"push\": True, \"sms\": False},\n        description=\"Настройки уведомлений\",\n    )",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserValidation",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserValidation(BaseModel):\n    \"\"\"Схема результата валидации данных пользователя.\"\"\"\n    valid: bool = Field(..., description=\"Результат валидации\")\n    errors: List[str] = Field(default_factory=list, description=\"Список ошибок\")\n    class Config:\n        from_attributes = True\nclass UserAvailability(BaseModel):\n    \"\"\"Схема проверки доступности username/email.\"\"\"\n    available: bool = Field(..., description=\"Доступность\")\n    class Config:",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserAvailability",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserAvailability(BaseModel):\n    \"\"\"Схема проверки доступности username/email.\"\"\"\n    available: bool = Field(..., description=\"Доступность\")\n    class Config:\n        from_attributes = True\nclass UserAudit(BaseModel):\n    \"\"\"Схема записи аудита пользователя.\"\"\"\n    id: str = Field(..., description=\"ID записи аудита\")\n    action: str = Field(..., description=\"Действие\")\n    timestamp: str = Field(..., description=\"Временная метка\")",
+        "detail": "backend.app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "UserAudit",
+        "kind": 6,
+        "importPath": "backend.app.schemas.user",
+        "description": "backend.app.schemas.user",
+        "peekOfCode": "class UserAudit(BaseModel):\n    \"\"\"Схема записи аудита пользователя.\"\"\"\n    id: str = Field(..., description=\"ID записи аудита\")\n    action: str = Field(..., description=\"Действие\")\n    timestamp: str = Field(..., description=\"Временная метка\")\n    details: Optional[Dict[str, Any]] = Field(None, description=\"Детали\")\n    ip_address: Optional[str] = Field(None, description=\"IP адрес\")\n    user_agent: Optional[str] = Field(None, description=\"User Agent\")\n    class Config:\n        from_attributes = True",
         "detail": "backend.app.schemas.user",
         "documentation": {}
     },
@@ -14796,6 +15544,33 @@
         "description": "backend.app.services.auth0_service",
         "peekOfCode": "auth0_service = Auth0Service()",
         "detail": "backend.app.services.auth0_service",
+        "documentation": {}
+    },
+    {
+        "label": "DashboardService",
+        "kind": 6,
+        "importPath": "backend.app.services.dashboard_service",
+        "description": "backend.app.services.dashboard_service",
+        "peekOfCode": "class DashboardService:\n    \"\"\"\n    Сервис дашборда.\n    Реализует принципы SOLID:\n    - Single Responsibility: отвечает только за логику дашборда\n    - Open/Closed: легко расширяется новыми виджетами и метриками\n    - Liskov Substitution: может быть заменен другой реализацией\n    - Interface Segregation: разделены интерфейсы для разных типов данных\n    - Dependency Inversion: зависит от абстракций CRUD\n    \"\"\"",
+        "detail": "backend.app.services.dashboard_service",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "backend.app.services.dashboard_service",
+        "description": "backend.app.services.dashboard_service",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass DashboardService:\n    \"\"\"\n    Сервис дашборда.\n    Реализует принципы SOLID:\n    - Single Responsibility: отвечает только за логику дашборда\n    - Open/Closed: легко расширяется новыми виджетами и метриками\n    - Liskov Substitution: может быть заменен другой реализацией\n    - Interface Segregation: разделены интерфейсы для разных типов данных\n    - Dependency Inversion: зависит от абстракций CRUD",
+        "detail": "backend.app.services.dashboard_service",
+        "documentation": {}
+    },
+    {
+        "label": "dashboard_service",
+        "kind": 5,
+        "importPath": "backend.app.services.dashboard_service",
+        "description": "backend.app.services.dashboard_service",
+        "peekOfCode": "dashboard_service = DashboardService()",
+        "detail": "backend.app.services.dashboard_service",
         "documentation": {}
     },
     {
@@ -14985,6 +15760,33 @@
         "description": "backend.app.services.reporting_service",
         "peekOfCode": "reporting_service = ReportingService()",
         "detail": "backend.app.services.reporting_service",
+        "documentation": {}
+    },
+    {
+        "label": "TeamService",
+        "kind": 6,
+        "importPath": "backend.app.services.team_service",
+        "description": "backend.app.services.team_service",
+        "peekOfCode": "class TeamService:\n    \"\"\"\n    Сервис управления командами.\n    Реализует принципы SOLID:\n    - Single Responsibility: отвечает только за логику команд\n    - Open/Closed: легко расширяется новыми функциями\n    - Liskov Substitution: может быть заменен другой реализацией\n    - Interface Segregation: разделены интерфейсы для разных операций\n    - Dependency Inversion: зависит от абстракций CRUD\n    \"\"\"",
+        "detail": "backend.app.services.team_service",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "backend.app.services.team_service",
+        "description": "backend.app.services.team_service",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nclass TeamService:\n    \"\"\"\n    Сервис управления командами.\n    Реализует принципы SOLID:\n    - Single Responsibility: отвечает только за логику команд\n    - Open/Closed: легко расширяется новыми функциями\n    - Liskov Substitution: может быть заменен другой реализацией\n    - Interface Segregation: разделены интерфейсы для разных операций\n    - Dependency Inversion: зависит от абстракций CRUD",
+        "detail": "backend.app.services.team_service",
+        "documentation": {}
+    },
+    {
+        "label": "team_service",
+        "kind": 5,
+        "importPath": "backend.app.services.team_service",
+        "description": "backend.app.services.team_service",
+        "peekOfCode": "team_service = TeamService()",
+        "detail": "backend.app.services.team_service",
         "documentation": {}
     },
     {

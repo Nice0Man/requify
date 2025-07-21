@@ -1,4 +1,4 @@
-import React, { memo, useState, useCallback, useMemo, useEffect } from "react";
+import React, { memo, useMemo, useEffect, useState } from "react";
 import {
   Box,
   Container,
@@ -6,19 +6,7 @@ import {
   useTheme,
   alpha,
   useMediaQuery,
-  IconButton,
-  Tooltip,
-  ButtonGroup,
-  Chip,
 } from "@mui/material";
-import {
-  ViewModule,
-  ViewList,
-  ViewComfy,
-  ViewCompact,
-  Fullscreen,
-  FullscreenExit,
-} from "@mui/icons-material";
 
 export type DashboardMode = "minimal" | "compact" | "detailed" | "fullscreen";
 export type DashboardLayout = "grid" | "list" | "masonry";
@@ -27,43 +15,25 @@ export type DashboardDensity = "comfortable" | "compact" | "dense";
 interface DashboardContainerProps {
   children: React.ReactNode;
   className?: string;
-  defaultMode?: DashboardMode;
-  defaultLayout?: DashboardLayout;
-  defaultDensity?: DashboardDensity;
-  showModeControls?: boolean;
+  mode?: DashboardMode;
+  layout?: DashboardLayout;
+  density?: DashboardDensity;
+  isFullscreen?: boolean;
   maxWidth?: "sm" | "md" | "lg" | "xl" | false;
-  onModeChange?: (mode: DashboardMode) => void;
-  onLayoutChange?: (layout: DashboardLayout) => void;
 }
 
 export const DashboardContainer = memo<DashboardContainerProps>(
   ({
     children,
     className,
-    defaultMode = "detailed",
-    defaultLayout = "grid",
-    defaultDensity = "comfortable",
-    showModeControls = true,
+    mode = "detailed",
+    layout = "grid",
+    density = "comfortable",
+    isFullscreen = false,
     maxWidth = "xl",
-    onModeChange,
-    onLayoutChange,
   }) => {
     const theme = useTheme();
-    
-    // Responsive breakpoints
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
-    // State management
-    const [mode, setMode] = useState<DashboardMode>(
-      isMobile ? "compact" : defaultMode
-    );
-    const [layout, setLayout] = useState<DashboardLayout>(
-      isMobile ? "list" : defaultLayout
-    );
-    const [density, setDensity] = useState<DashboardDensity>(
-      isMobile ? "compact" : defaultDensity
-    );
-    const [isFullscreen, setIsFullscreen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
 
     // Handle mounting safely
@@ -100,7 +70,7 @@ export const DashboardContainer = memo<DashboardContainerProps>(
     // Context7 padding system
     const getPadding = useMemo(() => {
       if (isFullscreen) return { xs: 1, sm: 1.5, md: 2 };
-      
+
       const basePadding = {
         minimal: { xs: 2, sm: 3, md: 3 },
         compact: { xs: 2, sm: 3, md: 3.5 },
@@ -111,53 +81,20 @@ export const DashboardContainer = memo<DashboardContainerProps>(
       return basePadding[mode];
     }, [mode, isFullscreen]);
 
-    // Event handlers
-    const handleModeChange = useCallback(
-      (newMode: DashboardMode) => {
-        setMode(newMode);
-        onModeChange?.(newMode);
-        
-        if (newMode === "minimal" && layout === "grid") {
-          setLayout("list");
-          onLayoutChange?.("list");
-        }
-      },
-      [layout, onModeChange, onLayoutChange]
-    );
-
-    const handleLayoutChange = useCallback(
-      (newLayout: DashboardLayout) => {
-        setLayout(newLayout);
-        onLayoutChange?.(newLayout);
-      },
-      [onLayoutChange]
-    );
-
-    const handleFullscreenToggle = useCallback(() => {
-      setIsFullscreen((prev) => !prev);
-      if (!isFullscreen) {
-        document.documentElement.requestFullscreen?.();
-      } else {
-        document.exitFullscreen?.();
-      }
-    }, [isFullscreen]);
-
     // Show basic version before mounting to prevent transition errors
     if (!isMounted) {
       return (
         <Box
           className={className}
           sx={{
-            minHeight: "100vh",
+            flex: 1,
             background: "transparent",
             position: "relative",
             opacity: 0.8,
           }}
         >
           <Container maxWidth={maxWidth} sx={{ py: 3, px: 3 }}>
-            <Stack spacing={3}>
-              {children}
-            </Stack>
+            <Stack spacing={3}>{children}</Stack>
           </Container>
         </Box>
       );
@@ -167,8 +104,8 @@ export const DashboardContainer = memo<DashboardContainerProps>(
       <Box
         className={className}
         sx={{
-          minHeight: "100vh",
-          background: isFullscreen 
+          flex: 1,
+          background: isFullscreen
             ? theme.palette.background.default
             : "transparent",
           position: "relative",
@@ -177,171 +114,165 @@ export const DashboardContainer = memo<DashboardContainerProps>(
       >
         <Container
           maxWidth={isFullscreen ? false : maxWidth}
+          disableGutters={isFullscreen}
           sx={{
             py: getPadding,
             px: getPadding,
             height: isFullscreen ? "100vh" : "auto",
+            minHeight: isFullscreen ? "100vh" : "auto",
             overflow: isFullscreen ? "auto" : "visible",
             scrollBehavior: "smooth",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            // Enhanced scrollbar styling
             "&::-webkit-scrollbar": {
-              width: 8,
+              width: isFullscreen ? 12 : 8,
               backgroundColor: "transparent",
             },
             "&::-webkit-scrollbar-track": {
               backgroundColor: alpha(theme.palette.divider, 0.05),
-              borderRadius: 4,
+              borderRadius: isFullscreen ? 6 : 4,
+              margin: isFullscreen ? 4 : 2,
             },
             "&::-webkit-scrollbar-thumb": {
               backgroundColor: alpha(theme.palette.primary.main, 0.2),
-              borderRadius: 4,
+              borderRadius: isFullscreen ? 6 : 4,
+              border: isFullscreen
+                ? `2px solid ${theme.palette.background.default}`
+                : "none",
               "&:hover": {
                 backgroundColor: alpha(theme.palette.primary.main, 0.3),
               },
             },
+            // Layout-specific adjustments
+            ...(layout === "masonry" && {
+              // Remove CSS columns conflicts - masonry handled by MasonryLayoutRenderer
+              overflow: "hidden",
+              "& .masonry-layout": {
+                width: "100%",
+                maxWidth: "100%",
+              },
+            }),
           }}
         >
-          {/* Mode Controls */}
-          {showModeControls && (
+          {/* Enhanced Content Container */}
+          {layout === "masonry" ? (
+            // Masonry Layout - Handled by MasonryLayoutRenderer
             <Box
+              className="masonry-layout"
               sx={{
-                position: "sticky",
-                top: 0,
-                zIndex: 100,
-                mb: getSpacing,
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 1,
-                animation: "slideDown 0.6s ease-out",
-                "@keyframes slideDown": {
+                animation: "slideUp 0.4s ease-out",
+                "@keyframes slideUp": {
                   "0%": {
                     opacity: 0,
-                    transform: "translateY(-20px)",
+                    transform: "translateY(20px)",
                   },
                   "100%": {
                     opacity: 1,
                     transform: "translateY(0)",
                   },
                 },
+                width: "100%",
+                maxWidth: "100%",
+                overflow: "hidden",
+                // Let MasonryLayoutRenderer handle all layout logic
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  p: 1,
-                  borderRadius: 3,
-                  background: `linear-gradient(135deg, 
-                    ${alpha(theme.palette.background.paper, 0.9)} 0%, 
-                    ${alpha(theme.palette.background.paper, 0.7)} 100%)`,
-                  backdropFilter: "blur(20px)",
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  boxShadow: `0 8px 32px ${alpha(
-                    theme.palette.common.black,
-                    0.08
-                  )}`,
-                }}
-              >
-                {/* Density Controls */}
-                <ButtonGroup size="small" variant="outlined">
-                  <Tooltip title="Comfortable">
-                    <IconButton
-                      onClick={() => setDensity("comfortable")}
-                      color={
-                        density === "comfortable" ? "primary" : "default"
-                      }
-                      size="small"
-                    >
-                      <ViewComfy fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Compact">
-                    <IconButton
-                      onClick={() => setDensity("compact")}
-                      color={density === "compact" ? "primary" : "default"}
-                      size="small"
-                    >
-                      <ViewCompact fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </ButtonGroup>
-
-                {/* Layout Controls */}
-                <ButtonGroup size="small" variant="outlined">
-                  <Tooltip title="Grid Layout">
-                    <IconButton
-                      onClick={() => handleLayoutChange("grid")}
-                      color={layout === "grid" ? "primary" : "default"}
-                      size="small"
-                    >
-                      <ViewModule fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="List Layout">
-                    <IconButton
-                      onClick={() => handleLayoutChange("list")}
-                      color={layout === "list" ? "primary" : "default"}
-                      size="small"
-                    >
-                      <ViewList fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </ButtonGroup>
-
-                {/* Fullscreen Toggle */}
-                <Tooltip
-                  title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                >
-                  <IconButton
-                    onClick={handleFullscreenToggle}
-                    color={isFullscreen ? "primary" : "default"}
-                    size="small"
-                  >
-                    {isFullscreen ? (
-                      <FullscreenExit fontSize="small" />
-                    ) : (
-                      <Fullscreen fontSize="small" />
-                    )}
-                  </IconButton>
-                </Tooltip>
-
-                {/* Mode Indicator */}
-                <Chip
-                  label={mode}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    height: 28,
-                    fontSize: "0.75rem",
-                    borderColor: alpha(theme.palette.primary.main, 0.3),
-                    color: theme.palette.primary.main,
-                  }}
-                />
-              </Box>
+              {children}
             </Box>
+          ) : (
+            // Standard Stack Layout for Grid and List
+            <Stack
+              direction={
+                layout === "list" && mode === "minimal" ? "row" : "column"
+              }
+              spacing={getSpacing}
+              flexWrap={
+                layout === "list" && mode === "minimal" ? "wrap" : "nowrap"
+              }
+              sx={{
+                animation: "slideUp 0.4s ease-out",
+                "@keyframes slideUp": {
+                  "0%": {
+                    opacity: 0,
+                    transform: "translateY(20px)",
+                  },
+                  "100%": {
+                    opacity: 1,
+                    transform: "translateY(0)",
+                  },
+                },
+                // Enhanced transitions
+                "& > *": {
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transformOrigin: "center top",
+                  // Layout-specific adjustments
+                  ...(layout === "list" && {
+                    "&:hover": {
+                      transform:
+                        mode === "fullscreen"
+                          ? "translateX(2px)"
+                          : "translateX(4px) translateZ(0)",
+                    },
+                  }),
+                  ...(layout === "grid" && {
+                    "&:hover": {
+                      transform:
+                        mode === "fullscreen"
+                          ? "translateY(-1px)"
+                          : "translateY(-2px) translateZ(0)",
+                    },
+                  }),
+                },
+                // List layout specific styles
+                ...(layout === "list" && {
+                  "& > *": {
+                    width: "100%",
+                    ...(mode === "minimal" && {
+                      minWidth: {
+                        xs: "100%",
+                        sm: "calc(50% - 8px)",
+                        md: "calc(33.333% - 12px)",
+                      },
+                    }),
+                  },
+                }),
+                // Grid layout optimizations - адаптивные колонки для контента
+                ...(layout === "grid" && {
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(auto-fit, minmax(400px, 1fr))",
+                    md: "repeat(auto-fit, minmax(450px, 1fr))",
+                    lg: "repeat(auto-fit, minmax(500px, 1fr))",
+                    xl: "repeat(auto-fit, minmax(550px, 1fr))",
+                  },
+                  gap: {
+                    xs: getSpacing.xs,
+                    sm: getSpacing.sm,
+                    md: getSpacing.md,
+                  },
+                  // Адаптивное поведение для виджетов
+                  "& > *": {
+                    // Большие виджеты занимают 2 ячейки сетки при возможности
+                    "&[data-large='true']": {
+                      gridColumn: {
+                        sm: "span 2",
+                        md: "span 2",
+                        lg: "span 1",
+                        xl: "span 1",
+                      },
+                    },
+                    // Маленькие виджеты занимают 1 ячейку
+                    "&[data-small='true']": {
+                      gridColumn: "span 1",
+                    },
+                  },
+                }),
+              }}
+            >
+              {children}
+            </Stack>
           )}
-
-          {/* Content */}
-          <Stack
-            spacing={getSpacing}
-            sx={{
-              animation: "slideUp 0.4s ease-out",
-              "@keyframes slideUp": {
-                "0%": {
-                  opacity: 0,
-                  transform: "translateY(20px)",
-                },
-                "100%": {
-                  opacity: 1,
-                  transform: "translateY(0)",
-                },
-              },
-              "& > *": {
-                transition: "all 0.2s ease",
-              },
-            }}
-          >
-            {children}
-          </Stack>
         </Container>
       </Box>
     );

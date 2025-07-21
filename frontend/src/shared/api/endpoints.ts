@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
     VALIDATE_TOKEN: "/auth/validate-token",
     CHANGE_PASSWORD: "/auth/change-password",
     RESET_PASSWORD: "/auth/reset-password",
+    FORGOT_PASSWORD: "/auth/forgot-password",
     RESET_PASSWORD_CONFIRM: "/auth/reset-password/confirm",
     VERIFY_EMAIL_REQUEST: "/auth/verify-email/request",
     VERIFY_EMAIL_CONFIRM: "/auth/verify-email/confirm",
@@ -21,8 +22,8 @@ export const API_ENDPOINTS = {
 
   // User endpoints
   USERS: {
-    LIST: "/users",
-    CREATE: "/users",
+    LIST: "/users/",
+    CREATE: "/users/",
     ME: "/users/me",
     UPDATE_ME: "/users/me",
     GET: (id: string) => `/users/${id}`,
@@ -30,12 +31,26 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/users/${id}`,
     ACTIVATE: (id: string) => `/users/${id}/activate`,
     DEACTIVATE: (id: string) => `/users/${id}/deactivate`,
+    // Additional endpoints for userDAO.ts
+    DETAIL: (id: number) => `/users/${id}`,
+    BY_USERNAME: (username: string) => `/users/username/${username}`,
+    BY_EMAIL: (email: string) => `/users/email/${email}`,
+    PROFILE: (id: number) => `/users/${id}/profile`,
+    STATS: (id: number) => `/users/${id}/stats`,
+    ACTIVITY: (id: number) => `/users/${id}/activity`,
+    VALIDATE: "/users/validate",
+    CHECK_USERNAME: (username: string) => `/users/check-username/${username}`,
+    CHECK_EMAIL: (email: string) => `/users/check-email/${email}`,
+    AUDIT: (id: number) => `/users/${id}/audit`,
+    SETTINGS: (id: number) => `/users/${id}/settings`,
+    ME_SETTINGS: "/users/me/settings",
+    SEARCH: "/users/search",
   },
 
   // Project endpoints
   PROJECTS: {
-    LIST: "/projects",
-    CREATE: "/projects",
+    LIST: "/projects/",
+    CREATE: "/projects/",
     GET: (id: string) => `/projects/${id}`,
     UPDATE: (id: string) => `/projects/${id}`,
     DELETE: (id: string) => `/projects/${id}`,
@@ -43,13 +58,21 @@ export const API_ENDPOINTS = {
     SYNC_TO_RELEASE: (id: string) => `/projects/${id}/sync-to-release`,
     RELEASES: (id: string) => `/projects/${id}/releases`,
     STATS: (id: string) => `/projects/${id}/stats`,
+    // Additional endpoints for projectDAO.ts
+    REMOVE_TEAM_MEMBER: (id: string, userId: string) => `/projects/${id}/team/${userId}`,
+    BULK: "/projects/bulk",
+    IMPORT: "/projects/import",
+    EXPORT: "/projects/export",
+    ARCHIVE: (id: string) => `/projects/${id}/archive`,
+    UNARCHIVE: (id: string) => `/projects/${id}/unarchive`,
+    FAVORITE: (id: string) => `/projects/${id}/favorite`,
   },
 
   // Requirement endpoints
   REQUIREMENTS: {
     SEARCH: "/requirements/search",
-    LIST: "/requirements",
-    CREATE: "/requirements",
+    LIST: "/requirements/",
+    CREATE: "/requirements/",
     GET: (id: string) => `/requirements/${id}`,
     UPDATE: (id: string) => `/requirements/${id}`,
     DELETE: (id: string) => `/requirements/${id}`,
@@ -57,13 +80,14 @@ export const API_ENDPOINTS = {
     UPDATE_PROGRESS: (id: string) => `/requirements/${id}/progress`,
     TESTS: (id: string) => `/requirements/${id}/tests`,
     RELATIONSHIPS: (id: string) => `/requirements/${id}/relationships`,
-    CREATE_RELATIONSHIP: (id: string) => `/requirements/${id}/relationships`,
+    CREATE_RELATIONSHIP: (id: string) =>
+      `/requirements/${id}/relationships`,
   },
 
   // Release endpoints
   RELEASES: {
-    LIST: "/releases",
-    CREATE: "/releases",
+    LIST: "/releases/",
+    CREATE: "/releases/",
     CREATE_FROM_REQUIREMENTS: "/releases/create-from-requirements",
     GET: (id: string) => `/releases/${id}`,
     UPDATE: (id: string) => `/releases/${id}`,
@@ -124,8 +148,8 @@ export const API_ENDPOINTS = {
 
   // Specification endpoints
   SPECIFICATIONS: {
-    LIST: "/specifications",
-    CREATE: "/specifications",
+    LIST: "/specifications/",
+    CREATE: "/specifications/",
     GET: (id: string) => `/specifications/${id}`,
     UPDATE: (id: string) => `/specifications/${id}`,
     DELETE: (id: string) => `/specifications/${id}`,
@@ -136,8 +160,8 @@ export const API_ENDPOINTS = {
 
   // Relationship endpoints
   RELATIONSHIPS: {
-    LIST: "/relationships",
-    CREATE: "/relationships",
+    LIST: "/relationships/",
+    CREATE: "/relationships/",
     GET: (id: string) => `/relationships/${id}`,
     UPDATE: (id: string) => `/relationships/${id}`,
     DELETE: (id: string) => `/relationships/${id}`,
@@ -155,8 +179,8 @@ export const API_ENDPOINTS = {
 
   // Comment endpoints
   COMMENTS: {
-    LIST: "/comments",
-    CREATE: "/comments",
+    LIST: "/comments/",
+    CREATE: "/comments/",
     GET: (id: string) => `/comments/${id}`,
     UPDATE: (id: string) => `/comments/${id}`,
     DELETE: (id: string) => `/comments/${id}`,
@@ -168,9 +192,9 @@ export const API_ENDPOINTS = {
     STATISTICS: "/comments/statistics",
   },
 
-  // Dashboard endpoints - ИСПРАВЛЕНО для правильных API v1 путей
+  // Dashboard endpoints - Обновлено согласно документации API v1
   DASHBOARD: {
-    ROOT: "/dashboard",
+    ROOT: "/dashboard/",
     STATS: "/dashboard/stats",
     OVERVIEW: "/dashboard/overview",
     MY_PROJECTS: "/dashboard/my-projects",
@@ -198,15 +222,17 @@ export const API_ENDPOINTS = {
     // System metrics
     SYSTEM_METRICS: "/dashboard/metrics/system",
     // Chart data endpoints
-    TIMELINE_DATA: "/dashboard/charts/timeline",
-    DISTRIBUTION_DATA: "/dashboard/charts/distribution",
-    PROJECT_TRENDS: "/dashboard/charts/project-trends",
+    CHARTS: {
+      TIMELINE: "/dashboard/charts/timeline",
+      DISTRIBUTION: "/dashboard/charts/distribution",
+      PROJECT_TRENDS: "/dashboard/charts/project-trends",
+    },
   },
 
   // Teams endpoints
   TEAMS: {
-    LIST: "/teams",
-    CREATE: "/teams",
+    LIST: "/teams/",
+    CREATE: "/teams/",
     GET: (id: string) => `/teams/${id}`,
     UPDATE: (id: string) => `/teams/${id}`,
     DELETE: (id: string) => `/teams/${id}`,

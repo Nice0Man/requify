@@ -6,6 +6,8 @@
 
 from fastapi import APIRouter
 
+from app import __version__
+
 from .endpoints import (
     auth_router,
     users_router,
@@ -21,7 +23,7 @@ from .endpoints import (
     dashboard_router,
     teams_router,
 )
-
+ 
 # Создаем основной роутер для API v1
 api_router = APIRouter()
 
@@ -61,4 +63,4 @@ api_router.include_router(teams_router, prefix="/teams", tags=["teams"])
 @api_router.get("/")
 async def root():
     """Корневой эндпоинт API v1."""
-    return {"message": "Requify API v1", "version": "1.0.0", "docs": "/docs"}
+    return {"message": "Requify API v1", "version": __version__, "docs": "/docs"}

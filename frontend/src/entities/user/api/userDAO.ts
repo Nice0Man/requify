@@ -54,7 +54,7 @@ export class UserDAO {
    */
   async getUsers(params?: UserQueryParams): Promise<UserListResponse> {
     try {
-      const response = await client.get<UserListResponse>("/users", { params });
+      const response = await client.get<UserListResponse>(API_ENDPOINTS.USERS.LIST, { params });
       return response.data;
     } catch (error) {
       console.error("Failed to get users:", error);
@@ -67,7 +67,7 @@ export class UserDAO {
    */
   async getUserById(id: number): Promise<UserDetailResponse> {
     try {
-      const response = await client.get<UserDetailResponse>(`/users/${id}`);
+      const response = await client.get<UserDetailResponse>(API_ENDPOINTS.USERS.DETAIL(id));
       return response.data;
     } catch (error) {
       console.error(`Failed to get user ${id}:`, error);
@@ -81,7 +81,7 @@ export class UserDAO {
   async getUserByUsername(username: string): Promise<UserDetailResponse> {
     try {
       const response = await client.get<UserDetailResponse>(
-        `/users/username/${username}`
+        API_ENDPOINTS.USERS.BY_USERNAME(username)
       );
       return response.data;
     } catch (error) {
@@ -96,7 +96,7 @@ export class UserDAO {
   async getUserByEmail(email: string): Promise<UserDetailResponse> {
     try {
       const response = await client.get<UserDetailResponse>(
-        `/users/email/${email}`
+        API_ENDPOINTS.USERS.BY_EMAIL(email)
       );
       return response.data;
     } catch (error) {
@@ -110,7 +110,7 @@ export class UserDAO {
    */
   async createUser(userData: UserCreate): Promise<User> {
     try {
-      const response = await client.post<User>("/users", userData);
+      const response = await client.post<User>(API_ENDPOINTS.USERS.LIST, userData);
       return response.data;
     } catch (error) {
       console.error("Failed to create user:", error);
@@ -123,7 +123,7 @@ export class UserDAO {
    */
   async updateUser(id: number, userData: UserUpdate): Promise<User> {
     try {
-      const response = await client.put<User>(`/users/${id}`, userData);
+      const response = await client.put<User>(API_ENDPOINTS.USERS.DETAIL(id), userData);
       return response.data;
     } catch (error) {
       console.error(`Failed to update user ${id}:`, error);
@@ -136,7 +136,7 @@ export class UserDAO {
    */
   async patchUser(id: number, userData: Partial<UserUpdate>): Promise<User> {
     try {
-      const response = await client.patch<User>(`/users/${id}`, userData);
+      const response = await client.patch<User>(API_ENDPOINTS.USERS.DETAIL(id), userData);
       return response.data;
     } catch (error) {
       console.error(`Failed to patch user ${id}:`, error);
@@ -149,7 +149,7 @@ export class UserDAO {
    */
   async deleteUser(id: number): Promise<void> {
     try {
-      await client.delete(`/users/${id}`);
+      await client.delete(API_ENDPOINTS.USERS.DETAIL(id));
     } catch (error) {
       console.error(`Failed to delete user ${id}:`, error);
       throw error;
@@ -189,7 +189,7 @@ export class UserDAO {
    */
   async getUserPublicProfile(id: number): Promise<UserProfile> {
     try {
-      const response = await client.get<UserProfile>(`/users/${id}/profile`);
+      const response = await client.get<UserProfile>(API_ENDPOINTS.USERS.PROFILE(id));
       return response.data;
     } catch (error) {
       console.error(`Failed to get public profile for user ${id}:`, error);
@@ -272,7 +272,7 @@ export class UserDAO {
    */
   async getUserWithStats(id: number): Promise<UserWithStats> {
     try {
-      const response = await client.get<UserWithStats>(`/users/${id}/stats`);
+      const response = await client.get<UserWithStats>(API_ENDPOINTS.USERS.STATS(id));
       return response.data;
     } catch (error) {
       console.error(`Failed to get user stats for ${id}:`, error);
@@ -286,7 +286,7 @@ export class UserDAO {
   async getUserActivity(id: number): Promise<UserActivityResponse> {
     try {
       const response = await client.get<UserActivityResponse>(
-        `/users/${id}/activity`
+        API_ENDPOINTS.USERS.ACTIVITY(id)
       );
       return response.data;
     } catch (error) {
@@ -302,7 +302,7 @@ export class UserDAO {
    */
   async bulkOperation(operation: UserBulkOperation): Promise<void> {
     try {
-      await client.post("/users/bulk", operation);
+      await client.post(API_ENDPOINTS.USERS.LIST, operation);
     } catch (error) {
       console.error("Failed to perform bulk operation:", error);
       throw error;
@@ -314,7 +314,7 @@ export class UserDAO {
    */
   async importUsers(data: UserImportData): Promise<void> {
     try {
-      await client.post("/users/import", data);
+      await client.post(API_ENDPOINTS.USERS.LIST, data);
     } catch (error) {
       console.error("Failed to import users:", error);
       throw error;
@@ -326,7 +326,7 @@ export class UserDAO {
    */
   async exportUsers(options: UserExportOptions): Promise<Blob> {
     try {
-      const response = await client.post("/users/export", options, {
+      const response = await client.post(API_ENDPOINTS.USERS.LIST, options, {
         responseType: "blob",
       });
       return response.data;
@@ -346,7 +346,7 @@ export class UserDAO {
   ): Promise<UserValidationResult> {
     try {
       const response = await client.post<UserValidationResult>(
-        "/users/validate",
+        API_ENDPOINTS.USERS.VALIDATE,
         userData
       );
       return response.data;
@@ -362,7 +362,7 @@ export class UserDAO {
   async checkUsernameAvailability(username: string): Promise<boolean> {
     try {
       const response = await client.get<{ available: boolean }>(
-        `/users/check-username/${username}`
+        API_ENDPOINTS.USERS.CHECK_USERNAME(username)
       );
       return response.data.available;
     } catch (error) {
@@ -377,7 +377,7 @@ export class UserDAO {
   async checkEmailAvailability(email: string): Promise<boolean> {
     try {
       const response = await client.get<{ available: boolean }>(
-        `/users/check-email/${email}`
+        API_ENDPOINTS.USERS.CHECK_EMAIL(email)
       );
       return response.data.available;
     } catch (error) {
@@ -398,7 +398,7 @@ export class UserDAO {
   ): Promise<UserAuditListResponse> {
     try {
       const response = await client.get<UserAuditListResponse>(
-        `/users/${id}/audit`,
+        API_ENDPOINTS.USERS.AUDIT(id),
         {
           params: { page, per_page: perPage },
         }
@@ -417,7 +417,7 @@ export class UserDAO {
    */
   async getUserSettings(id: number): Promise<UserSettings> {
     try {
-      const response = await client.get<UserSettings>(`/users/${id}/settings`);
+      const response = await client.get<UserSettings>(API_ENDPOINTS.USERS.SETTINGS(id));
       return response.data;
     } catch (error) {
       console.error(`Failed to get settings for user ${id}:`, error);
@@ -434,7 +434,7 @@ export class UserDAO {
   ): Promise<UserSettings> {
     try {
       const response = await client.put<UserSettings>(
-        `/users/${id}/settings`,
+        API_ENDPOINTS.USERS.SETTINGS(id),
         settings
       );
       return response.data;
@@ -449,7 +449,7 @@ export class UserDAO {
    */
   async getCurrentUserSettings(): Promise<UserSettings> {
     try {
-      const response = await client.get<UserSettings>("/users/me/settings");
+      const response = await client.get<UserSettings>(API_ENDPOINTS.USERS.ME_SETTINGS);
       return response.data;
     } catch (error) {
       console.error("Failed to get current user settings:", error);
@@ -465,7 +465,7 @@ export class UserDAO {
   ): Promise<UserSettings> {
     try {
       const response = await client.put<UserSettings>(
-        "/users/me/settings",
+        API_ENDPOINTS.USERS.ME_SETTINGS,
         settings
       );
       return response.data;
@@ -485,7 +485,7 @@ export class UserDAO {
     filters?: UserQueryParams
   ): Promise<UserListResponse> {
     try {
-      const response = await client.get<UserListResponse>("/users/search", {
+      const response = await client.get<UserListResponse>(API_ENDPOINTS.USERS.SEARCH, {
         params: { q: query, ...filters },
       });
       return response.data;
@@ -502,7 +502,7 @@ export class UserDAO {
    */
   async activateUser(id: number): Promise<void> {
     try {
-      await client.post(`/users/${id}/activate`);
+      await client.post(API_ENDPOINTS.USERS.ACTIVATE(id));
     } catch (error) {
       console.error(`Failed to activate user ${id}:`, error);
       throw error;
@@ -514,7 +514,7 @@ export class UserDAO {
    */
   async deactivateUser(id: number): Promise<void> {
     try {
-      await client.post(`/users/${id}/deactivate`);
+      await client.post(API_ENDPOINTS.USERS.DEACTIVATE(id));
     } catch (error) {
       console.error(`Failed to deactivate user ${id}:`, error);
       throw error;

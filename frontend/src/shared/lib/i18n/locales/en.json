@@ -654,7 +654,8 @@
     },
     "filters": {
       "status": "Status",
-      "priority": "Priority"
+      "priority": "Priority",
+      "all": "All"
     },
     "progress": "Progress",
     "requirements": "Requirements",
@@ -666,7 +667,8 @@
       "active": "Active",
       "completed": "Completed",
       "onHold": "On Hold",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "planning": "Planning"
     },
     "statusText": {
       "active": "Active",
@@ -674,6 +676,12 @@
       "onHold": "On Hold",
       "cancelled": "Cancelled",
       "planning": "Planning"
+    },
+    "priority": {
+      "all": "All",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
     },
     "fields": {
       "name": "Name",
@@ -846,6 +854,15 @@
   },
   "charts": {
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "placeholder": {
+      "title": "No Data Available",
+      "general": "No data available to display this chart",
+      "projects": "No project data available to display charts",
+      "requirements": "No requirements data available to display charts",
+      "teams": "No team data available to display charts",
+      "releases": "No release data available to display charts",
+      "hint": "Click refresh to reload data"
+    }
   }
 }

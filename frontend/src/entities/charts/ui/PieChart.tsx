@@ -1,18 +1,18 @@
-import React, { memo } from 'react';
+import React, { memo, useRef, useEffect, useState } from "react";
 import {
   PieChart as RechartsPieChart,
   Pie,
   Cell,
+  ResponsiveContainer,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-} from 'recharts';
-import { useTheme, alpha, Box, CircularProgress, Alert } from '@mui/material';
-import type { PieChartProps } from '../model/types';
+} from "recharts";
+import { useTheme, alpha, Box, CircularProgress, Alert } from "@mui/material";
+import type { PieChartProps } from "../model/types";
 
-const CustomTooltip = ({ active, payload }: any) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
   const theme = useTheme();
-  
+
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
@@ -27,21 +27,23 @@ const CustomTooltip = ({ active, payload }: any) => {
           transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
-        <Box sx={{ 
-          fontWeight: 600, 
-          marginBottom: 1.5, 
-          color: theme.palette.text.primary,
-          fontSize: '0.875rem'
-        }}>
-          {data.name}
+        <Box
+          sx={{
+            fontWeight: 600,
+            marginBottom: 1,
+            color: theme.palette.text.primary,
+            fontSize: "0.875rem",
+          }}
+        >
+          {data.payload.label}
         </Box>
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 1.5,
-            color: data.payload.fill,
-            fontSize: '0.875rem',
+            color: data.payload.color,
+            fontSize: "0.875rem",
             fontWeight: 500,
           }}
         >
@@ -49,13 +51,13 @@ const CustomTooltip = ({ active, payload }: any) => {
             sx={{
               width: 10,
               height: 10,
-              borderRadius: '50%',
-              backgroundColor: data.payload.fill,
-              boxShadow: `0 2px 4px ${alpha(data.payload.fill, 0.3)}`,
+              borderRadius: "50%",
+              backgroundColor: data.payload.color,
+              boxShadow: `0 2px 4px ${alpha(data.payload.color, 0.3)}`,
             }}
           />
           <span>
-            {data.value?.toLocaleString?.() || data.value} 
+            {data.value?.toLocaleString?.() || data.value}
             {data.payload.percentage && ` (${data.payload.percentage}%)`}
           </span>
         </Box>
@@ -65,178 +67,318 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }: any) => {
+const CustomLegend = ({ payload }: any) => {
   const theme = useTheme();
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-  if (percent < 0.05) return null; // Don't show labels for slices smaller than 5%
+  if (!payload || !payload.length) return null;
 
   return (
-    <text
-      x={x}
-      y={y}
-      fill={theme.palette.background.paper}
-      textAnchor={x > cx ? 'start' : 'end'}
-      dominantBaseline="central"
-      fontSize={12}
-      fontWeight={600}
-      fontFamily={theme.typography.fontFamily}
-      filter="drop-shadow(0 1px 2px rgba(0,0,0,0.3))"
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        gap: 2,
+        mt: 2,
+        px: 2,
+      }}
     >
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
+      {payload.map((entry: any, index: number) => (
+        <Box
+          key={index}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            fontSize: "0.8rem",
+            fontWeight: 500,
+            color: theme.palette.text.secondary,
+          }}
+        >
+          <Box
+            sx={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              backgroundColor: entry.color,
+            }}
+          />
+          <span>{entry.value}</span>
+        </Box>
+      ))}
+    </Box>
   );
 };
 
-export const PieChart = memo<PieChartProps>(({
-  data,
-  height = 320,
-  width,
-  loading = false,
-  error = null,
-  className,
-  showLabels = true,
-  showLegend = true,
-  donut = false,
-  onSliceClick,
-  config,
-}) => {
-  const theme = useTheme();
+export const PieChart = memo<PieChartProps>(
+  ({
+    data,
+    height = 320,
+    width,
+    loading = false,
+    error = null,
+    className,
+    showLabels = true,
+    showLegend = true,
+    innerRadius = 0,
+    outerRadius = "80%",
+    onPointClick,
+    config,
+    // New responsive props
+    responsive = true,
+    minHeight = 200,
+    maxHeight = 600,
+    aspectRatio = 1,
+    debounceMs = 150,
+  }) => {
+    const theme = useTheme();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-  // Transform data for Recharts format and calculate percentages
-  const total = data.reduce((sum, item) => sum + item.value, 0);
-  const chartData = data.map((point, index) => ({
-    name: point.label,
-    value: point.value,
-    percentage: total > 0 ? ((point.value / total) * 100).toFixed(1) : '0',
-    fill: point.color || config?.theme?.colors?.primary?.[index % 6] || theme.palette.primary.main,
-    id: point.id,
-    label: point.label,
-  }));
+    // Responsive values based on screen size and container
+    const getResponsiveValues = () => {
+      const isSmall = containerSize.width < 400;
+      const isMedium = containerSize.width < 600;
+      
+      return {
+        fontSize: isSmall ? 10 : isMedium ? 11 : 12,
+        outerRadius: isSmall ? "70%" : isMedium ? "75%" : "80%",
+        innerRadius: typeof innerRadius === "number" 
+          ? (isSmall ? Math.max(0, innerRadius - 10) : innerRadius)
+          : innerRadius,
+        labelFontSize: isSmall ? 9 : 10,
+        legendSpacing: isSmall ? 1 : 2,
+      };
+    };
 
-  // Context7 color palette with enhanced visibility
-  const chartColors = config?.theme?.colors?.primary || [
-    theme.palette.primary.main,
-    theme.palette.secondary.main,
-    theme.palette.success.main,
-    theme.palette.info.main,
-    theme.palette.warning.main,
-    theme.palette.error.main,
-  ];
+    const responsiveValues = getResponsiveValues();
 
-  if (loading) {
+    // Debounced resize observer
+    useEffect(() => {
+      if (!responsive || !containerRef.current) return;
+
+      let timeoutId: NodeJS.Timeout;
+      
+      const resizeObserver = new ResizeObserver((entries) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          for (const entry of entries) {
+            const { width, height: observedHeight } = entry.contentRect;
+            
+            // For pie charts, we typically want square aspect ratio
+            let adaptiveHeight = responsive 
+              ? Math.max(minHeight, Math.min(maxHeight, width / aspectRatio))
+              : height;
+              
+            setContainerSize({ 
+              width, 
+              height: adaptiveHeight 
+            });
+          }
+        }, debounceMs);
+      });
+
+      resizeObserver.observe(containerRef.current);
+
+      return () => {
+        clearTimeout(timeoutId);
+        resizeObserver.disconnect();
+      };
+    }, [responsive, minHeight, maxHeight, aspectRatio, height, debounceMs]);
+
+    // Transform data for Recharts format
+    const chartData = data.map((point, index) => ({
+      id: point.id,
+      label: point.label,
+      value: point.value,
+      color:
+        point.color ||
+        config?.theme?.colors?.primary?.[index % 6] ||
+        theme.palette.primary.main,
+      percentage: point.metadata?.percentage,
+      metadata: point.metadata,
+    }));
+
+    // Context7 color palette with vibrant gradients
+    const chartColors = config?.theme?.colors?.primary || [
+      theme.palette.primary.main,
+      theme.palette.secondary.main,
+      theme.palette.success.main,
+      theme.palette.info.main,
+      theme.palette.warning.main,
+      theme.palette.error.main,
+    ];
+
+    const finalHeight = responsive ? containerSize.height || height : height;
+
+    if (loading) {
+      return (
+        <Box
+          ref={containerRef}
+          className={className}
+          sx={{
+            height: finalHeight,
+            width: width || "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: alpha(theme.palette.primary.main, 0.02),
+            borderRadius: 2,
+          }}
+        >
+          <CircularProgress
+            size={40}
+            thickness={4}
+            sx={{
+              color: theme.palette.primary.main,
+            }}
+          />
+        </Box>
+      );
+    }
+
+    if (error) {
+      return (
+        <Box 
+          ref={containerRef}
+          className={className} 
+          sx={{ height: finalHeight, width: width || "100%" }}
+        >
+          <Alert
+            severity="error"
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+            }}
+          >
+            {error}
+          </Alert>
+        </Box>
+      );
+    }
+
+    if (!chartData || chartData.length === 0) {
+      return (
+        <Box
+          ref={containerRef}
+          className={className}
+          sx={{
+            height: finalHeight,
+            width: width || "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: theme.palette.text.secondary,
+            fontSize: "0.875rem",
+          }}
+        >
+          No data available
+        </Box>
+      );
+    }
+
     return (
       <Box
+        ref={containerRef}
         className={className}
         sx={{
-          height,
-          width: width || '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: alpha(theme.palette.primary.main, 0.02),
-          borderRadius: 2,
+          height: finalHeight,
+          width: width || "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          "& .recharts-wrapper": {
+            width: "100% !important",
+            height: "100% !important",
+          },
+          "& .recharts-pie-sector": {
+            filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.common.black, 0.1)})`,
+          },
+          "& .recharts-tooltip-wrapper": {
+            zIndex: 1000,
+          },
         }}
       >
-        <CircularProgress 
-          size={40} 
-          thickness={4}
-          sx={{ 
-            color: theme.palette.primary.main,
-          }}
-        />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box className={className} sx={{ height, width: width || '100%' }}>
-        <Alert 
-          severity="error" 
-          sx={{ 
-            height: '100%', 
-            display: 'flex', 
-            alignItems: 'center',
-            borderRadius: 2,
-            border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-          }}
+        <ResponsiveContainer 
+          width="100%" 
+          height="100%"
+          minHeight={minHeight}
+          maxHeight={responsive ? maxHeight : undefined}
         >
-          {error}
-        </Alert>
-      </Box>
-    );
-  }
+          <RechartsPieChart>
+            <defs>
+              {chartData.map((entry, index) => {
+                const color =
+                  entry.color || chartColors[index % chartColors.length];
+                return (
+                  <linearGradient
+                    key={`pie-gradient-${index}`}
+                    id={`pie-gradient-${index}`}
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor={color} stopOpacity={0.9} />
+                    <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                  </linearGradient>
+                );
+              })}
+            </defs>
 
-  return (
-    <Box 
-      className={className} 
-      sx={{ 
-        height, 
-        width: width || '100%',
-        '& .recharts-pie-sector': {
-          filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.common.black, 0.1)})`,
-          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-        },
-        '& .recharts-pie-sector:hover': {
-          filter: `drop-shadow(0 4px 8px ${alpha(theme.palette.common.black, 0.15)})`,
-          transform: 'scale(1.02)',
-        },
-      }}
-    >
-      <ResponsiveContainer width="100%" height="100%">
-        <RechartsPieChart
-          margin={{ 
-            top: 20, 
-            right: 30, 
-            left: 20, 
-            bottom: showLegend ? 60 : 20 
-          }}
-        >
-          <Pie
-            data={chartData}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={showLabels ? CustomLabel : false}
-            outerRadius={Math.min(height, width || height) * 0.3}
-            innerRadius={donut ? Math.min(height, width || height) * 0.15 : 0}
-            fill="#8884d8"
-            dataKey="value"
-            onClick={onSliceClick}
-            animationBegin={0}
-            animationDuration={800}
-            animationEasing="ease-out"
-          >
-            {chartData.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={entry.fill}
-                stroke={theme.palette.background.paper}
-                strokeWidth={2}
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="label"
+              cx="50%"
+              cy="50%"
+              innerRadius={responsiveValues.innerRadius}
+              outerRadius={responsiveValues.outerRadius}
+              paddingAngle={2}
+              animationBegin={0}
+              animationDuration={800}
+              onClick={
+                onPointClick ? (data: any) => onPointClick(data) : undefined
+              }
+            >
+              {chartData.map((entry, index) => {
+                const color =
+                  entry.color || chartColors[index % chartColors.length];
+                return (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={`url(#pie-gradient-${index})`}
+                    stroke={alpha(theme.palette.common.black, 0.05)}
+                    strokeWidth={1}
+                    style={{
+                      cursor: onPointClick ? "pointer" : "default",
+                    }}
+                  />
+                );
+              })}
+            </Pie>
+
+            <Tooltip content={<CustomTooltip />} />
+
+            {showLegend && (
+              <Legend
+                content={<CustomLegend />}
+                wrapperStyle={{
+                  paddingTop: "16px",
+                  fontSize: `${responsiveValues.fontSize}px`,
+                  fontWeight: 500,
+                  fontFamily: theme.typography.fontFamily,
+                }}
               />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-          {showLegend && (
-            <Legend 
-              wrapperStyle={{
-                paddingTop: '20px',
-                fontSize: '13px',
-                fontWeight: 500,
-                fontFamily: theme.typography.fontFamily,
-                color: theme.palette.text.secondary,
-              }}
-              iconType="circle"
-            />
-          )}
-        </RechartsPieChart>
-      </ResponsiveContainer>
-    </Box>
-  );
-});
+            )}
+          </RechartsPieChart>
+        </ResponsiveContainer>
+      </Box>
+    );
+  }
+);
 
-PieChart.displayName = 'PieChart'; 
+PieChart.displayName = "PieChart";

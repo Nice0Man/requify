@@ -55,8 +55,23 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({ childr
     const checkAuth = async () => {
       try {
         setIsLoading(true);
+        console.info('🔐 BasicOAuth2Provider: Checking authentication...');
         
+        // Сначала проверяем токен локально
         if (oauth2API.isAuthenticated()) {
+          console.info('🔐 BasicOAuth2Provider: Token found, fetching user data...');
+          
+          // Проверяем, нужно ли обновить токен
+          if (oauth2API.shouldRefreshToken()) {
+            console.info('🔄 BasicOAuth2Provider: Token needs refresh, attempting...');
+            try {
+              await oauth2API.autoRefreshToken();
+            } catch (refreshErr) {
+              console.warn('⚠️ BasicOAuth2Provider: Token refresh failed:', refreshErr);
+              // Продолжаем с текущим токеном, возможно он еще валидный
+            }
+          }
+          
           const currentUser = await oauth2API.getCurrentUser();
           setUser({
             id: currentUser.id,
@@ -65,14 +80,30 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({ childr
             role: currentUser.role,
           });
           setIsAuthenticated(true);
+          console.info('✅ BasicOAuth2Provider: User authenticated successfully');
+        } else {
+          console.info('🔐 BasicOAuth2Provider: No valid token found');
+          setIsAuthenticated(false);
+          setUser(undefined);
         }
       } catch (err) {
-        console.info('User not authenticated or token expired');
+        console.warn('⚠️ BasicOAuth2Provider: Authentication check failed:', err);
+        
+        // Если ошибка связана с токеном, очищаем его
+        if (err instanceof Error && (
+          err.message.includes('401') || 
+          err.message.includes('token') || 
+          err.message.includes('Unauthorized')
+        )) {
+          console.info('🧹 BasicOAuth2Provider: Clearing invalid tokens');
         oauth2API.clearTokens();
+        }
+        
         setIsAuthenticated(false);
         setUser(undefined);
       } finally {
         setIsLoading(false);
+        console.info('🏁 BasicOAuth2Provider: Authentication check completed');
       }
     };
 

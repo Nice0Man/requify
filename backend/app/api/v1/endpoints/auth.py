@@ -499,6 +499,37 @@ async def request_password_reset(
     return {"message": "If the email exists, a password reset link has been sent"}
 
 
+@router.post("/forgot-password")
+async def forgot_password(
+    reset_request: PasswordResetRequest, db: AsyncSession = Depends(get_db)
+) -> dict:
+    """
+    Запросить восстановление пароля (альтернативный эндпоинт).
+
+    Args:
+        reset_request: Запрос восстановления пароля
+        db: Сессия базы данных
+
+    Returns:
+        dict: Результат операции
+    """
+    user = await crud_user.get_by_email(db, email=reset_request.email)
+
+    # Всегда возвращаем успех для безопасности (не раскрываем существование email)
+    if user and user.is_active:
+        reset_token = JWTTokenManager.create_password_reset_token(user.email)
+        # Отправляем email с токеном восстановления
+        await email_service.send_password_reset_email(
+            user_email=user.email,
+            reset_token=reset_token,
+            user_name=user.name or user.email,
+        )
+
+        logger.info(f"Password reset requested for user: {user.email}")
+
+    return {"message": "If the email exists, a password recovery link has been sent"}
+
+
 @router.post("/reset-password/confirm")
 async def confirm_password_reset(
     reset_confirm: PasswordResetConfirm, db: AsyncSession = Depends(get_db)

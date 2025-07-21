@@ -1,110 +1,194 @@
-import { client } from '../../../shared/api/client';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { client } from "@/shared/api/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
+import type {
+  Release,
+  ReleaseFilters,
+  CreateReleaseData,
+  UpdateReleaseData,
+  ReleaseStats,
+} from "../model/types";
 
-export interface Release {
-  id: string;
-  name: string;
-  version: string;
-  description?: string;
-  status: 'draft' | 'planned' | 'in_progress' | 'released' | 'cancelled';
-  projectId: string;
-  releaseDate?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// Query Keys
+export const releaseKeys = {
+  all: ["releases"] as const,
+  lists: () => [...releaseKeys.all, "list"] as const,
+  list: (filters: ReleaseFilters) => [...releaseKeys.lists(), filters] as const,
+  details: () => [...releaseKeys.all, "detail"] as const,
+  detail: (id: string) => [...releaseKeys.details(), id] as const,
+  stats: () => [...releaseKeys.all, "stats"] as const,
+  projectReleases: (projectId: string) =>
+    [...releaseKeys.all, "project", projectId] as const,
+};
 
-export interface CreateReleaseRequest {
-  name: string;
-  version: string;
-  description?: string;
-  projectId: string;
-  releaseDate?: string;
-}
-
-export interface UpdateReleaseRequest {
-  name?: string;
-  version?: string;
-  description?: string;
-  status?: 'draft' | 'planned' | 'in_progress' | 'released' | 'cancelled';
-  releaseDate?: string;
-}
-
-export interface ReleaseFilters {
-  projectId?: string;
-  status?: string;
-  search?: string;
-}
-
-export interface ReleaseStats {
-  totalReleases: number;
-  draftReleases: number;
-  plannedReleases: number;
-  inProgressReleases: number;
-  releasedReleases: number;
-  cancelledReleases: number;
-}
-
+// API Functions
 export const releaseApi = {
-  // Get all releases with optional filters
-  async getReleases(filters?: ReleaseFilters): Promise<Release[]> {
+  getReleases: async (filters: ReleaseFilters = {}) => {
     const params = new URLSearchParams();
-    if (filters?.projectId) params.append('projectId', filters.projectId);
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.search) params.append('search', filters.search);
-    
-    const response = await client.get(`/releases?${params.toString()}`);
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        params.append(key, value.toString());
+      }
+    });
+    const response = await client.get(
+      `${API_ENDPOINTS.RELEASES.LIST}?${params.toString()}`
+    );
     return response.data;
   },
 
-  // Get a single release by ID
-  async getRelease(id: string): Promise<Release> {
-    const response = await client.get(`/releases/${id}`);
+  getRelease: async (id: string): Promise<Release> => {
+    const response = await client.get(API_ENDPOINTS.RELEASES.GET(id));
     return response.data;
   },
 
-  // Create a new release
-  async createRelease(data: CreateReleaseRequest): Promise<Release> {
-    const response = await client.post('/releases', data);
+  createRelease: async (data: CreateReleaseData): Promise<Release> => {
+    const response = await client.post(API_ENDPOINTS.RELEASES.CREATE, data);
     return response.data;
   },
 
-  // Update an existing release
-  async updateRelease(id: string, data: UpdateReleaseRequest): Promise<Release> {
-    const response = await client.put(`/releases/${id}`, data);
+  updateRelease: async (
+    id: string,
+    data: UpdateReleaseData
+  ): Promise<Release> => {
+    const response = await client.put(API_ENDPOINTS.RELEASES.UPDATE(id), data);
     return response.data;
   },
 
-  // Delete a release
-  async deleteRelease(id: string): Promise<void> {
-    await client.delete(`/releases/${id}`);
+  deleteRelease: async (id: string): Promise<void> => {
+    await client.delete(API_ENDPOINTS.RELEASES.DELETE(id));
   },
 
-  // Get release statistics
-  async getReleaseStats(): Promise<ReleaseStats> {
-    const response = await client.get('/releases/stats');
+  getReleaseStats: async (): Promise<ReleaseStats> => {
+    const response = await client.get(API_ENDPOINTS.RELEASES.LIST); // Using list endpoint for stats
     return response.data;
   },
 
-  // Get releases for a specific project
-  async getProjectReleases(projectId: string): Promise<Release[]> {
-    const response = await client.get(`/projects/${projectId}/releases`);
+  getProjectReleases: async (projectId: string) => {
+    const response = await client.get(API_ENDPOINTS.PROJECTS.RELEASES(projectId));
     return response.data;
   },
 
-  // Publish a release
-  async publishRelease(id: string): Promise<Release> {
-    const response = await client.post(`/releases/${id}/publish`);
+  publishRelease: async (id: string) => {
+    const response = await client.post(API_ENDPOINTS.RELEASES.PUBLISH(id));
     return response.data;
   },
 
-  // Rollback a release
-  async rollbackRelease(id: string): Promise<Release> {
-    const response = await client.post(`/releases/${id}/rollback`);
+  rollbackRelease: async (id: string) => {
+    const response = await client.post(`${API_ENDPOINTS.RELEASES.GET(id)}/rollback`);
     return response.data;
   },
 
-  // Deploy a release to environment
-  async deployRelease(id: string, environment: string): Promise<Release> {
-    const response = await client.post(`/releases/${id}/deploy`, { environment });
+  deployRelease: async (id: string, environment: string) => {
+    const response = await client.post(`${API_ENDPOINTS.RELEASES.GET(id)}/deploy`, { environment });
     return response.data;
   },
+};
+
+// Hooks
+export const useReleases = (filters: ReleaseFilters = {}) => {
+  return useQuery({
+    queryKey: releaseKeys.list(filters),
+    queryFn: () => releaseApi.getReleases(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+export const useRelease = (id: string) => {
+  return useQuery({
+    queryKey: releaseKeys.detail(id),
+    queryFn: () => releaseApi.getRelease(id),
+    enabled: !!id,
+  });
+};
+
+export const useCreateRelease = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: releaseApi.createRelease,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: releaseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: releaseKeys.stats() });
+    },
+  });
+};
+
+export const useUpdateRelease = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateReleaseData }) =>
+      releaseApi.updateRelease(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: releaseKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: releaseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: releaseKeys.stats() });
+    },
+  });
+};
+
+export const useDeleteRelease = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: releaseApi.deleteRelease,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: releaseKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: releaseKeys.stats() });
+    },
+  });
+};
+
+export const useReleaseStats = () => {
+  return useQuery({
+    queryKey: releaseKeys.stats(),
+    queryFn: releaseApi.getReleaseStats,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
+export const useProjectReleases = (projectId: string) => {
+  return useQuery({
+    queryKey: releaseKeys.projectReleases(projectId),
+    queryFn: () => releaseApi.getProjectReleases(projectId),
+    enabled: !!projectId,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const usePublishRelease = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: releaseApi.publishRelease,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: releaseKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: releaseKeys.lists() });
+    },
+  });
+};
+
+export const useRollbackRelease = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: releaseApi.rollbackRelease,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: releaseKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: releaseKeys.lists() });
+    },
+  });
+};
+
+export const useDeployRelease = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, environment }: { id: string; environment: string }) =>
+      releaseApi.deployRelease(id, environment),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: releaseKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: releaseKeys.lists() });
+    },
+  });
 };

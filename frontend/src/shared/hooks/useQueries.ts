@@ -57,13 +57,27 @@ export {
 // Auth queries
 export {
   useCurrentUser,
-  useLoginMutation,
-  useLogoutMutation,
-  useRegisterMutation,
-  useForgotPasswordMutation,
-  useResetPasswordMutation,
-  authQueryKeys,
+  useLogin,
+  useLogout, 
+  useRegister,
+  useRefreshTokens,
+  useUserSessions,
+  useRevokeSessions,
+  useAuthStatus,
+  useForgotPassword,
+  useResetPassword,
+  authKeys,
 } from "@/features/auth/model/useAuthQuery";
+
+// Auth mutations (aliases for backward compatibility)
+export { useLogin as useLoginMutation } from "@/features/auth/model/useAuthQuery";
+export { useLogout as useLogoutMutation } from "@/features/auth/model/useAuthQuery";
+export { useRegister as useRegisterMutation } from "@/features/auth/model/useAuthQuery";
+export { useForgotPassword as useForgotPasswordMutation } from "@/features/auth/model/useAuthQuery";
+export { useResetPassword as useResetPasswordMutation } from "@/features/auth/model/useAuthQuery";
+
+// Auth keys alias
+export { authKeys as authQueryKeys } from "@/features/auth/model/useAuthQuery";
 
 // Notification queries
 export {

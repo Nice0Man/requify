@@ -1,146 +1,209 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { authApi } from "../api/authApi";
+import { oauth2API } from "@/shared/api/oauth2";
+import type { LoginRequest, RegisterRequest } from "../api/authApi";
 
-// Query Keys
-export const authQueryKeys = {
-  currentUser: ["auth", "currentUser"] as const,
-  profile: ["auth", "profile"] as const,
-  auth0Status: ["auth", "auth0", "status"] as const,
+export const authKeys = {
+  all: ["auth"] as const,
+  user: () => [...authKeys.all, "user"] as const,
+  sessions: () => [...authKeys.all, "sessions"] as const,
 };
 
-// Queries
+/**
+ * Query для получения текущего пользователя
+ */
 export const useCurrentUser = () => {
   return useQuery({
-    queryKey: authQueryKeys.currentUser,
-    queryFn: authApi.getMe,
-    retry: false,
-    staleTime: 30 * 60 * 1000, // 30 минут
-    gcTime: 60 * 60 * 1000, // 1 час
-  });
-};
-
-export const useAuth0Status = () => {
-  return useQuery({
-    queryKey: authQueryKeys.auth0Status,
-    queryFn: authApi.getAuth0Status,
-    retry: 2,
+    queryKey: authKeys.user(),
+    queryFn: () => oauth2API.getCurrentUser(),
+    enabled: oauth2API.isAuthenticated(), // Запрашиваем только если аутентифицированы
     staleTime: 5 * 60 * 1000, // 5 минут
-    gcTime: 10 * 60 * 1000, // 10 минут
+    retry: (failureCount, error: any) => {
+      // Не повторяем запрос если проблема с аутентификацией
+      if (error?.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 };
 
-// Mutations
-export const useLoginMutation = () => {
+/**
+ * Mutation для логина
+ */
+export const useLogin = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: authApi.login,
+    mutationFn: async (credentials: LoginRequest) => {
+      const response = await oauth2API.login(credentials);
+      return response;
+    },
     onSuccess: (data) => {
-      // Сохраняем токены (проверяем оба формата для совместимости)
-      const accessToken = data.access_token || data.token;
-      const refreshToken = data.refresh_token || data.refreshToken;
-      
-      if (accessToken) {
-        localStorage.setItem("authToken", accessToken);
-        localStorage.setItem("access_token", accessToken);
-      }
-      if (refreshToken) {
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("refresh_token", refreshToken);
+      // Устанавливаем данные пользователя в кэш
+      if (data.user) {
+        queryClient.setQueryData(authKeys.user(), data.user);
       }
 
-      // Обновляем кэш пользователя
-      queryClient.setQueryData(authQueryKeys.currentUser, data.user);
-
-      // Инвалидируем связанные запросы
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      // Инвалидируем все auth-запросы для обновления состояния
+      queryClient.invalidateQueries({ queryKey: authKeys.all });
     },
     onError: (error) => {
-      console.error("Login error:", error);
+      console.error("Login mutation failed:", error);
+      // Очищаем auth кэш при ошибке логина
+      queryClient.removeQueries({ queryKey: authKeys.all });
     },
   });
 };
 
-export const useRegisterMutation = () => {
+/**
+ * Mutation для регистрации
+ */
+export const useRegister = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: authApi.register,
+    mutationFn: async (userData: RegisterRequest) => {
+      const response = await oauth2API.login({
+        username: userData.email,
+        password: userData.password,
+      });
+      return response;
+    },
     onSuccess: (data) => {
-      // Сохраняем токены (проверяем оба формата для совместимости)
-      const accessToken = data.access_token || data.token;
-      const refreshToken = data.refresh_token || data.refreshToken;
-      
-      if (accessToken) {
-        localStorage.setItem("authToken", accessToken);
-        localStorage.setItem("access_token", accessToken);
-      }
-      if (refreshToken) {
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("refresh_token", refreshToken);
+      // Устанавливаем данные пользователя в кэш
+      if (data.user) {
+        queryClient.setQueryData(authKeys.user(), data.user);
       }
 
-      // Обновляем кэш пользователя
-      queryClient.setQueryData(authQueryKeys.currentUser, data.user);
-
-      // Инвалидируем связанные запросы
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      // Инвалидируем все auth-запросы для обновления состояния
+      queryClient.invalidateQueries({ queryKey: authKeys.all });
     },
     onError: (error) => {
-      console.error("Register error:", error);
+      console.error("Registration mutation failed:", error);
+      // Очищаем auth кэш при ошибке регистрации
+      queryClient.removeQueries({ queryKey: authKeys.all });
     },
   });
 };
 
-export const useLogoutMutation = () => {
+/**
+ * Mutation для выхода
+ */
+export const useLogout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: authApi.logout,
+    mutationFn: async () => {
+      await oauth2API.logout();
+    },
     onSuccess: () => {
-      // Удаляем токены из localStorage
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("refreshToken");
-
-      // Очищаем кэш
+      // Очищаем весь кэш при выходе
       queryClient.clear();
-
-      // Перенаправляем на страницу авторизации
-      window.location.href = "/auth";
     },
     onError: (error) => {
-      console.error("Logout error:", error);
-      // Даже при ошибке очищаем локальные данные
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("refreshToken");
+      console.error("Logout mutation failed:", error);
+      // Очищаем кэш даже при ошибке выхода
       queryClient.clear();
     },
   });
 };
 
-export const useForgotPasswordMutation = () => {
+/**
+ * Mutation для обновления токенов
+ */
+export const useRefreshTokens = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: authApi.forgotPassword,
+    mutationFn: async () => {
+      await oauth2API.autoRefreshToken();
+    },
     onSuccess: () => {
-      // Показываем уведомление об успешной отправке
-      console.log("Password reset email sent");
+      // Инвалидируем auth-запросы после обновления токенов
+      queryClient.invalidateQueries({ queryKey: authKeys.all });
     },
     onError: (error) => {
-      console.error("Forgot password error:", error);
+      console.error("Token refresh mutation failed:", error);
+      // При неудачном обновлении токенов очищаем кэш
+      queryClient.removeQueries({ queryKey: authKeys.all });
     },
   });
 };
 
-export const useResetPasswordMutation = () => {
+/**
+ * Query для получения сессий пользователя
+ */
+export const useUserSessions = () => {
+  return useQuery({
+    queryKey: authKeys.sessions(),
+    queryFn: () => oauth2API.getSessions(),
+    enabled: oauth2API.isAuthenticated(),
+    staleTime: 2 * 60 * 1000, // 2 минуты
+  });
+};
+
+/**
+ * Mutation для отзыва сессий
+ */
+export const useRevokeSessions = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: ({ token, password }: { token: string; password: string }) =>
-      authApi.resetPassword(token, password),
+    mutationFn: async (sessionIds?: string[]) => {
+      await oauth2API.revokeSession(sessionIds);
+    },
     onSuccess: () => {
-      // Показываем уведомление об успешном сбросе пароля
-      console.log("Password reset successfully");
+      // Обновляем список сессий
+      queryClient.invalidateQueries({ queryKey: authKeys.sessions() });
+    },
+  });
+};
+
+/**
+ * Хук для проверки статуса аутентификации
+ */
+export const useAuthStatus = () => {
+  const { data: user, isLoading, error } = useCurrentUser();
+
+  return {
+    user,
+    isAuthenticated: oauth2API.isAuthenticated() && !!user,
+    isLoading,
+    error,
+    shouldRefresh: oauth2API.shouldRefreshToken(),
+    debugInfo: oauth2API.getTokenDebugInfo(),
+  };
+};
+
+/**
+ * Mutation для запроса восстановления пароля
+ */
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: async (email: string) => {
+      // TODO: Implement forgot password API call
+      await oauth2API.forgotPassword(email);
+      console.log("Forgot password request for:", email);
+      throw new Error("Forgot password functionality not implemented yet");
     },
     onError: (error) => {
-      console.error("Reset password error:", error);
+      console.error("Forgot password mutation failed:", error);
+    },
+  });
+};
+
+/**
+ * Mutation для сброса пароля
+ */
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: async (data: { token: string; newPassword: string }) => {
+      // TODO: Implement reset password API call
+      console.log("Reset password request with token:", data.token);
+      throw new Error("Reset password functionality not implemented yet");
+    },
+    onError: (error) => {
+      console.error("Reset password mutation failed:", error);
     },
   });
 };

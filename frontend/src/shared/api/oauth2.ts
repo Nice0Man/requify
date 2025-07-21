@@ -1,6 +1,7 @@
 /**
  * OAuth2 API Client
  * Интегрирован с обновленным authApi
+ * Использует только access_token и refresh_token (без дублирования)
  */
 
 import { client } from "./client";
@@ -20,13 +21,29 @@ import type {
 } from "@/features/auth/api/authApi";
 
 /**
+ * OAuth2 Storage Keys - унифицированные ключи
+ */
+const STORAGE_KEYS = {
+  ACCESS_TOKEN: "access_token",
+  REFRESH_TOKEN: "refresh_token",
+  TOKEN_EXPIRES_AT: "token_expires_at",
+  USER_DATA: "user_data",
+} as const;
+
+/**
  * OAuth2 API класс для работы с аутентификацией
- * Использует обновленный authApi
+ * Использует только стандартные токены OAuth2: access_token и refresh_token
  */
 export class OAuth2API {
   private static instance: OAuth2API;
+  private refreshPromise: Promise<LoginResponse> | null = null;
 
-  private constructor() {}
+  private constructor() {
+    // Автоматическое обновление токенов каждые 30 секунд
+    setInterval(() => {
+      this.autoRefreshToken().catch(console.error);
+    }, 30000);
+  }
 
   /**
    * Получить singleton instance
@@ -46,34 +63,29 @@ export class OAuth2API {
     password: string;
   }): Promise<LoginResponse> {
     try {
-      // Передаем данные как есть - бэкенд ожидает username и password
+      console.info(
+        "🔐 OAuth2API: Attempting login for user:",
+        credentials.username
+      );
+
       const loginData = {
         username: credentials.username,
         password: credentials.password,
       };
 
       const response = await authApi.login(loginData);
+      console.info("✅ OAuth2API: Login API response received");
 
-      // Сохраняем токены в разных форматах для совместимости
-      const accessToken = response.access_token || response.token;
-      const refreshToken = response.refresh_token || response.refreshToken;
-
-      if (accessToken) {
-        localStorage.setItem("access_token", accessToken);
-        localStorage.setItem("authToken", accessToken); // Для совместимости с API client
-      }
-      if (refreshToken) {
-        localStorage.setItem("refresh_token", refreshToken);
-        localStorage.setItem("refreshToken", refreshToken); // Для совместимости с API client
-      }
-
-      // Устанавливаем время истечения (предполагаем 1 час для access token)
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-      localStorage.setItem("token_expires_at", expiresAt.toISOString());
+      // Стандартизированная обработка токенов
+      await this.saveTokens(response);
 
       return response;
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("❌ OAuth2API: Login failed:", error);
+
+      // Очищаем токены при неудачном логине
+      this.clearTokens();
+
       throw error;
     }
   }
@@ -82,39 +94,101 @@ export class OAuth2API {
    * Обновление токенов
    */
   async refreshTokens(_refreshToken?: string): Promise<LoginResponse> {
+    // Предотвращаем одновременные запросы обновления
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
     try {
-      const token = _refreshToken || localStorage.getItem("refresh_token");
+      const token = _refreshToken || this.getRefreshToken();
 
       if (!token) {
+        console.error("❌ OAuth2API: No refresh token available");
         throw new Error("No refresh token available");
       }
 
-      const response = await authApi.refreshToken({ refreshToken: token });
+      console.info("🔄 OAuth2API: Refreshing tokens...");
 
-      // Обновляем токены в разных форматах для совместимости
-      const accessToken = response.access_token || response.token;
-      const refreshToken = response.refresh_token || response.refreshToken;
+      this.refreshPromise = authApi.refreshToken({ refreshToken: token });
+      const response = await this.refreshPromise;
 
-      if (accessToken) {
-        localStorage.setItem("access_token", accessToken);
-        localStorage.setItem("authToken", accessToken); // Для совместимости с API client
-      }
-      if (refreshToken) {
-        localStorage.setItem("refresh_token", refreshToken);
-        localStorage.setItem("refreshToken", refreshToken); // Для совместимости с API client
-      }
+      console.info("✅ OAuth2API: Token refresh API response received");
 
-      // Обновляем время истечения
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-      localStorage.setItem("token_expires_at", expiresAt.toISOString());
+      // Стандартизированная обработка токенов
+      await this.saveTokens(response);
 
       return response;
     } catch (error) {
-      console.error("Token refresh failed:", error);
+      console.error("❌ OAuth2API: Token refresh failed:", error);
+
       // Очищаем токены при неудачном обновлении
       this.clearTokens();
+
       throw error;
+    } finally {
+      this.refreshPromise = null;
     }
+  }
+
+  /**
+   * Сохранение токенов (унифицированный метод)
+   */
+  private async saveTokens(response: LoginResponse): Promise<void> {
+    const accessToken = response.access_token || response.token;
+    const refreshToken = response.refresh_token || response.refreshToken;
+    const expiresIn = response.expires_in || 3600; // По умолчанию 1 час
+
+    if (!accessToken) {
+      console.error("❌ OAuth2API: No access token in response:", response);
+      throw new Error("No access token received from server");
+    }
+
+    console.info("🔐 OAuth2API: Saving tokens to localStorage");
+
+    // Сохраняем только стандартные OAuth2 токены
+    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+
+    if (refreshToken) {
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    }
+
+    // Рассчитываем время истечения токена
+    const expiresAt = new Date(Date.now() + expiresIn * 1000);
+    localStorage.setItem(
+      STORAGE_KEYS.TOKEN_EXPIRES_AT,
+      expiresAt.toISOString()
+    );
+
+    // Сохраняем данные пользователя если есть
+    if (response.user) {
+      localStorage.setItem(
+        STORAGE_KEYS.USER_DATA,
+        JSON.stringify(response.user)
+      );
+    }
+
+    console.info("✅ OAuth2API: Tokens saved successfully", {
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken,
+      expiresAt: expiresAt.toISOString(),
+      expiresInMinutes: Math.round(expiresIn / 60),
+    });
+
+    // Удаляем старые дублированные токены если они есть
+    this.cleanupLegacyTokens();
+  }
+
+  /**
+   * Удаление устаревших дублированных токенов
+   */
+  private cleanupLegacyTokens(): void {
+    const legacyKeys = ["authToken", "refreshToken", "token", "user_profile"];
+    legacyKeys.forEach((key) => {
+      if (localStorage.getItem(key)) {
+        localStorage.removeItem(key);
+        console.debug(`🔐 OAuth2API: Removed legacy token: ${key}`);
+      }
+    });
   }
 
   /**
@@ -239,70 +313,94 @@ export class OAuth2API {
    * Проверка аутентификации
    */
   isAuthenticated(): boolean {
-    // Проверяем различные варианты хранения токенов
-    const token =
-      localStorage.getItem("access_token") || localStorage.getItem("authToken");
-    const expiresAt = localStorage.getItem("token_expires_at");
+    const token = this.getAccessToken();
+    const expiresAt = localStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRES_AT);
 
     if (!token) {
+      console.debug("🔐 OAuth2API: No access token found - not authenticated");
       return false;
     }
 
     if (!expiresAt) {
-      // Если нет времени истечения, считаем токен валидным (для совместимости)
-      return true;
+      // Если нет времени истечения, считаем токен истекшим для безопасности
+      console.debug(
+        "🔐 OAuth2API: No expiry time found - token considered expired"
+      );
+      return false;
     }
 
     // Проверяем, не истёк ли токен
     const expiryDate = new Date(expiresAt);
-    return expiryDate > new Date();
+    const now = new Date();
+    const isValid = expiryDate > now;
+
+    if (!isValid) {
+      console.debug("🔐 OAuth2API: Token expired", {
+        expiresAt: expiryDate.toISOString(),
+        now: now.toISOString(),
+      });
+    } else {
+      const minutesUntilExpiry = Math.round(
+        (expiryDate.getTime() - now.getTime()) / (1000 * 60)
+      );
+      console.debug("🔐 OAuth2API: Token is valid", {
+        expiresAt: expiryDate.toISOString(),
+        minutesUntilExpiry,
+      });
+    }
+
+    return isValid;
   }
 
   /**
    * Получение access token
    */
   getAccessToken(): string | null {
-    if (this.isAuthenticated()) {
-      // Проверяем различные варианты хранения токенов
-      return (
-        localStorage.getItem("access_token") ||
-        localStorage.getItem("authToken") ||
-        null
-      );
-    }
-    return null;
+    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
   }
 
   /**
    * Получение refresh token
    */
   getRefreshToken(): string | null {
-    // Проверяем различные варианты хранения токенов
-    return (
-      localStorage.getItem("refresh_token") ||
-      localStorage.getItem("refreshToken") ||
-      null
-    );
+    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+  }
+
+  /**
+   * Получение времени истечения токена
+   */
+  getTokenExpiryTime(): Date | null {
+    const expiresAt = localStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRES_AT);
+    return expiresAt ? new Date(expiresAt) : null;
   }
 
   /**
    * Очистка токенов
    */
   clearTokens(): void {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("token_expires_at");
-    // Очищаем также ключи для совместимости
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
+    console.info("🔐 OAuth2API: Clearing all tokens from localStorage");
+
+    // Очищаем только наши токены
+    Object.values(STORAGE_KEYS).forEach((key) => {
+      localStorage.removeItem(key);
+    });
+
+    // Очищаем и старые токены для полной очистки
+    this.cleanupLegacyTokens();
+
+    console.info("✅ OAuth2API: All tokens cleared successfully");
   }
 
   /**
    * Проверка необходимости обновления токена
    */
   shouldRefreshToken(): boolean {
-    const expiresAt = localStorage.getItem("token_expires_at");
-    if (!expiresAt) return false;
+    const expiresAt = localStorage.getItem(STORAGE_KEYS.TOKEN_EXPIRES_AT);
+    const refreshToken = this.getRefreshToken();
+
+    if (!expiresAt || !refreshToken) {
+      return false;
+    }
 
     const expiryDate = new Date(expiresAt);
     const now = new Date();
@@ -310,17 +408,31 @@ export class OAuth2API {
       (expiryDate.getTime() - now.getTime()) / (1000 * 60);
 
     // Обновляем токен за 5 минут до истечения
-    return minutesUntilExpiry <= 5;
+    const shouldRefresh = minutesUntilExpiry <= 5 && minutesUntilExpiry > -60; // Даем час на обновление просроченного токена
+
+    if (shouldRefresh) {
+      console.debug("🔐 OAuth2API: Token refresh needed", {
+        expiresAt: expiryDate.toISOString(),
+        minutesUntilExpiry: Math.round(minutesUntilExpiry),
+        hasRefreshToken: !!refreshToken,
+      });
+    }
+
+    return shouldRefresh;
   }
 
   /**
    * Автоматическое обновление токена при необходимости
    */
   async autoRefreshToken(): Promise<void> {
-    if (this.shouldRefreshToken()) {
-      const refreshToken = this.getRefreshToken();
-      if (refreshToken) {
-        await this.refreshTokens(refreshToken);
+    if (this.shouldRefreshToken() && !this.refreshPromise) {
+      try {
+        console.info("🔄 OAuth2API: Auto-refreshing token...");
+        await this.refreshTokens();
+        console.info("✅ OAuth2API: Auto-refresh completed successfully");
+      } catch (error) {
+        console.error("❌ OAuth2API: Auto-refresh failed:", error);
+        // При неудачном автообновлении не очищаем токены - пользователь может продолжить работу
       }
     }
   }
@@ -330,7 +442,20 @@ export class OAuth2API {
    */
   async getCurrentUser(): Promise<LoginResponse["user"]> {
     try {
-      return await authApi.getMe();
+      // Сначала пытаемся получить из кэша
+      const cachedUser = localStorage.getItem(STORAGE_KEYS.USER_DATA);
+      if (cachedUser) {
+        try {
+          return JSON.parse(cachedUser);
+        } catch (error) {
+          console.warn("Failed to parse cached user data:", error);
+        }
+      }
+
+      // Если нет в кэше, запрашиваем с сервера
+      const user = await authApi.getMe();
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      return user;
     } catch (error) {
       console.error("Failed to get current user:", error);
       throw error;
@@ -344,9 +469,49 @@ export class OAuth2API {
     userData: Partial<LoginResponse["user"]>
   ): Promise<LoginResponse["user"]> {
     try {
-      return await authApi.updateMe(userData);
+      const user = await authApi.updateMe(userData);
+      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      return user;
     } catch (error) {
       console.error("Failed to update current user:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Получение статистики токенов для отладки
+   */
+  getTokenDebugInfo() {
+    const accessToken = this.getAccessToken();
+    const refreshToken = this.getRefreshToken();
+    const expiryTime = this.getTokenExpiryTime();
+    const isAuthenticated = this.isAuthenticated();
+    const shouldRefresh = this.shouldRefreshToken();
+
+    return {
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken,
+      hasExpiryTime: !!expiryTime,
+      isAuthenticated,
+      shouldRefresh,
+      expiryTime: expiryTime?.toISOString(),
+      minutesUntilExpiry: expiryTime
+        ? Math.round((expiryTime.getTime() - Date.now()) / (1000 * 60))
+        : null,
+      accessTokenPreview: accessToken
+        ? `${accessToken.substring(0, 20)}...`
+        : null,
+      refreshTokenPreview: refreshToken
+        ? `${refreshToken.substring(0, 20)}...`
+        : null,
+    };
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    try {
+      await authApi.forgotPassword(email);
+    } catch (error) {
+      console.error("Failed to request password reset:", error);
       throw error;
     }
   }

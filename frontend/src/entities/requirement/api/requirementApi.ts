@@ -1,4 +1,5 @@
 import { client } from "../../../shared/api/client";
+import { API_ENDPOINTS } from "../../../shared/api/endpoints";
 
 export interface Requirement {
   id: string;
@@ -47,49 +48,51 @@ export interface RequirementFilters {
 }
 
 export const requirementApi = {
+  /**
+   * Получить список требований
+   */
   getRequirements: async (
     filters?: RequirementFilters
   ): Promise<Requirement[]> => {
     const params = new URLSearchParams();
-
-    if (filters?.search) {
-      params.append("search", filters.search);
+    if (filters?.projectId) {
+      params.append("projectId", filters.projectId);
     }
     if (filters?.status) {
       params.append("status", filters.status);
     }
-    if (filters?.priority) {
-      params.append("priority", filters.priority);
-    }
     if (filters?.type) {
       params.append("type", filters.type);
     }
-    if (filters?.projectId) {
-      params.append("project_id", filters.projectId);
+    if (filters?.priority) {
+      params.append("priority", filters.priority);
     }
     if (filters?.authorId) {
-      params.append("author_id", filters.authorId);
+      params.append("authorId", filters.authorId);
     }
-    if (filters?.isActive !== undefined) {
-      params.append("is_active", String(filters.isActive));
+    if (filters?.search) {
+      params.append("search", filters.search);
     }
 
-    const url = `/requirements${
+    const url = `${API_ENDPOINTS.REQUIREMENTS.LIST}${
       params.toString() ? `?${params.toString()}` : ""
     }`;
-    const response = await client.get<Requirement[]>(url);
+    const response = await client.get(url);
     return response.data;
   },
 
+  /**
+   * Получить требование по ID
+   */
   getRequirement: async (id: string): Promise<Requirement> => {
-    const response = await client.get(`/requirements/${id}`);
+    const response = await client.get(API_ENDPOINTS.REQUIREMENTS.GET(id));
     return response.data;
   },
 
   createRequirement: async (
     data: CreateRequirementRequest
   ): Promise<Requirement> => {
-    const response = await client.post("/requirements", data);
+    const response = await client.post(API_ENDPOINTS.REQUIREMENTS.CREATE, data);
     return response.data;
   },
 
@@ -97,11 +100,11 @@ export const requirementApi = {
     id: string,
     data: UpdateRequirementRequest
   ): Promise<Requirement> => {
-    const response = await client.put(`/requirements/${id}`, data);
+    const response = await client.put(API_ENDPOINTS.REQUIREMENTS.UPDATE(id), data);
     return response.data;
   },
 
   deleteRequirement: async (id: string): Promise<void> => {
-    await client.delete(`/requirements/${id}`);
+    await client.delete(API_ENDPOINTS.REQUIREMENTS.DELETE(id));
   },
 };

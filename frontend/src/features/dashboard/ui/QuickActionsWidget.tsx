@@ -1,398 +1,452 @@
-import React, { memo, useMemo, useCallback } from "react";
+import React, { memo, useState, useCallback, useMemo } from "react";
 import {
   Box,
-  Grid,
-  Typography,
   Card,
   CardContent,
-  Stack,
+  Grid,
+  Typography,
   useTheme,
   alpha,
+  Stack,
+  Chip,
+  IconButton,
+  Menu,
+  MenuItem,
   Skeleton,
   Alert,
-  Chip,
 } from "@mui/material";
 import {
   Add,
   Assignment,
-  RocketLaunch,
+  Group,
+  Settings,
   BugReport,
   Analytics,
-  Assessment,
-  TrendingUp,
-  Upload,
-  FileDownload,
+  RocketLaunch,
+  MoreVert,
+  KeyboardArrowRight,
 } from "@mui/icons-material";
-import i18n from "@/shared/lib/i18n";
-import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import type { DashboardMode, DashboardDensity } from "@/widgets/dashboard-container";
+import { useDashboardSizing, useCardSizing } from "@/shared/hooks";
 
-import type { QuickAction } from "@/entities/dashboard";
-import { ActionCategory } from "@/entities/dashboard";
-import { useQuickActions } from "../model/queries";
+// Types
+enum ActionCategory {
+  CREATE = "create",
+  MANAGE = "manage",
+  ANALYZE = "analyze",
+  CONFIGURE = "configure",
+}
+
+interface QuickAction {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactElement;
+  category: ActionCategory;
+  shortcut?: string;
+  onClick: () => void;
+  disabled?: boolean;
+  badge?: string | number;
+  color?: string;
+  priority?: number;
+}
 
 interface QuickActionsWidgetProps {
-  variant?: "minimal" | "detailed" | "compact";
+  variant?: "minimal" | "compact" | "detailed";
+  mode?: DashboardMode;
+  density?: DashboardDensity;
+  layout?: "grid" | "list" | "masonry";
   maxActions?: number;
   showCategories?: boolean;
   showShortcuts?: boolean;
-  className?: string;
   onActionClick?: (action: QuickAction) => void;
+  className?: string;
+  // New masonry support
+  masonry?: boolean;
+  flexible?: boolean;
+  maxHeight?: number;
+  overflow?: string;
 }
 
 export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
   ({
     variant = "detailed",
+    mode = "detailed",
+    density = "comfortable",
+    layout = "grid",
     maxActions = 9,
     showCategories = true,
     showShortcuts = true,
     onActionClick,
     className,
+    masonry = false,
+    flexible = false,
+    maxHeight,
+    overflow = "visible",
   }) => {
-    const t = i18n.t;
+    const { t } = useTranslation();
     const theme = useTheme();
-    const navigate = useNavigate();
+    
+    // New adaptive sizing system
+    const sizing = useDashboardSizing({ 
+      mode, 
+      density, 
+      layout, 
+      masonry, 
+      flexible 
+    });
+    
+    const cardSizing = useCardSizing(mode, density, masonry);
 
-    const isCompact = variant === "compact" || variant === "minimal";
+    // State
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedCategory, setSelectedCategory] = useState<ActionCategory | "all">("all");
 
-    // Use real API data
-    const { data: actions, isLoading, error, isError } = useQuickActions();
+    const isCompact = variant === "minimal" || mode === "minimal";
 
-    // Filter and categorize actions
+    // Define quick actions with priorities for masonry
+    const quickActions = useMemo((): QuickAction[] => {
+      return [
+        {
+          id: "create-project",
+          title: t("quickActions.createProject", "Create Project"),
+          description: t("quickActions.createProjectDesc", "Start a new project"),
+          icon: <Add />,
+          category: ActionCategory.CREATE,
+          shortcut: "Ctrl+N",
+          onClick: () => console.log("Create project"),
+          color: theme.palette.primary.main,
+          priority: 1,
+        },
+        {
+          id: "create-requirement",
+          title: t("quickActions.createRequirement", "New Requirement"),
+          description: t("quickActions.createRequirementDesc", "Add requirement"),
+          icon: <Assignment />,
+          category: ActionCategory.CREATE,
+          shortcut: "Ctrl+R",
+          onClick: () => console.log("Create requirement"),
+          color: theme.palette.secondary.main,
+          priority: 2,
+        },
+        {
+          id: "manage-team",
+          title: t("quickActions.manageTeam", "Team Management"),
+          description: t("quickActions.manageTeamDesc", "Manage team members"),
+          icon: <Group />,
+          category: ActionCategory.MANAGE,
+          onClick: () => console.log("Manage team"),
+          color: theme.palette.info.main,
+          priority: 3,
+        },
+        {
+          id: "view-analytics",
+          title: t("quickActions.viewAnalytics", "Analytics"),
+          description: t("quickActions.viewAnalyticsDesc", "View project analytics"),
+          icon: <Analytics />,
+          category: ActionCategory.ANALYZE,
+          onClick: () => console.log("View analytics"),
+          color: theme.palette.success.main,
+          priority: 4,
+        },
+        {
+          id: "system-settings",
+          title: t("quickActions.systemSettings", "Settings"),
+          description: t("quickActions.systemSettingsDesc", "Configure system"),
+          icon: <Settings />,
+          category: ActionCategory.CONFIGURE,
+          onClick: () => console.log("System settings"),
+          color: theme.palette.warning.main,
+          priority: 5,
+        },
+        {
+          id: "report-bug",
+          title: t("quickActions.reportBug", "Report Bug"),
+          description: t("quickActions.reportBugDesc", "Submit bug report"),
+          icon: <BugReport />,
+          category: ActionCategory.MANAGE,
+          onClick: () => console.log("Report bug"),
+          color: theme.palette.error.main,
+          priority: 6,
+        },
+        {
+          id: "quick-deploy",
+          title: t("quickActions.quickDeploy", "Quick Deploy"),
+          description: t("quickActions.quickDeployDesc", "Deploy latest changes"),
+          icon: <RocketLaunch />,
+          category: ActionCategory.MANAGE,
+          shortcut: "Ctrl+D",
+          onClick: () => console.log("Quick deploy"),
+          badge: "NEW",
+          color: theme.palette.secondary.main,
+          priority: 7,
+        },
+      ];
+    }, [theme, t]);
+
+    // Filter actions based on category and maxActions
     const filteredActions = useMemo(() => {
-      if (!actions) return [];
-      return actions.slice(0, maxActions);
-    }, [actions, maxActions]);
+      let filtered = quickActions;
+      
+      if (selectedCategory !== "all") {
+        filtered = filtered.filter(action => action.category === selectedCategory);
+      }
+      
+      return filtered.slice(0, maxActions);
+    }, [quickActions, selectedCategory, maxActions]);
 
-    const groupedActions = useMemo(() => {
-      if (!showCategories) return {};
-
-      return filteredActions.reduce((groups, action) => {
-        const category = action.category || ActionCategory.CREATE;
-        if (!groups[category]) {
-          groups[category] = [];
-        }
-        groups[category].push(action);
-        return groups;
-      }, {} as Record<ActionCategory, QuickAction[]>);
-    }, [filteredActions, showCategories]);
-
-    // Event handlers
-    const handleActionClick = useCallback(
-      (action: QuickAction) => {
-        if (onActionClick) {
-          onActionClick(action);
-        } else {
-          navigate(action.path);
-        }
-      },
-      [onActionClick, navigate]
-    );
-
-    // Helper functions
-    const getCategoryColor = useCallback(
-      (category: ActionCategory) => {
-        switch (category) {
-          case ActionCategory.CREATE:
-            return theme.palette.primary.main;
-          case ActionCategory.ANALYZE:
-            return theme.palette.info.main;
-          case ActionCategory.MANAGE:
-            return theme.palette.success.main;
-          default:
-            return theme.palette.secondary.main;
-        }
-      },
-      [theme.palette]
-    );
-
-    const getActionIcon = useCallback((iconName: string) => {
-      const iconMap: Record<string, React.ReactNode> = {
-        Add: <Add />,
-        Assignment: <Assignment />,
-        RocketLaunch: <RocketLaunch />,
-        BugReport: <BugReport />,
-        Analytics: <Analytics />,
-        Assessment: <Assessment />,
-        TrendingUp: <TrendingUp />,
-        Upload: <Upload />,
-        FileDownload: <FileDownload />,
-      };
-      return iconMap[iconName] || <Add />;
-    }, []);
-
-    const getCategoryTitle = useCallback((category: ActionCategory) => {
+    // Get category color helper
+    const getCategoryColor = (category: ActionCategory): string => {
       switch (category) {
         case ActionCategory.CREATE:
-          return "Create";
-        case ActionCategory.ANALYZE:
-          return "Analyze";
+          return theme.palette.primary.main;
         case ActionCategory.MANAGE:
-          return "Manage";
+          return theme.palette.info.main;
+        case ActionCategory.ANALYZE:
+          return theme.palette.success.main;
+        case ActionCategory.CONFIGURE:
+          return theme.palette.warning.main;
         default:
-          return category;
+          return theme.palette.grey[500];
       }
-    }, []);
+    };
 
-    // Action Card component - matching Key Metrics style
-    const renderAction = useCallback(
-      (action: QuickAction, index: number) => {
-        const actionColor = getCategoryColor(action.category || ActionCategory.CREATE);
+    // Handle action click
+    const handleActionClick = useCallback((action: QuickAction) => {
+      action.onClick();
+      onActionClick?.(action);
+    }, [onActionClick]);
 
-        return (
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            md={4}
-            key={action.id}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <Box sx={{ width: "100%", maxWidth: 320 }}>
-              <Card
-                onClick={() => handleActionClick(action)}
-                sx={{
-                  cursor: "pointer",
-                  borderRadius: 3,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                  boxShadow: `0 2px 20px ${alpha(theme.palette.common.black, 0.04)}`,
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  background: theme.palette.background.paper,
-                  height: 180,
-                  display: "flex",
-                  flexDirection: "column",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: `0 8px 40px ${alpha(theme.palette.common.black, 0.12)}`,
-                    borderColor: alpha(actionColor, 0.2),
-                  },
-                }}
-              >
-                <CardContent
-                  sx={{ 
-                    p: 3, 
-                    flex: 1, 
-                    display: "flex", 
-                    flexDirection: "column",
-                    height: "100%",
-                  }}
-                >
-                  <Stack spacing={2} sx={{ height: "100%" }}>
-                    {/* Header */}
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
-                    >
-                      <Box
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 2.5,
-                          background: `linear-gradient(135deg, ${alpha(
-                            actionColor,
-                            0.1
-                          )}, ${alpha(actionColor, 0.05)})`,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          border: `1px solid ${alpha(actionColor, 0.1)}`,
-                        }}
-                      >
-                        <Box
-                          sx={{ 
-                            color: actionColor, 
-                            fontSize: 24,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {getActionIcon(action.icon)}
-                        </Box>
-                      </Box>
+    // Handle menu
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    };
 
-                      {/* Shortcut chip */}
-                      {showShortcuts && action.shortcut && (
-                        <Chip
-                          label={action.shortcut}
-                          size="small"
-                          variant="outlined"
-                          sx={{
-                            fontSize: "0.75rem",
-                            height: 24,
-                            fontFamily: "monospace",
-                            fontWeight: 600,
-                            "& .MuiChip-label": { px: 1 },
-                            borderRadius: 1.5,
-                            borderColor: alpha(actionColor, 0.2),
-                            color: actionColor,
-                          }}
-                        />
-                      )}
-                    </Box>
+    const handleMenuClose = () => {
+      setAnchorEl(null);
+    };
 
-                    {/* Content */}
-                    <Stack spacing={0.5} sx={{ flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 700,
-                          color: theme.palette.text.primary,
-                          fontSize: isCompact ? "1rem" : "1.125rem",
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {action.title}
-                      </Typography>
+    // Responsive grid configuration using new sizing system
+    const getGridConfig = () => {
+      if (layout === "list") {
+        return { xs: 12 }; // Full width for list
+      }
+      
+      // Use sizing system for responsive grid
+      const { columns } = sizing.gridConfig;
+      
+      // Improved responsive grid based on dashboard mode and screen size
+      if (mode === "minimal") {
+        return { xs: 12, sm: 6, md: 6, lg: 4, xl: 4 };
+      }
+      
+      if (mode === "compact") {
+        return { xs: 12, sm: 6, md: 4, lg: 4, xl: 3 };
+      }
+      
+      if (mode === "fullscreen") {
+        return { xs: 12, sm: 6, md: 4, lg: 3, xl: 2 };
+      }
+      
+      // Detailed mode - adaptive based on screen size and available columns
+      if (columns >= 6) {
+        return { xs: 12, sm: 6, md: 4, lg: 3, xl: 2 };
+      } else if (columns >= 4) {
+        return { xs: 12, sm: 6, md: 4, lg: 3, xl: 3 };
+      } else if (columns >= 3) {
+        return { xs: 12, sm: 6, md: 4, lg: 4, xl: 4 };
+      } else {
+        return { xs: 12, sm: 6, md: 6, lg: 6, xl: 6 };
+      }
+    };
 
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: theme.palette.text.secondary,
-                          fontWeight: 500,
-                          fontSize: "0.875rem",
-                          letterSpacing: "0.02em",
-                          lineHeight: 1.4,
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                        }}
-                      >
-                        {action.description}
-                      </Typography>
-                    </Stack>
+    const gridConfig = getGridConfig();
 
-                    {/* Category indicator */}
-                    <Box
-                      sx={{
-                        height: 4,
-                        borderRadius: 2,
-                        background: `linear-gradient(90deg, ${actionColor}, ${alpha(
-                          actionColor,
-                          0.7
-                        )})`,
-                        opacity: 0.6,
-                      }}
-                    />
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Box>
-          </Grid>
-        );
-      },
-      [
-        theme.palette,
-        isCompact,
-        showShortcuts,
-        handleActionClick,
-        getActionIcon,
-        getCategoryColor,
-      ]
-    );
+    // Action Card component with new sizing
+    const ActionCard: React.FC<{ action: QuickAction; index: number }> = ({ action, index }) => {
+      const actionColor = action.color || getCategoryColor(action.category);
 
-    // Loading state
-    if (isLoading) {
       return (
-        <Box className={className} sx={{ width: "100%" }}>
-          <Box
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-              backgroundColor: theme.palette.background.paper,
-              width: "100%",
-            }}
-          >
-            <Stack spacing={3}>
-              {/* Header skeleton */}
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Stack spacing={1}>
-                  <Box display="flex" alignItems="center" gap={1.5}>
-                    <Skeleton variant="rounded" width={32} height={32} />
-                    <Skeleton variant="text" width={150} height={32} />
-                  </Box>
-                  <Skeleton variant="text" width={200} height={20} />
-                </Stack>
-              </Box>
-
-              {/* Content skeleton */}
-              <Box>
-                <Grid container spacing={3}>
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <Grid item xs={12} sm={6} md={4} key={index}>
-                      <Skeleton
-                        variant="rectangular"
-                        height={180}
-                        sx={{ borderRadius: 3 }}
-                      />
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-            </Stack>
-          </Box>
-        </Box>
-      );
-    }
-
-    // Error state
-    if (isError) {
-      return (
-        <Box className={className} sx={{ width: "100%" }}>
-          <Box
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-              backgroundColor: theme.palette.background.paper,
-              width: "100%",
-            }}
-          >
-            <Stack spacing={2} alignItems="center" sx={{ py: 4 }}>
-              <RocketLaunch
-                sx={{ fontSize: 48, color: "text.secondary", opacity: 0.3 }}
-              />
-              <Typography color="error" variant="body2" textAlign="center">
-                {t("errors.loadingError")}: {error?.message || "Unknown error"}
-              </Typography>
-              <Alert
-                severity="error"
-                sx={{ width: "100%", textAlign: "center" }}
-              >
-                {t(
-                  "dashboard.quickActions.errorMessage",
-                  "Quick Actions temporarily unavailable"
-                )}
-              </Alert>
-            </Stack>
-          </Box>
-        </Box>
-      );
-    }
-
-    return (
-      <Box className={className} sx={{ width: "100%" }}>
-        {/* Container with same styling as Key Metrics */}
-        <Box
+        <Card
+          onClick={() => handleActionClick(action)}
           sx={{
-            p: 3,
-            borderRadius: 2,
+            cursor: action.disabled ? "not-allowed" : "pointer",
+            borderRadius: cardSizing.borderRadius,
             border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-            backgroundColor: theme.palette.background.paper,
-            width: "100%",
+            boxShadow: cardSizing.elevation,
+            background: theme.palette.background.paper,
+            height: "100%",
+            minHeight: mode === "minimal" ? 120 : mode === "compact" ? 140 : cardSizing.minHeight,
+            maxHeight: maxHeight || (mode === "minimal" ? 180 : mode === "compact" ? 220 : 280),
+            overflow: overflow,
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            opacity: action.disabled ? 0.6 : 1,
+            "&:hover": action.disabled ? {} : {
+              transform: mode === "fullscreen" ? "none" : "translateY(-2px)",
+              boxShadow: mode === "minimal" 
+                ? `0 4px 16px ${alpha(theme.palette.common.black, 0.08)}`
+                : `0 8px 32px ${alpha(theme.palette.common.black, 0.12)}`,
+              borderColor: alpha(actionColor, mode === "minimal" ? 0.15 : 0.2),
+            },
           }}
         >
-          <Stack spacing={3}>
-            {/* Header Section - matching Key Metrics pattern */}
+          <CardContent
+            sx={{
+              p: {
+                xs: mode === "minimal" ? 1.5 : cardSizing.padding.xs,
+                sm: mode === "minimal" ? 2 : cardSizing.padding.sm,
+                md: mode === "minimal" ? 2.5 : cardSizing.padding.md,
+              },
+              "&:last-child": { 
+                pb: mode === "minimal" ? 1.5 : cardSizing.padding.sm 
+              },
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Stack spacing={2} sx={{ height: "100%" }}>
+              {/* Header */}
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box
+                  sx={{
+                    width: (mode === "minimal" ? 32 : mode === "compact" ? 36 : cardSizing.iconSize + 16),
+                    height: (mode === "minimal" ? 32 : mode === "compact" ? 36 : cardSizing.iconSize + 16),
+                    borderRadius: cardSizing.borderRadius,
+                    background: `linear-gradient(135deg, ${alpha(actionColor, 0.1)}, ${alpha(actionColor, 0.05)})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: `1px solid ${alpha(actionColor, 0.1)}`,
+                  }}
+                >
+                  {React.cloneElement(action.icon, {
+                    sx: { 
+                      color: actionColor, 
+                      fontSize: mode === "minimal" ? 18 : mode === "compact" ? 20 : cardSizing.iconSize 
+                    },
+                  })}
+                </Box>
+                
+                {/* Badge or Category */}
+                {action.badge ? (
+                  <Chip
+                    label={action.badge}
+                    size="small"
+                    sx={{
+                      backgroundColor: alpha(actionColor, 0.1),
+                      color: actionColor,
+                      fontSize: sizing.typography.caption,
+                      fontWeight: 600,
+                    }}
+                  />
+                ) : showCategories ? (
+                  <Chip
+                    label={action.category}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      textTransform: "capitalize",
+                      borderColor: alpha(actionColor, 0.2),
+                      color: actionColor,
+                      fontSize: sizing.typography.caption,
+                    }}
+                  />
+                ) : null}
+              </Box>
+
+              {/* Title */}
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontSize: sizing.typography.subtitle,
+                  fontWeight: 600,
+                  color: theme.palette.text.primary,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {action.title}
+              </Typography>
+
+              {/* Description */}
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: sizing.typography.body,
+                  color: theme.palette.text.secondary,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  display: "-webkit-box",
+                  WebkitLineClamp: isCompact ? 1 : 2,
+                  WebkitBoxOrient: "vertical",
+                  flex: 1,
+                }}
+              >
+                {action.description}
+              </Typography>
+
+              {/* Footer */}
+              <Box 
+                display="flex" 
+                alignItems="center" 
+                justifyContent="space-between"
+                sx={{ mt: "auto" }}
+              >
+                {/* Shortcut */}
+                {showShortcuts && action.shortcut && (
+                  <Chip
+                    label={action.shortcut}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      fontSize: sizing.typography.caption,
+                      fontFamily: "monospace",
+                      color: theme.palette.text.secondary,
+                      borderColor: alpha(theme.palette.divider, 0.3),
+                    }}
+                  />
+                )}
+                
+                {/* Arrow indicator */}
+                <KeyboardArrowRight
+                  sx={{
+                    color: actionColor,
+                    fontSize: 20,
+                    opacity: 0.7,
+                    ml: "auto",
+                  }}
+                />
+              </Box>
+            </Stack>
+          </CardContent>
+        </Card>
+      );
+    };
+
+    return (
+      <Box className={className} sx={{ width: "100%", overflow: overflow }}>
+        {/* Container with adaptive sizing */}
+        <Box
+          sx={{
+            p: {
+              xs: sizing.padding.xs,
+              sm: sizing.padding.sm,
+              md: sizing.padding.md,
+            },
+            borderRadius: sizing.borderRadius.medium,
+            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+            backgroundColor: theme.palette.background.paper,
+            boxShadow: sizing.elevation.widget,
+            width: "100%",
+            maxHeight: maxHeight,
+            overflow: overflow,
+          }}
+        >
+          <Stack spacing={sizing.spacing}>
+            {/* Header Section */}
             <Box
               display="flex"
               justifyContent="space-between"
@@ -402,9 +456,9 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                 <Box display="flex" alignItems="center" gap={1.5}>
                   <Box
                     sx={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 2,
+                      width: sizing.headerHeight - 20,
+                      height: sizing.headerHeight - 20,
+                      borderRadius: sizing.borderRadius.small,
                       background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                       display: "flex",
                       alignItems: "center",
@@ -418,7 +472,7 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                     sx={{
                       fontWeight: 700,
                       color: theme.palette.text.primary,
-                      fontSize: isCompact ? "1.25rem" : "1.5rem",
+                      fontSize: sizing.typography.title,
                     }}
                   >
                     {t("dashboard.quickActions.title", "Quick Actions")}
@@ -427,102 +481,102 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                 <Typography
                   variant="body2"
                   sx={{
-                    fontSize: "0.875rem",
+                    fontSize: sizing.typography.body,
                     color: theme.palette.text.secondary,
                   }}
                 >
                   {t("dashboard.quickActions.subtitle", "Frequently used functions")}
                 </Typography>
               </Stack>
+
+              {/* Menu */}
+              <IconButton
+                onClick={handleMenuOpen}
+                sx={{
+                  borderRadius: sizing.borderRadius.small,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                }}
+              >
+                <MoreVert />
+              </IconButton>
             </Box>
 
-            {/* Content Section */}
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              {/* Actions Grid - matching Key Metrics centered layout */}
-              {showCategories ? (
-                <Box sx={{ width: "100%" }}>
-                  <Stack spacing={4}>
-                    {Object.entries(groupedActions).map(
-                      ([cat, categoryActions]) => (
-                        <Box key={cat}>
-                          <Typography
-                            variant={isCompact ? "subtitle1" : "h6"}
-                            sx={{
-                              color: "text.primary",
-                              fontWeight: 600,
-                              mb: 2,
-                              fontSize: isCompact ? "1rem" : "1.1rem",
-                              letterSpacing: "-0.01em",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
+            {/* Category Filter */}
+            {showCategories && (
+              <Box>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Chip
+                    label="All"
+                    onClick={() => setSelectedCategory("all")}
+                    variant={selectedCategory === "all" ? "filled" : "outlined"}
+                    color={selectedCategory === "all" ? "primary" : "default"}
+                    size="small"
+                    sx={{ fontSize: sizing.typography.caption }}
+                  />
+                  {Object.values(ActionCategory).map((category) => (
+                    <Chip
+                      key={category}
+                      label={category}
+                      onClick={() => setSelectedCategory(category)}
+                      variant={selectedCategory === category ? "filled" : "outlined"}
+                      color={selectedCategory === category ? "primary" : "default"}
+                      size="small"
+                      sx={{ 
+                        textTransform: "capitalize",
+                        fontSize: sizing.typography.caption,
+                      }}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            )}
 
-                              "&::before": {
-                                content: '""',
-                                width: 4,
-                                height: 20,
-                                borderRadius: 2,
-                                background: `linear-gradient(135deg, 
-                                ${getCategoryColor(cat as ActionCategory)} 0%, 
-                                ${alpha(
-                                  getCategoryColor(cat as ActionCategory),
-                                  0.7
-                                )} 100%)`,
-                              },
-                            }}
-                          >
-                            {getCategoryTitle(cat as ActionCategory)}
-                          </Typography>
-                          <Grid 
-                            container 
-                            spacing={3} 
-                            alignItems="stretch"
-                            justifyContent="flex-start"
-                            sx={{
-                              maxWidth: "100%",
-                              width: "100%",
-                            }}
-                          >
-                            {(categoryActions as QuickAction[]).map(
-                              (action: QuickAction, index: number) =>
-                                renderAction(action, index)
-                            )}
-                          </Grid>
-                        </Box>
-                      )
-                    )}
-                  </Stack>
-                </Box>
+            {/* Actions Grid */}
+            <Box>
+              {filteredActions.length === 0 ? (
+                <Alert severity="info" sx={{ borderRadius: sizing.borderRadius.small }}>
+                  {t("quickActions.noActions", "No actions available for the selected category.")}
+                </Alert>
               ) : (
                 <Grid 
                   container 
-                  spacing={3} 
-                  alignItems="stretch"
-                  justifyContent="flex-start"
-                  sx={{
-                    maxWidth: "100%",
-                    width: "100%",
+                  spacing={{
+                    xs: sizing.spacing.xs,
+                    sm: sizing.spacing.sm,
+                    md: sizing.spacing.md,
                   }}
                 >
-                  {filteredActions.map((action, index) =>
-                    renderAction(action, index)
-                  )}
+                  {filteredActions.map((action, index) => (
+                    <Grid item {...gridConfig} key={action.id}>
+                      <ActionCard action={action} index={index} />
+                    </Grid>
+                  ))}
                 </Grid>
               )}
             </Box>
           </Stack>
         </Box>
+
+        {/* Context Menu */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          <MenuItem onClick={handleMenuClose}>
+            <Settings sx={{ mr: 2 }} />
+            {t("quickActions.settings", "Settings")}
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            <Add sx={{ mr: 2 }} />
+            {t("quickActions.addCustom", "Add Custom Action")}
+          </MenuItem>
+        </Menu>
       </Box>
     );
   }
 );
 
 QuickActionsWidget.displayName = "QuickActionsWidget";
-
-export default QuickActionsWidget;

@@ -124,7 +124,9 @@ export class DashboardApi {
     }
 
     const queryString = params.toString();
-    const url = `${API_ENDPOINTS.DASHBOARD.STATS}${queryString ? `?${queryString}` : ""}`;
+    const url = `${API_ENDPOINTS.DASHBOARD.STATS}${
+      queryString ? `?${queryString}` : ""
+    }`;
 
     try {
       const response = await client.get<BackendDashboardStatsResponse>(url);
@@ -144,20 +146,26 @@ export class DashboardApi {
           changes: {
             totalProjects: data.trending_metrics?.releases_this_month || 0,
             activeProjects: data.overview?.active_projects || 0,
-            totalRequirements: data.trending_metrics?.requirements_this_week || 0,
-            activeRequirements: data.trending_metrics?.requirements_last_week || 0,
+            totalRequirements:
+              data.trending_metrics?.requirements_this_week || 0,
+            activeRequirements:
+              data.trending_metrics?.requirements_last_week || 0,
           },
           trends: {
             totalProjects: {
               current: data.overview?.total_projects || 0,
-              previous: (data.overview?.total_projects || 0) - (data.trending_metrics?.releases_last_month || 0),
+              previous:
+                (data.overview?.total_projects || 0) -
+                (data.trending_metrics?.releases_last_month || 0),
               percentage: this.calculatePercentageChange(
                 data.overview?.total_projects || 0,
-                (data.overview?.total_projects || 0) - (data.trending_metrics?.releases_last_month || 0)
+                (data.overview?.total_projects || 0) -
+                  (data.trending_metrics?.releases_last_month || 0)
               ),
               direction: this.getTrendDirection(
                 data.overview?.total_projects || 0,
-                (data.overview?.total_projects || 0) - (data.trending_metrics?.releases_last_month || 0)
+                (data.overview?.total_projects || 0) -
+                  (data.trending_metrics?.releases_last_month || 0)
               ),
             },
             activeProjects: {
@@ -290,7 +298,9 @@ export class DashboardApi {
    */
   static async getMyRequirements(): Promise<any[]> {
     try {
-      const response = await client.get(API_ENDPOINTS.DASHBOARD.MY_REQUIREMENTS);
+      const response = await client.get(
+        API_ENDPOINTS.DASHBOARD.MY_REQUIREMENTS
+      );
       return response.data || [];
     } catch (error) {
       console.warn("Failed to fetch my requirements:", error);
@@ -303,7 +313,9 @@ export class DashboardApi {
    */
   static async getMyActivity(): Promise<ActivityItem[]> {
     try {
-      const response = await client.get<BackendActivityItem[]>(API_ENDPOINTS.DASHBOARD.MY_ACTIVITY);
+      const response = await client.get<BackendActivityItem[]>(
+        API_ENDPOINTS.DASHBOARD.MY_ACTIVITY
+      );
 
       // Transform backend activity to frontend format
       if (response.data && Array.isArray(response.data)) {
@@ -333,7 +345,9 @@ export class DashboardApi {
    */
   static async getMyNotifications(): Promise<any[]> {
     try {
-      const response = await client.get(API_ENDPOINTS.DASHBOARD.MY_NOTIFICATIONS);
+      const response = await client.get(
+        API_ENDPOINTS.DASHBOARD.MY_NOTIFICATIONS
+      );
       return response.data || [];
     } catch (error) {
       console.warn("Failed to fetch my notifications:", error);
@@ -387,7 +401,9 @@ export class DashboardApi {
     }`;
 
     try {
-      const response = await client.get<BackendActivityItem[] | { data: BackendActivityItem[]; total: number }>(url);
+      const response = await client.get<
+        BackendActivityItem[] | { data: BackendActivityItem[]; total: number }
+      >(url);
 
       // Transform backend response to frontend format
       if (response?.data) {
@@ -403,23 +419,25 @@ export class DashboardApi {
             item && typeof item === "object" && (item.id || item.title)
         );
 
-        const transformedData = validActivities.map((item: BackendActivityItem) => ({
-          id: item.id || `activity_${Date.now()}_${Math.random()}`,
-          type: item.type || "project",
-          title: item.title || "Activity",
-          description: item.description || "",
-          timestamp: item.timestamp || new Date().toISOString(),
-          userName: item.user_name || "Unknown User",
-          userAvatar: item.user_avatar,
-          projectName: item.project_name,
-          status: item.status,
-          priority: item.priority || "medium",
-          // Add nested user object for component compatibility
-          user: {
-            name: item.user_name || "Unknown User",
-            avatar: item.user_avatar,
-          },
-        }));
+        const transformedData = validActivities.map(
+          (item: BackendActivityItem) => ({
+            id: item.id || `activity_${Date.now()}_${Math.random()}`,
+            type: item.type || "project",
+            title: item.title || "Activity",
+            description: item.description || "",
+            timestamp: item.timestamp || new Date().toISOString(),
+            userName: item.user_name || "Unknown User",
+            userAvatar: item.user_avatar,
+            projectName: item.project_name,
+            status: item.status,
+            priority: item.priority || "medium",
+            // Add nested user object for component compatibility
+            user: {
+              name: item.user_name || "Unknown User",
+              avatar: item.user_avatar,
+            },
+          })
+        );
 
         const limit = Math.max(1, filters?.limit || 10);
         const offset = Math.max(0, filters?.offset || 0);
@@ -460,7 +478,9 @@ export class DashboardApi {
    */
   static async getRecentProjects(): Promise<any[]> {
     try {
-      const response = await client.get(API_ENDPOINTS.DASHBOARD.RECENT_PROJECTS);
+      const response = await client.get(
+        API_ENDPOINTS.DASHBOARD.RECENT_PROJECTS
+      );
       return response.data || [];
     } catch (error) {
       console.warn("Failed to fetch recent projects:", error);
@@ -473,7 +493,9 @@ export class DashboardApi {
    */
   static async getRequirementsStats(): Promise<any> {
     try {
-      const response = await client.get(API_ENDPOINTS.DASHBOARD.REQUIREMENTS_STATS);
+      const response = await client.get(
+        API_ENDPOINTS.DASHBOARD.REQUIREMENTS_STATS
+      );
       return response.data;
     } catch (error) {
       console.warn("Failed to fetch requirements stats:", error);
@@ -486,7 +508,9 @@ export class DashboardApi {
    */
   static async getRecentRequirements(): Promise<any[]> {
     try {
-      const response = await client.get(API_ENDPOINTS.DASHBOARD.RECENT_REQUIREMENTS);
+      const response = await client.get(
+        API_ENDPOINTS.DASHBOARD.RECENT_REQUIREMENTS
+      );
       return response.data || [];
     } catch (error) {
       console.warn("Failed to fetch recent requirements:", error);
@@ -499,7 +523,9 @@ export class DashboardApi {
    */
   static async getSystemHealth(): Promise<SystemHealth> {
     try {
-      const response = await client.get<SystemHealth>(API_ENDPOINTS.DASHBOARD.HEALTH);
+      const response = await client.get<SystemHealth>(
+        API_ENDPOINTS.DASHBOARD.HEALTH
+      );
 
       if (response?.data) {
         return response.data;
@@ -647,7 +673,10 @@ export class DashboardApi {
     preferences: Partial<DashboardPreferences>
   ): Promise<DashboardPreferences> {
     try {
-      const response = await client.post(API_ENDPOINTS.DASHBOARD.PREFERENCES, preferences);
+      const response = await client.post(
+        API_ENDPOINTS.DASHBOARD.PREFERENCES,
+        preferences
+      );
 
       // Also store locally for immediate access
       const updatedPreferences = {
@@ -687,7 +716,10 @@ export class DashboardApi {
     priority?: string;
   }): Promise<any> {
     try {
-      const response = await client.post(API_ENDPOINTS.DASHBOARD.NOTIFICATIONS, notification);
+      const response = await client.post(
+        API_ENDPOINTS.DASHBOARD.NOTIFICATIONS,
+        notification
+      );
       return response.data;
     } catch (error) {
       console.warn("Failed to create notification:", error);
@@ -779,7 +811,7 @@ export class DashboardApi {
       }
 
       const queryString = params.toString();
-      const url = `${API_ENDPOINTS.DASHBOARD.TIMELINE_DATA}${
+      const url = `${API_ENDPOINTS.DASHBOARD.CHARTS.TIMELINE}${
         queryString ? `?${queryString}` : ""
       }`;
 
@@ -819,21 +851,23 @@ export class DashboardApi {
       }
 
       const queryString = params.toString();
-      const url = `${API_ENDPOINTS.DASHBOARD.DISTRIBUTION_DATA}${
+      const url = `${API_ENDPOINTS.DASHBOARD.CHARTS.DISTRIBUTION}${
         queryString ? `?${queryString}` : ""
       }`;
 
       const response = await client.get<BackendDistributionDataPoint[]>(url);
 
       // Transform backend response to frontend format
-      return (response.data || []).map((item: BackendDistributionDataPoint) => ({
-        id: item.id,
-        label: item.label,
-        value: item.value,
-        percentage: item.percentage,
-        color: item.color,
-        metadata: item.metadata,
-      }));
+      return (response.data || []).map(
+        (item: BackendDistributionDataPoint) => ({
+          id: item.id,
+          label: item.label,
+          value: item.value,
+          percentage: item.percentage,
+          color: item.color,
+          metadata: item.metadata,
+        })
+      );
     } catch (error) {
       console.warn("Failed to fetch distribution data:", error);
       // Return empty array instead of fake data
@@ -871,7 +905,9 @@ export class DashboardApi {
    */
   static async getSystemMetrics(): Promise<SystemMetrics> {
     try {
-      const response = await client.get<BackendSystemMetrics>(API_ENDPOINTS.DASHBOARD.METRICS);
+      const response = await client.get<BackendSystemMetrics>(
+        API_ENDPOINTS.DASHBOARD.METRICS
+      );
 
       if (response?.data) {
         // Transform backend response with snake_case to frontend camelCase

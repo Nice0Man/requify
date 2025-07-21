@@ -14,3 +14,6 @@ export { ScrollContainer, ScrollNavigator } from "./Scroll";
 
 // Placeholders
 export { EmptyStateChart } from "./placeholders";
+
+// Debug Components
+export { AuthDebugPanel } from "./AuthDebugPanel";
