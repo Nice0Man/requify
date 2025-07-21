@@ -20,3 +20,9 @@ export interface CreateReleaseRequest {
   projectId: string;
   plannedDate: string;
 } 
+
+export interface ReleaseFilters {
+  search?: string;
+  status?: "draft" | "planned" | "in_progress" | "testing" | "released" | "cancelled"; 
+  projectId?: string;
+}

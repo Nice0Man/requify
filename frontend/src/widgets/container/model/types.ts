@@ -1,15 +1,63 @@
-import type {
-  DashboardMode,
-  DashboardLayout,
-  DashboardDensity,
-} from "@/shared/ui";
+import type { 
+  DashboardMode, 
+  DashboardLayout, 
+  DashboardDensity 
+} from "@/shared/styles/dashboard-tokens";
 
+/**
+ * 🏗️ Dashboard Container Props
+ * Optimized for modern styling system and performance
+ */
 export interface DashboardContainerProps {
-  mode: DashboardMode;
-  layout: DashboardLayout;
-  density: DashboardDensity;
+  /** React children elements */
+  children: React.ReactNode;
+  
+  /** Additional CSS class name */
   className?: string;
-  children?: React.ReactNode;
-  loading?: boolean;
-  error?: string | Error;
+  
+  /** Dashboard display mode */
+  mode?: DashboardMode;
+  
+  /** Layout type for content organization */
+  layout?: DashboardLayout;
+  
+  /** Content density level */
+  density?: DashboardDensity;
+  
+  /** Whether dashboard is in fullscreen mode */
+  isFullscreen?: boolean;
+  
+  /** Maximum width constraint (false for no constraint) */
+  maxWidth?: "sm" | "md" | "lg" | "xl" | false;
+  
+  /** Disable container gutters/padding */
+  disableGutters?: boolean;
+  
+  /** Enable entrance animations */
+  enableAnimations?: boolean;
+  
+  /** Performance optimization hint */
+  highPerformanceMode?: boolean;
+}
+
+/**
+ * 🎨 Container Style Configuration
+ * For internal styling system use
+ */
+export interface DashboardContainerStyleConfig {
+  spacing: {
+    xs: number;
+    sm: number;
+    md: number;
+  };
+  
+  padding: {
+    xs: number;
+    sm: number;
+    md: number;
+  };
+  
+  background: string;
+  overflow: "hidden" | "visible" | "auto";
+  animations: boolean;
 } 

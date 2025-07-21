@@ -34,7 +34,7 @@ import {
   useReleaseStats,
   useUpdateRelease,
 } from "@/features/releases";
-import { LoadingSpinner } from "../../../shared/ui";
+import { LoadingSpinner } from "@/shared/ui";
 import { DashboardLayout } from "@/widgets/layout/ui";
 import type { Release, ReleaseFilters } from "@/entities/release/model/types";
 
