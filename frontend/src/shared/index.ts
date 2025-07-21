@@ -8,6 +8,6 @@ export * from "./hooks";
 export * from "./contexts";
 export * from "./components";
 
-// 🎨 Modern styling system
+//  Modern styling system
 export * from "./styles";
 export * from "./providers"; 

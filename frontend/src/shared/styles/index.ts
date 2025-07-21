@@ -1,4 +1,4 @@
-// 🎨 Dashboard Design System - Unified exports
+//  Dashboard Design System - Unified exports
 
 // Design tokens and types
 export * from "./dashboard-tokens";

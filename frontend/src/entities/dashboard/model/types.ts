@@ -27,12 +27,12 @@ export interface DashboardStats {
     [key: string]: number;
   };
   trends: {
-    [key: string]: TrendData;
+    [key: string]: DashboardTrendData;
   };
   timestamp: string;
 }
 
-export interface TrendData {
+export interface DashboardTrendData {
   current: number;
   previous: number;
   percentage: number;
@@ -327,7 +327,7 @@ export interface TrendDataPoint {
   direction: "up" | "down" | "stable";
 }
 
-export interface SystemMetrics {
+export interface DashboardSystemMetrics {
   cpuUsage: number;
   memoryUsage: number;
   diskUsage: number;

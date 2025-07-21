@@ -202,7 +202,7 @@ export type DashboardDensity = "dense" | "compact" | "comfortable";
 export type WidgetSize = "small" | "medium" | "large" | "xlarge" | "auto";
 
 // Helper functions for theme integration
-export const getDashboardToken = (path: string, theme?: Theme): any => {
+export const getDashboardToken = (path: string): any => {
   const tokens = path
     .split(".")
     .reduce((obj, key) => obj?.[key], DASHBOARD_TOKENS as any);

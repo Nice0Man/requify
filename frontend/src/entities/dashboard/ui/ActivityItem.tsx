@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import {
   Box,
   Stack,
@@ -9,7 +9,6 @@ import {
   alpha,
   Skeleton,
   IconButton,
-  Tooltip,
 } from "@mui/material";
 import {
   Assignment,
@@ -18,7 +17,6 @@ import {
   BugReport,
   Person,
   CheckCircle,
-  Code,
   Comment,
   MoreVert,
 } from "@mui/icons-material";
@@ -27,8 +25,6 @@ import { ru } from "date-fns/locale";
 import type {
   ActivityItem as ActivityItemType,
   ActivityType,
-  ActivityStatus,
-  Priority,
 } from "../model/types";
 
 interface ActivityItemProps {

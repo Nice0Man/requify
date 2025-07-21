@@ -128,3 +128,31 @@ export interface ProjectStatusDistribution {
   count: number;
   percentage: number;
 }
+
+// Create and Update types for API
+export interface CreateProjectData {
+  name: string;
+  description: string;
+  key: string;
+  status: ProjectStatus;
+  priority: ProjectPriority;
+  startDate: string;
+  endDate?: string;
+  ownerId: string;
+  teamMembers?: string[];
+  tags?: string[];
+}
+
+export interface UpdateProjectData {
+  name?: string;
+  description?: string;
+  key?: string;
+  status?: ProjectStatus;
+  priority?: ProjectPriority;
+  startDate?: string;
+  endDate?: string;
+  ownerId?: string;
+  teamMembers?: string[];
+  tags?: string[];
+  isActive?: boolean;
+}

@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from "react";
+import { useMemo } from "react";
 import { useTheme, useMediaQuery } from "@mui/material";
 import type { Theme, SxProps } from "@mui/material/styles";
 import {

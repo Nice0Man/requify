@@ -3,15 +3,12 @@ import {
   Box,
   Typography,
   IconButton,
-  Tooltip,
   Skeleton,
   Stack,
   Chip,
   Avatar,
   Menu,
   MenuItem,
-  alpha,
-  useTheme,
 } from "@mui/material";
 import {
   Refresh,
@@ -149,13 +146,13 @@ const transformSingleItem = (item: any): SafeActivityItem => {
   };
 };
 
-// Loading skeleton component
-const ActivitySkeleton = memo(() => (
-  <Box display="flex" alignItems="center" gap={1} py={0.5}>
-    <Skeleton variant="circular" width={24} height={24} />
-    <Skeleton variant="text" width="60%" />
-  </Box>
-));
+// Loading skeleton component (unused but kept for future use)
+// const ActivitySkeleton = memo(() => (
+//   <Box display="flex" alignItems="center" gap={1} py={0.5}>
+//     <Skeleton variant="circular" width={24} height={24} />
+//     <Skeleton variant="text" width="60%" />
+//   </Box>
+// ));
 
 // Activity item component
 const ActivityItemComponent = memo<{ item: SafeActivityItem }>(({ item }) => {
@@ -217,7 +214,10 @@ const ActivityItemComponent = memo<{ item: SafeActivityItem }>(({ item }) => {
 const activityFeedWidgetConfig: WidgetConfig = {
   id: "activity-feed-widget",
   title: i18n.t("dashboard.widgets.activity.title", "Последняя активность"),
-  description: i18n.t("dashboard.widgets.activity.description", "Лента активности и событий системы"),
+  description: i18n.t(
+    "dashboard.widgets.activity.description",
+    "Лента активности и событий системы"
+  ),
   icon: Timeline,
 
   // Настройки по умолчанию
@@ -330,8 +330,8 @@ export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
 
     // Local state
     const [searchTerm, setSearchTerm] = useState("");
-    const [typeFilter, setTypeFilter] = useState<string>("all");
-    const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [typeFilter] = useState<string>("all");
+    const [statusFilter] = useState<string>("all");
 
     // Debounced search
     const debouncedSearch = useDebounced(searchTerm, 300);
@@ -450,13 +450,13 @@ export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
             {title}
           </Typography>
           {refreshable && (
-                          <IconButton
-                onClick={handleRefresh}
-                disabled={isLoading || isFetching}
-                size="small"
-              >
-                <Refresh />
-              </IconButton>
+            <IconButton
+              onClick={handleRefresh}
+              disabled={isLoading || isFetching}
+              size="small"
+            >
+              <Refresh />
+            </IconButton>
           )}
         </Box>
 
@@ -484,7 +484,10 @@ export const ActivityFeedWidget = memo<ActivityFeedWidgetProps>(
                   />
                   <input
                     type="text"
-                    placeholder={i18n.t("dashboard.activity.searchPlaceholder", "Поиск активности...")}
+                    placeholder={i18n.t(
+                      "dashboard.activity.searchPlaceholder",
+                      "Поиск активности..."
+                    )}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     style={{ paddingRight: "32px" }}

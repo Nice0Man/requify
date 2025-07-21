@@ -31,10 +31,7 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/features/auth/model/useAuth";
 import { useNavigate } from "react-router-dom";
-import {
-  useTheme as useThemeMode,
-  useLoadingState,
-} from "@/shared/contexts/PerformanceContext";
+// Removed unused imports: useThemeMode, useLoadingState
 import {
   useRenderTracker,
   usePerformanceMeasure,
@@ -56,9 +53,7 @@ export const HeaderWidget: React.FC<HeaderWidgetProps> = memo(
 
     // Theme and state management
     const muiTheme = useTheme();
-    const themeMode = useThemeMode();
     const { t } = i18n;
-    const { isLoading } = useLoadingState();
     const navigate = useNavigate();
     const { user, logout } = useAuth();
 

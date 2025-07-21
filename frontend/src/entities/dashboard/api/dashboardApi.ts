@@ -1,7 +1,7 @@
 import { client } from "@/shared/api/client";
 import {
   type DashboardStats,
-  type DashboardStatsResponse,
+
   type ActivityItem,
   type ActivityResponse,
   type ActivityFilters,
@@ -969,6 +969,7 @@ export class DashboardApi {
 
   /**
    * Get default/fallback dashboard statistics
+   * @private - internal use only
    */
   private static getDefaultStats(): DashboardStats {
     const timestamp = new Date().toISOString();
