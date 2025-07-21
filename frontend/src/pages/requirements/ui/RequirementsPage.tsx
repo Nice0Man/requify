@@ -27,10 +27,10 @@ import {
   Search as SearchIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
-import { DashboardLayout } from "@/widgets/layout";
-import { useRequirements } from "../../../features/requirement-management/model/useRequirementQuery";
-import { LoadingSpinner } from "../../../shared/ui";
-import type { Requirement } from "../../../entities/requirement";
+import { useRequirements } from "@/features/requirements/model/useRequirementQuery";
+import { LoadingSpinner } from "@/shared/ui";
+import type { Requirement } from "@/entities/requirement";
+import { DashboardLayout } from "@/widgets/layout/ui";
 
 const RequirementsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -343,7 +343,7 @@ const RequirementsPage: React.FC = () => {
           </Paper>
         ) : (
           <Grid container spacing={3}>
-            {filteredRequirements.map((requirement) => (
+            {filteredRequirements.map((requirement: Requirement) => (
               <Grid item xs={12} md={6} lg={4} key={requirement.id}>
                 <RequirementCard requirement={requirement} />
               </Grid>

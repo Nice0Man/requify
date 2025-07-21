@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useRef, useEffect, useState } from "react";
+import { memo, useRef, useEffect, useState } from "react";
 import { Box, useTheme, alpha, Typography } from "@mui/material";
 import {
   BarChart as RechartsBarChart,
@@ -54,8 +54,6 @@ export const BarChart = memo<BarChartProps>(
     error = null,
     className,
     horizontal = false,
-    stacked = false,
-    grouped = false,
     onPointClick,
     config,
     responsive = true,
@@ -101,7 +99,7 @@ export const BarChart = memo<BarChartProps>(
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           for (const entry of entries) {
-            const { width, height: observedHeight } = entry.contentRect;
+            const { width } = entry.contentRect;
             
             // Calculate adaptive height based on container width and aspect ratio
             let adaptiveHeight = responsive 

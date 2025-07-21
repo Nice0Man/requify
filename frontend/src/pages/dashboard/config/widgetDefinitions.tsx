@@ -1,4 +1,3 @@
-import React from "react";
 import type { DashboardWidget } from "../ui/DashboardLayoutRenderer";
 
 // Widget Components
@@ -7,13 +6,13 @@ import { ChartsManagementWidget } from "@/features/charts";
 import { QuickActionsWidget } from "@/widgets";
 import { ProjectOverviewWidget } from "@/widgets/project-overview";
 import { SystemHealthWidget } from "@/widgets/system-health";
-import { ActivityFeedWidget } from "@/widgets/dashboard-activity-feed";
+import { ActivityFeedWidget } from "@/widgets/activity-feed";
 
 // Create widget configuration for the new layout system
 export const createDashboardWidgets = (
-  overview: any,
-  timelineData: any[],
-  distributionData: any[]
+  _overview: any,
+  _timelineData: any[],
+  _distributionData: any[]
 ): DashboardWidget[] => {
   const widgets: DashboardWidget[] = [
     // 1. Key Metrics - Highest Priority (большой виджет)

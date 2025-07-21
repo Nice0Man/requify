@@ -31,10 +31,10 @@ import {
   Group as GroupIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
-import { DashboardLayout } from "@/widgets/layout";
-import { useProjects } from "../../../features/project-management/model/useProjectQuery";
-import { LoadingSpinner } from "../../../shared/ui";
-import { Project } from "../../../features/project-management/api/projectApi";
+import { DashboardLayout } from "@/widgets/layout/ui";
+import { useProjects } from "@/features/projects/model/useProjectQuery";
+import { LoadingSpinner } from "@/shared/ui";
+import { Project } from "@/entities/project/model/types";
 
 const ProjectsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ const ProjectsPage: React.FC = () => {
   const { data: projects = [], isPending, error } = useProjects();
 
   // Фильтрация проектов
-  const filteredProjects = projects.filter((project: Project) => {
+  const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       project.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -56,7 +56,7 @@ const ProjectsPage: React.FC = () => {
 
   const getStatusColor = (status: Project["status"]) => {
     switch (status) {
-      case "active":
+      case "in_progress":
         return "success";
       case "completed":
         return "primary";
@@ -182,7 +182,7 @@ const ProjectsPage: React.FC = () => {
             </Box>
             <LinearProgress
               variant="determinate"
-              value={project.progress || 0}
+              value={Number(project.progress) || 0}
               sx={{
                 height: 6,
                 borderRadius: 3,
@@ -487,7 +487,7 @@ const ProjectsPage: React.FC = () => {
                     },
                   }}
                 >
-                  <ProjectCard project={project} />
+                  <ProjectCard project={project as unknown as Project} />
                 </Box>
               </Grid>
             ))}

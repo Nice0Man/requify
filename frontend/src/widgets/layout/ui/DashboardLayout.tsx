@@ -1,8 +1,8 @@
 import { Box, CssBaseline, useTheme, alpha } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
-import { SidebarWidget, useSidebarState } from "@/widgets/sidebar";
-import { HeaderWidget } from "@/widgets/header";
+import { SidebarWidget, useSidebarState } from "@/widgets/app-sidebar";
+import { HeaderWidget } from "@/widgets/app-header";
 
 interface DashboardLayoutProps {
   children: ReactNode;

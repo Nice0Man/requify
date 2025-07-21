@@ -38,9 +38,17 @@ import {
   Flag,
   FolderOpen,
   TrendingUp,
+  Work,
 } from "@mui/icons-material";
 import i18n from "@/shared/lib/i18n";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  DashboardWidgetWrapper,
+  type WidgetConfig,
+  type DashboardMode,
+  type DashboardLayout,
+  type DashboardDensity,
+} from "@/shared/ui";
 import { projectApi } from "@/entities/project/api/projectApi";
 import type { Project, ProjectFilters } from "@/entities/project/model/types";
 import { format } from "date-fns";
@@ -48,7 +56,6 @@ import { ru } from "date-fns/locale";
 
 // New sizing hooks
 import { useDashboardSizing, useCardSizing } from "@/shared/hooks";
-import type { DashboardMode, DashboardDensity } from "@/widgets/dashboard-container";
 
 // Enhanced types for widget display
 interface ExtendedProject extends Project {
@@ -61,18 +68,26 @@ interface ExtendedProject extends Project {
 }
 
 interface ProjectOverviewWidgetProps {
-  className?: string;
+  // Dashboard settings
+  mode: DashboardMode;
+  layout: DashboardLayout;
+  density: DashboardDensity;
+
+  // Feature-specific props
   limit?: number;
   showFilters?: boolean;
   showActions?: boolean;
-  // New sizing props
-  mode?: DashboardMode;
-  density?: DashboardDensity;
-  layout?: "grid" | "list" | "masonry";
   masonry?: boolean;
   flexible?: boolean;
   maxHeight?: number;
   overflow?: string;
+
+  // Wrapper props
+  className?: string;
+  loading?: boolean;
+  error?: string | Error;
+  onResize?: (size: { width: number; height: number }) => void;
+  onCollapse?: (collapsed: boolean) => void;
 }
 
 // Project-specific hooks
@@ -119,7 +134,7 @@ const StatusChip: React.FC<{ status: string }> = ({ status }) => {
 const PriorityChip: React.FC<{ priority?: string }> = ({ priority }) => {
   const getPriorityColor = (priority?: string) => {
     if (!priority) return "#757575";
-    
+
     switch (priority.toLowerCase()) {
       case "high":
         return "#f44336";
@@ -193,10 +208,10 @@ const ProjectCard = memo<{
       <CardHeader
         title={
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography 
-              variant="h6" 
-              noWrap 
-              sx={{ 
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
                 flex: 1,
                 fontSize: sizing.typography.subtitle,
                 fontWeight: 600,
@@ -209,9 +224,9 @@ const ProjectCard = memo<{
         }
         subheader={
           <Box sx={{ mt: 1 }}>
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
+            <Typography
+              variant="body2"
+              color="text.secondary"
               noWrap
               sx={{ fontSize: sizing.typography.body }}
             >
@@ -225,7 +240,7 @@ const ProjectCard = memo<{
                   label={tag}
                   size="small"
                   variant="outlined"
-                  sx={{ 
+                  sx={{
                     fontSize: sizing.typography.caption,
                   }}
                 />
@@ -233,15 +248,15 @@ const ProjectCard = memo<{
             </Box>
           </Box>
         }
-        sx={{ 
+        sx={{
           pb: 1,
           px: cardSizing.padding.sm,
           pt: cardSizing.padding.sm,
         }}
       />
 
-      <CardContent 
-        sx={{ 
+      <CardContent
+        sx={{
           flexGrow: 1,
           px: cardSizing.padding.sm,
           pb: cardSizing.padding.sm,
@@ -260,15 +275,15 @@ const ProjectCard = memo<{
                 mb: 1,
               }}
             >
-              <Typography 
-                variant="body2" 
+              <Typography
+                variant="body2"
                 color="text.secondary"
                 sx={{ fontSize: sizing.typography.body }}
               >
                 {t("projects.progress", "Прогресс")}
               </Typography>
-              <Typography 
-                variant="body2" 
+              <Typography
+                variant="body2"
                 fontWeight={600}
                 sx={{ fontSize: sizing.typography.body }}
               >
@@ -302,15 +317,15 @@ const ProjectCard = memo<{
                   borderRadius: sizing.borderRadius.small,
                 }}
               >
-                <Typography 
-                  variant="h6" 
+                <Typography
+                  variant="h6"
                   color="primary"
                   sx={{ fontSize: sizing.typography.subtitle }}
                 >
                   {project.requirements.completed}/{project.requirements.total}
                 </Typography>
-                <Typography 
-                  variant="caption" 
+                <Typography
+                  variant="caption"
                   color="text.secondary"
                   sx={{ fontSize: sizing.typography.caption }}
                 >
@@ -329,15 +344,15 @@ const ProjectCard = memo<{
                   borderRadius: sizing.borderRadius.small,
                 }}
               >
-                <Typography 
-                  variant="h6" 
+                <Typography
+                  variant="h6"
                   color="success.main"
                   sx={{ fontSize: sizing.typography.subtitle }}
                 >
                   {project.testCases.passed}/{project.testCases.total}
                 </Typography>
-                <Typography 
-                  variant="caption" 
+                <Typography
+                  variant="caption"
                   color="text.secondary"
                   sx={{ fontSize: sizing.typography.caption }}
                 >
@@ -351,9 +366,9 @@ const ProjectCard = memo<{
         {/* Team */}
         {project.team && project.team.length > 0 && (
           <Box sx={{ mb: 2 }}>
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
+            <Typography
+              variant="body2"
+              color="text.secondary"
               gutterBottom
               sx={{ fontSize: sizing.typography.body }}
             >
@@ -378,16 +393,16 @@ const ProjectCard = memo<{
         <Box
           sx={{ display: "flex", justifyContent: "space-between", mt: "auto" }}
         >
-          <Typography 
-            variant="caption" 
+          <Typography
+            variant="caption"
             color="text.secondary"
             sx={{ fontSize: sizing.typography.caption }}
           >
             {t("projects.started", "Начат")}: {formatDate(project.startDate)}
           </Typography>
           {project.endDate && (
-            <Typography 
-              variant="caption" 
+            <Typography
+              variant="caption"
               color="text.secondary"
               sx={{ fontSize: sizing.typography.caption }}
             >
@@ -400,19 +415,103 @@ const ProjectCard = memo<{
   );
 });
 
+// Конфигурация виджета для разных режимов дашборда
+const projectOverviewWidgetConfig: WidgetConfig = {
+  id: "project-overview-widget",
+  title: i18n.t("dashboard.widgets.projectOverview.title", "Обзор проектов"),
+  description: i18n.t(
+    "dashboard.widgets.projectOverview.description",
+    "Список проектов с основной информацией"
+  ),
+  icon: Work,
+
+  // Настройки по умолчанию
+  defaultSize: "medium",
+  defaultPriority: "normal",
+  defaultAspectRatio: "wide",
+
+  // Режимы дашборда
+  modes: {
+    minimal: {
+      size: "small",
+      visible: false, // Скрыт в минимальном режиме
+      priority: "low",
+    },
+    compact: {
+      size: "medium",
+      visible: true,
+      priority: "normal",
+      aspectRatio: "square",
+      spacing: { padding: "16px" },
+    },
+    detailed: {
+      size: "large",
+      visible: true,
+      priority: "normal",
+      aspectRatio: "wide",
+      spacing: { padding: "20px" },
+    },
+    fullscreen: {
+      size: "xlarge",
+      visible: true,
+      priority: "high",
+      aspectRatio: "wide",
+      spacing: { padding: "24px" },
+    },
+  },
+
+  // Лейауты
+  layouts: {
+    grid: {
+      aspectRatio: "wide",
+      minHeight: "350px",
+      maxHeight: "500px",
+    },
+    list: {
+      size: "large",
+      aspectRatio: "wide",
+      minHeight: "250px",
+      maxHeight: "400px",
+    },
+    masonry: {
+      size: "auto",
+      aspectRatio: "auto",
+      minHeight: "300px",
+    },
+  },
+
+  // Стили
+  border: true,
+  shadow: true,
+  borderRadius: 12,
+
+  // Поведение
+  collapsible: true,
+  resizable: false,
+  draggable: false,
+
+  // Производительность
+  lazy: true,
+  virtualizeContent: false,
+};
+
 export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
-  ({ 
-    className, 
-    limit = 6, 
-    showFilters = true, 
+  ({
+    mode,
+    layout,
+    density,
+    limit = 6,
+    showFilters = true,
     showActions = true,
-    mode = "detailed",
-    density = "comfortable",
-    layout = "grid",
     masonry = false,
     flexible = false,
     maxHeight,
     overflow = "visible",
+    className,
+    loading: externalLoading = false,
+    error: externalError,
+    onResize,
+    onCollapse,
   }) => {
     const { t } = i18n;
     const theme = useTheme();
@@ -422,15 +521,33 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
     const [priorityFilter, setPriorityFilter] = useState("all");
 
     // New adaptive sizing system
-    const sizing = useDashboardSizing({ 
-      mode, 
-      density, 
-      layout, 
-      masonry, 
-      flexible 
+    const sizing = useDashboardSizing({
+      mode,
+      density,
+      layout,
+      masonry,
+      flexible,
     });
-    
+
     const cardSizing = useCardSizing(mode, density, masonry);
+
+    // Адаптируем настройки на основе dashboard mode и density
+    const adaptedLimit = useMemo(() => {
+      if (mode === "minimal") return Math.min(limit, 3);
+      if (density === "dense") return Math.min(limit, 4);
+      if (layout === "list") return Math.min(limit, 8);
+      return limit;
+    }, [mode, density, layout, limit]);
+
+    const adaptedShowFilters = useMemo(() => {
+      if (mode === "minimal" || density === "dense") return false;
+      return showFilters;
+    }, [mode, density, showFilters]);
+
+    const adaptedShowActions = useMemo(() => {
+      if (mode === "minimal") return false;
+      return showActions;
+    }, [mode, showActions]);
 
     // Build filters object
     const filters = useMemo(
@@ -452,8 +569,8 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
 
     // Apply limit for display
     const displayProjects = useMemo(() => {
-      return projects.slice(0, limit);
-    }, [projects, limit]);
+      return projects.slice(0, adaptedLimit);
+    }, [projects, adaptedLimit]);
 
     const handleRefresh = useCallback(() => {
       refetch();
@@ -527,14 +644,14 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
       if (layout === "list") {
         return { xs: 12 }; // Full width for list
       }
-      
+
       // Use sizing system for responsive grid
       const { columns } = sizing.gridConfig;
-      
+
       if (mode === "minimal") {
         return { xs: 12, sm: 6, md: 4 };
       }
-      
+
       // Adaptive based on columns
       if (columns >= 6) {
         return { xs: 12, sm: 6, md: 4, lg: 3 };
@@ -548,83 +665,78 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
     const gridConfig = getGridConfig();
 
     return (
-      <Box className={className} sx={{ width: "100%", overflow: overflow }}>
-        {/* Container with adaptive sizing */}
-        <Box
-          sx={{
-            p: {
-              xs: sizing.padding.xs,
-              sm: sizing.padding.sm,
-              md: sizing.padding.md,
-            },
-            borderRadius: sizing.borderRadius.medium,
-            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-            backgroundColor: theme.palette.background.paper,
-            boxShadow: sizing.elevation.widget,
-            width: "100%",
-            maxHeight: maxHeight,
-            overflow: overflow,
-          }}
-        >
-          <Stack spacing={sizing.spacing}>
-            {/* Header Section */}
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Stack spacing={1}>
-                <Box display="flex" alignItems="center" gap={1.5}>
-                  <Box
-                    sx={{
-                      width: sizing.headerHeight - 20,
-                      height: sizing.headerHeight - 20,
-                      borderRadius: sizing.borderRadius.small,
-                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <FolderOpen sx={{ color: "white", fontSize: 18 }} />
-                  </Box>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: 700,
-                      color: theme.palette.text.primary,
-                      fontSize: sizing.typography.title,
-                    }}
-                  >
-                    {t("projects.overview.title", "Обзор проектов")}
-                  </Typography>
-                </Box>
-                <Typography
-                  variant="body2"
+      <DashboardWidgetWrapper
+        config={projectOverviewWidgetConfig}
+        mode={mode}
+        layout={layout}
+        density={density}
+        className={className}
+        loading={externalLoading || isLoading}
+        error={externalError || (error ? error : undefined)}
+        onResize={onResize}
+        onCollapse={onCollapse}
+        aria-label="Виджет обзора проектов"
+      >
+        <Stack spacing={sizing.spacing}>
+          {/* Header Section */}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Stack spacing={1}>
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <Box
                   sx={{
-                    fontSize: sizing.typography.body,
-                    color: theme.palette.text.secondary,
+                    width: sizing.headerHeight - 20,
+                    height: sizing.headerHeight - 20,
+                    borderRadius: sizing.borderRadius.small,
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  {t(
-                    "projects.overview.subtitle",
-                    "Управление активными проектами"
-                  )}
+                  <FolderOpen sx={{ color: "white", fontSize: 18 }} />
+                </Box>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    color: theme.palette.text.primary,
+                    fontSize: sizing.typography.title,
+                  }}
+                >
+                  {t("projects.overview.title", "Обзор проектов")}
                 </Typography>
-              </Stack>
-
-              {/* Actions */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {showActions && (
-                  <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    size="small"
-                    sx={{ borderRadius: sizing.borderRadius.small }}
-                  >
-                    {t("projects.create", "Создать")}
-                  </Button>
+              </Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: sizing.typography.body,
+                  color: theme.palette.text.secondary,
+                }}
+              >
+                {t(
+                  "projects.overview.subtitle",
+                  "Управление активными проектами"
                 )}
+              </Typography>
+            </Stack>
+
+            {/* Actions */}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {adaptedShowActions && (
+                <Button
+                  variant="contained"
+                  startIcon={<Add />}
+                  size="small"
+                  sx={{ borderRadius: sizing.borderRadius.small }}
+                >
+                  {t("projects.create", "Создать")}
+                </Button>
+              )}
+              {adaptedShowActions && (
                 <IconButton
                   onClick={handleRefresh}
                   disabled={isLoading}
@@ -645,134 +757,159 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
                     }}
                   />
                 </IconButton>
-              </Box>
-            </Box>
+              )}
 
-            {/* Filters */}
-            {showFilters && (
-              <Box>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder={t(
-                        "projects.search.placeholder",
-                        "Поиск проектов..."
-                      )}
-                      value={searchQuery}
-                      onChange={handleSearchChange}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <Search />
-                          </InputAdornment>
+              {adaptedShowActions && (
+                <Tooltip
+                  title={t("projects.overview.addProject", "Добавить проект")}
+                >
+                  <IconButton
+                    onClick={() => console.log("Add project")}
+                    sx={{
+                      borderRadius: sizing.borderRadius.small,
+                      color: theme.palette.primary.main,
+                      "&:hover": {
+                        backgroundColor: alpha(
+                          theme.palette.primary.main,
+                          0.08
                         ),
-                      }}
+                      },
+                    }}
+                  >
+                    <Add fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
+          </Box>
+
+          {/* Filters */}
+          {adaptedShowFilters && (
+            <Box>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    placeholder={t(
+                      "projects.search.placeholder",
+                      "Поиск проектов..."
+                    )}
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>
+                      {t("projects.filters.status", "Статус")}
+                    </InputLabel>
+                    <Select
+                      value={statusFilter}
+                      onChange={handleStatusChange}
+                      label={t("projects.filters.status", "Статус")}
+                    >
+                      <MenuItem value="all">
+                        {t("projects.filters.all", "Все")}
+                      </MenuItem>
+                      <MenuItem value="active">
+                        {t("projects.status.active", "Активные")}
+                      </MenuItem>
+                      <MenuItem value="planning">
+                        {t("projects.status.planning", "Планирование")}
+                      </MenuItem>
+                      <MenuItem value="completed">
+                        {t("projects.status.completed", "Завершенные")}
+                      </MenuItem>
+                      <MenuItem value="on_hold">
+                        {t("projects.status.onHold", "Приостановленные")}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>
+                      {t("projects.filters.priority", "Приоритет")}
+                    </InputLabel>
+                    <Select
+                      value={priorityFilter}
+                      onChange={handlePriorityChange}
+                      label={t("projects.filters.priority", "Приоритет")}
+                    >
+                      <MenuItem value="all">
+                        {t("projects.filters.all", "Все")}
+                      </MenuItem>
+                      <MenuItem value="high">
+                        {t("projects.priority.high", "Высокий")}
+                      </MenuItem>
+                      <MenuItem value="medium">
+                        {t("projects.priority.medium", "Средний")}
+                      </MenuItem>
+                      <MenuItem value="low">
+                        {t("projects.priority.low", "Низкий")}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+
+          {/* Content */}
+          <Box>
+            {isLoading ? (
+              <Grid container spacing={sizing.spacing}>
+                {Array.from({ length: adaptedLimit }).map((_, index) => (
+                  <Grid item {...gridConfig} key={index}>
+                    <Skeleton
+                      variant="rectangular"
+                      height={cardSizing.minHeight}
+                      sx={{ borderRadius: cardSizing.borderRadius }}
                     />
                   </Grid>
-                  <Grid item xs={6} md={3}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>
-                        {t("projects.filters.status", "Статус")}
-                      </InputLabel>
-                      <Select
-                        value={statusFilter}
-                        onChange={handleStatusChange}
-                        label={t("projects.filters.status", "Статус")}
-                      >
-                        <MenuItem value="all">
-                          {t("projects.filters.all", "Все")}
-                        </MenuItem>
-                        <MenuItem value="active">
-                          {t("projects.status.active", "Активные")}
-                        </MenuItem>
-                        <MenuItem value="planning">
-                          {t("projects.status.planning", "Планирование")}
-                        </MenuItem>
-                        <MenuItem value="completed">
-                          {t("projects.status.completed", "Завершенные")}
-                        </MenuItem>
-                        <MenuItem value="on_hold">
-                          {t("projects.status.onHold", "Приостановленные")}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel>
-                        {t("projects.filters.priority", "Приоритет")}
-                      </InputLabel>
-                      <Select
-                        value={priorityFilter}
-                        onChange={handlePriorityChange}
-                        label={t("projects.filters.priority", "Приоритет")}
-                      >
-                        <MenuItem value="all">
-                          {t("projects.filters.all", "Все")}
-                        </MenuItem>
-                        <MenuItem value="high">
-                          {t("projects.priority.high", "Высокий")}
-                        </MenuItem>
-                        <MenuItem value="medium">
-                          {t("projects.priority.medium", "Средний")}
-                        </MenuItem>
-                        <MenuItem value="low">
-                          {t("projects.priority.low", "Низкий")}
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </Box>
-            )}
-
-            {/* Content */}
-            <Box>
-              {isLoading ? (
-                <Grid container spacing={sizing.spacing}>
-                  {Array.from({ length: limit }).map((_, index) => (
-                    <Grid item {...gridConfig} key={index}>
-                      <Skeleton
-                        variant="rectangular"
-                        height={cardSizing.minHeight}
-                        sx={{ borderRadius: cardSizing.borderRadius }}
+                ))}
+              </Grid>
+            ) : displayProjects.length === 0 ? (
+              <EmptyStatePlaceholder />
+            ) : (
+              <Fade in={!isLoading}>
+                <Grid
+                  container
+                  spacing={{
+                    xs: sizing.spacing.xs,
+                    sm: sizing.spacing.sm,
+                    md: sizing.spacing.md,
+                  }}
+                >
+                  {displayProjects.map((project) => (
+                    <Grid item {...gridConfig} key={project.id}>
+                      <ProjectCard
+                        project={project}
+                        _onEdit={handleEditProject}
+                        cardSizing={cardSizing}
+                        sizing={sizing}
+                        mode={mode}
+                        maxHeight={maxHeight}
+                        overflow={overflow}
                       />
                     </Grid>
                   ))}
                 </Grid>
-              ) : displayProjects.length === 0 ? (
-                <EmptyStatePlaceholder />
-              ) : (
-                <Fade in={!isLoading}>
-                  <Grid 
-                    container 
-                    spacing={{
-                      xs: sizing.spacing.xs,
-                      sm: sizing.spacing.sm,
-                      md: sizing.spacing.md,
-                    }}
-                  >
-                    {displayProjects.map((project) => (
-                      <Grid item {...gridConfig} key={project.id}>
-                        <ProjectCard
-                          project={project}
-                          _onEdit={handleEditProject}
-                          cardSizing={cardSizing}
-                          sizing={sizing}
-                          mode={mode}
-                          maxHeight={maxHeight}
-                          overflow={overflow}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Fade>
-              )}
+              </Fade>
+            )}
 
-              {/* Show more link */}
-              {!isLoading && displayProjects.length > 0 && projects.length > limit && (
+            {/* Show more link */}
+            {!isLoading &&
+              displayProjects.length > 0 &&
+              projects.length > adaptedLimit && (
                 <Box sx={{ textAlign: "center", mt: 3 }}>
                   <Button
                     variant="outlined"
@@ -783,27 +920,26 @@ export const ProjectOverviewWidget = memo<ProjectOverviewWidgetProps>(
                     sx={{ borderRadius: sizing.borderRadius.small }}
                   >
                     {t("projects.overview.showMore", "Показать все проекты")} (
-                    {projects.length - limit} {t("common.more", "ещё")})
+                    {projects.length - adaptedLimit} {t("common.more", "ещё")})
                   </Button>
                 </Box>
               )}
 
-              {/* Error state */}
-              {error && (
-                <Alert 
-                  severity="error" 
-                  sx={{ 
-                    borderRadius: sizing.borderRadius.small,
-                    mt: 2,
-                  }}
-                >
-                  {t("projects.overview.error", "Ошибка загрузки проектов")}
-                </Alert>
-              )}
-            </Box>
-          </Stack>
-        </Box>
-      </Box>
+            {/* Error state */}
+            {error && (
+              <Alert
+                severity="error"
+                sx={{
+                  borderRadius: sizing.borderRadius.small,
+                  mt: 2,
+                }}
+              >
+                {t("projects.overview.error", "Ошибка загрузки проектов")}
+              </Alert>
+            )}
+          </Box>
+        </Stack>
+      </DashboardWidgetWrapper>
     );
   }
 );

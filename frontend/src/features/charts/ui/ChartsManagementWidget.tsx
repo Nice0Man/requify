@@ -39,13 +39,19 @@ import {
 } from "@mui/icons-material";
 import i18n from "@/shared/lib/i18n";
 import {
+  DashboardWidgetWrapper,
+  type WidgetConfig,
+  type DashboardMode,
+  type DashboardLayout,
+  type DashboardDensity,
+} from "@/shared/ui";
+import {
   usePerformanceMeasure,
   useRenderTracker,
 } from "@/shared/hooks/usePerformanceOptimizations";
 
 // New sizing hooks
 import { useDashboardSizing, useChartSizing } from "@/shared/hooks";
-import type { DashboardMode, DashboardDensity } from "@/widgets/dashboard-container";
 
 // Chart components из entities/charts
 import {
@@ -92,11 +98,13 @@ interface ChartConfig {
 }
 
 interface ChartsManagementWidgetProps {
+  // Dashboard settings
+  mode: DashboardMode;
+  layout: DashboardLayout;
+  density: DashboardDensity;
+  
+  // Feature-specific props
   variant?: "minimal" | "compact" | "detailed";
-  layout?: "grid" | "list" | "masonry";
-  mode?: DashboardMode;
-  density?: DashboardDensity;
-  className?: string;
   defaultExpanded?: boolean;
   showControls?: boolean;
   maxCharts?: number;
@@ -104,12 +112,95 @@ interface ChartsManagementWidgetProps {
   refreshInterval?: number;
   onChartClick?: (chartId: string) => void;
   onRefresh?: () => void;
-  // New masonry support
   masonry?: boolean;
   flexible?: boolean;
   maxHeight?: number;
   overflow?: string;
+  
+  // Wrapper props
+  className?: string;
+  loading?: boolean;
+  error?: string | Error;
+  onResize?: (size: { width: number; height: number }) => void;
+  onCollapse?: (collapsed: boolean) => void;
 }
+
+// Конфигурация виджета для разных режимов дашборда
+const chartsManagementWidgetConfig: WidgetConfig = {
+  id: 'charts-management-widget',
+  title: i18n.t('dashboard.widgets.charts.title', 'Управление графиками'),
+  description: i18n.t('dashboard.widgets.charts.description', 'Настройка и просмотр аналитических графиков'),
+  icon: ShowChart,
+  
+  // Настройки по умолчанию
+  defaultSize: 'large',
+  defaultPriority: 'high',
+  defaultAspectRatio: 'wide',
+  
+  // Режимы дашборда
+  modes: {
+    minimal: {
+      size: 'medium',
+      visible: false, // Скрыт в минимальном режиме
+      priority: 'normal',
+    },
+    compact: {
+      size: 'large',
+      visible: true,
+      priority: 'high',
+      aspectRatio: 'wide',
+      spacing: { padding: '16px' },
+    },
+    detailed: {
+      size: 'xlarge',
+      visible: true,
+      priority: 'high',
+      aspectRatio: 'wide',
+      spacing: { padding: '20px' },
+    },
+    fullscreen: {
+      size: 'xlarge',
+      visible: true,
+      priority: 'critical',
+      aspectRatio: 'wide',
+      spacing: { padding: '24px' },
+    },
+  },
+  
+  // Лейауты
+  layouts: {
+    grid: {
+      aspectRatio: 'wide',
+      minHeight: '400px',
+      maxHeight: '600px',
+    },
+    list: {
+      size: 'large',
+      aspectRatio: 'wide',
+      minHeight: '300px',
+      maxHeight: '500px',
+    },
+    masonry: {
+      size: 'auto',
+      aspectRatio: 'auto',
+      minHeight: '350px',
+    },
+  },
+  
+  // Стили
+  border: true,
+  shadow: true,
+  borderRadius: 12,
+  
+  // Поведение
+  collapsible: true,
+  resizable: false,
+  draggable: false,
+  
+  // Производительность
+  lazy: false,
+  virtualizeContent: false,
+};
 
 /**
  * Charts Management Widget with optimized performance and adaptive sizing
@@ -117,10 +208,9 @@ interface ChartsManagementWidgetProps {
  */
 export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
   ({
-    className,
-    mode = "detailed",
-    layout = "grid",
-    density = "comfortable",
+    mode,
+    layout,
+    density,
     variant = "detailed",
     showControls = true,
     maxItems = 4,
@@ -133,6 +223,11 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
     flexible = false,
     maxHeight,
     overflow = "visible",
+    className,
+    loading: externalLoading = false,
+    error: externalError,
+    onResize,
+    onCollapse,
     ...rest
   }) => {
     // Performance hooks
@@ -439,350 +534,341 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
       [chartSizing.height, variant, viewMode, layout]
     );
 
-    if (isStatsLoading) {
+    if (isStatsLoading || externalLoading) {
       return (
-        <Box className={className} sx={{ width: "100%", overflow: overflow }}>
-          <Card
-            sx={{
-              borderRadius: sizing.borderRadius.medium,
-              border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-              p: sizing.padding,
-              maxHeight: maxHeight,
-              overflow: overflow,
-            }}
-          >
-            <Box sx={{ textAlign: "center", py: 4 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t("common.loading", "Loading charts...")}
-              </Typography>
-            </Box>
-          </Card>
-        </Box>
+        <DashboardWidgetWrapper
+          config={chartsManagementWidgetConfig}
+          mode={mode}
+          layout={layout}
+          density={density}
+          className={className}
+          loading={true}
+          onResize={onResize}
+          onCollapse={onCollapse}
+          aria-label="Виджет управления графиками"
+        >
+          <Box sx={{ p: 2 }}>
+            <Skeleton variant="text" width="60%" height={28} />
+            <Skeleton variant="rectangular" width="100%" height={200} sx={{ mt: 2 }} />
+            <Skeleton variant="text" width="40%" height={20} sx={{ mt: 1 }} />
+          </Box>
+        </DashboardWidgetWrapper>
       );
     }
 
     return (
-      <Box className={className} sx={{ width: "100%", overflow: overflow }}>
-        <Card
-          sx={{
-            // Unified border radius across all modes using new sizing system
-            borderRadius: sizing.borderRadius.medium,
-            // Conditional borders and shadows based on mode and layout
-            border: `1px solid ${alpha(
-              theme.palette.divider,
-              mode === "fullscreen" ? 0.06 : 0.08
-            )}`,
-            background: theme.palette.background.paper,
-            boxShadow: sizing.elevation.widget,
-            overflow: "hidden",
-            maxHeight: maxHeight,
-            // Prevent container overflow
-            "& *": {
-              overflow: overflow === "hidden" ? "hidden" : "visible",
-            },
-          }}
-        >
-          {/* Header */}
-          <CardHeader
-            avatar={
-              <Box
-                sx={{
-                  width: sizing.iconSize + 8,
-                  height: sizing.iconSize + 8,
-                  borderRadius: sizing.borderRadius.small,
-                  background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ShowChart sx={{ color: "white", fontSize: sizing.iconSize }} />
-              </Box>
-            }
-            title={
-              <Typography
-                variant="h6"
-                sx={{
-                  fontWeight: 600,
-                  color: theme.palette.text.primary,
-                  fontSize: sizing.typography.title,
-                }}
-              >
-                {t("dashboard.charts.title", "Analytics Charts")}
-              </Typography>
-            }
-            subheader={
-              <Typography 
-                variant="caption" 
-                color="text.secondary"
-                sx={{ fontSize: sizing.typography.caption }}
-              >
-                {expanded
-                  ? `${filteredCharts.length} charts visible`
-                  : `${filteredCharts.length} charts hidden`}
-              </Typography>
-            }
-            action={
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                {/* Entity filter */}
-                {showControls && (
-                  <>
-                    <FormControl size="small" sx={{ minWidth: 120 }}>
-                      <InputLabel>Entity</InputLabel>
-                      <Select
-                        value={selectedEntity}
-                        onChange={(e) => handleEntityFilter(e.target.value as typeof selectedEntity)}
-                        label="Entity"
-                      >
-                        <MenuItem value="all">All</MenuItem>
-                        <MenuItem value="projects">Projects</MenuItem>
-                        <MenuItem value="requirements">Requirements</MenuItem>
-                        <MenuItem value="teams">Teams</MenuItem>
-                        <MenuItem value="releases">Releases</MenuItem>
-                      </Select>
-                    </FormControl>
-
-                    {/* View mode toggle */}
-                    <ButtonGroup size="small" variant="outlined">
-                      <IconButton
-                        onClick={() => setViewMode("grid")}
-                        color={viewMode === "grid" ? "primary" : "default"}
-                        size="small"
-                      >
-                        <ViewModule fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => setViewMode("list")}
-                        color={viewMode === "list" ? "primary" : "default"}
-                        size="small"
-                      >
-                        <ViewList fontSize="small" />
-                      </IconButton>
-                    </ButtonGroup>
-
-                    {/* Refresh Button */}
-                    <IconButton onClick={handleRefresh} size="small">
-                      <Refresh fontSize="small" />
-                    </IconButton>
-                  </>
-                )}
-
-                {/* Expand/Collapse Toggle */}
-                <IconButton
-                  onClick={handleToggle}
-                  sx={{
-                    transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.3s ease",
-                  }}
-                >
-                  <ExpandMore />
-                </IconButton>
-              </Box>
-            }
-          />
-
-          {/* Charts Content */}
-          <Collapse in={expanded} timeout={300}>
-            <CardContent
+      <DashboardWidgetWrapper
+        config={chartsManagementWidgetConfig}
+        mode={mode}
+        layout={layout}
+        density={density}
+        className={className}
+        loading={externalLoading || isStatsLoading}
+        error={externalError}
+        onResize={onResize}
+        onCollapse={onCollapse}
+        aria-label="Виджет управления графиками"
+      >
+        {/* Header */}
+        <CardHeader
+          avatar={
+            <Box
               sx={{
-                // Adaptive padding based on density and mode using new sizing system
-                px: {
-                  xs: sizing.padding.xs,
-                  sm: sizing.padding.sm,
-                  md: sizing.padding.md,
-                },
-                pb: {
-                  xs: sizing.padding.xs,
-                  sm: sizing.padding.sm,
-                  md: sizing.padding.md,
-                },
-                pt: 0, // No top padding
-                overflow: overflow,
-                maxHeight: maxHeight ? maxHeight - sizing.headerHeight : undefined,
+                width: sizing.iconSize + 8,
+                height: sizing.iconSize + 8,
+                borderRadius: sizing.borderRadius.small,
+                background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {filteredCharts.length === 0 ? (
-                <Alert severity="info" sx={{ borderRadius: sizing.borderRadius.small }}>
-                  {t(
-                    "dashboard.charts.noData",
-                    "No charts available for the selected entity."
-                  )}
-                </Alert>
-              ) : (
-                <Grid
-                  container
-                  spacing={{
-                    xs: sizing.spacing.xs,
-                    sm: sizing.spacing.sm,
-                    md: sizing.spacing.md,
-                  }}
-                  sx={{
-                    // Layout-specific adjustments
-                    ...((layout === "list" || viewMode === "list") && {
+              <ShowChart sx={{ color: "white", fontSize: sizing.iconSize }} />
+            </Box>
+          }
+          title={
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: theme.palette.text.primary,
+                fontSize: sizing.typography.title,
+              }}
+            >
+              {t("dashboard.charts.title", "Analytics Charts")}
+            </Typography>
+          }
+          subheader={
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ fontSize: sizing.typography.caption }}
+            >
+              {expanded
+                ? `${filteredCharts.length} charts visible`
+                : `${filteredCharts.length} charts hidden`}
+            </Typography>
+          }
+          action={
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {/* Entity filter */}
+              {showControls && (
+                <>
+                  <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <InputLabel>Entity</InputLabel>
+                    <Select
+                      value={selectedEntity}
+                      onChange={(e) => handleEntityFilter(e.target.value as typeof selectedEntity)}
+                      label="Entity"
+                    >
+                      <MenuItem value="all">All</MenuItem>
+                      <MenuItem value="projects">Projects</MenuItem>
+                      <MenuItem value="requirements">Requirements</MenuItem>
+                      <MenuItem value="teams">Teams</MenuItem>
+                      <MenuItem value="releases">Releases</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  {/* View mode toggle */}
+                  <ButtonGroup size="small" variant="outlined">
+                    <IconButton
+                      onClick={() => setViewMode("grid")}
+                      color={viewMode === "grid" ? "primary" : "default"}
+                      size="small"
+                    >
+                      <ViewModule fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => setViewMode("list")}
+                      color={viewMode === "list" ? "primary" : "default"}
+                      size="small"
+                    >
+                      <ViewList fontSize="small" />
+                    </IconButton>
+                  </ButtonGroup>
+
+                  {/* Refresh Button */}
+                  <IconButton onClick={handleRefresh} size="small">
+                    <Refresh fontSize="small" />
+                  </IconButton>
+                </>
+              )}
+
+              {/* Expand/Collapse Toggle */}
+              <IconButton
+                onClick={handleToggle}
+                sx={{
+                  transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.3s ease",
+                }}
+              >
+                <ExpandMore />
+              </IconButton>
+            </Box>
+          }
+        />
+
+        {/* Charts Content */}
+        <Collapse in={expanded} timeout={300}>
+          <CardContent
+            sx={{
+              // Adaptive padding based on density and mode using new sizing system
+              px: {
+                xs: sizing.padding.xs,
+                sm: sizing.padding.sm,
+                md: sizing.padding.md,
+              },
+              pb: {
+                xs: sizing.padding.xs,
+                sm: sizing.padding.sm,
+                md: sizing.padding.md,
+              },
+              pt: 0, // No top padding
+              overflow: overflow,
+              maxHeight: maxHeight ? maxHeight - sizing.headerHeight : undefined,
+            }}
+          >
+            {filteredCharts.length === 0 ? (
+              <Alert severity="info" sx={{ borderRadius: sizing.borderRadius.small }}>
+                {t(
+                  "dashboard.charts.noData",
+                  "No charts available for the selected entity."
+                )}
+              </Alert>
+            ) : (
+              <Grid
+                container
+                spacing={{
+                  xs: sizing.spacing.xs,
+                  sm: sizing.spacing.sm,
+                  md: sizing.spacing.md,
+                }}
+                sx={{
+                  // Layout-specific adjustments
+                  ...((layout === "list" || viewMode === "list") && {
+                    flexDirection: "column",
+                    "& .MuiGrid-item": {
+                      maxWidth: "none !important",
+                      flexBasis: "auto",
+                      width: "100%",
+                    },
+                  }),
+                  ...(layout === "masonry" && {
+                    alignItems: "flex-start",
+                    "& .MuiGrid-item": {
+                      display: "flex",
                       flexDirection: "column",
-                      "& .MuiGrid-item": {
-                        maxWidth: "none !important",
-                        flexBasis: "auto",
-                        width: "100%",
-                      },
-                    }),
-                    ...(layout === "masonry" && {
-                      alignItems: "flex-start",
-                      "& .MuiGrid-item": {
-                        display: "flex",
-                        flexDirection: "column",
-                      },
-                    }),
-                  }}
-                >
-                  {filteredCharts.map((chart) => {
-                    // Calculate responsive grid sizes based on layout and mode
-                    const getGridSizes = () => {
-                      if (layout === "list" || viewMode === "list") {
-                        return { xs: 12, sm: 12, md: 12, lg: 12, xl: 12 };
-                      }
+                    },
+                  }),
+                }}
+              >
+                {filteredCharts.map((chart) => {
+                  // Calculate responsive grid sizes based on layout and mode
+                  const getGridSizes = () => {
+                    if (layout === "list" || viewMode === "list") {
+                      return { xs: 12, sm: 12, md: 12, lg: 12, xl: 12 };
+                    }
 
-                      if (mode === "minimal") {
-                        return { xs: 12, sm: 12, md: 12, lg: 12, xl: 6 };
-                      }
+                    if (mode === "minimal") {
+                      return { xs: 12, sm: 12, md: 12, lg: 12, xl: 6 };
+                    }
 
-                      if (mode === "compact") {
-                        return { xs: 12, sm: 6, md: 6, lg: 6, xl: 4 };
-                      }
+                    if (mode === "compact") {
+                      return { xs: 12, sm: 6, md: 6, lg: 6, xl: 4 };
+                    }
 
-                      if (mode === "fullscreen") {
-                        return { xs: 12, sm: 6, md: 4, lg: 3, xl: 3 };
-                      }
+                    if (mode === "fullscreen") {
+                      return { xs: 12, sm: 6, md: 4, lg: 3, xl: 3 };
+                    }
 
-                      // Default detailed mode
-                      return { xs: 12, sm: 6, md: 6, lg: 4, xl: 4 };
-                    };
+                    // Default detailed mode
+                    return { xs: 12, sm: 6, md: 6, lg: 4, xl: 4 };
+                  };
 
-                    const gridSizes = getGridSizes();
+                  const gridSizes = getGridSizes();
 
-                    return (
-                      <Grid item {...gridSizes} key={chart.id}>
-                        <Card
-                          sx={{
-                            // Unified border radius with parent using new sizing
-                            borderRadius: sizing.borderRadius.small,
-                            // Lighter borders for nested cards to avoid double outlines
-                            border: `1px solid ${alpha(
-                              theme.palette.divider,
-                              mode === "fullscreen" ? 0.04 : 0.06
-                            )}`,
-                            background: theme.palette.background.paper,
-                            height: "100%",
-                            minHeight: chartSizing.height + 80, // Chart + header
-                            maxHeight: maxHeight ? maxHeight * 0.8 : undefined,
-                            display: "flex",
-                            flexDirection: "column",
-                            transition: "all 0.3s ease",
-                            overflow: overflow,
-                            // Subtle shadows for nested cards using new elevation system
-                            boxShadow: chartSizing.elevation,
-                            "&:hover": {
-                              transform:
-                                mode === "fullscreen"
-                                  ? "none"
-                                  : "translateY(-2px)",
-                              boxShadow:
-                                mode === "fullscreen"
-                                  ? `0 2px 8px ${alpha(
-                                      theme.palette.common.black,
-                                      0.03
-                                    )}`
-                                  : `0 8px 32px ${alpha(
-                                      theme.palette.common.black,
-                                      0.08
-                                    )}`,
-                              borderColor: alpha(
-                                chart.color,
-                                mode === "fullscreen" ? 0.2 : 0.3
-                              ),
-                            },
-                          }}
-                        >
-                          <CardHeader
-                            avatar={
-                              <Box
-                                sx={{
-                                  width: sizing.iconSize,
-                                  height: sizing.iconSize,
-                                  borderRadius: sizing.borderRadius.small,
-                                  backgroundColor: alpha(chart.color, 0.1),
-                                  color: chart.color,
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                }}
-                              >
-                                {chart.icon}
-                              </Box>
-                            }
-                            title={
-                              <Typography
-                                variant="subtitle2"
-                                sx={{
-                                  fontWeight: 600,
-                                  fontSize: sizing.typography.subtitle,
-                                  color: theme.palette.text.primary,
-                                }}
-                              >
-                                {chart.title}
-                              </Typography>
-                            }
-                            action={
-                              <Chip
-                                label={chart.entity}
-                                size="small"
-                                sx={{
-                                  textTransform: "capitalize",
-                                  backgroundColor: alpha(chart.color, 0.1),
-                                  color: chart.color,
-                                  fontSize: sizing.typography.caption,
-                                }}
-                              />
-                            }
-                            sx={{ 
-                              pb: 1,
-                              px: sizing.padding.sm,
-                              pt: sizing.padding.sm,
-                            }}
-                          />
-                          <CardContent
-                            sx={{
-                              pt: 0,
-                              pb: sizing.padding.sm,
-                              px: sizing.padding.sm,
-                              flexGrow: 1,
-                              display: "flex",
-                              flexDirection: "column",
-                              minHeight: 0,
-                              overflow: overflow,
-                            }}
-                          >
-                            <Box 
-                              sx={{ 
-                                flexGrow: 1, 
-                                minHeight: 0,
-                                overflow: overflow,
-                                position: "relative",
+                  return (
+                    <Grid item {...gridSizes} key={chart.id}>
+                      <Card
+                        sx={{
+                          // Unified border radius with parent using new sizing
+                          borderRadius: sizing.borderRadius.small,
+                          // Lighter borders for nested cards to avoid double outlines
+                          border: `1px solid ${alpha(
+                            theme.palette.divider,
+                            mode === "fullscreen" ? 0.04 : 0.06
+                          )}`,
+                          background: theme.palette.background.paper,
+                          height: "100%",
+                          minHeight: chartSizing.height + 80, // Chart + header
+                          maxHeight: maxHeight ? maxHeight * 0.8 : undefined,
+                          display: "flex",
+                          flexDirection: "column",
+                          transition: "all 0.3s ease",
+                          overflow: overflow,
+                          // Subtle shadows for nested cards using new elevation system
+                          boxShadow: chartSizing.elevation,
+                          "&:hover": {
+                            transform:
+                              mode === "fullscreen"
+                                ? "none"
+                                : "translateY(-2px)",
+                            boxShadow:
+                              mode === "fullscreen"
+                                ? `0 2px 8px ${alpha(
+                                    theme.palette.common.black,
+                                    0.03
+                                  )}`
+                                : `0 8px 32px ${alpha(
+                                    theme.palette.common.black,
+                                    0.08
+                                  )}`,
+                            borderColor: alpha(
+                              chart.color,
+                              mode === "fullscreen" ? 0.2 : 0.3
+                            ),
+                          },
+                        }}
+                      >
+                        <CardHeader
+                          avatar={
+                            <Box
+                              sx={{
+                                width: sizing.iconSize,
+                                height: sizing.iconSize,
+                                borderRadius: sizing.borderRadius.small,
+                                backgroundColor: alpha(chart.color, 0.1),
+                                color: chart.color,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                               }}
                             >
-                              {renderChart(chart)}
+                              {chart.icon}
                             </Box>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    );
-                  })}
-                </Grid>
-              )}
-            </CardContent>
-          </Collapse>
-        </Card>
-      </Box>
+                          }
+                          title={
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                fontWeight: 600,
+                                fontSize: sizing.typography.subtitle,
+                                color: theme.palette.text.primary,
+                              }}
+                            >
+                              {chart.title}
+                            </Typography>
+                          }
+                          action={
+                            <Chip
+                              label={chart.entity}
+                              size="small"
+                              sx={{
+                                textTransform: "capitalize",
+                                backgroundColor: alpha(chart.color, 0.1),
+                                color: chart.color,
+                                fontSize: sizing.typography.caption,
+                              }}
+                            />
+                          }
+                          sx={{ 
+                            pb: 1,
+                            px: sizing.padding.sm,
+                            pt: sizing.padding.sm,
+                          }}
+                        />
+                        <CardContent
+                          sx={{
+                            pt: 0,
+                            pb: sizing.padding.sm,
+                            px: sizing.padding.sm,
+                            flexGrow: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            minHeight: 0,
+                            overflow: overflow,
+                          }}
+                        >
+                          <Box 
+                            sx={{ 
+                              flexGrow: 1, 
+                              minHeight: 0,
+                              overflow: overflow,
+                              position: "relative",
+                            }}
+                          >
+                            {renderChart(chart)}
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )}
+          </CardContent>
+        </Collapse>
+      </DashboardWidgetWrapper>
     );
   }
 );

@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect, useState } from "react";
+import { memo, useRef, useEffect, useState } from "react";
 import {
   PieChart as RechartsPieChart,
   Pie,
@@ -10,7 +10,7 @@ import {
 import { useTheme, alpha, Box, CircularProgress, Alert } from "@mui/material";
 import type { PieChartProps } from "../model/types";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
   const theme = useTheme();
 
   if (active && payload && payload.length) {
@@ -118,7 +118,6 @@ export const PieChart = memo<PieChartProps>(
     loading = false,
     error = null,
     className,
-    showLabels = true,
     showLegend = true,
     innerRadius = 0,
     outerRadius = "80%",
@@ -163,7 +162,7 @@ export const PieChart = memo<PieChartProps>(
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           for (const entry of entries) {
-            const { width, height: observedHeight } = entry.contentRect;
+            const { width } = entry.contentRect;
             
             // For pie charts, we typically want square aspect ratio
             let adaptiveHeight = responsive 

@@ -27,17 +27,14 @@ import {
   Assignment as AssignmentIcon,
   PlayArrow as PlayArrowIcon,
 } from "@mui/icons-material";
-import { DashboardLayout } from "@/widgets/layout";
 import {
   useTestCases,
   useTestStats,
   useUpdateTestCase,
-} from "@/features/test-management";
+} from "@/features/testing";
 import { LoadingSpinner } from "@/shared/ui";
-import type {
-  TestCase,
-  TestFilters,
-} from "@/features/test-management/api/testApi";
+import type { TestCase, TestFilters } from "@/features/testing/api/testApi";
+import { DashboardLayout } from "@/widgets/layout/ui";
 
 const TestingPage: React.FC = () => {
   const { t } = useTranslation();
@@ -230,187 +227,191 @@ const TestingPage: React.FC = () => {
   return (
     <DashboardLayout>
       <Box p={3}>
-      {/* Заголовок */}
-      <Box mb={3}>
-        <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
-          {t("testing.title")}
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          {t("testing.subtitle")}
-        </Typography>
-      </Box>
+        {/* Заголовок */}
+        <Box mb={3}>
+          <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
+            {t("testing.title")}
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            {t("testing.subtitle")}
+          </Typography>
+        </Box>
 
-      {/* Статистика */}
-      {testStats && (
-        <Grid container spacing={3} mb={3}>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="primary" fontWeight={700}>
-                {testStats.totalTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.totalTests")}
-              </Typography>
-            </Paper>
+        {/* Статистика */}
+        {testStats && (
+          <Grid container spacing={3} mb={3}>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="primary" fontWeight={700}>
+                  {testStats.totalTests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  {t("testing.stats.totalTests")}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="success.main" fontWeight={700}>
+                  {testStats.passedTests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  {t("testing.stats.passedTests")}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="error.main" fontWeight={700}>
+                  {testStats.failedTests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  {t("testing.stats.failedTests")}
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="warning.main" fontWeight={700}>
+                  {(testStats?.totalTests || 0) -
+                    (testStats?.passedTests || 0) -
+                    (testStats?.failedTests || 0)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  {t("testing.stats.skippedTests")}
+                </Typography>
+              </Paper>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="success.main" fontWeight={700}>
-                {testStats.passedTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.passedTests")}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="error.main" fontWeight={700}>
-                {testStats.failedTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.failedTests")}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="warning.main" fontWeight={700}>
-                {testStats.skippedTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.skippedTests")}
-              </Typography>
-            </Paper>
-          </Grid>
-        </Grid>
-      )}
+        )}
 
-      {/* Фильтры и поиск */}
-      <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              placeholder={t("testing.searchPlaceholder")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <SearchIcon sx={{ mr: 1, color: "action.active" }} />
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>{t("testing.fields.status")}</InputLabel>
-              <Select
-                value={statusFilter}
-                label={t("testing.fields.status")}
-                onChange={(e) =>
-                  setStatusFilter(e.target.value as typeof statusFilter)
+        {/* Фильтры и поиск */}
+        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={3}>
+              <TextField
+                fullWidth
+                placeholder={t("testing.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <SearchIcon sx={{ mr: 1, color: "action.active" }} />
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>{t("testing.fields.status")}</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label={t("testing.fields.status")}
+                  onChange={(e) =>
+                    setStatusFilter(e.target.value as typeof statusFilter)
+                  }
+                >
+                  <MenuItem value="all">{t("testing.status.all")}</MenuItem>
+                  <MenuItem value="draft">{t("testing.status.draft")}</MenuItem>
+                  <MenuItem value="active">
+                    {t("testing.status.active")}
+                  </MenuItem>
+                  <MenuItem value="deprecated">
+                    {t("testing.status.deprecated")}
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>{t("testing.fields.priority")}</InputLabel>
+                <Select
+                  value={priorityFilter}
+                  label={t("testing.fields.priority")}
+                  onChange={(e) =>
+                    setPriorityFilter(e.target.value as typeof priorityFilter)
+                  }
+                >
+                  <MenuItem value="all">{t("testing.priority.all")}</MenuItem>
+                  <MenuItem value="low">{t("testing.priority.low")}</MenuItem>
+                  <MenuItem value="medium">
+                    {t("testing.priority.medium")}
+                  </MenuItem>
+                  <MenuItem value="high">{t("testing.priority.high")}</MenuItem>
+                  <MenuItem value="critical">
+                    {t("testing.priority.critical")}
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, newViewMode) =>
+                  newViewMode && setViewMode(newViewMode)
                 }
+                aria-label={t("common.view")}
               >
-                <MenuItem value="all">{t("testing.status.all")}</MenuItem>
-                <MenuItem value="draft">{t("testing.status.draft")}</MenuItem>
-                <MenuItem value="active">{t("testing.status.active")}</MenuItem>
-                <MenuItem value="deprecated">
-                  {t("testing.status.deprecated")}
-                </MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>{t("testing.fields.priority")}</InputLabel>
-              <Select
-                value={priorityFilter}
-                label={t("testing.fields.priority")}
-                onChange={(e) =>
-                  setPriorityFilter(e.target.value as typeof priorityFilter)
-                }
+                <ToggleButton value="grid" aria-label="grid view">
+                  <ViewModuleIcon />
+                </ToggleButton>
+                <ToggleButton value="list" aria-label="list view">
+                  <ViewListIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<AddIcon />}
+                sx={{ fontWeight: 600 }}
               >
-                <MenuItem value="all">{t("testing.priority.all")}</MenuItem>
-                <MenuItem value="low">{t("testing.priority.low")}</MenuItem>
-                <MenuItem value="medium">
-                  {t("testing.priority.medium")}
-                </MenuItem>
-                <MenuItem value="high">{t("testing.priority.high")}</MenuItem>
-                <MenuItem value="critical">
-                  {t("testing.priority.critical")}
-                </MenuItem>
-              </Select>
-            </FormControl>
+                {t("testing.createTestCase")}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={3}>
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={(_, newViewMode) =>
-                newViewMode && setViewMode(newViewMode)
-              }
-              aria-label={t("common.view")}
-            >
-              <ToggleButton value="grid" aria-label="grid view">
-                <ViewModuleIcon />
-              </ToggleButton>
-              <ToggleButton value="list" aria-label="list view">
-                <ViewListIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Grid>
-          <Grid item xs={12} md={2}>
+        </Paper>
+
+        {/* Список тест-кейсов */}
+        {filteredTestCases.length === 0 ? (
+          <Paper
+            elevation={1}
+            sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
+          >
+            <Typography variant="h6" color="text.secondary" mb={2}>
+              {t("testing.notFound")}
+            </Typography>
             <Button
-              fullWidth
               variant="contained"
               startIcon={<AddIcon />}
               sx={{ fontWeight: 600 }}
             >
-              {t("testing.createTestCase")}
+              {t("testing.createFirstTestCase")}
             </Button>
+          </Paper>
+        ) : (
+          <Grid container spacing={3}>
+            {filteredTestCases.map((testCase) => (
+              <Grid item xs={12} md={6} lg={4} key={testCase.id}>
+                <TestCaseCard testCase={testCase} />
+              </Grid>
+            ))}
           </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Список тест-кейсов */}
-      {filteredTestCases.length === 0 ? (
-        <Paper
-          elevation={1}
-          sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
-        >
-          <Typography variant="h6" color="text.secondary" mb={2}>
-            {t("testing.notFound")}
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{ fontWeight: 600 }}
-          >
-            {t("testing.createFirstTestCase")}
-          </Button>
-        </Paper>
-      ) : (
-        <Grid container spacing={3}>
-          {filteredTestCases.map((testCase) => (
-            <Grid item xs={12} md={6} lg={4} key={testCase.id}>
-              <TestCaseCard testCase={testCase} />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+        )}
       </Box>
     </DashboardLayout>
   );

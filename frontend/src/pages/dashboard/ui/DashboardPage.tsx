@@ -29,7 +29,7 @@ import {
   type DashboardLayout as DashboardLayoutType,
   type DashboardDensity,
 } from "@/widgets/dashboard-sidebar";
-import { DashboardContainer } from "@/widgets/dashboard-container";
+import { DashboardContainer } from "@/widgets/container";
 
 // Import new layout system
 import { DashboardLayoutRenderer } from "./DashboardLayoutRenderer";
@@ -88,6 +88,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
   );
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Handle mounting to prevent Fade errors
   useEffect(() => {
@@ -232,8 +233,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
         setDashboardDensity(newDensity);
       });
     },
-    [] // Убираем зависимости
+    []
   );
+
+  const handleToggleCollapse = useCallback(() => {
+    setSidebarCollapsed((prev) => !prev);
+  }, []);
 
   const handleFullscreenToggle = useCallback(() => {
     if (isFullscreen) {
@@ -355,11 +360,12 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
           mode={dashboardMode}
           layout={dashboardLayout}
           density={dashboardDensity}
+          collapsed={sidebarCollapsed}
           isFullscreen={isFullscreen}
-          showControls={!isTablet} // Hide on tablet and mobile
           onModeChange={handleModeChange}
           onLayoutChange={handleLayoutChange}
           onDensityChange={handleDensityChange}
+          onToggleCollapse={handleToggleCollapse}
           onFullscreenToggle={handleFullscreenToggle}
         />
       </Box>

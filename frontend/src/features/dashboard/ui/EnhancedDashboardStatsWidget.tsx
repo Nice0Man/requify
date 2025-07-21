@@ -20,10 +20,13 @@ import {
   TrendingDown,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
-import type {
-  DashboardMode,
-  DashboardDensity,
-} from "@/widgets/dashboard-container";
+import {
+  DashboardWidgetWrapper,
+  type WidgetConfig,
+  type DashboardMode,
+  type DashboardLayout,
+  type DashboardDensity,
+} from "@/shared/ui";
 import { useDashboardStats } from "../model/queries";
 import { useCardSizing, useDashboardSizing } from "@/shared/hooks";
 
@@ -48,33 +51,125 @@ interface MetricCardData {
 }
 
 interface EnhancedDashboardStatsWidgetProps {
+  // Dashboard settings
+  mode: DashboardMode;
+  layout: DashboardLayout;
+  density: DashboardDensity;
+  
+  // Feature-specific props
   variant?: "minimal" | "compact" | "detailed";
-  mode?: DashboardMode;
-  density?: DashboardDensity;
-  layout?: "grid" | "list" | "masonry";
   showTrends?: boolean;
-  className?: string;
   onMetricClick?: (metricId: string) => void;
   masonry?: boolean;
   flexible?: boolean;
   maxHeight?: number;
   overflow?: string;
+  
+  // Wrapper props
+  className?: string;
+  loading?: boolean;
+  error?: string | Error;
+  onResize?: (size: { width: number; height: number }) => void;
+  onCollapse?: (collapsed: boolean) => void;
 }
+
+// Конфигурация виджета для разных режимов дашборда
+const enhancedStatsWidgetConfig: WidgetConfig = {
+  id: 'enhanced-stats-widget',
+  title: 'Расширенная статистика',
+  description: 'Детальные метрики и KPI с трендами',
+  icon: Assessment,
+  
+  // Настройки по умолчанию
+  defaultSize: 'xlarge',
+  defaultPriority: 'critical',
+  defaultAspectRatio: 'wide',
+  
+  // Режимы дашборда
+  modes: {
+    minimal: {
+      size: 'large',
+      visible: true,
+      priority: 'critical',
+      aspectRatio: 'wide',
+      spacing: { padding: '16px' },
+    },
+    compact: {
+      size: 'xlarge',
+      visible: true,
+      priority: 'critical',
+      aspectRatio: 'wide',
+      spacing: { padding: '20px' },
+    },
+    detailed: {
+      size: 'xlarge',
+      visible: true,
+      priority: 'critical',
+      aspectRatio: 'wide',
+      spacing: { padding: '24px' },
+    },
+    fullscreen: {
+      size: 'xlarge',
+      visible: true,
+      priority: 'critical',
+      aspectRatio: 'wide',
+      spacing: { padding: '32px' },
+    },
+  },
+  
+  // Лейауты
+  layouts: {
+    grid: {
+      aspectRatio: 'wide',
+      minHeight: '300px',
+      maxHeight: '500px',
+    },
+    list: {
+      size: 'xlarge',
+      aspectRatio: 'wide',
+      minHeight: '200px',
+      maxHeight: '400px',
+    },
+    masonry: {
+      size: 'auto',
+      aspectRatio: 'auto',
+      minHeight: '280px',
+    },
+  },
+  
+  // Стили
+  border: true,
+  shadow: true,
+  borderRadius: 12,
+  
+  // Поведение
+  collapsible: true,
+  resizable: false,
+  draggable: false,
+  
+  // Производительность
+  lazy: false,
+  virtualizeContent: false,
+};
 
 export const EnhancedDashboardStatsWidget =
   memo<EnhancedDashboardStatsWidgetProps>(
     ({
+      mode,
+      layout,
+      density,
       variant = "detailed",
-      mode = "detailed",
-      density = "comfortable",
-      layout = "grid",
       showTrends = true,
-      className,
       onMetricClick,
       masonry = false,
       flexible = false,
       maxHeight,
       overflow = "visible",
+      className,
+      loading: externalLoading = false,
+      error: externalError,
+      onResize,
+      onCollapse,
     }) => {
       const { t } = useTranslation();
       const theme = useTheme();
@@ -512,126 +607,107 @@ export const EnhancedDashboardStatsWidget =
       }
 
       return (
-        <Box className={className} sx={{ width: "100%", overflow: overflow }}>
-          <Box
-            sx={{
-              // Adaptive padding based on density and mode
-              p: {
-                xs: sizing.padding.xs,
-                sm: sizing.padding.sm,
-                md: sizing.padding.md,
-              },
-              // Unified border radius across all modes
-              borderRadius: sizing.borderRadius.medium,
-              // Conditional borders and shadows
-              border: `1px solid ${alpha(
-                theme.palette.divider,
-                mode === "fullscreen" ? 0.06 : 0.08
-              )}`,
-              backgroundColor: theme.palette.background.paper,
-              boxShadow: sizing.elevation.widget,
-              width: "100%",
-              maxHeight: maxHeight,
-              overflow: overflow,
-              // Layout-specific adjustments
-              ...(layout === "list" && {
-                display: "flex",
-                flexDirection: mode === "minimal" ? "row" : "column",
-                alignItems: mode === "minimal" ? "center" : "stretch",
-                gap: mode === "minimal" ? 2 : 0,
-              }),
-            }}
-          >
-            <Stack spacing={sizing.spacing}>
-              {/* Header Section */}
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Stack spacing={1}>
-                  <Box display="flex" alignItems="center" gap={1.5}>
-                    <Box
-                      sx={{
-                        width: sizing.headerHeight - 20,
-                        height: sizing.headerHeight - 20,
-                        borderRadius: sizing.borderRadius.small,
-                        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Assessment sx={{ color: "white", fontSize: 18 }} />
-                    </Box>
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: 700,
-                        color: theme.palette.text.primary,
-                        fontSize: sizing.typography.title,
-                      }}
-                    >
-                      {t("dashboard.metrics.title", "Key Metrics")}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body2"
+        <DashboardWidgetWrapper
+          config={enhancedStatsWidgetConfig}
+          mode={mode}
+          layout={layout}
+          density={density}
+          className={className}
+          loading={externalLoading || isLoading}
+          error={externalError}
+          onResize={onResize}
+          onCollapse={onCollapse}
+          aria-label="Виджет расширенной статистики"
+        >
+          <Stack spacing={sizing.spacing}>
+            {/* Header Section */}
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Stack spacing={1}>
+                <Box display="flex" alignItems="center" gap={1.5}>
+                  <Box
                     sx={{
-                      fontSize: sizing.typography.body,
-                      color: theme.palette.text.secondary,
+                      width: sizing.headerHeight - 20,
+                      height: sizing.headerHeight - 20,
+                      borderRadius: sizing.borderRadius.small,
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {t(
-                      "dashboard.metrics.subtitle",
-                      "Real-time project statistics"
-                    )}
-                  </Typography>
-                </Stack>
-
-                {/* Refresh Button */}
-                <IconButton
-                  onClick={handleRefresh}
-                  disabled={isFetching}
-                  sx={{
-                    borderRadius: sizing.borderRadius.small,
-                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  }}
-                >
-                  <Refresh
+                    <Assessment sx={{ color: "white", fontSize: 18 }} />
+                  </Box>
+                  <Typography
+                    variant="h5"
                     sx={{
-                      ...(isFetching && {
-                        animation: "spin 1s linear infinite",
-                        "@keyframes spin": {
-                          "0%": { transform: "rotate(0deg)" },
-                          "100%": { transform: "rotate(360deg)" },
-                        },
-                      }),
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                      fontSize: sizing.typography.title,
                     }}
-                  />
-                </IconButton>
-              </Box>
-
-              {/* Key Metrics Grid */}
-              <Box>
-                <Grid
-                  container
-                  spacing={{
-                    xs: sizing.spacing.xs,
-                    sm: sizing.spacing.sm,
-                    md: sizing.spacing.md,
+                  >
+                    {t("dashboard.metrics.title", "Key Metrics")}
+                  </Typography>
+                </Box>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: sizing.typography.body,
+                    color: theme.palette.text.secondary,
                   }}
                 >
-                  {keyMetrics.map((metric) => (
-                    <Grid item {...gridConfig} key={metric.id}>
-                      <MetricCard metric={metric} />
-                    </Grid>
-                  ))}
-                </Grid>
-              </Box>
-            </Stack>
-          </Box>
-        </Box>
+                  {t(
+                    "dashboard.metrics.subtitle",
+                    "Real-time project statistics"
+                  )}
+                </Typography>
+              </Stack>
+
+              {/* Refresh Button */}
+              <IconButton
+                onClick={handleRefresh}
+                disabled={isFetching}
+                sx={{
+                  borderRadius: sizing.borderRadius.small,
+                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                }}
+              >
+                <Refresh
+                  sx={{
+                    ...(isFetching && {
+                      animation: "spin 1s linear infinite",
+                      "@keyframes spin": {
+                        "0%": { transform: "rotate(0deg)" },
+                        "100%": { transform: "rotate(360deg)" },
+                      },
+                    }),
+                  }}
+                />
+              </IconButton>
+            </Box>
+
+            {/* Key Metrics Grid */}
+            <Box>
+              <Grid
+                container
+                spacing={{
+                  xs: sizing.spacing.xs,
+                  sm: sizing.spacing.sm,
+                  md: sizing.spacing.md,
+                }}
+              >
+                {keyMetrics.map((metric) => (
+                  <Grid item {...gridConfig} key={metric.id}>
+                    <MetricCard metric={metric} />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          </Stack>
+        </DashboardWidgetWrapper>
       );
     }
   );

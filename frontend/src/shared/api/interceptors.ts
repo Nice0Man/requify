@@ -1,10 +1,10 @@
 // API interceptors
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 
 export const setupRequestInterceptors = (client: AxiosInstance) => {
   // Request interceptor for adding auth token
   client.interceptors.request.use(
-    (config: AxiosRequestConfig) => {
+    (config: InternalAxiosRequestConfig) => {
       const token = localStorage.getItem('auth_token');
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;

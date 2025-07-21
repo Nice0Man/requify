@@ -1,12 +1,14 @@
 // Main widgets exports
 export * from "./layout";
-export * from "./header";
-export * from "./sidebar";
-export * from "./navigation";
+export * from "./app-header";
+export * from "./app-sidebar";
+export * from "./app-navigation";
 export * from "./landing";
-export * from "./dashboard-stats";
-export * from "./dashboard-activity-feed";
-export * from "./dashboard-container"; // Context7 dashboard container
+export * from "./stats";
+export * from "./activity-feed";
+export * from "./container"; // Context7 dashboard container
+export * from "./dashboard-header";
+export * from "./dashboard-sidebar";
 export * from "./project-overview";
 export * from "./project-stats";
 export * from "./system-health";
@@ -16,4 +18,4 @@ export * from "./scroll-navigation";
 export * from "./kanban";
 
 // Re-export types
-export type { WidgetProps } from "./types";
+export type { BaseWidgetProps, WidgetConfig, DashboardLayout } from "./types";

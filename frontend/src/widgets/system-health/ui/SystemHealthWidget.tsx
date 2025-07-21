@@ -27,7 +27,6 @@ import {
   useRenderTracker,
   usePerformanceMeasure,
 } from "@/shared/hooks/usePerformanceOptimizations";
-
 import {
   Refresh,
   Memory,
@@ -40,18 +39,37 @@ import {
   HealthAndSafety,
 } from "@mui/icons-material";
 import i18n from "@/shared/lib/i18n";
+import {
+  DashboardWidgetWrapper,
+  type WidgetConfig,
+  type DashboardMode,
+  type DashboardLayout,
+  type DashboardDensity,
+} from "@/shared/ui";
 import { useSystemHealth } from "@/features/dashboard";
 import type { SystemHealth, ServiceHealth } from "@/entities/dashboard";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
 
 interface SystemHealthWidgetProps {
+  // Dashboard settings
+  mode: DashboardMode;
+  layout: DashboardLayout;
+  density: DashboardDensity;
+  
+  // Feature-specific props
   variant?: "minimal" | "detailed" | "compact";
   showRefresh?: boolean;
   autoRefresh?: boolean;
   refreshInterval?: number;
-  className?: string;
   onHealthClick?: (serviceName: string) => void;
+  
+  // Wrapper props
+  className?: string;
+  loading?: boolean;
+  error?: string | Error;
+  onResize?: (size: { width: number; height: number }) => void;
+  onCollapse?: (collapsed: boolean) => void;
 }
 
 // Компонент для отображения статуса сервиса
@@ -151,8 +169,97 @@ const SystemMetric = memo<{
 
 SystemMetric.displayName = "SystemMetric";
 
+// Конфигурация виджета для разных режимов дашборда
+const systemHealthWidgetConfig: WidgetConfig = {
+  id: 'system-health-widget',
+  title: i18n.t('dashboard.widgets.systemHealth.title', 'Состояние системы'),
+  description: i18n.t('dashboard.widgets.systemHealth.description', 'Мониторинг состояния сервисов и ресурсов'),
+  icon: HealthAndSafety,
+  
+  // Настройки по умолчанию
+  defaultSize: 'small',
+  defaultPriority: 'low',
+  defaultAspectRatio: 'square',
+  
+  // Режимы дашборда
+  modes: {
+    minimal: {
+      size: 'small',
+      visible: false, // Скрыт в минимальном режиме
+      priority: 'low',
+    },
+    compact: {
+      size: 'small',
+      visible: false, // Скрыт в компактном режиме
+      priority: 'low',
+    },
+    detailed: {
+      size: 'small',
+      visible: true,
+      priority: 'low',
+      aspectRatio: 'square',
+      spacing: { padding: '16px' },
+    },
+    fullscreen: {
+      size: 'medium',
+      visible: true,
+      priority: 'normal',
+      aspectRatio: 'wide',
+      spacing: { padding: '20px' },
+    },
+  },
+  
+  // Лейауты
+  layouts: {
+    grid: {
+      aspectRatio: 'square',
+      minHeight: '200px',
+      maxHeight: '300px',
+    },
+    list: {
+      size: 'small',
+      aspectRatio: 'wide',
+      minHeight: '150px',
+      maxHeight: '200px',
+    },
+    masonry: {
+      size: 'auto',
+      aspectRatio: 'auto',
+      minHeight: '180px',
+    },
+  },
+  
+  // Стили
+  border: true,
+  shadow: true,
+  borderRadius: 12,
+  
+  // Поведение
+  collapsible: false,
+  resizable: false,
+  draggable: false,
+  
+  // Производительность
+  lazy: true,
+  virtualizeContent: false,
+};
+
 export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
-  ({ variant = "detailed", showRefresh = true, className, onHealthClick }) => {
+  ({ 
+    mode,
+    layout,
+    density,
+    variant = "detailed", 
+    showRefresh = true, 
+    autoRefresh = false,
+    refreshInterval = 30000,
+    onHealthClick,
+    className,
+    loading: externalLoading = false,
+    error: externalError,
+    onResize,
+    onCollapse,
+  }) => {
     const muiTheme = useTheme();
     const t = i18n.t;
 
@@ -233,114 +340,48 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
     );
 
     // Backup-style loading state
-    if (isLoading) {
+    if (isLoading || externalLoading) {
       return (
-        <Card
+        <DashboardWidgetWrapper
+          config={systemHealthWidgetConfig}
+          mode={mode}
+          layout={layout}
+          density={density}
           className={className}
-          sx={{
-            borderRadius: 3,
-            border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-            boxShadow: `0 2px 20px ${alpha(
-              muiTheme.palette.common.black,
-              0.04
-            )}`,
-            background: muiTheme.palette.background.paper,
-            overflow: "hidden",
-          }}
+          loading={true}
+          onResize={onResize}
+          onCollapse={onCollapse}
+          aria-label="Виджет состояния системы"
         >
-          <CardHeader
-            avatar={
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 2,
-                  background: `linear-gradient(135deg, ${muiTheme.palette.success.main}, ${muiTheme.palette.primary.main})`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <HealthAndSafety sx={{ color: "white", fontSize: 20 }} />
-              </Box>
-            }
-            title={
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, fontSize: "1.1rem" }}
-              >
-                {t("dashboard.systemHealth.title")}
-              </Typography>
-            }
-            action={
-              showRefresh && (
-                <IconButton
-                  size="small"
-                  sx={{
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(muiTheme.palette.divider, 0.1)}`,
-                    "&:hover": {
-                      backgroundColor: alpha(
-                        muiTheme.palette.primary.main,
-                        0.04
-                      ),
-                      borderColor: alpha(muiTheme.palette.primary.main, 0.2),
-                    },
-                  }}
-                >
-                  <Refresh />
-                </IconButton>
-              )
-            }
-            sx={{ pb: 1 }}
-          />
-
-          <CardContent sx={{ pt: 0 }}>
-            <Stack spacing={2}>
-              {Array.from({ length: 4 }).map((_, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    p: 2,
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(
-                      muiTheme.palette.divider,
-                      0.08
-                    )}`,
-                    background: muiTheme.palette.background.paper,
-                  }}
-                >
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Skeleton variant="circular" width={32} height={32} />
-                    <Box sx={{ flex: 1 }}>
-                      <Skeleton variant="text" width="80%" height={20} />
-                      <Skeleton
-                        variant="text"
-                        width="60%"
-                        height={16}
-                        sx={{ mt: 0.5 }}
-                      />
-                    </Box>
-                    <Skeleton variant="rounded" width={60} height={24} />
-                  </Stack>
-                </Box>
-              ))}
-            </Stack>
-          </CardContent>
-        </Card>
+          <Box sx={{ p: 2 }}>
+            <Skeleton variant="text" width="80%" height={24} />
+            <Skeleton variant="rectangular" width="100%" height={60} sx={{ mt: 2 }} />
+            <Skeleton variant="text" width="60%" height={20} sx={{ mt: 1 }} />
+          </Box>
+        </DashboardWidgetWrapper>
       );
     }
 
     // Backup-style error state
-    if (isError) {
+    if (isError || externalError) {
       return (
-        <Card className={className}>
-          <CardContent>
+        <DashboardWidgetWrapper
+          config={systemHealthWidgetConfig}
+          mode={mode}
+          layout={layout}
+          density={density}
+          className={className}
+          error={externalError || (error ? error : undefined)}
+          onResize={onResize}
+          onCollapse={onCollapse}
+          aria-label="Виджет состояния системы"
+        >
+          <Box sx={{ p: 2, textAlign: 'center' }}>
             <Alert
               severity="error"
               action={
                 showRefresh && (
-                  <Tooltip title={t("common.refresh", "Обновить")}>
+                  <Tooltip title={i18n.t("common.refresh", "Обновить")}>
                     <span>
                       <IconButton
                         color="inherit"
@@ -355,13 +396,10 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                 )
               }
             >
-              <Typography variant="body2">
-                {t("system.error", "System health check failed")}:{" "}
-                {error?.message || "Unknown error"}
-              </Typography>
+              {i18n.t("dashboard.systemHealth.error", "Ошибка загрузки состояния системы")}
             </Alert>
-          </CardContent>
-        </Card>
+          </Box>
+        </DashboardWidgetWrapper>
       );
     }
 
@@ -375,22 +413,28 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
       : muiTheme.palette.error.main;
 
     return (
-      <Grow in timeout={600}>
-        <Card
-          className={className}
-          sx={{
-            borderRadius: 3,
-            border: `1px solid ${alpha(muiTheme.palette.divider, 0.08)}`,
-            boxShadow: `0 4px 24px ${alpha(
-              muiTheme.palette.common.black,
-              0.06
-            )}`,
-            background: muiTheme.palette.background.paper,
-            overflow: "hidden",
-          }}
-        >
-          <CardHeader
-            avatar={
+      <DashboardWidgetWrapper
+        config={systemHealthWidgetConfig}
+        mode={mode}
+        layout={layout}
+        density={density}
+        className={className}
+        loading={externalLoading || isLoading}
+        error={externalError || (isError ? error : undefined)}
+        onResize={onResize}
+        onCollapse={onCollapse}
+        aria-label="Виджет состояния системы"
+      >
+          {/* Header */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 2,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box position="relative">
                 <Box
                   sx={{
@@ -432,8 +476,7 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                   }}
                 />
               </Box>
-            }
-            title={
+
               <Box>
                 <Typography
                   variant="h6"
@@ -452,82 +495,81 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                   System Status: {health.status}
                 </Typography>
               </Box>
-            }
-            action={
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Chip
-                  label={health.status}
-                  size="small"
-                  icon={getSystemStatusIcon(
-                    health.status as SystemHealth["status"]
-                  )}
-                  sx={{
-                    background: `linear-gradient(135deg, ${alpha(
-                      getSystemStatusColor(health.status),
-                      0.1
-                    )}, ${alpha(getSystemStatusColor(health.status), 0.05)})`,
-                    border: `1px solid ${alpha(
-                      getSystemStatusColor(health.status),
-                      0.2
-                    )}`,
-                    color: getSystemStatusColor(health.status),
-                    fontWeight: 600,
-                    fontSize: "0.75rem",
-                    height: 28,
-                    "& .MuiChip-icon": {
-                      color: getSystemStatusColor(health.status),
-                      fontSize: 16,
-                    },
-                  }}
-                />
+            </Box>
 
-                {showRefresh && (
-                  <Tooltip title={t("common.refresh", "Обновить")}>
-                    <span>
-                      <IconButton
-                        size="small"
-                        onClick={() => refetch()}
-                        disabled={isFetching}
-                        sx={{
-                          borderRadius: 2,
-                          border: `1px solid ${alpha(
-                            muiTheme.palette.divider,
-                            0.1
-                          )}`,
-                          "&:hover": {
-                            backgroundColor: alpha(
-                              muiTheme.palette.primary.main,
-                              0.04
-                            ),
-                            borderColor: alpha(
-                              muiTheme.palette.primary.main,
-                              0.2
-                            ),
-                          },
-                        }}
-                      >
-                        <Refresh
-                          fontSize="small"
-                          sx={{
-                            ...(isFetching && {
-                              animation: "spin 1s linear infinite",
-                              "@keyframes spin": {
-                                "0%": { transform: "rotate(0deg)" },
-                                "100%": { transform: "rotate(360deg)" },
-                              },
-                            }),
-                          }}
-                        />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip
+                label={health.status}
+                size="small"
+                icon={getSystemStatusIcon(
+                  health.status as SystemHealth["status"]
                 )}
-              </Stack>
-            }
-            sx={{ pb: 1 }}
-          />
+                sx={{
+                  background: `linear-gradient(135deg, ${alpha(
+                    getSystemStatusColor(health.status),
+                    0.1
+                  )}, ${alpha(getSystemStatusColor(health.status), 0.05)})`,
+                  border: `1px solid ${alpha(
+                    getSystemStatusColor(health.status),
+                    0.2
+                  )}`,
+                  color: getSystemStatusColor(health.status),
+                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  height: 28,
+                  "& .MuiChip-icon": {
+                    color: getSystemStatusColor(health.status),
+                    fontSize: 16,
+                  },
+                }}
+              />
 
-          <CardContent sx={{ pt: 0 }}>
+              {showRefresh && (
+                <Tooltip title={t("common.refresh", "Обновить")}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={() => refetch()}
+                      disabled={isFetching}
+                      sx={{
+                        borderRadius: 2,
+                        border: `1px solid ${alpha(
+                          muiTheme.palette.divider,
+                          0.1
+                        )}`,
+                        "&:hover": {
+                          backgroundColor: alpha(
+                            muiTheme.palette.primary.main,
+                            0.04
+                          ),
+                          borderColor: alpha(
+                            muiTheme.palette.primary.main,
+                            0.2
+                          ),
+                        },
+                      }}
+                    >
+                      <Refresh
+                        fontSize="small"
+                        sx={{
+                          ...(isFetching && {
+                            animation: "spin 1s linear infinite",
+                            "@keyframes spin": {
+                              "0%": { transform: "rotate(0deg)" },
+                              "100%": { transform: "rotate(360deg)" },
+                            },
+                          }),
+                        }}
+                      />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
+            </Stack>
+          </Box>
+
+          {/* Content */}
+          <Box>
             {isCompact ? (
               // Compact layout
               <Grid container spacing={2}>
@@ -759,9 +801,8 @@ export const SystemHealthWidget = memo<SystemHealthWidgetProps>(
                 </Grid>
               </Grid>
             </Box>
-          </CardContent>
-        </Card>
-      </Grow>
+          </Box>
+        </DashboardWidgetWrapper>
     );
   }
 );

@@ -1,5 +1,6 @@
 // Release entity types
 export interface Release {
+  releaseDate(releaseDate: any): import("react").ReactNode;
   id: string;
   name: string;
   version: string;

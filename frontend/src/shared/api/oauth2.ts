@@ -4,12 +4,9 @@
  * Использует только access_token и refresh_token (без дублирования)
  */
 
-import { client } from "./client";
 import { authApi } from "@/features/auth/api/authApi";
 import type {
-  LoginRequest,
   LoginResponse,
-  RefreshTokenRequest,
   ChangePasswordRequest,
   ResetPasswordRequest,
   ResetPasswordConfirmRequest,

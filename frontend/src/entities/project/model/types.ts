@@ -1,14 +1,17 @@
+import { ReactNode } from "react";
+
 export interface Project {
+  [x: string]: ReactNode;
   id: string;
   name: string;
   description: string;
   key: string;
   status: ProjectStatus;
   priority: ProjectPriority;
-  startDate: Date;
-  endDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  startDate: string;
+  endDate?: string;
+  createdAt: string;
+  updatedAt: string;
   ownerId: string;
   teamMembers: string[];
   tags: string[];

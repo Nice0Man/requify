@@ -34,12 +34,10 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { useTranslation } from "react-i18next";
 import { useTheme as useThemeMode } from "@/shared/contexts/PerformanceContext";
 import {
   useRenderTracker,
   usePerformanceMeasure,
-  useDebounced,
 } from "@/shared/hooks/usePerformanceOptimizations";
 import {
   Assignment,
@@ -73,8 +71,8 @@ import {
   useKanbanData,
   useKanbanFilters,
   useKanbanDragDrop,
-} from "@/features/kanban-management/model";
-import { useKanbanStore } from "@/features/kanban-management/model/kanbanStore";
+} from "@/features/kanban/model";
+import { useKanbanStore } from "@/features/kanban/model/kanbanStore";
 import i18n from "@/shared/lib/i18n";
 import { TFunction } from "i18next";
 

@@ -1,1 +1,2 @@
-export { ScrollNavigationWidget } from "./ui/ScrollNavigationWidget";
+export * from "./ui";
+export * from "./model";

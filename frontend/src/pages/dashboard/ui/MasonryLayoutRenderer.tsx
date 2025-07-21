@@ -1,9 +1,9 @@
-import React, { memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import { Box, useTheme, alpha, Skeleton, useMediaQuery } from "@mui/material";
 import type {
   DashboardMode,
   DashboardDensity,
-} from "@/widgets/dashboard-container";
+} from "@/shared/types/dashboard";
 import type { DashboardWidget } from "./DashboardLayoutRenderer";
 
 interface MasonryLayoutRendererProps {

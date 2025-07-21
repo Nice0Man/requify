@@ -23,7 +23,7 @@ from .endpoints import (
     dashboard_router,
     teams_router,
 )
- 
+
 # Создаем основной роутер для API v1
 api_router = APIRouter()
 

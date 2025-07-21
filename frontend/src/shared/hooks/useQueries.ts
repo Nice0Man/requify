@@ -1,96 +1,101 @@
-// Project management queries
-export {
+import {
   useProjects,
   useProject,
-  useProjectStats,
   useCreateProject,
   useUpdateProject,
   useDeleteProject,
-  projectQueryKeys,
-} from "@/features/project-management/model/useProjectQuery";
+} from "@/features/projects/model/useProjectQuery";
 
-// Requirement management queries
-export {
+import {
   useRequirements,
   useRequirement,
-  useRequirementStats,
   useCreateRequirement,
   useUpdateRequirement,
   useDeleteRequirement,
-  requirementKeys,
-} from "@/features/requirement-management/model/useRequirementQuery";
+  useRequirementStats,
+} from "@/features/requirements/model/useRequirementQuery";
 
-// Release management queries
-export {
+import {
   useReleases,
   useRelease,
-  useReleaseStats,
   useCreateRelease,
   useUpdateRelease,
   useDeleteRelease,
-  releaseQueryKeys,
-} from "@/features/release-management/model/useReleaseQuery";
+  useReleaseStats,
+} from "@/features/releases/model/useReleaseQuery";
 
-// Test management queries
-export {
+import {
   useTestCases,
   useTestCase,
-  useTestStats,
   useCreateTestCase,
   useUpdateTestCase,
   useDeleteTestCase,
+  useExecuteTestCase,
+  useTestStats,
   useTestSuites,
   useTestSuite,
   useCreateTestSuite,
   useUpdateTestSuite,
   useDeleteTestSuite,
-  testQueryKeys,
-} from "@/features/test-management/model/useTestQuery";
+} from "@/features/testing/model/useTestQuery";
 
-// Dashboard queries
-export {
-  useDashboardStats,
-  useDashboardActivity,
-  dashboardQueryKeys,
-} from "@/features/dashboard/model/useDashboardQuery";
-
-// Auth queries
-export {
-  useCurrentUser,
-  useLogin,
-  useLogout, 
-  useRegister,
-  useRefreshTokens,
-  useUserSessions,
-  useRevokeSessions,
-  useAuthStatus,
-  useForgotPassword,
-  useResetPassword,
-  authKeys,
-} from "@/features/auth/model/useAuthQuery";
-
-// Auth mutations (aliases for backward compatibility)
-export { useLogin as useLoginMutation } from "@/features/auth/model/useAuthQuery";
-export { useLogout as useLogoutMutation } from "@/features/auth/model/useAuthQuery";
-export { useRegister as useRegisterMutation } from "@/features/auth/model/useAuthQuery";
-export { useForgotPassword as useForgotPasswordMutation } from "@/features/auth/model/useAuthQuery";
-export { useResetPassword as useResetPasswordMutation } from "@/features/auth/model/useAuthQuery";
-
-// Auth keys alias
-export { authKeys as authQueryKeys } from "@/features/auth/model/useAuthQuery";
-
-// Notification queries
-export {
+import {
   useNotifications,
   useNotification,
+  useCreateNotification,
+  useDeleteNotification,
   useMarkAsRead,
   useMarkAllAsRead,
-  useDeleteNotification,
-  useArchiveNotification,
-  useNotificationPreferences,
-  useUpdateNotificationPreferences,
-  notificationQueryKeys,
-} from "@/features/notification-management/model/useNotificationQuery";
+  useNotificationStats,
+  useUnreadCount,
+} from "@/features/notifications/model/useNotificationQuery";
 
-// Query client utilities
-export { useQueryClient } from "@tanstack/react-query";
+// Re-export all hooks for centralized access
+export {
+  // Projects
+  useProjects,
+  useProject,
+  useCreateProject,
+  useUpdateProject,
+  useDeleteProject,
+  
+  // Requirements
+  useRequirements,
+  useRequirement,
+  useCreateRequirement,
+  useUpdateRequirement,
+  useDeleteRequirement,
+  useRequirementStats,
+  
+  // Releases
+  useReleases,
+  useRelease,
+  useCreateRelease,
+  useUpdateRelease,
+  useDeleteRelease,
+  useReleaseStats,
+  
+  // Testing
+  useTestCases,
+  useTestCase,
+  useCreateTestCase,
+  useUpdateTestCase,
+  useDeleteTestCase,
+  useExecuteTestCase,
+  useTestStats,
+  useTestSuites,
+  useTestSuite,
+  useCreateTestSuite,
+  useUpdateTestSuite,
+  useDeleteTestSuite,
+  
+  // Notifications
+  useNotifications,
+  useNotification,
+  useCreateNotification,
+  useDeleteNotification,
+  useMarkAsRead,
+  useMarkAllAsRead,
+  useNotificationStats,
+  useUnreadCount,
+};

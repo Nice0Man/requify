@@ -33,13 +33,10 @@ import {
   useReleases,
   useReleaseStats,
   useUpdateRelease,
-} from "../../../features/release-management";
+} from "@/features/releases";
 import { LoadingSpinner } from "../../../shared/ui";
-import { DashboardLayout } from "@/widgets/layout";
-import type {
-  Release,
-  ReleaseFilters,
-} from "../../../features/release-management/api/releaseApi";
+import { DashboardLayout } from "@/widgets/layout/ui";
+import type { Release, ReleaseFilters } from "@/entities/release/model/types";
 
 const ReleasesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -85,8 +82,6 @@ const ReleasesPage: React.FC = () => {
 
   const getStatusColor = (status: Release["status"]) => {
     switch (status) {
-      case "draft":
-        return "default";
       case "planned":
         return "info";
       case "in_progress":
@@ -180,7 +175,7 @@ const ReleasesPage: React.FC = () => {
               {t("releases.fields.releaseDate")}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {formatDate(release.releaseDate)}
+              {formatDate(release.releaseDate.toString())}
             </Typography>
           </Box>
           <Box>
@@ -428,7 +423,7 @@ const ReleasesPage: React.FC = () => {
             </Paper>
           ) : (
             <Grid container spacing={3}>
-              {filteredReleases.map((release) => (
+              {filteredReleases.map((release: Release) => (
                 <Grid item xs={12} md={6} lg={4} key={release.id}>
                   <ReleaseCard release={release} />
                 </Grid>

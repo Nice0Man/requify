@@ -26,8 +26,8 @@ import {
   MoreVert,
   KeyboardArrowRight,
 } from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
-import type { DashboardMode, DashboardDensity } from "@/widgets/dashboard-container";
+import i18n from "@/shared/lib/i18n";
+import type { DashboardMode, DashboardDensity } from "@/shared/types/dashboard";
 import { useDashboardSizing, useCardSizing } from "@/shared/hooks";
 
 // Types
@@ -85,23 +85,25 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
     maxHeight,
     overflow = "visible",
   }) => {
-    const { t } = useTranslation();
+    const { t } = i18n;
     const theme = useTheme();
-    
+
     // New adaptive sizing system
-    const sizing = useDashboardSizing({ 
-      mode, 
-      density, 
-      layout, 
-      masonry, 
-      flexible 
+    const sizing = useDashboardSizing({
+      mode,
+      density,
+      layout,
+      masonry,
+      flexible,
     });
-    
+
     const cardSizing = useCardSizing(mode, density, masonry);
 
     // State
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [selectedCategory, setSelectedCategory] = useState<ActionCategory | "all">("all");
+    const [selectedCategory, setSelectedCategory] = useState<
+      ActionCategory | "all"
+    >("all");
 
     const isCompact = variant === "minimal" || mode === "minimal";
 
@@ -111,7 +113,10 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
         {
           id: "create-project",
           title: t("quickActions.createProject", "Create Project"),
-          description: t("quickActions.createProjectDesc", "Start a new project"),
+          description: t(
+            "quickActions.createProjectDesc",
+            "Start a new project"
+          ),
           icon: <Add />,
           category: ActionCategory.CREATE,
           shortcut: "Ctrl+N",
@@ -122,7 +127,10 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
         {
           id: "create-requirement",
           title: t("quickActions.createRequirement", "New Requirement"),
-          description: t("quickActions.createRequirementDesc", "Add requirement"),
+          description: t(
+            "quickActions.createRequirementDesc",
+            "Add requirement"
+          ),
           icon: <Assignment />,
           category: ActionCategory.CREATE,
           shortcut: "Ctrl+R",
@@ -143,7 +151,10 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
         {
           id: "view-analytics",
           title: t("quickActions.viewAnalytics", "Analytics"),
-          description: t("quickActions.viewAnalyticsDesc", "View project analytics"),
+          description: t(
+            "quickActions.viewAnalyticsDesc",
+            "View project analytics"
+          ),
           icon: <Analytics />,
           category: ActionCategory.ANALYZE,
           onClick: () => console.log("View analytics"),
@@ -173,7 +184,10 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
         {
           id: "quick-deploy",
           title: t("quickActions.quickDeploy", "Quick Deploy"),
-          description: t("quickActions.quickDeployDesc", "Deploy latest changes"),
+          description: t(
+            "quickActions.quickDeployDesc",
+            "Deploy latest changes"
+          ),
           icon: <RocketLaunch />,
           category: ActionCategory.MANAGE,
           shortcut: "Ctrl+D",
@@ -188,11 +202,13 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
     // Filter actions based on category and maxActions
     const filteredActions = useMemo(() => {
       let filtered = quickActions;
-      
+
       if (selectedCategory !== "all") {
-        filtered = filtered.filter(action => action.category === selectedCategory);
+        filtered = filtered.filter(
+          (action) => action.category === selectedCategory
+        );
       }
-      
+
       return filtered.slice(0, maxActions);
     }, [quickActions, selectedCategory, maxActions]);
 
@@ -213,10 +229,13 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
     };
 
     // Handle action click
-    const handleActionClick = useCallback((action: QuickAction) => {
-      action.onClick();
-      onActionClick?.(action);
-    }, [onActionClick]);
+    const handleActionClick = useCallback(
+      (action: QuickAction) => {
+        action.onClick();
+        onActionClick?.(action);
+      },
+      [onActionClick]
+    );
 
     // Handle menu
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -232,23 +251,23 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
       if (layout === "list") {
         return { xs: 12 }; // Full width for list
       }
-      
+
       // Use sizing system for responsive grid
       const { columns } = sizing.gridConfig;
-      
+
       // Improved responsive grid based on dashboard mode and screen size
       if (mode === "minimal") {
         return { xs: 12, sm: 6, md: 6, lg: 4, xl: 4 };
       }
-      
+
       if (mode === "compact") {
         return { xs: 12, sm: 6, md: 4, lg: 4, xl: 3 };
       }
-      
+
       if (mode === "fullscreen") {
         return { xs: 12, sm: 6, md: 4, lg: 3, xl: 2 };
       }
-      
+
       // Detailed mode - adaptive based on screen size and available columns
       if (columns >= 6) {
         return { xs: 12, sm: 6, md: 4, lg: 3, xl: 2 };
@@ -264,7 +283,10 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
     const gridConfig = getGridConfig();
 
     // Action Card component with new sizing
-    const ActionCard: React.FC<{ action: QuickAction; index: number }> = ({ action, index }) => {
+    const ActionCard: React.FC<{ action: QuickAction; index: number }> = ({
+      action,
+      index,
+    }) => {
       const actionColor = action.color || getCategoryColor(action.category);
 
       return (
@@ -277,18 +299,32 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
             boxShadow: cardSizing.elevation,
             background: theme.palette.background.paper,
             height: "100%",
-            minHeight: mode === "minimal" ? 120 : mode === "compact" ? 140 : cardSizing.minHeight,
-            maxHeight: maxHeight || (mode === "minimal" ? 180 : mode === "compact" ? 220 : 280),
+            minHeight:
+              mode === "minimal"
+                ? 120
+                : mode === "compact"
+                ? 140
+                : cardSizing.minHeight,
+            maxHeight:
+              maxHeight ||
+              (mode === "minimal" ? 180 : mode === "compact" ? 220 : 280),
             overflow: overflow,
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             opacity: action.disabled ? 0.6 : 1,
-            "&:hover": action.disabled ? {} : {
-              transform: mode === "fullscreen" ? "none" : "translateY(-2px)",
-              boxShadow: mode === "minimal" 
-                ? `0 4px 16px ${alpha(theme.palette.common.black, 0.08)}`
-                : `0 8px 32px ${alpha(theme.palette.common.black, 0.12)}`,
-              borderColor: alpha(actionColor, mode === "minimal" ? 0.15 : 0.2),
-            },
+            "&:hover": action.disabled
+              ? {}
+              : {
+                  transform:
+                    mode === "fullscreen" ? "none" : "translateY(-2px)",
+                  boxShadow:
+                    mode === "minimal"
+                      ? `0 4px 16px ${alpha(theme.palette.common.black, 0.08)}`
+                      : `0 8px 32px ${alpha(theme.palette.common.black, 0.12)}`,
+                  borderColor: alpha(
+                    actionColor,
+                    mode === "minimal" ? 0.15 : 0.2
+                  ),
+                },
           }}
         >
           <CardContent
@@ -298,8 +334,8 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                 sm: mode === "minimal" ? 2 : cardSizing.padding.sm,
                 md: mode === "minimal" ? 2.5 : cardSizing.padding.md,
               },
-              "&:last-child": { 
-                pb: mode === "minimal" ? 1.5 : cardSizing.padding.sm 
+              "&:last-child": {
+                pb: mode === "minimal" ? 1.5 : cardSizing.padding.sm,
               },
               height: "100%",
               display: "flex",
@@ -308,13 +344,30 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
           >
             <Stack spacing={2} sx={{ height: "100%" }}>
               {/* Header */}
-              <Box display="flex" alignItems="center" justifyContent="space-between">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Box
                   sx={{
-                    width: (mode === "minimal" ? 32 : mode === "compact" ? 36 : cardSizing.iconSize + 16),
-                    height: (mode === "minimal" ? 32 : mode === "compact" ? 36 : cardSizing.iconSize + 16),
+                    width:
+                      mode === "minimal"
+                        ? 32
+                        : mode === "compact"
+                        ? 36
+                        : cardSizing.iconSize + 16,
+                    height:
+                      mode === "minimal"
+                        ? 32
+                        : mode === "compact"
+                        ? 36
+                        : cardSizing.iconSize + 16,
                     borderRadius: cardSizing.borderRadius,
-                    background: `linear-gradient(135deg, ${alpha(actionColor, 0.1)}, ${alpha(actionColor, 0.05)})`,
+                    background: `linear-gradient(135deg, ${alpha(
+                      actionColor,
+                      0.1
+                    )}, ${alpha(actionColor, 0.05)})`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -322,13 +375,18 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                   }}
                 >
                   {React.cloneElement(action.icon, {
-                    sx: { 
-                      color: actionColor, 
-                      fontSize: mode === "minimal" ? 18 : mode === "compact" ? 20 : cardSizing.iconSize 
+                    sx: {
+                      color: actionColor,
+                      fontSize:
+                        mode === "minimal"
+                          ? 18
+                          : mode === "compact"
+                          ? 20
+                          : cardSizing.iconSize,
                     },
                   })}
                 </Box>
-                
+
                 {/* Badge or Category */}
                 {action.badge ? (
                   <Chip
@@ -389,9 +447,9 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
               </Typography>
 
               {/* Footer */}
-              <Box 
-                display="flex" 
-                alignItems="center" 
+              <Box
+                display="flex"
+                alignItems="center"
                 justifyContent="space-between"
                 sx={{ mt: "auto" }}
               >
@@ -409,7 +467,7 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                     }}
                   />
                 )}
-                
+
                 {/* Arrow indicator */}
                 <KeyboardArrowRight
                   sx={{
@@ -485,7 +543,10 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                     color: theme.palette.text.secondary,
                   }}
                 >
-                  {t("dashboard.quickActions.subtitle", "Frequently used functions")}
+                  {t(
+                    "dashboard.quickActions.subtitle",
+                    "Frequently used functions"
+                  )}
                 </Typography>
               </Stack>
 
@@ -518,10 +579,14 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
                       key={category}
                       label={category}
                       onClick={() => setSelectedCategory(category)}
-                      variant={selectedCategory === category ? "filled" : "outlined"}
-                      color={selectedCategory === category ? "primary" : "default"}
+                      variant={
+                        selectedCategory === category ? "filled" : "outlined"
+                      }
+                      color={
+                        selectedCategory === category ? "primary" : "default"
+                      }
                       size="small"
-                      sx={{ 
+                      sx={{
                         textTransform: "capitalize",
                         fontSize: sizing.typography.caption,
                       }}
@@ -534,12 +599,18 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
             {/* Actions Grid */}
             <Box>
               {filteredActions.length === 0 ? (
-                <Alert severity="info" sx={{ borderRadius: sizing.borderRadius.small }}>
-                  {t("quickActions.noActions", "No actions available for the selected category.")}
+                <Alert
+                  severity="info"
+                  sx={{ borderRadius: sizing.borderRadius.small }}
+                >
+                  {t(
+                    "quickActions.noActions",
+                    "No actions available for the selected category."
+                  )}
                 </Alert>
               ) : (
-                <Grid 
-                  container 
+                <Grid
+                  container
                   spacing={{
                     xs: sizing.spacing.xs,
                     sm: sizing.spacing.sm,
@@ -562,8 +633,8 @@ export const QuickActionsWidget = memo<QuickActionsWidgetProps>(
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
           <MenuItem onClick={handleMenuClose}>
             <Settings sx={{ mr: 2 }} />

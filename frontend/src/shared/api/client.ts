@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // Создаем экземпляр axios с базовой конфигурацией
 export const client: AxiosInstance = axios.create({

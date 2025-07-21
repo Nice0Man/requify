@@ -13,3 +13,9 @@ export {
   useChartSizing 
 } from "./useDashboardSizing";
 export type { DashboardSizes, DashboardSizingConfig } from "./useDashboardSizing";
+
+// Dashboard widget hooks
+export { 
+  useDashboardWidgetSettings,
+  type ComputedWidgetSettings
+} from "./useDashboardWidgetSettings";

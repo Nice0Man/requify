@@ -109,7 +109,7 @@ const useProjectStats = (filters: ProjectFilters, period: string = "month") => {
       const filtersWithPeriod = { ...filters, period } as ProjectFilters & {
         period: string;
       };
-      return projectApi.getProjectsStats(filtersWithPeriod);
+      return projectApi.getProjectStats(String(filtersWithPeriod));
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes

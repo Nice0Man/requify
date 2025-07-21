@@ -1,4 +1,4 @@
-import React, { memo, useRef, useEffect, useState } from 'react';
+import { memo, useRef, useEffect, useState } from "react";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -10,13 +10,13 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
-} from 'recharts';
-import { useTheme, alpha, Box, CircularProgress, Alert } from '@mui/material';
-import type { LineChartProps } from '../model/types';
+} from "recharts";
+import { useTheme, alpha, Box, CircularProgress, Alert } from "@mui/material";
+import type { LineChartProps } from "../model/types";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   const theme = useTheme();
-  
+
   if (active && payload && payload.length) {
     return (
       <Box
@@ -30,23 +30,25 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
-        <Box sx={{ 
-          fontWeight: 600, 
-          marginBottom: 1.5, 
-          color: theme.palette.text.primary,
-          fontSize: '0.875rem'
-        }}>
+        <Box
+          sx={{
+            fontWeight: 600,
+            marginBottom: 1.5,
+            color: theme.palette.text.primary,
+            fontSize: "0.875rem",
+          }}
+        >
           {label}
         </Box>
         {payload.map((entry: any, index: number) => (
           <Box
             key={index}
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               gap: 1.5,
               color: entry.color,
-              fontSize: '0.875rem',
+              fontSize: "0.875rem",
               fontWeight: 500,
               mb: index < payload.length - 1 ? 0.5 : 0,
             }}
@@ -60,7 +62,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 boxShadow: `0 2px 4px ${alpha(entry.color, 0.3)}`,
               }}
             />
-            <span>{entry.name}: {entry.value?.toLocaleString?.() || entry.value}</span>
+            <span>
+              {entry.name}: {entry.value?.toLocaleString?.() || entry.value}
+            </span>
           </Box>
         ))}
       </Box>
@@ -69,323 +73,343 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export const LineChart = memo<LineChartProps>(({
-  data,
-  height = 320,
-  width,
-  loading = false,
-  error = null,
-  className,
-  showPoints = true,
-  showGrid = true,
-  smooth = false,
-  area = false,
-  onPointClick,
-  config,
-  // New responsive props
-  responsive = true,
-  minHeight = 200,
-  maxHeight = 600,
-  aspectRatio = 16 / 9,
-  debounceMs = 150,
-}) => {
-  const theme = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+export const LineChart = memo<LineChartProps>(
+  ({
+    data,
+    height = 320,
+    width,
+    loading = false,
+    error = null,
+    className,
+    showPoints = true,
+    showGrid = true,
+    smooth = false,
+    area = false,
+    onPointClick,
+    config,
+    // New responsive props
+    responsive = true,
+    minHeight = 200,
+    maxHeight = 600,
+    aspectRatio = 16 / 9,
+    debounceMs = 150,
+  }) => {
+    const theme = useTheme();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-  // Responsive values based on screen size and container
-  const getResponsiveValues = () => {
-    const isSmall = containerSize.width < 600;
-    const isMedium = containerSize.width < 960;
-    
-    return {
-      margin: {
-        top: isSmall ? 10 : 20,
-        right: isSmall ? 15 : 30,
-        left: isSmall ? 10 : 20,
-        bottom: isSmall ? 10 : 20,
-      },
-      fontSize: isSmall ? 11 : isMedium ? 12 : 13,
-      axisHeight: isSmall ? 50 : 60,
-      axisWidth: isSmall ? 50 : 60,
-      strokeWidth: isSmall ? 2 : 3,
-      dotRadius: isSmall ? 3 : 5,
-      activeDotRadius: isSmall ? 5 : 7,
+    // Responsive values based on screen size and container
+    const getResponsiveValues = () => {
+      const isSmall = containerSize.width < 600;
+      const isMedium = containerSize.width < 960;
+
+      return {
+        margin: {
+          top: isSmall ? 10 : 20,
+          right: isSmall ? 15 : 30,
+          left: isSmall ? 10 : 20,
+          bottom: isSmall ? 10 : 20,
+        },
+        fontSize: isSmall ? 11 : isMedium ? 12 : 13,
+        axisHeight: isSmall ? 50 : 60,
+        axisWidth: isSmall ? 50 : 60,
+        strokeWidth: isSmall ? 2 : 3,
+        dotRadius: isSmall ? 3 : 5,
+        activeDotRadius: isSmall ? 5 : 7,
+      };
     };
-  };
 
-  const responsiveValues = getResponsiveValues();
+    const responsiveValues = getResponsiveValues();
 
-  // Debounced resize observer
-  useEffect(() => {
-    if (!responsive || !containerRef.current) return;
+    // Debounced resize observer
+    useEffect(() => {
+      if (!responsive || !containerRef.current) return;
 
-    let timeoutId: NodeJS.Timeout;
-    
-    const resizeObserver = new ResizeObserver((entries) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        for (const entry of entries) {
-          const { width, height: observedHeight } = entry.contentRect;
-          
-          // Calculate adaptive height based on container width and aspect ratio
-          let adaptiveHeight = responsive 
-            ? Math.max(minHeight, Math.min(maxHeight, width / aspectRatio))
-            : height;
-            
-          setContainerSize({ 
-            width, 
-            height: adaptiveHeight 
-          });
-        }
-      }, debounceMs);
-    });
+      let timeoutId: NodeJS.Timeout;
 
-    resizeObserver.observe(containerRef.current);
+      const resizeObserver = new ResizeObserver((entries) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          for (const entry of entries) {
+            const { width } = entry.contentRect;
 
-    return () => {
-      clearTimeout(timeoutId);
-      resizeObserver.disconnect();
-    };
-  }, [responsive, minHeight, maxHeight, aspectRatio, height, debounceMs]);
+            // Calculate adaptive height based on container width and aspect ratio
+            let adaptiveHeight = responsive
+              ? Math.max(minHeight, Math.min(maxHeight, width / aspectRatio))
+              : height;
 
-  // Transform data for Recharts format
-  const chartData = data.map((point, _index) => ({
-    name: point.label || new Date(point.date).toLocaleDateString('ru-RU', { 
-      month: 'short', 
-      day: 'numeric' 
-    }),
-    category: point.category,
-    ...point,
-  }));
+            setContainerSize({
+              width,
+              height: adaptiveHeight,
+            });
+          }
+        }, debounceMs);
+      });
 
-  // Context7 color palette with gradients
-  const chartColors = config?.theme?.colors?.primary || [
-    theme.palette.primary.main,
-    theme.palette.secondary.main,
-    theme.palette.success.main,
-    theme.palette.info.main,
-    theme.palette.warning.main,
-    theme.palette.error.main,
-  ];
+      resizeObserver.observe(containerRef.current);
 
-  const finalHeight = responsive ? containerSize.height || height : height;
+      return () => {
+        clearTimeout(timeoutId);
+        resizeObserver.disconnect();
+      };
+    }, [responsive, minHeight, maxHeight, aspectRatio, height, debounceMs]);
 
-  if (loading) {
+    // Transform data for Recharts format
+    const chartData = data.map((point, _index) => ({
+      name:
+        point.label ||
+        new Date(point.date).toLocaleDateString("ru-RU", {
+          month: "short",
+          day: "numeric",
+        }),
+      category: point.category,
+      ...point,
+    }));
+
+    // Context7 color palette with gradients
+    const chartColors = config?.theme?.colors?.primary || [
+      theme.palette.primary.main,
+      theme.palette.secondary.main,
+      theme.palette.success.main,
+      theme.palette.info.main,
+      theme.palette.warning.main,
+      theme.palette.error.main,
+    ];
+
+    const finalHeight = responsive ? containerSize.height || height : height;
+
+    if (loading) {
+      return (
+        <Box
+          ref={containerRef}
+          className={className}
+          sx={{
+            height: finalHeight,
+            width: width || "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: alpha(theme.palette.primary.main, 0.02),
+            borderRadius: 2,
+          }}
+        >
+          <CircularProgress
+            size={40}
+            thickness={4}
+            sx={{
+              color: theme.palette.primary.main,
+            }}
+          />
+        </Box>
+      );
+    }
+
+    if (error) {
+      return (
+        <Box
+          ref={containerRef}
+          className={className}
+          sx={{ height: finalHeight, width: width || "100%" }}
+        >
+          <Alert
+            severity="error"
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
+            }}
+          >
+            {error}
+          </Alert>
+        </Box>
+      );
+    }
+
+    const ChartComponent = area ? AreaChart : RechartsLineChart;
+    const primaryColor = chartColors[0];
+
     return (
       <Box
         ref={containerRef}
         className={className}
         sx={{
           height: finalHeight,
-          width: width || '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: alpha(theme.palette.primary.main, 0.02),
-          borderRadius: 2,
+          width: width || "100%",
+          overflow: "hidden",
+          "& .recharts-cartesian-grid-horizontal line": {
+            stroke: alpha(theme.palette.divider, 0.08),
+          },
+          "& .recharts-cartesian-grid-vertical line": {
+            stroke: alpha(theme.palette.divider, 0.08),
+          },
+          "& .recharts-line": {
+            filter: `drop-shadow(0 2px 4px ${alpha(
+              theme.palette.common.black,
+              0.1
+            )})`,
+          },
+          "& .recharts-area": {
+            filter: `drop-shadow(0 2px 4px ${alpha(
+              theme.palette.common.black,
+              0.1
+            )})`,
+          },
+          "& .recharts-tooltip-wrapper": {
+            zIndex: 1000,
+          },
+          "& .recharts-wrapper": {
+            width: "100% !important",
+            height: "100% !important",
+          },
         }}
       >
-        <CircularProgress 
-          size={40} 
-          thickness={4}
-          sx={{ 
-            color: theme.palette.primary.main,
-          }}
-        />
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minHeight={minHeight}
+          maxHeight={responsive ? maxHeight : undefined}
+        >
+          <ChartComponent data={chartData} margin={responsiveValues.margin}>
+            {showGrid && (
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={alpha(theme.palette.divider, 0.1)}
+                vertical={false}
+              />
+            )}
+            <XAxis
+              dataKey="name"
+              tick={{
+                fill: theme.palette.text.secondary,
+                fontSize: responsiveValues.fontSize,
+                fontWeight: 500,
+                fontFamily: theme.typography.fontFamily,
+              }}
+              axisLine={{
+                stroke: alpha(theme.palette.divider, 0.2),
+                strokeWidth: 1,
+              }}
+              tickLine={{
+                stroke: alpha(theme.palette.divider, 0.2),
+                strokeWidth: 1,
+              }}
+              tickMargin={12}
+              height={responsiveValues.axisHeight}
+            />
+            <YAxis
+              tick={{
+                fill: theme.palette.text.secondary,
+                fontSize: responsiveValues.fontSize,
+                fontWeight: 500,
+                fontFamily: theme.typography.fontFamily,
+              }}
+              axisLine={{
+                stroke: alpha(theme.palette.divider, 0.2),
+                strokeWidth: 1,
+              }}
+              tickLine={{
+                stroke: alpha(theme.palette.divider, 0.2),
+                strokeWidth: 1,
+              }}
+              tickMargin={12}
+              width={responsiveValues.axisWidth}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+              wrapperStyle={{
+                paddingTop: "16px",
+                fontSize: `${responsiveValues.fontSize}px`,
+                fontWeight: 500,
+                fontFamily: theme.typography.fontFamily,
+                color: theme.palette.text.secondary,
+              }}
+            />
+
+            {area ? (
+              <Area
+                type={smooth ? "monotone" : "linear"}
+                dataKey="value"
+                stroke={primaryColor}
+                fill={`url(#gradient-${primaryColor.replace("#", "")})`}
+                strokeWidth={responsiveValues.strokeWidth}
+                dot={
+                  showPoints
+                    ? {
+                        fill: theme.palette.background.paper,
+                        stroke: primaryColor,
+                        strokeWidth: responsiveValues.strokeWidth,
+                        r: responsiveValues.dotRadius,
+                        filter: `drop-shadow(0 2px 4px ${alpha(
+                          primaryColor,
+                          0.3
+                        )})`,
+                      }
+                    : false
+                }
+                activeDot={{
+                  r: responsiveValues.activeDotRadius,
+                  stroke: primaryColor,
+                  strokeWidth: responsiveValues.strokeWidth,
+                  fill: theme.palette.background.paper,
+                  filter: `drop-shadow(0 4px 8px ${alpha(primaryColor, 0.4)})`,
+                }}
+                onClick={onPointClick as any}
+              />
+            ) : (
+              <Line
+                type={smooth ? "monotone" : "linear"}
+                dataKey="value"
+                stroke={primaryColor}
+                strokeWidth={responsiveValues.strokeWidth}
+                dot={
+                  showPoints
+                    ? {
+                        fill: theme.palette.background.paper,
+                        stroke: primaryColor,
+                        strokeWidth: responsiveValues.strokeWidth,
+                        r: responsiveValues.dotRadius,
+                        filter: `drop-shadow(0 2px 4px ${alpha(
+                          primaryColor,
+                          0.3
+                        )})`,
+                      }
+                    : false
+                }
+                activeDot={{
+                  r: responsiveValues.activeDotRadius,
+                  stroke: primaryColor,
+                  strokeWidth: responsiveValues.strokeWidth,
+                  fill: theme.palette.background.paper,
+                  filter: `drop-shadow(0 4px 8px ${alpha(primaryColor, 0.4)})`,
+                }}
+                onClick={onPointClick as any}
+              />
+            )}
+
+            {/* Gradient definitions */}
+            <defs>
+              <linearGradient
+                id={`gradient-${primaryColor.replace("#", "")}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="0%" stopColor={primaryColor} stopOpacity={0.2} />
+                <stop
+                  offset="100%"
+                  stopColor={primaryColor}
+                  stopOpacity={0.02}
+                />
+              </linearGradient>
+            </defs>
+          </ChartComponent>
+        </ResponsiveContainer>
       </Box>
     );
   }
+);
 
-  if (error) {
-    return (
-      <Box 
-        ref={containerRef}
-        className={className} 
-        sx={{ height: finalHeight, width: width || '100%' }}
-      >
-        <Alert 
-          severity="error" 
-          sx={{ 
-            height: '100%', 
-            display: 'flex', 
-            alignItems: 'center',
-            borderRadius: 2,
-            border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-          }}
-        >
-          {error}
-        </Alert>
-      </Box>
-    );
-  }
-
-  const ChartComponent = area ? AreaChart : RechartsLineChart;
-  const primaryColor = chartColors[0];
-
-  return (
-    <Box 
-      ref={containerRef}
-      className={className} 
-      sx={{ 
-        height: finalHeight, 
-        width: width || '100%',
-        overflow: "hidden",
-        '& .recharts-cartesian-grid-horizontal line': {
-          stroke: alpha(theme.palette.divider, 0.08),
-        },
-        '& .recharts-cartesian-grid-vertical line': {
-          stroke: alpha(theme.palette.divider, 0.08),
-        },
-        '& .recharts-line': {
-          filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.common.black, 0.1)})`,
-        },
-        '& .recharts-area': {
-          filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.common.black, 0.1)})`,
-        },
-        '& .recharts-tooltip-wrapper': {
-          zIndex: 1000,
-        },
-        '& .recharts-wrapper': {
-          width: "100% !important",
-          height: "100% !important",
-        },
-      }}
-    >
-      <ResponsiveContainer 
-        width="100%" 
-        height="100%"
-        minHeight={minHeight}
-        maxHeight={responsive ? maxHeight : undefined}
-      >
-        <ChartComponent
-          data={chartData}
-          margin={responsiveValues.margin}
-        >
-          {showGrid && (
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke={alpha(theme.palette.divider, 0.1)}
-              vertical={false}
-            />
-          )}
-          <XAxis
-            dataKey="name"
-            tick={{ 
-              fill: theme.palette.text.secondary, 
-              fontSize: responsiveValues.fontSize,
-              fontWeight: 500,
-              fontFamily: theme.typography.fontFamily,
-            }}
-            axisLine={{
-              stroke: alpha(theme.palette.divider, 0.2),
-              strokeWidth: 1,
-            }}
-            tickLine={{
-              stroke: alpha(theme.palette.divider, 0.2),
-              strokeWidth: 1,
-            }}
-            tickMargin={12}
-            height={responsiveValues.axisHeight}
-          />
-          <YAxis
-            tick={{ 
-              fill: theme.palette.text.secondary, 
-              fontSize: responsiveValues.fontSize,
-              fontWeight: 500,
-              fontFamily: theme.typography.fontFamily,
-            }}
-            axisLine={{
-              stroke: alpha(theme.palette.divider, 0.2),
-              strokeWidth: 1,
-            }}
-            tickLine={{
-              stroke: alpha(theme.palette.divider, 0.2),
-              strokeWidth: 1,
-            }}
-            tickMargin={12}
-            width={responsiveValues.axisWidth}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend 
-            wrapperStyle={{
-              paddingTop: '16px',
-              fontSize: `${responsiveValues.fontSize}px`,
-              fontWeight: 500,
-              fontFamily: theme.typography.fontFamily,
-              color: theme.palette.text.secondary,
-            }}
-          />
-          
-          {area ? (
-            <Area
-              type={smooth ? "monotone" : "linear"}
-              dataKey="value"
-              stroke={primaryColor}
-              fill={`url(#gradient-${primaryColor.replace('#', '')})`}
-              strokeWidth={responsiveValues.strokeWidth}
-              dot={showPoints ? { 
-                fill: theme.palette.background.paper, 
-                stroke: primaryColor,
-                strokeWidth: responsiveValues.strokeWidth, 
-                r: responsiveValues.dotRadius,
-                filter: `drop-shadow(0 2px 4px ${alpha(primaryColor, 0.3)})`,
-              } : false}
-              activeDot={{ 
-                r: responsiveValues.activeDotRadius, 
-                stroke: primaryColor, 
-                strokeWidth: responsiveValues.strokeWidth, 
-                fill: theme.palette.background.paper,
-                filter: `drop-shadow(0 4px 8px ${alpha(primaryColor, 0.4)})`,
-              }}
-              onClick={onPointClick as any}
-            />
-          ) : (
-            <Line
-              type={smooth ? "monotone" : "linear"}
-              dataKey="value"
-              stroke={primaryColor}
-              strokeWidth={responsiveValues.strokeWidth}
-              dot={showPoints ? { 
-                fill: theme.palette.background.paper, 
-                stroke: primaryColor,
-                strokeWidth: responsiveValues.strokeWidth, 
-                r: responsiveValues.dotRadius,
-                filter: `drop-shadow(0 2px 4px ${alpha(primaryColor, 0.3)})`,
-              } : false}
-              activeDot={{ 
-                r: responsiveValues.activeDotRadius, 
-                stroke: primaryColor, 
-                strokeWidth: responsiveValues.strokeWidth, 
-                fill: theme.palette.background.paper,
-                filter: `drop-shadow(0 4px 8px ${alpha(primaryColor, 0.4)})`,
-              }}
-              onClick={onPointClick as any}
-            />
-          )}
-          
-          {/* Gradient definitions */}
-          <defs>
-            <linearGradient 
-              id={`gradient-${primaryColor.replace('#', '')}`} 
-              x1="0" y1="0" x2="0" y2="1"
-            >
-              <stop 
-                offset="0%" 
-                stopColor={primaryColor} 
-                stopOpacity={0.2}
-              />
-              <stop 
-                offset="100%" 
-                stopColor={primaryColor} 
-                stopOpacity={0.02}
-              />
-            </linearGradient>
-          </defs>
-        </ChartComponent>
-      </ResponsiveContainer>
-    </Box>
-  );
-});
-
-LineChart.displayName = 'LineChart'; 
+LineChart.displayName = "LineChart";

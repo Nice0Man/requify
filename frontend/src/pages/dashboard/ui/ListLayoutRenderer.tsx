@@ -1,9 +1,14 @@
 import React, { memo, useMemo } from "react";
-import { Box, Stack, useTheme, alpha, Skeleton, Divider, useMediaQuery } from "@mui/material";
-import type {
-  DashboardMode,
-  DashboardDensity,
-} from "@/widgets/dashboard-container";
+import {
+  Box,
+  Stack,
+  useTheme,
+  alpha,
+  Skeleton,
+  Divider,
+  useMediaQuery,
+} from "@mui/material";
+import type { DashboardMode, DashboardDensity } from "@/shared/types/dashboard";
 import type { DashboardWidget } from "./DashboardLayoutRenderer";
 
 interface ListLayoutRendererProps {
@@ -24,8 +29,12 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
     const theme = useTheme();
 
     // Detect ultrawide screens (21:9 aspect ratio or wider)
-    const isUltrawide = useMediaQuery('(min-aspect-ratio: 21/9) and (min-width: 2560px)');
-    const isWidescreen = useMediaQuery('(min-aspect-ratio: 16/9) and (min-width: 1920px)');
+    const isUltrawide = useMediaQuery(
+      "(min-aspect-ratio: 21/9) and (min-width: 2560px)"
+    );
+    const isWidescreen = useMediaQuery(
+      "(min-aspect-ratio: 16/9) and (min-width: 1920px)"
+    );
 
     // Sort widgets by priority for optimal ordering
     const sortedWidgets = useMemo(() => {
@@ -91,7 +100,8 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
 
     // Loading skeleton for list layout
     const renderLoadingSkeleton = () => {
-      const skeletonCount = mode === "minimal" ? 8 : mode === "compact" ? 10 : 12;
+      const skeletonCount =
+        mode === "minimal" ? 8 : mode === "compact" ? 10 : 12;
 
       return (
         <Stack spacing={getItemSpacing()} sx={getListConfig()}>
@@ -126,7 +136,12 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
                   height={24}
                   sx={{ mb: 1 }}
                 />
-                <Skeleton variant="text" width="40%" height={16} sx={{ mb: 1 }} />
+                <Skeleton
+                  variant="text"
+                  width="40%"
+                  height={16}
+                  sx={{ mb: 1 }}
+                />
                 <Skeleton variant="text" width="80%" height={14} />
               </Box>
             </Box>
@@ -136,7 +151,10 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
     };
 
     // Render single column of widgets
-    const renderWidgetColumn = (columnWidgets: DashboardWidget[], startIndex = 0) => (
+    const renderWidgetColumn = (
+      columnWidgets: DashboardWidget[],
+      startIndex = 0
+    ) => (
       <Stack spacing={getItemSpacing()}>
         {columnWidgets.map((widget, index) => {
           const WidgetComponent = widget.component;
@@ -149,7 +167,9 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
                 className="list-item"
                 sx={{
                   // Animation delays for staggered entrance
-                  animation: `slideInLeft 0.6s ease-out ${globalIndex * 0.05}s both`,
+                  animation: `slideInLeft 0.6s ease-out ${
+                    globalIndex * 0.05
+                  }s both`,
                   "@keyframes slideInLeft": {
                     "0%": {
                       opacity: 0,
@@ -177,7 +197,8 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
                     p: 0,
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                     "&:hover": {
-                      transform: mode === "fullscreen" ? "none" : "translateY(-1px)",
+                      transform:
+                        mode === "fullscreen" ? "none" : "translateY(-1px)",
                       zIndex: 1,
                     },
                   }}

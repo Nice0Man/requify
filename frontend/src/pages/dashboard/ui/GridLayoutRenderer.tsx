@@ -1,9 +1,13 @@
 import React, { memo, useMemo } from "react";
-import { Grid, Box, useTheme, alpha, Skeleton, useMediaQuery } from "@mui/material";
-import type {
-  DashboardMode,
-  DashboardDensity,
-} from "@/widgets/dashboard-container";
+import {
+  Grid,
+  Box,
+  useTheme,
+  alpha,
+  Skeleton,
+  useMediaQuery,
+} from "@mui/material";
+import type { DashboardMode, DashboardDensity } from "@/shared/types/dashboard";
 import type { DashboardWidget } from "./DashboardLayoutRenderer";
 
 interface GridLayoutRendererProps {
@@ -24,11 +28,15 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
     const theme = useTheme();
 
     // Detect different screen sizes for optimal grid layout
-    const isUltrawide = useMediaQuery('(min-aspect-ratio: 21/9) and (min-width: 2560px)');
-    const isWidescreen = useMediaQuery('(min-aspect-ratio: 16/9) and (min-width: 1920px)');
-    const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
-    const isMediumScreen = useMediaQuery(theme.breakpoints.up('md'));
-    const isSmallScreen = useMediaQuery(theme.breakpoints.up('sm'));
+    const isUltrawide = useMediaQuery(
+      "(min-aspect-ratio: 21/9) and (min-width: 2560px)"
+    );
+    const isWidescreen = useMediaQuery(
+      "(min-aspect-ratio: 16/9) and (min-width: 1920px)"
+    );
+    const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
+    const isMediumScreen = useMediaQuery(theme.breakpoints.up("md"));
+    const isSmallScreen = useMediaQuery(theme.breakpoints.up("sm"));
 
     // Sort widgets by priority for optimal grid placement
     const sortedWidgets = useMemo(() => {
@@ -106,7 +114,7 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
 
       // Priority-based ordering with responsive adjustments
       const basePriority = widget.priority || 999;
-      
+
       return {
         order: {
           xs: basePriority,
@@ -138,18 +146,27 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
                     borderRadius: 3,
                     background: alpha(theme.palette.background.paper, 0.7),
                     border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                    height: mode === "minimal" ? 200 : mode === "compact" ? 250 : 300,
+                    height:
+                      mode === "minimal" ? 200 : mode === "compact" ? 250 : 300,
                     display: "flex",
                     flexDirection: "column",
                     gap: 2,
-                    animation: `skeletonPulse 1.5s ease-in-out infinite ${index * 0.1}s`,
+                    animation: `skeletonPulse 1.5s ease-in-out infinite ${
+                      index * 0.1
+                    }s`,
                     "@keyframes skeletonPulse": {
                       "0%, 100%": { opacity: 0.6 },
                       "50%": { opacity: 0.8 },
                     },
                   }}
                 >
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     <Skeleton
                       variant="rectangular"
                       width={40}
@@ -171,7 +188,14 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
                   </Box>
                   <Skeleton variant="text" width="80%" height={24} />
                   <Skeleton variant="text" width="60%" height={16} />
-                  <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     <Skeleton
                       variant="rectangular"
                       width="90%"
@@ -214,7 +238,7 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
               zIndex: 2,
               // Enhanced shadow on ultrawide screens
               "& > *": {
-                boxShadow: isUltrawide 
+                boxShadow: isUltrawide
                   ? `0 12px 40px ${alpha(theme.palette.common.black, 0.1)}`
                   : `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
               },
@@ -256,7 +280,8 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
             // Optimizations for ultrawide displays
             ...(isUltrawide && {
               "& .MuiGrid-item": {
-                minHeight: mode === "minimal" ? 200 : mode === "compact" ? 240 : 280,
+                minHeight:
+                  mode === "minimal" ? 200 : mode === "compact" ? 240 : 280,
               },
             }),
           }}
@@ -284,7 +309,9 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
                     xl: gridConfig.xl === 0 ? "none" : "flex",
                   },
                   // Staggered animation entrance based on priority and index
-                  animation: `fadeInUp 0.6s ease-out ${(widget.priority || index) * 0.05}s both`,
+                  animation: `fadeInUp 0.6s ease-out ${
+                    (widget.priority || index) * 0.05
+                  }s both`,
                   "@keyframes fadeInUp": {
                     "0%": {
                       opacity: 0,
@@ -297,11 +324,28 @@ export const GridLayoutRenderer = memo<GridLayoutRendererProps>(
                   },
                   // Enhanced responsive min-height for consistent grid alignment
                   minHeight: {
-                    xs: mode === "minimal" ? 180 : mode === "compact" ? 220 : 260,
-                    sm: mode === "minimal" ? 200 : mode === "compact" ? 240 : 280,
-                    md: mode === "minimal" ? 220 : mode === "compact" ? 260 : 300,
-                    lg: isUltrawide && mode === "detailed" ? 320 : mode === "minimal" ? 240 : mode === "compact" ? 280 : 320,
-                    xl: isUltrawide && mode === "detailed" ? 340 : mode === "minimal" ? 260 : mode === "compact" ? 300 : 340,
+                    xs:
+                      mode === "minimal" ? 180 : mode === "compact" ? 220 : 260,
+                    sm:
+                      mode === "minimal" ? 200 : mode === "compact" ? 240 : 280,
+                    md:
+                      mode === "minimal" ? 220 : mode === "compact" ? 260 : 300,
+                    lg:
+                      isUltrawide && mode === "detailed"
+                        ? 320
+                        : mode === "minimal"
+                        ? 240
+                        : mode === "compact"
+                        ? 280
+                        : 320,
+                    xl:
+                      isUltrawide && mode === "detailed"
+                        ? 340
+                        : mode === "minimal"
+                        ? 260
+                        : mode === "compact"
+                        ? 300
+                        : 340,
                   },
                 }}
               >

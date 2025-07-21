@@ -4,7 +4,7 @@ import type {
   DashboardMode,
   DashboardLayout,
   DashboardDensity,
-} from "@/widgets/dashboard-container";
+} from "@/shared/types/dashboard";
 
 // Layout Renderers
 import { GridLayoutRenderer } from "./GridLayoutRenderer";
