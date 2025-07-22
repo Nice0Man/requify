@@ -8,11 +8,16 @@ import {
   Divider,
   useMediaQuery,
 } from "@mui/material";
-import type { DashboardMode, DashboardDensity } from "@/shared/types/dashboard";
+import type {
+  DashboardMode,
+  DashboardLayout,
+  DashboardDensity,
+} from "@/shared/types/dashboard";
 import type { DashboardWidget } from "./DashboardLayoutRenderer";
 
 interface ListLayoutRendererProps {
   mode: DashboardMode;
+  layout: DashboardLayout;
   density: DashboardDensity;
   widgets: DashboardWidget[];
   spacing: {
@@ -25,7 +30,7 @@ interface ListLayoutRendererProps {
 }
 
 export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
-  ({ mode, density, widgets, spacing, onWidgetClick }) => {
+  ({ mode, layout, density, widgets, spacing, onWidgetClick }) => {
     const theme = useTheme();
 
     // Detect ultrawide screens (21:9 aspect ratio or wider)
@@ -61,9 +66,16 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
     // Get responsive list configuration
     const getListConfig = () => {
       return {
+        // Context7: Правильный sizing для предотвращения overflow
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
-        maxWidth: "none", // Full width for list layout
+        minWidth: 0,
+        maxWidth: "100%", // Предотвращаем overflow
         margin: 0,
+        // Context7: Предотвращаем overflow-x
+        overflowX: "hidden",
+        overflowY: "visible",
         px: {
           xs: 0,
           sm: isUltrawide ? 2 : 0,
@@ -186,14 +198,19 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
                   className="dashboard-widget"
                   onClick={() => onWidgetClick?.(widget.id)}
                   sx={{
+                    // Context7: Правильный sizing для предотвращения content cropping
+                    display: "flex",
+                    flexDirection: "column",
                     width: "100%",
+                    minWidth: 0, // Важно для flex shrinking
+                    maxWidth: "100%",
                     minHeight: mode === "minimal" ? "auto" : itemHeight,
                     cursor: onWidgetClick ? "pointer" : "default",
                     background: "transparent",
                     borderRadius: mode === "fullscreen" ? 2 : 3,
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
+                    // Context7: Предотвращаем overflow-x в list layout
+                    overflowX: "hidden",
+                    overflowY: "auto",
                     p: 0,
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                     "&:hover": {
@@ -206,9 +223,8 @@ export const ListLayoutRenderer = memo<ListLayoutRendererProps>(
                   <WidgetComponent
                     {...widget.props}
                     mode={mode}
+                    layout={layout}
                     density={density}
-                    layout="list"
-                    compact={mode === "minimal"}
                     fullWidth={true}
                     ultrawide={isUltrawide}
                   />

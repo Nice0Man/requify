@@ -21,7 +21,7 @@ import i18n from "@/shared/lib/i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import { DashboardErrorBoundary, AuthDebugPanel } from "@/shared/ui";
 
-import { DashboardLayout } from "@/widgets/layout";
+import { DashboardLayout } from "@/widgets/layout/ui/DashboardLayout";
 import { DashboardHeader } from "@/widgets/dashboard-header";
 import {
   DashboardSidebar,
@@ -227,14 +227,11 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
     [] // Убираем зависимости для стабильности
   );
 
-  const handleDensityChange = useCallback(
-    (newDensity: DashboardDensity) => {
-      startTransition(() => {
-        setDashboardDensity(newDensity);
-      });
-    },
-    []
-  );
+  const handleDensityChange = useCallback((newDensity: DashboardDensity) => {
+    startTransition(() => {
+      setDashboardDensity(newDensity);
+    });
+  }, []);
 
   const handleToggleCollapse = useCallback(() => {
     setSidebarCollapsed((prev) => !prev);
@@ -325,11 +322,19 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
         className={className}
         sx={{
           display: "flex",
-          gap: 3,
+          flexDirection: "column",
           flex: 1,
+          minWidth: 0, // Важно для flex shrinking
           minHeight: 0, // Important for flex children
-          px: { xs: 2, sm: 3, md: 4 },
-          pb: { xs: 2, sm: 3, md: 4 },
+          maxWidth: "100%", // Предотвращаем overflow
+          // Context7: Минимальные отступы для предотвращения overflow
+          px: { xs: 0.5, sm: 1, md: 1.5 }, // Еще больше уменьшаем padding
+          pb: { xs: 0.5, sm: 1, md: 1.5 }, // Еще больше уменьшаем bottom padding
+          // Оставляем место для fixed sidebar справа
+          pr: { xs: 0.5, sm: 1.5, md: 8 }, // Меньше места справа, но достаточно для sidebar
+          // Context7: Предотвращаем overflow-x
+          overflowX: "hidden",
+          overflowY: "visible",
         }}
       >
         {/* Main Content Container (Left) */}
@@ -380,18 +385,16 @@ export const DashboardPageWithSuspense = () => (
   <DashboardErrorBoundary>
     <Suspense
       fallback={
-        <DashboardLayout>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "50vh",
-            }}
-          >
-            <CircularProgress size={48} thickness={4} />
-          </Box>
-        </DashboardLayout>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "50vh",
+          }}
+        >
+          <CircularProgress size={48} thickness={4} />
+        </Box>
       }
     >
       <DashboardPage />

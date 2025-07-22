@@ -19,3 +19,10 @@ export {
   useDashboardWidgetSettings,
   type ComputedWidgetSettings
 } from "./useDashboardWidgetSettings";
+
+// Layout calculation hooks
+export { 
+  useLayoutCalculations,
+  type LayoutDimensions,
+  type UseLayoutCalculationsProps
+} from "./useLayoutCalculations";

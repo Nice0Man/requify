@@ -10,6 +10,7 @@ import type {
   WidgetSize,
   WidgetPriority,
   SpacingConfig,
+  ResponsiveConfig,
 } from '@/shared/types/dashboard';
 
 export interface ComputedWidgetSettings extends ModeSettings {
@@ -101,7 +102,8 @@ function calculateDimensions(
   layout: DashboardLayout,
   density: DashboardDensity,
   isMobile: boolean,
-  isTablet: boolean
+  isTablet: boolean,
+  responsive?: ResponsiveConfig
 ): WidgetDimensions {
   const baseMultiplier = getBaseMultiplier(density);
   

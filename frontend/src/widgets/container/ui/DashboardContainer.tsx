@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useMemo } from "react";
 import { Box, Container, useMediaQuery } from "@mui/material";
 import type { DashboardContainerProps } from "../model/types";
 import {
@@ -174,25 +174,68 @@ export const DashboardContainer = memo<DashboardContainerProps>(
       );
     }
 
+    // Точные расчеты размеров контейнера 
+    const containerWidth = useMemo(() => {
+      if (responsiveMaxWidth === false) {
+        return "100%"; // Без ограничений
+      }
+      
+      // Базовые ограничения для разных breakpoints
+      const breakpointLimits = {
+        sm: 600,
+        md: 900, 
+        lg: 1200,
+        xl: 1536
+      };
+      
+      if (typeof responsiveMaxWidth === 'string' && breakpointLimits[responsiveMaxWidth]) {
+        return `${breakpointLimits[responsiveMaxWidth]}px`;
+      }
+      
+      return "100%";
+    }, [responsiveMaxWidth]);
+
+    // Точные расчеты padding без костылей
+    const containerPadding = useMemo(() => {
+      if (disableGutters) return 0;
+      
+      // Базовые значения padding для density
+      const paddingMap = {
+        dense: 8,
+        compact: 12,
+        comfortable: 16
+      };
+      
+      return `${paddingMap[density]}px`;
+    }, [disableGutters, density]);
+
     return (
-      <Container
+      <Box
         className={className}
-        maxWidth={responsiveMaxWidth}
-        disableGutters={disableGutters}
-        sx={containerStyles.root}
+        sx={{
+          // Context7: Точные расчеты вместо overflow костылей
+          ...containerStyles.root,
+          ...containerStyles.content,
+          
+          // Точная ширина и позиционирование
+          width: "100%",
+          maxWidth: containerWidth,
+          margin: "0 auto",
+          padding: containerPadding,
+          
+          // Правильный flex layout
+          display: "flex",
+          flexDirection: "column",
+          position: "relative",
+          
+          // Применяем анимации если включены
+          ...(!shouldReduceAnimations &&
+            enableAnimations &&
+            animatedStyles("fadeIn")),
+        }}
       >
-        <Box
-          sx={{
-            ...containerStyles.content,
-            // Apply animations if enabled
-            ...(!shouldReduceAnimations &&
-              enableAnimations &&
-              animatedStyles("fadeIn")),
-          }}
-        >
-          {children}
-        </Box>
-      </Container>
+        {children}
+      </Box>
     );
   }
 );

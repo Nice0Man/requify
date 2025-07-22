@@ -1,7 +1,6 @@
 import { client } from "@/shared/api/client";
 import {
   type DashboardStats,
-
   type ActivityItem,
   type ActivityResponse,
   type ActivityFilters,
@@ -13,7 +12,7 @@ import {
   type ChartData,
   type TimelineDataPoint,
   type DistributionDataPoint,
-  type SystemMetrics,
+  type DashboardSystemMetrics,
   ActionCategory,
   NotificationType,
   DashboardView,
@@ -903,7 +902,7 @@ export class DashboardApi {
   /**
    * Get real system metrics using /api/v1/dashboard/metrics
    */
-  static async getSystemMetrics(): Promise<SystemMetrics> {
+  static async getSystemMetrics(): Promise<DashboardSystemMetrics> {
     try {
       const response = await client.get<BackendSystemMetrics>(
         API_ENDPOINTS.DASHBOARD.METRICS
@@ -971,6 +970,7 @@ export class DashboardApi {
    * Get default/fallback dashboard statistics
    * @private - internal use only
    */
+  /** @private */
   private static getDefaultStats(): DashboardStats {
     const timestamp = new Date().toISOString();
 
@@ -1088,7 +1088,7 @@ export class DashboardApi {
   /**
    * Get default system metrics
    */
-  private static getDefaultSystemMetrics(): SystemMetrics {
+  private static getDefaultSystemMetrics(): DashboardSystemMetrics {
     return {
       cpuUsage: 0,
       memoryUsage: 0,

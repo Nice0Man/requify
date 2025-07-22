@@ -1,18 +1,22 @@
 import { useMemo } from "react";
 import { useTheme, useMediaQuery } from "@mui/material";
 import type { Theme, SxProps } from "@mui/material/styles";
+import type {
+  DashboardMode,
+  DashboardLayout,
+  DashboardDensity,
+  WidgetSize,
+} from "../types/dashboard";
 import {
   DASHBOARD_TOKENS,
-  type DashboardMode,
-  type DashboardLayout,
-  type DashboardDensity,
-  type WidgetSize,
   getSpacingForMode,
   getWidgetPadding,
   getShadowForState,
   getAnimationDuration,
   getStaggerDelay,
+  getDashboardZIndex,
 } from "./dashboard-tokens";
+import { alpha } from "@mui/material/styles";
 
 // Мемоизированный хук для spacing системы
 export const useDashboardSpacing = (
@@ -41,6 +45,7 @@ export const useDashboardSpacing = (
 export const useWidgetStyles = (
   mode: DashboardMode,
   density: DashboardDensity,
+  layout: DashboardLayout = "grid",
   size: WidgetSize = "medium",
   isHovered = false,
   isFocused = false
@@ -49,8 +54,9 @@ export const useWidgetStyles = (
 
   return useMemo(() => {
     const padding = getWidgetPadding(density);
+    // Используем централизованную систему теней - ТОЛЬКО для виджетов
     const shadow = getShadowForState(
-      isFocused ? "focused" : isHovered ? "hover" : "rest"
+      isFocused ? "focus" : isHovered ? "hover" : "rest"
     );
     const borderRadius =
       mode === "fullscreen"
@@ -60,57 +66,92 @@ export const useWidgetStyles = (
     return {
       padding: `${padding}px`,
       borderRadius: `${borderRadius}px`,
-      boxShadow: shadow,
+      // Context7: ТОЛЬКО виджеты имеют тени, контейнеры - НЕТ
+      boxShadow: mode === "fullscreen" ? "none" : shadow,
       backgroundColor: DASHBOARD_TOKENS.colors.surface.card,
       backdropFilter: "blur(8px)",
-      border: `1px solid ${theme.palette.divider}`,
+      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+
+      // Context7: Предсказуемые переходы без overflow
       transition: `all ${getAnimationDuration("standard")}ms ${
         DASHBOARD_TOKENS.animation.easing.standard
       }`,
+      willChange: "transform, box-shadow", // Оптимизация GPU
 
-      // Размеры виджета
-      ...(size !== "auto" && {
-        minWidth: DASHBOARD_TOKENS.widget.sizes[size]?.width,
-        minHeight: DASHBOARD_TOKENS.widget.sizes[size]?.height,
-      }),
+      // Context7: Контролируемые размеры без overflow
+      ...(size !== "auto" &&
+        DASHBOARD_TOKENS.widget.sizes[
+          size as keyof typeof DASHBOARD_TOKENS.widget.sizes
+        ] && {
+          minWidth:
+            DASHBOARD_TOKENS.widget.sizes[
+              size as keyof typeof DASHBOARD_TOKENS.widget.sizes
+            ].width,
+          minHeight:
+            DASHBOARD_TOKENS.widget.sizes[
+              size as keyof typeof DASHBOARD_TOKENS.widget.sizes
+            ].height,
+          maxWidth: "100%", // Предотвращаем overflow
+        }),
 
-      // Оптимизация для fullscreen режима
-      ...(mode === "fullscreen" && {
-        boxShadow: DASHBOARD_TOKENS.shadows.container.flat,
-        borderRadius: `${DASHBOARD_TOKENS.layout.widget.borderRadius.fullscreen}px`,
-      }),
+      // Контейнер должен корректно обрабатывать overflow
+      overflow: "hidden",
+      contain: "layout style paint", // CSS containment для производительности
 
-      // Hover и focus states
+      // Context7: Централизованная Z-index система
+      zIndex: DASHBOARD_TOKENS.zIndex.dashboard.widget.rest,
+
+      // Hover и focus states - БЕЗ дублирования теней
       "&:hover": {
         transform: mode === "fullscreen" ? "none" : "translateY(-2px)",
-        boxShadow: getShadowForState("hover"),
+        zIndex: DASHBOARD_TOKENS.zIndex.dashboard.widget.hover,
+        // Тень уже установлена выше через getShadowForState
       },
 
       "&:focus-within": {
-        boxShadow: getShadowForState("focused"),
+        zIndex: DASHBOARD_TOKENS.zIndex.dashboard.widget.focus,
+        // Тень уже установлена выше через getShadowForState
         outline: "none",
       },
+
+      "&:active": {
+        zIndex: DASHBOARD_TOKENS.zIndex.dashboard.widget.active,
+      },
+
+      // Context7: Адаптивные отступы
+      [theme.breakpoints.down("sm")]: {
+        padding: `${padding * 0.75}px`,
+        borderRadius: `${borderRadius * 0.8}px`,
+      },
     };
-  }, [theme, mode, density, size, isHovered, isFocused]);
+  }, [theme, mode, layout, density, size, isHovered, isFocused]);
 };
 
 // Responsive hooks с мемоизацией
 export const useDashboardBreakpoints = () => {
   const theme = useTheme();
 
+  // Вызываем хуки на верхнем уровне
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
+  const isWide = useMediaQuery(
+    `(min-width: ${DASHBOARD_TOKENS.breakpoints.wide}px)`
+  );
+  const isUltrawide = useMediaQuery(
+    `(min-width: ${DASHBOARD_TOKENS.breakpoints.ultrawide}px)`
+  );
+
+  // Мемоизируем только результирующий объект
   return useMemo(
     () => ({
-      isMobile: useMediaQuery(theme.breakpoints.down("sm")),
-      isTablet: useMediaQuery(theme.breakpoints.between("sm", "md")),
-      isDesktop: useMediaQuery(theme.breakpoints.up("lg")),
-      isWide: useMediaQuery(
-        `(min-width: ${DASHBOARD_TOKENS.breakpoints.wide}px)`
-      ),
-      isUltrawide: useMediaQuery(
-        `(min-width: ${DASHBOARD_TOKENS.breakpoints.ultrawide}px)`
-      ),
+      isMobile,
+      isTablet,
+      isDesktop,
+      isWide,
+      isUltrawide,
     }),
-    [theme]
+    [isMobile, isTablet, isDesktop, isWide, isUltrawide]
   );
 };
 
@@ -331,7 +372,7 @@ export const useAdaptiveSizing = (
 
     // Fullscreen режим увеличивает размеры
     if (mode === "fullscreen") {
-      const sizeMap = {
+      const sizeMap: Record<WidgetSize, WidgetSize> = {
         small: "medium",
         medium: "large",
         large: "xlarge",
@@ -372,6 +413,7 @@ export const useDashboardStyleSystem = (
   const widgetStyles = useWidgetStyles(
     mode,
     density,
+    "grid", // default layout для обратной совместимости
     adaptiveSize as WidgetSize
   );
 

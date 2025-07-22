@@ -64,13 +64,21 @@ export const BarChart = memo<BarChartProps>(
   }) => {
     const theme = useTheme();
     const containerRef = useRef<HTMLDivElement>(null);
-    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+    const [containerSize, setContainerSize] = useState({
+      width: 400,
+      height: 320,
+    }); // Безопасные начальные значения
 
     // Responsive values based on screen size and container
     const getResponsiveValues = () => {
-      const isSmall = containerSize.width < 600;
-      const isMedium = containerSize.width < 960;
-      
+      // Безопасные проверки с fallback значениями
+      const safeWidth =
+        Number.isFinite(containerSize.width) && containerSize.width > 0
+          ? containerSize.width
+          : 400;
+      const isSmall = safeWidth < 600;
+      const isMedium = safeWidth < 960;
+
       return {
         margin: {
           top: isSmall ? 10 : 20,
@@ -78,12 +86,12 @@ export const BarChart = memo<BarChartProps>(
           left: horizontal ? (isSmall ? 60 : 80) : isSmall ? 10 : 20,
           bottom: isSmall ? 10 : 20,
         },
-        fontSize: isSmall ? 11 : isMedium ? 12 : 13,
-        axisWidth: isSmall ? 50 : 60,
-        axisHeight: isSmall ? 50 : 60,
-        yAxisWidth: isSmall ? 80 : 100,
-        barRadius: isSmall ? 2 : 3,
-        barGap: isSmall ? 2 : 4,
+        fontSize: Math.max(10, isSmall ? 11 : isMedium ? 12 : 13), // Минимальный размер 10px
+        axisWidth: Math.max(40, isSmall ? 50 : 60), // Минимальная ширина оси
+        axisHeight: Math.max(40, isSmall ? 50 : 60), // Минимальная высота оси
+        yAxisWidth: Math.max(60, isSmall ? 80 : 100), // Минимальная ширина Y-оси
+        barRadius: Math.max(1, isSmall ? 2 : 3), // Минимальный радиус
+        barGap: Math.max(1, isSmall ? 2 : 4), // Минимальный отступ
       };
     };
 
@@ -94,21 +102,42 @@ export const BarChart = memo<BarChartProps>(
       if (!responsive || !containerRef.current) return;
 
       let timeoutId: NodeJS.Timeout;
-      
+
       const resizeObserver = new ResizeObserver((entries) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           for (const entry of entries) {
             const { width } = entry.contentRect;
-            
+
+            // Безопасные вычисления с проверками на NaN/Infinity
+            const safeWidth = Number.isFinite(width) && width > 0 ? width : 400;
+            const safeAspectRatio =
+              Number.isFinite(aspectRatio) && aspectRatio > 0
+                ? aspectRatio
+                : 16 / 9;
+            const safeMinHeight =
+              Number.isFinite(minHeight) && minHeight > 0 ? minHeight : 200;
+            const safeMaxHeight =
+              Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : 600;
+            const safeHeight =
+              Number.isFinite(height) && height > 0 ? height : 320;
+
             // Calculate adaptive height based on container width and aspect ratio
-            let adaptiveHeight = responsive 
-              ? Math.max(minHeight, Math.min(maxHeight, width / aspectRatio))
-              : height;
-              
-            setContainerSize({ 
-              width, 
-              height: adaptiveHeight 
+            let adaptiveHeight = responsive
+              ? Math.max(
+                  safeMinHeight,
+                  Math.min(safeMaxHeight, safeWidth / safeAspectRatio)
+                )
+              : safeHeight;
+
+            // Дополнительная проверка результата
+            if (!Number.isFinite(adaptiveHeight) || adaptiveHeight <= 0) {
+              adaptiveHeight = safeHeight;
+            }
+
+            setContainerSize({
+              width: safeWidth,
+              height: adaptiveHeight,
             });
           }
         }, debounceMs);
@@ -271,8 +300,8 @@ export const BarChart = memo<BarChartProps>(
           },
         }}
       >
-        <ResponsiveContainer 
-          width="100%" 
+        <ResponsiveContainer
+          width="100%"
           height="100%"
           minHeight={minHeight}
           maxHeight={responsive ? maxHeight : undefined}
@@ -282,13 +311,13 @@ export const BarChart = memo<BarChartProps>(
             layout={horizontal ? "horizontal" : "vertical"}
             margin={responsiveValues.margin}
           >
-            <CartesianGrid 
-              strokeDasharray="3 3" 
+            <CartesianGrid
+              strokeDasharray="3 3"
               stroke={alpha(theme.palette.divider, 0.1)}
               horizontal={!horizontal}
               vertical={horizontal}
             />
-            
+
             {horizontal ? (
               <>
                 <XAxis
@@ -324,7 +353,12 @@ export const BarChart = memo<BarChartProps>(
 
             <Bar
               dataKey="value"
-              radius={[responsiveValues.barRadius, responsiveValues.barRadius, 0, 0]}
+              radius={[
+                responsiveValues.barRadius,
+                responsiveValues.barRadius,
+                0,
+                0,
+              ]}
               onClick={handleBarClick}
               cursor={onPointClick ? "pointer" : "default"}
             >
@@ -334,18 +368,19 @@ export const BarChart = memo<BarChartProps>(
                   fill={entry.color || chartColors[index % chartColors.length]}
                 />
               ))}
-              
-              {/* Add labels if space allows */}
-              {containerSize.width > 400 && (
-                <LabelList
-                  dataKey="value"
-                  position={horizontal ? "right" : "top"}
-                  style={{
-                    fontSize: responsiveValues.fontSize - 1,
-                    fill: theme.palette.text.secondary,
-                  }}
-                />
-              )}
+
+              {/* Add labels if space allows - с безопасной проверкой */}
+              {Number.isFinite(containerSize.width) &&
+                containerSize.width > 400 && (
+                  <LabelList
+                    dataKey="value"
+                    position={horizontal ? "right" : "top"}
+                    style={{
+                      fontSize: Math.max(10, responsiveValues.fontSize - 1), // Минимальный размер шрифта
+                      fill: theme.palette.text.secondary,
+                    }}
+                  />
+                )}
             </Bar>
           </RechartsBarChart>
         </ResponsiveContainer>

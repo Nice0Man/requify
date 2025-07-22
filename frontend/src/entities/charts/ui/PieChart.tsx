@@ -120,7 +120,7 @@ export const PieChart = memo<PieChartProps>(
     className,
     showLegend = true,
     innerRadius = 0,
-    outerRadius = "80%",
+    // outerRadius = "80%", // Calculated dynamically
     onPointClick,
     config,
     // New responsive props
@@ -132,21 +132,32 @@ export const PieChart = memo<PieChartProps>(
   }) => {
     const theme = useTheme();
     const containerRef = useRef<HTMLDivElement>(null);
-    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+    const [containerSize, setContainerSize] = useState({
+      width: 400,
+      height: 400,
+    }); // Безопасные начальные значения
 
     // Responsive values based on screen size and container
     const getResponsiveValues = () => {
-      const isSmall = containerSize.width < 400;
-      const isMedium = containerSize.width < 600;
-      
+      // Безопасные проверки с fallback значениями
+      const safeWidth =
+        Number.isFinite(containerSize.width) && containerSize.width > 0
+          ? containerSize.width
+          : 400;
+      const isSmall = safeWidth < 400;
+      const isMedium = safeWidth < 600;
+
       return {
-        fontSize: isSmall ? 10 : isMedium ? 11 : 12,
+        fontSize: Math.max(9, isSmall ? 10 : isMedium ? 11 : 12), // Минимальный размер 9px
         outerRadius: isSmall ? "70%" : isMedium ? "75%" : "80%",
-        innerRadius: typeof innerRadius === "number" 
-          ? (isSmall ? Math.max(0, innerRadius - 10) : innerRadius)
-          : innerRadius,
-        labelFontSize: isSmall ? 9 : 10,
-        legendSpacing: isSmall ? 1 : 2,
+        innerRadius:
+          typeof innerRadius === "number"
+            ? isSmall
+              ? Math.max(0, innerRadius - 10)
+              : innerRadius
+            : innerRadius,
+        labelFontSize: Math.max(8, isSmall ? 9 : 10), // Минимальный размер лейбла
+        legendSpacing: Math.max(1, isSmall ? 1 : 2), // Минимальный отступ
       };
     };
 
@@ -157,21 +168,40 @@ export const PieChart = memo<PieChartProps>(
       if (!responsive || !containerRef.current) return;
 
       let timeoutId: NodeJS.Timeout;
-      
+
       const resizeObserver = new ResizeObserver((entries) => {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           for (const entry of entries) {
             const { width } = entry.contentRect;
-            
+
+            // Безопасные вычисления с проверками на NaN/Infinity
+            const safeWidth = Number.isFinite(width) && width > 0 ? width : 400;
+            const safeAspectRatio =
+              Number.isFinite(aspectRatio) && aspectRatio > 0 ? aspectRatio : 1;
+            const safeMinHeight =
+              Number.isFinite(minHeight) && minHeight > 0 ? minHeight : 300;
+            const safeMaxHeight =
+              Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : 600;
+            const safeHeight =
+              Number.isFinite(height) && height > 0 ? height : 400;
+
             // For pie charts, we typically want square aspect ratio
-            let adaptiveHeight = responsive 
-              ? Math.max(minHeight, Math.min(maxHeight, width / aspectRatio))
-              : height;
-              
-            setContainerSize({ 
-              width, 
-              height: adaptiveHeight 
+            let adaptiveHeight = responsive
+              ? Math.max(
+                  safeMinHeight,
+                  Math.min(safeMaxHeight, safeWidth / safeAspectRatio)
+                )
+              : safeHeight;
+
+            // Дополнительная проверка результата
+            if (!Number.isFinite(adaptiveHeight) || adaptiveHeight <= 0) {
+              adaptiveHeight = safeHeight;
+            }
+
+            setContainerSize({
+              width: safeWidth,
+              height: adaptiveHeight,
             });
           }
         }, debounceMs);
@@ -238,9 +268,9 @@ export const PieChart = memo<PieChartProps>(
 
     if (error) {
       return (
-        <Box 
+        <Box
           ref={containerRef}
-          className={className} 
+          className={className}
           sx={{ height: finalHeight, width: width || "100%" }}
         >
           <Alert
@@ -294,15 +324,18 @@ export const PieChart = memo<PieChartProps>(
             height: "100% !important",
           },
           "& .recharts-pie-sector": {
-            filter: `drop-shadow(0 2px 4px ${alpha(theme.palette.common.black, 0.1)})`,
+            filter: `drop-shadow(0 2px 4px ${alpha(
+              theme.palette.common.black,
+              0.1
+            )})`,
           },
           "& .recharts-tooltip-wrapper": {
             zIndex: 1000,
           },
         }}
       >
-        <ResponsiveContainer 
-          width="100%" 
+        <ResponsiveContainer
+          width="100%"
           height="100%"
           minHeight={minHeight}
           maxHeight={responsive ? maxHeight : undefined}
@@ -344,8 +377,7 @@ export const PieChart = memo<PieChartProps>(
               }
             >
               {chartData.map((entry, index) => {
-                const color =
-                  entry.color || chartColors[index % chartColors.length];
+                // const color = entry.color || chartColors[index % chartColors.length];
                 return (
                   <Cell
                     key={`cell-${index}`}

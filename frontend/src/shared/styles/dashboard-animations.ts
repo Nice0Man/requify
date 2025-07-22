@@ -148,7 +148,7 @@ export const DASHBOARD_ANIMATIONS = {
     willChange: "transform, box-shadow",
     "&:hover": {
       transform: "translateY(-2px) translateZ(0)",
-      boxShadow: DASHBOARD_TOKENS.shadows.widget.hover,
+      boxShadow: DASHBOARD_TOKENS.shadows.component.widget.hover,
     },
   },
   

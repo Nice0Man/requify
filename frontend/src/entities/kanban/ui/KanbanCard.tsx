@@ -18,8 +18,8 @@ import {
   MoreVert,
   Flag,
   Person,
-  Schedule,
-  Assignment,
+  // Schedule, // unused
+  // Assignment, // unused
   CalendarToday,
   AccessTime,
 } from "@mui/icons-material";
@@ -36,8 +36,8 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
   item,
   index,
   onItemClick,
-  onEdit,
-  onDelete,
+  // onEdit, // TODO: implement edit functionality
+  // onDelete, // TODO: implement delete functionality
   variant = "detailed",
   isDragging = false,
 }) => {

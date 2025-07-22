@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useMemo, useCallback } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import type { Theme, Components } from "@mui/material/styles";
-import {
-  DASHBOARD_TOKENS,
-  type DashboardMode,
-  type DashboardLayout,
-  type DashboardDensity,
-} from "../styles/dashboard-tokens";
+import { DASHBOARD_TOKENS } from "../styles/dashboard-tokens";
+import type {
+  DashboardMode,
+  DashboardLayout,
+  DashboardDensity,
+} from "../types/dashboard";
 import { useDashboardStyleSystem } from "../styles/dashboard-hooks";
 
 // Dashboard Theme Context
@@ -38,39 +38,42 @@ const createDashboardComponents = (
           mode === "fullscreen"
             ? DASHBOARD_TOKENS.layout.widget.borderRadius.fullscreen
             : DASHBOARD_TOKENS.layout.widget.borderRadius.normal,
-        boxShadow: DASHBOARD_TOKENS.shadows.widget.rest,
+        boxShadow: DASHBOARD_TOKENS.shadows.component.widget.rest,
         backgroundColor: DASHBOARD_TOKENS.colors.surface.card,
         backdropFilter: "blur(8px)",
         border: "1px solid rgba(0, 0, 0, 0.06)",
         transition: `all ${DASHBOARD_TOKENS.animation.duration.standard}ms ${DASHBOARD_TOKENS.animation.easing.standard}`,
 
         "&:hover": {
-          boxShadow: DASHBOARD_TOKENS.shadows.widget.hover,
+          boxShadow: DASHBOARD_TOKENS.shadows.component.widget.hover,
           transform: mode === "fullscreen" ? "none" : "translateY(-2px)",
         },
 
         "&:focus-within": {
-          boxShadow: DASHBOARD_TOKENS.shadows.widget.focused,
+          boxShadow: DASHBOARD_TOKENS.shadows.component.widget.focus,
           outline: "none",
         },
       },
     },
   },
 
-  // Container для dashboard layout
+  // Container для dashboard layout - ИСПРАВЛЯЕМ экстремальные паддинги
   MuiContainer: {
     styleOverrides: {
       root: {
         maxWidth: DASHBOARD_TOKENS.layout.container.maxWidth,
+        // Context7: Более разумные паддинги для dashboard
         padding:
-          density === "dense"
-            ? `${DASHBOARD_TOKENS.layout.container.padding.xs}px`
-            : `${DASHBOARD_TOKENS.layout.container.padding.md}px`,
+          density === "dense" ? "8px" : density === "compact" ? "12px" : "16px",
 
-        // Responsive padding
+        // Responsive padding - уменьшаем для мобильных
         "@media (max-width: 768px)": {
-          padding: `${DASHBOARD_TOKENS.layout.container.padding.xs}px`,
+          padding: "8px",
         },
+
+        // Context7: Убираем margin auto если есть проблемы с шириной
+        margin: 0,
+        width: "100%",
       },
     },
   },
@@ -83,10 +86,10 @@ const createDashboardComponents = (
         backgroundColor: DASHBOARD_TOKENS.colors.surface.elevated,
       },
       elevation1: {
-        boxShadow: DASHBOARD_TOKENS.shadows.container.elevated,
+        boxShadow: DASHBOARD_TOKENS.shadows.component.container.elevated,
       },
       elevation2: {
-        boxShadow: DASHBOARD_TOKENS.shadows.container.floating,
+        boxShadow: DASHBOARD_TOKENS.shadows.component.container.floating,
       },
     },
   },
@@ -176,9 +179,9 @@ const createDashboardTheme = (
     },
     zIndex: {
       ...baseTheme.zIndex,
-      modal: DASHBOARD_TOKENS.zIndex.modal,
-      tooltip: DASHBOARD_TOKENS.zIndex.tooltip,
-      drawer: DASHBOARD_TOKENS.zIndex.dropdown,
+      modal: DASHBOARD_TOKENS.zIndex.dashboard.interactions.modal,
+      tooltip: DASHBOARD_TOKENS.zIndex.dashboard.interactions.tooltip,
+      drawer: DASHBOARD_TOKENS.zIndex.dashboard.interactions.dropdown,
     },
     transitions: {
       ...baseTheme.transitions,

@@ -1,21 +1,23 @@
+import { Team, TeamMember, TeamStats } from "../api";
+
 // Re-export API types for use in components
 export type {
   Team,
   TeamMember,
   TeamMemberRole,
   TeamStats,
-  TeamsListResponse,
+  TeamListResponse,
   TeamStatsOverviewResponse,
-  CreateTeamRequest,
-  UpdateTeamRequest,
-  AddTeamMemberRequest,
-  UpdateTeamMemberRequest,
+  TeamCreate as CreateTeamRequest,
+  TeamUpdate as UpdateTeamRequest,
+  TeamMemberCreate as AddTeamMemberRequest,
+  TeamMemberUpdate as UpdateTeamMemberRequest,
   BulkCreateTeamsRequest,
   BulkAddMembersRequest,
   PermissionCheckRequest,
   PermissionCheckResponse,
-  TeamFilters
-} from '../api/types';
+  TeamQueryParams as TeamFilters,
+} from "../api/types";
 
 // Internal model types for UI state management
 export interface TeamState {
@@ -45,15 +47,15 @@ export interface TeamSearchFilters {
 
 // UI-specific enums
 export enum TeamViewMode {
-  LIST = 'list',
-  CARDS = 'cards',
-  TABLE = 'table'
+  LIST = "list",
+  CARDS = "cards",
+  TABLE = "table",
 }
 
 export enum TeamMemberPermission {
-  VIEW = 'view',
-  EDIT = 'edit',
-  MANAGE_MEMBERS = 'manage_members',
-  DELETE = 'delete',
-  ARCHIVE = 'archive'
-} 
+  VIEW = "view",
+  EDIT = "edit",
+  MANAGE_MEMBERS = "manage_members",
+  DELETE = "delete",
+  ARCHIVE = "archive",
+}

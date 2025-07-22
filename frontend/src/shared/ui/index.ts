@@ -21,12 +21,21 @@ export { AuthDebugPanel } from "./AuthDebugPanel";
 // Dashboard Components
 export { DashboardWidgetWrapper } from "./DashboardWidgetWrapper";
 export type {
-  DashboardMode,
-  DashboardLayout,
-  DashboardDensity,
-  WidgetSize,
   WidgetPriority,
   WidgetConfig,
   DashboardWidgetWrapperProps,
   ComputedWidgetSettings,
 } from "./DashboardWidgetWrapper";
+
+// Dashboard Types (re-export from shared/types)
+export type {
+  DashboardMode,
+  DashboardLayout,
+  DashboardDensity,
+  WidgetSize,
+  WidgetAspectRatio,
+  WidgetAlignment,
+  ResponsiveConfig,
+  SpacingConfig,
+  ModeSettings,
+} from "../types/dashboard";

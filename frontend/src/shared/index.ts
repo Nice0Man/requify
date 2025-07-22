@@ -5,8 +5,6 @@ export * from "./ui";
 export * from "./types";
 export * from "./utils";
 export * from "./hooks";
-export * from "./contexts";
-export * from "./components";
 
 //  Modern styling system
 export * from "./styles";

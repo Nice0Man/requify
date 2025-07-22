@@ -11,6 +11,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from "../model/useAuth";
 import type { RegisterFormData } from "../model/types";
+import i18n from "@/shared/lib/i18n";
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -18,12 +19,14 @@ interface RegisterFormProps {
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<RegisterFormData>({
+    username: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-    acceptTerms: false,
+    confirm_password: "",
+    first_name: "",
+    last_name: "",
+    terms_accepted: false,
+    privacy_accepted: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +34,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
 
   const { register, isLoading, error } = useAuth();
-
+  const { t } = i18n;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -39,21 +42,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     const newErrors: Partial<RegisterFormData> = {};
 
     if (!formData.email) {
-      newErrors.email = "Email обязателен";
+      newErrors.email = t("auth.emailRequired");
     }
 
     if (!formData.password) {
-      newErrors.password = "Пароль обязателен";
+      newErrors.password = t("auth.passwordRequired");
     } else if (formData.password.length < 8) {
-      newErrors.password = "Пароль должен содержать минимум 8 символов";
+      newErrors.password = t("auth.passwordMinLength");
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Пароли не совпадают";
+    if (formData.password !== formData.confirm_password) {
+      newErrors.confirm_password = t("auth.passwordsDoNotMatch");
     }
 
-    if (!formData.acceptTerms) {
-      newErrors.acceptTerms = "Необходимо принять условия";
+    if (!formData.terms_accepted) {
+      newErrors.terms_accepted = false;
     }
 
     setErrors(newErrors);
@@ -68,23 +71,24 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     }
   };
 
-  const handleChange = (field: keyof RegisterFormData) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Очищаем ошибки при изменении поля
-    if (errors[field]) {
-      setErrors((prev) => ({
+  const handleChange =
+    (field: keyof RegisterFormData) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value =
+        e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      setFormData((prev) => ({
         ...prev,
-        [field]: undefined,
+        [field]: value,
       }));
-    }
-  };
+
+      // Очищаем ошибки при изменении поля
+      if (errors[field]) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]: undefined,
+        }));
+      }
+    };
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
@@ -102,10 +106,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         label="Имя"
         name="firstName"
         autoComplete="given-name"
-        value={formData.firstName}
-        onChange={handleChange("firstName")}
-        error={!!errors.firstName}
-        helperText={errors.firstName}
+        value={formData.first_name}
+        onChange={handleChange("first_name")}
+        error={!!errors.first_name}
+        helperText={errors.first_name}
       />
 
       <TextField
@@ -116,10 +120,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         label="Фамилия"
         name="lastName"
         autoComplete="family-name"
-        value={formData.lastName}
-        onChange={handleChange("lastName")}
-        error={!!errors.lastName}
-        helperText={errors.lastName}
+        value={formData.last_name}
+        onChange={handleChange("last_name")}
+        error={!!errors.last_name}
+        helperText={errors.last_name}
       />
 
       <TextField
@@ -173,10 +177,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         type={showConfirmPassword ? "text" : "password"}
         id="confirmPassword"
         autoComplete="new-password"
-        value={formData.confirmPassword}
-        onChange={handleChange("confirmPassword")}
-        error={!!errors.confirmPassword}
-        helperText={errors.confirmPassword}
+        value={formData.confirm_password}
+        onChange={handleChange("confirm_password")}
+        error={!!errors.confirm_password}
+        helperText={errors.confirm_password}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">

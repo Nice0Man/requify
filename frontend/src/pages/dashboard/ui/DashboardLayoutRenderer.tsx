@@ -160,6 +160,7 @@ export const DashboardLayoutRenderer = memo<DashboardLayoutRendererProps>(
     const renderLayout = () => {
       const commonProps = {
         mode,
+        layout,
         density,
         widgets: layoutOptimizedWidgets,
         spacing: getSpacing,

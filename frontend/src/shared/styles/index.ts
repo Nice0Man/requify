@@ -8,11 +8,3 @@ export * from "./dashboard-hooks";
 
 // Optimized animations system
 export * from "./dashboard-animations";
-
-// Re-export types for convenience
-export type {
-  DashboardMode,
-  DashboardLayout,
-  DashboardDensity,
-  WidgetSize,
-} from "./dashboard-tokens"; 

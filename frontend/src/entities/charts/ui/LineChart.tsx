@@ -96,12 +96,20 @@ export const LineChart = memo<LineChartProps>(
   }) => {
     const theme = useTheme();
     const containerRef = useRef<HTMLDivElement>(null);
-    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+    const [containerSize, setContainerSize] = useState({
+      width: 600,
+      height: 320,
+    }); // Безопасные начальные значения
 
     // Responsive values based on screen size and container
     const getResponsiveValues = () => {
-      const isSmall = containerSize.width < 600;
-      const isMedium = containerSize.width < 960;
+      // Безопасные проверки с fallback значениями
+      const safeWidth =
+        Number.isFinite(containerSize.width) && containerSize.width > 0
+          ? containerSize.width
+          : 600;
+      const isSmall = safeWidth < 600;
+      const isMedium = safeWidth < 960;
 
       return {
         margin: {
@@ -110,12 +118,12 @@ export const LineChart = memo<LineChartProps>(
           left: isSmall ? 10 : 20,
           bottom: isSmall ? 10 : 20,
         },
-        fontSize: isSmall ? 11 : isMedium ? 12 : 13,
-        axisHeight: isSmall ? 50 : 60,
-        axisWidth: isSmall ? 50 : 60,
-        strokeWidth: isSmall ? 2 : 3,
-        dotRadius: isSmall ? 3 : 5,
-        activeDotRadius: isSmall ? 5 : 7,
+        fontSize: Math.max(10, isSmall ? 11 : isMedium ? 12 : 13), // Минимальный размер 10px
+        axisHeight: Math.max(40, isSmall ? 50 : 60), // Минимальная высота оси
+        axisWidth: Math.max(40, isSmall ? 50 : 60), // Минимальная ширина оси
+        strokeWidth: Math.max(1, isSmall ? 2 : 3), // Минимальная толщина линии
+        dotRadius: Math.max(2, isSmall ? 3 : 5), // Минимальный радиус точки
+        activeDotRadius: Math.max(3, isSmall ? 5 : 7), // Минимальный радиус активной точки
       };
     };
 
@@ -133,13 +141,34 @@ export const LineChart = memo<LineChartProps>(
           for (const entry of entries) {
             const { width } = entry.contentRect;
 
+            // Безопасные вычисления с проверками на NaN/Infinity
+            const safeWidth = Number.isFinite(width) && width > 0 ? width : 600;
+            const safeAspectRatio =
+              Number.isFinite(aspectRatio) && aspectRatio > 0
+                ? aspectRatio
+                : 16 / 9;
+            const safeMinHeight =
+              Number.isFinite(minHeight) && minHeight > 0 ? minHeight : 200;
+            const safeMaxHeight =
+              Number.isFinite(maxHeight) && maxHeight > 0 ? maxHeight : 600;
+            const safeHeight =
+              Number.isFinite(height) && height > 0 ? height : 320;
+
             // Calculate adaptive height based on container width and aspect ratio
             let adaptiveHeight = responsive
-              ? Math.max(minHeight, Math.min(maxHeight, width / aspectRatio))
-              : height;
+              ? Math.max(
+                  safeMinHeight,
+                  Math.min(safeMaxHeight, safeWidth / safeAspectRatio)
+                )
+              : safeHeight;
+
+            // Дополнительная проверка результата
+            if (!Number.isFinite(adaptiveHeight) || adaptiveHeight <= 0) {
+              adaptiveHeight = safeHeight;
+            }
 
             setContainerSize({
-              width,
+              width: safeWidth,
               height: adaptiveHeight,
             });
           }

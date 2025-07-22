@@ -1,9 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { TeamDAO } from '../api/teamDAO';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { TeamDAO } from "../api/teamDAO";
 import type {
-  Team,
-  TeamMember,
-  TeamStats,
+  // Team, // TODO: use in query implementations
+  // TeamMember, // TODO: use in query implementations
+  // TeamStats, // TODO: use in query implementations
   TeamCreate,
   TeamUpdate,
   TeamMemberCreate,
@@ -13,27 +13,28 @@ import type {
   BulkCreateTeamsRequest,
   BulkAddMembersRequest,
   PermissionCheckRequest,
-  TeamQueryParams
-} from '../api/types';
+  TeamQueryParams as TeamFilters,
+  TeamQueryParams,
+} from "../api/types";
 
 // Query keys factory for teams
 export const teamKeys = {
-  all: ['teams'] as const,
-  lists: () => [...teamKeys.all, 'list'] as const,
+  all: ["teams"] as const,
+  lists: () => [...teamKeys.all, "list"] as const,
   list: (filters?: TeamFilters) => [...teamKeys.lists(), filters] as const,
-  details: () => [...teamKeys.all, 'detail'] as const,
+  details: () => [...teamKeys.all, "detail"] as const,
   detail: (id: string) => [...teamKeys.details(), id] as const,
-  members: (id: string) => [...teamKeys.detail(id), 'members'] as const,
-  stats: (id: string) => [...teamKeys.detail(id), 'stats'] as const,
-  statsOverview: () => [...teamKeys.all, 'stats-overview'] as const,
-  permissions: (teamId: string, userId: string) => 
-    [...teamKeys.detail(teamId), 'permissions', userId] as const,
+  members: (id: string) => [...teamKeys.detail(id), "members"] as const,
+  stats: (id: string) => [...teamKeys.detail(id), "stats"] as const,
+  statsOverview: () => [...teamKeys.all, "stats-overview"] as const,
+  permissions: (teamId: string, userId: string) =>
+    [...teamKeys.detail(teamId), "permissions", userId] as const,
 };
 
 /**
  * Hook для получения списка команд
  */
-export const useTeams = (params?: TeamQueryParams) => {
+export const useTeams = (params?: TeamFilters) => {
   return useQuery({
     queryKey: teamKeys.list(params),
     queryFn: () => TeamDAO.getInstance().getTeams(params),
@@ -140,7 +141,9 @@ export const useDeleteTeam = () => {
     mutationFn: (teamId: number) => TeamDAO.getInstance().deleteTeam(teamId),
     onSuccess: (_, teamId) => {
       // Удаляем команду из кеша
-      queryClient.removeQueries({ queryKey: teamKeys.detail(teamId.toString()) });
+      queryClient.removeQueries({
+        queryKey: teamKeys.detail(teamId.toString()),
+      });
       // Обновляем список команд
       queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
       // Обновляем общую статистику
@@ -159,7 +162,10 @@ export const useArchiveTeam = () => {
     mutationFn: (teamId: number) => TeamDAO.getInstance().archiveTeam(teamId),
     onSuccess: (archivedTeam, teamId) => {
       // Обновляем команду в кеше
-      queryClient.setQueryData(teamKeys.detail(teamId.toString()), archivedTeam);
+      queryClient.setQueryData(
+        teamKeys.detail(teamId.toString()),
+        archivedTeam
+      );
       // Обновляем список команд
       queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
       // Обновляем статистику
@@ -178,7 +184,10 @@ export const useRestoreTeam = () => {
     mutationFn: (teamId: number) => TeamDAO.getInstance().restoreTeam(teamId),
     onSuccess: (restoredTeam, teamId) => {
       // Обновляем команду в кеше
-      queryClient.setQueryData(teamKeys.detail(teamId.toString()), restoredTeam);
+      queryClient.setQueryData(
+        teamKeys.detail(teamId.toString()),
+        restoredTeam
+      );
       // Обновляем список команд
       queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
       // Обновляем статистику
@@ -194,15 +203,26 @@ export const useAddTeamMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ teamId, data }: { teamId: number; data: TeamMemberCreate }) =>
-      TeamDAO.getInstance().addTeamMember(teamId, data),
+    mutationFn: ({
+      teamId,
+      data,
+    }: {
+      teamId: number;
+      data: TeamMemberCreate;
+    }) => TeamDAO.getInstance().addTeamMember(teamId, data),
     onSuccess: (_, { teamId }) => {
       // Обновляем список участников
-      queryClient.invalidateQueries({ queryKey: teamKeys.members(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.members(teamId.toString()),
+      });
       // Обновляем информацию о команде (счетчик участников)
-      queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.detail(teamId.toString()),
+      });
       // Обновляем статистику команды
-      queryClient.invalidateQueries({ queryKey: teamKeys.stats(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.stats(teamId.toString()),
+      });
     },
   });
 };
@@ -214,18 +234,20 @@ export const useUpdateTeamMember = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ 
-      teamId, 
-      userId, 
-      data 
-    }: { 
-      teamId: number; 
-      userId: number; 
-      data: TeamMemberUpdate 
+    mutationFn: ({
+      teamId,
+      userId,
+      data,
+    }: {
+      teamId: number;
+      userId: number;
+      data: TeamMemberUpdate;
     }) => TeamDAO.getInstance().updateTeamMember(teamId, userId, data),
     onSuccess: (_, { teamId }) => {
       // Обновляем список участников
-      queryClient.invalidateQueries({ queryKey: teamKeys.members(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.members(teamId.toString()),
+      });
     },
   });
 };
@@ -241,11 +263,17 @@ export const useRemoveTeamMember = () => {
       TeamDAO.getInstance().removeTeamMember(teamId, userId),
     onSuccess: (_, { teamId }) => {
       // Обновляем список участников
-      queryClient.invalidateQueries({ queryKey: teamKeys.members(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.members(teamId.toString()),
+      });
       // Обновляем информацию о команде (счетчик участников)
-      queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.detail(teamId.toString()),
+      });
       // Обновляем статистику команды
-      queryClient.invalidateQueries({ queryKey: teamKeys.stats(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.stats(teamId.toString()),
+      });
     },
   });
 };
@@ -257,18 +285,20 @@ export const useChangeTeamMemberRole = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ 
-      teamId, 
-      userId, 
-      data 
-    }: { 
-      teamId: number; 
-      userId: number; 
-      data: TeamMemberUpdate 
+    mutationFn: ({
+      teamId,
+      userId,
+      data,
+    }: {
+      teamId: number;
+      userId: number;
+      data: TeamMemberUpdate;
     }) => TeamDAO.getInstance().changeTeamMemberRole(teamId, userId, data),
     onSuccess: (_, { teamId }) => {
       // Обновляем список участников
-      queryClient.invalidateQueries({ queryKey: teamKeys.members(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.members(teamId.toString()),
+      });
     },
   });
 };
@@ -280,7 +310,8 @@ export const useBulkCreateTeams = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: BulkCreateTeamsRequest) => TeamDAO.getInstance().bulkCreateTeams(data),
+    mutationFn: (data: BulkCreateTeamsRequest) =>
+      TeamDAO.getInstance().bulkCreateTeams(data),
     onSuccess: () => {
       // Обновляем весь список команд
       queryClient.invalidateQueries({ queryKey: teamKeys.lists() });
@@ -297,15 +328,26 @@ export const useBulkAddMembers = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ teamId, data }: { teamId: number; data: BulkAddMembersRequest }) =>
-      TeamDAO.getInstance().bulkAddMembers(teamId, data),
+    mutationFn: ({
+      teamId,
+      data,
+    }: {
+      teamId: number;
+      data: BulkAddMembersRequest;
+    }) => TeamDAO.getInstance().bulkAddMembers(teamId, data),
     onSuccess: (_, { teamId }) => {
       // Обновляем список участников
-      queryClient.invalidateQueries({ queryKey: teamKeys.members(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.members(teamId.toString()),
+      });
       // Обновляем информацию о команде
-      queryClient.invalidateQueries({ queryKey: teamKeys.detail(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.detail(teamId.toString()),
+      });
       // Обновляем статистику команды
-      queryClient.invalidateQueries({ queryKey: teamKeys.stats(teamId.toString()) });
+      queryClient.invalidateQueries({
+        queryKey: teamKeys.stats(teamId.toString()),
+      });
     },
   });
 };
@@ -318,10 +360,13 @@ export const useCheckTeamPermissions = (
   enabled: boolean = true
 ) => {
   return useQuery({
-    queryKey: teamKeys.permissions(data.team_id.toString(), data.user_id.toString()),
+    queryKey: teamKeys.permissions(
+      data.team_id.toString(),
+      data.user_id.toString()
+    ),
     queryFn: () => TeamDAO.getInstance().checkPermissions(data),
     enabled: enabled && !!data.team_id && !!data.user_id,
     staleTime: 5 * 60 * 1000, // 5 минут для прав доступа
     gcTime: 10 * 60 * 1000,
   });
-}; 
+};

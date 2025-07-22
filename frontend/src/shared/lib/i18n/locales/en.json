@@ -539,6 +539,8 @@
   "dashboard": {
     "title": "Dashboard",
     "subtitle": "Welcome back! Here's what's happening with your projects.",
+    "refresh": "Refresh data",
+    "refreshing": "Refreshing...",
     "upToDate": "Up to date",
     "activeProjects": "active projects",
     "lastUpdate": "Last updated 2 min ago",

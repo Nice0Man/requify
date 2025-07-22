@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import {
   Box,
   Typography,
-  Paper,
+  // Paper, // unused
   Skeleton,
   Alert,
   useTheme,
@@ -76,7 +76,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     }
 
     // Sort items
-    filteredItems = sortKanbanItems(filteredItems, "priority", "desc");
+    filteredItems = sortKanbanItems(filteredItems, "priority");
 
     // Group by columns
     const groupedItems = groupItemsByColumn(filteredItems, config.columns);

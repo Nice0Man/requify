@@ -502,7 +502,7 @@ export class UserDAO {
    */
   async activateUser(id: number): Promise<void> {
     try {
-      await client.post(API_ENDPOINTS.USERS.ACTIVATE(id));
+      await client.post(API_ENDPOINTS.USERS.ACTIVATE(id.toString()));
     } catch (error) {
       console.error(`Failed to activate user ${id}:`, error);
       throw error;
@@ -514,7 +514,7 @@ export class UserDAO {
    */
   async deactivateUser(id: number): Promise<void> {
     try {
-      await client.post(API_ENDPOINTS.USERS.DEACTIVATE(id));
+      await client.post(API_ENDPOINTS.USERS.DEACTIVATE(id.toString()));
     } catch (error) {
       console.error(`Failed to deactivate user ${id}:`, error);
       throw error;

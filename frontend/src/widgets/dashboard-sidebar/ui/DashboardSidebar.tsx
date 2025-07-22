@@ -222,7 +222,7 @@ export const DashboardSidebar = memo<DashboardSidebarProps>(
 
     if (isMobile) return null;
 
-    // Collapsed state - thin strip hidden at the right edge
+    // Collapsed state - thin strip at the right edge (visible)
     if (collapsed) {
       return (
         <Box
@@ -230,13 +230,14 @@ export const DashboardSidebar = memo<DashboardSidebarProps>(
           sx={{
             position: "fixed",
             top: "50%",
-            right: isHovered ? 10 : -30,
+            right: isHovered ? 10 : 5, // Context7: Всегда видим, не скрываем за границей экрана
             transform: "translateY(-50%)",
             zIndex: theme.zIndex.drawer + 1,
-            transition: theme.transitions.create(["right"], {
+            transition: theme.transitions.create(["right", "opacity"], {
               duration: theme.transitions.duration.short,
               easing: theme.transitions.easing.easeOut,
             }),
+            opacity: isHovered ? 1 : 0.7, // Показываем через прозрачность
           }}
         >
           <Box

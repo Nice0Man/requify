@@ -1,109 +1,153 @@
-import { Box, CssBaseline, useTheme, alpha } from "@mui/material";
-import { ThemeProvider } from "@mui/material/styles";
-import { ReactNode } from "react";
+import React, { useMemo, useEffect, useState } from "react";
+import {
+  Box,
+  CssBaseline,
+  ThemeProvider,
+  useTheme,
+  alpha,
+} from "@mui/material";
+import { DashboardThemeProvider } from "@/shared/providers";
 import { SidebarWidget, useSidebarState } from "@/widgets/app-sidebar";
 import { HeaderWidget } from "@/widgets/app-header";
+import { DASHBOARD_TOKENS } from "@/shared/styles";
+import { useLayoutCalculations } from "@/shared/hooks";
+import type { DashboardMode, DashboardLayout as DashboardLayoutType, DashboardDensity } from "@/shared/types/dashboard";
 
-interface DashboardLayoutProps {
-  children: ReactNode;
+export interface DashboardLayoutProps {
+  children: React.ReactNode;
+  mode?: DashboardMode;
+  layout?: DashboardLayoutType;
+  density?: DashboardDensity;
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
+  mode = "detailed",
+  layout = "grid", 
+  density = "comfortable"
 }) => {
   const theme = useTheme();
   const { isCollapsed, isMobile } = useSidebarState();
 
-  // Context7 принципы - рассчитываем отступ для main контента
-  const getMainMarginLeft = () => {
-    if (isMobile) {
-      return 0; // На мобильном сайдбар overlay, не отступ
-    }
-    return isCollapsed ? 72 : 280; // collapsed: 72px, expanded: 280px
-  };
+  // Получаем точные расчеты для layout без overflow костылей
+  const { dimensions, recalculate, breakpoints } = useLayoutCalculations({
+    mode,
+    layout,
+    density,
+    sidebarCollapsed: isCollapsed
+  });
+
+  // State для отслеживания изменений размеров окна
+  const [currentDimensions, setCurrentDimensions] = useState(dimensions);
+
+  // Пересчитываем размеры при изменении окна
+  useEffect(() => {
+    const handleResize = () => {
+      const newDimensions = recalculate();
+      setCurrentDimensions(newDimensions);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [recalculate]);
+
+  // Обновляем размеры при изменении параметров
+  useEffect(() => {
+    setCurrentDimensions(dimensions);
+  }, [dimensions]);
+
+  // Точные стили для корневого контейнера
+  const rootContainerStyles = useMemo(() => ({
+    display: "flex",
+    height: `${currentDimensions.viewport.height}px`, // Точная высота viewport
+    width: `${currentDimensions.viewport.width}px`, // Точная ширина viewport
+    position: "relative" as const,
+    background: `linear-gradient(135deg, 
+      ${alpha(theme.palette.background.default, 0.95)} 0%, 
+      ${alpha(theme.palette.grey[50], 0.3)} 100%)`,
+  }), [currentDimensions.viewport, theme]);
+
+  // Точные стили для main content
+  const mainContentStyles = useMemo(() => ({
+    // Точный расчет ширины и позиции
+    width: `${currentDimensions.content.width}px`,
+    height: `${currentDimensions.content.height + currentDimensions.header.height}px`,
+    marginLeft: `${currentDimensions.content.margin.left}px`,
+    marginRight: `${currentDimensions.content.margin.right}px`,
+    
+    display: "flex",
+    flexDirection: "column" as const,
+    position: "relative" as const,
+    
+    // Transition для анимации при изменении sidebar
+    transition: theme.transitions.create(["margin-left", "width"], {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.standard,
+    }),
+  }), [currentDimensions, theme]);
+
+  // Точные стили для content area
+  const contentAreaStyles = useMemo(() => ({
+    width: "100%",
+    height: `${currentDimensions.content.height}px`,
+    // Точные padding из расчетов
+    paddingLeft: `${currentDimensions.content.padding.horizontal}px`,
+    paddingRight: `${currentDimensions.content.padding.horizontal}px`,
+    paddingTop: `${currentDimensions.content.padding.vertical}px`,
+    paddingBottom: `${currentDimensions.content.padding.vertical}px`,
+    
+    backgroundColor: "transparent",
+    position: "relative" as const,
+    
+    // Кастомный скроллбар
+    "&::-webkit-scrollbar": {
+      width: 6,
+      backgroundColor: "transparent",
+    },
+    "&::-webkit-scrollbar-track": {
+      backgroundColor: alpha(theme.palette.divider, 0.05),
+      borderRadius: 3,
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+      borderRadius: 3,
+      "&:hover": {
+        backgroundColor: alpha(theme.palette.primary.main, 0.3),
+      },
+    },
+    
+    // Плавный скролл только если нужен
+    scrollBehavior: "smooth",
+  }), [currentDimensions, theme]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          display: "flex",
-          height: "100vh",
-          overflow: "hidden",
-          background: `linear-gradient(135deg, 
-            ${alpha(theme.palette.background.default, 0.95)} 0%, 
-            ${alpha(theme.palette.grey[50], 0.3)} 100%)`,
-          // Context7 микро-градиент для глубины
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            opacity: 0.02,
-            backgroundImage: `radial-gradient(circle at 25% 25%, ${theme.palette.primary.main} 0%, transparent 50%), 
-                             radial-gradient(circle at 75% 75%, ${theme.palette.secondary.main} 0%, transparent 50%)`,
-            pointerEvents: "none",
-            zIndex: -1,
-          },
-        }}
-      >
-        <SidebarWidget />
+    <DashboardThemeProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        
+        {/* Root Container - точные размеры viewport */}
+        <Box sx={rootContainerStyles}>
+          
+          {/* Sidebar - фиксированная позиция */}
+          <SidebarWidget />
 
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-            // Context7 плавные переходы
-            marginLeft: `${getMainMarginLeft()}px`,
-            transition: theme.transitions.create(["margin-left"], {
-              easing: theme.transitions.easing.easeInOut,
-              duration: theme.transitions.duration.standard,
-            }),
-            // На мобильном занимаем всю ширину
-            width: isMobile ? "100%" : `calc(100% - ${getMainMarginLeft()}px)`,
-            // Context7 subtle shadow для depth
-            boxShadow: isMobile
-              ? "none"
-              : `inset 2px 0 8px ${alpha(theme.palette.common.black, 0.02)}`,
-          }}
-        >
-          <HeaderWidget />
-
+          {/* Main Content Area - точно рассчитанные размеры */}
           <Box
-            sx={{
-              flexGrow: 1,
-              overflow: "auto",
-              backgroundColor: "transparent", // Прозрачный для градиента
-              position: "relative",
-              // Context7 scrollbar styling
-              "&::-webkit-scrollbar": {
-                width: 6,
-                backgroundColor: "transparent",
-              },
-              "&::-webkit-scrollbar-track": {
-                backgroundColor: alpha(theme.palette.divider, 0.05),
-                borderRadius: 3,
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                borderRadius: 3,
-                "&:hover": {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.3),
-                },
-              },
-              // Smooth scrolling
-              scrollBehavior: "smooth",
-            }}
+            component="main"
+            sx={mainContentStyles}
           >
-            {children}
+            {/* Header - фиксированная высота */}
+            <HeaderWidget />
+
+            {/* Content Area - точные размеры и padding */}
+            <Box sx={contentAreaStyles}>
+              {children}
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </ThemeProvider>
+      </ThemeProvider>
+    </DashboardThemeProvider>
   );
 };
+
+export default DashboardLayout;

@@ -1,4 +1,10 @@
 import type { Theme } from "@mui/material/styles";
+import type {
+  DashboardMode,
+  DashboardLayout,
+  DashboardDensity,
+  WidgetSize,
+} from "../types/dashboard";
 
 // Dashboard Design Tokens - Современная система дизайна
 export const DASHBOARD_TOKENS = {
@@ -86,18 +92,54 @@ export const DASHBOARD_TOKENS = {
     },
   },
 
-  // Shadow system
+  // Shadow system - Context7 centralized approach
   shadows: {
-    widget: {
-      rest: "0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06)",
-      hover: "0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
-      active: "0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.06)",
-      focused: "0 0 0 3px rgba(59, 130, 246, 0.1)",
+    // Base elevation system (Material Design + Context7)
+    elevation: {
+      none: "none",
+      xs: "0 1px 2px rgba(0, 0, 0, 0.05)",
+      sm: "0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06)",
+      md: "0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)",
+      lg: "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.08)",
+      xl: "0 20px 25px rgba(0, 0, 0, 0.1), 0 8px 10px rgba(0, 0, 0, 0.08)",
+      "2xl": "0 25px 50px rgba(0, 0, 0, 0.12), 0 12px 20px rgba(0, 0, 0, 0.08)",
     },
-    container: {
-      flat: "none",
-      elevated: "0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1)",
-      floating: "0 8px 32px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.08)",
+    // Component-specific shadows (no duplication)
+    component: {
+      // Widget shadows (only for widgets, nowhere else)
+      widget: {
+        rest: "0 1px 3px rgba(0, 0, 0, 0.08)",
+        hover: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        active: "0 1px 2px rgba(0, 0, 0, 0.1)",
+        focus: "0 0 0 3px rgba(59, 130, 246, 0.1)",
+      },
+      // Container shadows (for layout containers only)
+      container: {
+        flat: "none",
+        subtle: "0 1px 3px rgba(0, 0, 0, 0.05)",
+        elevated: "0 4px 8px rgba(0, 0, 0, 0.06)",
+        floating: "0 8px 16px rgba(0, 0, 0, 0.08)",
+      },
+      // Navigation shadows
+      navigation: {
+        sidebar: "2px 0 8px rgba(0, 0, 0, 0.02)",
+        header: "0 1px 3px rgba(0, 0, 0, 0.05)",
+      },
+    },
+    // Dark mode variants
+    dark: {
+      widget: {
+        rest: "0 1px 3px rgba(0, 0, 0, 0.2)",
+        hover: "0 4px 12px rgba(0, 0, 0, 0.25)",
+        active: "0 1px 2px rgba(0, 0, 0, 0.2)",
+        focus: "0 0 0 3px rgba(59, 130, 246, 0.2)",
+      },
+      container: {
+        flat: "none",
+        subtle: "0 1px 3px rgba(0, 0, 0, 0.15)",
+        elevated: "0 4px 8px rgba(0, 0, 0, 0.18)",
+        floating: "0 8px 16px rgba(0, 0, 0, 0.22)",
+      },
     },
   },
 
@@ -137,11 +179,46 @@ export const DASHBOARD_TOKENS = {
     ultrawide: 1920,
   },
 
-  // Z-index scale
+  // Z-index scale - Context7 centralized system
   zIndex: {
+    // Base levels
     hide: -1,
     auto: "auto",
     base: 0,
+
+    // Dashboard-specific z-index hierarchy
+    dashboard: {
+      background: 0,
+      container: 1,
+      widget: {
+        rest: 2,
+        hover: 3,
+        active: 4,
+        focus: 5,
+      },
+      navigation: {
+        sidebar: 10,
+        header: 11,
+        mobile_overlay: 12,
+      },
+      controls: {
+        sidebar: 15,
+        floating_actions: 16,
+      },
+      interactions: {
+        tooltip: 20,
+        dropdown: 25,
+        modal_backdrop: 30,
+        modal: 31,
+      },
+      system: {
+        loading: 50,
+        error: 51,
+        debug: 100,
+      },
+    },
+
+    // Legacy MUI levels (for compatibility)
     docked: 10,
     dropdown: 1000,
     sticky: 1100,
@@ -195,11 +272,7 @@ export const DASHBOARD_TOKENS = {
   },
 } as const;
 
-// Utility types for type safety
-export type DashboardMode = "minimal" | "compact" | "detailed" | "fullscreen";
-export type DashboardLayout = "grid" | "list" | "masonry";
-export type DashboardDensity = "dense" | "compact" | "comfortable";
-export type WidgetSize = "small" | "medium" | "large" | "xlarge" | "auto";
+// Utility types imported from shared/types/dashboard
 
 // Helper functions for theme integration
 export const getDashboardToken = (path: string): any => {
@@ -231,9 +304,76 @@ export const getWidgetPadding = (
 };
 
 export const getShadowForState = (
-  state: "rest" | "hover" | "active" | "focused" = "rest"
+  state: "rest" | "hover" | "active" | "focus" = "rest"
 ): string => {
-  return DASHBOARD_TOKENS.shadows.widget[state];
+  return DASHBOARD_TOKENS.shadows.component.widget[state];
+};
+
+// Helper function to get z-index for dashboard components
+export const getDashboardZIndex = (
+  component:
+    | "container"
+    | "widget"
+    | "navigation"
+    | "controls"
+    | "interactions"
+    | "system",
+  state?: string
+): number => {
+  const dashboardZ = DASHBOARD_TOKENS.zIndex.dashboard;
+
+  if (component === "widget" && state) {
+    return (
+      dashboardZ.widget[state as keyof typeof dashboardZ.widget] ||
+      dashboardZ.widget.rest
+    );
+  }
+
+  if (component === "navigation" && state) {
+    return (
+      dashboardZ.navigation[state as keyof typeof dashboardZ.navigation] ||
+      dashboardZ.navigation.sidebar
+    );
+  }
+
+  if (component === "controls" && state) {
+    return (
+      dashboardZ.controls[state as keyof typeof dashboardZ.controls] ||
+      dashboardZ.controls.sidebar
+    );
+  }
+
+  if (component === "interactions" && state) {
+    return (
+      dashboardZ.interactions[state as keyof typeof dashboardZ.interactions] ||
+      dashboardZ.interactions.tooltip
+    );
+  }
+
+  if (component === "system" && state) {
+    return (
+      dashboardZ.system[state as keyof typeof dashboardZ.system] ||
+      dashboardZ.system.loading
+    );
+  }
+
+  // Для компонентов без состояния возвращаем базовое значение
+  switch (component) {
+    case "container":
+      return dashboardZ.container;
+    case "widget":
+      return dashboardZ.widget.rest;
+    case "navigation":
+      return dashboardZ.navigation.sidebar;
+    case "controls":
+      return dashboardZ.controls.sidebar;
+    case "interactions":
+      return dashboardZ.interactions.tooltip;
+    case "system":
+      return dashboardZ.system.loading;
+    default:
+      return dashboardZ.container;
+  }
 };
 
 export const getAnimationDuration = (

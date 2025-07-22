@@ -1,6 +1,6 @@
 import type {
   KanbanCard,
-  KanbanItem,
+  // KanbanItem, // TODO: implement when needed
   KanbanFilter,
   KanbanType,
   KanbanItemPriority,
@@ -91,8 +91,8 @@ export const filterKanbanItems = (
 // Sort kanban items by priority and date
 export const sortKanbanItems = (
   items: KanbanCard[],
-  p0: string,
-  p1: string,
+  // p0: string, // TODO: implement position-based sorting
+  // p1: string, // TODO: implement position-based sorting
   sortBy: "priority" | "date" | "title" = "priority"
 ): KanbanCard[] => {
   return [...items].sort((a, b) => {

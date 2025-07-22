@@ -12,7 +12,7 @@ import type {
   TeamMember,
   TeamMemberCreate,
   TeamMemberUpdate,
-  TeamStats,
+  // TeamStats, // TODO: implement team stats
   TeamListResponse,
   TeamDetailResponse,
   TeamMemberListResponse,
