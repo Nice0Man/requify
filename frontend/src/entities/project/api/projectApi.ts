@@ -1,4 +1,4 @@
-import { client } from "@/shared/api/client";
+import { client } from "@/app/providers/client";
 import { API_ENDPOINTS } from "@/shared/api/endpoints";
 import type { Project, ProjectFilters, CreateProjectData, UpdateProjectData } from "../model/types";
 

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { DashboardApi } from '@/entities/dashboard';
+import { dashboardApi } from "@/entities/dashboard";
 
 // Types
 interface DashboardState {
@@ -20,10 +20,10 @@ const initialState: DashboardState = {
 
 // Async thunks
 export const fetchDashboardStats = createAsyncThunk(
-  'dashboard/fetchStats',
+  "dashboard/fetchStats",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await DashboardApi.getStats();
+      const response = await dashboardApi.getStats();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -32,10 +32,10 @@ export const fetchDashboardStats = createAsyncThunk(
 );
 
 export const fetchRecentActivity = createAsyncThunk(
-  'dashboard/fetchRecentActivity',
+  "dashboard/fetchRecentActivity",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await DashboardApi.getActivity();
+      const response = await dashboardApi.getActivity();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -44,11 +44,11 @@ export const fetchRecentActivity = createAsyncThunk(
 );
 
 export const fetchChartData = createAsyncThunk(
-  'dashboard/fetchChartData',
+  "dashboard/fetchChartData",
   async (_, { rejectWithValue }) => {
     try {
       // TODO: добавить метод getChartData в dashboardApi
-      const response = await DashboardApi.getStats();
+      const response = await dashboardApi.getStats();
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -57,7 +57,7 @@ export const fetchChartData = createAsyncThunk(
 );
 
 const dashboardSlice = createSlice({
-  name: 'dashboard',
+  name: "dashboard",
   initialState,
   reducers: {
     clearError: (state) => {
@@ -91,4 +91,4 @@ const dashboardSlice = createSlice({
 });
 
 export const { clearError } = dashboardSlice.actions;
-export { dashboardSlice }; 
+export { dashboardSlice };

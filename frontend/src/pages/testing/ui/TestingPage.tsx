@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   Box,
   Typography,
@@ -27,17 +26,54 @@ import {
   Assignment as AssignmentIcon,
   PlayArrow as PlayArrowIcon,
 } from "@mui/icons-material";
-import {
-  useTestCases,
-  useTestStats,
-  useUpdateTestCase,
-} from "@/features/testing";
+import { PageLayout } from "@/shared/ui/PageLayout";
 import { LoadingSpinner } from "@/shared/ui";
-import type { TestCase, TestFilters } from "@/features/testing/api/testApi";
-import { DashboardLayout } from "@/widgets/layout/ui";
+// TODO: Implement these hooks when testing feature is ready
+// import {
+//   useTestCases,
+//   useTestStats,
+//   useUpdateTestCase,
+// } from "@/features/testing";
+// import type { TestCase, TestFilters } from "@/features/testing/api/testApi";
+
+// Temporary mock types and hooks for demo
+interface TestCase {
+  id: string;
+  title: string;
+  description?: string;
+  steps: string[];
+  status: 'draft' | 'active' | 'deprecated';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  createdAt: string;
+}
+
+interface TestFilters {
+  search?: string;
+  status?: string;
+  priority?: string;
+  projectId?: string;
+}
+
+// Mock hooks
+const useTestCases = (filters: TestFilters) => ({
+  data: [] as TestCase[],
+  isPending: false,
+  error: null,
+});
+
+const useTestStats = () => ({
+  data: {
+    totalTests: 0,
+    passedTests: 0,
+    failedTests: 0,
+  },
+  isPending: false,
+  error: null,
+});
+
+const useUpdateTestCase = () => ({});
 
 const TestingPage: React.FC = () => {
-  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "draft" | "active" | "deprecated"
@@ -144,13 +180,13 @@ const TestingPage: React.FC = () => {
           </Typography>
           <Box display="flex" gap={1}>
             <Chip
-              label={t(`testing.status.${testCase.status}`)}
+              label={`Статус: ${testCase.status}`}
               color={getStatusColor(testCase.status)}
               size="small"
               sx={{ fontWeight: 600 }}
             />
             <Chip
-              label={t(`testing.priority.${testCase.priority}`)}
+              label={`Приоритет: ${testCase.priority}`}
               color={getPriorityColor(testCase.priority)}
               size="small"
               variant="outlined"
@@ -160,21 +196,21 @@ const TestingPage: React.FC = () => {
         </Box>
 
         <Typography variant="body2" color="text.secondary" mb={2}>
-          {testCase.description || t("testing.placeholders.noDescription")}
+          {testCase.description || "Описание отсутствует"}
         </Typography>
 
         <Box display="flex" gap={2} mb={2}>
           <Box>
             <Typography variant="body2" color="text.secondary">
-              {t("testing.fields.steps")}
+              Шаги
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {testCase.steps.length} {t("testing.fields.stepsCount")}
+              {testCase.steps.length} шагов
             </Typography>
           </Box>
           <Box>
             <Typography variant="body2" color="text.secondary">
-              {t("testing.fields.createdAt")}
+              Создан
             </Typography>
             <Typography variant="body2" fontWeight={500}>
               {formatDate(testCase.createdAt)}
@@ -185,7 +221,7 @@ const TestingPage: React.FC = () => {
 
       <CardActions sx={{ p: 2, pt: 0 }}>
         <Button size="small" startIcon={<EditIcon />} sx={{ fontWeight: 600 }}>
-          {t("common.edit")}
+          Редактировать
         </Button>
         <Button
           size="small"
@@ -193,14 +229,14 @@ const TestingPage: React.FC = () => {
           sx={{ fontWeight: 600 }}
           color="primary"
         >
-          {t("testing.execute")}
+          Выполнить
         </Button>
         <Button
           size="small"
           startIcon={<AssignmentIcon />}
           sx={{ fontWeight: 600 }}
         >
-          {t("common.view")}
+          Просмотр
         </Button>
       </CardActions>
     </Card>
@@ -208,32 +244,32 @@ const TestingPage: React.FC = () => {
 
   if (testCasesLoading || testStatsLoading) {
     return (
-      <DashboardLayout>
+      <PageLayout title="Тестирование">
         <LoadingSpinner fullScreen />
-      </DashboardLayout>
+      </PageLayout>
     );
   }
 
   if (testCasesError || testStatsError) {
     return (
-      <DashboardLayout>
+      <PageLayout title="Тестирование">
         <Box p={3} textAlign="center">
-          <Typography color="error">{t("errors.loadingError")}</Typography>
+          <Typography color="error">Ошибка загрузки данных</Typography>
         </Box>
-      </DashboardLayout>
+      </PageLayout>
     );
   }
 
   return (
-    <DashboardLayout>
+    <PageLayout title="Тестирование">
       <Box p={3}>
         {/* Заголовок */}
         <Box mb={3}>
           <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
-            {t("testing.title")}
+            Тестирование
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            {t("testing.subtitle")}
+            Управление тест-кейсами и выполнение тестов
           </Typography>
         </Box>
 
@@ -249,7 +285,7 @@ const TestingPage: React.FC = () => {
                   {testStats.totalTests}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={1}>
-                  {t("testing.stats.totalTests")}
+                  Всего тестов
                 </Typography>
               </Paper>
             </Grid>
@@ -262,7 +298,7 @@ const TestingPage: React.FC = () => {
                   {testStats.passedTests}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={1}>
-                  {t("testing.stats.passedTests")}
+                  Пройдено
                 </Typography>
               </Paper>
             </Grid>
@@ -275,7 +311,7 @@ const TestingPage: React.FC = () => {
                   {testStats.failedTests}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={1}>
-                  {t("testing.stats.failedTests")}
+                  Провалено
                 </Typography>
               </Paper>
             </Grid>
@@ -290,7 +326,7 @@ const TestingPage: React.FC = () => {
                     (testStats?.failedTests || 0)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={1}>
-                  {t("testing.stats.skippedTests")}
+                  Пропущено
                 </Typography>
               </Paper>
             </Grid>
@@ -303,7 +339,7 @@ const TestingPage: React.FC = () => {
             <Grid item xs={12} md={3}>
               <TextField
                 fullWidth
-                placeholder={t("testing.searchPlaceholder")}
+                placeholder="Поиск тест-кейсов..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
@@ -315,44 +351,36 @@ const TestingPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} md={2}>
               <FormControl fullWidth>
-                <InputLabel>{t("testing.fields.status")}</InputLabel>
+                <InputLabel>Статус</InputLabel>
                 <Select
                   value={statusFilter}
-                  label={t("testing.fields.status")}
+                  label="Статус"
                   onChange={(e) =>
                     setStatusFilter(e.target.value as typeof statusFilter)
                   }
                 >
-                  <MenuItem value="all">{t("testing.status.all")}</MenuItem>
-                  <MenuItem value="draft">{t("testing.status.draft")}</MenuItem>
-                  <MenuItem value="active">
-                    {t("testing.status.active")}
-                  </MenuItem>
-                  <MenuItem value="deprecated">
-                    {t("testing.status.deprecated")}
-                  </MenuItem>
+                  <MenuItem value="all">Все статусы</MenuItem>
+                  <MenuItem value="draft">Черновик</MenuItem>
+                  <MenuItem value="active">Активный</MenuItem>
+                  <MenuItem value="deprecated">Устаревший</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} md={2}>
               <FormControl fullWidth>
-                <InputLabel>{t("testing.fields.priority")}</InputLabel>
+                <InputLabel>Приоритет</InputLabel>
                 <Select
                   value={priorityFilter}
-                  label={t("testing.fields.priority")}
+                  label="Приоритет"
                   onChange={(e) =>
                     setPriorityFilter(e.target.value as typeof priorityFilter)
                   }
                 >
-                  <MenuItem value="all">{t("testing.priority.all")}</MenuItem>
-                  <MenuItem value="low">{t("testing.priority.low")}</MenuItem>
-                  <MenuItem value="medium">
-                    {t("testing.priority.medium")}
-                  </MenuItem>
-                  <MenuItem value="high">{t("testing.priority.high")}</MenuItem>
-                  <MenuItem value="critical">
-                    {t("testing.priority.critical")}
-                  </MenuItem>
+                  <MenuItem value="all">Все приоритеты</MenuItem>
+                  <MenuItem value="low">Низкий</MenuItem>
+                  <MenuItem value="medium">Средний</MenuItem>
+                  <MenuItem value="high">Высокий</MenuItem>
+                  <MenuItem value="critical">Критический</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -363,7 +391,7 @@ const TestingPage: React.FC = () => {
                 onChange={(_, newViewMode) =>
                   newViewMode && setViewMode(newViewMode)
                 }
-                aria-label={t("common.view")}
+                aria-label="Режим просмотра"
               >
                 <ToggleButton value="grid" aria-label="grid view">
                   <ViewModuleIcon />
@@ -380,7 +408,7 @@ const TestingPage: React.FC = () => {
                 startIcon={<AddIcon />}
                 sx={{ fontWeight: 600 }}
               >
-                {t("testing.createTestCase")}
+                Создать тест-кейс
               </Button>
             </Grid>
           </Grid>
@@ -393,14 +421,14 @@ const TestingPage: React.FC = () => {
             sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
           >
             <Typography variant="h6" color="text.secondary" mb={2}>
-              {t("testing.notFound")}
+              Тест-кейсы не найдены
             </Typography>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               sx={{ fontWeight: 600 }}
             >
-              {t("testing.createFirstTestCase")}
+              Создать первый тест-кейс
             </Button>
           </Paper>
         ) : (
@@ -413,7 +441,7 @@ const TestingPage: React.FC = () => {
           </Grid>
         )}
       </Box>
-    </DashboardLayout>
+    </PageLayout>
   );
 };
 

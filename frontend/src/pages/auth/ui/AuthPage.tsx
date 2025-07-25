@@ -28,17 +28,13 @@ import {
   GitHub,
   Login,
   PersonAdd,
-  ArrowForward,
   Visibility,
   VisibilityOff,
-  CheckCircle,
-  Error,
   Person,
   Email,
   Lock,
 } from "@mui/icons-material";
-import { useAuth } from "@/features/auth/model/useAuth";
-import { Auth0StatusBanner } from "@/features/auth/ui/Auth0StatusBanner";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import type {
   LoginFormData,
   RegisterFormData,
@@ -991,14 +987,6 @@ const AuthPage: React.FC = () => {
     >
       <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
         {renderHeader()}
-
-        {/* Auth0 Status Banner */}
-        <Fade in timeout={600} style={{ transitionDelay: "200ms" }}>
-          <Box sx={{ mb: 3, maxWidth: 500, mx: "auto" }}>
-            <Auth0StatusBanner />
-          </Box>
-        </Fade>
-
         <Fade in timeout={600} style={{ transitionDelay: "400ms" }}>
           <Paper
             elevation={20}

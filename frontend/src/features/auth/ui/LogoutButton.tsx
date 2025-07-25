@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@mui/material";
 import { ExitToApp } from "@mui/icons-material";
-import { useAuth } from "../model/useAuth";
+import { useAuth } from "../hooks/useAuth";
 
 interface LogoutButtonProps {
   variant?: "contained" | "outlined" | "text";

@@ -1,405 +1,323 @@
-import React, {
-  memo,
-  useState,
-  useCallback,
-  startTransition,
-  Suspense,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import { memo, useCallback, useMemo } from "react";
+import { Grid, Alert, Fab, Fade, IconButton } from "@mui/material";
 import {
-  Box,
-  CircularProgress,
-  Alert,
-  useTheme,
-  alpha,
-  useMediaQuery,
-} from "@mui/material";
-import i18n from "@/shared/lib/i18n";
+  Refresh as RefreshIcon,
+  ViewModule as GridIcon,
+  ViewList as ListIcon,
+  ViewQuilt as MasonryIcon,
+} from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
-import { DashboardErrorBoundary, AuthDebugPanel } from "@/shared/ui";
 
-import { DashboardLayout } from "@/widgets/layout/ui/DashboardLayout";
-import { DashboardHeader } from "@/widgets/dashboard-header";
-import {
-  DashboardSidebar,
-  type DashboardMode,
-  type DashboardLayout as DashboardLayoutType,
-  type DashboardDensity,
-} from "@/widgets/dashboard-sidebar";
-import { DashboardContainer } from "@/widgets/container";
+// Shared imports
+import { PageLayout, ErrorBoundary, LazyWidget } from "@/shared/ui";
 
-// Import new layout system
-import { DashboardLayoutRenderer } from "./DashboardLayoutRenderer";
+// Dashboard features
 import {
-  createDashboardWidgets,
-  getWidgetsForMode,
-  getWidgetsForLayout,
-} from "../config/widgetDefinitions";
-
-import {
+  EnhancedDashboardStatsWidget,
   useDashboardOverview,
-  useRefreshDashboard,
-  useTimelineData,
-  useDistributionData,
+  useDashboardStats,
+  useSystemHealth,
+  useQuickActions,
   dashboardKeys,
 } from "@/features/dashboard";
-import { useLayoutMode } from "@/shared/contexts/PerformanceContext";
 
-export interface DashboardPageProps {
-  className?: string;
-}
+// Lazy widgets для code splitting
+import {
+  LazyProjectOverviewWidget,
+  LazyActivityFeedWidget,
+  LazyQuickActionsWidget,
+  LazySystemHealthWidget,
+} from "@/widgets/lazy";
+
+// Dashboard context
+import {
+  DashboardProvider,
+  useDashboard,
+  useDashboardWidgets,
+} from "../context/DashboardContext";
+import { useWidgetStyles } from "../styles/DashboardWidgetStyles";
+import type { DashboardLayoutType } from "@/shared/types/dashboard";
 
 /**
- * Main Dashboard Page Component with Context7 Design
- * New structure: Header at top, main content on left, controls sidebar on right
+ * Основной компонент дашборда
  */
-const DashboardPage: React.FC<DashboardPageProps> = ({ className }) => {
-  // Hooks
-  const t = i18n.t;
-  const theme = useTheme();
+const DashboardContent = memo(() => {
   const queryClient = useQueryClient();
-  const { mode: layoutMode, setMode: setLayoutMode } = useLayoutMode();
+  const { state, setLayout, setRefreshing, setError, spacing } = useDashboard();
 
-  // Responsive - стабилизируем с помощью useRef чтобы избежать ререндеров
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-  const isMobileRef = useRef(isMobile);
-  const isTabletRef = useRef(isTablet);
+  const { visibleWidgets: _visibleWidgets } = useDashboardWidgets();
 
-  // Обновляем ref-ы при изменении media queries
-  useEffect(() => {
-    isMobileRef.current = isMobile;
-    isTabletRef.current = isTablet;
-  }, [isMobile, isTablet]);
-
-  // State
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [dashboardMode, setDashboardMode] = useState<DashboardMode>(
-    isMobile ? "compact" : "detailed"
-  );
-  const [dashboardLayout, setDashboardLayout] = useState<DashboardLayoutType>(
-    isMobile ? "list" : "grid"
-  );
-  const [dashboardDensity, setDashboardDensity] = useState<DashboardDensity>(
-    isMobile ? "compact" : "comfortable"
-  );
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  // Handle mounting to prevent Fade errors
-  useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 150);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Handle fullscreen events from browser (ESC key, F11, etc.)
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      const isCurrentlyFullscreen = Boolean(document.fullscreenElement);
-      if (isCurrentlyFullscreen !== isFullscreen) {
-        setIsFullscreen(isCurrentlyFullscreen);
-
-        // Update mode accordingly
-        if (!isCurrentlyFullscreen && dashboardMode === "fullscreen") {
-          setDashboardMode(isMobile ? "compact" : "detailed");
-        }
-      }
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
-    document.addEventListener("mozfullscreenchange", handleFullscreenChange);
-    document.addEventListener("msfullscreenchange", handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-      document.removeEventListener(
-        "webkitfullscreenchange",
-        handleFullscreenChange
-      );
-      document.removeEventListener(
-        "mozfullscreenchange",
-        handleFullscreenChange
-      );
-      document.removeEventListener(
-        "msfullscreenchange",
-        handleFullscreenChange
-      );
-    };
-  }, [isFullscreen, dashboardMode, isMobile]);
-
-  // Data fetching
-  const { data: overview, isError, error, isFetching } = useDashboardOverview();
-
-  // Chart data from API
-  const { data: timelineData, isLoading: isTimelineLoading } =
-    useTimelineData();
-  const { data: distributionData, isLoading: isDistributionLoading } =
-    useDistributionData();
-
-  // Performance optimization with useDeferredValue
-  const deferredOverview = useDeferredValue(overview);
-
-  // Create widgets configuration based on data
-  const baseWidgets = useMemo(() => {
-    return createDashboardWidgets(
-      deferredOverview,
-      timelineData || [],
-      distributionData || []
-    );
-  }, [deferredOverview, timelineData, distributionData]);
-
-  // Apply mode and layout filters to widgets
-  const finalWidgets = useMemo(() => {
-    const modeFilteredWidgets = getWidgetsForMode(baseWidgets, dashboardMode);
-    return getWidgetsForLayout(modeFilteredWidgets, dashboardLayout);
-  }, [baseWidgets, dashboardMode, dashboardLayout]);
-
-  // Mutation for refresh
-  const refreshMutation = useRefreshDashboard({
-    onMutate: () => setIsRefreshing(true),
-    onSettled: () => setIsRefreshing(false),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
-    },
+  // Получение стилей для контейнера
+  const { containerStyles: _containerStyles } = useWidgetStyles({
+    mode: state.mode,
+    layout: state.layout,
+    density: state.density,
   });
 
-  // Event handlers
-  const handleRefresh = useCallback(() => {
-    if (!isRefreshing) {
-      refreshMutation.mutate();
+  // Data queries с интеграцией
+  const {
+    data: overview,
+    isLoading: overviewLoading,
+    error: overviewError,
+    refetch: refetchOverview,
+  } = useDashboardOverview();
+
+  const {
+    data: _stats,
+    isLoading: statsLoading,
+    error: statsError,
+    refetch: refetchStats,
+  } = useDashboardStats();
+
+  const {
+    data: _systemHealth,
+    isLoading: systemHealthLoading,
+    error: systemHealthError,
+    refetch: refetchSystemHealth,
+  } = useSystemHealth();
+
+  const {
+    data: quickActions,
+    isLoading: quickActionsLoading,
+    error: quickActionsError,
+    refetch: refetchQuickActions,
+  } = useQuickActions();
+
+  // Общее состояние загрузки
+  const isLoading = overviewLoading || statsLoading || systemHealthLoading;
+  const hasError = !!(overviewError || statsError || systemHealthError);
+
+  // Обработчик обновления всех данных
+  const handleRefreshAll = useCallback(async () => {
+    setRefreshing(true);
+
+    try {
+      await Promise.all([
+        refetchOverview(),
+        refetchStats(),
+        refetchSystemHealth(),
+        refetchQuickActions(),
+      ]);
+
+      // Invalidate all dashboard queries
+      await queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
+    } catch (error) {
+      console.error("Ошибка при обновлении дашборда:", error);
+      setError(true, "Не удалось обновить данные дашборда");
+    } finally {
+      setRefreshing(false);
     }
-  }, [refreshMutation, isRefreshing]);
+  }, [
+    refetchOverview,
+    refetchStats,
+    refetchSystemHealth,
+    refetchQuickActions,
+    queryClient,
+    setRefreshing,
+    setError,
+  ]);
 
-  // Enhanced event handlers with smart mode coordination
-  const handleModeChange = useCallback(
-    (newMode: DashboardMode) => {
-      startTransition(() => {
-        setDashboardMode(newMode);
-
-        // Smart mode transitions - используем ref для актуальных значений
-        if (newMode === "minimal") {
-          // Minimal mode works best with list layout and dense density
-          setDashboardLayout((currentLayout) => {
-            if (currentLayout === "masonry") {
-              return "list";
-            }
-            return currentLayout;
-          });
-          setDashboardDensity((currentDensity) => {
-            if (currentDensity === "comfortable") {
-              return "dense";
-            }
-            return currentDensity;
-          });
-        } else if (newMode === "fullscreen") {
-          // Enter fullscreen mode
-          document.documentElement.requestFullscreen?.();
-          // Fullscreen mode can use any layout but prefers grid/masonry
-          setDashboardLayout((currentLayout) => {
-            if (currentLayout === "list" && !isMobileRef.current) {
-              return "grid";
-            }
-            return currentLayout;
-          });
-        }
-      });
-    },
-    [] // Убираем все зависимости, используем ref-ы и функциональные апдейты
-  );
-
+  // Обработчики переключения layout
   const handleLayoutChange = useCallback(
     (newLayout: DashboardLayoutType) => {
-      startTransition(() => {
-        setDashboardLayout(newLayout);
-        // Sync with legacy layout mode
-        if (newLayout === "grid") {
-          setLayoutMode("grid");
-        } else if (newLayout === "list") {
-          setLayoutMode("list");
-        }
-      });
+      setLayout(newLayout);
     },
-    [] // Убираем зависимости для стабильности
+    [setLayout]
   );
 
-  const handleDensityChange = useCallback((newDensity: DashboardDensity) => {
-    startTransition(() => {
-      setDashboardDensity(newDensity);
-    });
-  }, []);
+  // Header actions
+  const headerActions = useMemo(
+    () => [
+      <IconButton
+        key="refresh"
+        onClick={handleRefreshAll}
+        disabled={state.isRefreshing}
+        size="small"
+        title="Обновить дашборд"
+      >
+        <RefreshIcon />
+      </IconButton>,
+      <IconButton
+        key="grid-layout"
+        onClick={() => handleLayoutChange("grid")}
+        color={state.layout === "grid" ? "primary" : "default"}
+        size="small"
+        title="Сеточный вид"
+      >
+        <GridIcon />
+      </IconButton>,
+      <IconButton
+        key="list-layout"
+        onClick={() => handleLayoutChange("list")}
+        color={state.layout === "list" ? "primary" : "default"}
+        size="small"
+        title="Списочный вид"
+      >
+        <ListIcon />
+      </IconButton>,
+      <IconButton
+        key="masonry-layout"
+        onClick={() => handleLayoutChange("masonry")}
+        color={state.layout === "masonry" ? "primary" : "default"}
+        size="small"
+        title="Масонри вид"
+      >
+        <MasonryIcon />
+      </IconButton>,
+    ],
+    [state.layout, state.isRefreshing, handleRefreshAll, handleLayoutChange]
+  );
 
-  const handleToggleCollapse = useCallback(() => {
-    setSidebarCollapsed((prev) => !prev);
-  }, []);
-
-  const handleFullscreenToggle = useCallback(() => {
-    if (isFullscreen) {
-      document.exitFullscreen?.();
-    } else {
-      document.documentElement.requestFullscreen?.();
-    }
-  }, []); // Убираем isFullscreen из зависимостей, будем полагаться на браузерные события
-
-  // Show minimal loading if not mounted to prevent Fade errors
-  if (!isMounted) {
+  // Если есть критическая ошибка
+  if (hasError && !isLoading) {
     return (
-      <DashboardLayout>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "50vh",
-            opacity: 0.7,
-          }}
-        >
-          <CircularProgress size={40} thickness={4} />
-        </Box>
-      </DashboardLayout>
-    );
-  }
-
-  // Error state
-  if (isError) {
-    return (
-      <DashboardLayout>
-        <Box sx={{ p: 3 }}>
-          <Alert
-            severity="error"
-            sx={{
-              borderRadius: 3,
-              boxShadow: `0 4px 20px ${alpha(theme.palette.error.main, 0.1)}`,
-            }}
-          >
-            {(error as any)?.message ||
-              t("dashboard.error", "Failed to load dashboard data")}
-          </Alert>
-        </Box>
-      </DashboardLayout>
-    );
-  }
-
-  // Loading state with better UX
-  if (isFetching && !deferredOverview) {
-    return (
-      <DashboardLayout>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "50vh",
-            gap: 2,
-          }}
-        >
-          <CircularProgress size={48} thickness={4} />
-          <Box
-            sx={{ color: theme.palette.text.secondary, textAlign: "center" }}
-          >
-            {t("dashboard.loading", "Loading dashboard...")}
-          </Box>
-        </Box>
-      </DashboardLayout>
+      <PageLayout
+        title="Дашборд"
+        subtitle="Обзор системы и ключевые показатели"
+        actions={headerActions}
+      >
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Произошла ошибка при загрузке дашборда. Попробуйте обновить страницу.
+        </Alert>
+      </PageLayout>
     );
   }
 
   return (
-    <DashboardLayout>
-      {/* Fixed Header at Top */}
-      <DashboardHeader
-        isRefreshing={isRefreshing || isFetching}
-        onRefresh={handleRefresh}
-      />
+    <PageLayout
+      title="Дашборд"
+      subtitle="Обзор системы и ключевые показатели"
+      actions={headerActions}
+    >
+      {/* Основной контент дашборда */}
+      <ErrorBoundary>
+        {state.hasError && (
+          <Alert severity="error" sx={{ mb: spacing.container }}>
+            {state.errorMessage || "Произошла ошибка"}
+          </Alert>
+        )}
 
-      {/* Main Content Area with Sidebar */}
-      <Box
-        className={className}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          minWidth: 0, // Важно для flex shrinking
-          minHeight: 0, // Important for flex children
-          maxWidth: "100%", // Предотвращаем overflow
-          // Context7: Минимальные отступы для предотвращения overflow
-          px: { xs: 0.5, sm: 1, md: 1.5 }, // Еще больше уменьшаем padding
-          pb: { xs: 0.5, sm: 1, md: 1.5 }, // Еще больше уменьшаем bottom padding
-          // Оставляем место для fixed sidebar справа
-          pr: { xs: 0.5, sm: 1.5, md: 8 }, // Меньше места справа, но достаточно для sidebar
-          // Context7: Предотвращаем overflow-x
-          overflowX: "hidden",
-          overflowY: "visible",
-        }}
-      >
-        {/* Main Content Container (Left) */}
-        <DashboardContainer
-          mode={dashboardMode}
-          layout={dashboardLayout}
-          density={dashboardDensity}
-          isFullscreen={isFullscreen}
-          maxWidth={false} // Don't constrain width in new layout
-        >
-          {/* New Unified Layout System */}
-          <DashboardLayoutRenderer
-            mode={dashboardMode}
-            layout={dashboardLayout}
-            density={dashboardDensity}
-            widgets={finalWidgets}
-            isLoading={isFetching || isTimelineLoading || isDistributionLoading}
-            onWidgetClick={(widgetId) => {
-              console.log("Widget clicked:", widgetId);
-              // Add widget-specific actions here
-            }}
-            onLayoutChange={handleLayoutChange}
-          />
-        </DashboardContainer>
+        <Grid container spacing={spacing.grid}>
+          {/* Enhanced Dashboard Stats Widget */}
+          <Grid item xs={12} lg={8}>
+            <ErrorBoundary>
+              <EnhancedDashboardStatsWidget
+                mode={state.mode}
+                layout={state.layout}
+                density={state.density}
+                variant="detailed"
+                showTrends={true}
+                loading={statsLoading}
+                error={statsError || undefined}
+                onMetricClick={(metricId) => {
+                  console.log("Metric clicked:", metricId);
+                }}
+              />
+            </ErrorBoundary>
+          </Grid>
 
-        {/* Control Sidebar (Right) - Hidden on mobile/tablet */}
-        <DashboardSidebar
-          mode={dashboardMode}
-          layout={dashboardLayout}
-          density={dashboardDensity}
-          collapsed={sidebarCollapsed}
-          isFullscreen={isFullscreen}
-          onModeChange={handleModeChange}
-          onLayoutChange={handleLayoutChange}
-          onDensityChange={handleDensityChange}
-          onToggleCollapse={handleToggleCollapse}
-          onFullscreenToggle={handleFullscreenToggle}
-        />
-      </Box>
+          {/* System Health Widget */}
+          <Grid item xs={12} lg={4}>
+            <ErrorBoundary>
+              <LazyWidget name="Системное здоровье">
+                <LazySystemHealthWidget
+                  mode={state.mode}
+                  layout={state.layout}
+                  density={state.density}
+                  isDataLoading={systemHealthLoading}
+                  dataError={systemHealthError}
+                  onRefresh={refetchSystemHealth}
+                />
+              </LazyWidget>
+            </ErrorBoundary>
+          </Grid>
 
-      {/* Auth Debug Panel for Development */}
-      {process.env.NODE_ENV === "development" && <AuthDebugPanel />}
-    </DashboardLayout>
-  );
-};
+          {/* Project Overview */}
+          <Grid item xs={12} md={6}>
+            <ErrorBoundary>
+              <LazyWidget name="Обзор проектов">
+                <LazyProjectOverviewWidget
+                  mode={state.mode}
+                  layout={state.layout}
+                  density={state.density}
+                  projects={[]}
+                  isDataLoading={overviewLoading}
+                  dataError={overviewError}
+                  maxProjects={state.mode === "minimal" ? 3 : 5}
+                  onRefresh={refetchOverview}
+                />
+              </LazyWidget>
+            </ErrorBoundary>
+          </Grid>
 
-export const DashboardPageWithSuspense = () => (
-  <DashboardErrorBoundary>
-    <Suspense
-      fallback={
-        <Box
+          {/* Quick Actions */}
+          <Grid item xs={12} md={6}>
+            <ErrorBoundary>
+              <LazyWidget name="Быстрые действия">
+                <LazyQuickActionsWidget
+                  mode={state.mode}
+                  layout={state.layout}
+                  density={state.density}
+                  actions={quickActions || []}
+                  isDataLoading={quickActionsLoading}
+                  dataError={quickActionsError}
+                  onRefresh={refetchQuickActions}
+                />
+              </LazyWidget>
+            </ErrorBoundary>
+          </Grid>
+
+          {/* Activity Feed */}
+          <Grid item xs={12}>
+            <ErrorBoundary>
+              <LazyWidget name="Лента активности">
+                <LazyActivityFeedWidget
+                  mode={state.mode}
+                  layout={state.layout}
+                  density={state.density}
+                  data={overview?.recentActivity || []}
+                  isDataLoading={overviewLoading}
+                  dataError={overviewError}
+                  maxItems={state.mode === "minimal" ? 5 : 10}
+                  showFilters={state.mode !== "minimal"}
+                  onRefresh={refetchOverview}
+                />
+              </LazyWidget>
+            </ErrorBoundary>
+          </Grid>
+        </Grid>
+      </ErrorBoundary>
+
+      {/* Floating Action Button */}
+      <Fade in={!state.isRefreshing} timeout={300}>
+        <Fab
+          color="primary"
+          onClick={handleRefreshAll}
           sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "50vh",
+            position: "fixed",
+            bottom: 16,
+            right: 16,
+            zIndex: 1000,
           }}
         >
-          <CircularProgress size={48} thickness={4} />
-        </Box>
-      }
-    >
-      <DashboardPage />
-    </Suspense>
-  </DashboardErrorBoundary>
-);
+          <RefreshIcon />
+        </Fab>
+      </Fade>
+    </PageLayout>
+  );
+});
 
-export default memo(DashboardPageWithSuspense);
+DashboardContent.displayName = "DashboardContent";
+
+/**
+ * Главная страница дашборда с провайдером контекста
+ */
+export const DashboardPage = memo(() => {
+  return (
+    <DashboardProvider>
+      <DashboardContent />
+    </DashboardProvider>
+  );
+});
+
+DashboardPage.displayName = "DashboardPage";

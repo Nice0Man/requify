@@ -1,11 +1,13 @@
-// Shared layer exports according to FSD
-export * from "./api";
-export * from "./lib";
-export * from "./ui";
-export * from "./types";
-export * from "./utils";
-export * from "./hooks";
+/**
+ * Shared layer exports
+ * Экспорт общих компонентов и утилит
+ */
 
-//  Modern styling system
-export * from "./styles";
-export * from "./providers"; 
+export * from "./api";
+export * from "./components";
+export * from "./contexts";
+export * from "./ui";
+export * from "./hooks";
+export * from "./lib";
+export * from "./utils";
+export * from "./types"; 

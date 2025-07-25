@@ -1,1 +1,2 @@
-export { HeaderWidget } from "./HeaderWidget"; 
+// App Header Widget UI
+export { AppHeaderWidget } from "./AppHeaderWidget"; 

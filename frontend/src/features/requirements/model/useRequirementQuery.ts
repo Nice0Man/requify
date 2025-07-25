@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { requirementApi, RequirementFilters } from "../api/requirementApi";
+import { requirementApi } from "../api/requirementApi";
+import type { RequirementFilters } from "./types";
 import type {
-  Requirement,
-  CreateRequirementRequest,
-  UpdateRequirementRequest,
-} from "../../../entities/requirement";
+  CreateRequirementRequestEntity as CreateRequirementRequest,
+  UpdateRequirementRequestEntity as UpdateRequirementRequest,
+} from "@/entities/requirement";
 
 // Query keys
 export const requirementKeys = {

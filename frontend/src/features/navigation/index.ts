@@ -1,3 +1,7 @@
-// Navigation feature exports
-export * from './ui';
-export * from './model'; 
+// Navigation feature - управление навигацией в сайдбаре
+export {
+  useSidebarNavigation,
+  type NavigationState,
+  type NavigationActions,
+  type UseSidebarNavigationReturn,
+} from "./model/useSidebarNavigation";

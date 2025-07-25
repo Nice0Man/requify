@@ -3,41 +3,34 @@
  * Основано на схемах из backend/app/schemas/requirement.py
  */
 
-import { client } from '@/shared/api/client';
+import { client } from "@/app/providers/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
 import type {
   Requirement,
   RequirementCreate,
   RequirementUpdate,
-  RequirementWithDetails,
-  RequirementWithTestResults,
   RequirementListResponse,
   RequirementDetailResponse,
   RequirementQueryParams,
   RequirementBulkOperation,
-  RequirementImportData,
-  RequirementExportOptions,
   RequirementValidationResult,
-  RequirementComment,
-  RequirementCommentCreate,
-  RequirementCommentUpdate,
-  RequirementAttachment,
-  RequirementAttachmentUpload,
-  RequirementRelation,
-  RequirementRelationCreate,
-  RequirementStatistics,
-  RequirementDashboard,
-  RequirementTemplate,
-  RequirementTemplateCreate,
-  RequirementFromTemplate,
-  RequirementType,
-  RequirementPriority,
   RequirementStatus,
+  RequirementPriority,
+  RequirementType,
+  RequirementRelationship,
+  RequirementRelationshipCreate,
+  RequirementCommentCreate,
+  RequirementComment,
+  RequirementAttachment,
+  RequirementAttachmentCreate,
+  RequirementHistory,
+  RequirementStats,
   RequirementSpec,
   RequirementApproval,
   RequirementApprovalRequest,
   RequirementNotification,
   RequirementChangeHistory,
-} from '@/shared/types/requirement';
+} from '../model/types';
 
 /**
  * RequirementDAO - класс для работы с API требований
@@ -141,9 +134,9 @@ export class RequirementDAO {
   /**
    * Получить требование с подробной информацией
    */
-  async getRequirementWithDetails(id: number): Promise<RequirementWithDetails> {
+  async getRequirementWithDetails(id: number): Promise<Requirement> {
     try {
-      const response = await client.get<RequirementWithDetails>(`/requirements/${id}/details`);
+      const response = await client.get<Requirement>(`/requirements/${id}/details`);
       return response.data;
     } catch (error) {
       console.error(`Failed to get requirement details for ${id}:`, error);
@@ -154,9 +147,9 @@ export class RequirementDAO {
   /**
    * Получить требование с результатами тестирования
    */
-  async getRequirementWithTestResults(id: number): Promise<RequirementWithTestResults> {
+  async getRequirementWithTestResults(id: number): Promise<Requirement> {
     try {
-      const response = await client.get<RequirementWithTestResults>(`/requirements/${id}/test-results`);
+      const response = await client.get<Requirement>(`/requirements/${id}/test-results`);
       return response.data;
     } catch (error) {
       console.error(`Failed to get requirement test results for ${id}:`, error);
@@ -195,7 +188,7 @@ export class RequirementDAO {
   /**
    * Обновить комментарий
    */
-  async updateComment(commentId: number, commentData: RequirementCommentUpdate): Promise<RequirementComment> {
+  async updateComment(commentId: number, commentData: RequirementCommentCreate): Promise<RequirementComment> {
     try {
       const response = await client.put<RequirementComment>(`/requirements/comments/${commentId}`, commentData);
       return response.data;
@@ -235,7 +228,7 @@ export class RequirementDAO {
   /**
    * Загрузить вложение к требованию
    */
-  async uploadAttachment(attachmentData: RequirementAttachmentUpload): Promise<RequirementAttachment> {
+  async uploadAttachment(attachmentData: RequirementAttachmentCreate): Promise<RequirementAttachment> {
     try {
       const formData = new FormData();
       formData.append('file', attachmentData.file);
@@ -288,9 +281,9 @@ export class RequirementDAO {
   /**
    * Получить связи требования
    */
-  async getRequirementRelations(id: number): Promise<RequirementRelation[]> {
+  async getRequirementRelations(id: number): Promise<RequirementRelationship[]> {
     try {
-      const response = await client.get<RequirementRelation[]>(`/requirements/${id}/relations`);
+      const response = await client.get<RequirementRelationship[]>(`/requirements/${id}/relations`);
       return response.data;
     } catch (error) {
       console.error(`Failed to get relations for requirement ${id}:`, error);
@@ -301,9 +294,9 @@ export class RequirementDAO {
   /**
    * Создать связь между требованиями
    */
-  async createRelation(relationData: RequirementRelationCreate): Promise<RequirementRelation> {
+  async createRelation(relationData: RequirementRelationshipCreate): Promise<RequirementRelationship> {
     try {
-      const response = await client.post<RequirementRelation>('/requirements/relations', relationData);
+      const response = await client.post<RequirementRelationship>('/requirements/relations', relationData);
       return response.data;
     } catch (error) {
       console.error('Failed to create requirement relation:', error);
@@ -340,7 +333,7 @@ export class RequirementDAO {
   /**
    * Импорт требований
    */
-  async importRequirements(data: RequirementImportData): Promise<void> {
+  async importRequirements(data: any): Promise<void> {
     try {
       await client.post('/requirements/import', data);
     } catch (error) {
@@ -352,7 +345,7 @@ export class RequirementDAO {
   /**
    * Экспорт требований
    */
-  async exportRequirements(options: RequirementExportOptions): Promise<Blob> {
+  async exportRequirements(options: any): Promise<Blob> {
     try {
       const response = await client.post('/requirements/export', options, {
         responseType: 'blob',
@@ -401,9 +394,9 @@ export class RequirementDAO {
   /**
    * Получить статистику по требованиям проекта
    */
-  async getRequirementStatistics(projectId: number): Promise<RequirementStatistics> {
+  async getRequirementStatistics(projectId: number): Promise<RequirementStats> {
     try {
-      const response = await client.get<RequirementStatistics>(`/requirements/statistics/${projectId}`);
+      const response = await client.get<RequirementStats>(`/requirements/statistics/${projectId}`);
       return response.data;
     } catch (error) {
       console.error(`Failed to get requirement statistics for project ${projectId}:`, error);
@@ -414,10 +407,10 @@ export class RequirementDAO {
   /**
    * Получить дашборд требований
    */
-  async getRequirementDashboard(projectId?: number): Promise<RequirementDashboard> {
+  async getRequirementDashboard(projectId?: number): Promise<any> {
     try {
       const url = projectId ? `/requirements/dashboard/${projectId}` : '/requirements/dashboard';
-      const response = await client.get<RequirementDashboard>(url);
+      const response = await client.get<any>(url);
       return response.data;
     } catch (error) {
       console.error('Failed to get requirement dashboard:', error);
@@ -430,10 +423,10 @@ export class RequirementDAO {
   /**
    * Получить список шаблонов требований
    */
-  async getRequirementTemplates(projectId?: number): Promise<RequirementTemplate[]> {
+  async getRequirementTemplates(projectId?: number): Promise<any[]> {
     try {
       const params = projectId ? { project_id: projectId } : {};
-      const response = await client.get<RequirementTemplate[]>('/requirements/templates', { params });
+      const response = await client.get<any[]>('/requirements/templates', { params });
       return response.data;
     } catch (error) {
       console.error('Failed to get requirement templates:', error);
@@ -444,9 +437,9 @@ export class RequirementDAO {
   /**
    * Создать шаблон требования
    */
-  async createRequirementTemplate(templateData: RequirementTemplateCreate): Promise<RequirementTemplate> {
+  async createRequirementTemplate(templateData: any): Promise<any> {
     try {
-      const response = await client.post<RequirementTemplate>('/requirements/templates', templateData);
+      const response = await client.post<any>('/requirements/templates', templateData);
       return response.data;
     } catch (error) {
       console.error('Failed to create requirement template:', error);
@@ -457,7 +450,7 @@ export class RequirementDAO {
   /**
    * Создать требование из шаблона
    */
-  async createRequirementFromTemplate(data: RequirementFromTemplate): Promise<Requirement> {
+  async createRequirementFromTemplate(data: any): Promise<Requirement> {
     try {
       const response = await client.post<Requirement>('/requirements/from-template', data);
       return response.data;
@@ -586,9 +579,9 @@ export class RequirementDAO {
   /**
    * Получить историю изменений требования
    */
-  async getRequirementChangeHistory(id: number): Promise<RequirementChangeHistory[]> {
+  async getRequirementChangeHistory(id: number): Promise<RequirementHistory[]> {
     try {
-      const response = await client.get<RequirementChangeHistory[]>(`/requirements/${id}/history`);
+      const response = await client.get<RequirementHistory[]>(`/requirements/${id}/history`);
       return response.data;
     } catch (error) {
       console.error(`Failed to get change history for requirement ${id}:`, error);

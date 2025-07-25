@@ -1,500 +1,380 @@
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
+import React, { useState, useMemo } from "react";
 import {
   Box,
-  Typography,
-  Paper,
+  Container,
   Grid,
-  Button,
   Card,
   CardContent,
-  CardActions,
+  Typography,
   Chip,
+  Button,
+  IconButton,
+  Stack,
   LinearProgress,
-  TextField,
+  Paper,
+  InputBase,
+  MenuItem,
+  Select,
   FormControl,
   InputLabel,
-  Select,
-  MenuItem,
-  ToggleButton,
-  ToggleButtonGroup,
-  Container,
-  Fade,
 } from "@mui/material";
 import {
   Add as AddIcon,
-  Edit as EditIcon,
-  ViewModule as ViewModuleIcon,
-  ViewList as ViewListIcon,
   Search as SearchIcon,
-  FolderOpen as FolderOpenIcon,
+  MoreVert as MoreVertIcon,
   Group as GroupIcon,
-  Assignment as AssignmentIcon,
+  Description as DescriptionIcon,
+  StarBorder as StarBorderIcon,
 } from "@mui/icons-material";
-import { DashboardLayout } from "@/widgets/layout/ui";
-import { useProjects } from "@/features/projects/model/useProjectQuery";
-import { LoadingSpinner } from "@/shared/ui";
-import { Project } from "@/entities/project/model/types";
+import i18n from "@/shared/lib/i18n";
+import { useProjects } from "@/entities/project/api/projectQueries";
+import type { ProjectStatus } from "@/entities/project/model/types";
+import { PROJECT_STATUSES } from "@/entities/project/model/types";
 
-const ProjectsPage: React.FC = () => {
-  const { t } = useTranslation();
+// Simple date formatter
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString();
+};
+
+export const ProjectsPage: React.FC = () => {
+  const { t } = i18n;
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<ProjectStatus | "all">(
+    "all"
+  );
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const { data: projects = [], isPending, error } = useProjects();
-
-  // Фильтрация проектов
-  const filteredProjects = projects.filter((project) => {
-    const matchesSearch =
-      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || project.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  const {
+    data: projectsResponse,
+    isLoading,
+    error,
+  } = useProjects({
+    search: searchTerm,
+    status: statusFilter !== "all" ? statusFilter : undefined,
   });
 
-  const getStatusColor = (status: Project["status"]) => {
+  const projects = projectsResponse?.projects || [];
+
+  const getStatusColor = (status: ProjectStatus) => {
     switch (status) {
-      case "in_progress":
-        return "success";
-      case "completed":
-        return "primary";
-      case "on_hold":
+      case "development":
         return "warning";
+      case "completed":
+        return "success";
+      case "testing":
+        return "info";
       case "cancelled":
         return "error";
-      default:
+      case "archived":
         return "default";
+      default:
+        return "primary";
     }
   };
 
-  const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return t("projects.placeholders.noDate");
-    return new Date(dateString).toLocaleDateString();
+  const getStatusLabel = (status: ProjectStatus) => {
+    const statusLabels: Record<ProjectStatus, string> = {
+      active: t("projects.status.active"),
+      inactive: t("projects.status.inactive"),
+      archived: t("projects.status.archived"),
+      planning: t("projects.status.planning"),
+      development: t("projects.status.development"),
+      testing: t("projects.status.testing"),
+      completed: t("projects.status.completed"),
+      cancelled: t("projects.status.cancelled"),
+    };
+    return statusLabels[status] || status;
   };
 
-  const ProjectCard = ({ project }: { project: Project }) => (
-    <Fade in timeout={600}>
-      <Card
-        elevation={0}
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: 3,
-          border: `1px solid rgba(0,0,0,0.06)`,
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          position: "relative",
-          overflow: "hidden",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 4,
-            background: `linear-gradient(90deg, ${
-              getStatusColor(project.status) === "success"
-                ? "#4caf50"
-                : getStatusColor(project.status) === "warning"
-                ? "#ff9800"
-                : getStatusColor(project.status) === "error"
-                ? "#f44336"
-                : "#2196f3"
-            }, transparent)`,
-          },
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0 12px 40px rgba(0,0,0,0.1)",
-            "& .project-actions": {
-              opacity: 1,
-              transform: "translateY(0)",
-            },
-          },
-        }}
-      >
-        <CardContent sx={{ flexGrow: 1, p: 3, pb: 1 }}>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="flex-start"
-            mb={2}
-          >
-            <Typography
-              variant="h6"
-              component="h2"
-              fontWeight={700}
-              sx={{
-                fontSize: "1.1rem",
-                lineHeight: 1.3,
-              }}
-            >
-              {project.name}
-            </Typography>
-            <Chip
-              label={t(
-                `projects.statusText.${
-                  project.status === "on_hold" ? "onHold" : project.status
-                }`
-              )}
-              color={getStatusColor(project.status)}
-              size="small"
-              sx={{
-                fontWeight: 600,
-                fontSize: "0.75rem",
-              }}
-            />
-          </Box>
+  const filteredProjects = useMemo(() => {
+    return projects.filter((project) => {
+      const matchesSearch =
+        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus =
+        statusFilter === "all" || project.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [projects, searchTerm, statusFilter]);
 
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            mb={2}
-            sx={{
-              lineHeight: 1.5,
-              overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {project.description || t("projects.placeholders.noDescription")}
-          </Typography>
-
-          <Box mb={2}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mb={1}
-            >
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                fontWeight={500}
-              >
-                {t("projects.fields.progress")}
-              </Typography>
-              <Typography variant="body2" fontWeight={600} color="primary">
-                {project.progress}%
-              </Typography>
-            </Box>
-            <LinearProgress
-              variant="determinate"
-              value={Number(project.progress) || 0}
-              sx={{
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: "rgba(0,0,0,0.06)",
-                "& .MuiLinearProgress-bar": {
-                  borderRadius: 3,
-                },
-              }}
-            />
-          </Box>
-
-          <Box display="flex" gap={2} mb={2}>
-            <Box display="flex" alignItems="center" gap={0.5}>
-              <GroupIcon fontSize="small" color="action" />
-              <Typography variant="body2" color="text.secondary">
-                {project.teamSize} {t("projects.stats.participants")}
-              </Typography>
-            </Box>
-            <Box display="flex" alignItems="center" gap={0.5}>
-              <AssignmentIcon fontSize="small" color="action" />
-              <Typography variant="body2" color="text.secondary">
-                {project.requirementsCount || 0}{" "}
-                {t("projects.stats.requirements")}
-              </Typography>
-            </Box>
-          </Box>
-
-          <Box display="flex" gap={2}>
-            <Box>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                fontWeight={500}
-              >
-                {t("projects.fields.startDate")}
-              </Typography>
-              <Typography variant="body2" fontWeight={500}>
-                {formatDate(project.startDate)}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                fontWeight={500}
-              >
-                {t("projects.fields.endDate")}
-              </Typography>
-              <Typography variant="body2" fontWeight={500}>
-                {formatDate(project.endDate)}
-              </Typography>
-            </Box>
-          </Box>
-        </CardContent>
-
-        <CardActions
-          className="project-actions"
-          sx={{
-            p: 2,
-            pt: 0,
-            opacity: 0.7,
-            transform: "translateY(4px)",
-            transition: "all 0.2s ease",
-          }}
-        >
-          <Button
-            size="small"
-            startIcon={<EditIcon />}
-            sx={{
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            {t("common.edit")}
-          </Button>
-          <Button
-            size="small"
-            startIcon={<FolderOpenIcon />}
-            color="primary"
-            variant="outlined"
-            sx={{
-              fontWeight: 600,
-              textTransform: "none",
-            }}
-          >
-            {t("common.open")}
-          </Button>
-        </CardActions>
-      </Card>
-    </Fade>
-  );
-
-  if (isPending) {
+  if (isLoading) {
     return (
-      <DashboardLayout>
-        <LoadingSpinner fullScreen />
-      </DashboardLayout>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
+          <Typography>Loading...</Typography>
+        </Box>
+      </Container>
     );
   }
 
   if (error) {
     return (
-      <DashboardLayout>
-        <Container maxWidth="xl" sx={{ py: 3 }}>
-          <Typography color="error">{t("errors.loadingError")}</Typography>
-        </Container>
-      </DashboardLayout>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
+          <Typography color="error">Error loading projects</Typography>
+        </Box>
+      </Container>
     );
   }
 
   return (
-    <DashboardLayout>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        {/* Заголовок */}
-        <Fade in timeout={400}>
-          <Box mb={4}>
-            <Typography
-              variant="h4"
-              component="h1"
-              gutterBottom
-              fontWeight={700}
-              sx={{
-                fontSize: { xs: "1.75rem", md: "2.125rem" },
-                background: `linear-gradient(135deg, #1976d2, #42a5f5)`,
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                mb: 1,
-              }}
-            >
-              {t("projects.title")}
-            </Typography>
-            <Typography
-              variant="h6"
-              color="text.secondary"
-              sx={{ fontWeight: 400 }}
-            >
-              {t("projects.subtitle")}
-            </Typography>
-          </Box>
-        </Fade>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      {/* Header */}
+      <Box mb={3}>
+        <Typography variant="h4" gutterBottom>
+          {t("projects.title")}
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          {t("projects.subtitle")}
+        </Typography>
+      </Box>
 
-        {/* Фильтры и поиск */}
-        <Fade in timeout={600}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              mb: 4,
-              borderRadius: 3,
-              border: "1px solid rgba(0,0,0,0.06)",
-              backgroundColor: "rgba(255,255,255,0.7)",
-              backdropFilter: "blur(10px)",
-            }}
-          >
-            <Grid container spacing={3} alignItems="center">
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  placeholder={t("projects.searchPlaceholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  variant="outlined"
-                  size="medium"
-                  InputProps={{
-                    startAdornment: (
-                      <SearchIcon sx={{ mr: 1, color: "action.active" }} />
-                    ),
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      backgroundColor: "rgba(255,255,255,0.8)",
-                    },
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <FormControl fullWidth>
-                  <InputLabel>{t("projects.fields.status")}</InputLabel>
-                  <Select
-                    value={statusFilter}
-                    label={t("projects.fields.status")}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    sx={{
-                      borderRadius: 2,
-                      backgroundColor: "rgba(255,255,255,0.8)",
-                    }}
-                  >
-                    <MenuItem value="all">{t("projects.status.all")}</MenuItem>
-                    <MenuItem value="active">
-                      {t("projects.status.active")}
-                    </MenuItem>
-                    <MenuItem value="completed">
-                      {t("projects.status.completed")}
-                    </MenuItem>
-                    <MenuItem value="on_hold">
-                      {t("projects.status.onHold")}
-                    </MenuItem>
-                    <MenuItem value="cancelled">
-                      {t("projects.status.cancelled")}
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <ToggleButtonGroup
-                  value={viewMode}
-                  exclusive
-                  onChange={(_, newViewMode) =>
-                    newViewMode && setViewMode(newViewMode)
-                  }
-                  aria-label={t("common.view")}
-                  sx={{
-                    "& .MuiToggleButton-root": {
-                      borderRadius: 2,
-                      border: "1px solid rgba(0,0,0,0.12)",
-                      "&.Mui-selected": {
-                        backgroundColor: "primary.main",
-                        color: "white",
-                        "&:hover": {
-                          backgroundColor: "primary.dark",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  <ToggleButton value="grid" aria-label="grid view">
-                    <ViewModuleIcon />
-                  </ToggleButton>
-                  <ToggleButton value="list" aria-label="list view">
-                    <ViewListIcon />
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  sx={{
-                    fontWeight: 600,
-                    borderRadius: 2,
-                    textTransform: "none",
-                    boxShadow: "none",
-                    "&:hover": {
-                      boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
-                    },
-                  }}
-                >
-                  {t("projects.createProject")}
-                </Button>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Fade>
+      {/* Controls */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={4}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <SearchIcon sx={{ color: "action.active", mr: 1 }} />
+              <InputBase
+                placeholder={t("projects.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{ flex: 1 }}
+              />
+            </Box>
+          </Grid>
 
-        {/* Список проектов */}
-        {filteredProjects.length === 0 ? (
-          <Fade in timeout={800}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 8,
-                textAlign: "center",
-                borderRadius: 3,
-                border: "1px solid rgba(0,0,0,0.06)",
-              }}
-            >
-              <Typography variant="h6" color="text.secondary" mb={2}>
-                {t("projects.notFound")}
-              </Typography>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth size="small">
+              <InputLabel>{t("projects.filterByStatus")}</InputLabel>
+              <Select
+                value={statusFilter}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as ProjectStatus | "all")
+                }
+                label={t("projects.filterByStatus")}
+              >
+                <MenuItem value="all">{t("projects.status.all")}</MenuItem>
+                {PROJECT_STATUSES.map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {getStatusLabel(status)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} md={3}>
+            <Box display="flex" justifyContent="center">
               <Button
-                variant="contained"
-                startIcon={<AddIcon />}
+                variant="outlined"
+                size="small"
+                onClick={() =>
+                  setViewMode(viewMode === "grid" ? "list" : "grid")
+                }
+              >
+                {viewMode === "grid" ? "List View" : "Grid View"}
+              </Button>
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} md={2}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              fullWidth
+              onClick={() => {
+                // Handle create project
+              }}
+            >
+              {t("projects.actions.create")}
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* Projects Grid */}
+      {filteredProjects.length === 0 ? (
+        <Paper sx={{ p: 4, textAlign: "center" }}>
+          <Typography variant="h6" color="text.secondary">
+            {t("projects.noProjectsFound")}
+          </Typography>
+        </Paper>
+      ) : (
+        <Grid container spacing={3}>
+          {filteredProjects.map((project) => (
+            <Grid
+              item
+              xs={12}
+              sm={viewMode === "grid" ? 6 : 12}
+              md={viewMode === "grid" ? 4 : 12}
+              key={project.id}
+            >
+              <Card
                 sx={{
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  textTransform: "none",
+                  height: "100%",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: 3,
+                  },
+                }}
+                onClick={() => {
+                  // Handle project click
                 }}
               >
-                {t("projects.createFirstProject")}
-              </Button>
-            </Paper>
-          </Fade>
-        ) : (
-          <Grid container spacing={3}>
-            {filteredProjects.map((project, index) => (
-              <Grid item xs={12} md={6} lg={4} key={project.id}>
                 <Box
-                  sx={{
-                    animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
-                    "@keyframes fadeInUp": {
-                      "0%": {
-                        opacity: 0,
-                        transform: "translateY(30px)",
-                      },
-                      "100%": {
-                        opacity: 1,
-                        transform: "translateY(0)",
-                      },
-                    },
-                  }}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  p={2}
+                  pb={1}
                 >
-                  <ProjectCard project={project as unknown as Project} />
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography
+                      variant="overline"
+                      color="text.secondary"
+                      fontSize="0.75rem"
+                    >
+                      {project.code || `PRJ-${project.id}`}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Chip
+                      size="small"
+                      label={getStatusLabel(project.status)}
+                      color={getStatusColor(project.status)}
+                      variant={
+                        project.status === "completed" ? "filled" : "outlined"
+                      }
+                    />
+                  </Stack>
                 </Box>
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Container>
-    </DashboardLayout>
+
+                <CardContent sx={{ pt: 1 }}>
+                  <Typography variant="h6" gutterBottom>
+                    {project.name}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2, height: 40, overflow: "hidden" }}
+                  >
+                    {project.description || t("projects.noDescription")}
+                  </Typography>
+
+                  <Stack spacing={2}>
+                    {/* Статистика из ProjectWithStats */}
+                    {"total_requirements" in project && (
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        mb={1}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontWeight={500}
+                        >
+                          {t("projects.fields.progress")}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          fontWeight={600}
+                          color="primary"
+                        >
+                          {project.completion_percentage || 0}%
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {"total_requirements" in project && (
+                      <LinearProgress
+                        variant="determinate"
+                        value={Number(project.completion_percentage) || 0}
+                        sx={{
+                          height: 6,
+                          borderRadius: 3,
+                          backgroundColor: "rgba(0,0,0,0.06)",
+                          "& .MuiLinearProgress-bar": {
+                            borderRadius: 3,
+                          },
+                        }}
+                      />
+                    )}
+
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <GroupIcon fontSize="small" color="action" />
+                        <Typography variant="body2" color="text.secondary">
+                          {/* Здесь можно добавить количество участников команды из ProjectTeamResponse */}
+                          {t("projects.stats.participants")}
+                        </Typography>
+                      </Box>
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <DescriptionIcon fontSize="small" color="action" />
+                        <Typography variant="body2" color="text.secondary">
+                          {"total_requirements" in project
+                            ? project.total_requirements
+                            : 0}{" "}
+                          {t("projects.stats.requirements")}
+                        </Typography>
+                      </Box>
+                    </Stack>
+
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      mt={2}
+                    >
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {t("projects.fields.created")}
+                        </Typography>
+                        <Typography variant="body2" fontWeight={500}>
+                          {formatDate(project.created_at)}
+                        </Typography>
+                      </Box>
+                      <Box textAlign="right">
+                        <Typography variant="caption" color="text.secondary">
+                          {t("projects.fields.updated")}
+                        </Typography>
+                        <Typography variant="body2" fontWeight={500}>
+                          {formatDate(project.updated_at)}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Stack>
+                </CardContent>
+
+                <Box sx={{ p: 2, pt: 0 }}>
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <IconButton size="small">
+                      <StarBorderIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small">
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+    </Container>
   );
 };
 

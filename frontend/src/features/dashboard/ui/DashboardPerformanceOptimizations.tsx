@@ -20,12 +20,13 @@ import {
   usePrefetchDashboard,
   useInvalidateDashboard,
 } from "../model/queries";
-import { ActivityType, DashboardStats, MetricCategory } from "@/entities";
+import { DashboardStats } from "@/entities";
 import {
   useRenderTracker,
   usePerformanceMeasure,
 } from "@/shared/hooks/usePerformanceOptimizations";
 import i18n from "@/shared/lib/i18n";
+import { ActivityType, MetricCategory } from "@/entities/dashboard";
 
 interface PerformanceMetric {
   name: string;
@@ -66,7 +67,7 @@ export const DashboardPerformanceOptimizations =
 
     // Queries с оптимизированными настройками
     const statsQuery = useDashboardStats(
-      { category: [MetricCategory.PERFORMANCE], period: "24h" },
+      { category: ["performance"], period: "24h" },
       {
         // Более агрессивное кэширование для performance metrics
         staleTime: 2 * 60 * 1000, // 2 минуты
@@ -158,24 +159,18 @@ export const DashboardPerformanceOptimizations =
           category: [
             MetricCategory.PROJECTS,
             MetricCategory.REQUIREMENTS,
-            MetricCategory.TEAM,
             MetricCategory.PERFORMANCE,
+            MetricCategory.SYSTEM,
           ],
-          period: "7d",
+          period: [
+            {
+              labels: ["7d"],
+              datasets: [],
+            },
+          ],
         });
         prefetchActivity({
-          type: [
-            ActivityType.PROJECT_CREATED,
-            ActivityType.REQUIREMENT_CREATED,
-            ActivityType.REQUIREMENT_UPDATED,
-            ActivityType.REQUIREMENT_DELETED,
-            ActivityType.PROJECT_UPDATED,
-            ActivityType.PROJECT_DELETED,
-            ActivityType.TEAM_UPDATED,
-            ActivityType.TEAM_DELETED,
-            ActivityType.USER_UPDATED,
-            ActivityType.USER_DELETED,
-          ],
+          type: [ActivityType.PROJECT_UPDATED],
         });
       });
     }, [prefetchStats, prefetchActivity]);

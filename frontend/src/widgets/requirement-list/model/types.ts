@@ -1,16 +1,10 @@
-import type {
-  DashboardMode,
-  DashboardLayout,
-  DashboardDensity,
-} from "@/shared/ui";
+import type { AdaptiveWidgetProps } from "@/widgets/types";
+import type { SxProps, Theme } from "@mui/material/styles";
 
-export interface RequirementListWidgetProps {
-  mode: DashboardMode;
-  layout: DashboardLayout;
-  density: DashboardDensity;
+export interface RequirementListWidgetProps extends AdaptiveWidgetProps {
+  /** CSS классы */
   className?: string;
-  limit?: number;
-  showFilters?: boolean;
-  loading?: boolean;
-  error?: string | Error;
+  /** Стили MUI */
+  sx?: SxProps<Theme>;
+  requirements?: Array<{ id: string; title: string; status: string }>;
 } 

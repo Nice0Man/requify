@@ -9,4 +9,6 @@ export * from "./reports";
 export * from "./settings";
 export * from "./not-found";
 export * from "./landing";
-// TODO: Add other pages here kanban, admin, user, etc.
+export * from "./kanban";
+export * from "./admin";
+// TODO: Add other pages here  user, etc.

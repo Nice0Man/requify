@@ -1,5 +1,4 @@
 import React from "react";
-import { UserRole } from "@/entities/user";
 
 // Lazy loading pages
 const DashboardPage = React.lazy(() => import("@/pages/dashboard"));
@@ -13,12 +12,13 @@ const ReportsPage = React.lazy(() => import("@/pages/reports"));
 const SettingsPage = React.lazy(() => import("@/pages/settings"));
 const AdminPage = React.lazy(() => import("@/pages/admin"));
 const NotFoundPage = React.lazy(() => import("@/pages/not-found"));
+const DemoNewLayoutPage = React.lazy(() => import("@/pages/demo/ui/DemoNewLayoutPage"));
 
 export interface RouteConfig {
   path: string;
   element: React.ReactElement;
   isProtected: boolean;
-  requiredRole?: UserRole;
+  requiredRole?: string; // TODO: change to UserRole
 }
 
 export const routes: RouteConfig[] = [
@@ -96,7 +96,14 @@ export const routes: RouteConfig[] = [
     path: "/admin/*",
     element: <AdminPage />,
     isProtected: true,
-    requiredRole: UserRole.ADMIN,
+    requiredRole: "admin",
+  },
+  
+  // Demo pages for development
+  {
+    path: "/demo/new-layout",
+    element: <DemoNewLayoutPage />,
+    isProtected: true,
   },
   
   // 404 page

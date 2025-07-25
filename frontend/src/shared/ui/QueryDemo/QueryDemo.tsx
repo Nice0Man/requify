@@ -26,7 +26,6 @@ import {
   Speed,
 } from "@mui/icons-material";
 import { useQueryClient } from "@tanstack/react-query";
-import { dashboardQueryKeys } from "@/features/dashboard/model/useDashboardQuery";
 
 export const QueryDemo = () => {
   const queryClient = useQueryClient();
@@ -60,11 +59,11 @@ export const QueryDemo = () => {
   };
 
   const handleInvalidateStats = () => {
-    queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.stats });
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] });
   };
 
   const handleInvalidateActivity = () => {
-    queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.activity });
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'activity'] });
   };
 
   const handleInvalidateAll = () => {

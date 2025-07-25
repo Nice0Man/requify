@@ -43,7 +43,7 @@ const ReleasesPage: React.FC = () => {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
-    "all" | "draft" | "planned" | "in_progress" | "released" | "cancelled"
+    "all" | "draft" | "planned" | "in_progress" | "published" | "archived"
   >("all");
   const [selectedProject, setSelectedProject] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -86,9 +86,9 @@ const ReleasesPage: React.FC = () => {
         return "info";
       case "in_progress":
         return "warning";
-      case "released":
+      case "published":
         return "success";
-      case "cancelled":
+      case "archived":
         return "error";
       default:
         return "default";
@@ -175,7 +175,9 @@ const ReleasesPage: React.FC = () => {
               {t("releases.fields.releaseDate")}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {formatDate(release.releaseDate.toString())}
+              {release.releaseDate
+                ? formatDate(release.releaseDate.toString())
+                : "-"}
             </Typography>
           </Box>
           <Box>
@@ -318,7 +320,7 @@ const ReleasesPage: React.FC = () => {
                         mb: 1,
                       }}
                     >
-                      {releaseStats.totalReleases}
+                      {releaseStats.totalCount}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {t("releases.stats.totalReleases")}
@@ -365,11 +367,11 @@ const ReleasesPage: React.FC = () => {
                     <MenuItem value="in_progress">
                       {t("releases.status.in_progress")}
                     </MenuItem>
-                    <MenuItem value="released">
-                      {t("releases.status.released")}
+                    <MenuItem value="published">
+                      {t("releases.status.published")}
                     </MenuItem>
-                    <MenuItem value="cancelled">
-                      {t("releases.status.cancelled")}
+                    <MenuItem value="archived">
+                      {t("releases.status.archived")}
                     </MenuItem>
                   </Select>
                 </FormControl>

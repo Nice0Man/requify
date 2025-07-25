@@ -1,15 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { releaseApi, ReleaseFilters } from '../api/releaseApi';
-import type { Release, CreateReleaseRequest, UpdateReleaseRequest } from '../api/releaseApi';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { releaseApi } from "../api/releaseApi";
+import type { ReleaseFilters } from "../api/releaseApi";
+import type { CreateReleaseData, UpdateReleaseData } from "../model/types";
 
 // Query keys
 export const releaseQueryKeys = {
-  all: ['releases'] as const,
-  lists: () => [...releaseQueryKeys.all, 'list'] as const,
-  list: (filters: ReleaseFilters) => [...releaseQueryKeys.lists(), { filters }] as const,
-  details: () => [...releaseQueryKeys.all, 'detail'] as const,
+  all: ["releases"] as const,
+  lists: () => [...releaseQueryKeys.all, "list"] as const,
+  list: (filters: ReleaseFilters) =>
+    [...releaseQueryKeys.lists(), { filters }] as const,
+  details: () => [...releaseQueryKeys.all, "detail"] as const,
   detail: (id: string) => [...releaseQueryKeys.details(), id] as const,
-  stats: () => [...releaseQueryKeys.all, 'stats'] as const,
+  stats: () => [...releaseQueryKeys.all, "stats"] as const,
 };
 
 // Hooks
@@ -45,7 +47,7 @@ export const useCreateRelease = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateReleaseRequest) => releaseApi.createRelease(data),
+    mutationFn: (data: CreateReleaseData) => releaseApi.createRelease(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: releaseQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: releaseQueryKeys.stats() });
@@ -57,7 +59,7 @@ export const useUpdateRelease = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateReleaseRequest }) => 
+    mutationFn: ({ id, data }: { id: string; data: UpdateReleaseData }) =>
       releaseApi.updateRelease(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: releaseQueryKeys.lists() });
@@ -77,4 +79,4 @@ export const useDeleteRelease = () => {
       queryClient.invalidateQueries({ queryKey: releaseQueryKeys.stats() });
     },
   });
-}; 
+};

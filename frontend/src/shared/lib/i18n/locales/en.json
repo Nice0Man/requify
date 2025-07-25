@@ -139,6 +139,13 @@
     }
   },
   "landing": {
+    "nav": {
+      "home": "Home",
+      "features": "Features",
+      "integrations": "Integrations",
+      "pricing": "Pricing",
+      "contact": "Contact"
+    },
     "hero": {
       "certification1": "The best requirements management software",
       "certification2": "Powerful and easy to use",
@@ -175,68 +182,213 @@
       "subtitle": "Powerful features designed to simplify your workflow and enhance team productivity.",
       "feature1": {
         "title": "Smart Analysis",
-        "desc": "AI-powered requirements analysis with intelligent suggestions and automated quality checks."
+        "desc": "AI-powered requirements analysis with intelligent suggestions."
       },
       "feature2": {
         "title": "Fast Delivery",
-        "desc": "Streamlined workflows that accelerate your development process and reduce time-to-market."
+        "desc": "Streamlined workflows that accelerate your development."
       },
       "feature3": {
         "title": "Enterprise Security",
-        "desc": "Bank-grade security with comprehensive audit trails and compliance management."
+        "desc": "Bank-grade security with comprehensive audit trails."
       },
       "feature4": {
         "title": "Real-time Analytics",
-        "desc": "Comprehensive insights and reporting to track progress and measure success."
+        "desc": "Comprehensive insights to track progress and measure success."
       },
       "feature5": {
         "title": "Team Collaboration",
-        "desc": "Seamless collaboration tools that keep your entire team aligned and productive."
+        "desc": "Seamless collaboration tools that keep your team aligned."
       },
       "feature6": {
         "title": "Quality Assurance",
-        "desc": "Built-in quality controls and validation to ensure your requirements meet standards."
+        "desc": "Built-in quality controls and validation for standards."
       }
     },
-    "metrics": {
-      "title": "Trusted by teams",
-      "titleHighlight": "worldwide",
-      "subtitle": "Real results from real teams who've transformed their development process.",
-      "metric1": {
-        "label": "Efficiency Boost",
-        "desc": "Average productivity increase"
+    "solutions": {
+      "title": "Solutions for every",
+      "titleHighlight": "industry",
+      "subtitle": "Tailored requirement management workflows designed for your industry's unique challenges and compliance needs.",
+      "fintech": {
+        "title": "FinTech",
+        "desc": "Compliance-ready requirements management for financial services.",
+        "testimonial": "Reduced compliance preparation time by 70%"
       },
-      "metric2": {
-        "label": "Time Saved",
-        "desc": "Weekly per development team"
+      "healthcare": {
+        "title": "Healthcare",
+        "desc": "HIPAA-compliant workflows for medical software development.",
+        "testimonial": "Streamlined FDA submission process significantly"
       },
-      "metric3": {
-        "label": "Active Teams",
-        "desc": "Using our platform daily"
+      "enterprise": {
+        "title": "Enterprise",
+        "desc": "Scalable requirements management for large organizations.",
+        "testimonial": "Improved cross-team alignment by 85%"
       },
-      "metric4": {
-        "label": "Uptime SLA",
-        "desc": "Enterprise-grade reliability"
+      "startups": {
+        "title": "Startups",
+        "desc": "Fast-moving teams need agile requirement management.",
+        "testimonial": "Accelerated product development by 50%"
       },
-      "testimonialsTitle": "What our customers say",
-      "testimonial1": {
-        "quote": "Transformed our development process completely. We ship features 60% faster now.",
-        "author": "Sarah Chen",
-        "role": "Engineering Manager",
-        "company": "TechCorp"
+      "education": {
+        "title": "Education",
+        "desc": "Academic institutions need structured requirement workflows.",
+        "testimonial": "Enhanced student project quality remarkably"
       },
-      "testimonial2": {
-        "quote": "The best investment we made this year. ROI was visible within the first month.",
-        "author": "Michael Rodriguez",
-        "role": "CTO",
-        "company": "StartupXYZ"
-      },
-      "testimonial3": {
-        "quote": "Finally, a tool that actually delivers on its promises. Our team loves it.",
-        "author": "Emma Thompson",
-        "role": "Product Lead",
-        "company": "InnovateLabs"
+      "retail": {
+        "title": "Retail",
+        "desc": "E-commerce platforms require rapid feature iteration.",
+        "testimonial": "Faster time-to-market for new features"
       }
+    },
+    "integrations": {
+      "title": "Seamless",
+      "titleHighlight": "integrations",
+      "subtitle": "Connect with your favorite tools and streamline your workflow with powerful integrations.",
+      "cta": "Need a custom integration? Our API makes it easy.",
+      "github": {
+        "desc": "Sync requirements with code repositories",
+        "category": "Version Control"
+      },
+      "slack": {
+        "desc": "Real-time notifications and updates",
+        "category": "Communication"
+      },
+      "jira": {
+        "desc": "Seamless project management integration",
+        "category": "Project Management"
+      },
+      "api": {
+        "desc": "Custom integrations via REST API",
+        "category": "Development"
+      },
+      "webhooks": {
+        "desc": "Real-time event notifications",
+        "category": "Automation"
+      },
+      "sso": {
+        "desc": "Enterprise authentication systems",
+        "category": "Security"
+      }
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "subtitle": "Join thousands of teams already using Requify to streamline their development process.",
+      "getStarted": "Get Started",
+      "contactSales": "Contact Sales"
+    }
+  },
+  "footer": {
+    "product": {
+      "title": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "security": "Security"
+    },
+    "solutions": {
+      "title": "Solutions",
+      "enterprise": "Enterprise",
+      "startups": "Startups",
+      "education": "Education",
+      "consulting": "Consulting"
+    },
+    "resources": {
+      "title": "Resources",
+      "docs": "Documentation",
+      "guides": "Guides",
+      "blog": "Blog",
+      "community": "Community"
+    },
+    "support": {
+      "title": "Support",
+      "help": "Help Center",
+      "contact": "Contact Us",
+      "status": "Status",
+      "training": "Training"
+    },
+    "contact": {
+      "title": "Contact",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address"
+    },
+    "newsletter": {
+      "title": "Stay updated",
+      "description": "Get updates about new features and best practices",
+      "placeholder": "Your email"
+    },
+    "social": {
+      "title": "Follow us"
+    },
+    "language": "English",
+    "version": "Version 0.0.1"
+  },
+  "features": {
+    "title": "Everything you need to",
+    "titleHighlight": "manage requirements",
+    "subtitle": "Powerful features designed to simplify your workflow and enhance team productivity.",
+    "feature1": {
+      "title": "Smart Analysis",
+      "desc": "AI-powered requirements analysis with intelligent suggestions and automated quality checks."
+    },
+    "feature2": {
+      "title": "Fast Delivery",
+      "desc": "Streamlined workflows that accelerate your development process and reduce time-to-market."
+    },
+    "feature3": {
+      "title": "Enterprise Security",
+      "desc": "Bank-grade security with comprehensive audit trails and compliance management."
+    },
+    "feature4": {
+      "title": "Real-time Analytics",
+      "desc": "Comprehensive insights and reporting to track progress and measure success."
+    },
+    "feature5": {
+      "title": "Team Collaboration",
+      "desc": "Seamless collaboration tools that keep your entire team aligned and productive."
+    },
+    "feature6": {
+      "title": "Quality Assurance",
+      "desc": "Built-in quality controls and validation to ensure your requirements meet standards."
+    }
+  },
+  "metrics": {
+    "title": "Trusted by teams",
+    "titleHighlight": "worldwide",
+    "subtitle": "Real results from real teams who've transformed their development process.",
+    "metric1": {
+      "label": "Efficiency Boost",
+      "desc": "Average productivity increase"
+    },
+    "metric2": {
+      "label": "Time Saved",
+      "desc": "Weekly per development team"
+    },
+    "metric3": {
+      "label": "Active Teams",
+      "desc": "Using our platform daily"
+    },
+    "metric4": {
+      "label": "Uptime SLA",
+      "desc": "Enterprise-grade reliability"
+    },
+    "testimonialsTitle": "What our customers say",
+    "testimonial1": {
+      "quote": "Transformed our development process completely. We ship features 60% faster now.",
+      "author": "Sarah Chen",
+      "role": "Engineering Manager",
+      "company": "TechCorp"
+    },
+    "testimonial2": {
+      "quote": "The best investment we made this year. ROI was visible within the first month.",
+      "author": "Michael Rodriguez",
+      "role": "CTO",
+      "company": "StartupXYZ"
+    },
+    "testimonial3": {
+      "quote": "Finally, a tool that actually delivers on its promises. Our team loves it.",
+      "author": "Emma Thompson",
+      "role": "Product Lead",
+      "company": "InnovateLabs"
     }
   },
   "business": {

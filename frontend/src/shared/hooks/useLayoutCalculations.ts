@@ -1,7 +1,11 @@
-import { useCallback, useMemo } from 'react';
-import { useMediaQuery, useTheme } from '@mui/material';
-import { DASHBOARD_TOKENS } from '@/shared/styles/dashboard-tokens';
-import type { DashboardMode, DashboardLayout, DashboardDensity } from '@/shared/types/dashboard';
+import { useCallback, useMemo } from "react";
+import { useMediaQuery, useTheme } from "@mui/material";
+import { DASHBOARD_TOKENS } from "@/shared/styles/dashboard-tokens";
+import type {
+  DashboardMode,
+  DashboardLayout,
+  DashboardDensity,
+} from "@/shared/types/dashboard";
 
 export interface LayoutDimensions {
   viewport: {
@@ -51,38 +55,38 @@ export const useLayoutCalculations = ({
   layout,
   density,
   sidebarCollapsed = false,
-  containerRef
+  containerRef,
 }: UseLayoutCalculationsProps) => {
   const theme = useTheme();
-  
+
   // Breakpoints для точных расчетов
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
-  const isWidescreen = useMediaQuery(theme.breakpoints.up('xl'));
-  const isUltrawide = useMediaQuery('(min-width: 1920px)');
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("md", "lg"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("lg"));
+  const isWidescreen = useMediaQuery(theme.breakpoints.up("xl"));
+  const isUltrawide = useMediaQuery("(min-width: 1920px)");
 
   // Базовые размеры из токенов
   const tokens = DASHBOARD_TOKENS;
-  
+
   // Расчет размеров viewport
   const getViewportDimensions = useCallback(() => {
     return {
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
     };
   }, []);
 
   // Расчет размеров sidebar
   const getSidebarDimensions = useCallback(() => {
-    const expandedWidth = tokens.layout.sidebar.expanded;
-    const collapsedWidth = tokens.layout.sidebar.collapsed;
-    
+    const expandedWidth = tokens.spacing.md;
+    const collapsedWidth = tokens.spacing.sm;
+
     return {
       width: sidebarCollapsed ? collapsedWidth : expandedWidth,
       collapsedWidth,
       isCollapsed: sidebarCollapsed,
-      isMobile
+      isMobile,
     };
   }, [sidebarCollapsed, isMobile, tokens]);
 
@@ -90,7 +94,7 @@ export const useLayoutCalculations = ({
   const getHeaderDimensions = useCallback(() => {
     const baseHeight = isMobile ? 56 : 64; // Material Design App Bar heights
     return {
-      height: baseHeight
+      height: baseHeight,
     };
   }, [isMobile]);
 
@@ -99,11 +103,11 @@ export const useLayoutCalculations = ({
     const basePadding = {
       dense: { xs: 4, sm: 6, md: 8, lg: 12 },
       compact: { xs: 6, sm: 8, md: 12, lg: 16 },
-      comfortable: { xs: 8, sm: 12, md: 16, lg: 24 }
+      comfortable: { xs: 8, sm: 12, md: 16, lg: 24 },
     };
 
-    const densityPadding = basePadding[density];
-    
+    const densityPadding = basePadding[density as keyof typeof basePadding];
+
     let horizontal: number;
     let vertical: number;
 
@@ -134,16 +138,17 @@ export const useLayoutCalculations = ({
     // Точный расчет ширины content area
     const sidebarWidth = isMobile ? 0 : sidebar.width;
     const availableWidth = viewport.width - sidebarWidth;
-    
+
     // Вычитаем горизонтальный padding (left + right)
-    const contentWidth = availableWidth - (padding.horizontal * 2);
-    
+    const contentWidth = availableWidth - padding.horizontal * 2;
+
     // Высота content area (viewport - header - vertical padding)
-    const contentHeight = viewport.height - header.height - (padding.vertical * 2);
+    const contentHeight =
+      viewport.height - header.height - padding.vertical * 2;
 
     // MaxWidth для разных breakpoints
     let maxWidth: number;
-    if (mode === 'fullscreen') {
+    if (mode === "fullscreen") {
       maxWidth = contentWidth; // Полная ширина в fullscreen
     } else {
       // Ограничиваем максимальную ширину для обычных режимов
@@ -165,27 +170,38 @@ export const useLayoutCalculations = ({
       padding,
       margin: {
         left: sidebarWidth,
-        right: 0
-      }
+        right: 0,
+      },
     };
-  }, [mode, isMobile, getViewportDimensions, getSidebarDimensions, getHeaderDimensions, getPadding, isUltrawide, isWidescreen, isDesktop]);
+  }, [
+    mode,
+    isMobile,
+    getViewportDimensions,
+    getSidebarDimensions,
+    getHeaderDimensions,
+    getPadding,
+    isUltrawide,
+    isWidescreen,
+    isDesktop,
+  ]);
 
   // Расчет grid параметров
   const getGridDimensions = useCallback(() => {
     const content = getContentDimensions();
-    
+
     // Количество колонок в зависимости от layout и screen size
     let columns: number;
-    if (layout === 'list') {
+    if (layout === "list") {
       columns = 1;
-    } else if (layout === 'masonry') {
+    } else if (layout === "masonry") {
       if (isMobile) columns = 1;
       else if (isTablet) columns = 2;
       else if (isDesktop) columns = 3;
       else if (isWidescreen) columns = 4;
       else columns = 5; // ultrawide
-    } else { // grid
-      if (mode === 'minimal') {
+    } else {
+      // grid
+      if (mode === "minimal") {
         if (isMobile) columns = 1;
         else if (isTablet) columns = 2;
         else columns = 3;
@@ -200,9 +216,10 @@ export const useLayoutCalculations = ({
 
     // Gap между элементами
     const gapMap = {
-      dense: { xs: 8, sm: 12, md: 16, lg: 20 },
-      compact: { xs: 12, sm: 16, md: 20, lg: 24 },
-      comfortable: { xs: 16, sm: 20, md: 24, lg: 32 }
+      dense: { xs: 4, sm: 8, md: 12, lg: 16 },
+      compact: { xs: 8, sm: 12, md: 16, lg: 20 },
+      comfortable: { xs: 12, sm: 16, md: 20, lg: 24 },
+      spacious: { xs: 16, sm: 20, md: 24, lg: 32 }, // Добавляю недостающее значение
     };
 
     let gap: number;
@@ -218,9 +235,9 @@ export const useLayoutCalculations = ({
 
     // Высота item'а в зависимости от режима
     let itemHeight: number;
-    if (mode === 'minimal') {
+    if (mode === "minimal") {
       itemHeight = itemWidth * 0.6; // 3:5 соотношение
-    } else if (mode === 'compact') {
+    } else if (mode === "compact") {
       itemHeight = itemWidth * 0.75; // 4:3 соотношение
     } else {
       itemHeight = itemWidth * 0.8; // Близко к квадрату
@@ -230,9 +247,18 @@ export const useLayoutCalculations = ({
       columns,
       gap,
       itemWidth: Math.floor(itemWidth), // Округляем для точности
-      itemHeight: Math.floor(itemHeight)
+      itemHeight: Math.floor(itemHeight),
     };
-  }, [layout, mode, density, isMobile, isTablet, isDesktop, isWidescreen, getContentDimensions]);
+  }, [
+    layout,
+    mode,
+    density,
+    isMobile,
+    isTablet,
+    isDesktop,
+    isWidescreen,
+    getContentDimensions,
+  ]);
 
   // Мемоизированные расчеты
   const layoutDimensions = useMemo<LayoutDimensions>(() => {
@@ -247,9 +273,15 @@ export const useLayoutCalculations = ({
       sidebar,
       header,
       content,
-      grid
+      grid,
     };
-  }, [getViewportDimensions, getSidebarDimensions, getHeaderDimensions, getContentDimensions, getGridDimensions]);
+  }, [
+    getViewportDimensions,
+    getSidebarDimensions,
+    getHeaderDimensions,
+    getContentDimensions,
+    getGridDimensions,
+  ]);
 
   // Функция для обновления расчетов при изменении размеров
   const recalculate = useCallback(() => {
@@ -259,9 +291,15 @@ export const useLayoutCalculations = ({
       sidebar: getSidebarDimensions(),
       header: getHeaderDimensions(),
       content: getContentDimensions(),
-      grid: getGridDimensions()
+      grid: getGridDimensions(),
     };
-  }, [getViewportDimensions, getSidebarDimensions, getHeaderDimensions, getContentDimensions, getGridDimensions]);
+  }, [
+    getViewportDimensions,
+    getSidebarDimensions,
+    getHeaderDimensions,
+    getContentDimensions,
+    getGridDimensions,
+  ]);
 
   return {
     dimensions: layoutDimensions,
@@ -271,9 +309,9 @@ export const useLayoutCalculations = ({
       isTablet,
       isDesktop,
       isWidescreen,
-      isUltrawide
-    }
+      isUltrawide,
+    },
   };
 };
 
-export default useLayoutCalculations; 
+export default useLayoutCalculations;

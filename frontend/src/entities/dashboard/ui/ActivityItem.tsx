@@ -184,7 +184,7 @@ export const ActivityItem = memo<ActivityItemProps>(
           {showAvatar && (
             <Box sx={{ position: "relative" }}>
               <Avatar
-                src={activity.user?.avatar || activity.userAvatar}
+                src={activity.user?.avatar}
                 sx={{
                   width: variant === "compact" ? 32 : 40,
                   height: variant === "compact" ? 32 : 40,
@@ -195,7 +195,7 @@ export const ActivityItem = memo<ActivityItemProps>(
                   color: getActivityColor(activity.type as ActivityType),
                 }}
               >
-                {activity.user?.avatar || activity.userAvatar
+                {activity.user?.avatar
                   ? null
                   : getActivityIcon(activity.type as ActivityType)}
               </Avatar>
@@ -257,7 +257,7 @@ export const ActivityItem = memo<ActivityItemProps>(
                       fontWeight: 500,
                     }}
                   >
-                    {activity.user?.name || activity.userName}
+                    {activity.user?.name}
                   </Typography>
                 </Box>
 
@@ -303,20 +303,18 @@ export const ActivityItem = memo<ActivityItemProps>(
               >
                 {/* Status and Priority chips */}
                 <Stack direction="row" spacing={1} alignItems="center">
-                  {showStatus && activity.status && (
+                  {showStatus && activity.metadata?.status && (
                     <Chip
-                      label={activity.status}
+                      label={activity.metadata.status}
                       size="small"
-                      variant="outlined"
-                      sx={{
-                        fontSize: "0.7rem",
-                        height: 20,
-                        borderColor: getStatusColor(activity.status),
-                        color: getStatusColor(activity.status),
-                        "& .MuiChip-label": {
-                          px: 1,
-                        },
-                      }}
+                      color={
+                        activity.metadata.status === "completed"
+                          ? "success"
+                          : activity.metadata.status === "in_progress"
+                          ? "primary"
+                          : "default"
+                      }
+                      sx={{ ml: 1, height: 20, fontSize: "0.75rem" }}
                     />
                   )}
 

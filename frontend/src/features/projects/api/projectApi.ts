@@ -1,10 +1,12 @@
-import { client } from '@/shared/api/client';
+import { client } from "@/app/providers/client";
+import { NotificationItem, type SearchResult } from "@/features/header/model/types";
+import { API_ENDPOINTS } from "@/shared";
 
 export interface Project {
   id: string;
   name: string;
   description?: string;
-  status: 'active' | 'completed' | 'on_hold' | 'cancelled';
+  status: "active" | "completed" | "on_hold" | "cancelled";
   startDate?: string;
   endDate?: string;
   progress: number;
@@ -23,7 +25,7 @@ export interface CreateProjectRequest {
 export interface UpdateProjectRequest {
   name?: string;
   description?: string;
-  status?: 'active' | 'completed' | 'on_hold' | 'cancelled';
+  status?: "active" | "completed" | "on_hold" | "cancelled";
   startDate?: string;
   endDate?: string;
 }
@@ -52,10 +54,11 @@ export const projectApi = {
   // Get all projects with optional filters
   getProjects: async (filters?: ProjectFilters): Promise<Project[]> => {
     const params = new URLSearchParams();
-    if (filters?.search) params.append('search', filters.search);
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.startDateFrom) params.append('startDateFrom', filters.startDateFrom);
-    if (filters?.startDateTo) params.append('startDateTo', filters.startDateTo);
+    if (filters?.search) params.append("search", filters.search);
+    if (filters?.status) params.append("status", filters.status);
+    if (filters?.startDateFrom)
+      params.append("startDateFrom", filters.startDateFrom);
+    if (filters?.startDateTo) params.append("startDateTo", filters.startDateTo);
 
     const response = await client.get(`/projects?${params}`);
     return response.data;
@@ -69,12 +72,15 @@ export const projectApi = {
 
   // Create new project
   createProject: async (data: CreateProjectRequest): Promise<Project> => {
-    const response = await client.post('/projects', data);
+    const response = await client.post("/projects", data);
     return response.data;
   },
 
   // Update existing project
-  updateProject: async (id: string, data: UpdateProjectRequest): Promise<Project> => {
+  updateProject: async (
+    id: string,
+    data: UpdateProjectRequest
+  ): Promise<Project> => {
     const response = await client.put(`/projects/${id}`, data);
     return response.data;
   },
@@ -86,7 +92,20 @@ export const projectApi = {
 
   // Get project statistics
   getProjectStats: async (): Promise<ProjectStats> => {
-    const response = await client.get('/projects/stats');
+    const response = await client.get("/projects/stats");
     return response.data;
   },
-}; 
+
+  // Search projects
+  search: async (query: string): Promise<SearchResult[]> => {
+    const response = await client.get(`/projects/search?query=${query}`);
+    return response.data;
+  },
+
+  // Get notifications
+  getNotifications: async (): Promise<NotificationItem[]> => {
+    const response = await client.get(API_ENDPOINTS.DASHBOARD.MY_NOTIFICATIONS);
+    // TODO: change to notifications endpoint on backend need create separate endpoint for notifications for each entity
+    return response.data;
+  },
+};

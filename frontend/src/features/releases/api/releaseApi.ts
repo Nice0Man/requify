@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { client } from "@/shared/api/client";
+import { client } from "@/app/providers/client";
 import { API_ENDPOINTS } from "@/shared/api/endpoints";
 import type {
   Release,
@@ -8,6 +8,9 @@ import type {
   UpdateReleaseData,
   ReleaseStats,
 } from "../model/types";
+
+// Экспортируем типы для использования в других частях приложения
+export type { Release, ReleaseFilters, CreateReleaseData, UpdateReleaseData, ReleaseStats };
 
 // Query Keys
 export const releaseKeys = {

@@ -3,7 +3,7 @@
  * Основано на схемах из backend/app/schemas/project.py
  */
 
-import { client } from "@/shared/api/client";
+import { client } from "@/app/providers/client";
 import { API_ENDPOINTS } from "@/shared/api/endpoints";
 import type {
   Project,
@@ -13,10 +13,6 @@ import type {
   ProjectListResponse,
   ProjectDetailResponse,
   ProjectQueryParams,
-  ProjectBulkOperation,
-  ProjectImportData,
-  ProjectExportOptions,
-  ProjectValidationResult,
   ProjectTeamMember,
   ProjectTeamRequest,
   ProjectTeamResponse,
@@ -27,7 +23,14 @@ import type {
   ProjectTemplateCreate,
   ProjectFromTemplate,
   ProjectDashboard,
-} from "@/shared/types/project";
+  ProjectBulkOperation,
+  ProjectImportData,
+  ProjectExportOptions,
+  ProjectValidationResult,
+} from "../model/types";
+
+// Дополнительные типы для DAO (если нужны)
+// (убираем дублированные типы, которые теперь есть в model/types)
 
 /**
  * ProjectDAO - класс для работы с API проектов
@@ -234,7 +237,7 @@ export class ProjectDAO {
   async updateTeamMember(
     id: number,
     userId: number,
-    memberData: Partial<ProjectTeamRequest>
+    memberData: ProjectTeamRequest
   ): Promise<ProjectTeamMember> {
     try {
       const response = await client.put<ProjectTeamMember>(

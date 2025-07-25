@@ -5,4 +5,4 @@ export type {
 } from './types';
 
 // Экспорт хука Auth0
-export { useAuth } from './useAuth';
+export { useAuth } from '../hooks/useAuth';

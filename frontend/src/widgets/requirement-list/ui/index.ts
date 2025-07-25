@@ -1,2 +1,1 @@
-// Requirement list widget UI
-export * from './RequirementListWidget'; 
+export { RequirementListWidget } from "./RequirementListWidget"; 

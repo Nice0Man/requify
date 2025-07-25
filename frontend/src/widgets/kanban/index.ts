@@ -1,3 +1,2 @@
-// Kanban widget exports
-export * from "./ui";
-export * from "./model"; 
+export { KanbanWidget } from "./ui";
+export type { KanbanWidgetProps } from "./model"; 

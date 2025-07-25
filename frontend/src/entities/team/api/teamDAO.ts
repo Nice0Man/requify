@@ -3,7 +3,7 @@
  * Основано на схемах из backend/app/schemas/team.py
  */
 
-import { client } from '@/shared/api/client';
+import { client } from '@/app/providers/client';
 import { API_ENDPOINTS } from '@/shared/api/endpoints';
 import type {
   Team,

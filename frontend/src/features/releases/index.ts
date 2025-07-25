@@ -1,6 +1,6 @@
-// Model exports
+// Model exports - избегаем дублирования с API
 export * from './model/useReleaseQuery';
 export * from './model';
 
-// API exports  
-export * from './api/releaseApi'; 
+// Типы из API - только типы, не функции
+export type { Release, ReleaseFilters, CreateReleaseData, UpdateReleaseData, ReleaseStats } from './api/releaseApi'; 

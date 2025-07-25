@@ -1,35 +1,131 @@
 import type {
-  DashboardMode,
-  DashboardLayout,
-  DashboardDensity,
-} from "@/shared/ui";
+  SystemHealthOverview,
+  SystemMetric,
+  SystemService,
+  SystemIncident,
+  SystemHealthFilters,
+} from "@/entities/system";
+import type { BaseWidgetProps } from "@/shared/types/dashboard";
 
-export interface SystemHealthWidgetProps {
-  // Dashboard settings
-  mode: DashboardMode;
-  layout: DashboardLayout;
-  density: DashboardDensity;
+/**
+ * Конфигурация отображения виджета здоровья системы
+ */
+export interface SystemHealthDisplayConfig {
+  /** Показывать общий статус */
+  showOverallStatus: boolean;
 
-  // Feature-specific props
-  showMetrics?: boolean;
-  showAlerts?: boolean;
-  showStatus?: boolean;
-  refreshInterval?: number;
-  autoRefresh?: boolean;
+  /** Показывать метрики */
+  showMetrics: boolean;
 
-  // Wrapper props
-  className?: string;
-  loading?: boolean;
-  error?: string | Error;
-  onResize?: (size: { width: number; height: number }) => void;
-  onCollapse?: (collapsed: boolean) => void;
+  /** Показывать сервисы */
+  showServices: boolean;
+
+  /** Показывать инциденты */
+  showIncidents: boolean;
+
+  /** Максимальное количество метрик */
+  maxMetrics: number;
+
+  /** Максимальное количество сервисов */
+  maxServices: number;
+
+  /** Максимальное количество инцидентов */
+  maxIncidents: number;
+
+  /** Показывать тренды */
+  showTrends: boolean;
+
+  /** Показывать время отклика */
+  showResponseTimes: boolean;
+
+  /** Автообновление */
+  autoRefresh: boolean;
+
+  /** Интервал автообновления (секунды) */
+  refreshInterval: number;
+
+  /** Компактный режим */
+  compact: boolean;
+
+  /** Группировать по типам */
+  groupByType: boolean;
+
+  /** Показывать только критичные */
+  showCriticalOnly: boolean;
 }
 
-export interface SystemMetric {
-  id: string;
-  name: string;
-  value: number;
-  unit: string;
-  status: "healthy" | "warning" | "critical";
-  trend?: "up" | "down" | "stable";
-} 
+/**
+ * Пропы для SystemHealthWidget
+ * Теперь использует типы из system entity
+ */
+export interface SystemHealthWidgetProps extends BaseWidgetProps {
+  /** Общий обзор системы */
+  overview?: SystemHealthOverview;
+
+  /** Метрики системы */
+  metrics?: SystemMetric[];
+
+  /** Сервисы системы */
+  services?: SystemService[];
+
+  /** Инциденты */
+  incidents?: SystemIncident[];
+
+  /** Конфигурация отображения */
+  displayConfig?: Partial<SystemHealthDisplayConfig>;
+
+  /** Фильтры */
+  filters?: SystemHealthFilters;
+
+  /** Загрузка данных */
+  isDataLoading?: boolean;
+
+  /** Ошибка загрузки */
+  dataError?: Error | null;
+
+  /** Обработчик обновления */
+  onRefresh?: () => void;
+
+  /** Обработчик клика по метрике */
+  onMetricClick?: (metric: SystemMetric) => void;
+
+  /** Обработчик клика по сервису */
+  onServiceClick?: (service: SystemService) => void;
+
+  /** Обработчик клика по инциденту */
+  onIncidentClick?: (incident: SystemIncident) => void;
+
+  /** Обработчик изменения фильтров */
+  onFiltersChange?: (filters: SystemHealthFilters) => void;
+
+  /** Обработчик настроек */
+  onSettings?: () => void;
+
+  /** Показывать настройки */
+  showSettings?: boolean;
+
+  /** Кастомный заголовок */
+  customTitle?: string;
+
+  refreshInterval?: number;
+  showDetails?: boolean;
+  variant?: string;
+  className?: string;
+  alertThresholds?: {
+    cpu: number;
+    memory: number;
+    disk: number;
+  };
+}
+
+// Re-export основных типов из entity для удобства
+export type {
+  SystemHealthOverview,
+  SystemMetric,
+  SystemService,
+  SystemIncident,
+  SystemHealthFilters,
+  HealthStatus,
+  MetricType,
+  MetricUnit,
+} from "@/entities/system";

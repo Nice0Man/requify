@@ -91,45 +91,45 @@ export const DASHBOARD_ANIMATIONS = {
     fadeInKeyframes,
     DASHBOARD_TOKENS.animation.duration.standard
   ),
-  
+
   slideUp: createOptimizedAnimation(
     slideUpKeyframes,
     DASHBOARD_TOKENS.animation.duration.standard
   ),
-  
+
   slideInLeft: createOptimizedAnimation(
     slideInLeftKeyframes,
     DASHBOARD_TOKENS.animation.duration.standard
   ),
-  
+
   scaleIn: createOptimizedAnimation(
     scaleInKeyframes,
     DASHBOARD_TOKENS.animation.duration.shorter
   ),
-  
+
   // Loading states
   pulse: createOptimizedAnimation(
     pulseKeyframes,
     1500, // Slower for loading states
     DASHBOARD_TOKENS.animation.easing.standard
   ),
-  
+
   shimmer: createOptimizedAnimation(
     shimmerKeyframes,
     2000, // Shimmer effect for skeletons
     "linear"
   ),
-  
+
   // Stagger animations factory
-  stagger: (index: number, speed: "fast" | "normal" | "slow" = "normal") => ({
+  stagger: (index: number, speed: "fast" | "medium" | "slow" = "medium") => ({
     ...createOptimizedAnimation(
       slideUpKeyframes,
       DASHBOARD_TOKENS.animation.duration.standard,
       DASHBOARD_TOKENS.animation.easing.decelerated,
-      DASHBOARD_TOKENS.animation.stagger[speed] * index
+      getStaggerDelay(index, speed)
     ),
   }),
-  
+
   // Micro-interactions
   buttonHover: {
     transition: `all ${DASHBOARD_TOKENS.animation.duration.shorter}ms ${DASHBOARD_TOKENS.animation.easing.standard}`,
@@ -142,7 +142,7 @@ export const DASHBOARD_ANIMATIONS = {
       transition: `all ${DASHBOARD_TOKENS.animation.duration.shortest}ms ${DASHBOARD_TOKENS.animation.easing.accelerated}`,
     },
   },
-  
+
   cardHover: {
     transition: `all ${DASHBOARD_TOKENS.animation.duration.standard}ms ${DASHBOARD_TOKENS.animation.easing.standard}`,
     willChange: "transform, box-shadow",
@@ -151,13 +151,13 @@ export const DASHBOARD_ANIMATIONS = {
       boxShadow: DASHBOARD_TOKENS.shadows.component.widget.hover,
     },
   },
-  
+
   // Layout transitions
   layoutTransition: {
     transition: `all ${DASHBOARD_TOKENS.animation.duration.complex}ms ${DASHBOARD_TOKENS.animation.easing.standard}`,
     willChange: "width, height, transform",
   },
-  
+
   // Responsive animations (disabled on mobile for performance)
   responsiveAnimation: (animation: any, disableOnMobile = true) => ({
     ...animation,
@@ -208,7 +208,7 @@ export const getAnimationStyles = (
       transition: "none",
     };
   }
-  
+
   return DASHBOARD_ANIMATIONS[animationType];
 };
 
@@ -217,11 +217,11 @@ export const MOBILE_ANIMATIONS = {
   fadeIn: {
     transition: `opacity ${DASHBOARD_TOKENS.animation.duration.shorter}ms ease-out`,
   },
-  
+
   slideUp: {
     transition: `transform ${DASHBOARD_TOKENS.animation.duration.shorter}ms ease-out`,
   },
-  
+
   // Disabled complex animations on mobile
   none: {
     animation: "none",
@@ -242,4 +242,17 @@ export const createSkeletonAnimation = (width?: string | number) => ({
   height: "1em",
 });
 
-export default DASHBOARD_ANIMATIONS; 
+export default DASHBOARD_ANIMATIONS;
+
+export const getStaggerDelay = (
+  index: number,
+  speed: "fast" | "medium" | "slow" = "medium"
+) => {
+  const staggerMap = {
+    fast: 50,
+    medium: 100,
+    slow: 150,
+  };
+
+  return staggerMap[speed] * index;
+};

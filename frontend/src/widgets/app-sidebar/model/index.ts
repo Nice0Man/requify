@@ -1,4 +1,8 @@
-export * from "./types";
-export * from "./store";
-export * from "./config";
-export * from "./hooks";
+// Хуки
+export { useAppSidebar } from "./useAppSidebar";
+
+// Типы
+export type {
+  AppSidebarState,
+  UseAppSidebarReturn,
+} from "./useAppSidebar"; 

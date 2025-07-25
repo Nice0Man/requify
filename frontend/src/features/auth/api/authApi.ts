@@ -1,4 +1,4 @@
-import { client } from "@/shared/api/client";
+import { client } from "@/app/providers/client";
 import { API_ENDPOINTS } from "@/shared/api/endpoints";
 
 // === Базовые типы для аутентификации ===
@@ -113,7 +113,11 @@ export const authApi = {
   },
 
   async logout(): Promise<void> {
-    await client.post(API_ENDPOINTS.AUTH.LOGOUT);
+    // Получаем refresh_token для отправки на сервер для аннулирования
+    const refreshToken = localStorage.getItem('refresh_token');
+    const payload = refreshToken ? { refresh_token: refreshToken } : {};
+    
+    await client.post(API_ENDPOINTS.AUTH.LOGOUT, payload);
   },
 
   async refreshToken(data: RefreshTokenRequest): Promise<LoginResponse> {
@@ -192,14 +196,14 @@ export const authApi = {
   // === Информация о пользователе ===
 
   async getMe(): Promise<LoginResponse["user"]> {
-    const response = await client.get(API_ENDPOINTS.USERS.ME);
+    const response = await client.get(API_ENDPOINTS.USERS.ME.ROOT);
     return response.data;
   },
 
   async updateMe(
     userData: Partial<LoginResponse["user"]>
   ): Promise<LoginResponse["user"]> {
-    const response = await client.put(API_ENDPOINTS.USERS.UPDATE_ME, userData);
+    const response = await client.put(API_ENDPOINTS.USERS.ME.UPDATE, userData);
     return response.data;
   },
 

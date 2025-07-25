@@ -376,7 +376,7 @@ export const PieChart = memo<PieChartProps>(
                 onPointClick ? (data: any) => onPointClick(data) : undefined
               }
             >
-              {chartData.map((entry, index) => {
+              {chartData.map((_entry, index) => {
                 // const color = entry.color || chartColors[index % chartColors.length];
                 return (
                   <Cell

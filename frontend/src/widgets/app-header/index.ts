@@ -1,2 +1,2 @@
-export * from "./ui";
-export * from "./model"; 
+// App Header Widget - полный экспорт
+export { AppHeaderWidget } from "./ui"; 

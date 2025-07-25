@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback, Suspense, useState } from "react";
+import React, { memo, useMemo, useCallback, useState } from "react";
 import {
   Box,
   Card,
@@ -6,21 +6,16 @@ import {
   CardHeader,
   Grid,
   Typography,
-  ToggleButton,
-  ToggleButtonGroup,
   FormControl,
   Select,
   MenuItem,
   Skeleton,
   alpha,
   useTheme,
-  SelectChangeEvent,
   IconButton,
-  Tooltip,
   Chip,
   InputLabel,
   ButtonGroup,
-  Button,
   Collapse,
   Alert,
 } from "@mui/material";
@@ -30,21 +25,12 @@ import {
   Insights,
   TrendingUp,
   Refresh,
-  Fullscreen,
-  Settings,
   BarChart as BarChartIcon,
   ViewModule,
   ViewList,
   ExpandMore,
 } from "@mui/icons-material";
 import i18n from "@/shared/lib/i18n";
-import {
-  DashboardWidgetWrapper,
-  type WidgetConfig,
-  type DashboardMode,
-  type DashboardLayout,
-  type DashboardDensity,
-} from "@/shared/ui";
 import {
   usePerformanceMeasure,
   useRenderTracker,
@@ -75,12 +61,19 @@ import {
   transformRequirementsTimelineToChartData,
   transformTeamWorkloadToChartData,
   transformProjectProgressToChartData,
-  chartUtils,
 } from "../model/queries";
 import { useDashboardStats } from "@/features/dashboard/model/queries";
 
 // Placeholder components
 import { ChartPlaceholder, ChartLoadingPlaceholder } from "./ChartPlaceholder";
+import {
+  DashboardDensity,
+  DashboardMode,
+  WidgetConfig,
+  WidgetSize,
+  WidgetType,
+} from "@/widgets/types";
+import { DashboardLayout } from "@/shared/types/dashboard";
 
 // Chart configuration type
 interface ChartConfig {
@@ -102,7 +95,7 @@ interface ChartsManagementWidgetProps {
   mode: DashboardMode;
   layout: DashboardLayout;
   density: DashboardDensity;
-  
+
   // Feature-specific props
   variant?: "minimal" | "compact" | "detailed";
   defaultExpanded?: boolean;
@@ -116,7 +109,7 @@ interface ChartsManagementWidgetProps {
   flexible?: boolean;
   maxHeight?: number;
   overflow?: string;
-  
+
   // Wrapper props
   className?: string;
   loading?: boolean;
@@ -126,77 +119,40 @@ interface ChartsManagementWidgetProps {
 }
 
 // Конфигурация виджета для разных режимов дашборда
-const chartsManagementWidgetConfig: WidgetConfig = {
-  id: 'charts-management-widget',
-  title: i18n.t('dashboard.widgets.charts.title', 'Управление графиками'),
-  description: i18n.t('dashboard.widgets.charts.description', 'Настройка и просмотр аналитических графиков'),
-  icon: ShowChart,
-  
+const chartsManagementWidgetConfig = {
+  id: "charts-management-widget",
+  title: i18n.t("dashboard.widgets.charts.title", "Управление графиками"),
+  description: i18n.t(
+    "dashboard.widgets.charts.description",
+    "Настройка и просмотр аналитических графиков"
+  ),
+  icon: <ShowChart />,
+
   // Настройки по умолчанию
-  defaultSize: 'large',
-  defaultPriority: 'high',
-  defaultAspectRatio: 'wide',
-  
-  // Режимы дашборда
-  modes: {
-    minimal: {
-      size: 'medium',
-      visible: false, // Скрыт в минимальном режиме
-      priority: 'normal',
-    },
-    compact: {
-      size: 'large',
-      visible: true,
-      priority: 'high',
-      aspectRatio: 'wide',
-      spacing: { padding: '16px' },
-    },
-    detailed: {
-      size: 'xlarge',
-      visible: true,
-      priority: 'high',
-      aspectRatio: 'wide',
-      spacing: { padding: '20px' },
-    },
-    fullscreen: {
-      size: 'xlarge',
-      visible: true,
-      priority: 'critical',
-      aspectRatio: 'wide',
-      spacing: { padding: '24px' },
-    },
+  size: WidgetSize.LARGE,
+  priority: 1,
+  type: WidgetType.CHART,
+  display: {
+    visible: true,
+    resizable: false,
+    draggable: false,
+    collapsible: true,
+    minWidth: 300,
+    minHeight: 300,
+    maxWidth: 1200,
+    maxHeight: 800,
   },
-  
-  // Лейауты
-  layouts: {
-    grid: {
-      aspectRatio: 'wide',
-      minHeight: '400px',
-      maxHeight: '600px',
-    },
-    list: {
-      size: 'large',
-      aspectRatio: 'wide',
-      minHeight: '300px',
-      maxHeight: '500px',
-    },
-    masonry: {
-      size: 'auto',
-      aspectRatio: 'auto',
-      minHeight: '350px',
-    },
-  },
-  
+
   // Стили
   border: true,
   shadow: true,
   borderRadius: 12,
-  
+
   // Поведение
   collapsible: true,
   resizable: false,
   draggable: false,
-  
+
   // Производительность
   lazy: false,
   virtualizeContent: false,
@@ -246,14 +202,14 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
     const t = i18n.t;
 
     // New adaptive sizing system
-    const sizing = useDashboardSizing({ 
-      mode, 
-      density, 
-      layout, 
-      masonry, 
-      flexible 
+    const sizing = useDashboardSizing({
+      mode,
+      density,
+      layout,
+      masonry,
+      flexible,
     });
-    
+
     const chartSizing = useChartSizing(mode, density, layout);
 
     // State
@@ -319,8 +275,12 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
           id: "in_progress",
           label: t("dashboard.status.in_progress", "In Progress"),
           value:
-            stats?.activeProjects || stats?.totalProjects
-              ? Math.round((stats.activeProjects || stats.totalProjects) * 0.5)
+            stats &&
+            (stats.activeProjects || stats.totalProjects) &&
+            (stats.activeProjects || stats.totalProjects)! > 0
+              ? Math.round(
+                  ((stats.activeProjects || stats.totalProjects)! * 0.5) / 100
+                )
               : 8,
           color: theme.palette.primary.main,
           percentage: 50,
@@ -373,7 +333,10 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
         },
         {
           id: "requirements-timeline",
-          title: t("dashboard.charts.requirementsTimeline", "Requirements Timeline"),
+          title: t(
+            "dashboard.charts.requirementsTimeline",
+            "Requirements Timeline"
+          ),
           type: "line" as const,
           entity: "requirements" as const,
           data: requirementsTimelineData
@@ -466,7 +429,10 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
         // Show loading placeholder
         if (chart.loading) {
           return (
-            <ChartLoadingPlaceholder height={chartSizing.height} type={chart.type} />
+            <ChartLoadingPlaceholder
+              height={chartSizing.height}
+              type={chart.type}
+            />
           );
         }
 
@@ -536,38 +502,34 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
 
     if (isStatsLoading || externalLoading) {
       return (
-        <DashboardWidgetWrapper
-          config={chartsManagementWidgetConfig}
-          mode={mode}
-          layout={layout}
-          density={density}
+        <Card
           className={className}
-          loading={true}
-          onResize={onResize}
-          onCollapse={onCollapse}
-          aria-label="Виджет управления графиками"
+          sx={{
+            borderRadius: sizing.borderRadius?.small || 2,
+            overflow: "visible",
+          }}
         >
           <Box sx={{ p: 2 }}>
             <Skeleton variant="text" width="60%" height={28} />
-            <Skeleton variant="rectangular" width="100%" height={200} sx={{ mt: 2 }} />
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height={200}
+              sx={{ mt: 2 }}
+            />
             <Skeleton variant="text" width="40%" height={20} sx={{ mt: 1 }} />
           </Box>
-        </DashboardWidgetWrapper>
+        </Card>
       );
     }
 
     return (
-      <DashboardWidgetWrapper
-        config={chartsManagementWidgetConfig}
-        mode={mode}
-        layout={layout}
-        density={density}
+      <Card
         className={className}
-        loading={externalLoading || isStatsLoading}
-        error={externalError}
-        onResize={onResize}
-        onCollapse={onCollapse}
-        aria-label="Виджет управления графиками"
+        sx={{
+          borderRadius: sizing.borderRadius?.small || 2,
+          overflow: "visible",
+        }}
       >
         {/* Header */}
         <CardHeader
@@ -599,8 +561,8 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
             </Typography>
           }
           subheader={
-            <Typography 
-              variant="caption" 
+            <Typography
+              variant="caption"
               color="text.secondary"
               sx={{ fontSize: sizing.typography.caption }}
             >
@@ -618,7 +580,11 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
                     <InputLabel>Entity</InputLabel>
                     <Select
                       value={selectedEntity}
-                      onChange={(e) => handleEntityFilter(e.target.value as typeof selectedEntity)}
+                      onChange={(e) =>
+                        handleEntityFilter(
+                          e.target.value as typeof selectedEntity
+                        )
+                      }
                       label="Entity"
                     >
                       <MenuItem value="all">All</MenuItem>
@@ -685,11 +651,16 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
               },
               pt: 0, // No top padding
               overflow: overflow,
-              maxHeight: maxHeight ? maxHeight - sizing.headerHeight : undefined,
+              maxHeight: maxHeight
+                ? maxHeight - sizing.headerHeight
+                : undefined,
             }}
           >
             {filteredCharts.length === 0 ? (
-              <Alert severity="info" sx={{ borderRadius: sizing.borderRadius.small }}>
+              <Alert
+                severity="info"
+                sx={{ borderRadius: sizing.borderRadius.small }}
+              >
                 {t(
                   "dashboard.charts.noData",
                   "No charts available for the selected entity."
@@ -831,7 +802,7 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
                               }}
                             />
                           }
-                          sx={{ 
+                          sx={{
                             pb: 1,
                             px: sizing.padding.sm,
                             pt: sizing.padding.sm,
@@ -849,9 +820,9 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
                             overflow: overflow,
                           }}
                         >
-                          <Box 
-                            sx={{ 
-                              flexGrow: 1, 
+                          <Box
+                            sx={{
+                              flexGrow: 1,
                               minHeight: 0,
                               overflow: overflow,
                               position: "relative",
@@ -868,7 +839,7 @@ export const ChartsManagementWidget = memo<ChartsManagementWidgetProps>(
             )}
           </CardContent>
         </Collapse>
-      </DashboardWidgetWrapper>
+      </Card>
     );
   }
 );

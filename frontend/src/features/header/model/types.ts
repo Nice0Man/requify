@@ -7,12 +7,12 @@ export interface SearchState {
 export interface SearchResult {
   id: string;
   title: string;
-  type: 'project' | 'requirement' | 'release' | 'user';
+  type: "project" | "requirement" | "release" | "user";
   url: string;
   description?: string;
 }
 
-export interface QuickAction {
+export interface HeaderAction {
   id: string;
   label: string;
   icon: React.ElementType;
@@ -27,7 +27,7 @@ export interface NotificationItem {
   message: string;
   time: string;
   read?: boolean;
-  type?: 'info' | 'warning' | 'error' | 'success';
+  type?: "info" | "warning" | "error" | "success";
   actionUrl?: string;
 }
 
@@ -35,7 +35,7 @@ export interface HeaderState {
   search: SearchState;
   notifications: NotificationItem[];
   unreadCount: number;
-  quickActions: QuickAction[];
+  quickActions: HeaderAction[];
 }
 
 export interface HeaderConfig {
@@ -44,4 +44,4 @@ export interface HeaderConfig {
   showQuickActions: boolean;
   showUserMenu: boolean;
   maxNotifications: number;
-} 
+}

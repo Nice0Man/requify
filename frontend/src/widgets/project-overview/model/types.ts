@@ -1,39 +1,106 @@
-import type {
-  DashboardMode,
-  DashboardLayout,
-  DashboardDensity,
-} from "@/shared/ui";
-import type { Project, ProjectFilters } from "@/entities/project/model/types";
+import type { AdaptiveWidgetProps } from "@/widgets/types";
+import type { SxProps, Theme } from "@mui/material/styles";
 
-// Enhanced types for widget display
-export interface ExtendedProject extends Project {
-  progress?: number;
-  requirements?: { total: number; completed: number; approved: number };
-  testCases?: { total: number; passed: number; failed: number };
-  team?: Array<{ id: string; name: string; avatar: string; role: string }>;
-  budget?: { allocated: number; spent: number; currency: string };
-  lastActivity?: string;
+/**
+ * Статус проекта
+ */
+export type ProjectStatus =
+  | "draft"
+  | "planning"
+  | "in_progress"
+  | "on_hold"
+  | "completed"
+  | "cancelled";
+
+/**
+ * Приоритет проекта
+ */
+export type ProjectPriority = "low" | "medium" | "high" | "critical";
+
+/**
+ * Информация о проекте
+ */
+export interface ProjectInfo {
+  /** Идентификатор */
+  id: string;
+
+  /** Название проекта */
+  name: string;
+
+  /** Описание */
+  description?: string;
+
+  /** Статус */
+  status: ProjectStatus;
+
+  /** Приоритет */
+  priority: ProjectPriority;
+
+  /** Прогресс (0-100) */
+  progress: number;
+
+  /** Дата начала */
+  startDate: Date;
+
+  /** Планируемая дата окончания */
+  endDate: Date;
+
+  /** Команда проекта */
+  team: Array<{
+    id: string;
+    name: string;
+    role: string;
+    avatar?: string;
+  }>;
+
+  /** Статистика */
+  stats: {
+    totalRequirements: number;
+    completedRequirements: number;
+    totalTasks: number;
+    completedTasks: number;
+    openIssues: number;
+  };
+
+  /** Теги */
+  tags?: string[];
+
+  /** Цвет проекта */
+  color?: string;
 }
 
-export interface ProjectOverviewWidgetProps {
-  // Dashboard settings
-  mode: DashboardMode;
-  layout: DashboardLayout;
-  density: DashboardDensity;
-
-  // Feature-specific props
-  limit?: number;
-  showFilters?: boolean;
-  showActions?: boolean;
-  masonry?: boolean;
-  flexible?: boolean;
-  maxHeight?: number;
-  overflow?: string;
-
-  // Wrapper props
+/**
+ * Пропы для ProjectOverviewWidget
+ */
+export interface ProjectOverviewWidgetProps extends AdaptiveWidgetProps {
+  /** CSS классы */
   className?: string;
-  loading?: boolean;
-  error?: string | Error;
-  onResize?: (size: { width: number; height: number }) => void;
-  onCollapse?: (collapsed: boolean) => void;
-} 
+  /** Стили MUI */
+  sx?: SxProps<Theme>;
+  /** Проекты для отображения */
+  projects?: ProjectInfo[];
+
+  /** Загрузка данных */
+  isDataLoading?: boolean;
+
+  /** Ошибка загрузки */
+  dataError?: Error | null;
+
+  /** Обработчик клика по проекту */
+  onProjectClick?: (project: ProjectInfo) => void;
+
+  /** Обработчик обновления */
+  onRefresh?: () => void;
+
+  /** Максимальное количество проектов */
+  maxProjects?: number;
+
+  /** Показывать команду */
+  showTeam?: boolean;
+
+  /** Показывать прогресс */
+  showProgress?: boolean;
+
+  /** Кастомный заголовок */
+  customTitle?: string;
+}

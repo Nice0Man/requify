@@ -1,41 +1,90 @@
+import type { BaseWidgetProps } from "@/shared/types/dashboard";
+
+// Импортируем типы активности из shared
 import type {
-  DashboardMode,
-  DashboardLayout,
-  DashboardDensity,
-} from "@/shared/ui";
+  ActivityType,
+  ActivityPriority,
+  ActivityStatus,
+  ActivityItem,
+  ActivityFilters,
+} from "@/shared/types/activity";
 
-export interface ActivityFeedWidgetProps {
-  // Dashboard settings
-  mode: DashboardMode;
-  layout: DashboardLayout;
-  density: DashboardDensity;
+// Реэкспортируем для обратной совместимости
+export type {
+  ActivityType,
+  ActivityPriority,
+  ActivityStatus,
+  ActivityItem,
+  ActivityFilters,
+};
 
-  // Feature-specific props
-  limit?: number;
-  showFilters?: boolean;
-  showTimestamp?: boolean;
-  showAvatars?: boolean;
-  groupByDate?: boolean;
-  activityTypes?: string[];
+/**
+ * Настройки группировки активности
+ */
+export interface ActivityGrouping {
+  /** Группировать по */
+  groupBy: "date" | "type" | "priority" | "author" | "project" | "none";
 
-  // Wrapper props
-  className?: string;
-  loading?: boolean;
-  error?: string | Error;
-  onResize?: (size: { width: number; height: number }) => void;
-  onCollapse?: (collapsed: boolean) => void;
+  /** Сортировка внутри групп */
+  sortWithinGroups: "timestamp" | "priority" | "alphabetical";
+
+  /** Порядок сортировки */
+  sortOrder: "asc" | "desc";
 }
 
-export interface ActivityItem {
-  id: string;
-  type: string;
-  title: string;
-  description?: string;
-  timestamp: string;
-  user?: {
-    id: string;
-    name: string;
-    avatar?: string;
-  };
-  metadata?: Record<string, any>;
+/**
+ * Конфигурация отображения активности
+ */
+export interface ActivityDisplayConfig {
+  /** Показывать аватары */
+  showAvatars: boolean;
+
+  /** Показывать временные метки */
+  showTimestamps: boolean;
+
+  /** Показывать приоритеты */
+  showPriorities: boolean;
+
+  /** Показывать статусы */
+  showStatuses: boolean;
+
+  /** Показывать связанные сущности */
+  showRelatedEntities: boolean;
+
+  /** Показывать теги */
+  showTags: boolean;
+
+  /** Компактный режим */
+  compact: boolean;
+
+  /** Максимальная длина описания */
+  maxDescriptionLength: number;
+
+  /** Показывать кнопки действий */
+  showActions: boolean;
+}
+
+/**
+ * Пропы для ActivityFeedWidget
+ */
+export interface ActivityFeedWidgetProps extends BaseWidgetProps {
+  maxItems?: number;
+  showFilters?: boolean;
+  refreshInterval?: number;
+  data?: ActivityItem[];
+  isDataLoading?: boolean;
+  dataError?: Error | null;
+  onRefresh?: () => void;
+
+  // Добавляю недостающие свойства
+  infiniteScroll?: boolean;
+  showSearch?: boolean;
+  autoRefreshInterval?: number;
+  filters?: ActivityFilters;
+  displayConfig?: any;
+  onItemClick?: (item: ActivityItem) => void;
+  onUndoAction?: (item: ActivityItem) => void;
+  onFiltersChange?: (filters: ActivityFilters) => void;
+  className?: string;
+  sx?: any;
 }

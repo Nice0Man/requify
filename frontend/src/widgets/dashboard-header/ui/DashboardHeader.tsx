@@ -1,177 +1,223 @@
-import React, { memo, useCallback, useState } from "react";
+import React, { memo } from "react";
 import {
-  Box,
+  AppBar,
+  Toolbar,
   Typography,
   IconButton,
+  Avatar,
+  Badge,
+  Box,
   Tooltip,
-  useTheme,
   alpha,
-  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { Refresh } from "@mui/icons-material";
-import i18n from "@/shared/lib/i18n";
-
-export interface DashboardHeaderProps {
-  className?: string;
-  isRefreshing?: boolean;
-  onRefresh?: () => void;
-}
+import {
+  Refresh as RefreshIcon,
+  Notifications as NotificationsIcon,
+  Settings as SettingsIcon,
+  Dashboard as DashboardIcon,
+} from "@mui/icons-material";
+import {
+  useDashboardStyleSystem,
+  DASHBOARD_TOKENS,
+} from "@/shared/styles";
+import { ErrorBoundary } from "@/shared/ui";
+import type { DashboardHeaderProps } from "../model/types";
 
 /**
- * Dashboard Header Component with Context7 Design
- * Always positioned at the top of the dashboard
+ * DashboardHeader - шапка дашборда
+ * Полная поддержка Context7 и всех режимов дашборда
  */
-export const DashboardHeader = memo<DashboardHeaderProps>(
-  ({ className, isRefreshing = false, onRefresh }) => {
-    const t = i18n.t;
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+export const DashboardHeader = memo<DashboardHeaderProps>(({
+  mode = "detailed",
+  layout = "grid",
+  density = "comfortable",
+  title = "Dashboard",
+  showRefresh = true,
+  isRefreshing = false,
+  onRefresh,
+  showNotifications = true,
+  notificationCount = 0,
+  onNotificationsClick,
+  showSettings = true,
+  onSettingsClick,
+  showUserProfile = true,
+  user,
+  onUserProfileClick,
+  actions = [],
+  className,
+  sx,
+  ...props
+}) => {
+  const theme = useTheme();
+  const styleSystem = useDashboardStyleSystem(mode, layout, density);
+  
+  const isCompact = mode === "minimal" || mode === "compact";
 
-    const handleRefresh = useCallback(() => {
-      if (!isRefreshing && onRefresh) {
-        onRefresh();
-      }
-    }, [isRefreshing, onRefresh]);
-
-    return (
-      <Box
+  return (
+    <ErrorBoundary>
+      <AppBar
+        position="static"
+        elevation={0}
         className={className}
         sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          mb: 3,
-          animation: "fadeInDown 0.6s ease-out",
-          "@keyframes fadeInDown": {
-            "0%": {
-              opacity: 0,
-              transform: "translateY(-20px)",
-            },
-            "100%": {
-              opacity: 1,
-              transform: "translateY(0)",
-            },
-          },
-        }}
+          bgcolor: alpha(theme.palette.background.paper, 0.95),
+          backdropFilter: "blur(8px)",
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          color: theme.palette.text.primary,
+          ...sx,
+        }}  
       >
-        <Box
+        <Toolbar
+          variant={isCompact ? "dense" : "regular"}
           sx={{
-            p: {
-              xs: 2.5,
-              sm: 3,
-              md: 3.5,
-            },
-            borderRadius: 3,
-            border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-            background: `linear-gradient(135deg, 
-              ${alpha(theme.palette.background.paper, 0.95)} 0%, 
-              ${alpha(theme.palette.background.paper, 0.8)} 100%)`,
-            backdropFilter: "blur(20px)",
-            boxShadow: `0 8px 40px ${alpha(theme.palette.common.black, 0.06)}`,
-            position: "relative",
-            overflow: "hidden",
-            // Context7 accent gradient bar
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 3,
-              background: `linear-gradient(90deg, 
-                ${theme.palette.primary.main} 0%, 
-                ${theme.palette.secondary.main} 50%, 
-                ${theme.palette.info.main} 100%)`,
-            },
+            minHeight: isCompact ? 48 : 64,
+            px: { xs: 1, sm: 2, md: 3 },
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: { xs: 2, sm: 0 },
-            }}
-          >
-            <Box>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: "1.75rem", sm: "2rem", md: "2.25rem" },
-                  background: `linear-gradient(135deg, 
-                    ${theme.palette.text.primary} 0%, 
-                    ${alpha(theme.palette.text.primary, 0.8)} 100%)`,
-                  backgroundClip: "text",
-                  WebkitBackgroundClip: "text",
-                  color: "transparent",
-                  mb: 0.5,
-                }}
-              >
-                {t("dashboard.title", "Dashboard")}
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: "1rem",
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                {t(
-                  "dashboard.subtitle",
-                  "Welcome back! Here's what's happening with your projects."
-                )}
-              </Typography>
-            </Box>
-
-            <Tooltip
-              title={
-                isRefreshing
-                  ? t("dashboard.refreshing", "Refreshing...")
-                  : t("dashboard.refresh", "Refresh data")
-              }
-              arrow
+          {/* Логотип и заголовок */}
+          <Box display="flex" alignItems="center" gap={1} flex={1}>
+            <Avatar
+              sx={{
+                bgcolor: DASHBOARD_TOKENS.colors.dashboard.primary,
+                width: isCompact ? 32 : 40,
+                height: isCompact ? 32 : 40,
+              }}
             >
-              <IconButton
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                sx={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 3,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
-                    borderColor: alpha(theme.palette.primary.main, 0.2),
-                    transform: "scale(1.05)",
-                  },
-                  "&:active": {
-                    transform: "scale(0.95)",
-                  },
-                }}
-              >
-                <Refresh
+              <DashboardIcon fontSize={isCompact ? "small" : "medium"} />
+            </Avatar>
+            
+            <Typography
+              variant={isCompact ? "h6" : "h5"}
+              fontWeight={600}
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {title}
+            </Typography>
+          </Box>
+
+          {/* Действия */}
+          <Box display="flex" alignItems="center" gap={0.5}>
+            {/* Кастомные действия */}
+            {actions.map((action) => (
+              <Tooltip key={action.id} title={action.label}>
+                <IconButton
+                  size={isCompact ? "small" : "medium"}
+                  onClick={action.onClick}
                   sx={{
-                    fontSize: { xs: 22, sm: 24 },
-                    color: theme.palette.primary.main,
-                    ...(isRefreshing && {
-                      animation: "spin 1s linear infinite",
+                    color: "text.secondary",
+                    "&:hover": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      color: "primary.main",
+                    },
+                  }}
+                >
+                  {action.icon}
+                </IconButton>
+              </Tooltip>
+            ))}
+
+            {/* Обновление */}
+            {showRefresh && onRefresh && (
+              <Tooltip title="Обновить">
+                <IconButton
+                  size={isCompact ? "small" : "medium"}
+                  onClick={onRefresh}
+                  disabled={isRefreshing}
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      color: "primary.main",
+                    },
+                  }}
+                >
+                  <RefreshIcon 
+                    sx={{
+                      animation: isRefreshing ? "spin 1s linear infinite" : "none",
                       "@keyframes spin": {
                         "0%": { transform: "rotate(0deg)" },
                         "100%": { transform: "rotate(360deg)" },
                       },
-                    }),
-                  }}
-                />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
-      </Box>
-    );
-  }
-);
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
+            )}
 
-DashboardHeader.displayName = "DashboardHeader";
+            {/* Уведомления */}
+            {showNotifications && onNotificationsClick && (
+              <Tooltip title="Уведомления">
+                <IconButton
+                  size={isCompact ? "small" : "medium"}
+                  onClick={onNotificationsClick}
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      color: "primary.main",
+                    },
+                  }}
+                >
+                  <Badge badgeContent={notificationCount} color="error">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Настройки */}
+            {showSettings && onSettingsClick && (
+              <Tooltip title="Настройки">
+                <IconButton
+                  size={isCompact ? "small" : "medium"}
+                  onClick={onSettingsClick}
+                  sx={{
+                    color: "text.secondary",
+                    "&:hover": {
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      color: "primary.main",
+                    },
+                  }}
+                >
+                  <SettingsIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Профиль пользователя */}
+            {showUserProfile && user && (
+              <Tooltip title={user.name}>
+                <IconButton
+                  size={isCompact ? "small" : "medium"}
+                  onClick={onUserProfileClick}
+                  sx={{
+                    ml: 1,
+                    p: 0,
+                  }}
+                >
+                  <Avatar
+                    src={user.avatar}
+                    sx={{
+                      width: isCompact ? 28 : 32,
+                      height: isCompact ? 28 : 32,
+                      fontSize: isCompact ? "0.75rem" : "0.875rem",
+                    }}
+                  >
+                    {user.name.charAt(0)}
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
+    </ErrorBoundary>
+  );
+});
+
+DashboardHeader.displayName = "DashboardHeader"; 

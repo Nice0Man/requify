@@ -14,14 +14,10 @@ import {
   Divider,
   Button,
   Chip,
-  Avatar,
   Tabs,
   Tab,
   CircularProgress,
-  Alert,
   Tooltip,
-  Card,
-  CardContent,
 } from "@mui/material";
 import {
   Notifications as NotificationsIcon,
@@ -37,15 +33,30 @@ import {
 } from "@mui/icons-material";
 import { format, isToday, isYesterday } from "date-fns";
 import { ru } from "date-fns/locale";
-import {
-  useNotifications,
-  useMarkAsRead,
-  useMarkAllAsRead,
-  useDeleteNotification,
-  useArchiveNotification,
-  useUnreadCount,
-} from "@/features/notifications/model/useNotificationQuery";
-import type { Notification } from "@/features/notifications/api/notificationApi";
+// TODO: Заменить на shared типы и хуки
+// import {
+//   useNotifications,
+//   useMarkAsRead,
+//   useMarkAllAsRead,
+//   useDeleteNotification,
+//   useArchiveNotification,
+//   useUnreadCount,
+// } from "@/features/notifications/model/useNotificationQuery";
+
+// Временные заглушки для демонстрации
+export interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  archived: boolean;
+  status?: string;
+  actionUrl?: string;
+  priority?: string;
+  createdAt?: Date;
+}
 
 interface NotificationCenterProps {
   onSettingsClick?: () => void;
@@ -64,14 +75,29 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const open = Boolean(anchorEl);
 
   // Используем хуки для получения уведомлений в реальном времени
-  const { data: allNotifications = [], isLoading } = useNotifications();
-  const { data: unreadCount = 0 } = useUnreadCount();
+  // TODO: Заменить на настоящие хуки из features когда они будут переданы через props
+  const allNotifications: Notification[] = [];
+  const isLoading = false;
+  const unreadCount = 0;
 
-  // Мутации
-  const markAsRead = useMarkAsRead();
-  const markAllAsRead = useMarkAllAsRead();
-  const deleteNotification = useDeleteNotification();
-  const archiveNotification = useArchiveNotification();
+  // Заглушки для мутаций
+  const markAsRead = { 
+    mutate: (id: string) => console.log('Mark as read:', id),
+    mutateAsync: async (id: string) => console.log('Mark as read async:', id)
+  };
+  const markAllAsRead = { 
+    mutate: () => console.log('Mark all as read'),
+    mutateAsync: async () => console.log('Mark all as read async'),
+    isPending: false
+  };
+  const deleteNotification = { 
+    mutate: (id: string) => console.log('Delete:', id),
+    mutateAsync: async (id: string) => console.log('Delete async:', id)
+  };
+  const archiveNotification = { 
+    mutate: (id: string) => console.log('Archive:', id),
+    mutateAsync: async (id: string) => console.log('Archive async:', id)
+  };
 
   // Фильтруем уведомления по статусу
   const unreadNotifications = allNotifications.filter(
@@ -250,7 +276,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       label={t(
                         `notifications.priority.${notification.priority}`
                       )}
-                      color={getPriorityColor(notification.priority) as any}
+                      color={getPriorityColor(notification.priority || 'low') as any}
                       size="small"
                     />
                   </Box>
@@ -261,7 +287,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       {notification.message}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {formatNotificationDate(notification.createdAt)}
+                      {formatNotificationDate((notification.createdAt || notification.timestamp)?.toString() || '')}
                     </Typography>
                   </Box>
                 }

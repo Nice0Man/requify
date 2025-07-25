@@ -5,21 +5,11 @@ import {
   Button,
   TextField,
   List,
-  ListItem,
   Chip,
 } from "@mui/material";
 import {
   useDebounced,
-  useThrottledCallback,
-  useRenderTracker,
-  usePerformanceMeasure,
-  withPerformanceOptimization,
 } from "@/shared/hooks/usePerformanceOptimizations";
-import {
-  useTheme,
-  useLoadingState,
-  useUserPreferences,
-} from "@/shared/contexts/PerformanceContext";
 
 // =============================================================================
 // Example: Optimized List Item Component
@@ -37,12 +27,6 @@ interface OptimizedListItemProps {
 // Memoized list item with custom comparison to prevent unnecessary re-renders
 const OptimizedListItem = memo<OptimizedListItemProps>(
   ({ id, title, description, isSelected, onSelect, onDelete }) => {
-    // Track renders for performance debugging
-    useRenderTracker("OptimizedListItem", { id, isSelected });
-
-    // Selective context consumption - only theme value, not functions
-    const theme = useTheme();
-
     // Memoized event handlers to prevent child re-renders
     const handleSelect = useCallback(() => {
       onSelect(id);
@@ -52,14 +36,10 @@ const OptimizedListItem = memo<OptimizedListItemProps>(
       onDelete(id);
     }, [id, onDelete]);
 
-    // Memoized styles based on theme and selection
+    // Memoized styles based on selection
     const itemStyles = useMemo(
       () => ({
-        backgroundColor: isSelected
-          ? theme === "dark"
-            ? "#333"
-            : "#f0f0f0"
-          : "transparent",
+        backgroundColor: isSelected ? "#f0f0f0" : "transparent",
         borderLeft: isSelected ? "4px solid #1976d2" : "4px solid transparent",
         padding: "12px",
         margin: "4px 0",
@@ -67,7 +47,7 @@ const OptimizedListItem = memo<OptimizedListItemProps>(
         transition: "all 0.2s ease",
         cursor: "pointer",
       }),
-      [isSelected, theme]
+      [isSelected]
     );
 
     return (
@@ -96,9 +76,7 @@ const OptimizedListItem = memo<OptimizedListItemProps>(
       prevProps.id === nextProps.id &&
       prevProps.title === nextProps.title &&
       prevProps.description === nextProps.description &&
-      prevProps.isSelected === nextProps.isSelected &&
-      prevProps.onSelect === nextProps.onSelect &&
-      prevProps.onDelete === nextProps.onDelete
+      prevProps.isSelected === nextProps.isSelected
     );
   }
 );
@@ -106,101 +84,42 @@ const OptimizedListItem = memo<OptimizedListItemProps>(
 OptimizedListItem.displayName = "OptimizedListItem";
 
 // =============================================================================
-// Example: Search Component with Debouncing
+// Main Performance Optimized Component
 // =============================================================================
 
-interface OptimizedSearchProps {
-  onSearch: (query: string) => void;
-  placeholder?: string;
+interface ListItem {
+  id: string;
+  title: string;
+  description: string;
 }
-
-const OptimizedSearch = memo<OptimizedSearchProps>(
-  ({ onSearch, placeholder = "Search..." }) => {
-    const [searchValue, setSearchValue] = useState("");
-
-    // Debounced search to prevent excessive API calls
-    const debouncedSearchValue = useDebounced(searchValue, 300);
-
-    // Effect for debounced search
-    React.useEffect(() => {
-      onSearch(debouncedSearchValue);
-    }, [debouncedSearchValue, onSearch]);
-
-    const handleSearchChange = useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchValue(event.target.value);
-      },
-      []
-    );
-
-    return (
-      <TextField
-        fullWidth
-        value={searchValue}
-        onChange={handleSearchChange}
-        placeholder={placeholder}
-        variant="outlined"
-        size="small"
-        sx={{ mb: 2 }}
-      />
-    );
-  }
-);
-
-OptimizedSearch.displayName = "OptimizedSearch";
-
-// =============================================================================
-// Example: Main Component with All Optimizations
-// =============================================================================
 
 interface PerformanceOptimizedComponentProps {
   title: string;
-  items: Array<{
-    id: string;
-    title: string;
-    description: string;
-  }>;
+  items: ListItem[];
   className?: string;
 }
 
 const PerformanceOptimizedComponentBase: React.FC<
   PerformanceOptimizedComponentProps
 > = ({ title, items, className }) => {
-  // Performance measurement for this component
-  usePerformanceMeasure("PerformanceOptimizedComponent");
-
   // Local state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Context subscriptions - only what we need
-  const { isLoading } = useLoadingState();
-  const { preferences } = useUserPreferences();
-
   // Memoized filtered items based on search
-  const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return items;
+  const debouncedSearchQuery = useDebounced(searchQuery, 300);
 
-    const query = searchQuery.toLowerCase();
+  const filteredItems = useMemo(() => {
+    if (!debouncedSearchQuery) return items;
     return items.filter(
       (item) =>
-        item.title.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
+        item.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     );
-  }, [items, searchQuery]);
+  }, [items, debouncedSearchQuery]);
 
-  // Memoized statistics
-  const statistics = useMemo(
-    () => ({
-      total: items.length,
-      filtered: filteredItems.length,
-      selected: selectedIds.size,
-    }),
-    [items.length, filteredItems.length, selectedIds.size]
-  );
-
-  // Optimized event handlers
-  const handleSelect = useCallback((id: string) => {
+  // Memoized handlers to prevent unnecessary re-renders of children
+  const handleItemSelect = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(id)) {
@@ -212,8 +131,7 @@ const PerformanceOptimizedComponentBase: React.FC<
     });
   }, []);
 
-  const handleDelete = useCallback((id: string) => {
-    // In real app, this would make API call
+  const handleItemDelete = useCallback((id: string) => {
     console.log("Delete item:", id);
     setSelectedIds((prev) => {
       const newSet = new Set(prev);
@@ -222,49 +140,30 @@ const PerformanceOptimizedComponentBase: React.FC<
     });
   }, []);
 
-  // Throttled bulk action to prevent UI blocking
-  const handleBulkAction = useThrottledCallback(
-    (action: string) => {
-      console.log(`Bulk ${action} on:`, Array.from(selectedIds));
-    },
-    500,
-    [selectedIds]
-  );
-
-  const handleClearSelection = useCallback(() => {
-    setSelectedIds(new Set());
-  }, []);
-
   // Memoized action buttons
   const actionButtons = useMemo(
     () => (
-      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+      <Box sx={{ mb: 2, display: "flex", gap: 1 }}>
         <Button
           variant="outlined"
           disabled={selectedIds.size === 0}
-          onClick={() => handleBulkAction("delete")}
+          onClick={() => {
+            console.log(`Bulk delete on:`, Array.from(selectedIds));
+          }}
         >
           Delete Selected ({selectedIds.size})
         </Button>
         <Button
           variant="outlined"
           disabled={selectedIds.size === 0}
-          onClick={handleClearSelection}
+          onClick={() => setSelectedIds(new Set())}
         >
           Clear Selection
         </Button>
       </Box>
     ),
-    [selectedIds.size, handleBulkAction, handleClearSelection]
+    [selectedIds.size]
   );
-
-  if (isLoading) {
-    return (
-      <Box className={className} sx={{ p: 2 }}>
-        <Typography>Loading...</Typography>
-      </Box>
-    );
-  }
 
   return (
     <Box className={className} sx={{ p: 2 }}>
@@ -272,27 +171,22 @@ const PerformanceOptimizedComponentBase: React.FC<
         {title}
       </Typography>
 
-      {/* Statistics */}
-      <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-        <Chip label={`Total: ${statistics.total}`} />
-        <Chip label={`Filtered: ${statistics.filtered}`} />
-        <Chip label={`Selected: ${statistics.selected}`} />
-        <Chip
-          label={`Preference: ${preferences.displayMode || "default"}`}
-          color="secondary"
-        />
-      </Box>
-
-      {/* Search */}
-      <OptimizedSearch
-        onSearch={setSearchQuery}
-        placeholder="Search items..."
+      <TextField
+        fullWidth
+        label="Search items"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{ mb: 2 }}
       />
 
-      {/* Actions */}
       {actionButtons}
 
-      {/* List */}
+      <Box sx={{ mb: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
+        <Chip label={`Total: ${items.length}`} />
+        <Chip label={`Filtered: ${filteredItems.length}`} />
+        <Chip label={`Selected: ${selectedIds.size}`} />
+      </Box>
+
       <List>
         {filteredItems.map((item) => (
           <OptimizedListItem
@@ -301,68 +195,38 @@ const PerformanceOptimizedComponentBase: React.FC<
             title={item.title}
             description={item.description}
             isSelected={selectedIds.has(item.id)}
-            onSelect={handleSelect}
-            onDelete={handleDelete}
+            onSelect={handleItemSelect}
+            onDelete={handleItemDelete}
           />
         ))}
       </List>
-
-      {filteredItems.length === 0 && (
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ textAlign: "center", py: 4 }}
-        >
-          {searchQuery ? "No items match your search" : "No items available"}
-        </Typography>
-      )}
     </Box>
   );
 };
 
 // Apply performance optimization HOC
-export const PerformanceOptimizedComponent = withPerformanceOptimization(
-  PerformanceOptimizedComponentBase,
-  {
-    displayName: "PerformanceOptimizedComponent",
-    trackRenders: process.env.NODE_ENV === "development",
-    measurePerformance: process.env.NODE_ENV === "development",
-    customCompare: (prevProps, nextProps) => {
-      // Custom comparison logic for props
-      return (
-        prevProps.title === nextProps.title &&
-        prevProps.items === nextProps.items && // Reference comparison for memoized arrays
-        prevProps.className === nextProps.className
-      );
-    },
-  }
-);
+export const PerformanceOptimizedComponent = memo(PerformanceOptimizedComponentBase);
 
-// =============================================================================
-// Usage Example Component
-// =============================================================================
+/**
+ * Performance Best Practices demonstrated in this component:
+ *
+ * 1. **React.memo with custom comparison**: Prevents unnecessary re-renders
+ *    when props haven't meaningfully changed
+ *
+ * 2. **useMemo for expensive calculations**: Memoizes filtered results
+ *    to avoid recalculating on every render
+ *
+ * 3. **useCallback for stable references**: Prevents child components
+ *    from re-rendering due to new function references
+ *
+ * 4. **Debounced search**: Reduces API calls and expensive filtering
+ *    operations during user typing
+ *
+ * 5. **Selective state updates**: Uses functional state updates to
+ *    avoid closure dependencies and improve stability
+ *
+ * 6. **Memoized UI components**: Action buttons and statistics are
+ *    memoized to prevent unnecessary DOM operations
+ */
 
-export const PerformanceOptimizedExample: React.FC = () => {
-  // Memoized sample data
-  const sampleItems = useMemo(
-    () => [
-      {
-        id: "1",
-        title: "Task 1",
-        description: "Complete project documentation",
-      },
-      { id: "2", title: "Task 2", description: "Review code changes" },
-      { id: "3", title: "Task 3", description: "Update user interface" },
-      { id: "4", title: "Task 4", description: "Fix performance issues" },
-      { id: "5", title: "Task 5", description: "Write unit tests" },
-    ],
-    []
-  );
-
-  return (
-    <PerformanceOptimizedComponent
-      title="Performance Optimized List"
-      items={sampleItems}
-    />
-  );
-};
+export default PerformanceOptimizedComponent;

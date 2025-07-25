@@ -24,8 +24,14 @@ export const API_ENDPOINTS = {
   USERS: {
     LIST: "/users/",
     CREATE: "/users/",
-    ME: "/users/me",
-    UPDATE_ME: "/users/me",
+    ME: {
+      ROOT: "/users/me",
+      UPDATE: "/users/me",
+      SIDEBAR_PREFERENCES: "/users/me/sidebar-preferences",
+      SETTINGS: "/users/me/settings",
+      ACTIVITY: "/users/me/activity",
+      PROFILE: "/users/me/profile",
+    },
     GET: (id: string) => `/users/${id}`,
     UPDATE: (id: string) => `/users/${id}`,
     DELETE: (id: string) => `/users/${id}`,
@@ -59,7 +65,8 @@ export const API_ENDPOINTS = {
     RELEASES: (id: string) => `/projects/${id}/releases`,
     STATS: (id: string) => `/projects/${id}/stats`,
     // Additional endpoints for projectDAO.ts
-    REMOVE_TEAM_MEMBER: (id: string, userId: string) => `/projects/${id}/team/${userId}`,
+    REMOVE_TEAM_MEMBER: (id: string, userId: string) =>
+      `/projects/${id}/team/${userId}`,
     BULK: "/projects/bulk",
     IMPORT: "/projects/import",
     EXPORT: "/projects/export",
@@ -80,8 +87,7 @@ export const API_ENDPOINTS = {
     UPDATE_PROGRESS: (id: string) => `/requirements/${id}/progress`,
     TESTS: (id: string) => `/requirements/${id}/tests`,
     RELATIONSHIPS: (id: string) => `/requirements/${id}/relationships`,
-    CREATE_RELATIONSHIP: (id: string) =>
-      `/requirements/${id}/relationships`,
+    CREATE_RELATIONSHIP: (id: string) => `/requirements/${id}/relationships`,
   },
 
   // Release endpoints
@@ -251,6 +257,12 @@ export const API_ENDPOINTS = {
     STATS_OVERVIEW: "/teams/stats/overview",
     TEAM_STATS: (id: string) => `/teams/${id}/stats`,
     CHECK_PERMISSIONS: "/teams/permissions/check",
+  },
+
+  // Email endpoints
+  EMAIL: {
+    SUBSCRIBE: "/email/subscribe",
+    UNSUBSCRIBE: "/email/unsubscribe",
   },
 
   // Root endpoints

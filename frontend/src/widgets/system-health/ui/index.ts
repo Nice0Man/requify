@@ -1,2 +1,2 @@
-// System health widget UI
-export * from './SystemHealthWidget'; 
+// System Health UI Components
+export { SystemHealthWidget } from "./SystemHealthWidget"; 

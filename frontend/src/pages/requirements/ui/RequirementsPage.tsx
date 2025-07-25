@@ -162,16 +162,16 @@ const RequirementsPage: React.FC = () => {
               {t("requirements.fields.project")}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {requirement.projectId ||
+              {requirement.project_id ||
                 t("requirements.placeholders.noProject")}
             </Typography>
           </Box>
           <Box>
-            <Typography variant="body2" color="text.secondary">
-              {t("requirements.fields.createdAt")}
+            <Typography variant="caption" color="text.secondary">
+              {t("requirements.fields.created")}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {formatDate(requirement.createdAt.toISOString())}
+              {formatDate(requirement.created_at)}
             </Typography>
           </Box>
         </Box>

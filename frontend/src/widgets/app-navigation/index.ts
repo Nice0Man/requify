@@ -1,3 +1,2 @@
-// Navigation widget exports
-export * from "./ui";
-export * from "./model"; 
+// App Navigation Widget - полный экспорт
+export { AppNavigationWidget } from "./ui"; 

@@ -1,5 +1,5 @@
-import { client } from "../../../shared/api/client";
-import { API_ENDPOINTS } from "../../../shared/api/endpoints";
+import { client } from "@/app/providers/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
 
 export interface Requirement {
   id: string;

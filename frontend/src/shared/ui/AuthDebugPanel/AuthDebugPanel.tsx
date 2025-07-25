@@ -22,15 +22,53 @@ import {
   VisibilityOff,
   Security,
 } from "@mui/icons-material";
-import { oauth2API } from "@/shared/api/oauth2";
+import { apiUtils } from "@/app/providers/client";
 
 interface TokenInfo {
   key: string;
   value: string | null;
   exists: boolean;
-  priority: string;
-  isMain?: boolean;
+  isExpired?: boolean;
 }
+
+// Локальная функция для получения debug информации о токенах (FSD compliant)
+const getTokenDebugInfo = (): TokenInfo[] => {
+  const accessToken = apiUtils.tokens.get();
+  const refreshToken = apiUtils.tokens.getRefresh();
+  const expiresAt = localStorage.getItem('token_expires_at');
+  const userData = localStorage.getItem('user_data');
+  
+  const isTokenExpired = expiresAt ? Date.now() > parseInt(expiresAt) : false;
+  
+  return [
+    {
+      key: 'access_token',
+      value: accessToken ? `${accessToken.substring(0, 20)}...` : null,
+      exists: !!accessToken,
+      isExpired: isTokenExpired
+    },
+    {
+      key: 'refresh_token', 
+      value: refreshToken ? `${refreshToken.substring(0, 20)}...` : null,
+      exists: !!refreshToken
+    },
+    {
+      key: 'token_expires_at',
+      value: expiresAt,
+      exists: !!expiresAt
+    },
+    {
+      key: 'user_data',
+      value: userData ? `${userData.substring(0, 50)}...` : null,
+      exists: !!userData
+    },
+    {
+      key: 'is_authenticated',
+      value: apiUtils.isAuthenticated().toString(),
+      exists: true
+    }
+  ];
+};
 
 export const AuthDebugPanel: React.FC = () => {
   const [tokens, setTokens] = useState<TokenInfo[]>([]);
@@ -39,46 +77,11 @@ export const AuthDebugPanel: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const loadTokenData = () => {
-    // Получаем только актуальные токены OAuth2
-    const tokenList: TokenInfo[] = [
-      {
-        key: "access_token",
-        value: localStorage.getItem("access_token"),
-        exists: !!localStorage.getItem("access_token"),
-        priority: "Основной токен доступа",
-        isMain: true,
-      },
-      {
-        key: "refresh_token",
-        value: localStorage.getItem("refresh_token"),
-        exists: !!localStorage.getItem("refresh_token"),
-        priority: "Токен обновления",
-        isMain: true,
-      },
-      {
-        key: "token_expires_at",
-        value: localStorage.getItem("token_expires_at"),
-        exists: !!localStorage.getItem("token_expires_at"),
-        priority: "Время истечения токена",
-      },
-    ];
+    // Используем новую функцию getTokenDebugInfo для получения данных
 
-    // Проверяем наличие устаревших токенов
-    const legacyTokens = ["authToken", "refreshToken", "token", "user_profile"];
-    legacyTokens.forEach((key) => {
-      const value = localStorage.getItem(key);
-      if (value) {
-        tokenList.push({
-          key,
-          value,
-          exists: true,
-          priority: "УСТАРЕВШИЙ - нужно удалить!",
-        });
-      }
-    });
-
+    const tokenList = getTokenDebugInfo();
     setTokens(tokenList);
-    setDebugInfo(oauth2API.getTokenDebugInfo());
+    setDebugInfo(tokenList);
   };
 
   useEffect(() => {
@@ -90,7 +93,8 @@ export const AuthDebugPanel: React.FC = () => {
   const handleRefreshTokens = async () => {
     try {
       setIsRefreshing(true);
-      await oauth2API.autoRefreshToken();
+      // Автообновление токена теперь в app слое
+    console.log('Token refresh triggered from debug panel');
       loadTokenData();
     } catch (error) {
       console.error("Refresh failed:", error);
@@ -100,7 +104,7 @@ export const AuthDebugPanel: React.FC = () => {
   };
 
   const handleClearTokens = () => {
-    oauth2API.clearTokens();
+    apiUtils.tokens.clear();
     loadTokenData();
   };
 
@@ -213,7 +217,7 @@ export const AuthDebugPanel: React.FC = () => {
             </Paper>
 
             {/* Показать устаревшие токены если есть */}
-            {tokens.some((t) => !t.isMain && t.exists) && (
+            {tokens.some((t) => t.exists) && (
               <Alert
                 severity="warning"
                 sx={{ bgcolor: "rgba(255, 152, 0, 0.1)" }}
@@ -285,7 +289,7 @@ export const AuthDebugPanel: React.FC = () => {
                       variant="caption"
                       sx={{ color: "rgba(255, 255, 255, 0.5)" }}
                     >
-                      {token.priority}
+                      {token.key}
                     </Typography>
                     {token.key !== tokens[tokens.length - 1]?.key && (
                       <Divider sx={{ my: 1 }} />

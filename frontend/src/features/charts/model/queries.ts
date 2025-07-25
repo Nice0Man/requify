@@ -23,8 +23,8 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { oauth2API } from "@/shared/api/oauth2";
-import { client } from "@/shared/api/client";
+// App Layer (провайдеры разрешены в features)
+import { client, apiUtils } from "@/app/providers/client";
 import type {
   TimelineDataPoint,
   DistributionDataPoint,
@@ -61,11 +61,11 @@ export const useTimelineData = () => {
     queryFn: async (): Promise<TimelineDataPoint[]> => {
       try {
         // Проверяем нужно ли обновить токен
-        if (oauth2API.shouldRefreshToken()) {
+        if (apiUtils.tokens.shouldRefresh()) {
           console.debug(
             "🔄 Charts: Auto-refreshing token before timeline request"
           );
-          await oauth2API.autoRefreshToken();
+          // Токен будет автоматически обновлен в interceptors
         }
 
         const response = await client.get(
@@ -77,7 +77,7 @@ export const useTimelineData = () => {
         throw error;
       }
     },
-    enabled: oauth2API.isAuthenticated(),
+    enabled: apiUtils.isAuthenticated(),
     staleTime: CHARTS_STALE_TIME,
     gcTime: CHARTS_CACHE_TIME,
     retry: 2,
@@ -93,11 +93,11 @@ export const useDistributionData = () => {
     queryFn: async (): Promise<DistributionDataPoint[]> => {
       try {
         // Проверяем нужно ли обновить токен
-        if (oauth2API.shouldRefreshToken()) {
+        if (apiUtils.tokens.shouldRefresh()) {
           console.debug(
             "🔄 Charts: Auto-refreshing token before distribution request"
           );
-          await oauth2API.autoRefreshToken();
+          // Токен будет автоматически обновлен в interceptors
         }
 
         const response = await client.get(

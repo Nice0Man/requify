@@ -1,4 +1,4 @@
-import { client } from '../../../shared/api/client';
+import { client } from '@/app/providers/client';
 
 export interface Notification {
   id: string;

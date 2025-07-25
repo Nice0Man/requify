@@ -9,7 +9,7 @@ import {
   IconButton,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useAuth } from "../model/useAuth";
+import { useAuth } from "../hooks/useAuth";
 import type { RegisterFormData } from "../model/types";
 import i18n from "@/shared/lib/i18n";
 

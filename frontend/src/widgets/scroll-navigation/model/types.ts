@@ -1,10 +1,3 @@
-export interface ScrollNavigationWidgetProps {
-  className?: string;
-  sections?: Array<{
-    id: string;
-    title: string;
-    anchor: string;
-  }>;
-  activeSection?: string;
-  onSectionChange?: (sectionId: string) => void;
-} 
+import type { BaseWidgetProps } from "@/widgets/types";
+
+export interface ScrollNavigationWidgetProps extends BaseWidgetProps {} 

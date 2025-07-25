@@ -1,7 +1,9 @@
-// Team UI components - placeholder exports until implementation
-export {}; // Make this file a module
+// Team UI components exports
+export { TeamCard } from './TeamCard';
+export { TeamList } from './TeamList';
+export { TeamMemberAvatar } from './TeamMemberAvatar';
 
-// TODO: Add team UI components when implemented
-// export * from './TeamCard';
-// export * from './TeamList';
-// export * from './TeamMemberList'; 
+// Export types for external usage
+export type { TeamCardProps } from './TeamCard';
+export type { TeamListProps } from './TeamList';
+export type { TeamMemberAvatarProps } from './TeamMemberAvatar'; 

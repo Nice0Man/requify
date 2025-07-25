@@ -8,7 +8,6 @@ import type {
 
 // Базовые константы размеров
 const SIZING_CONSTANTS = {
-  // Базовые размеры для разных режимов
   baseSizes: {
     minimal: {
       widgetHeight: 180,
@@ -25,26 +24,33 @@ const SIZING_CONSTANTS = {
       chartHeight: 200,
     },
     detailed: {
-      widgetHeight: 280,
+      widgetHeight: 300,
       cardHeight: 200,
-      iconSize: 28,
+      iconSize: 32,
       headerHeight: 80,
-      chartHeight: 260,
+      chartHeight: 250,
     },
     fullscreen: {
-      widgetHeight: 240,
+      widgetHeight: 400,
+      cardHeight: 280,
+      iconSize: 40,
+      headerHeight: 100,
+      chartHeight: 350,
+    },
+    overview: { // Добавляю недостающий overview
+      widgetHeight: 250,
       cardHeight: 180,
-      iconSize: 26,
+      iconSize: 28,
       headerHeight: 75,
       chartHeight: 220,
     },
   },
 
-  // Мультипликаторы для плотности
   densityMultipliers: {
     dense: 0.85,
     compact: 0.92,
-    comfortable: 1.0,
+    comfortable: 1,
+    spacious: 1.15, // Добавляю недостающий spacious
   },
 
   // Мультипликаторы для разных раскладок
@@ -52,6 +58,7 @@ const SIZING_CONSTANTS = {
     grid: 1.0,
     list: 0.9,
     masonry: 1.1,
+    default: 1.0,
   },
 
   // Responsive breakpoints

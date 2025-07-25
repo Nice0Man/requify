@@ -1,2 +1,2 @@
-// Dashboard Activity Feed Widget UI
+// Activity Feed UI Components
 export { ActivityFeedWidget } from "./ActivityFeedWidget"; 

@@ -1,8 +1,19 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { oauth2API } from '@/shared/api/oauth2';
-import type { LoginRequest, LoginResponse } from '@/features/auth/api/authApi';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { apiUtils } from "./client";
 
-// Типы для Basic OAuth2
+/**
+ * App Layer Basic OAuth2 Provider
+ * Простой провайдер аутентификации согласно FSD архитектуре
+ * БЕЗ МОКОВ И НАРУШЕНИЙ FSD ПРАВИЛ
+ */
+
+// Типы для Basic OAuth2 (локальные для app слоя)
 interface BasicOAuth2User {
   id: string;
   email: string;
@@ -10,12 +21,17 @@ interface BasicOAuth2User {
   role: string;
 }
 
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
 interface BasicOAuth2ContextValue {
   user?: BasicOAuth2User;
   isAuthenticated: boolean;
   isLoading: boolean;
   error?: Error;
-  loginWithCredentials: (credentials: LoginRequest) => Promise<void>;
+  loginWithCredentials: (credentials: LoginCredentials) => Promise<void>;
   logout: (options?: { returnTo?: string }) => void;
   getAccessTokenSilently: () => Promise<string>;
   refreshToken: () => Promise<void>;
@@ -27,7 +43,7 @@ const BasicOAuth2Context = createContext<BasicOAuth2ContextValue>({
   isLoading: false,
   loginWithCredentials: async () => {},
   logout: () => {},
-  getAccessTokenSilently: async () => '',
+  getAccessTokenSilently: async () => "",
   refreshToken: async () => {},
 });
 
@@ -35,7 +51,7 @@ const BasicOAuth2Context = createContext<BasicOAuth2ContextValue>({
 export const useAuth0 = () => {
   const context = useContext(BasicOAuth2Context);
   if (!context) {
-    throw new Error('useAuth0 must be used within BasicOAuth2Provider');
+    throw new Error("useAuth0 must be used within BasicOAuth2Provider");
   }
   return context;
 };
@@ -44,149 +60,232 @@ interface BasicOAuth2ProviderProps {
   children: React.ReactNode;
 }
 
-export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({ children }) => {
+export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
+  children,
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<BasicOAuth2User | undefined>();
   const [error, setError] = useState<Error | undefined>();
 
-  // Проверка аутентификации при загрузке
+  // Получение пользователя из localStorage
+  const getUserFromStorage = (): BasicOAuth2User | null => {
+    try {
+      const userData = localStorage.getItem("user_data");
+      return userData ? JSON.parse(userData) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Сохранение пользователя в localStorage
+  const saveUserToStorage = (userData: BasicOAuth2User): void => {
+    try {
+      localStorage.setItem("user_data", JSON.stringify(userData));
+    } catch (error) {
+      console.error("Failed to save user data:", error);
+    }
+  };
+
+  // Инициализация при загрузке
   useEffect(() => {
-    const checkAuth = async () => {
+    const initializeAuth = async () => {
       try {
         setIsLoading(true);
-        console.info('🔐 BasicOAuth2Provider: Checking authentication...');
-        
-        // Сначала проверяем токен локально
-        if (oauth2API.isAuthenticated()) {
-          console.info('🔐 BasicOAuth2Provider: Token found, fetching user data...');
-          
-          // Проверяем, нужно ли обновить токен
-          if (oauth2API.shouldRefreshToken()) {
-            console.info('🔄 BasicOAuth2Provider: Token needs refresh, attempting...');
+
+        // Проверяем есть ли токен
+        const hasValidToken = apiUtils.isAuthenticated();
+
+        if (hasValidToken) {
+          // Получаем данные пользователя из storage
+          const storedUser = getUserFromStorage();
+
+          if (storedUser) {
+            setUser(storedUser);
+            setIsAuthenticated(true);
+          } else {
+            // Если нет данных пользователя, пытаемся получить с сервера
             try {
-              await oauth2API.autoRefreshToken();
-            } catch (refreshErr) {
-              console.warn('⚠️ BasicOAuth2Provider: Token refresh failed:', refreshErr);
-              // Продолжаем с текущим токеном, возможно он еще валидный
+              // Простой запрос к /users/me для получения данных пользователя
+              const response = await fetch(
+                `${
+                  import.meta.env.VITE_API_BASE_URL ||
+                  "http://localhost:8000/api/v1"
+                }/users/me`,
+                {
+                  headers: apiUtils.getAuthHeaders(),
+                }
+              );
+
+              if (response.ok) {
+                const userData = await response.json();
+                const user: BasicOAuth2User = {
+                  id: userData.id,
+                  email: userData.email,
+                  name: userData.username || userData.email,
+                  role: userData.role || "user",
+                };
+
+                setUser(user);
+                saveUserToStorage(user);
+                setIsAuthenticated(true);
+              } else {
+                // Если не удалось получить пользователя, очищаем токены
+                apiUtils.tokens.clear();
+                setIsAuthenticated(false);
+              }
+            } catch (fetchError) {
+              console.warn("Failed to fetch user data:", fetchError);
+              apiUtils.tokens.clear();
+              setIsAuthenticated(false);
             }
           }
-          
-          const currentUser = await oauth2API.getCurrentUser();
-          setUser({
-            id: currentUser.id,
-            email: currentUser.email,
-            name: currentUser.name,
-            role: currentUser.role,
-          });
-          setIsAuthenticated(true);
-          console.info('✅ BasicOAuth2Provider: User authenticated successfully');
         } else {
-          console.info('🔐 BasicOAuth2Provider: No valid token found');
           setIsAuthenticated(false);
-          setUser(undefined);
         }
-      } catch (err) {
-        console.warn('⚠️ BasicOAuth2Provider: Authentication check failed:', err);
-        
-        // Если ошибка связана с токеном, очищаем его
-        if (err instanceof Error && (
-          err.message.includes('401') || 
-          err.message.includes('token') || 
-          err.message.includes('Unauthorized')
-        )) {
-          console.info('🧹 BasicOAuth2Provider: Clearing invalid tokens');
-        oauth2API.clearTokens();
-        }
-        
+      } catch (initError) {
+        console.error("Auth initialization failed:", initError);
+        setError(initError as Error);
         setIsAuthenticated(false);
-        setUser(undefined);
       } finally {
         setIsLoading(false);
-        console.info('🏁 BasicOAuth2Provider: Authentication check completed');
       }
     };
 
-    checkAuth();
+    initializeAuth();
   }, []);
 
-  const loginWithCredentials = useCallback(async (credentials: LoginRequest) => {
-    setIsLoading(true);
-    setError(undefined);
-    
-    try {
-      const response: LoginResponse = await oauth2API.login(credentials);
-      
-      setUser({
-        id: response.user.id,
-        email: response.user.email,
-        name: response.user.name,
-        role: response.user.role,
-      });
-      setIsAuthenticated(true);
-      
-      console.info('🔐 Basic OAuth2: Успешная аутентификация');
-    } catch (err: any) {
-      setError(err);
-      setIsAuthenticated(false);
-      setUser(undefined);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  // Вход в систему
+  const loginWithCredentials = useCallback(
+    async (credentials: LoginCredentials): Promise<void> => {
+      try {
+        setIsLoading(true);
+        setError(undefined);
 
-  const logout = useCallback(async (options?: { returnTo?: string }) => {
-    try {
-      await oauth2API.logout();
-    } catch (err) {
-      console.error('Logout error:', err);
-    } finally {
-      setUser(undefined);
-      setIsAuthenticated(false);
-      console.info('🔐 Basic OAuth2: Выход выполнен');
-      
-      if (options?.returnTo) {
-        window.location.href = options.returnTo;
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1"
+          }/auth/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(credentials),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Login failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.access_token && data.refresh_token) {
+          // Сохраняем токены
+          apiUtils.tokens.save(data.access_token, data.refresh_token);
+
+          // Создаем объект пользователя
+          const userData: BasicOAuth2User = {
+            id: data.user?.id || "unknown",
+            email: data.user?.email || credentials.email,
+            name: data.user?.username || credentials.email,
+            role: data.user?.role || "user",
+          };
+
+          setUser(userData);
+          saveUserToStorage(userData);
+          setIsAuthenticated(true);
+        } else {
+          throw new Error("Invalid login response");
+        }
+      } catch (loginError) {
+        console.error("Login failed:", loginError);
+        setError(loginError as Error);
+        setIsAuthenticated(false);
+        throw loginError;
+      } finally {
+        setIsLoading(false);
       }
+    },
+    []
+  );
+
+  // Выход из системы
+  const logout = useCallback((options?: { returnTo?: string }): void => {
+    try {
+      // Очищаем все данные
+      apiUtils.tokens.clear();
+      setUser(undefined);
+      setIsAuthenticated(false);
+      setError(undefined);
+
+      // Перенаправляем если указан returnTo
+      if (options?.returnTo && typeof window !== "undefined") {
+        window.location.href = options.returnTo;
+      } else {
+        // По умолчанию перенаправляем на страницу входа
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth";
+        }
+      }
+    } catch (logoutError) {
+      console.error("Logout failed:", logoutError);
     }
   }, []);
 
+  // Получение токена
   const getAccessTokenSilently = useCallback(async (): Promise<string> => {
-    if (!isAuthenticated) {
-      throw new Error('Not authenticated');
-    }
+    const token = apiUtils.tokens.get();
 
-    // Проверяем, нужно ли обновить токен
-    if (oauth2API.shouldRefreshToken()) {
-      await oauth2API.autoRefreshToken();
-    }
-
-    const token = oauth2API.getAccessToken();
     if (!token) {
-      throw new Error('No access token available');
+      throw new Error("No access token available");
+    }
+
+    // Проверяем нужно ли обновить токен
+    if (apiUtils.tokens.shouldRefresh()) {
+      const refreshToken = apiUtils.tokens.getRefresh();
+      if (refreshToken) {
+        try {
+          // Обновляем токен через прямой запрос
+          const response = await fetch(
+            `${
+              import.meta.env.VITE_API_BASE_URL ||
+              "http://localhost:8000/api/v1"
+            }/auth/refresh`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ refresh_token: refreshToken }),
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.access_token && data.refresh_token) {
+              apiUtils.tokens.save(data.access_token, data.refresh_token);
+              return data.access_token;
+            }
+          }
+        } catch (refreshError) {
+          console.error("Token refresh failed:", refreshError);
+          logout();
+          throw new Error("Token refresh failed");
+        }
+      }
     }
 
     return token;
-  }, [isAuthenticated]);
+  }, [logout]);
 
-  const refreshToken = useCallback(async () => {
-    try {
-      const refreshTokenValue = oauth2API.getRefreshToken();
-      if (refreshTokenValue) {
-        await oauth2API.refreshTokens(refreshTokenValue);
-        console.info('🔐 Basic OAuth2: Токен обновлен');
-      }
-    } catch (err) {
-      console.error('Token refresh failed:', err);
-      oauth2API.clearTokens();
-      setIsAuthenticated(false);
-      setUser(undefined);
-      throw err;
-    }
-  }, []);
+  // Обновление токена
+  const refreshToken = useCallback(async (): Promise<void> => {
+    await getAccessTokenSilently();
+  }, [getAccessTokenSilently]);
 
-  const value: BasicOAuth2ContextValue = {
+  const contextValue: BasicOAuth2ContextValue = {
     user,
     isAuthenticated,
     isLoading,
@@ -198,8 +297,8 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({ childr
   };
 
   return (
-    <BasicOAuth2Context.Provider value={value}>
+    <BasicOAuth2Context.Provider value={contextValue}>
       {children}
     </BasicOAuth2Context.Provider>
   );
-}; 
+};

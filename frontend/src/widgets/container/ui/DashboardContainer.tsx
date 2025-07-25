@@ -1,241 +1,88 @@
-import React, { memo, useEffect, useState, useMemo } from "react";
-import { Box, Container, useMediaQuery } from "@mui/material";
-import type { DashboardContainerProps } from "../model/types";
-import {
-  useDashboardTheme,
-  useDashboardStyles,
-  useAnimatedContainerStyles,
-  useDashboardPerformance,
-} from "@/shared/providers/DashboardThemeProvider";
-import {
-  useDashboardBreakpoints,
-  useOptimizedStyles,
-} from "@/shared/styles/dashboard-hooks";
+import { memo, ReactNode } from "react";
+import { Container, useTheme } from "@mui/material";
+import { useDashboardStyleSystem, DASHBOARD_TOKENS } from "@/shared/styles";
+import type { DashboardMode, DashboardLayoutType, DashboardDensity } from "@/entities/dashboard";
+
+interface DashboardContainerProps {
+  mode?: DashboardMode;
+  layout?: DashboardLayoutType;
+  density?: DashboardDensity;
+  children: ReactNode;
+  maxWidth?: "xs" | "sm" | "md" | "lg" | "xl" | false;
+  padding?: number | string;
+  backgroundColor?: string;
+  elevation?: number;
+  className?: string;
+  sx?: any;
+}
 
 /**
- * Optimized Dashboard Container with modern styling system
- *
- * Features:
- * - Design tokens integration
- * - Performance optimized styles
- * - Responsive behavior
- * - Animation system
- * - Reduced render cycles
+ * DashboardContainer - основной контейнер для дашборда
+ * Context7 совместимый с адаптивным дизайном
  */
 export const DashboardContainer = memo<DashboardContainerProps>(
   ({
-    children,
-    className,
     mode = "detailed",
     layout = "grid",
     density = "comfortable",
-    isFullscreen = false,
-    maxWidth = false, // Don't constrain by default for new layout
-    disableGutters = false,
-    enableAnimations = true,
+    children,
+    maxWidth = "xl",
+    padding,
+    backgroundColor,
+    elevation = 0,
+    className,
+    sx,
+    ...props
   }) => {
-    // Theme system
-    const { styleSystem } = useDashboardTheme();
-    const { isHighPerformanceMode, shouldReduceAnimations } =
-      useDashboardPerformance();
-    const { isMobile, isTablet } = useDashboardBreakpoints();
+    const theme = useTheme();
+    const styleSystem = useDashboardStyleSystem(mode, layout, density);
 
-    // Optimized styles with memoization
-    const containerStyles = useOptimizedStyles(
-      () => ({
-        // Base container styles
-        root: {
-          width: "100%",
-          minHeight: 0, // Important for flex children
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          overflow: "hidden", // Prevent layout shifts
-
-          // Background system
-          background: styleSystem.colors.background,
-
-          // Spacing system using design tokens
-          padding: disableGutters
-            ? 0
-            : {
-                xs: styleSystem.spacing.xs,
-                sm: styleSystem.spacing.sm,
-                md: styleSystem.spacing.md,
-              },
-
-          // Responsive behavior
-          ...(isMobile && {
-            padding: disableGutters ? 0 : styleSystem.spacing.xs,
-          }),
-
-          // Fullscreen optimizations
-          ...(isFullscreen && {
-            padding: 0,
-            background: styleSystem.colors.text.primary,
-            overflow: "auto",
-
-            // Performance optimizations for fullscreen
-            willChange: "auto",
-            transform: "translateZ(0)", // Force GPU acceleration
-          }),
-
-          // High performance mode optimizations
-          ...(isHighPerformanceMode && {
-            padding: disableGutters ? 0 : styleSystem.spacing.xs,
-            background: "transparent",
-          }),
-
-          // Layout-specific optimizations
-          ...(layout === "masonry" && {
-            overflow: "visible", // Allow masonry to flow naturally
-          }),
-
-          // Animation styles
-          ...(!shouldReduceAnimations &&
-            enableAnimations && {
-              transition: `all ${styleSystem.animations.fadeIn} ease-out`,
-              ...styleSystem.animations.fadeIn,
-            }),
-        },
-
-        // Inner content wrapper
-        content: {
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
-          minHeight: 0,
-
-          // Layout-specific content styles
-          ...(layout === "grid" && {
-            gap: styleSystem.spacing.md,
-          }),
-
-          ...(layout === "masonry" && {
-            gap: styleSystem.spacing.sm,
-          }),
-
-          ...(layout === "list" && {
-            gap: styleSystem.spacing.sm,
-          }),
-        },
-      }),
-      [
-        styleSystem,
-        disableGutters,
-        isMobile,
-        isFullscreen,
-        isHighPerformanceMode,
-        layout,
-        shouldReduceAnimations,
-        enableAnimations,
-      ]
-    );
-
-    // Performance tracking
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-      // Delayed mounting to prevent layout shifts
-      const timer = setTimeout(() => setIsMounted(true), 50);
-      return () => clearTimeout(timer);
-    }, []);
-
-    // Animated container styles
-    const animatedStyles = useAnimatedContainerStyles();
-
-    // Responsive maxWidth handling
-    const responsiveMaxWidth =
-      maxWidth === false
-        ? false
-        : isFullscreen
-        ? false
-        : isMobile
-        ? "sm"
-        : isTablet
-        ? "md"
-        : maxWidth || "xl";
-
-    if (!isMounted) {
-      // Minimal loading state to prevent flashes
-      return (
-        <Box
-          sx={{
-            width: "100%",
-            minHeight: 200,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: 0.7,
-          }}
-        />
-      );
-    }
-
-    // Точные расчеты размеров контейнера 
-    const containerWidth = useMemo(() => {
-      if (responsiveMaxWidth === false) {
-        return "100%"; // Без ограничений
-      }
-      
-      // Базовые ограничения для разных breakpoints
-      const breakpointLimits = {
-        sm: 600,
-        md: 900, 
-        lg: 1200,
-        xl: 1536
-      };
-      
-      if (typeof responsiveMaxWidth === 'string' && breakpointLimits[responsiveMaxWidth]) {
-        return `${breakpointLimits[responsiveMaxWidth]}px`;
-      }
-      
-      return "100%";
-    }, [responsiveMaxWidth]);
-
-    // Точные расчеты padding без костылей
-    const containerPadding = useMemo(() => {
-      if (disableGutters) return 0;
-      
-      // Базовые значения padding для density
-      const paddingMap = {
-        dense: 8,
-        compact: 12,
-        comfortable: 16
-      };
-      
-      return `${paddingMap[density]}px`;
-    }, [disableGutters, density]);
+    // Адаптивная ширина для разных режимов
+    const adaptiveMaxWidth = (() => {
+      if (mode === "fullscreen") return false;
+      if (mode === "minimal") return "md";
+      return maxWidth === false ? false : maxWidth || "xl";
+    })();
 
     return (
-      <Box
+      <Container
+        maxWidth={adaptiveMaxWidth}
         className={className}
         sx={{
-          // Context7: Точные расчеты вместо overflow костылей
-          ...containerStyles.root,
-          ...containerStyles.content,
-          
-          // Точная ширина и позиционирование
+          // Используем styleSystem для базовых стилей
+          ...styleSystem.spacing,
+
+          // Context7: Правильные размеры без overflow
           width: "100%",
-          maxWidth: containerWidth,
-          margin: "0 auto",
-          padding: containerPadding,
-          
-          // Правильный flex layout
+          minHeight: 0,
           display: "flex",
           flexDirection: "column",
-          position: "relative",
-          
-          // Применяем анимации если включены
-          ...(!shouldReduceAnimations &&
-            enableAnimations &&
-            animatedStyles("fadeIn")),
+
+          // Адаптивные отступы из styleSystem
+          px: padding || styleSystem.spacing.xs,
+          py: mode === "fullscreen" ? 0 : padding || styleSystem.spacing.sm,
+
+          // Фон и стили с использованием темы
+          backgroundColor: backgroundColor || theme.palette.background.default,
+
+          // Layout-specific стили из styleSystem
+          ...styleSystem.spacing,
+
+          // Context7: Предотвращаем overflow
+          overflow: "visible",
+          overflowX: "hidden",
+
+          // Анимации из styleSystem
+          ...styleSystem.animations,
+
+          // Кастомные стили
+          ...sx,
         }}
       >
         {children}
-      </Box>
+      </Container>
     );
   }
 );
+
+DashboardContainer.displayName = "DashboardContainer";

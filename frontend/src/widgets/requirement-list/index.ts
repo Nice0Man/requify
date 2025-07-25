@@ -1,3 +1,2 @@
-// Requirement list widget exports
-export * from "./ui";
-export * from "./model"; 
+export { RequirementListWidget } from "./ui";
+export type { RequirementListWidgetProps } from "./model"; 

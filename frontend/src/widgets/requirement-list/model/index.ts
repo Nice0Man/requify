@@ -1,1 +1,1 @@
-export * from "./types"; 
+export type { RequirementListWidgetProps } from "./types"; 

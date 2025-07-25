@@ -1,1 +1,1 @@
-export * from "./types"; 
+export type { ProjectStatsWidgetProps } from "./types"; 
