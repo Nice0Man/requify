@@ -1,15 +1,25 @@
 export interface Integration {
   id: string;
-  title: string;
+  title: string; // Основной заголовок
   description: string;
-  icon: string;
-  connections: string;
-  category: "popular" | "new" | "enterprise" | "featured";
+  icon: string; // Название иконки как строка для гибкости
+  connections: string; // Количество подключений как строка для отображения
+  category:
+    | "popular"
+    | "new"
+    | "enterprise"
+    | "featured"
+    | "development"
+    | "communication"
+    | "management"
+    | "security";
   color: string;
-  gradient: string;
+  gradient?: string; // Опциональный градиент
   isPopular?: boolean;
   isNew?: boolean;
   order: number;
+  features: string[];
+  status?: "active" | "inactive" | "beta"; // Статус интеграции
 }
 
 export interface CarouselControlsProps {
@@ -78,4 +88,5 @@ export interface IntegrationCategory {
   id: string;
   name: string;
   description: string;
+  color: string;
 }

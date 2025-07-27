@@ -259,7 +259,26 @@ export const API_ENDPOINTS = {
     CHECK_PERMISSIONS: "/teams/permissions/check",
   },
 
+  // Integration endpoints
+  // not implemented on backend yet
+  INTEGRATIONS: {
+    LIST: "/integrations/",
+    GET: (id: string) => `/integrations/${id}`,
+    CATEGORIES: "/integrations/categories",
+    POPULAR: "/integrations/popular",
+    CONNECT: "/integrations/connect",
+    DISCONNECT: (connectionId: string) =>
+      `/integrations/connections/${connectionId}`,
+    CONNECTION_STATUS: (integrationId: string) =>
+      `/integrations/${integrationId}/status`,
+    SYNC: (connectionId: string) =>
+      `/integrations/connections/${connectionId}/sync`,
+    CONNECTIONS: "/integrations/connections",
+    AVAILABLE: "/integrations/available",
+  },
+
   // Email endpoints
+  // not implemented on backend yet
   EMAIL: {
     SUBSCRIBE: "/email/subscribe",
     UNSUBSCRIBE: "/email/unsubscribe",

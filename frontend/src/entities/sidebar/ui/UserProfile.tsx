@@ -146,30 +146,16 @@ export const UserProfile: React.FC<UserProfileProps> = memo(
         width: isCollapsed ? 44 : "auto",
         maxWidth: isCollapsed ? 44 : "none",
         minHeight: isCollapsed ? 44 : 64,
-        borderRadius: 2,
         background: `linear-gradient(135deg, ${alpha(
           SIDEBAR_COLORS.background.secondary,
           0.3
         )} 0%, ${alpha(SIDEBAR_COLORS.background.primary, 0.8)} 100%)`,
-        border: `1px solid ${alpha(SIDEBAR_COLORS.border.light, 0.3)}`,
         backdropFilter: "blur(10px)",
         boxShadow: `0 2px 8px ${alpha(SIDEBAR_COLORS.text.primary, 0.04)}`,
         transition: "all 0.2s ease",
         display: "flex",
         alignItems: "center",
         justifyContent: isCollapsed ? "center" : "flex-start",
-        "&:hover": {
-          background: `linear-gradient(135deg, ${alpha(
-            SIDEBAR_COLORS.background.hover,
-            0.6
-          )} 0%, ${alpha(SIDEBAR_COLORS.background.secondary, 0.9)} 100%)`,
-          border: `1px solid ${alpha(SIDEBAR_COLORS.border.medium, 0.4)}`,
-          boxShadow: `0 4px 16px ${alpha(SIDEBAR_COLORS.text.primary, 0.08)}`,
-          transform: isCollapsed ? "scale(1.05)" : "translateY(-1px)",
-          "& .MuiAvatar-root": {
-            boxShadow: `0 0 0 2px ${alpha(roleData.color, 0.3)}`,
-          },
-        },
         ...sx,
       }),
       [isCollapsed, roleData.color, sx]

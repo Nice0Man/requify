@@ -1,10 +1,9 @@
-import React, { useMemo, memo } from "react";
+import React, { useMemo, memo, useCallback, useRef } from "react";
 import {
   Box,
   Drawer,
   List,
   ListItem,
-  IconButton,
   Tooltip,
   Divider,
   Typography,
@@ -15,14 +14,26 @@ import {
   Paper,
 } from "@mui/material";
 import {
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
-} from "@mui/icons-material";
-import { DndContext, closestCenter, DragOverlay } from "@dnd-kit/core";
+  DndContext,
+  closestCenter,
+  DragOverlay,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  MouseSensor,
+  TouchSensor,
+  MeasuringStrategy,
+  type Modifier,
+  type UniqueIdentifier,
+} from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
 import type { SidebarItem, SidebarItemState } from "@/entities/sidebar";
 import {
   SidebarButton,
@@ -40,6 +51,50 @@ import type {
 } from "@/features";
 import type { User } from "@/entities/user";
 import { SortableItem } from "./SortableItem";
+
+/**
+ * Кастомный модификатор для ограничения перетаскивания в пределах sidebar
+ */
+const createRestrictToSidebarModifier = (sidebarRef: React.RefObject<HTMLElement>): Modifier => {
+  return ({ transform, containerNodeRect, draggingNodeRect, activatorEvent }) => {
+    if (!sidebarRef.current || !containerNodeRect || !draggingNodeRect) {
+      return transform;
+    }
+
+    const sidebarRect = sidebarRef.current.getBoundingClientRect();
+    const navigationContent = sidebarRef.current;
+    
+    // Получаем границы навигационного контента (исключаем header и footer)
+    const contentTop = 20; // Padding top
+    const contentHeight = navigationContent.clientHeight - 40; // Minus top and bottom padding
+    
+    // Ограничиваем движение в пределах видимой области navigation content
+    const minY = contentTop;
+    const maxY = Math.max(contentTop, contentHeight - draggingNodeRect.height);
+    
+    // Строго ограничиваем горизонтальное движение (только вертикальная ось)
+    const centerX = Math.max(0, (sidebarRect.width - draggingNodeRect.width) / 2);
+
+    // Добавляем мягкое ограничение с resistance эффектом на границах
+    let constrainedY = transform.y;
+    
+    if (transform.y < minY) {
+      // Resistance эффект сверху
+      const overflow = minY - transform.y;
+      constrainedY = minY - Math.sqrt(overflow) * 2;
+    } else if (transform.y > maxY) {
+      // Resistance эффект снизу  
+      const overflow = transform.y - maxY;
+      constrainedY = maxY + Math.sqrt(overflow) * 2;
+    }
+
+    return {
+      ...transform,
+      x: centerX, // Фиксируем по центру sidebar
+      y: Math.max(minY - 20, Math.min(maxY + 20, constrainedY)), // Небольшой допуск для resistance
+    };
+  };
+};
 
 // Константы цветов (мемоизированы для предотвращения пересоздания)
 const SIDEBAR_COLORS = {
@@ -127,11 +182,34 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
     onStateChange,
   }) => {
     const theme = useTheme();
+    const sidebarRef = useRef<HTMLDivElement>(null);
 
     // Мемоизированная конфигурация
     const config = useMemo(
       () => ({ ...DEFAULT_APP_SIDEBAR_CONFIG, ...userConfig }),
       [userConfig]
+    );
+
+    // Настройка сенсоров с ограничениями активации
+    const sensors = useSensors(
+      useSensor(MouseSensor, {
+        activationConstraint: {
+          distance: { y: 8 }, // Минимальное вертикальное движение для активации
+          tolerance: { x: 5 }, // Допустимое горизонтальное отклонение
+        },
+      }),
+      useSensor(TouchSensor, {
+        activationConstraint: {
+          delay: 250, // Задержка для touch устройств
+          tolerance: { y: 8, x: 5 }, // Допустимое отклонение
+        },
+      }),
+      useSensor(PointerSensor, {
+        activationConstraint: {
+          distance: { y: 8 },
+          tolerance: { x: 5 },
+        },
+      })
     );
 
     // Мемоизированные группированные элементы
@@ -209,13 +287,45 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
       [drawerWidth, theme.transitions, modernStyles, sx]
     );
 
+    // Мемоизированные обработчики drag events
+    const handleDragStart = useCallback((event: any) => {
+      // Добавляем data-attribute для визуального feedback
+      if (sidebarRef.current) {
+        sidebarRef.current.setAttribute('data-dragging', 'true');
+      }
+      dndActions.handleDragStart(event);
+    }, [dndActions]);
+
+    const handleDragEnd = useCallback((event: any) => {
+      // Убираем data-attribute после завершения drag
+      if (sidebarRef.current) {
+        sidebarRef.current.removeAttribute('data-dragging');
+      }
+      dndActions.handleDragEnd(event);
+    }, [dndActions]);
+
+    const handleDragCancel = useCallback(() => {
+      // Убираем data-attribute при отмене drag
+      if (sidebarRef.current) {
+        sidebarRef.current.removeAttribute('data-dragging');
+      }
+    }, []);
+
     return (
       <Drawer variant="permanent" className={className} sx={drawerStyles}>
         <DndContext
-          sensors={dndState.sensors}
+          sensors={sensors}
           collisionDetection={closestCenter}
-          onDragStart={dndActions.handleDragStart}
-          onDragEnd={dndActions.handleDragEnd}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+          modifiers={[
+            restrictToVerticalAxis, // Ограничиваем движение только по вертикали
+            createRestrictToSidebarModifier(sidebarRef), // Ограничиваем область sidebar
+          ]}
+          autoScroll={{
+            enabled: false, // Отключаем автоскролл для избежания конфликтов
+          }}
         >
           {/* Header with toggle */}
           {config.showHeader && (
@@ -325,13 +435,32 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
 
           {/* Navigation Content */}
           <Box
+            ref={sidebarRef}
             sx={{
               flex: 1,
-              overflow: "hidden auto",
+              overflow: "hidden", // Предотвращаем overflow во время drag
               py: 2,
               display: "flex",
               flexDirection: "column",
               alignItems: isCollapsed ? "center" : "stretch",
+              position: "relative", // Для правильного позиционирования during drag
+              minHeight: 0, // Позволяет flex элементу уменьшаться
+              // Добавляем визуальные границы области drag (только во время dragging)
+              "&[data-dragging='true']": {
+                "&::before": {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  border: `2px dashed ${SIDEBAR_COLORS.accent.primary}`,
+                  borderRadius: 2,
+                  opacity: 0.3,
+                  pointerEvents: 'none',
+                  zIndex: 1,
+                },
+              },
               "&::-webkit-scrollbar": {
                 width: 6,
               },
@@ -549,7 +678,12 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
           )}
         </DndContext>
 
-        <DragOverlay>
+        <DragOverlay
+          modifiers={[
+            restrictToVerticalAxis, // Те же ограничения для overlay
+            createRestrictToSidebarModifier(sidebarRef),
+          ]}
+        >
           {dndState.activeId && dndActions.getActiveItem() ? (
             <SidebarButton
               item={dndActions.getActiveItem()!}
@@ -557,9 +691,23 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
               isCollapsed={isCollapsed}
               onClick={() => {}}
               sx={{
-                opacity: 0.8,
-                transform: "rotate(5deg)",
-                boxShadow: SIDEBAR_COLORS.shadow.lg,
+                opacity: 0.9,
+                transform: "rotate(2deg)",
+                boxShadow: `${SIDEBAR_COLORS.shadow.lg}, 0 0 0 1px ${SIDEBAR_COLORS.border.medium}`,
+                cursor: 'grabbing',
+                zIndex: 1000,
+                // Добавляем визуальный индикатор ограничений
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: -2,
+                  left: -2,
+                  right: -2,
+                  bottom: -2,
+                  border: `2px dashed ${SIDEBAR_COLORS.accent.primary}`,
+                  borderRadius: 'inherit',
+                  opacity: 0.6,
+                },
               }}
             />
           ) : null}

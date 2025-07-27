@@ -10,31 +10,25 @@ import {
   IconButton,
   Chip,
   Divider,
-  useMediaQuery,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Close,
   OpenInNew,
   Star,
   CheckCircle,
-  ArrowBack as ArrowBackIcon,
-  ArrowForward as ArrowForwardIcon,
-  FiberManualRecord as DotIcon,
   Api as ApiIcon,
   Security as SecurityIcon,
   CloudSync as CloudSyncIcon,
-  Pause as PauseIcon,
-  PlayArrow as PlayIcon,
 } from "@mui/icons-material";
-import { useTranslation } from "@/shared/hooks/useTranslation";
-import { INTEGRATIONS, type Integration } from "@/entities/integration";
+import {
+  INTEGRATIONS,
+  IntegrationCard,
+  type Integration,
+} from "@/entities/integration";
 
 const MotionBox = motion(Box);
-const MotionContainer = motion(Container);
 const MotionTypography = motion(Typography);
-const MotionButton = motion(Button);
-const MotionIconButton = motion(IconButton);
 
 // Анимационные варианты согласно дизайн-системе
 const containerVariants = {
@@ -54,229 +48,6 @@ const itemVariants = {
     opacity: 1,
     y: 0,
   },
-};
-
-// Компонент карточки интеграции с соотношением 3:4
-interface IntegrationCardProps {
-  integration: Integration;
-  onClick?: (integration: Integration) => void;
-  index: number;
-  total: number;
-}
-
-const IntegrationCard: React.FC<IntegrationCardProps> = ({
-  integration,
-  onClick,
-  index,
-  total,
-}) => {
-  const theme = useTheme();
-
-  const getIconComponent = (iconName: string) => {
-    const iconMap = {
-      Api: ApiIcon,
-      Security: SecurityIcon,
-      CloudSync: CloudSyncIcon,
-    };
-    return iconMap[iconName as keyof typeof iconMap] || ApiIcon;
-  };
-
-  const IconComponent = getIconComponent(integration.icon);
-
-  const handleClick = () => {
-    if (onClick) {
-      onClick(integration);
-    }
-  };
-
-  return (
-    <MotionBox
-      whileHover={{ scale: 1.05, y: -10 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={handleClick}
-      sx={{
-        position: "relative",
-        width: "280px", // Фиксированная ширина
-        height: "373px", // Соотношение 3:4 (280 * 4/3 = 373)
-        borderRadius: 3,
-        background: `linear-gradient(145deg, 
-          ${theme.palette.background.paper}FC 0%, 
-          ${theme.palette.background.paper}F8 25%,
-          ${integration.color}08 50%,
-          ${theme.palette.background.paper}F8 75%,
-          ${theme.palette.background.paper}FC 100%)`,
-        border: `1px solid ${integration.color}40`,
-        overflow: "hidden",
-        cursor: "pointer",
-        transition: "all 0.3s ease",
-        boxShadow: `0 8px 32px ${integration.color}20`,
-        "&:hover": {
-          boxShadow: `0 20px 60px ${integration.color}40`,
-          border: `1px solid ${integration.color}60`,
-        },
-        flexShrink: 0,
-      }}
-    >
-      {/* Декоративный элемент сверху */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 4,
-          background: `linear-gradient(90deg, 
-            transparent 0%, 
-            ${integration.color}60 20%, 
-            ${integration.color}80 50%, 
-            ${integration.color}60 80%, 
-            transparent 100%)`,
-        }}
-      />
-
-      {/* Содержимое карточки */}
-      <Box
-        sx={{
-          p: 3,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {/* Иконка интеграции */}
-        <Box
-          sx={{
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            width: 72,
-            height: 72,
-            borderRadius: 2,
-            background: `linear-gradient(135deg, ${integration.color}20 0%, ${integration.color}40 100%)`,
-            mb: 3,
-            boxShadow: `0 8px 24px ${integration.color}30`,
-          }}
-        >
-          <IconComponent
-            sx={{
-              color: integration.color,
-              fontSize: 36,
-            }}
-          />
-        </Box>
-
-        {/* Заголовок */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: 700,
-            color: "text.primary",
-            mb: 2,
-            fontSize: "1.25rem",
-            lineHeight: 1.2,
-          }}
-        >
-          {integration.title}
-        </Typography>
-
-        {/* Описание */}
-        <Typography
-          variant="body2"
-          sx={{
-            color: "text.secondary",
-            mb: 3,
-            fontSize: "0.9rem",
-            lineHeight: 1.5,
-            flex: 1,
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {integration.description}
-        </Typography>
-
-        {/* Нижняя часть */}
-        <Box sx={{ mt: "auto" }}>
-          {/* Популярность */}
-          {integration.isPopular && (
-            <Chip
-              icon={<Star sx={{ fontSize: "14px !important" }} />}
-              label="Популярно"
-              size="small"
-              color="warning"
-              variant="filled"
-              sx={{ mb: 2 }}
-            />
-          )}
-
-          {/* Статистика подключений */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 2,
-            }}
-          >
-            <Typography
-              variant="caption"
-              sx={{
-                color: integration.color,
-                fontWeight: 600,
-                fontSize: "0.8rem",
-              }}
-            >
-              {integration.connections}
-            </Typography>
-
-            <Typography
-              variant="caption"
-              sx={{
-                color: "text.disabled",
-                fontSize: "0.75rem",
-              }}
-            >
-              {index + 1} / {total}
-            </Typography>
-          </Box>
-
-          {/* Connect Button */}
-          <Button
-            variant="outlined"
-            size="small"
-            fullWidth
-            sx={{
-              borderColor: integration.color,
-              color: integration.color,
-              "&:hover": {
-                borderColor: integration.color,
-                backgroundColor: `${integration.color}10`,
-              },
-            }}
-          >
-            Подключить
-          </Button>
-        </Box>
-      </Box>
-
-      {/* Декоративное свечение */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: -30,
-          right: -30,
-          width: 120,
-          height: 120,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${integration.color}15 0%, transparent 70%)`,
-          filter: "blur(30px)",
-          pointerEvents: "none",
-        }}
-      />
-    </MotionBox>
-  );
 };
 
 // Автоматическая карусель компонент
@@ -328,7 +99,10 @@ const AutoCarousel: React.FC<AutoCarouselProps> = ({
       sx={{
         position: "relative",
         width: "100%",
-        overflow: "hidden",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        zIndex: 1,
         "&:hover .carousel-controls": {
           opacity: 1,
         },
@@ -342,6 +116,8 @@ const AutoCarousel: React.FC<AutoCarouselProps> = ({
           transform: `translateX(-${offset}px)`,
           transition: isPaused ? "transform 0.3s ease" : "none",
           width: "fit-content",
+          alignItems: "center",
+          py: 2,
         }}
       >
         {children}
@@ -360,20 +136,7 @@ const AutoCarousel: React.FC<AutoCarouselProps> = ({
           transition: "opacity 0.3s ease",
           zIndex: 2,
         }}
-      >
-        <IconButton
-          onClick={() => setIsPaused(!isPaused)}
-          sx={{
-            backgroundColor: "rgba(0,0,0,0.5)",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "rgba(0,0,0,0.7)",
-            },
-          }}
-        >
-          {isPaused ? <PlayIcon /> : <PauseIcon />}
-        </IconButton>
-      </Box>
+      ></Box>
     </Box>
   );
 };
@@ -413,6 +176,7 @@ const IntegrationCTAModal: React.FC<IntegrationCTAModalProps> = ({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
         p: 2,
       }}
     >
@@ -427,15 +191,31 @@ const IntegrationCTAModal: React.FC<IntegrationCTAModalProps> = ({
             maxWidth: { xs: "90vw", sm: "500px" },
             width: "100%",
             maxHeight: "90vh",
-            overflow: "auto",
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
+            bgcolor: "background",
+            borderRadius: 4, // Увеличиваем как в других компонентах
+            background: "rgba(255, 255, 255, 0.98)", // Делаем светлее
+            backdropFilter: "blur(10px)",
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: `0 20px 60px rgba(0,0,0,0.15)`, // Уменьшаем тень для светлого вида
             outline: "none",
-            border: "1px solid",
-            borderColor: "divider",
+            overflow: "hidden",
           }}
         >
+          {/* Декоративный blur элемент */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: -30,
+              right: -30,
+              width: 150,
+              height: 150,
+              borderRadius: "50%",
+              background: `radial-gradient(circle, ${integration.color}10 0%, transparent 70%)`, // Делаем светлее
+              filter: "blur(40px)",
+              pointerEvents: "none",
+            }}
+          />
+
           {/* Close Button */}
           <IconButton
             onClick={onClose}
@@ -462,14 +242,14 @@ const IntegrationCTAModal: React.FC<IntegrationCTAModalProps> = ({
                   width: 64,
                   height: 64,
                   borderRadius: 2,
-                  background: `linear-gradient(135deg, ${integration.color}15 0%, ${integration.color}25 100%)`,
-                  border: "1px solid",
-                  borderColor: `${integration.color}30`,
+                  background: `linear-gradient(135deg, ${integration.color}20 0%, ${integration.color}40 100%)`,
+                  border: `1px solid ${integration.color}30`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   mr: 3,
                   flexShrink: 0,
+                  boxShadow: `0 8px 20px ${integration.color}30`,
                 }}
               >
                 <ApiIcon sx={{ fontSize: 32, color: integration.color }} />
@@ -558,10 +338,17 @@ const IntegrationCTAModal: React.FC<IntegrationCTAModalProps> = ({
                 startIcon={<CheckCircle />}
                 sx={{
                   py: 1.5,
-                  fontWeight: 600,
+                  px: 4,
+                  fontSize: "1rem",
+                  fontWeight: 700,
+                  borderRadius: 3, // Как в AdvancedFeaturesSection
+                  textTransform: "none",
                   background: `linear-gradient(135deg, ${integration.color} 0%, ${integration.color}CC 100%)`,
+                  boxShadow: `0 8px 25px ${integration.color}25`, // Делаем светлее
                   "&:hover": {
                     background: `linear-gradient(135deg, ${integration.color}DD 0%, ${integration.color}BB 100%)`,
+                    boxShadow: `0 12px 35px ${integration.color}30`, // Делаем светлее
+                    transform: "translateY(-2px)",
                   },
                 }}
               >
@@ -572,7 +359,21 @@ const IntegrationCTAModal: React.FC<IntegrationCTAModalProps> = ({
                 fullWidth
                 onClick={handleLearnMoreClick}
                 endIcon={<OpenInNew />}
-                sx={{ py: 1.5, fontWeight: 600 }}
+                sx={{
+                  py: 1.5,
+                  px: 4,
+                  fontSize: "1rem",
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  textTransform: "none",
+                  borderColor: integration.color,
+                  color: integration.color,
+                  "&:hover": {
+                    borderColor: integration.color,
+                    backgroundColor: `${integration.color}08`,
+                    transform: "translateY(-1px)",
+                  },
+                }}
               >
                 Узнать больше
               </Button>
@@ -584,7 +385,7 @@ const IntegrationCTAModal: React.FC<IntegrationCTAModalProps> = ({
                 mt: 3,
                 p: 2,
                 borderRadius: 2,
-                bgcolor: theme.palette.mode === "dark" ? "grey.900" : "grey.50",
+                bgcolor: "grey.25", // Делаем светлее
                 textAlign: "center",
               }}
             >
@@ -601,7 +402,6 @@ const IntegrationCTAModal: React.FC<IntegrationCTAModalProps> = ({
 
 export const IntegrationsSection: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [autoPlay, setAutoPlay] = useState(true);
 
   // Состояние для CTA модального окна
@@ -628,15 +428,26 @@ export const IntegrationsSection: React.FC = () => {
     });
   }, []);
 
-  // Создаем карточки интеграций
+  // Создаем карточки интеграций используя компонент из entity
   const integrationCards = INTEGRATIONS.map((integration, index) => (
-    <IntegrationCard
+    <Box
       key={integration.id}
-      integration={integration}
-      onClick={handleIntegrationClick}
-      index={index}
-      total={INTEGRATIONS.length}
-    />
+      sx={{
+        width: "300px",
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <IntegrationCard
+        integration={integration}
+        onClick={handleIntegrationClick}
+        isVisible={true}
+        blurLevel={0}
+        scale={1}
+      />
+    </Box>
   ));
 
   return (
@@ -655,26 +466,25 @@ export const IntegrationsSection: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          backgroundColor: "background.default",
-          overflow: "hidden",
           py: { xs: 8, md: 12 },
-        }}
-      >
-        {/* Динамический фон */}
-        <Box
-          sx={{
+          background: "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(250,250,255,0.95) 100%)",
+          "&::before": {
+            content: '""',
             position: "absolute",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            background: `radial-gradient(circle at 30% 70%, ${theme.palette.primary.main}08 0%, transparent 50%), 
-                         radial-gradient(circle at 70% 30%, ${theme.palette.secondary.main}06 0%, transparent 50%)`,
-            zIndex: 0,
+            background: `
+              radial-gradient(600px circle at 20% 30%, rgba(120, 119, 198, 0.03) 0%, transparent 50%),
+              radial-gradient(800px circle at 80% 70%, rgba(255, 171, 145, 0.03) 0%, transparent 50%),
+              radial-gradient(400px circle at 40% 80%, rgba(79, 172, 254, 0.02) 0%, transparent 50%)
+            `,
             pointerEvents: "none",
-          }}
-        />
-
+            zIndex: 0,
+          },
+        }}
+      >
         <Container
           maxWidth="xl"
           sx={{ position: "relative", zIndex: 1, height: "100%" }}
@@ -745,22 +555,7 @@ export const IntegrationsSection: React.FC = () => {
                   gap: 2,
                   mb: 4,
                 }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  Автопрокрутка:
-                </Typography>
-                <IconButton
-                  onClick={() => setAutoPlay(!autoPlay)}
-                  sx={{
-                    color: autoPlay ? "primary.main" : "text.disabled",
-                    "&:hover": {
-                      backgroundColor: "action.hover",
-                    },
-                  }}
-                >
-                  {autoPlay ? <PauseIcon /> : <PlayIcon />}
-                </IconButton>
-              </Box>
+              ></Box>
             </MotionBox>
 
             {/* Carousel */}
@@ -768,8 +563,9 @@ export const IntegrationsSection: React.FC = () => {
               variants={itemVariants}
               sx={{
                 position: "relative",
-                height: { xs: 450, md: 520 },
+                minHeight: { xs: 400, md: 500 },
                 mb: { xs: 6, md: 8 },
+                p: { xs: 2, md: 3 },
               }}
             >
               <AutoCarousel autoPlay={autoPlay} speed={30} pauseOnHover={true}>
