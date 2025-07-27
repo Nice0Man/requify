@@ -1,116 +1,118 @@
 {% extends "base.html.jinja" %}
 
-{% block title %}Уведомление безопасности - Requify{% endblock %}
+{% block title %}Оповещение о безопасности - Requify{% endblock %}
 
 {% block content %}
 <h1 class="email-title">
-    <span class="icon">🔒</span>Уведомление безопасности
+    <span class="icon">🔒</span>Оповещение о безопасности
 </h1>
 
 <p class="email-text">
     Здравствуйте, <strong>{{ user_name | default(user_email) }}</strong>!
 </p>
 
-<p class="email-text">
-    Мы обнаружили новую активность в вашей учетной записи Requify и хотим убедиться, что это были вы.
-</p>
-
-{% set alert_type_class = "alert" %}
-{% if alert_type == 'password_change' %}
-    {% set alert_type_class = "alert alert-success" %}
-{% elif alert_type == 'login_new_device' %}
-    {% set alert_type_class = "alert alert-info" %}
-{% elif alert_type == 'suspicious_activity' %}
-    {% set alert_type_class = "alert alert-error" %}
-{% elif alert_type == 'account_locked' %}
-    {% set alert_type_class = "alert alert-warning" %}
-{% endif %}
-
-<div class="{{ alert_type_class }}">
+<div class="alert alert-error">
     <div class="alert-title">
-        {% if alert_type == 'password_change' %}
-            <span class="icon">🔑</span>Пароль изменен
-        {% elif alert_type == 'login_new_device' %}
-            <span class="icon">📱</span>Вход с нового устройства
-        {% elif alert_type == 'suspicious_activity' %}
-            <span class="icon">⚠️</span>Подозрительная активность
-        {% elif alert_type == 'account_locked' %}
-            <span class="icon">🚫</span>Аккаунт заблокирован
-        {% else %}
-            <span class="icon">🔔</span>{{ alert_type }}
-        {% endif %}
+        <span class="icon">⚠️</span>Обнаружена подозрительная активность
     </div>
     <div class="alert-text">
-        <strong>Время:</strong> {{ details.timestamp | default(now()) | strftime('%d.%m.%Y в %H:%M') }}<br>
-        <strong>IP-адрес:</strong> <span class="code">{{ details.ip_address | default('Неизвестно') }}</span><br>
-        {% if details.user_agent %}
-        <strong>Устройство:</strong> {{ details.user_agent }}<br>
-        {% endif %}
-        {% if details.location %}
-        <strong>Местоположение:</strong> {{ details.location }}<br>
-        {% endif %}
+        Мы зафиксировали {{ event_type }} в вашей учетной записи <strong>Requify</strong>, 
+        которая может указывать на попытку несанкционированного доступа.
     </div>
 </div>
 
-{% if alert_type == 'password_change' %}
-<div class="alert alert-success">
-    <div class="alert-title">
-        <span class="icon">✅</span>Пароль успешно изменен
-    </div>
-    <div class="alert-text">
-        Ваш пароль был успешно изменен. Если это были вы, никаких дополнительных действий не требуется.
-    </div>
-</div>
-{% elif alert_type == 'login_new_device' %}
 <div class="alert alert-info">
     <div class="alert-title">
-        <span class="icon">📱</span>Новое устройство
+        <span class="icon">📋</span>Детали события
     </div>
     <div class="alert-text">
-        Обнаружен вход в вашу учетную запись с нового устройства. Если это были вы, 
-        рекомендуем добавить это устройство в список доверенных в настройках безопасности.
+        <strong>🕐 Время:</strong> {{ timestamp | default(now()) | strftime('%d.%m.%Y в %H:%M') }}<br>
+        <strong>🌐 IP-адрес:</strong> <span class="code">{{ ip_address | default('неизвестен') }}</span><br>
+        <strong>📱 Устройство:</strong> {{ user_agent | default('неизвестно') }}<br>
+        <strong>📍 Местоположение:</strong> {{ location | default('неизвестно') }}
     </div>
 </div>
-{% elif alert_type == 'account_locked' %}
+
+{% if event_type == "failed_login" %}
 <div class="alert alert-warning">
     <div class="alert-title">
-        <span class="icon">🚫</span>Аккаунт временно заблокирован
+        <span class="icon">🚫</span>Неудачная попытка входа
     </div>
     <div class="alert-text">
-        Ваш аккаунт был временно заблокирован из-за подозрительной активности или 
-        множественных неудачных попыток входа. Блокировка будет снята автоматически через <strong>30 минут</strong>.
+        Была предпринята неудачная попытка входа в вашу учетную запись. 
+        Если это были не вы, рекомендуем немедленно сменить пароль.
+    </div>
+</div>
+{% elif event_type == "password_changed" %}
+<div class="alert alert-success">
+    <div class="alert-title">
+        <span class="icon">🔄</span>Пароль изменен
+    </div>
+    <div class="alert-text">
+        Пароль для вашей учетной записи был успешно изменен. 
+        Если это были не вы, немедленно свяжитесь с нашей службой поддержки.
+    </div>
+</div>
+{% elif event_type == "login_from_new_device" %}
+<div class="alert alert-info">
+    <div class="alert-title">
+        <span class="icon">📱</span>Вход с нового устройства
+    </div>
+    <div class="alert-text">
+        Обнаружен вход в систему с нового устройства или браузера. 
+        Если это были вы, можете проигнорировать это сообщение.
     </div>
 </div>
 {% endif %}
+
+<p class="email-text">
+    <strong>Если это были вы</strong> — никаких действий не требуется.
+</p>
+
+<p class="email-text">
+    <strong>Если это были НЕ вы</strong> — немедленно примите меры для защиты учетной записи:
+</p>
+
+<div class="button-container">
+    <a href="{{ reset_password_url }}" class="button">
+        <span class="icon">🔐</span>Сменить пароль
+    </a>
+</div>
+
+<div class="alert alert-warning">
+    <div class="alert-title">
+        <span class="icon">🛡️</span>Рекомендации по безопасности
+    </div>
+    <div class="alert-text">
+        <strong>🔑 Смените пароль</strong> - Используйте надежный уникальный пароль<br>
+        <strong>📱 Включите 2FA</strong> - Активируйте двухфакторную аутентификацию<br>
+        <strong>👀 Проверьте сессии</strong> - Просмотрите активные сеансы в настройках<br>
+        <strong>📧 Проверьте email</strong> - Убедитесь в безопасности почтового ящика
+    </div>
+</div>
+
+<div class="button-container">
+    <a href="{{ account_security_url }}" class="button button-secondary">
+        <span class="icon">⚙️</span>Настройки безопасности
+    </a>
+</div>
 
 <div class="spacer"></div>
 
-<div class="alert alert-error">
+<div class="alert alert-info">
     <div class="alert-title">
-        <span class="icon">🛡️</span>Если это были не вы
+        <span class="icon">📞</span>Нужна помощь?
     </div>
     <div class="alert-text">
-        <strong>Немедленно выполните следующие действия:</strong><br><br>
-        <strong>1. Смените пароль</strong> от вашей учетной записи<br>
-        <strong>2. Проверьте активные сессии</strong> и завершите подозрительные<br>
-        <strong>3. Включите двухфакторную аутентификацию</strong><br>
-        <strong>4. Обратитесь в службу поддержки</strong>
+        Если у вас есть подозрения о компрометации учетной записи или вам нужна помощь, 
+        немедленно свяжитесь с нашей службой поддержки. Мы поможем восстановить безопасность аккаунта.
     </div>
 </div>
 
-{% if alert_type != 'account_locked' %}
-<div class="button-container">
-    <a href="{{ app_url | default('https://requify.com') }}/security" class="button">
-        Настройки безопасности
-    </a>
-    <a href="{{ app_url | default('https://requify.com') }}/support" class="button button-secondary">
-        Связаться с поддержкой
-    </a>
-</div>
-{% endif %}
-
 <p class="email-text text-small text-muted">
-    Это автоматическое уведомление системы безопасности. Мы отправляем такие письма, 
-    чтобы защитить вашу учетную запись от несанкционированного доступа.
+    Это автоматическое уведомление системы безопасности Requify. 
+    Мы следим за безопасностью вашей учетной записи 24/7.
+</p>
+{% endblock %} 
 </p>
 {% endblock %} 
