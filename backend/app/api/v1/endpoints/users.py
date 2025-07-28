@@ -5,7 +5,7 @@ API эндпоинты для работы с пользователями.
 """
 
 from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import (
@@ -492,6 +492,102 @@ async def get_user_audit_log(
     # Получаем журнал аудита пользователя
     audit_log = await crud.user.get_user_audit_log(db, user_id=user_id, limit=limit)
     return audit_log
+
+
+@router.get("/me/avatar")
+async def get_current_user_avatar(current_user: User = Depends(get_current_active_user)):
+    """
+    Получить URL аватара текущего пользователя.
+    
+    Returns:
+        dict: Информация об аватаре пользователя
+    """
+    return {
+        "avatar_url": current_user.avatar_url,
+        "has_avatar": current_user.avatar_url is not None
+    }
+
+
+@router.post("/me/avatar")
+async def upload_avatar(
+    file: UploadFile,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Загрузить аватар для текущего пользователя.
+    
+    Args:
+        file: Файл изображения для аватара
+        db: Сессия базы данных
+        current_user: Текущий пользователь
+        
+    Returns:
+        dict: Информация о загруженном аватаре
+        
+    Raises:
+        HTTPException: При ошибках валидации или загрузки
+    """
+    from app.services.file_service import file_service
+    
+    try:
+        # Загружаем аватар через файловый сервис
+        avatar_url = await file_service.upload_avatar(
+            file=file,
+            user_id=current_user.id,
+            db=db
+        )
+        
+        # Обновляем пользователя в БД
+        updated_user = await crud.user.update_avatar(
+            db, user_id=current_user.id, avatar_url=avatar_url
+        )
+        
+        return {
+            "message": "Avatar uploaded successfully",
+            "avatar_url": avatar_url,
+            "user_id": current_user.id
+        }
+        
+    except HTTPException:
+        # Перебрасываем HTTP исключения без изменений
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload avatar: {str(e)}"
+        )
+
+
+@router.delete("/me/avatar")
+async def delete_avatar(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Удалить аватар текущего пользователя.
+    
+    Args:
+        db: Сессия базы данных
+        current_user: Текущий пользователь
+        
+    Returns:
+        dict: Результат удаления аватара
+    """
+    try:
+        # Удаляем аватар через CRUD
+        updated_user = await crud.user.remove_avatar(db, user_id=current_user.id)
+        
+        return {
+            "message": "Avatar deleted successfully",
+            "user_id": current_user.id
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete avatar: {str(e)}"
+        )
 
 
 @router.get("/me/settings", response_model=schemas.UserSettings)

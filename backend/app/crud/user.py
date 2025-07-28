@@ -4,13 +4,14 @@ CRUD операции для модели User.
 
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from sqlalchemy import select, func
+from sqlalchemy import func, select, or_, and_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash, verify_password
+from app.utils.logger import logger
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -214,8 +215,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         self, db: AsyncSession, *, search_term: str, skip: int = 0, limit: int = 100
     ) -> List[User]:
         """Поиск пользователей по email или имени."""
-        from sqlalchemy import or_
-
         stmt = (
             select(User)
             .where(
@@ -324,22 +323,53 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     ) -> Dict[str, Any]:
         """Получить настройки пользователя"""
         try:
-            # Базовые настройки по умолчанию
-            return {
+            # TODO: Реализовать получение из БД, пока возвращаем настройки по умолчанию
+            # В будущем создать таблицу user_settings или использовать JSON поле в users
+            default_settings = {
                 "user_id": user_id,
                 "theme": "light",
                 "language": "ru",
                 "timezone": "UTC",
                 "notifications": {
                     "email": True,
-                    "push": True,
-                    "sms": False,
+                    "browser": True,
+                    "mentions": True,
+                    "comments": True,
+                    "status_changes": True
                 },
                 "privacy": {
                     "profile_visible": True,
                     "activity_visible": False,
                 },
+                "dashboard": {
+                    "layout": "grid",
+                    "widgets": [],
+                    "refresh_interval": 30
+                },
+                "sidebar": {
+                    "isCollapsed": False,
+                    "isPinned": True,
+                    "width": 280,
+                    "itemOrder": [],
+                    "hiddenItems": [],
+                    "pinnedItems": [],
+                    "expandedGroups": []
+                },
+                "navigation": {
+                    "favoriteItems": [],
+                    "hiddenItems": [],
+                    "customOrder": [],
+                    "displayPreferences": {
+                        "showIcons": True,
+                        "showBadges": True,
+                        "showDescriptions": True,
+                        "compactMode": False,
+                        "groupByCategory": True
+                    }
+                }
             }
+            
+            return default_settings
         except Exception as e:
             return {"error": str(e)}
 
@@ -348,17 +378,105 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     ) -> Dict[str, Any]:
         """Обновить настройки пользователя"""
         try:
-            # Базовая реализация - возвращаем обновленные настройки
-            # TODO: реализовать сохранение в БД
+            # TODO: Реализовать сохранение в БД
+            # Вариант 1: JSON поле в таблице users
+            # Вариант 2: Отдельная таблица user_settings
+            
+            # Получаем текущие настройки
             current_settings = await self.get_user_settings(db, user_id=user_id)
 
-            # Обновляем настройки (shallow merge)
-            current_settings.update(settings_data)
-            current_settings["updated_at"] = datetime.now().isoformat()
+            # Глубокое обновление настроек (deep merge)
+            def deep_merge(base_dict: dict, update_dict: dict) -> dict:
+                """Глубокое слияние словарей"""
+                result = base_dict.copy()
+                for key, value in update_dict.items():
+                    if (
+                        key in result 
+                        and isinstance(result[key], dict) 
+                        and isinstance(value, dict)
+                    ):
+                        result[key] = deep_merge(result[key], value)
+                    else:
+                        result[key] = value
+                return result
+            
+            updated_settings = deep_merge(current_settings, settings_data)
+            updated_settings["updated_at"] = datetime.now().isoformat()
 
-            return current_settings
+            # Логируем изменения для отладки
+            logger.info(f"Updated settings for user {user_id}: {list(settings_data.keys())}")
+            
+            return updated_settings
         except Exception as e:
+            logger.error(f"Failed to update user settings for user {user_id}: {str(e)}")
             return {"error": str(e)}
+    
+    async def update_avatar(
+        self, db: AsyncSession, *, user_id: int, avatar_url: str
+    ) -> User:
+        """Обновить аватар пользователя"""
+        try:
+            # Получаем пользователя
+            user = await self.get(db, id=user_id)
+            if not user:
+                raise ValueError(f"User with id {user_id} not found")
+            
+            # Сохраняем старый URL для удаления
+            old_avatar_url = user.avatar_url
+            
+            # Обновляем аватар
+            user.avatar_url = avatar_url
+            await db.commit()
+            await db.refresh(user)
+            
+            logger.info(f"Avatar updated for user {user_id}: {avatar_url}")
+            
+            # Удаляем старый аватар если он был
+            if old_avatar_url:
+                try:
+                    from app.services.file_service import file_service
+                    await file_service.delete_avatar(old_avatar_url)
+                except Exception as e:
+                    logger.warning(f"Failed to delete old avatar for user {user_id}: {str(e)}")
+                    pass
+            
+            return user
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Failed to update avatar for user {user_id}: {str(e)}")
+            raise e
+    
+    async def remove_avatar(self, db: AsyncSession, *, user_id: int) -> User:
+        """Удалить аватар пользователя"""
+        try:
+            # Получаем пользователя
+            user = await self.get(db, id=user_id)
+            if not user:
+                raise ValueError(f"User with id {user_id} not found")
+            
+            # Сохраняем URL для удаления файла
+            avatar_url = user.avatar_url
+            
+            # Удаляем аватар из БД
+            user.avatar_url = None
+            await db.commit()
+            await db.refresh(user)
+            
+            # Удаляем файл
+            if avatar_url:
+                try:
+                    from app.services.file_service import file_service
+                    await file_service.delete_avatar(avatar_url)
+                except Exception as e:
+                    logger.warning(f"Failed to delete avatar file for user {user_id}: {str(e)}")
+                    pass
+            
+            logger.info(f"Avatar removed for user {user_id}")
+            return user
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Failed to remove avatar for user {user_id}: {str(e)}")
+            raise e
 
 
 # Создаем экземпляр CRUD для использования в API

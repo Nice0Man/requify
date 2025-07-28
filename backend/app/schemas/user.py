@@ -21,6 +21,7 @@ class UserBase(BaseModel):
     department: Optional[str] = Field(None, description="Отдел пользователя")
     phone: Optional[str] = Field(None, description="Телефон пользователя")
     auth0_id: Optional[str] = Field(None, description="Auth0 ID пользователя")
+    avatar_url: Optional[str] = Field(None, description="URL аватара пользователя")
 
     @field_validator("username")
     def validate_username(cls, v):
@@ -707,14 +708,69 @@ class UserSettings(BaseModel):
     theme: str = Field("light", description="Тема интерфейса")
     language: str = Field("ru", description="Язык интерфейса")
     timezone: str = Field("UTC", description="Часовой пояс")
+    
+    # Настройки уведомлений
     notifications: Dict[str, bool] = Field(
-        default_factory=lambda: {"email": True, "push": True, "sms": False},
+        default_factory=lambda: {
+            "email": True, 
+            "browser": True, 
+            "mentions": True,
+            "comments": True,
+            "status_changes": True
+        },
         description="Настройки уведомлений",
     )
+    
+    # Настройки приватности
     privacy: Dict[str, bool] = Field(
-        default_factory=lambda: {"profile_visible": True, "activity_visible": False},
+        default_factory=lambda: {
+            "profile_visible": True, 
+            "activity_visible": False
+        },
         description="Настройки приватности",
     )
+    
+    # Настройки дашборда (соответствуют frontend/src/shared/types/user.ts)
+    dashboard: Dict[str, Any] = Field(
+        default_factory=lambda: {
+            "layout": "grid",
+            "widgets": [],
+            "refresh_interval": 30
+        },
+        description="Настройки дашборда",
+    )
+    
+    # Настройки сайдбара (соответствуют frontend/src/entities/sidebar/model/types.ts)
+    sidebar: Dict[str, Any] = Field(
+        default_factory=lambda: {
+            "isCollapsed": False,
+            "isPinned": True,
+            "width": 280,
+            "itemOrder": [],
+            "hiddenItems": [],
+            "pinnedItems": [],
+            "expandedGroups": []
+        },
+        description="Настройки сайдбара",
+    )
+    
+    # Настройки навигации (соответствуют frontend/src/entities/navigation/model/types.ts)
+    navigation: Dict[str, Any] = Field(
+        default_factory=lambda: {
+            "favoriteItems": [],
+            "hiddenItems": [],
+            "customOrder": [],
+            "displayPreferences": {
+                "showIcons": True,
+                "showBadges": True,
+                "showDescriptions": True,
+                "compactMode": False,
+                "groupByCategory": True
+            }
+        },
+        description="Настройки навигации",
+    )
+    
     updated_at: Optional[str] = Field(None, description="Дата обновления")
 
     class Config:

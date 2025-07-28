@@ -57,11 +57,6 @@ class User(Base, TimestampedMixin):
     auth0_id: Mapped[Optional[str]] = mapped_column(
         String(255), unique=True, nullable=True, comment="Auth0 user ID для интеграции"
     )
-
-    # Профиль пользователя
-    name: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True, comment="Полное имя пользователя"
-    )
     first_name: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True, comment="Имя пользователя"
     )
@@ -73,6 +68,9 @@ class User(Base, TimestampedMixin):
     )
     phone: Mapped[Optional[str]] = mapped_column(
         String(20), nullable=True, comment="Телефон пользователя"
+    )
+    avatar_url: Mapped[Optional[str]] = mapped_column(
+        String(500), nullable=True, comment="URL аватара пользователя"
     )
     role: Mapped[str] = mapped_column(
         String(20),

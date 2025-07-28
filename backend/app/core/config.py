@@ -252,9 +252,34 @@ class EmailConfig(BaseModel):
 
 
 class FileStorageConfig(BaseModel):
+    # Local storage settings
     upload_dir: str = "uploads"
-    max_file_size: int = 10485760
-    allowed_extensions: str = "pdf,doc,docx,txt,jpg,jpeg,png,gif"
+    max_file_size: int = 10485760  # 10MB default
+    allowed_extensions: str = "pdf,doc,docx,txt,jpg,jpeg,png,gif,webp,svg"
+    
+    # Avatar specific settings
+    avatar_max_size: int = 2097152  # 2MB for avatars
+    avatar_allowed_extensions: str = "jpg,jpeg,png,webp"
+    avatar_resize_dimensions: str = "128x128,256x256,512x512"  # Multiple sizes for optimization
+    
+    # Blob storage settings (for production)
+    use_blob_storage: bool = False
+    blob_storage_container: str = "requify-uploads"
+    blob_storage_cdn_url: str = ""
+    blob_storage_connection_string: str = ""
+    
+    # File organization
+    organize_by_date: bool = True  # uploads/2025/01/28/file.jpg
+    organize_by_user: bool = True  # uploads/users/{user_id}/avatar.jpg
+    
+    # Security settings
+    enable_virus_scan: bool = False
+    quarantine_dir: str = "quarantine"
+    
+    # CDN and caching
+    enable_cdn: bool = False
+    cdn_base_url: str = ""
+    cache_control_max_age: int = 86400  # 24 hours
 
 
 class AccessToken(BaseModel):

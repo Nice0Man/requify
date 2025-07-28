@@ -26,6 +26,8 @@ redis = "^5.0.0"
 auth0-python = "^4.0.0"
 pyjwt = { extras = ["cryptography"], version = "^2.8.0" }
 jwcrypto = "^1.5.0"
+pillow = "^10.0.0"
+aiofiles = "^24.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
