@@ -279,10 +279,14 @@ class FileStorageConfig(BaseModel):
 
     # CDN Configuration
     cdn_enabled: bool = True
-    cdn_base_url: str = "http://localhost:8080"  # NGINX CDN proxy
-    cdn_avatar_path: str = "/avatars"
-    cdn_uploads_path: str = "/uploads"
-    cdn_documents_path: str = "/documents"
+    cdn_base_url: str = (
+        "http://localhost"  # NGINX CDN proxy (изменил порт с 8080 на 80)
+    )
+    cdn_avatar_path: str = "/cdn/avatars"
+    cdn_uploads_path: str = "/cdn/uploads"
+    cdn_documents_path: str = "/cdn/documents"
+    cdn_static_path: str = "/cdn/static"  # Добавил новый путь для статических файлов
+    cdn_images_path: str = "/cdn/images"  # Добавил новый путь для изображений
 
     # Legacy blob storage settings (for Azure/AWS migration)
     use_blob_storage: bool = False
@@ -295,8 +299,35 @@ class FileStorageConfig(BaseModel):
     organize_by_user: bool = True  # uploads/users/{user_id}/avatar.jpg
 
     # Security settings
-    enable_virus_scan: bool = False
+    enable_virus_scan: bool = True  # Включаем по умолчанию
     quarantine_dir: str = "quarantine"
+
+    # Антивирусные настройки
+    virus_scan_engine: str = "clamav"  # clamav, pattern_match, both
+    clamav_socket_path: str = "/var/run/clamav/clamd.ctl"  # Unix socket для ClamAV
+    clamav_host: str = "localhost"
+    clamav_port: int = 3310
+    clamav_timeout: int = 30
+
+    # Настройки проверки паттернов
+    scan_patterns_enabled: bool = True
+    scan_magic_bytes: bool = True  # Проверка магических байтов
+    scan_embedded_content: bool = True  # Проверка встроенного контента
+
+    # Логирование безопасности
+    security_log_enabled: bool = True
+    security_log_file: str = "logs/security.log"
+    security_log_level: str = "WARNING"
+
+    # Уведомления администратора
+    admin_notifications_enabled: bool = True
+    admin_notification_methods: str = "email,log"  # email, log, webhook
+    admin_notification_threshold: int = 3  # Количество инцидентов для уведомления
+    admin_notification_webhook_url: str = ""
+
+    # Карантин
+    quarantine_retention_days: int = 30  # Сколько дней хранить файлы в карантине
+    auto_delete_quarantine: bool = True
 
     # Cache and performance
     cache_control_max_age: int = 86400  # 24 hours

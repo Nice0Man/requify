@@ -1,0 +1,39 @@
+{
+  "original_filename": "dangerous.html",
+  "user_id": 999,
+  "quarantine_timestamp": "2025-07-28T23:32:55.755942",
+  "file_hash": "42d7a88e52440fe1f16b756271137deddc3ceb3b94aef7e11e940a0896b95198",
+  "file_size": 66,
+  "threats_detected": [
+    {
+      "type": "PATTERN_MATCH",
+      "pattern": "<script",
+      "description": "JavaScript injection attempt",
+      "severity": "HIGH"
+    },
+    {
+      "type": "PATTERN_MATCH",
+      "pattern": "<?php",
+      "description": "PHP code detected",
+      "severity": "MEDIUM"
+    },
+    {
+      "type": "PATTERN_MATCH",
+      "pattern": "exec(",
+      "description": "Code execution attempt",
+      "severity": "HIGH"
+    },
+    {
+      "type": "PATTERN_MATCH",
+      "pattern": "eval(",
+      "description": "Code evaluation attempt",
+      "severity": "HIGH"
+    },
+    {
+      "type": "MULTIPLE_EXECUTABLE_PATTERNS",
+      "description": "Multiple executable patterns detected (4)",
+      "severity": "HIGH"
+    }
+  ],
+  "retention_until": "2025-08-27T23:32:55.755954"
+}

@@ -472,42 +472,42 @@
 </head>
 <body>
     <div class="email-wrapper">
-        <div class="email-container">
-            <!-- Header -->
-            <div class="email-header">
+                    <div class="email-container">
+                        <!-- Header -->
+                        <div class="email-header">
                 <div class="brand-icon">
                     📋
                 </div>
                 <a href="#" class="logo">Requify</a>
                 <p class="logo-subtitle">Requirements Management System</p>
-            </div>
-            
-            <!-- Content -->
-            <div class="email-content">
-                {% block content %}
-                <!-- Email content goes here -->
-                {% endblock %}
-            </div>
-            
-            <!-- Footer -->
-            <div class="email-footer">
-                <p class="footer-text">
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="email-content">
+                            {% block content %}
+                            <!-- Email content goes here -->
+                            {% endblock %}
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="email-footer">
+                            <p class="footer-text">
                     <strong>Requify</strong> - Professional Requirements Management
-                </p>
+                            </p>
                 <p class="footer-text">
                     Это автоматическое письмо от системы управления требованиями Requify.
                     <br>Если у вас есть вопросы, свяжитесь с нашей службой поддержки.
                 </p>
-                <div class="footer-links">
+                            <div class="footer-links">
                     <a href="#" class="footer-link">Поддержка</a>
                     <a href="#" class="footer-link">Документация</a>
                     <a href="#" class="footer-link">Настройки</a>
-                </div>
+                            </div>
                 <p class="footer-text text-small text-muted">
                     © {{ now().year }} Requify. Все права защищены.
                 </p>
-            </div>
-        </div>
+                        </div>
+                    </div>
     </div>
 </body>
 </html> 
