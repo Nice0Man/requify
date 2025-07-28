@@ -80,6 +80,70 @@ services:
       timeout: 5s
       retries: 5
 
+  # MinIO Object Storage для CDN
+  minio:
+    image: minio/minio:latest
+    container_name: requify_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001" --address ":9000"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL:-http://localhost:9001}
+      MINIO_STORAGE_CLASS_STANDARD: EC:1
+    ports:
+      - "9000:9000"  # MinIO API
+      - "9001:9001"  # MinIO Console  
+    volumes:
+      - minio_data:/data
+      - ./minio/config:/root/.minio
+    networks:
+      - requify-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 10s
+
+  # Redis для CDN метаданных
+  redis-cdn:
+    image: redis:7-alpine
+    container_name: requify_redis_cdn
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_cdn_data:/data
+    networks:
+      - requify-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # MinIO Client для инициализации buckets
+  mc:
+    image: minio/mc:latest
+    container_name: requify_mc
+    depends_on:
+      - minio
+    networks:
+      - requify-network
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add myminio http://minio:9000 admin minioadmin123) do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc mb myminio/requify-uploads --ignore-existing;
+      /usr/bin/mc mb myminio/requify-avatars --ignore-existing;
+      /usr/bin/mc mb myminio/requify-documents --ignore-existing;
+      /usr/bin/mc policy set public myminio/requify-uploads;
+      /usr/bin/mc policy set public myminio/requify-avatars;
+      /usr/bin/mc admin info myminio;
+      exit 0;
+      "
+    profiles:
+      - init
+
   # Основное приложение FastAPI
   app:
     build:
@@ -96,6 +160,17 @@ services:
       - APP_CONFIG__REDIS__PORT=6379
       - APP_CONFIG__REDIS__DB=0
       - APP_CONFIG__REDIS__PASSWORD=
+      # MinIO Configuration
+      - APP_CONFIG__FILE_STORAGE__USE_MINIO=true
+      - APP_CONFIG__FILE_STORAGE__MINIO_ENDPOINT=minio:9000
+      - APP_CONFIG__FILE_STORAGE__MINIO_ACCESS_KEY=admin
+      - APP_CONFIG__FILE_STORAGE__MINIO_SECRET_KEY=minioadmin123
+      - APP_CONFIG__FILE_STORAGE__MINIO_SECURE=false
+      - APP_CONFIG__FILE_STORAGE__CDN_ENABLED=true
+      - APP_CONFIG__FILE_STORAGE__CDN_BASE_URL=http://localhost
+      - APP_CONFIG__FILE_STORAGE__CDN_AVATAR_PATH=/avatars
+      - APP_CONFIG__FILE_STORAGE__CDN_UPLOADS_PATH=/cdn/uploads
+      - APP_CONFIG__FILE_STORAGE__CDN_DOCUMENTS_PATH=/cdn/documents
     ports:
       - "8000:8000"
     volumes:
@@ -107,11 +182,13 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     networks:
       - requify-network
     restart: unless-stopped
 
-  # Nginx reverse proxy
+  # Nginx reverse proxy with CDN support
   nginx:
     image: nginx:alpine
     container_name: requify_nginx
@@ -119,12 +196,15 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./logs:/var/log/nginx
       - ./uploads:/var/www/uploads
       - ./static:/var/www/static
+      - nginx_cache:/var/cache/nginx
     depends_on:
       - app
+      - minio
     networks:
       - requify-network
     restart: unless-stopped
@@ -149,6 +229,12 @@ volumes:
     name: requify_postgres_test_data
   redis_data:
     name: requify_redis_data
+  minio_data:
+    name: requify_minio_data
+  redis_cdn_data:
+    name: requify_redis_cdn_data
+  nginx_cache:
+    name: requify_nginx_cache
 
 networks:
   requify-network:

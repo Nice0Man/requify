@@ -7,6 +7,7 @@ API эндпоинты для работы с пользователями.
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.responses import JSONResponse
 
 from app.api.deps import (
     get_db,
@@ -508,6 +509,33 @@ async def get_current_user_avatar(current_user: User = Depends(get_current_activ
     }
 
 
+@router.get("/file-service/health")
+async def get_file_service_health():
+    """
+    Проверка здоровья файлового сервиса и CDN.
+    
+    Returns:
+        dict: Статус файлового сервиса, MinIO и CDN
+    """
+    from app.services.file_service import file_service
+    
+    health_status = file_service.get_health_status()
+    
+    # Добавляем общий статус
+    health_status["healthy"] = (
+        health_status.get("minio_connected", False) if health_status["storage_type"] == "minio" 
+        else True  # Для локального хранилища всегда здоров
+    )
+    
+    # HTTP статус код
+    status_code = status.HTTP_200_OK if health_status["healthy"] else status.HTTP_503_SERVICE_UNAVAILABLE
+    
+    return JSONResponse(
+        status_code=status_code,
+        content=health_status
+    )
+
+
 @router.post("/me/avatar")
 async def upload_avatar(
     file: UploadFile,
@@ -576,8 +604,7 @@ async def delete_avatar(
     """
     try:
         # Удаляем аватар через CRUD
-        updated_user = await crud.user.remove_avatar(db, user_id=current_user.id)
-        
+        await crud.user.remove_avatar(db, user_id=current_user.id)
         return {
             "message": "Avatar deleted successfully",
             "user_id": current_user.id
