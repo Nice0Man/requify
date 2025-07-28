@@ -30,7 +30,6 @@ import {
 import { useRequirements } from "@/features/requirements/model/useRequirementQuery";
 import { LoadingSpinner } from "@/shared/ui";
 import type { Requirement } from "@/entities/requirement";
-import { DashboardLayout } from "@/widgets/layout/ui";
 
 const RequirementsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -193,165 +192,155 @@ const RequirementsPage: React.FC = () => {
   );
 
   if (isPending) {
-    return (
-      <DashboardLayout>
-        <LoadingSpinner fullScreen />
-      </DashboardLayout>
-    );
+    return <LoadingSpinner fullScreen />;
   }
 
   if (error) {
     return (
-      <DashboardLayout>
-        <Box p={3} textAlign="center">
-          <Typography color="error">{t("errors.loadingError")}</Typography>
-        </Box>
-      </DashboardLayout>
+      <Box p={3} textAlign="center">
+        <Typography color="error">{t("errors.loadingError")}</Typography>
+      </Box>
     );
   }
 
   return (
-    <DashboardLayout>
-      <Box p={3}>
-        {/* Заголовок */}
-        <Box mb={3}>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
-            {t("requirements.title")}
-          </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            {t("requirements.subtitle")}
-          </Typography>
-        </Box>
+    <Box p={3}>
+      {/* Заголовок */}
+      <Box mb={3}>
+        <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
+          {t("requirements.title")}
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary">
+          {t("requirements.subtitle")}
+        </Typography>
+      </Box>
 
-        {/* Фильтры и поиск */}
-        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                placeholder={t("requirements.searchPlaceholder")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <SearchIcon sx={{ mr: 1, color: "action.active" }} />
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth>
-                <InputLabel>{t("requirements.fields.status")}</InputLabel>
-                <Select
-                  value={statusFilter}
-                  label={t("requirements.fields.status")}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <MenuItem value="all">
-                    {t("requirements.status.all")}
-                  </MenuItem>
-                  <MenuItem value="draft">
-                    {t("requirements.status.draft")}
-                  </MenuItem>
-                  <MenuItem value="approved">
-                    {t("requirements.status.approved")}
-                  </MenuItem>
-                  <MenuItem value="in_progress">
-                    {t("requirements.status.inProgress")}
-                  </MenuItem>
-                  <MenuItem value="completed">
-                    {t("requirements.status.completed")}
-                  </MenuItem>
-                  <MenuItem value="rejected">
-                    {t("requirements.status.rejected")}
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth>
-                <InputLabel>{t("requirements.fields.priority")}</InputLabel>
-                <Select
-                  value={priorityFilter}
-                  label={t("requirements.fields.priority")}
-                  onChange={(e) => setPriorityFilter(e.target.value)}
-                >
-                  <MenuItem value="all">
-                    {t("requirements.priority.all")}
-                  </MenuItem>
-                  <MenuItem value="low">
-                    {t("requirements.priority.low")}
-                  </MenuItem>
-                  <MenuItem value="medium">
-                    {t("requirements.priority.medium")}
-                  </MenuItem>
-                  <MenuItem value="high">
-                    {t("requirements.priority.high")}
-                  </MenuItem>
-                  <MenuItem value="critical">
-                    {t("requirements.priority.critical")}
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <ToggleButtonGroup
-                value={viewMode}
-                exclusive
-                onChange={(_, newViewMode) =>
-                  newViewMode && setViewMode(newViewMode)
-                }
-                aria-label={t("common.view")}
-              >
-                <ToggleButton value="grid" aria-label="grid view">
-                  <ViewModuleIcon />
-                </ToggleButton>
-                <ToggleButton value="list" aria-label="list view">
-                  <ViewListIcon />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<AddIcon />}
-                sx={{ fontWeight: 600 }}
-              >
-                {t("requirements.createRequirement")}
-              </Button>
-            </Grid>
+      {/* Фильтры и поиск */}
+      <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={3}>
+            <TextField
+              fullWidth
+              placeholder={t("requirements.searchPlaceholder")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <SearchIcon sx={{ mr: 1, color: "action.active" }} />
+                ),
+              }}
+            />
           </Grid>
-        </Paper>
-
-        {/* Список требований */}
-        {filteredRequirements.length === 0 ? (
-          <Paper
-            elevation={1}
-            sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
-          >
-            <Typography variant="h6" color="text.secondary" mb={2}>
-              {t("requirements.notFound")}
-            </Typography>
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>{t("requirements.fields.status")}</InputLabel>
+              <Select
+                value={statusFilter}
+                label={t("requirements.fields.status")}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <MenuItem value="all">{t("requirements.status.all")}</MenuItem>
+                <MenuItem value="draft">
+                  {t("requirements.status.draft")}
+                </MenuItem>
+                <MenuItem value="approved">
+                  {t("requirements.status.approved")}
+                </MenuItem>
+                <MenuItem value="in_progress">
+                  {t("requirements.status.inProgress")}
+                </MenuItem>
+                <MenuItem value="completed">
+                  {t("requirements.status.completed")}
+                </MenuItem>
+                <MenuItem value="rejected">
+                  {t("requirements.status.rejected")}
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>{t("requirements.fields.priority")}</InputLabel>
+              <Select
+                value={priorityFilter}
+                label={t("requirements.fields.priority")}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+              >
+                <MenuItem value="all">
+                  {t("requirements.priority.all")}
+                </MenuItem>
+                <MenuItem value="low">
+                  {t("requirements.priority.low")}
+                </MenuItem>
+                <MenuItem value="medium">
+                  {t("requirements.priority.medium")}
+                </MenuItem>
+                <MenuItem value="high">
+                  {t("requirements.priority.high")}
+                </MenuItem>
+                <MenuItem value="critical">
+                  {t("requirements.priority.critical")}
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(_, newViewMode) =>
+                newViewMode && setViewMode(newViewMode)
+              }
+              aria-label={t("common.view")}
+            >
+              <ToggleButton value="grid" aria-label="grid view">
+                <ViewModuleIcon />
+              </ToggleButton>
+              <ToggleButton value="list" aria-label="list view">
+                <ViewListIcon />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Grid>
+          <Grid item xs={12} md={2}>
             <Button
+              fullWidth
               variant="contained"
               startIcon={<AddIcon />}
               sx={{ fontWeight: 600 }}
             >
-              {t("requirements.createFirstRequirement")}
+              {t("requirements.createRequirement")}
             </Button>
-          </Paper>
-        ) : (
-          <Grid container spacing={3}>
-            {filteredRequirements.map((requirement: Requirement) => (
-              <Grid item xs={12} md={6} lg={4} key={requirement.id}>
-                <RequirementCard requirement={requirement} />
-              </Grid>
-            ))}
           </Grid>
-        )}
-      </Box>
-    </DashboardLayout>
+        </Grid>
+      </Paper>
+
+      {/* Список требований */}
+      {filteredRequirements.length === 0 ? (
+        <Paper
+          elevation={1}
+          sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
+        >
+          <Typography variant="h6" color="text.secondary" mb={2}>
+            {t("requirements.notFound")}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{ fontWeight: 600 }}
+          >
+            {t("requirements.createFirstRequirement")}
+          </Button>
+        </Paper>
+      ) : (
+        <Grid container spacing={3}>
+          {filteredRequirements.map((requirement: Requirement) => (
+            <Grid item xs={12} md={6} lg={4} key={requirement.id}>
+              <RequirementCard requirement={requirement} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+    </Box>
   );
 };
 

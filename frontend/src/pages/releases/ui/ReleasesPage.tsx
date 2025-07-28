@@ -35,7 +35,6 @@ import {
   useUpdateRelease,
 } from "@/features/releases";
 import { LoadingSpinner } from "@/shared/ui";
-import { DashboardLayout } from "@/widgets/layout/ui";
 import type { Release, ReleaseFilters } from "@/entities/release/model/types";
 
 const ReleasesPage: React.FC = () => {
@@ -194,247 +193,236 @@ const ReleasesPage: React.FC = () => {
   );
 
   if (releasesLoading || releaseStatsLoading) {
-    return (
-      <DashboardLayout>
-        <LoadingSpinner fullScreen />
-      </DashboardLayout>
-    );
+    return <LoadingSpinner fullScreen />;
   }
 
   if (releasesError || releaseStatsError) {
     return (
-      <DashboardLayout>
-        <Box p={3} textAlign="center">
-          <Typography color="error">{t("errors.loadingError")}</Typography>
-        </Box>
-      </DashboardLayout>
+      <Box p={3} textAlign="center">
+        <Typography color="error">{t("errors.loadingError")}</Typography>
+      </Box>
     );
   }
 
   return (
-    <DashboardLayout>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: `linear-gradient(135deg, 
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: `linear-gradient(135deg, 
             ${alpha(theme.palette.background.default, 1)} 0%, 
             ${alpha(theme.palette.grey[50], 0.8)} 100%)`,
-          position: "relative",
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            opacity: 0.03,
-            backgroundImage: `radial-gradient(circle at 25% 25%, ${theme.palette.info.main} 0%, transparent 50%), 
+        position: "relative",
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          opacity: 0.03,
+          backgroundImage: `radial-gradient(circle at 25% 25%, ${theme.palette.info.main} 0%, transparent 50%), 
                              radial-gradient(circle at 75% 75%, ${theme.palette.success.main} 0%, transparent 50%)`,
-          },
-        }}
-      >
-        <Container
-          maxWidth="xl"
-          sx={{ py: 4, position: "relative", zIndex: 1 }}
-        >
-          {/* Заголовок */}
-          <Fade in={true} timeout={600}>
-            <Box sx={{ mb: 4 }}>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                <Box
+        },
+      }}
+    >
+      <Container maxWidth="xl" sx={{ py: 4, position: "relative", zIndex: 1 }}>
+        {/* Заголовок */}
+        <Fade in={true} timeout={600}>
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <Box
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  mr: 3,
+                  boxShadow: `0 8px 24px ${alpha(
+                    theme.palette.info.main,
+                    0.3
+                  )}`,
+                }}
+              >
+                <RocketLaunch sx={{ color: "white", fontSize: 24 }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="h3"
+                  component="h1"
                   sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 3,
-                    background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.info.dark})`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mr: 3,
-                    boxShadow: `0 8px 24px ${alpha(
-                      theme.palette.info.main,
-                      0.3
-                    )}`,
+                    fontWeight: 800,
+                    background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.success.main})`,
+                    backgroundClip: "text",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    mb: 0.5,
                   }}
                 >
-                  <RocketLaunch sx={{ color: "white", fontSize: 24 }} />
-                </Box>
-                <Box>
-                  <Typography
-                    variant="h3"
-                    component="h1"
-                    sx={{
-                      fontWeight: 800,
-                      background: `linear-gradient(135deg, ${theme.palette.info.main}, ${theme.palette.success.main})`,
-                      backgroundClip: "text",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      mb: 0.5,
-                    }}
-                  >
-                    {t("releases.title")}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="text.secondary"
-                    sx={{ fontWeight: 500 }}
-                  >
-                    {t("releases.subtitle")}
-                  </Typography>
-                </Box>
+                  {t("releases.title")}
+                </Typography>
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{ fontWeight: 500 }}
+                >
+                  {t("releases.subtitle")}
+                </Typography>
               </Box>
             </Box>
-          </Fade>
+          </Box>
+        </Fade>
 
-          {/* Статистика */}
-          {releaseStats && (
-            <Slide direction="up" in={true} timeout={400}>
-              <Grid container spacing={3} mb={4}>
-                <Grid item xs={12} md={3}>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 3,
-                      borderRadius: 3,
-                      textAlign: "center",
-                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                      background: `linear-gradient(135deg, 
+        {/* Статистика */}
+        {releaseStats && (
+          <Slide direction="up" in={true} timeout={400}>
+            <Grid container spacing={3} mb={4}>
+              <Grid item xs={12} md={3}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    textAlign: "center",
+                    border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                    background: `linear-gradient(135deg, 
                         ${alpha(theme.palette.background.paper, 0.9)} 0%, 
                         ${alpha(theme.palette.background.default, 0.6)} 100%)`,
-                      backdropFilter: "blur(20px)",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-2px)",
-                        boxShadow: `0 8px 24px ${alpha(
-                          theme.palette.primary.main,
-                          0.1
-                        )}`,
-                      },
+                    backdropFilter: "blur(20px)",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: `0 8px 24px ${alpha(
+                        theme.palette.primary.main,
+                        0.1
+                      )}`,
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      color: theme.palette.primary.main,
+                      fontWeight: 800,
+                      mb: 1,
                     }}
                   >
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        color: theme.palette.primary.main,
-                        fontWeight: 800,
-                        mb: 1,
-                      }}
-                    >
-                      {releaseStats.totalCount}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t("releases.stats.totalReleases")}
-                    </Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Slide>
-          )}
-
-          {/* Фильтры и поиск */}
-          <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  placeholder={t("releases.searchPlaceholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <SearchIcon sx={{ mr: 1, color: "action.active" }} />
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <FormControl fullWidth>
-                  <InputLabel>{t("releases.fields.status")}</InputLabel>
-                  <Select
-                    value={statusFilter}
-                    label={t("releases.fields.status")}
-                    onChange={(e) =>
-                      setStatusFilter(e.target.value as typeof statusFilter)
-                    }
-                  >
-                    <MenuItem value="all">{t("releases.status.all")}</MenuItem>
-                    <MenuItem value="draft">
-                      {t("releases.status.draft")}
-                    </MenuItem>
-                    <MenuItem value="planned">
-                      {t("releases.status.planned")}
-                    </MenuItem>
-                    <MenuItem value="in_progress">
-                      {t("releases.status.in_progress")}
-                    </MenuItem>
-                    <MenuItem value="published">
-                      {t("releases.status.published")}
-                    </MenuItem>
-                    <MenuItem value="archived">
-                      {t("releases.status.archived")}
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <ToggleButtonGroup
-                  value={viewMode}
-                  exclusive
-                  onChange={(_, newViewMode) =>
-                    newViewMode && setViewMode(newViewMode)
-                  }
-                  aria-label={t("common.view")}
-                >
-                  <ToggleButton value="grid" aria-label="grid view">
-                    <ViewModuleIcon />
-                  </ToggleButton>
-                  <ToggleButton value="list" aria-label="list view">
-                    <ViewListIcon />
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  sx={{ fontWeight: 600 }}
-                >
-                  {t("releases.createRelease")}
-                </Button>
+                    {releaseStats.totalCount}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t("releases.stats.totalReleases")}
+                  </Typography>
+                </Paper>
               </Grid>
             </Grid>
-          </Paper>
+          </Slide>
+        )}
 
-          {/* Список релизов */}
-          {filteredReleases.length === 0 ? (
-            <Paper
-              elevation={1}
-              sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
-            >
-              <Typography variant="h6" color="text.secondary" mb={2}>
-                {t("releases.notFound")}
-              </Typography>
+        {/* Фильтры и поиск */}
+        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={3}>
+              <TextField
+                fullWidth
+                placeholder={t("releases.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <SearchIcon sx={{ mr: 1, color: "action.active" }} />
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>{t("releases.fields.status")}</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label={t("releases.fields.status")}
+                  onChange={(e) =>
+                    setStatusFilter(e.target.value as typeof statusFilter)
+                  }
+                >
+                  <MenuItem value="all">{t("releases.status.all")}</MenuItem>
+                  <MenuItem value="draft">
+                    {t("releases.status.draft")}
+                  </MenuItem>
+                  <MenuItem value="planned">
+                    {t("releases.status.planned")}
+                  </MenuItem>
+                  <MenuItem value="in_progress">
+                    {t("releases.status.in_progress")}
+                  </MenuItem>
+                  <MenuItem value="published">
+                    {t("releases.status.published")}
+                  </MenuItem>
+                  <MenuItem value="archived">
+                    {t("releases.status.archived")}
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, newViewMode) =>
+                  newViewMode && setViewMode(newViewMode)
+                }
+                aria-label={t("common.view")}
+              >
+                <ToggleButton value="grid" aria-label="grid view">
+                  <ViewModuleIcon />
+                </ToggleButton>
+                <ToggleButton value="list" aria-label="list view">
+                  <ViewListIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Grid>
+            <Grid item xs={12} md={2}>
               <Button
+                fullWidth
                 variant="contained"
                 startIcon={<AddIcon />}
                 sx={{ fontWeight: 600 }}
               >
-                {t("releases.createFirstRelease")}
+                {t("releases.createRelease")}
               </Button>
-            </Paper>
-          ) : (
-            <Grid container spacing={3}>
-              {filteredReleases.map((release: Release) => (
-                <Grid item xs={12} md={6} lg={4} key={release.id}>
-                  <ReleaseCard release={release} />
-                </Grid>
-              ))}
             </Grid>
-          )}
-        </Container>
-      </Box>
-    </DashboardLayout>
+          </Grid>
+        </Paper>
+
+        {/* Список релизов */}
+        {filteredReleases.length === 0 ? (
+          <Paper
+            elevation={1}
+            sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
+          >
+            <Typography variant="h6" color="text.secondary" mb={2}>
+              {t("releases.notFound")}
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              sx={{ fontWeight: 600 }}
+            >
+              {t("releases.createFirstRelease")}
+            </Button>
+          </Paper>
+        ) : (
+          <Grid container spacing={3}>
+            {filteredReleases.map((release: Release) => (
+              <Grid item xs={12} md={6} lg={4} key={release.id}>
+                <ReleaseCard release={release} />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Container>
+    </Box>
   );
 };
 

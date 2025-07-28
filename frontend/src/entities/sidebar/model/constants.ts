@@ -16,6 +16,15 @@ import {
   Notifications as NotificationsIcon,
   CalendarToday as CalendarTodayIcon,
   AccountTree as AccountTreeIcon,
+  Description as DescriptionIcon,
+  TrendingUp as TrendingUpIcon,
+  Folder as FolderIcon,
+  RocketLaunch as RocketLaunchIcon,
+  Engineering as EngineeringIcon,
+  SupervisorAccount as SupervisorAccountIcon,
+  AdminPanelSettings as AdminIcon,
+  SettingsApplications as SettingsApplicationsIcon,
+  Star as StarIcon,
 } from "@mui/icons-material";
 
 // Маппинг иконок
@@ -35,6 +44,14 @@ export const SIDEBAR_ICON_MAP = {
   Notifications: NotificationsIcon,
   CalendarToday: CalendarTodayIcon,
   AccountTree: AccountTreeIcon,
+  Description: DescriptionIcon,
+  TrendingUp: TrendingUpIcon,
+  Folder: FolderIcon,
+  RocketLaunch: RocketLaunchIcon,
+  Engineering: EngineeringIcon,
+  SupervisorAccount: SupervisorAccountIcon,
+  SettingsApplications: SettingsApplicationsIcon,
+  Star: StarIcon,
 } as const;
 
 // Конфигурация по умолчанию
@@ -167,7 +184,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
     {
       id: "projects",
       label: "Проекты",
-      icon: "Assignment",
+      icon: "Folder",
       path: "/projects",
       isDraggable: true,
       allowedRoles: [
@@ -187,7 +204,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
     {
       id: "requirements",
       label: "Требования",
-      icon: "Assignment",
+      icon: "Description",
       path: "/requirements",
       isDraggable: true,
       allowedRoles: [
@@ -207,7 +224,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
     {
       id: "releases",
       label: "Релизы",
-      icon: "Assessment",
+      icon: "RocketLaunch",
       path: "/releases",
       isDraggable: true,
       allowedRoles: [
@@ -227,7 +244,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
     {
       id: "testing",
       label: "Тестирование",
-      icon: "BugReport",
+      icon: "Engineering",
       path: "/testing",
       isDraggable: true,
       allowedRoles: [
@@ -262,7 +279,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
     {
       id: "admin-users",
       label: "Пользователи",
-      icon: "Group",
+      icon: "SupervisorAccount",
       path: "/admin/users",
       isDraggable: true,
       allowedRoles: ["admin"],
@@ -275,7 +292,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
     {
       id: "admin-system",
       label: "Система",
-      icon: "Settings",
+      icon: "SettingsApplications",
       path: "/admin/system",
       isDraggable: true,
       allowedRoles: ["admin"],
@@ -288,7 +305,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
     {
       id: "admin-analytics",
       label: "Аналитика",
-      icon: "Analytics",
+      icon: "TrendingUp",
       path: "/admin/analytics",
       isDraggable: true,
       allowedRoles: ["admin"],
