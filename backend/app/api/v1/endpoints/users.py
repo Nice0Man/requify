@@ -494,6 +494,33 @@ async def get_user_audit_log(
     return audit_log
 
 
+@router.get("/me/settings", response_model=schemas.UserSettings)
+async def get_my_settings(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Получить мои настройки.
+    """
+    settings = await crud.user.get_user_settings(db, user_id=current_user.id)
+    return settings
+
+
+@router.put("/me/settings", response_model=schemas.UserSettings)
+async def update_my_settings(
+    settings_data: Dict[str, Any],
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Обновить мои настройки.
+    """
+    settings = await crud.user.update_user_settings(
+        db, user_id=current_user.id, settings_data=settings_data
+    )
+    return settings
+
+
 @router.get("/{user_id}/settings", response_model=schemas.UserSettings)
 async def get_user_settings(
     user_id: int,
@@ -547,33 +574,6 @@ async def update_user_settings(
     # Обновляем настройки пользователя
     settings = await crud.user.update_user_settings(
         db, user_id=user_id, settings_data=settings_data
-    )
-    return settings
-
-
-@router.get("/me/settings", response_model=schemas.UserSettings)
-async def get_my_settings(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
-):
-    """
-    Получить мои настройки.
-    """
-    settings = await crud.user.get_user_settings(db, user_id=current_user.id)
-    return settings
-
-
-@router.put("/me/settings", response_model=schemas.UserSettings)
-async def update_my_settings(
-    settings_data: Dict[str, Any],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
-):
-    """
-    Обновить мои настройки.
-    """
-    settings = await crud.user.update_user_settings(
-        db, user_id=current_user.id, settings_data=settings_data
     )
     return settings
 
