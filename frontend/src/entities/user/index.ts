@@ -11,4 +11,5 @@ export { userDAO } from './api/userDAO';
 export type {
   User as UserEntity,
   UserRole as UserRoleEntity,
+  UserRole, // Добавляем прямой экспорт для обратной совместимости
 } from './model'; 

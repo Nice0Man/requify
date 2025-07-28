@@ -46,6 +46,7 @@ import type {
 } from "@/features";
 import type { User } from "@/entities/user";
 import { SortableItem } from "./SortableItem";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Кастомный модификатор для ограничения перетаскивания в пределах sidebar
@@ -171,7 +172,7 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
     const sidebarRef = useRef<HTMLDivElement>(null);
     const mainNavigationRef = useRef<HTMLDivElement>(null);
     const adminNavigationRef = useRef<HTMLDivElement>(null);
-
+    const navigate = useNavigate();
     // Мемоизированная конфигурация
     const config = useMemo(
       () => ({ ...DEFAULT_APP_SIDEBAR_CONFIG, ...userConfig }),
@@ -698,7 +699,7 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
               onLogout={onLogout}
               onSettings={() => {
                 // Навигация к настройкам
-                console.log("Navigate to settings");
+                navigate("/settings");
               }}
             />
           )}

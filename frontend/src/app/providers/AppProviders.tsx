@@ -57,8 +57,6 @@ const PermissionsBridge: React.FC<{ children: React.ReactNode }> = memo(
       };
     }, [userProfile]);
 
-
-
     return (
       <PermissionsProvider
         user={user}

@@ -138,8 +138,15 @@ dev:	## Start development environment with Docker
 	cd ../deploy/docker && docker compose -f docker-compose.dev.yml up -d
 	@echo "Development environment started!"
 	@echo "Backend:  http://localhost:8000"
-	@echo "Frontend: http://localhost:3000"
-	@echo "API Docs: http://localhost:8000/docs"
+	@echo "Frontend: http://localhost"
+	@echo "API Docs: http://localhost/docs"	
+	@echo "MinIO:     http://localhost:9000 	(admin:minioadmin123)"
+	@echo "CDN:       http://localhost"
+	@echo "Adminer:   http://localhost:8080 	(requify_user:requify_password)"
+	@echo "MailHog:   http://localhost:8025"	
+	@echo "Redis:     http://localhost:6379"
+	@echo "Redis CDN: http://localhost:6380"
+	@echo "----------------------------------------"
 
 dev-build:	## Rebuild and start development environment
 	@echo "Rebuilding development environment..."
@@ -228,6 +235,11 @@ status:	## Show status of all containers
 	@echo "API Docs:       http://localhost:8000/docs"
 	@echo "Database Admin: http://localhost:8080"
 	@echo "Mail Testing:   http://localhost:8025"
+	@echo "MinIO:          http://localhost:9000"
+	@echo "CDN:            http://localhost"
+	@echo "Redis:          http://localhost:6379"
+	@echo "Redis CDN:      http://localhost:6380"
+	@echo "----------------------------------------"
 
 # =============================================================================
 # Frontend Error Monitoring

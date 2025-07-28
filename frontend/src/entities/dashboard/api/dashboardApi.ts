@@ -135,6 +135,40 @@ export class dashboardApi {
   }
 
   /**
+   * Update user preferences
+   */
+  static async updatePreferences(
+    preferences: Partial<DashboardPreferences>
+  ): Promise<DashboardPreferences> {
+    try {
+      const response = await client.post(
+        API_ENDPOINTS.DASHBOARD.PREFERENCES,
+        preferences
+      );
+
+      if (response.data) {
+        // Обновляем localStorage
+        localStorage.setItem(
+          "dashboard-preferences",
+          JSON.stringify(response.data)
+        );
+        return response.data;
+      }
+
+      throw new Error("No response data");
+    } catch (error) {
+      console.warn("Failed to update preferences on server:", error);
+
+      // Fallback: обновляем локально
+      const current = await this.getPreferences();
+      const updated = { ...current, ...preferences };
+      localStorage.setItem("dashboard-preferences", JSON.stringify(updated));
+
+      return updated;
+    }
+  }
+
+  /**
    * Get timeline data
    */
   static async getTimelineData(
