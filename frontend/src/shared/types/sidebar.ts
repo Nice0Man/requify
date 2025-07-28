@@ -6,7 +6,16 @@
 /**
  * Роль пользователя для определения доступных элементов
  */
-export type UserRole = "admin" | "user" | "guest" | "manager" | "developer";
+export type UserRole = 
+  | "admin" 
+  | "user" 
+  | "guest" 
+  | "manager" 
+  | "developer"
+  | "project_manager"
+  | "analyst"
+  | "tester"
+  | "viewer";
 
 /**
  * Тип элемента сайдбара

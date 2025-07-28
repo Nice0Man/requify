@@ -82,6 +82,7 @@ export interface InfiniteCarouselProps {
   showControls?: boolean;
   config?: Partial<CarouselConfig>;
   className?: string;
+  pauseOnHover?: boolean;
 }
 
 export interface IntegrationCategory {

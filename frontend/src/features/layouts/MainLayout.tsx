@@ -47,16 +47,15 @@ export const MainLayout: React.FC<MainLayoutProps> = memo(
       showSidebar,
       showHeader,
       contentOverflow: overflow ? ("auto" as const) : ("hidden" as const),
-      contentPadding: 3,
+      contentPadding: 0,
       enableTransitions: true,
     };
 
     // Конвертируем массив actions в единый ReactNode
-    const layoutActions = actions && actions.length > 0 ? (
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        {actions}
-      </Box>
-    ) : undefined;
+    const layoutActions =
+      actions && actions.length > 0 ? (
+        <Box sx={{ display: "flex", gap: 1, p: 0, m: 0 }}>{actions}</Box>
+      ) : undefined;
 
     const layoutProps: LayoutWidgetProps = {
       children,
@@ -73,4 +72,3 @@ export const MainLayout: React.FC<MainLayoutProps> = memo(
 );
 
 MainLayout.displayName = "MainLayout";
-

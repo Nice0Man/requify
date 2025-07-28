@@ -2,15 +2,18 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { NoPermissionPage } from "@/pages/no-permission";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string;
+  requiredRoles?: string[];
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole,
+  requiredRoles,
 }) => {
   const { isLoading, isAuthenticated, user } = useAuth();
   const location = useLocation();
@@ -40,8 +43,24 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Проверяем роль, если требуется
-  if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/dashboard" replace />;
+  const hasRequiredRole = () => {
+    if (!user?.role) return false;
+    
+    // Проверка одной роли
+    if (requiredRole) {
+      return user.role === requiredRole;
+    }
+    
+    // Проверка массива ролей
+    if (requiredRoles && requiredRoles.length > 0) {
+      return requiredRoles.includes(user.role);
+    }
+    
+    return true;
+  };
+
+  if ((requiredRole || requiredRoles) && !hasRequiredRole()) {
+    return <NoPermissionPage />;
   }
 
   return <>{children}</>;

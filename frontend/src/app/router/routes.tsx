@@ -1,8 +1,16 @@
 import React from "react";
+import { UserRole } from "@/entities/user";
 
 // Lazy loading pages
 const DashboardPage = React.lazy(() => import("@/pages/dashboard"));
-const AuthPage = React.lazy(() => import("@/pages/auth"));
+const AuthPage = React.lazy(() => import("@/pages/auth/ui/AuthPage"));
+const EmailConfirmationPage = React.lazy(
+  () => import("@/pages/auth/ui/EmailConfirmationPage")
+);
+const EmailVerificationPage = React.lazy(
+  () => import("@/pages/auth/ui/EmailVerificationPage")
+);
+const ViewerPage = React.lazy(() => import("@/pages/viewer").then(module => ({ default: module.ViewerPage })));
 const LandingPage = React.lazy(() => import("@/pages/landing"));
 const ProjectsPage = React.lazy(() => import("@/pages/projects"));
 const RequirementsPage = React.lazy(() => import("@/pages/requirements"));
@@ -12,13 +20,13 @@ const ReportsPage = React.lazy(() => import("@/pages/reports"));
 const SettingsPage = React.lazy(() => import("@/pages/settings"));
 const AdminPage = React.lazy(() => import("@/pages/admin"));
 const NotFoundPage = React.lazy(() => import("@/pages/not-found"));
-const DemoNewLayoutPage = React.lazy(() => import("@/pages/demo/ui/DemoNewLayoutPage"));
+const KanbanPage = React.lazy(() => import("@/pages/kanban"));
 
 export interface RouteConfig {
   path: string;
   element: React.ReactElement;
   isProtected: boolean;
-  requiredRole?: string; // TODO: change to UserRole
+  requiredRoles?: UserRole[];
 }
 
 export const routes: RouteConfig[] = [
@@ -28,7 +36,7 @@ export const routes: RouteConfig[] = [
     element: <LandingPage />,
     isProtected: false,
   },
-  
+
   // Authentication routes - all public
   {
     path: "/auth/*",
@@ -55,57 +63,128 @@ export const routes: RouteConfig[] = [
     element: <AuthPage />,
     isProtected: false,
   },
-  
+  {
+    path: "/email-confirmation",
+    element: <EmailConfirmationPage />,
+    isProtected: false,
+  },
+  {
+    path: "/verify-email",
+    element: <EmailVerificationPage />,
+    isProtected: false,
+  },
+  {
+    path: "/viewer",
+    element: <ViewerPage />,
+    isProtected: true,
+    requiredRoles: ["viewer"],
+  },
+
   // Protected routes
   {
     path: "/dashboard",
     element: <DashboardPage />,
     isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+    ],
   },
   {
     path: "/projects/*",
     element: <ProjectsPage />,
     isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+    ],
   },
   {
     path: "/requirements/*",
     element: <RequirementsPage />,
     isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+    ],
   },
   {
     path: "/releases/*",
     element: <ReleasesPage />,
     isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+    ],
   },
   {
     path: "/testing/*",
     element: <TestingPage />,
     isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+    ],
   },
   {
-    path: "/reports",
+    path: "/reports/*",
     element: <ReportsPage />,
     isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+    ],
   },
   {
-    path: "/settings",
+    path: "/kanban/*",
+    element: <KanbanPage />,
+    isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+    ],
+  },
+  {
+    path: "/settings/*",
     element: <SettingsPage />,
     isProtected: true,
+    requiredRoles: [
+      "admin",
+      "project_manager",
+      "analyst",
+      "developer",
+      "tester",
+      "viewer",
+    ],
   },
+
   {
     path: "/admin/*",
     element: <AdminPage />,
     isProtected: true,
-    requiredRole: "admin",
+    requiredRoles: ["admin"],
   },
-  
-  // Demo pages for development
-  {
-    path: "/demo/new-layout",
-    element: <DemoNewLayoutPage />,
-    isProtected: true,
-  },
-  
   // 404 page
   {
     path: "*",

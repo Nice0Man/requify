@@ -95,7 +95,8 @@ export const MainLayout: React.FC<MainLayoutProps> = memo(
         display: "flex",
         flexDirection: "column",
         minWidth: 0, // Предотвращаем overflow
-        height: "100vh", // Фиксированная высота
+        p: 0,
+        m: 0,
       }),
       []
     );
@@ -130,7 +131,7 @@ export const MainLayout: React.FC<MainLayoutProps> = memo(
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
-              p: 2,
+              p: 0,
               borderBottom: `1px solid ${theme.palette.divider}`,
               minHeight: 64,
               flexShrink: 0, // Не сжимается

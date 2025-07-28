@@ -27,6 +27,7 @@ export { ActivityFeedWidget } from "./activity-feed";
 export { RequirementListWidget } from "./requirement-list";
 export { KanbanWidget } from "./kanban";
 export { DashboardStatsWidget } from "./dashboard-stats";
+export { DemoDashboardWidget } from "./demo-dashboard";
 
 // Layout widgets
 export { AppHeaderWidget } from "./app-header";
@@ -39,4 +40,7 @@ export { MainLayout } from "./layout";
 export * from './lazy';
 
 // LazyWidget компонент
-export { LazyWidget } from '@/shared/ui/LazyWidget/LazyWidget'; 
+export { LazyWidget } from '@/shared/ui/LazyWidget/LazyWidget';
+
+// Auth widgets
+export * from "./auth"; 

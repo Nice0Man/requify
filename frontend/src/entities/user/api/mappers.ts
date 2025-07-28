@@ -1,7 +1,7 @@
 import { User, UserRole } from "../model/types";
 
 export interface UserDTO {
-  id: string;
+  id: number;
   name: string;
   email: string;
   role: string;
@@ -11,16 +11,19 @@ export interface UserDTO {
 
 export const mapUserDtoToUser = (dto: UserDTO): User => ({
   id: dto.id,
-  name: dto.name,
   email: dto.email,
   role: dto.role as UserRole,
-  isActive: true,
-  createdAt: new Date(dto.created_at),
-  updatedAt: new Date(dto.updated_at),
+  username: dto.name,
+  created_at: dto.created_at,
+  updated_at: dto.updated_at,
+  is_active: true,
+  email_verified: false,
 });
 
 export const mapUserToUserDto = (user: User): Partial<UserDTO> => ({
-  name: user.name,
+  id: user.id,
   email: user.email,
   role: user.role,
+  created_at: user.created_at,
+  updated_at: user.updated_at,
 });

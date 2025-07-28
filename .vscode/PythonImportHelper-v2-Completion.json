@@ -11960,7 +11960,7 @@
         "kind": 6,
         "importPath": "backend.app.core.config",
         "description": "backend.app.core.config",
-        "peekOfCode": "class SecurityConfig(BaseModel):\n    \"\"\"Настройки безопасности.\"\"\"\n    # Основные настройки\n    secret_key: str = \"super-secret-key-change-in-production-minimum-32-characters\"\n    algorithm: str = \"HS256\"\n    # URL фронтенда для ссылок в email\n    frontend_url: str = \"http://localhost:3000\"\n    # Настройки access токенов\n    access_token_expire_minutes: int = 30\n    access_token_algorithm: str = \"HS256\"",
+        "peekOfCode": "class SecurityConfig(BaseModel):\n    \"\"\"Настройки безопасности.\"\"\"\n    # Основные настройки\n    secret_key: str = \"super-secret-key-change-in-production-minimum-32-characters\"\n    algorithm: str = \"HS256\"\n    # URL фронтенда для ссылок в email\n    frontend_url: str = \"http://localhost\"\n    # Настройки access токенов\n    access_token_expire_minutes: int = 30\n    access_token_algorithm: str = \"HS256\"",
         "detail": "backend.app.core.config",
         "documentation": {}
     },

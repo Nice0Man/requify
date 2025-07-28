@@ -40,4 +40,11 @@ export { MainLayout } from "../../features/layouts/MainLayout";
 export type { MainLayoutProps } from "../../features/layouts/MainLayout";
 
 // Lazy loading
-export { LazyWidget } from './LazyWidget/LazyWidget';
+export { LazyWidget } from "./LazyWidget/LazyWidget";
+
+// Auth UI Components
+export { AuthFormField } from "./AuthFormField";
+export type { AuthFormFieldProps } from "./AuthFormField";
+
+export { AuthButton } from "./AuthButton";
+export type { AuthButtonProps } from "./AuthButton";

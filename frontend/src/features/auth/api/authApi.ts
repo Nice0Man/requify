@@ -9,9 +9,13 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  name: string;
+  name?: string;
   email: string;
   password: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  role: string; // Обязательное поле согласно схеме бэкенда
 }
 
 export interface LoginResponse {

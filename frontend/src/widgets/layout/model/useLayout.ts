@@ -85,7 +85,7 @@ export const useLayout = (
   }, []);
 
   const toggleSidebar = useCallback(() => {
-    setIsSidebarCollapsed(prev => !prev);
+    setIsSidebarCollapsed((prev: boolean) => !prev);
   }, []);
 
   const setPageTitle = useCallback((title: string, subtitle?: string) => {

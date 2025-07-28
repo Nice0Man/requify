@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 // Features API (согласно FSD)
 import { authApi } from "../api/authApi";
-import type { LoginRequest } from "../api/authApi";
+import type { LoginRequest, RegisterRequest } from "../api/authApi";
+import type { RegisterFormData } from "../model/types";
 // App Layer (провайдеры разрешены в features)
 import { apiUtils } from "@/app/providers/client";
 // Entities (разрешено в features)
@@ -82,13 +83,25 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, []);
 
-  const register = useCallback(async (userData: any) => {
+  const register = useCallback(async (userData: RegisterFormData) => {
     try {
       setIsLoading(true);
       setError(null);
 
+      // Преобразуем данные формы в формат API
+      const registerData: RegisterRequest = {
+        email: userData.email,
+        password: userData.password,
+        role: userData.role,
+        username: userData.username,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        // Если есть first_name и last_name, объединяем их в name
+        name: [userData.first_name, userData.last_name].filter(Boolean).join(' ') || userData.username,
+      };
+
       // Регистрация через API
-      const response = await authApi.register(userData);
+      const response = await authApi.register(registerData);
 
       // Автоматический логин после регистрации
       if (response.access_token && response.refresh_token) {

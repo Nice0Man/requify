@@ -17,9 +17,6 @@ export {
   useDashboardWidgets,
 } from './context/DashboardContext';
 
-// Dashboard components
-export { UniversalWidget } from './components/UniversalWidget';
-
 // Dashboard styles
 export {
   useWidgetStyles,

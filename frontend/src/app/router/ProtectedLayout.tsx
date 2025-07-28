@@ -8,6 +8,8 @@ export interface ProtectedLayoutProps extends Omit<MainLayoutProps, 'children'> 
   children: React.ReactNode;
   /** Роль, необходимая для доступа */
   requiredRole?: string;
+  /** Роли, необходимые для доступа */
+  requiredRoles?: string[];
 }
 
 /**
@@ -17,6 +19,7 @@ export interface ProtectedLayoutProps extends Omit<MainLayoutProps, 'children'> 
 export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   children,
   requiredRole,
+  requiredRoles,
   title,
   subtitle,
   actions,
@@ -27,7 +30,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   ...props
 }) => {
   return (
-    <ProtectedRoute requiredRole={requiredRole}>
+    <ProtectedRoute requiredRole={requiredRole} requiredRoles={requiredRoles}>
       <MainLayout
         title={title}
         subtitle={subtitle}

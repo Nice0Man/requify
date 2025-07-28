@@ -65,8 +65,14 @@ export const AppSidebarWidget: React.FC<AppSidebarProps> = memo(
 
     // Получение элементов сайдбара
     const initialItems = useMemo(() => {
-      const items = getDefaultSidebarItems(user?.role);
-      return user?.role ? filterItemsByRole(items, user.role) : items;
+      // ВАЖНО: Если пользователь не загружен, не показываем никаких элементов
+      // Это предотвращает показ админских элементов при первом рендере
+      if (!user?.role) {
+        return [];
+      }
+
+      const items = getDefaultSidebarItems(user.role);
+      return filterItemsByRole(items, user.role);
     }, [user?.role]);
 
     // Feature hooks для декомпозированной логики
@@ -112,6 +118,7 @@ export const AppSidebarWidget: React.FC<AppSidebarProps> = memo(
       [sidebarActions, onStateChange, sidebarState.isCollapsed]
     );
 
+    // Если пользователь не загружен, показываем базовую структуру sidebar без элементов
     return (
       <AppSidebarView
         user={user}

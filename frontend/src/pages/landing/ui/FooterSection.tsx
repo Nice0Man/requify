@@ -173,8 +173,6 @@ const CONTACT_INFO = [
 ];
 
 const MotionBox = motion(Box);
-const MotionTypography = motion(Typography);
-const MotionButton = motion(Button);
 const MotionIconButton = motion(IconButton);
 
 // Animation variants
@@ -260,12 +258,6 @@ export const FooterSection: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
 
   return (
     <Box
@@ -630,7 +622,7 @@ export const FooterSection: React.FC = () => {
               >
                 {t(
                   "footer.copyright",
-                  "© 2024 Requify. All rights reserved. Built with ❤️ for teams who demand excellence."
+                  "© 2025 Requify. All rights reserved. Built with ❤️ for teams who demand excellence."
                 )}
               </Typography>
             </Box>

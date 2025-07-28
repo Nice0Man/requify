@@ -10,5 +10,5 @@ export { userDAO } from './api/userDAO';
 // === Re-exports with aliases to avoid conflicts ===
 export type {
   User as UserEntity,
-  UserDTO as UserDTOEntity,
+  UserRole as UserRoleEntity,
 } from './model'; 

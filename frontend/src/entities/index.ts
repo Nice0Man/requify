@@ -1,6 +1,7 @@
 // === Entities Layer Exports ===
 
 // Core entities
+export * from "./auth";
 export * from "./user";
 export * from "./project";
 export * from "./requirement";
@@ -31,3 +32,6 @@ export * from "./dashboard";
 
 // Kanban entities
 export * from "./kanban";
+
+// Demo entities
+export * from "./demo";

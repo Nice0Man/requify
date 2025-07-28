@@ -1,2 +1,3 @@
 // Auth page UI
-export { default } from './AuthPage'; 
+export { default as AuthPage } from "./AuthPage";
+export { default as EmailConfirmationPage } from "./EmailConfirmationPage";

@@ -25,6 +25,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     confirm_password: "",
     first_name: "",
     last_name: "",
+    role: "user", // Значение по умолчанию
     terms_accepted: false,
     privacy_accepted: false,
   });
@@ -53,6 +54,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
     if (formData.password !== formData.confirm_password) {
       newErrors.confirm_password = t("auth.passwordsDoNotMatch");
+    }
+
+    if (!formData.role) {
+      newErrors.role = "Роль обязательна для заполнения";
     }
 
     if (!formData.terms_accepted) {
@@ -139,6 +144,29 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         error={!!errors.email}
         helperText={errors.email}
       />
+
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        select
+        id="role"
+        label="Роль"
+        name="role"
+        value={formData.role}
+        onChange={handleChange("role")}
+        error={!!errors.role}
+        helperText={errors.role || "Выберите роль в системе"}
+        SelectProps={{
+          native: true,
+        }}
+      >
+        <option value="">Выберите роль</option>
+        <option value="user">Пользователь</option>
+        <option value="admin">Администратор</option>
+        <option value="moderator">Модератор</option>
+        <option value="analyst">Аналитик</option>
+      </TextField>
 
       <TextField
         margin="normal"

@@ -8,6 +8,7 @@ export * from "./testing";
 export * from "./reports";
 export * from "./settings";
 export * from "./not-found";
+export * from "./no-permission";
 export * from "./landing";
 export * from "./kanban";
 export * from "./admin";

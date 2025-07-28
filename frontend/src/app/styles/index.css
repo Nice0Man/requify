@@ -4,6 +4,11 @@
 :root {
   --vh: 1vh;
   --vw: 1vw;
+  /* Context7: Scroll optimization variables */
+  --scrollbar-width: 8px;
+  --scrollbar-track-color: rgba(0, 0, 0, 0.1);
+  --scrollbar-thumb-color: rgba(0, 0, 0, 0.3);
+  --scrollbar-thumb-hover-color: rgba(0, 0, 0, 0.5);
 }
 
 /* Global styles */
@@ -14,12 +19,17 @@
 }
 
 html {
+  /* Context7: Предотвращаем двойную прокрутку */
+  overflow-x: hidden;
+  overflow-y: auto;
   scroll-behavior: smooth;
   font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1;
+  /* Context7: Улучшенная производительность scroll */
+  scroll-padding-top: 80px;
 }
 
 body {
@@ -28,7 +38,55 @@ body {
   line-height: 1.6;
   color: #333;
   background-color: #fafafa;
+  /* Context7: Правильное управление overflow для предотвращения двойной прокрутки */
   overflow-x: hidden;
+  overflow-y: hidden; /* Позволяем управлять scroll на уровне компонентов */
+  /* Context7: Улучшенная производительность scroll на мобильных устройствах */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Context7: Кастомные scrollbar для лучшего UX */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-color);
+  border-radius: 4px;
+  transition: background 0.2s ease-in-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover-color);
+}
+
+/* Context7: Dark theme scrollbar support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --scrollbar-track-color: rgba(255, 255, 255, 0.1);
+    --scrollbar-thumb-color: rgba(255, 255, 255, 0.3);
+    --scrollbar-thumb-hover-color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Context7: Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Landing page responsive optimizations */

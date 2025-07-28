@@ -237,6 +237,21 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
       },
     },
 
+    // Специальные элементы для viewer
+    {
+      id: "viewer-personal",
+      label: "Получить полный доступ",
+      icon: "Star",
+      path: "/viewer-personal",
+      isDraggable: false,
+      allowedRoles: ["viewer"],
+      order: 150,
+      metadata: {
+        category: "main",
+        description: "Персональная страница viewer'а с планами",
+      },
+    },
+
     // Профильные элементы
     {
       id: "settings",
@@ -274,9 +289,11 @@ export const filterItemsByRole = (
   userRole: UserRole
 ): SidebarItem[] => {
   return items
-    .filter(
-      (item) => !item.allowedRoles || item.allowedRoles.includes(userRole)
-    )
+    .filter((item) => {
+      // Если allowedRoles не указаны, элемент доступен всем
+      // Если указаны, проверяем что текущая роль входит в список
+      return !item.allowedRoles || item.allowedRoles.includes(userRole);
+    })
     .map((item) => ({
       ...item,
       children: item.children

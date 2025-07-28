@@ -23,6 +23,7 @@ export interface RegisterFormData {
   confirm_password: string;
   first_name?: string;
   last_name?: string;
+  role: string; // Обязательное поле согласно схеме бэкенда
   terms_accepted: boolean;
   privacy_accepted: boolean;
 }

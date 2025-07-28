@@ -6,6 +6,9 @@ export * from "./auth";
 // Charts features
 export * from "./charts";
 
+// Demo platform features
+export * from "./demo-platform";
+
 // Dashboard features (убираем clearError)
 export * from "./dashboard/api";
 export * from "./dashboard/ui";

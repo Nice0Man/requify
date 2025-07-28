@@ -28,7 +28,7 @@ export const AppRouter: React.FC = () => {
             path={route.path}
             element={
               route.isProtected ? (
-                <ProtectedLayout requiredRole={route.requiredRole}>
+                <ProtectedLayout requiredRoles={route.requiredRoles}>
                   {route.element}
                 </ProtectedLayout>
               ) : (

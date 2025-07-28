@@ -162,7 +162,7 @@ class SecurityConfig(BaseModel):
     algorithm: str = "HS256"
 
     # URL фронтенда для ссылок в email
-    frontend_url: str = "http://localhost:3000"
+    frontend_url: str = "http://localhost"
 
     # Настройки access токенов
     access_token_expire_minutes: int = 30
