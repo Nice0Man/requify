@@ -27,8 +27,7 @@ export const API_ENDPOINTS = {
     ME: {
       ROOT: "/users/me",
       UPDATE: "/users/me",
-      SIDEBAR_PREFERENCES: "/users/me/sidebar-preferences",
-      SETTINGS: "/users/me/settings",
+      SETTINGS: "/users/me/settings", // TODO: implement sidebar preferences on backend
       ACTIVITY: "/users/me/activity",
       PROFILE: "/users/me/profile",
     },

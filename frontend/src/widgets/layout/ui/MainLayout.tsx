@@ -36,8 +36,8 @@ export const MainLayout: React.FC<MainLayoutProps> = memo(
         full_name: userProfile.full_name,
         role: userProfile.role,
         avatar_url: userProfile.avatar_url,
-        is_active: true, // Предполагаем, что аутентифицированный пользователь активен
-        email_verified: true, // Предполагаем, что email подтвержден
+        is_active: userProfile.is_active,
+        email_verified: userProfile.email_verified,
         created_at: userProfile.created_at,
         updated_at: userProfile.updated_at,
         last_login_at: userProfile.last_login_at,

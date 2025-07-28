@@ -22,18 +22,13 @@ import {
   PointerSensor,
   MouseSensor,
   TouchSensor,
-  MeasuringStrategy,
   type Modifier,
-  type UniqueIdentifier,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  restrictToVerticalAxis,
-  restrictToParentElement,
-} from "@dnd-kit/modifiers";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import type { SidebarItem, SidebarItemState } from "@/entities/sidebar";
 import {
   SidebarButton,
@@ -54,44 +49,35 @@ import { SortableItem } from "./SortableItem";
 
 /**
  * Кастомный модификатор для ограничения перетаскивания в пределах sidebar
+ * Убраны строгие вертикальные ограничения для свободного DnD
  */
-const createRestrictToSidebarModifier = (sidebarRef: React.RefObject<HTMLElement>): Modifier => {
-  return ({ transform, containerNodeRect, draggingNodeRect, activatorEvent }) => {
+const createRestrictToSidebarModifier = (
+  sidebarRef: React.RefObject<HTMLElement>
+): Modifier => {
+  return ({
+    transform,
+    containerNodeRect,
+    draggingNodeRect,
+    activatorEvent,
+  }) => {
     if (!sidebarRef.current || !containerNodeRect || !draggingNodeRect) {
       return transform;
     }
 
     const sidebarRect = sidebarRef.current.getBoundingClientRect();
-    const navigationContent = sidebarRef.current;
-    
-    // Получаем границы навигационного контента (исключаем header и footer)
-    const contentTop = 20; // Padding top
-    const contentHeight = navigationContent.clientHeight - 40; // Minus top and bottom padding
-    
-    // Ограничиваем движение в пределах видимой области navigation content
-    const minY = contentTop;
-    const maxY = Math.max(contentTop, contentHeight - draggingNodeRect.height);
-    
-    // Строго ограничиваем горизонтальное движение (только вертикальная ось)
-    const centerX = Math.max(0, (sidebarRect.width - draggingNodeRect.width) / 2);
 
-    // Добавляем мягкое ограничение с resistance эффектом на границах
-    let constrainedY = transform.y;
-    
-    if (transform.y < minY) {
-      // Resistance эффект сверху
-      const overflow = minY - transform.y;
-      constrainedY = minY - Math.sqrt(overflow) * 2;
-    } else if (transform.y > maxY) {
-      // Resistance эффект снизу  
-      const overflow = transform.y - maxY;
-      constrainedY = maxY + Math.sqrt(overflow) * 2;
-    }
+    // Ограничиваем только горизонтальное движение (центрируем в sidebar)
+    const centerX = Math.max(
+      0,
+      (sidebarRect.width - draggingNodeRect.width) / 2
+    );
 
+    // Убираем строгие вертикальные ограничения для свободного перетаскивания
+    // Позволяем элементам двигаться в любом направлении внутри sidebar
     return {
       ...transform,
-      x: centerX, // Фиксируем по центру sidebar
-      y: Math.max(minY - 20, Math.min(maxY + 20, constrainedY)), // Небольшой допуск для resistance
+      x: centerX - 10, // Фиксируем по центру sidebar по горизонтали
+      y: transform.y, // Полная свобода по вертикали
     };
   };
 };
@@ -183,6 +169,8 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
   }) => {
     const theme = useTheme();
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const mainNavigationRef = useRef<HTMLDivElement>(null);
+    const adminNavigationRef = useRef<HTMLDivElement>(null);
 
     // Мемоизированная конфигурация
     const config = useMemo(
@@ -288,28 +276,72 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
     );
 
     // Мемоизированные обработчики drag events
-    const handleDragStart = useCallback((event: any) => {
-      // Добавляем data-attribute для визуального feedback
-      if (sidebarRef.current) {
-        sidebarRef.current.setAttribute('data-dragging', 'true');
-      }
-      dndActions.handleDragStart(event);
-    }, [dndActions]);
+    const handleDragStart = useCallback(
+      (event: any) => {
+        // Добавляем data-attribute для визуального feedback
+        if (sidebarRef.current) {
+          sidebarRef.current.setAttribute("data-dragging", "true");
+        }
+        if (mainNavigationRef.current) {
+          mainNavigationRef.current.setAttribute("data-dragging", "true");
+        }
+        if (adminNavigationRef.current) {
+          adminNavigationRef.current.setAttribute("data-dragging", "true");
+        }
+        dndActions.handleDragStart(event);
+      },
+      [dndActions]
+    );
 
-    const handleDragEnd = useCallback((event: any) => {
-      // Убираем data-attribute после завершения drag
-      if (sidebarRef.current) {
-        sidebarRef.current.removeAttribute('data-dragging');
-      }
-      dndActions.handleDragEnd(event);
-    }, [dndActions]);
+    const handleDragEnd = useCallback(
+      (event: any) => {
+        // Убираем data-attribute после завершения drag
+        if (sidebarRef.current) {
+          sidebarRef.current.removeAttribute("data-dragging");
+        }
+        if (mainNavigationRef.current) {
+          mainNavigationRef.current.removeAttribute("data-dragging");
+        }
+        if (adminNavigationRef.current) {
+          adminNavigationRef.current.removeAttribute("data-dragging");
+        }
+        dndActions.handleDragEnd(event);
+      },
+      [dndActions]
+    );
 
     const handleDragCancel = useCallback(() => {
       // Убираем data-attribute при отмене drag
       if (sidebarRef.current) {
-        sidebarRef.current.removeAttribute('data-dragging');
+        sidebarRef.current.removeAttribute("data-dragging");
+      }
+      if (mainNavigationRef.current) {
+        mainNavigationRef.current.removeAttribute("data-dragging");
+      }
+      if (adminNavigationRef.current) {
+        adminNavigationRef.current.removeAttribute("data-dragging");
       }
     }, []);
+
+    // Стили для dnd области с outline
+    const dndAreaStyles = {
+      position: "relative",
+      "&[data-dragging='true']": {
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          top: 0,
+          left: 8,
+          right: 8,
+          bottom: 0,
+          border: `2px dashed ${SIDEBAR_COLORS.accent.primary}`,
+          borderRadius: 2,
+          opacity: 0.4,
+          pointerEvents: "none",
+          zIndex: 1,
+        },
+      },
+    };
 
     return (
       <Drawer variant="permanent" className={className} sx={drawerStyles}>
@@ -445,22 +477,6 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
               alignItems: isCollapsed ? "center" : "stretch",
               position: "relative", // Для правильного позиционирования during drag
               minHeight: 0, // Позволяет flex элементу уменьшаться
-              // Добавляем визуальные границы области drag (только во время dragging)
-              "&[data-dragging='true']": {
-                "&::before": {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  border: `2px dashed ${SIDEBAR_COLORS.accent.primary}`,
-                  borderRadius: 2,
-                  opacity: 0.3,
-                  pointerEvents: 'none',
-                  zIndex: 1,
-                },
-              },
               "&::-webkit-scrollbar": {
                 width: 6,
               },
@@ -508,51 +524,56 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
                     </Typography>
                   </Collapse>
 
-                  <SortableContext
-                    items={groupedItems.main
-                      .filter((item) => !item.isGroup)
-                      .map((item) => item.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {groupedItems.main.map((item) => (
-                      <ListItem
-                        key={item.id}
-                        disablePadding
-                        sx={{
-                          px: isCollapsed ? 0 : 1,
-                          width: "100%",
-                          display: "flex",
-                          justifyContent: isCollapsed ? "center" : "stretch",
-                          alignItems: "center",
-                          mb: 0.5,
-                        }}
-                      >
-                        {item.isGroup ? (
-                          <SidebarGroup
-                            group={item}
-                            isCollapsed={isCollapsed}
-                            isExpanded={groupsActions.isGroupExpanded(
-                              item.metadata?.category || "main"
-                            )}
-                            onToggleExpand={() =>
-                              groupsActions.handleToggleGroup(
+                  {/* Main Navigation DnD Area */}
+                  <Box ref={mainNavigationRef} sx={dndAreaStyles}>
+                    <SortableContext
+                      items={[
+                        ...(groupedItems.main || [])
+                          .filter((item) => !item.isGroup)
+                          .map((item) => item.id),
+                      ]}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {groupedItems.main.map((item) => (
+                        <ListItem
+                          key={item.id}
+                          disablePadding
+                          sx={{
+                            px: isCollapsed ? 0 : 1,
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: isCollapsed ? "center" : "stretch",
+                            alignItems: "center",
+                            mb: 0.5,
+                          }}
+                        >
+                          {item.isGroup ? (
+                            <SidebarGroup
+                              group={item}
+                              isCollapsed={isCollapsed}
+                              isExpanded={groupsActions.isGroupExpanded(
                                 item.metadata?.category || "main"
-                              )
-                            }
-                            onItemClick={navigationActions.handleItemClick}
-                            getItemState={getItemState}
-                          />
-                        ) : (
-                          <SortableItem
-                            item={item}
-                            isCollapsed={isCollapsed}
-                            onItemClick={navigationActions.handleItemClick}
-                            getItemState={getItemState}
-                          />
-                        )}
-                      </ListItem>
-                    ))}
-                  </SortableContext>
+                              )}
+                              onToggleExpand={() =>
+                                groupsActions.handleToggleGroup(
+                                  item.metadata?.category || "main"
+                                )
+                              }
+                              onItemClick={navigationActions.handleItemClick}
+                              getItemState={getItemState}
+                            />
+                          ) : (
+                            <SortableItem
+                              item={item}
+                              isCollapsed={isCollapsed}
+                              onItemClick={navigationActions.handleItemClick}
+                              getItemState={getItemState}
+                            />
+                          )}
+                        </ListItem>
+                      ))}
+                    </SortableContext>
+                  </Box>
                 </>
               )}
 
@@ -580,51 +601,56 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
                     </Typography>
                   </Collapse>
 
-                  <SortableContext
-                    items={groupedItems.admin
-                      .filter((item) => !item.isGroup)
-                      .map((item) => item.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {groupedItems.admin.map((item) => (
-                      <ListItem
-                        key={item.id}
-                        disablePadding
-                        sx={{
-                          px: isCollapsed ? 0 : 1,
-                          width: "100%",
-                          display: "flex",
-                          justifyContent: isCollapsed ? "center" : "stretch",
-                          alignItems: "center",
-                          mb: 0.5,
-                        }}
-                      >
-                        {item.isGroup ? (
-                          <SidebarGroup
-                            group={item}
-                            isCollapsed={isCollapsed}
-                            isExpanded={groupsActions.isGroupExpanded(
-                              item.metadata?.category || "admin"
-                            )}
-                            onToggleExpand={() =>
-                              groupsActions.handleToggleGroup(
+                  {/* Admin Navigation DnD Area */}
+                  <Box ref={adminNavigationRef} sx={dndAreaStyles}>
+                    <SortableContext
+                      items={[
+                        ...(groupedItems.admin || [])
+                          .filter((item) => !item.isGroup)
+                          .map((item) => item.id),
+                      ]}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {groupedItems.admin.map((item) => (
+                        <ListItem
+                          key={item.id}
+                          disablePadding
+                          sx={{
+                            px: isCollapsed ? 0 : 1,
+                            width: "100%",
+                            display: "flex",
+                            justifyContent: isCollapsed ? "center" : "stretch",
+                            alignItems: "center",
+                            mb: 0.5,
+                          }}
+                        >
+                          {item.isGroup ? (
+                            <SidebarGroup
+                              group={item}
+                              isCollapsed={isCollapsed}
+                              isExpanded={groupsActions.isGroupExpanded(
                                 item.metadata?.category || "admin"
-                              )
-                            }
-                            onItemClick={navigationActions.handleItemClick}
-                            getItemState={getItemState}
-                          />
-                        ) : (
-                          <SortableItem
-                            item={item}
-                            isCollapsed={isCollapsed}
-                            onItemClick={navigationActions.handleItemClick}
-                            getItemState={getItemState}
-                          />
-                        )}
-                      </ListItem>
-                    ))}
-                  </SortableContext>
+                              )}
+                              onToggleExpand={() =>
+                                groupsActions.handleToggleGroup(
+                                  item.metadata?.category || "admin"
+                                )
+                              }
+                              onItemClick={navigationActions.handleItemClick}
+                              getItemState={getItemState}
+                            />
+                          ) : (
+                            <SortableItem
+                              item={item}
+                              isCollapsed={isCollapsed}
+                              onItemClick={navigationActions.handleItemClick}
+                              getItemState={getItemState}
+                            />
+                          )}
+                        </ListItem>
+                      ))}
+                    </SortableContext>
+                  </Box>
                 </>
               )}
 
@@ -694,18 +720,18 @@ export const AppSidebarView: React.FC<AppSidebarViewProps> = memo(
                 opacity: 0.9,
                 transform: "rotate(2deg)",
                 boxShadow: `${SIDEBAR_COLORS.shadow.lg}, 0 0 0 1px ${SIDEBAR_COLORS.border.medium}`,
-                cursor: 'grabbing',
+                cursor: "grabbing",
                 zIndex: 1000,
                 // Добавляем визуальный индикатор ограничений
-                '&::before': {
+                "&::before": {
                   content: '""',
-                  position: 'absolute',
+                  position: "absolute",
                   top: -2,
                   left: -2,
                   right: -2,
                   bottom: -2,
                   border: `2px dashed ${SIDEBAR_COLORS.accent.primary}`,
-                  borderRadius: 'inherit',
+                  borderRadius: "inherit",
                   opacity: 0.6,
                 },
               }}

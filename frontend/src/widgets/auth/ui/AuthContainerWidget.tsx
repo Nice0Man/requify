@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Box,
   Container,
@@ -47,9 +47,11 @@ export const AuthContainerWidget: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const { isAuthenticated, isLoading, error, loginWithSocial } = useAuth();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode");
 
   // Tab management
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(mode === "register" ? 1 : 0);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -75,7 +77,7 @@ export const AuthContainerWidget: React.FC = () => {
   const handleFormSuccess = () => {
     // Для login - переходим на dashboard  
     // Для register - RegisterFormWidget сам управляет навигацией
-    if (activeTab === 0) {
+    if (activeTab === 0 || mode === "login") {
       navigate("/dashboard", { replace: true });
     }
     // Для register ничего не делаем, так как RegisterFormWidget уже перенаправил

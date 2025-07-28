@@ -109,6 +109,8 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
   last_login_at?: string;
+  email_verified: boolean;
+  is_active: boolean;
 }
 
 // =============================================================================

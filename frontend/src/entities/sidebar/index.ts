@@ -18,6 +18,13 @@ export {
   groupItemsByCategory,
 } from "./model/constants";
 
+// Новые хелперы с поддержкой разрешений
+export {
+  filterItemsByPermissions,
+  isItemVisible,
+  SIDEBAR_PERMISSIONS_MAP,
+} from "./model/helpers";
+
 // Mappers
 export {
   mapSidebarPreferencesDTO,
@@ -33,4 +40,4 @@ export {
 // UI компоненты
 export { SidebarButton } from "./ui/SidebarButton";
 export { SidebarGroup } from "./ui/SidebarGroup";
-export { UserProfile } from "./ui/UserProfile"; 
+export { UserProfile } from "./ui/UserProfile";

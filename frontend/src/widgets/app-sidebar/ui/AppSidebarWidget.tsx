@@ -1,46 +1,28 @@
-import React, { useMemo, memo } from "react";
-import { useMediaQuery, useTheme } from "@mui/material";
-
-// Импорты из entities
-import type { User } from "@/entities/user";
-import { getDefaultSidebarItems, filterItemsByRole } from "@/entities/sidebar";
-
-// Импорты из features
-import { useLogout } from "@/features/auth/hooks/useAuthQuery";
+import React, { useMemo, useCallback, memo } from "react";
+import { useTheme, useMediaQuery } from "@mui/material";
+import { AppSidebarView } from "./AppSidebarView";
+import { useAppSidebar } from "../model/useAppSidebar";
 import { useSidebarNavigation } from "@/features/navigation";
 import { useSidebarDnd } from "@/features/sidebar-dnd";
 import { useSidebarGroups } from "@/features/sidebar-management";
+import { useLogout } from "@/features/auth/hooks/useAuthQuery";
+import {
+  getDefaultSidebarItems,
+  filterItemsByPermissions,
+  type SidebarItem,
+  type SidebarItemState,
+} from "@/entities/sidebar";
+import { usePermissions } from "@/features/permissions";
+import type { AppSidebarProps } from "../model/types";
 
-// Хук сайдбара (остается в widgets как композиция)
-import { useAppSidebar } from "../model/useAppSidebar";
-
-// Презентационный компонент
-import { AppSidebarView, type AppSidebarConfig } from "./AppSidebarView";
-
-export interface AppSidebarProps {
-  /** Пользователь для отображения в сайдбаре */
-  user?: User;
-  /** Сворачивать ли сайдбар по умолчанию */
-  defaultCollapsed?: boolean;
-  /** Конфигурация виджета */
-  config?: Partial<AppSidebarConfig>;
-  /** Callback при изменении состояния сворачивания */
-  onStateChange?: (isCollapsed: boolean) => void;
-  /** Callback при навигации */
-  onNavigate?: (path: string, item: any) => void;
-  /** Callback при клике на профиль */
-  onProfileClick?: (user: User) => void;
-  /** Callback при выходе */
-  onLogout?: () => void;
-  /** CSS класс */
-  className?: string;
-  /** Кастомные стили */
-  sx?: any;
-}
+// =============================================================================
+// Типы для AppSidebarWidget
+// =============================================================================
 
 /**
  * Оптимизированный AppSidebarWidget с React.memo
  * Предотвращает ненужные ре-рендеры согласно React best practices
+ * Интегрирован с новой системой разрешений
  */
 export const AppSidebarWidget: React.FC<AppSidebarProps> = memo(
   ({
@@ -57,68 +39,81 @@ export const AppSidebarWidget: React.FC<AppSidebarProps> = memo(
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
+    // Получаем разрешения пользователя
+    const { permissions } = usePermissions();
+
     // Хук для управления общим состоянием сайдбара (collapse, preferences)
     const { state: sidebarState, actions: sidebarActions } = useAppSidebar(
       user,
       isMobile ? true : defaultCollapsed
     );
 
-    // Получение элементов сайдбара
+    // Получение элементов сайдбара с использованием новой системы разрешений
     const initialItems = useMemo(() => {
-      // ВАЖНО: Если пользователь не загружен, не показываем никаких элементов
-      // Это предотвращает показ админских элементов при первом рендере
-      if (!user?.role) {
+      // ВАЖНО: Если пользователь не загружен или нет разрешений, не показываем элементы
+      if (!user?.role || !permissions) {
         return [];
       }
 
-      const items = getDefaultSidebarItems(user.role);
-      return filterItemsByRole(items, user.role);
-    }, [user?.role]);
+      const allItems = getDefaultSidebarItems(user.role);
+      
+      // Используем новую систему разрешений для фильтрации
+      const filteredItems = filterItemsByPermissions(allItems, permissions);
+      
+
+      
+      return filteredItems;
+    }, [user?.role, permissions]);
 
     // Feature hooks для декомпозированной логики
     const navigation = useSidebarNavigation(initialItems, onNavigate);
 
-    const dnd = useSidebarDnd(initialItems, (newItems) => {
+    const dnd = useSidebarDnd(initialItems, (newItems: SidebarItem[]) => {
       // Можно добавить сохранение порядка элементов в preferences
       console.log("Items reordered:", newItems);
     });
 
-    const groups = useSidebarGroups(user, (groupId, isExpanded) => {
-      // Можно добавить сохранение состояния групп в preferences
-      console.log("Group toggled:", groupId, isExpanded);
-    });
+
+
+    const groups = useSidebarGroups(
+      user,
+      (groupId: string, isExpanded: boolean) => {
+        // Можно добавить сохранение состояния групп в preferences
+        console.log("Group toggled:", groupId, isExpanded);
+      }
+    );
 
     // API для logout
     const logoutMutation = useLogout();
 
     // Обработчик выхода из системы
-    const handleLogout = useMemo(
-      () => async () => {
-        if (onLogout) {
-          onLogout();
-        } else {
-          try {
-            await logoutMutation.mutateAsync();
-            // После успешного logout API автоматически очистит токены и кэш
-            // Navigation происходит в navigation feature
-          } catch (error) {
-            console.error("Logout failed:", error);
-          }
-        }
+    const handleLogout = useCallback(async () => {
+      try {
+        await logoutMutation.mutateAsync();
+        onLogout?.();
+      } catch (error) {
+        console.error("Logout failed:", error);
+        // Можно добавить toast notification об ошибке
+      }
+    }, [logoutMutation, onLogout]);
+
+    // Функция для получения состояния элемента
+    const getItemState = useCallback((itemId: string): SidebarItemState => {
+      return {
+        isActive: false,
+        isHovered: false,
+        isVisible: true,
+      };
+    }, []);
+
+    // Обработчик навигации
+    const handleNavigation = useCallback(
+      (path: string) => {
+        navigation.actions.handleItemClick({ id: "", path } as any);
       },
-      [onLogout, logoutMutation]
+      [navigation.actions]
     );
 
-    // Обработчик переключения состояния сворачивания
-    const handleToggleCollapse = useMemo(
-      () => () => {
-        sidebarActions.toggleCollapse();
-        onStateChange?.(!sidebarState.isCollapsed);
-      },
-      [sidebarActions, onStateChange, sidebarState.isCollapsed]
-    );
-
-    // Если пользователь не загружен, показываем базовую структуру sidebar без элементов
     return (
       <AppSidebarView
         user={user}
@@ -126,7 +121,7 @@ export const AppSidebarWidget: React.FC<AppSidebarProps> = memo(
         className={className}
         sx={sx}
         isCollapsed={sidebarState.isCollapsed}
-        onToggleCollapse={handleToggleCollapse}
+        onToggleCollapse={sidebarActions.toggleCollapse}
         navigationState={navigation.state}
         navigationActions={navigation.actions}
         dndState={dnd.state}

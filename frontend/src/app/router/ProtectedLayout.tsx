@@ -6,8 +6,6 @@ import type { MainLayoutProps } from "@/shared/ui";
 export interface ProtectedLayoutProps extends Omit<MainLayoutProps, 'children'> {
   /** Контент страницы */
   children: React.ReactNode;
-  /** Роль, необходимая для доступа */
-  requiredRole?: string;
   /** Роли, необходимые для доступа */
   requiredRoles?: string[];
 }
@@ -18,7 +16,6 @@ export interface ProtectedLayoutProps extends Omit<MainLayoutProps, 'children'> 
  */
 export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   children,
-  requiredRole,
   requiredRoles,
   title,
   subtitle,
@@ -30,7 +27,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   ...props
 }) => {
   return (
-    <ProtectedRoute requiredRole={requiredRole} requiredRoles={requiredRoles}>
+    <ProtectedRoute requiredRoles={requiredRoles}>
       <MainLayout
         title={title}
         subtitle={subtitle}

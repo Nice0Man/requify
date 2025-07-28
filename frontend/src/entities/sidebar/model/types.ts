@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import type { UserRole } from "@/entities/user";
 
+// Re-export for convenience
+export type { UserRole };
+
 // Базовый элемент сайдбара
 export interface SidebarItem {
   id: string;
@@ -67,7 +70,9 @@ export interface SidebarPreferencesDTO {
 }
 
 // Маппер для преобразования DTO в модель
-export const mapSidebarPreferencesDTO = (dto: SidebarPreferencesDTO): SidebarUserPreferences => {
+export const mapSidebarPreferencesDTO = (
+  dto: SidebarPreferencesDTO
+): SidebarUserPreferences => {
   return {
     itemOrder: dto.preferences.itemOrder || [],
     hiddenItems: dto.preferences.hiddenItems || [],
@@ -87,4 +92,4 @@ export const mapSidebarPreferencesToDTO = (
     preferences,
     updatedAt: new Date().toISOString(),
   };
-}; 
+};

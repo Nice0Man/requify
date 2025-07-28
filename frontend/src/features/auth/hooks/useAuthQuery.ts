@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from "@tanstack/react-query";
 // Features API (согласно FSD)
 import { authApi } from "../api/authApi";
 import type { LoginRequest, RegisterRequest } from "../api/authApi";
@@ -6,6 +11,7 @@ import type { LoginRequest, RegisterRequest } from "../api/authApi";
 import { apiUtils } from "@/app/providers/client";
 // Entities (разрешено в features)
 import { userDAO } from "@/entities/user/api/userDAO";
+import { User, UserProfile } from "@/entities/user/model/types";
 
 export const authKeys = {
   all: ["auth"] as const,
@@ -16,10 +22,13 @@ export const authKeys = {
 /**
  * Query для получения текущего пользователя
  */
-export const useCurrentUser = () => {
+export const useCurrentUser = (): UseQueryResult<UserProfile, Error> => {
   return useQuery({
     queryKey: authKeys.user(),
-    queryFn: () => userDAO.getCurrentUserProfile(),
+    queryFn: async () => {
+      const userProfile = await userDAO.getCurrentUserProfile();
+      return userProfile;
+    },
     enabled: apiUtils.isAuthenticated(), // Запрашиваем только если аутентифицированы
     staleTime: 5 * 60 * 1000, // 5 минут
     retry: (failureCount, error: any) => {
@@ -200,7 +209,11 @@ export const useRevokeSessions = () => {
  * Хук для проверки статуса аутентификации
  */
 export const useAuthStatus = () => {
-  const { data: user, isLoading, error } = useCurrentUser();
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useCurrentUser() as UseQueryResult<User, Error>;
 
   return {
     user,

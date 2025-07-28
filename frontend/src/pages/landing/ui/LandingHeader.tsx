@@ -132,7 +132,7 @@ export const LandingHeader: React.FC<LandingHeaderProps> = ({
     if (type === "login") {
       navigate("/auth");
     } else {
-      navigate("/auth");
+      navigate("/auth?mode=register");
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   KeyboardSensor,
   PointerSensor,
@@ -39,6 +39,11 @@ export const useSidebarDnd = (
   // DnD состояние
   const [activeId, setActiveId] = useState<string | null>(null);
   const [sidebarItems, setSidebarItems] = useState<SidebarItem[]>(initialItems);
+
+  // Синхронизация с изменениями initialItems (важно для обновления после фильтрации)
+  useEffect(() => {
+    setSidebarItems(initialItems);
+  }, [initialItems]);
 
   // DnD sensors
   const sensors = useSensors(

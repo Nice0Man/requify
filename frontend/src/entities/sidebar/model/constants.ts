@@ -12,6 +12,10 @@ import {
   BarChart as BarChartIcon,
   Groups as GroupsIcon,
   Extension as ExtensionIcon,
+  Analytics as AnalyticsIcon,
+  Notifications as NotificationsIcon,
+  CalendarToday as CalendarTodayIcon,
+  AccountTree as AccountTreeIcon,
 } from "@mui/icons-material";
 
 // Маппинг иконок
@@ -27,6 +31,10 @@ export const SIDEBAR_ICON_MAP = {
   BarChart: BarChartIcon,
   Groups: GroupsIcon,
   Extension: ExtensionIcon,
+  Analytics: AnalyticsIcon,
+  Notifications: NotificationsIcon,
+  CalendarToday: CalendarTodayIcon,
+  AccountTree: AccountTreeIcon,
 } as const;
 
 // Конфигурация по умолчанию
@@ -44,7 +52,7 @@ export const DEFAULT_SIDEBAR_CONFIG = {
 // Получение стандартных элементов сайдбара
 export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
   const baseItems: SidebarItem[] = [
-    // Основная навигация
+    // Основная навигация (новый порядок)
     {
       id: "dashboard",
       label: "Дашборд",
@@ -66,6 +74,97 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
       },
     },
     {
+      id: "reports",
+      label: "Отчёты",
+      icon: "BarChart",
+      path: "/reports",
+      isDraggable: true,
+      allowedRoles: ["admin", "project_manager", "analyst", "viewer"],
+      order: 2,
+      metadata: {
+        category: "main",
+        description: "Аналитика и отчёты",
+      },
+    },
+    {
+      id: "analytics",
+      label: "Аналитика",
+      icon: "Analytics",
+      path: "/analytics",
+      isDraggable: true,
+      allowedRoles: ["admin", "project_manager", "analyst"],
+      order: 3,
+      metadata: {
+        category: "main",
+        description: "Системная аналитика",
+      },
+    },
+    {
+      id: "notifications",
+      label: "Уведомления",
+      icon: "Notifications",
+      path: "/notifications",
+      isDraggable: true,
+      allowedRoles: [
+        "admin",
+        "project_manager",
+        "analyst",
+        "developer",
+        "tester",
+        "viewer",
+      ],
+      order: 4,
+      metadata: {
+        category: "main",
+        description: "Центр уведомлений",
+      },
+    },
+    {
+      id: "calendar",
+      label: "Календарь",
+      icon: "CalendarToday",
+      path: "/calendar",
+      isDraggable: true,
+      allowedRoles: [
+        "admin",
+        "project_manager",
+        "analyst",
+        "developer",
+        "tester",
+      ],
+      order: 5,
+      metadata: {
+        category: "main",
+        description: "Планирование и календарь",
+      },
+    },
+    {
+      id: "teams",
+      label: "Команда",
+      icon: "Groups",
+      path: "/teams",
+      isDraggable: true,
+      allowedRoles: ["admin", "project_manager"],
+      order: 6,
+      metadata: {
+        category: "main",
+        description: "Управление командами",
+      },
+    },
+    {
+      id: "processes",
+      label: "Процессы",
+      icon: "AccountTree",
+      path: "/processes",
+      isDraggable: true,
+      allowedRoles: ["admin", "project_manager", "analyst"],
+      order: 7,
+      metadata: {
+        category: "main",
+        description: "Бизнес-процессы",
+      },
+    },
+    {
       id: "projects",
       label: "Проекты",
       icon: "Assignment",
@@ -79,7 +178,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
         "tester",
         "viewer",
       ],
-      order: 2,
+      order: 8,
       metadata: {
         category: "main",
         description: "Управление проектами",
@@ -99,7 +198,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
         "tester",
         "viewer",
       ],
-      order: 3,
+      order: 9,
       metadata: {
         category: "main",
         description: "Управление требованиями",
@@ -119,7 +218,7 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
         "tester",
         "viewer",
       ],
-      order: 4,
+      order: 10,
       metadata: {
         category: "main",
         description: "Управление релизами",
@@ -139,56 +238,19 @@ export const getDefaultSidebarItems = (userRole?: UserRole): SidebarItem[] => {
         "tester",
         "viewer",
       ],
-      order: 5,
+      order: 11,
       metadata: {
         category: "main",
         description: "Управление тестированием",
       },
     },
     {
-      id: "reports",
-      label: "Отчёты",
-      icon: "BarChart",
-      path: "/reports",
-      isDraggable: true,
-      allowedRoles: [
-        "admin",
-        "project_manager",
-        "analyst",
-        "viewer",
-      ],
-      order: 6,
-      metadata: {
-        category: "main",
-        description: "Аналитика и отчёты",
-      },
-    },
-    {
-      id: "teams",
-      label: "Команды",
-      icon: "Groups",
-      path: "/teams",
-      isDraggable: true,
-      allowedRoles: [
-        "admin",
-        "project_manager",
-      ],
-      order: 7,
-      metadata: {
-        category: "main",
-        description: "Управление командами",
-      },
-    },
-    {
       id: "integrations",
-      label: "Интеграции", 
+      label: "Интеграции",
       icon: "Extension",
       path: "/integrations",
       isDraggable: true,
-      allowedRoles: [
-        "admin",
-        "project_manager",
-      ],
+      allowedRoles: ["admin", "project_manager"],
       order: 8,
       metadata: {
         category: "main",
@@ -303,14 +365,5 @@ export const filterItemsByRole = (
     .filter((item) => !item.children || item.children.length > 0);
 };
 
-// Утилита для группировки элементов по категориям
-export const groupItemsByCategory = (items: SidebarItem[]) => {
-  return items.reduce((groups, item) => {
-    const category = item.metadata?.category || "main";
-    if (!groups[category]) {
-      groups[category] = [];
-    }
-    groups[category].push(item);
-    return groups;
-  }, {} as Record<string, SidebarItem[]>);
-};
+// Для обратной совместимости - экспортируем из helpers
+export { groupItemsByCategory } from "./helpers";

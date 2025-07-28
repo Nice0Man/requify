@@ -20,7 +20,7 @@ export class SidebarPreferencesDAO {
   ): Promise<SidebarUserPreferences | null> {
     try {
       const response = await fetch(
-        `${API_ENDPOINTS.USERS.ME.SIDEBAR_PREFERENCES}`,
+        `${API_ENDPOINTS.USERS.ME.SETTINGS}`,
         {
           method: "GET",
           headers: {
@@ -58,7 +58,7 @@ export class SidebarPreferencesDAO {
       const dto = mapSidebarPreferencesToDTO(userId, preferences);
 
       const response = await fetch(
-        `${API_ENDPOINTS.USERS.ME.SIDEBAR_PREFERENCES}`,
+        `${API_ENDPOINTS.USERS.ME.SETTINGS}`,
         {
           method: "PUT",
           headers: {
