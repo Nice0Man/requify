@@ -1,12 +1,18 @@
 # Development Backend Dockerfile
 FROM python:3.13-slim as base
 
-# Системные зависимости
+# Системные зависимости включая библиотеки для Pillow
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     curl \
     git \
+    libjpeg-dev \
+    libpng-dev \
+    libwebp-dev \
+    libtiff5-dev \
+    libfreetype6-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем Poetry

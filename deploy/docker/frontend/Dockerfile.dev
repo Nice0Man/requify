@@ -3,41 +3,48 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Create non-root user with home directory for npm cache
-RUN addgroup -g 1001 -S frontend && \
-    adduser -S -u 1001 -G frontend -h /home/frontend frontend
-
 # Install system dependencies
 RUN apk add --no-cache \
     git \
     openssh-client \
+    curl \
     && rm -rf /var/cache/apk/*
 
+# Create non-root user with home directory for npm cache
+RUN addgroup -g 1001 -S frontend && \
+    adduser -S -u 1001 -G frontend -h /home/frontend frontend && \
+    mkdir -p /home/frontend/.npm && \
+    chown -R frontend:frontend /home/frontend
+
 # Copy package files first to leverage Docker cache
-COPY package*.json ./
-COPY yarn.lock* ./
+COPY package.json package-lock.json* ./
 
-# Install dependencies as root to ensure permissions
-RUN npm ci --include=dev && \
-    npm cache clean --force
+# Install dependencies as root first, then fix permissions
+RUN npm ci --include=dev --no-audit --no-fund && \
+    npm cache clean --force && \
+    chown -R frontend:frontend /app/node_modules
 
-# Copy application code
-COPY . .
-
-# Create necessary directories and set permissions
-RUN mkdir -p node_modules/.cache && \
-    chown -R frontend:frontend /app && \
-    chmod -R 755 /app
-
-# Switch to non-root user
-USER frontend
+# Create directories that will be needed
+RUN mkdir -p node_modules/.cache dist && \
+    chown -R frontend:frontend /app
 
 # Set environment variables
 ENV NODE_ENV=development
 ENV VITE_HOST=0.0.0.0
 ENV VITE_PORT=3000
+ENV NPM_CONFIG_CACHE=/home/frontend/.npm
+
+# Switch to non-root user
+USER frontend
+
+# Set the working directory ownership
+WORKDIR /app
 
 EXPOSE 3000
 
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:3000 || exit 1
+
 # Hot reload for development with proper host binding
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["sh", "-c", "npm install --no-fund && npm run dev -- --host 0.0.0.0 --port 3000"]

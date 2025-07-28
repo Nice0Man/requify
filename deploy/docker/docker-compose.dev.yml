@@ -55,7 +55,7 @@ services:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: minioadmin123
       MINIO_BROWSER_REDIRECT_URL: http://localhost:9001
-      MINIO_STORAGE_CLASS_STANDARD: EC:1
+      # Removed MINIO_STORAGE_CLASS_STANDARD: EC:1 for single-node deployment
     ports:
       - "9000:9000"  # MinIO API
       - "9001:9001"  # MinIO Console  
@@ -64,11 +64,11 @@ services:
     networks:
       - requify-dev-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD-SHELL", "timeout 5s bash -c '</dev/tcp/localhost/9000' || exit 1"]
       interval: 30s
       timeout: 20s
       retries: 3
-      start_period: 10s
+      start_period: 30s
 
   # Redis для CDN метаданных
   redis-cdn:
@@ -96,12 +96,12 @@ services:
       - requify-dev-network
     entrypoint: >
       /bin/sh -c "
-      until (/usr/bin/mc config host add myminio http://minio:9000 admin minioadmin123) do echo '...waiting...' && sleep 1; done;
+      until (/usr/bin/mc alias set myminio http://minio:9000 admin minioadmin123) do echo '...waiting...' && sleep 1; done;
       /usr/bin/mc mb myminio/requify-uploads --ignore-existing;
       /usr/bin/mc mb myminio/requify-avatars --ignore-existing;
       /usr/bin/mc mb myminio/requify-documents --ignore-existing;
-      /usr/bin/mc policy set public myminio/requify-uploads;
-      /usr/bin/mc policy set public myminio/requify-avatars;
+      /usr/bin/mc anonymous set public myminio/requify-uploads;
+      /usr/bin/mc anonymous set public myminio/requify-avatars;
       /usr/bin/mc admin info myminio;
       exit 0;
       "
@@ -181,20 +181,40 @@ services:
       dockerfile: ../deploy/docker/frontend/Dockerfile.dev
     container_name: requify-frontend-dev
     volumes:
-      - "../../frontend:/app"
-      - "/app/node_modules"
+      - "../../frontend:/app:delegated"
+      - "frontend_node_modules:/app/node_modules"  # Named volume to preserve node_modules
+      - "frontend_dist:/app/dist"          # Named volume for build artifacts
+      - "frontend_vite_cache:/app/.vite"   # Named volume for Vite cache
     ports:
       - "3000:3000"
     environment:
       - VITE_API_BASE_URL=http://localhost/api/v1
       - NODE_ENV=development
+      - VITE_HMR_PORT=3000
+      - VITE_HMR_HOST=localhost
       # Auth0 OAuth2 Configuration (демо для разработки - ОТКЛЮЧЕНО)
       - REACT_APP_AUTH0_DOMAIN=localhost
       - REACT_APP_AUTH0_CLIENT_ID=demo-local-client-id
       - REACT_APP_AUTH0_AUDIENCE=https://api.requify.com
     networks:
       - requify-dev-network
-    command: npm run dev -- --host 0.0.0.0
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s  # Give more time for initial package installation
+    restart: unless-stopped
+    # Command to ensure packages are installed and then start dev server
+    command: >
+      sh -c "
+      echo 'Installing npm packages...' &&
+      npm install --no-fund --loglevel=error &&
+      echo 'Starting Vite dev server...' &&
+      npm run dev -- --host 0.0.0.0 --port 3000
+      "
 
   # Nginx для разработки
   nginx:
@@ -256,6 +276,12 @@ volumes:
     name: requify_backend_uploads_dev
   nginx_logs:
     name: requify_nginx_logs_dev
+  frontend_node_modules:
+    name: requify_frontend_node_modules_dev
+  frontend_dist:
+    name: requify_frontend_dist_dev
+  frontend_vite_cache:
+    name: requify_frontend_vite_cache_dev
 
 networks:
   requify-dev-network:
