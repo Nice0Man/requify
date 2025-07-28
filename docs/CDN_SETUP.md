@@ -42,40 +42,48 @@ Frontend/API → NGINX (CDN Proxy) → MinIO (Object Storage)
 ### Быстрый старт
 
 ```bash
-# Запуск основной инфраструктуры
+# 1. Скопируйте конфигурацию окружения
+cp deploy/docker.env.example deploy/docker/.env
+cp backend/env.example backend/.env
+
+# 2. Запуск основной инфраструктуры
+cd deploy/docker
 docker-compose up -d
 
-# Инициализация MinIO buckets (разовая операция)
+# 3. Инициализация MinIO buckets (разовая операция)
 docker-compose --profile init up mc
 ```
 
 ### Полная конфигурация
 
 1. **Настройка переменных окружения**:
-
 ```bash
-# Скопируйте пример конфигурации
+# Основная конфигурация для Docker
+cp deploy/docker.env.example deploy/docker/.env
+
+# Конфигурация для backend приложения
+cp backend/env.example backend/.env
+
+# Дополнительная CDN конфигурация (опционально)
 cp deploy/env/cdn.env.example deploy/env/cdn.env
 
-# Отредактируйте настройки
-nano deploy/env/cdn.env
+# Отредактируйте настройки согласно вашим требованиям
+nano deploy/docker/.env
+nano backend/.env
 ```
 
 2. **Запуск сервисов**:
-
 ```bash
 cd deploy/docker
 docker-compose up -d postgres redis minio redis-cdn
 ```
 
 3. **Инициализация buckets**:
-
 ```bash
 docker-compose --profile init up mc
 ```
 
 4. **Запуск приложения**:
-
 ```bash
 docker-compose up -d app nginx
 ```

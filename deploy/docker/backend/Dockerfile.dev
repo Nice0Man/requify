@@ -19,7 +19,7 @@ ENV POETRY_NO_INTERACTION=1 \
 
 WORKDIR /app
 
-# Копируем файлы зависимостей и конфигурации
+# Копируем файлы зависимостей и конфигурации из backend папки
 COPY backend/pyproject.toml backend/poetry.lock* ./
 COPY backend/alembic.ini ./alembic.ini
 
@@ -28,7 +28,10 @@ RUN poetry config virtualenvs.create false && \
     poetry install --with dev && \
     rm -rf $POETRY_CACHE_DIR
 
-# Создаем пользователя и группу раньше
+# Копируем весь backend код
+COPY backend/ .
+
+# Создаем пользователя и группу
 RUN groupadd -r requify && useradd -r -g requify -s /bin/bash requify
 
 # Создаем необходимые директории с правильными правами
@@ -36,9 +39,13 @@ RUN mkdir -p logs uploads static backups && \
     chown -R requify:requify /app && \
     chmod -R 755 /app
 
+# Устанавливаем переменные окружения для Python
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
 USER requify
 
 EXPOSE 8000
 
-# Hot reload для разработки
+# Hot reload для разработки с правильным путем к main модулю
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"] 
