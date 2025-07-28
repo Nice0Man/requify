@@ -60,8 +60,6 @@ export const AppSidebarWidget: React.FC<AppSidebarProps> = memo(
       // Используем новую систему разрешений для фильтрации
       const filteredItems = filterItemsByPermissions(allItems, permissions);
       
-
-      
       return filteredItems;
     }, [user?.role, permissions]);
 

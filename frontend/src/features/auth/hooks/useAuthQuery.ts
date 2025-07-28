@@ -4,6 +4,7 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 // Features API (согласно FSD)
 import { authApi } from "../api/authApi";
 import type { LoginRequest, RegisterRequest } from "../api/authApi";
@@ -20,16 +21,64 @@ export const authKeys = {
 };
 
 /**
+ * Хук для реактивного отслеживания состояния аутентификации
+ */
+const useAuthState = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => 
+    apiUtils.isAuthenticated()
+  );
+
+  useEffect(() => {
+    // Проверяем состояние аутентификации каждые 30 секунд
+    const interval = setInterval(() => {
+      const currentAuthState = apiUtils.isAuthenticated();
+      if (currentAuthState !== isAuthenticated) {
+        setIsAuthenticated(currentAuthState);
+      }
+    }, 30000);
+
+    // Проверяем при фокусе окна
+    const handleFocus = () => {
+      const currentAuthState = apiUtils.isAuthenticated();
+      if (currentAuthState !== isAuthenticated) {
+        setIsAuthenticated(currentAuthState);
+      }
+    };
+
+    // Слушаем изменения в localStorage (для случаев логина в другой вкладке)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'access_token' || e.key === 'token_expires_at') {
+        const currentAuthState = apiUtils.isAuthenticated();
+        setIsAuthenticated(currentAuthState);
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [isAuthenticated]);
+
+  return isAuthenticated;
+};
+
+/**
  * Query для получения текущего пользователя
  */
 export const useCurrentUser = (): UseQueryResult<UserProfile, Error> => {
+  const isAuthenticated = useAuthState();
+
   return useQuery({
     queryKey: authKeys.user(),
     queryFn: async () => {
       const userProfile = await userDAO.getCurrentUserProfile();
       return userProfile;
     },
-    enabled: apiUtils.isAuthenticated(), // Запрашиваем только если аутентифицированы
+    enabled: isAuthenticated, // Теперь реактивно отслеживается
     staleTime: 5 * 60 * 1000, // 5 минут
     retry: (failureCount, error: any) => {
       // Не повторяем запрос если проблема с аутентификацией
@@ -59,16 +108,34 @@ export const useLogin = () => {
       return response;
     },
     onSuccess: async (data) => {
+      // Принудительно обновляем состояние аутентификации
+      // Это заставит useAuthState() перезапустить useCurrentUser
+      
+      // Сначала инвалидируем кэш
+      queryClient.invalidateQueries({ queryKey: authKeys.all });
+      
       // Получаем полную информацию о пользователе после логина
       try {
         const userData = await userDAO.getCurrentUserProfile();
         queryClient.setQueryData(authKeys.user(), userData);
+        
+        // Форсируем обновление всех компонентов, использующих эти данные
+        queryClient.refetchQueries({ queryKey: authKeys.user() });
       } catch (error) {
         console.warn("Failed to fetch user profile after login:", error);
+        // Если не удалось получить профиль, все равно инвалидируем для повторной попытки
+        queryClient.invalidateQueries({ queryKey: authKeys.user() });
       }
 
       // Инвалидируем все auth-запросы для обновления состояния
       queryClient.invalidateQueries({ queryKey: authKeys.all });
+      
+      // Принудительно уведомляем об изменении localStorage для useAuthState
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'access_token',
+        newValue: data.access_token,
+        storageArea: localStorage
+      }));
     },
     onError: (error) => {
       console.error("Login mutation failed:", error);
@@ -96,16 +163,32 @@ export const useRegister = () => {
       return response;
     },
     onSuccess: async (data) => {
+      // Принудительно обновляем состояние аутентификации
+      // Сначала инвалидируем кэш
+      queryClient.invalidateQueries({ queryKey: authKeys.all });
+      
       // Получаем полную информацию о пользователе после регистрации
       try {
         const userData = await userDAO.getCurrentUserProfile();
         queryClient.setQueryData(authKeys.user(), userData);
+        
+        // Форсируем обновление всех компонентов
+        queryClient.refetchQueries({ queryKey: authKeys.user() });
       } catch (error) {
         console.warn("Failed to fetch user profile after registration:", error);
+        // Если не удалось получить профиль, все равно инвалидируем
+        queryClient.invalidateQueries({ queryKey: authKeys.user() });
       }
 
       // Инвалидируем все auth-запросы для обновления состояния
       queryClient.invalidateQueries({ queryKey: authKeys.all });
+      
+      // Принудительно уведомляем об изменении localStorage для useAuthState
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'access_token',
+        newValue: data.access_token,
+        storageArea: localStorage
+      }));
     },
     onError: (error) => {
       console.error("Registration mutation failed:", error);
@@ -130,12 +213,26 @@ export const useLogout = () => {
     onSuccess: () => {
       // Очищаем весь кэш при выходе
       queryClient.clear();
+      
+      // Принудительно уведомляем об изменении localStorage для useAuthState
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'access_token',
+        newValue: null,
+        storageArea: localStorage
+      }));
     },
     onError: (error) => {
       console.error("Logout mutation failed:", error);
       // Очищаем кэш и токены даже при ошибке выхода
       queryClient.clear();
       apiUtils.tokens.clear();
+      
+      // Уведомляем об очистке даже при ошибке
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'access_token',
+        newValue: null,
+        storageArea: localStorage
+      }));
     },
   });
 };
@@ -161,6 +258,13 @@ export const useRefreshTokens = () => {
     onSuccess: () => {
       // Инвалидируем auth-запросы после обновления токенов
       queryClient.invalidateQueries({ queryKey: authKeys.all });
+      
+      // Уведомляем useAuthState об обновлении токена
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'access_token',
+        newValue: apiUtils.tokens.get(),
+        storageArea: localStorage
+      }));
     },
     onError: (error) => {
       console.error("Token refresh mutation failed:", error);
