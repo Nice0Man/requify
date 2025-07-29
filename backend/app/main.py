@@ -6,8 +6,11 @@ from contextlib import asynccontextmanager
 # from fastapi.middleware.cors import CORSMiddleware  # CORS handled by Nginx
 
 from app.api.v1.router import api_router
-from app.core.config import settings
+
+# from app.core.config import settings  # Temporarily commented out
 from app.utils.logger import logger, LoggedOperation
+
+from app.core.config import settings
 
 
 @asynccontextmanager
@@ -19,12 +22,12 @@ async def lifespan(app: FastAPI):
     # Startup
     with LoggedOperation("Application startup", logger):
         try:
+            # Import settings locally to avoid import errors
+
             # Инициализация логирования
-            logger.info(
-                f"Starting {settings.app_config.name} v{settings.app_config.version}"
-            )
-            logger.info(f"Environment: {settings.app_config.env}")
-            logger.info(f"Debug mode: {settings.app_config.debug}")
+            logger.info(f"Starting {settings.run.name} v{settings.run.version}")
+            logger.info(f"Environment: {settings.run.env}")
+            logger.info(f"Debug mode: {settings.run.debug}")
 
             # Проверка подключения к базе данных
             try:
@@ -141,8 +144,8 @@ async def lifespan(app: FastAPI):
 
 # Создаем FastAPI приложение с обработчиком жизненного цикла
 app = FastAPI(
-    title=settings.app_config.name,
-    version=settings.app_config.version,
+    title=settings.run.name,
+    version=settings.run.version,
     description="API для автоматизированной системы управления требованиями Requify",
     lifespan=lifespan,
 )
@@ -163,7 +166,7 @@ from app.core.exceptions import register_exception_handlers
 register_exception_handlers(app)
 
 # Подключение маршрутизатора API
-app.include_router(api_router, prefix=settings.app_config.api_v1_str)
+app.include_router(api_router, prefix=settings.run.api_v1_str)
 
 
 @app.get("/")
@@ -172,11 +175,24 @@ async def root():
     Корневой эндпоинт для проверки работоспособности API.
     """
     return {
-        "app_name": settings.app_config.name,
-        "version": settings.app_config.version,
+        "app_name": settings.run.name,
+        "version": settings.run.version,
         "status": "running",
-        "environment": settings.app_config.env,
-        "debug": settings.app_config.debug,
+        "environment": settings.run.env,
+        "debug": settings.run.debug,
+    }
+
+
+# Add basic health endpoint without config dependencies
+@app.get("/health")
+async def basic_health_check():
+    """
+    Basic health check endpoint without config dependencies.
+    """
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now(UTC).isoformat(),
+        "message": "Basic health check OK",
     }
 
 
@@ -191,8 +207,8 @@ async def health_check():
     health_status = {
         "status": "healthy",
         "timestamp": datetime.now(UTC).isoformat(),
-        "version": settings.app_config.version,
-        "environment": settings.app_config.env,
+        "version": settings.run.version,
+        "environment": settings.run.env,
         "checks": {
             "database": "unknown",
             "api": "healthy",
@@ -256,6 +272,14 @@ async def health_check():
                 integration_status.append("testing_system")
             if settings.integrations.project_management_api_url:
                 integration_status.append("project_management")
+            if settings.integrations.file_storage_api_url:
+                integration_status.append("file_storage")
+            if settings.integrations.email_service_api_url:
+                integration_status.append("email_service")
+            if settings.integrations.notification_service_api_url:
+                integration_status.append("notification_service")
+            if settings.integrations.security_service_api_url:
+                integration_status.append("security_service")
 
         if integration_status:
             health_status["checks"]["integrations"] = "configured"

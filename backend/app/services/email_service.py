@@ -78,8 +78,7 @@ class EmailConfig:
 
         # Определяем режим работы
         config.DEVELOPMENT_MODE = (
-            getattr(settings, "app_config", {})
-            and getattr(settings.app_config, "env", "development") == "development"
+            getattr(settings.run, "env", "development") == "development"
         )
 
         # Если SMTP настройки заданы, используем SMTP (включая MailHog)

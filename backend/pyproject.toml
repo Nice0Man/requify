@@ -1,10 +1,9 @@
 [tool.poetry]
-name = "requify"
+name = "requify-backend"
 version = "0.1.0"
 description = "Автоматизированная система управления требованиями"
 authors = ["Eugene <e.krotov03@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "requify" }]
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -30,20 +29,18 @@ pillow = "^10.0.0"
 aiofiles = "^24.0.0"
 minio = "^7.2.0"
 aiosmtplib = "^3.0.0"
-httpx = "^0.27.0"
+httpx = "^0.28.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 pytest-asyncio = "^0.24.0"
 pytest-cov = "^6.0.0"
-httpx = "^0.28.0"
 isort = "^5.13.0"
 flake8 = "^7.0.0"
 pylint = "^3.3.7"
 
-
 [tool.pytest.ini_options]
-testpaths = ["requify/tests"]
+testpaths = ["app/tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]

@@ -1696,6 +1696,54 @@
         "documentation": {}
     },
     {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "List",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Tuple",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "BinaryIO",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "Dict",
         "importPath": "typing",
         "description": "typing",
@@ -2521,6 +2569,14 @@
         "documentation": {}
     },
     {
+        "label": "func",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "select",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -2529,7 +2585,23 @@
         "documentation": {}
     },
     {
-        "label": "func",
+        "label": "or_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "and_",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "desc",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -3810,6 +3882,14 @@
         "documentation": {}
     },
     {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
         "label": "create_async_engine",
         "importPath": "sqlalchemy.ext.asyncio",
         "description": "sqlalchemy.ext.asyncio",
@@ -4067,6 +4147,14 @@
     },
     {
         "label": "DatabaseConfig",
+        "importPath": "app.core.config",
+        "description": "app.core.config",
+        "isExtraImport": true,
+        "detail": "app.core.config",
+        "documentation": {}
+    },
+    {
+        "label": "settings",
         "importPath": "app.core.config",
         "description": "app.core.config",
         "isExtraImport": true,
@@ -4998,6 +5086,22 @@
         "documentation": {}
     },
     {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
         "label": "UTC",
         "importPath": "datetime",
         "description": "datetime",
@@ -5687,6 +5791,14 @@
     },
     {
         "label": "Query",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "UploadFile",
         "importPath": "fastapi",
         "description": "fastapi",
         "isExtraImport": true,
@@ -5743,6 +5855,30 @@
     },
     {
         "label": "Request",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "UploadFile",
         "importPath": "fastapi",
         "description": "fastapi",
         "isExtraImport": true,
@@ -7438,6 +7574,22 @@
         "documentation": {}
     },
     {
+        "label": "logger",
+        "importPath": "app.utils.logger",
+        "description": "app.utils.logger",
+        "isExtraImport": true,
+        "detail": "app.utils.logger",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "importPath": "app.utils.logger",
+        "description": "app.utils.logger",
+        "isExtraImport": true,
+        "detail": "app.utils.logger",
+        "documentation": {}
+    },
+    {
         "label": "LoggedOperation",
         "importPath": "app.utils.logger",
         "description": "app.utils.logger",
@@ -8663,6 +8815,22 @@
         "documentation": {}
     },
     {
+        "label": "JSONResponse",
+        "importPath": "fastapi.responses",
+        "description": "fastapi.responses",
+        "isExtraImport": true,
+        "detail": "fastapi.responses",
+        "documentation": {}
+    },
+    {
+        "label": "JSONResponse",
+        "importPath": "fastapi.responses",
+        "description": "fastapi.responses",
+        "isExtraImport": true,
+        "detail": "fastapi.responses",
+        "documentation": {}
+    },
+    {
         "label": "get_async_session",
         "importPath": "app.db.db_helper",
         "description": "app.db.db_helper",
@@ -8692,6 +8860,14 @@
         "description": "app.db.db_helper",
         "isExtraImport": true,
         "detail": "app.db.db_helper",
+        "documentation": {}
+    },
+    {
+        "label": "Path",
+        "importPath": "pathlib",
+        "description": "pathlib",
+        "isExtraImport": true,
+        "detail": "pathlib",
         "documentation": {}
     },
     {
@@ -9308,14 +9484,6 @@
         "description": "pydantic_settings",
         "isExtraImport": true,
         "detail": "pydantic_settings",
-        "documentation": {}
-    },
-    {
-        "label": "JSONResponse",
-        "importPath": "fastapi.responses",
-        "description": "fastapi.responses",
-        "isExtraImport": true,
-        "detail": "fastapi.responses",
         "documentation": {}
     },
     {
@@ -11432,12 +11600,21 @@
         "documentation": {}
     },
     {
-        "label": "csv",
+        "label": "hashlib",
         "kind": 6,
         "isExtraImport": true,
-        "importPath": "csv",
-        "description": "csv",
-        "detail": "csv",
+        "importPath": "hashlib",
+        "description": "hashlib",
+        "detail": "hashlib",
+        "documentation": {}
+    },
+    {
+        "label": "socket",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "socket",
+        "description": "socket",
+        "detail": "socket",
         "documentation": {}
     },
     {
@@ -11447,6 +11624,56 @@
         "importPath": "io",
         "description": "io",
         "detail": "io",
+        "documentation": {}
+    },
+    {
+        "label": "BytesIO",
+        "importPath": "io",
+        "description": "io",
+        "isExtraImport": true,
+        "detail": "io",
+        "documentation": {}
+    },
+    {
+        "label": "Image",
+        "importPath": "PIL",
+        "description": "PIL",
+        "isExtraImport": true,
+        "detail": "PIL",
+        "documentation": {}
+    },
+    {
+        "label": "aiofiles",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "aiofiles",
+        "description": "aiofiles",
+        "detail": "aiofiles",
+        "documentation": {}
+    },
+    {
+        "label": "Minio",
+        "importPath": "minio",
+        "description": "minio",
+        "isExtraImport": true,
+        "detail": "minio",
+        "documentation": {}
+    },
+    {
+        "label": "S3Error",
+        "importPath": "minio.error",
+        "description": "minio.error",
+        "isExtraImport": true,
+        "detail": "minio.error",
+        "documentation": {}
+    },
+    {
+        "label": "csv",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "csv",
+        "description": "csv",
+        "detail": "csv",
         "documentation": {}
     },
     {
@@ -11634,19 +11861,19 @@
     {
         "label": "upgrade",
         "kind": 2,
-        "importPath": "alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
-        "description": "alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
+        "importPath": "alembic.versions.2025_07_28_2210-07a49d277c47_init",
+        "description": "alembic.versions.2025_07_28_2210-07a49d277c47_init",
         "peekOfCode": "def upgrade() -> None:\n    \"\"\"Upgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.create_table(\n        \"relationship_types\",\n        sa.Column(\"id\", sa.Integer(), nullable=False),\n        sa.Column(\"name\", sa.String(length=50), nullable=False),\n        sa.PrimaryKeyConstraint(\"id\", name=op.f(\"pk_relationship_types\")),\n        sa.UniqueConstraint(\"name\", name=op.f(\"uq_relationship_types_name\")),\n    )",
-        "detail": "alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
+        "detail": "alembic.versions.2025_07_28_2210-07a49d277c47_init",
         "documentation": {}
     },
     {
         "label": "downgrade",
         "kind": 2,
-        "importPath": "alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
-        "description": "alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
-        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_table(\"test_results\")\n    op.drop_table(\"relationships\")\n    op.drop_index(\n        op.f(\"ix_dashboard_notifications_id\"), table_name=\"dashboard_notifications\"\n    )\n    op.drop_table(\"dashboard_notifications\")\n    op.drop_index(op.f(\"ix_dashboard_activities_id\"), table_name=\"dashboard_activities\")",
-        "detail": "alembic.versions.2025_07_10_1942-3759a1bbae5a_init",
+        "importPath": "alembic.versions.2025_07_28_2210-07a49d277c47_init",
+        "description": "alembic.versions.2025_07_28_2210-07a49d277c47_init",
+        "peekOfCode": "def downgrade() -> None:\n    \"\"\"Downgrade schema.\"\"\"\n    # ### commands auto generated by Alembic - please adjust! ###\n    op.drop_table(\"test_results\")\n    op.drop_table(\"relationships\")\n    op.drop_index(op.f(\"ix_dashboard_notifications_id\"), table_name=\"dashboard_notifications\")\n    op.drop_table(\"dashboard_notifications\")\n    op.drop_index(op.f(\"ix_dashboard_activities_id\"), table_name=\"dashboard_activities\")\n    op.drop_table(\"dashboard_activities\")\n    op.drop_table(\"comments\")",
+        "detail": "alembic.versions.2025_07_28_2210-07a49d277c47_init",
         "documentation": {}
     },
     {
@@ -12005,7 +12232,7 @@
         "kind": 6,
         "importPath": "app.core.config",
         "description": "app.core.config",
-        "peekOfCode": "class FileStorageConfig(BaseModel):\n    upload_dir: str = \"uploads\"\n    max_file_size: int = 10485760\n    allowed_extensions: str = \"pdf,doc,docx,txt,jpg,jpeg,png,gif\"\nclass AccessToken(BaseModel):\n    lifetime_seconds: int = 1800  # 30 minutes (30 * 60)\n    reset_password_token_secret: str = \"reset-password-secret-change-in-production\"\n    verification_token_secret: str = \"verification-secret-change-in-production\"\nclass Settings(BaseSettings):\n    model_config = SettingsConfigDict(",
+        "peekOfCode": "class FileStorageConfig(BaseModel):\n    # Local storage settings\n    upload_dir: str = \"uploads\"\n    max_file_size: int = 10485760  # 10MB default\n    allowed_extensions: str = \"pdf,doc,docx,txt,jpg,jpeg,png,gif,webp,svg\"\n    # Avatar specific settings\n    avatar_max_size: int = 2097152  # 2MB for avatars\n    avatar_allowed_extensions: str = \"jpg,jpeg,png,webp\"\n    avatar_resize_dimensions: str = (\n        \"128x128,256x256,512x512\"  # Multiple sizes for optimization",
         "detail": "app.core.config",
         "documentation": {}
     },
@@ -15470,7 +15697,7 @@
         "kind": 6,
         "importPath": "app.schemas.user",
         "description": "app.schemas.user",
-        "peekOfCode": "class UserSettings(BaseModel):\n    \"\"\"Схема настроек пользователя.\"\"\"\n    user_id: int = Field(..., description=\"ID пользователя\")\n    theme: str = Field(\"light\", description=\"Тема интерфейса\")\n    language: str = Field(\"ru\", description=\"Язык интерфейса\")\n    timezone: str = Field(\"UTC\", description=\"Часовой пояс\")\n    notifications: Dict[str, bool] = Field(\n        default_factory=lambda: {\"email\": True, \"push\": True, \"sms\": False},\n        description=\"Настройки уведомлений\",\n    )",
+        "peekOfCode": "class UserSettings(BaseModel):\n    \"\"\"Схема настроек пользователя.\"\"\"\n    user_id: int = Field(..., description=\"ID пользователя\")\n    theme: str = Field(\"light\", description=\"Тема интерфейса\")\n    language: str = Field(\"ru\", description=\"Язык интерфейса\")\n    timezone: str = Field(\"UTC\", description=\"Часовой пояс\")\n    # Настройки уведомлений\n    notifications: Dict[str, bool] = Field(\n        default_factory=lambda: {\n            \"email\": True, ",
         "detail": "app.schemas.user",
         "documentation": {}
     },
@@ -15607,6 +15834,24 @@
         "description": "app.services.email_service",
         "peekOfCode": "email_service = EmailService()",
         "detail": "app.services.email_service",
+        "documentation": {}
+    },
+    {
+        "label": "FileService",
+        "kind": 6,
+        "importPath": "app.services.file_service",
+        "description": "app.services.file_service",
+        "peekOfCode": "class FileService:\n    \"\"\"Сервис для работы с файлами и MinIO Object Storage.\"\"\"\n    def __init__(self):\n        self.config = settings.file_storage\n        self.upload_dir = Path(self.config.upload_dir)\n        self.quarantine_dir = Path(self.config.quarantine_dir)\n        # MinIO client initialization\n        if self.config.use_minio:\n            try:\n                self.minio_client = Minio(",
+        "detail": "app.services.file_service",
+        "documentation": {}
+    },
+    {
+        "label": "file_service",
+        "kind": 5,
+        "importPath": "app.services.file_service",
+        "description": "app.services.file_service",
+        "peekOfCode": "file_service = FileService()",
+        "detail": "app.services.file_service",
         "documentation": {}
     },
     {

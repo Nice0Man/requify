@@ -1,209 +1,172 @@
-version: '3.8'
-
+# Production overrides - используется с -f docker-compose.base.yml -f docker-compose.prod.yml
 services:
-  # Production SMTP Relay (optional - for organizations that need internal SMTP)
-  # Uncomment if you want to use a containerized SMTP relay
-  # smtp-relay:
-  #   image: namshi/smtp:latest
-  #   container_name: requify-smtp-relay-prod
-  #   environment:
-  #     - RELAY_NETWORKS=:192.168.0.0/16:10.0.0.0/8
-  #     - SMARTHOST_ADDRESS=your-external-smtp-server.com
-  #     - SMARTHOST_PORT=587
-  #     - SMARTHOST_USER=your-smtp-user
-  #     - SMARTHOST_PASSWORD=your-smtp-password
-  #   networks:
-  #     - requify-prod-network
-  #   restart: unless-stopped
-  # PostgreSQL основная база данных
   postgres:
-    image: postgres:16.0
-    container_name: requify_postgres_prod
+    env_file:
+      - ../env/common.env
+      - ../env/production.env
     environment:
-      POSTGRES_DB: ${DB_NAME:-requify-db}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
-    ports:
-      - "127.0.0.1:5432:5432"  # Bind только к localhost
-    volumes:
-      - postgres_prod_data:/var/lib/postgresql/data
-      - ./backups:/backups
-    networks:
-      - requify-prod-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-requify-db}"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: always
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} # Обязательно из переменных окружения
+    command: >
+      postgres 
+      -c max_connections=500
+      -c shared_buffers=512MB
+      -c effective_cache_size=2GB
+      -c maintenance_work_mem=128MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=32MB
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=8MB
+      -c min_wal_size=2GB
+      -c max_wal_size=8GB
     deploy:
       resources:
         limits:
           memory: 2G
+          cpus: "1.0"
         reservations:
           memory: 1G
-    command: >
-      postgres 
-      -c max_connections=200
-      -c shared_buffers=512MB
-      -c effective_cache_size=1536MB
-      -c maintenance_work_mem=128MB
-      -c checkpoint_completion_target=0.9
-      -c wal_buffers=16MB
-      -c default_statistics_target=100
-      -c random_page_cost=1.1
-      -c effective_io_concurrency=200
-      -c work_mem=8MB
-      -c min_wal_size=1GB
-      -c max_wal_size=4GB
-      -c max_worker_processes=8
-      -c max_parallel_workers_per_gather=4
-      -c max_parallel_workers=8
-      -c max_parallel_maintenance_workers=4
-      -c log_min_duration_statement=1000
-      -c log_statement=ddl
+          cpus: "0.5"
 
-  # Redis
   redis:
-    image: redis:7.2-alpine
-    container_name: requify_redis_prod
-    ports:
-      - "127.0.0.1:6379:6379"
-    volumes:
-      - redis_prod_data:/data
-      - ./redis.prod.conf:/usr/local/etc/redis/redis.conf:ro
-    command: redis-server /usr/local/etc/redis/redis.conf
-    networks:
-      - requify-prod-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: always
+    env_file:
+      - ../env/common.env
+      - ../env/production.env
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD} # Обязательно из переменных окружения
+    command: >
+      redis-server 
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 1gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --appendonly yes
+      --appendfsync everysec
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
+          cpus: "0.5"
         reservations:
-          memory: 256M
+          memory: 512M
+          cpus: "0.25"
 
-  # Backend FastAPI
+  minio:
+    env_file:
+      - ../env/common.env
+      - ../env/production.env
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "0.5"
+        reservations:
+          memory: 512M
+          cpus: "0.25"
+
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.backend.prod
-    container_name: requify_backend_prod
+      dockerfile: ../deploy/docker/backend/Dockerfile.prod
+    env_file:
+      - ../env/common.env
+      - ../env/production.env
     environment:
-      - APP_CONFIG__ENV=production
-      - APP_CONFIG__DB__HOST=postgres
-      - APP_CONFIG__DB__PORT=5432
-      - APP_CONFIG__REDIS__HOST=redis
-      - APP_CONFIG__REDIS__PORT=6379
-      - APP_CONFIG__REDIS__DB=0
-      - APP_CONFIG__LOGGING__FILE=/app/logs/requify.log
-    ports:
-      - "127.0.0.1:8000:8000"
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=info
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
-      - ./logs:/app/logs
-      - ./uploads:/app/uploads:ro
-      - ./.env.prod:/app/.env:ro
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - requify-prod-network
-    restart: always
+      - backend_logs:/app/logs
+      - backend_uploads:/app/uploads
+      # Убираем bind mount исходного кода в продакшн
     deploy:
-      replicas: 2
       resources:
         limits:
-          memory: 1G
+          memory: 2G
+          cpus: "2.0"
         reservations:
-          memory: 512M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+          memory: 1G
+          cpus: "1.0"
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
 
-  # Frontend
   frontend:
     build:
-      context: .
-      dockerfile: Dockerfile.frontend.prod
-    container_name: requify_frontend_prod
-    ports:
-      - "127.0.0.1:3000:80"
-    networks:
-      - requify-prod-network
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Nginx reverse proxy
-  nginx:
-    image: nginx:alpine
-    container_name: requify_nginx_prod
-    ports:
-      - "80:80"
-      - "443:443"
+      dockerfile: ../deploy/docker/frontend/Dockerfile.prod
+    env_file:
+      - ../env/common.env
+      - ../env/production.env
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+      - VITE_CDN_BASE_URL=${VITE_CDN_BASE_URL}
     volumes:
-      - ./nginx/prod.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./logs:/var/log/nginx
-      - ./uploads:/var/www/uploads:ro
-      - ./static:/var/www/static:ro
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - requify-prod-network
-    restart: always
+      - frontend_dist:/app/dist
+      # Убираем bind mount исходного кода в продакшн
     deploy:
       resources:
         limits:
-          memory: 256M
+          memory: 512M
+          cpus: "0.5"
         reservations:
-          memory: 128M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+          memory: 256M
+          cpus: "0.25"
 
-  # Monitoring
+  # Production nginx override
+  nginx:
+    environment:
+      - NGINX_ENV=production
+      - NGINX_CONFIG=./nginx/nginx.prod.conf
+    volumes:
+      # Override для production: используем production конфигурацию
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - nginx_cache:/var/cache/nginx
+      - nginx_logs:/var/log/nginx
+      # SSL сертификаты для production
+      - ../data/ssl:/etc/nginx/ssl:ro
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Monitoring сервисы для продакшн
   prometheus:
     image: prom/prometheus:latest
     container_name: requify_prometheus
     ports:
       - "127.0.0.1:9090:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
     networks:
-      - requify-prod-network
+      - requify-network
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
 
   grafana:
     image: grafana/grafana:latest
@@ -212,25 +175,25 @@ services:
       - "127.0.0.1:3001:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana:/etc/grafana/provisioning
+      - ../monitoring/grafana:/etc/grafana/provisioning:ro
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SECURITY_DISABLE_GRAVATAR=true
     networks:
-      - requify-prod-network
+      - requify-network
     restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
 
+# Дополнительные volumes для продакшн
 volumes:
-  postgres_prod_data:
-    name: requify_postgres_prod_data
-  redis_prod_data:
-    name: requify_redis_prod_data
   prometheus_data:
     name: requify_prometheus_data
   grafana_data:
     name: requify_grafana_data
-
-networks:
-  requify-prod-network:
-    name: requify_prod_network
-    driver: bridge 
+  certbot_webroot:
+    name: requify_certbot_webroot

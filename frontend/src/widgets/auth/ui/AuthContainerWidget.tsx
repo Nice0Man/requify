@@ -53,12 +53,12 @@ export const AuthContainerWidget: React.FC = () => {
   // Tab management
   const [activeTab, setActiveTab] = useState(mode === "register" ? 1 : 0);
 
-  // Redirect if already authenticated - REMOVED
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     navigate("/dashboard", { replace: true });
-  //   }
-  // }, [isAuthenticated, navigate]);
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   // Event Handlers
   const handleTabChange = (newValue: number) => {
@@ -78,7 +78,7 @@ export const AuthContainerWidget: React.FC = () => {
   const handleFormSuccess = () => {
     // Dashboard redirect removed
     console.log(`Form success for tab: ${activeTab === 0 ? 'login' : 'register'}`);
-    // No automatic redirect to dashboard
+    navigate("/dashboard", { replace: true });
   };
 
   // Brand Header
@@ -109,6 +109,9 @@ export const AuthContainerWidget: React.FC = () => {
               fontWeight: 700,
               boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.3)}`,
               transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+              "&:hover": {
+                transform: "scale(1.02)",
+              },
             }}
           >
             R
@@ -122,10 +125,6 @@ export const AuthContainerWidget: React.FC = () => {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               fontSize: { xs: "2rem", sm: "2.5rem" },
-              transition: "all 0.3s ease-in-out",
-              "&:hover": {
-                transform: "scale(1.02)",
-              },
             }}
           >
             Requify

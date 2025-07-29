@@ -137,7 +137,7 @@ class Auth0Config(BaseModel):
     domain: str = ""
     client_id: str = ""
     client_secret: str = ""
-    audience: str = "https://api.requify.com"
+    audience: str = "https://api.requify.local"
     algorithms: list[str] = ["RS256"]
     issuer: str = ""  # Will be set based on domain
 
@@ -150,8 +150,8 @@ class Auth0Config(BaseModel):
 
     def model_post_init(self, __context):
         """Автоматически устанавливает issuer на основе domain."""
-        if self.domain and not self.issuer:
-            self.issuer = f"https://{self.domain}/"
+        if self.domain and self.domain.strip() and not self.issuer:
+            self.issuer = f"https://{self.domain.strip()}/"
 
 
 class SecurityConfig(BaseModel):
@@ -214,8 +214,8 @@ class SecurityConfig(BaseModel):
 
 
 class AdminConfig(BaseModel):
-    email: str = "admin@requify.local"
-    password: str = "admin123"
+    email: str = "admin@example.com"
+    password: str = "SecurePass1!"
     name: str = "Admin User"
 
 
@@ -224,6 +224,13 @@ class IntegrationsConfig(BaseModel):
     testing_system_api_key: str = "test-api-key-change-in-production"
     project_management_api_url: str = "http://localhost:8002/api/v1"
     project_management_api_key: str = "project-api-key-change-in-production"
+    file_storage_api_url: str = "http://localhost:8003/api/v1"
+    file_storage_api_key: str = "file-storage-api-key-change-in-production"
+    email_service_api_url: str = "http://localhost:8004/api/v1"
+    email_service_api_key: str = "email-service-api-key-change-in-production"
+    notification_service_api_url: str = "http://localhost:8005/api/v1"
+    notification_service_api_key: str = "notification-service-api-key-change-in-production"
+    security_service_api_url: str = "http://localhost:8006/api/v1"
 
 
 class LoggingConfig(BaseModel):
@@ -352,7 +359,7 @@ class Settings(BaseSettings):
     )
 
     # Main app config
-    app_config: RunConfig = Field(default_factory=RunConfig)
+    run: RunConfig = Field(default_factory=RunConfig)
 
     # Database configs
     db: DatabaseConfig = Field(default_factory=DatabaseConfig)
@@ -402,70 +409,80 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context):
         """Post-initialization to handle legacy variables and setup derived fields"""
-        from urllib.parse import urlparse
+        try:
+            from urllib.parse import urlparse
 
-        # Handle legacy database URIs if they exist
-        if self.database_uri:
-            # Parse legacy URI format for main DB
-            parsed = urlparse(self.database_uri)
-            if parsed.hostname:
-                self.db.host = parsed.hostname
-            if parsed.port:
-                self.db.port = parsed.port
-            if parsed.username:
-                self.db.user = parsed.username
-            if parsed.password:
-                self.db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.db.name = parsed.path[1:]  # Remove leading '/'
+            # Handle legacy database URIs if they exist
+            if self.database_uri:
+                # Parse legacy URI format for main DB
+                parsed = urlparse(self.database_uri)
+                if parsed.hostname:
+                    self.db.host = parsed.hostname
+                if parsed.port:
+                    self.db.port = parsed.port
+                if parsed.username:
+                    self.db.user = parsed.username
+                if parsed.password:
+                    self.db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.db.name = parsed.path[1:]  # Remove leading '/'
 
-        if self.async_database_uri:
-            # Parse legacy URI format for main DB (async)
-            parsed = urlparse(self.async_database_uri)
-            if parsed.hostname:
-                self.db.host = parsed.hostname
-            if parsed.port:
-                self.db.port = parsed.port
-            if parsed.username:
-                self.db.user = parsed.username
-            if parsed.password:
-                self.db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.db.name = parsed.path[1:]
+            if self.async_database_uri:
+                # Parse legacy URI format for main DB (async)
+                parsed = urlparse(self.async_database_uri)
+                if parsed.hostname:
+                    self.db.host = parsed.hostname
+                if parsed.port:
+                    self.db.port = parsed.port
+                if parsed.username:
+                    self.db.user = parsed.username
+                if parsed.password:
+                    self.db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.db.name = parsed.path[1:]
 
-        if self.test_database_uri:
-            # Parse legacy URI format for test DB
-            parsed = urlparse(self.test_database_uri)
-            if parsed.hostname:
-                self.test_db.host = parsed.hostname
-            if parsed.port:
-                self.test_db.port = parsed.port
-            if parsed.username:
-                self.test_db.user = parsed.username
-            if parsed.password:
-                self.test_db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.test_db.name = parsed.path[1:]
+            if self.test_database_uri:
+                # Parse legacy URI format for test DB
+                parsed = urlparse(self.test_database_uri)
+                if parsed.hostname:
+                    self.test_db.host = parsed.hostname
+                if parsed.port:
+                    self.test_db.port = parsed.port
+                if parsed.username:
+                    self.test_db.user = parsed.username
+                if parsed.password:
+                    self.test_db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.test_db.name = parsed.path[1:]
 
-        if self.test_async_database_uri:
-            # Parse legacy URI format for test DB (async)
-            parsed = urlparse(self.test_async_database_uri)
-            if parsed.hostname:
-                self.test_db.host = parsed.hostname
-            if parsed.port:
-                self.test_db.port = parsed.port
-            if parsed.username:
-                self.test_db.user = parsed.username
-            if parsed.password:
-                self.test_db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.test_db.name = parsed.path[1:]
+            if self.test_async_database_uri:
+                # Parse legacy URI format for test DB (async)
+                parsed = urlparse(self.test_async_database_uri)
+                if parsed.hostname:
+                    self.test_db.host = parsed.hostname
+                if parsed.port:
+                    self.test_db.port = parsed.port
+                if parsed.username:
+                    self.test_db.user = parsed.username
+                if parsed.password:
+                    self.test_db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.test_db.name = parsed.path[1:]
 
-        # Validate critical settings
-        self._validate_security_settings()
-        self._validate_database_settings()
-        self._validate_email_settings()
-        self._validate_file_storage_settings()
+            # Validate critical settings (skip in development if validation fails)
+            if self.run.env != "development":
+                self._validate_security_settings()
+                self._validate_database_settings()
+                self._validate_email_settings()
+                self._validate_file_storage_settings()
+        except Exception as e:
+            # In development, log the error but don't fail startup
+            if self.run.env == "development":
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Settings validation warning: {e}")
+            else:
+                raise
 
     def _validate_security_settings(self) -> None:
         """Validate security configuration"""
@@ -474,7 +491,7 @@ class Settings(BaseSettings):
             raise ValueError("Security secret key must be at least 32 characters long")
 
         # Check if using default secrets in production
-        if self.app_config.env == "production":
+        if self.run.env == "production":
             dangerous_defaults = [
                 "super-secret-key-change-in-production-minimum-32-characters",
                 "password-reset-secret-change-in-production",
@@ -533,7 +550,7 @@ class Settings(BaseSettings):
         # Check SMTP settings if email is configured
         if self.email.smtp_host:
             if not self.email.smtp_user or not self.email.smtp_password:
-                if self.app_config.env == "production":
+                if self.run.env == "production":
                     raise ValueError(
                         "SMTP user and password are required in production"
                     )
@@ -604,15 +621,15 @@ class Settings(BaseSettings):
 
     def is_development(self) -> bool:
         """Check if running in development mode"""
-        return self.app_config.env.lower() in ("development", "dev", "local")
+        return self.run.env.lower() in ("development", "dev", "local")
 
     def is_production(self) -> bool:
         """Check if running in production mode"""
-        return self.app_config.env.lower() in ("production", "prod")
+        return self.run.env.lower() in ("production", "prod")
 
     def is_testing(self) -> bool:
         """Check if running in testing mode"""
-        return self.app_config.env.lower() in ("testing", "test")
+        return self.run.env.lower() in ("testing", "test")
 
 
 settings = Settings()

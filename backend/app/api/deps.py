@@ -27,7 +27,7 @@ from app.services import auth0_service, Auth0UserInfo
 
 # OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.app_config.api_v1_str}/auth/login",
+    tokenUrl=f"{settings.run.api_v1_str}/auth/login",
     scopes={
         "me": "Read information about the current user",
         "users:read": "Read users information",

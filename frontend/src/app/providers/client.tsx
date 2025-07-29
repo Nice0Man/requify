@@ -8,7 +8,8 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 
 // Создаем экземпляр axios с базовой конфигурацией
 export const client: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1",
+  
+  baseURL: import.meta.env.VITE_API_BASE_URL + "/api/v1",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -37,8 +38,11 @@ const processQueue = (error: any, token: string | null = null) => {
 // Получение токена из localStorage (без зависимостей)
 const getStoredToken = (): string | null => {
   try {
-    return localStorage.getItem('access_token');
+    const token = localStorage.getItem('access_token');
+    console.log('🔑 Getting stored token:', token ? `${token.substring(0, 10)}...` : 'null');
+    return token;
   } catch {
+    console.warn('⚠️ Failed to get stored token');
     return null;
   }
 };
@@ -46,32 +50,48 @@ const getStoredToken = (): string | null => {
 // Получение refresh токена из localStorage
 const getStoredRefreshToken = (): string | null => {
   try {
-    return localStorage.getItem('refresh_token');
+    const token = localStorage.getItem('refresh_token');
+    console.log('🔄 Getting stored refresh token:', token ? `${token.substring(0, 10)}...` : 'null');
+    return token;
   } catch {
+    console.warn('⚠️ Failed to get stored refresh token');
     return null;
   }
 };
 
 // Сохранение токенов в localStorage
-const saveTokens = (accessToken: string, refreshToken: string): void => {
+const saveTokens = (accessToken: string, refreshToken: string, expiresIn?: number): void => {
   try {
+    console.log('💾 Saving tokens:', {
+      accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : 'null',
+      refreshToken: refreshToken ? `${refreshToken.substring(0, 10)}...` : 'null',
+      expiresIn
+    });
+    
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
-    localStorage.setItem('token_expires_at', (Date.now() + 3600000).toString());
+    
+    // Используем expires_in из ответа API, или fallback на 1 час
+    const expiryTime = Date.now() + (expiresIn ? expiresIn * 1000 : 3600000);
+    localStorage.setItem('token_expires_at', expiryTime.toString());
+    
+    console.log('✅ Tokens saved successfully. Expires at:', new Date(expiryTime));
   } catch (error) {
-    console.error('Failed to save tokens:', error);
+    console.error('❌ Failed to save tokens:', error);
   }
 };
 
 // Очистка токенов
 const clearTokens = (): void => {
   try {
+    console.log('🗑️ Clearing all tokens');
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('token_expires_at');
     localStorage.removeItem('user_data');
+    console.log('✅ Tokens cleared successfully');
   } catch (error) {
-    console.error('Failed to clear tokens:', error);
+    console.error('❌ Failed to clear tokens:', error);
   }
 };
 
@@ -79,14 +99,26 @@ const clearTokens = (): void => {
 const shouldRefreshToken = (): boolean => {
   try {
     const expiresAt = localStorage.getItem('token_expires_at');
-    if (!expiresAt) return false;
+    if (!expiresAt) {
+      console.log('⚠️ No token expiry found');
+      return false;
+    }
     
     const expiryTime = parseInt(expiresAt);
     const currentTime = Date.now();
+    const timeUntilExpiry = expiryTime - currentTime;
+    
+    console.log('🕐 Token refresh check:', {
+      expiresAt: new Date(expiryTime),
+      currentTime: new Date(currentTime),
+      timeUntilExpiry: Math.round(timeUntilExpiry / 1000 / 60) + ' minutes',
+      shouldRefresh: timeUntilExpiry < 300000
+    });
     
     // Обновляем токен за 5 минут до истечения
-    return (expiryTime - currentTime) < 300000;
-  } catch {
+    return timeUntilExpiry < 300000;
+  } catch (error) {
+    console.warn('⚠️ Error checking token refresh:', error);
     return false;
   }
 };
@@ -94,20 +126,22 @@ const shouldRefreshToken = (): boolean => {
 // Обновление токена через API
 const refreshTokenRequest = async (refreshToken: string) => {
   try {
+    console.log('🔄 Refreshing token...');
     const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1"}/auth/refresh`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh`,
       { refresh_token: refreshToken },
       { headers: { "Content-Type": "application/json" } }
     );
     
     if (response.data.access_token && response.data.refresh_token) {
-      saveTokens(response.data.access_token, response.data.refresh_token);
+      saveTokens(response.data.access_token, response.data.refresh_token, response.data.expires_in);
+      console.log('✅ Token refreshed successfully');
       return response.data.access_token;
     }
     
     throw new Error('Invalid refresh response');
   } catch (error) {
-    console.error('Token refresh failed:', error);
+    console.error('❌ Token refresh failed:', error);
     clearTokens();
     throw error;
   }
@@ -269,12 +303,24 @@ export const apiUtils = {
     const token = getStoredToken();
     const expiresAt = localStorage.getItem('token_expires_at');
     
-    if (!token || !expiresAt) return false;
+    console.log('🔐 Checking isAuthenticated:', {
+      hasToken: !!token,
+      expiresAt: expiresAt ? new Date(parseInt(expiresAt)) : 'null',
+      currentTime: new Date()
+    });
+    
+    if (!token || !expiresAt) {
+      console.log('❌ Authentication failed: missing token or expiry');
+      return false;
+    }
     
     try {
       const expiryTime = parseInt(expiresAt);
-      return Date.now() < expiryTime;
+      const isValid = Date.now() < expiryTime;
+      console.log(isValid ? '✅ Token is valid' : '❌ Token expired');
+      return isValid;
     } catch {
+      console.warn('⚠️ Failed to parse token expiry time');
       return false;
     }
   },
@@ -285,7 +331,8 @@ export const apiUtils = {
   tokens: {
     get: getStoredToken,
     getRefresh: getStoredRefreshToken,
-    save: saveTokens,
+    save: (accessToken: string, refreshToken: string, expiresIn?: number) => 
+      saveTokens(accessToken, refreshToken, expiresIn),
     clear: clearTokens,
     shouldRefresh: shouldRefreshToken,
   }

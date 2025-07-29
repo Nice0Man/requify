@@ -67,14 +67,14 @@ async def test_configuration_loading(results: HealthTestResults):
     try:
         # Test settings load
         assert settings is not None
-        assert hasattr(settings, "app_config")
+        assert hasattr(settings, "run")
         assert hasattr(settings, "db")
         assert hasattr(settings, "security")
 
         results.add_result(
             "Configuration Loading",
             True,
-            details=f"App: {settings.app_config.name} v{settings.app_config.version}",
+            details=f"App: {settings.run.name} v{settings.run.version}",
         )
 
         # Test database URL generation
@@ -100,7 +100,7 @@ async def test_configuration_loading(results: HealthTestResults):
 async def test_api_availability(results: HealthTestResults):
     """Test API endpoint availability"""
     try:
-        base_url = f"http://localhost:{settings.app_config.port}"
+        base_url = f"http://localhost:{settings.run.port}"
         timeout = httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=5.0)
 
         async with httpx.AsyncClient(timeout=timeout) as client:
@@ -243,7 +243,7 @@ async def test_frontend_api_paths(results: HealthTestResults):
     """Test that frontend API path fixes are correct"""
     try:
         # Simulate frontend API client behavior
-        base_url = f"http://localhost:{settings.app_config.port}"
+        base_url = f"http://localhost:{settings.run.port}"
         timeout = httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=5.0)
 
         async with httpx.AsyncClient(

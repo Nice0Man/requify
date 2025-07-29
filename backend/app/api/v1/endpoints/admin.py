@@ -82,9 +82,9 @@ async def get_system_info(
                 "used": disk.used // (1024**3),  # GB
                 "percent": round((disk.used / disk.total) * 100, 2),
             },
-            "app_version": settings.app_config.version,
-            "debug_mode": settings.app_config.debug,
-            "environment": settings.app_config.env,
+            "app_version": settings.run.version,
+            "debug_mode": settings.run.debug,
+            "environment": settings.run.env,
         }
     except Exception as e:
         # Fallback в случае ошибки
@@ -92,9 +92,9 @@ async def get_system_info(
             "platform": platform.system(),
             "python_version": platform.python_version(),
             "error": f"Could not gather full system info: {str(e)}",
-            "app_version": settings.app_config.version,
-            "debug_mode": settings.app_config.debug,
-            "environment": settings.app_config.env,
+            "app_version": settings.run.version,
+            "debug_mode": settings.run.debug,
+            "environment": settings.run.env,
         }
 
 
@@ -859,3 +859,29 @@ async def get_audit_log(
                 "timestamp": datetime.now(UTC).isoformat(),
             }
         ]
+
+@router.get("/file-service/health", response_model=Dict[str, Any])
+async def get_file_service_health():
+    """
+    Проверка здоровья файлового сервиса и CDN.
+    
+    Returns:
+        dict: Статус файлового сервиса, MinIO и CDN
+    """
+    from app.services.file_service import file_service
+    
+    health_status = file_service.get_health_status()
+    
+    # Добавляем общий статус
+    health_status["healthy"] = (
+        health_status.get("minio_connected", False) if health_status["storage_type"] == "minio" 
+        else True  # Для локального хранилища всегда здоров
+    )
+    
+    # HTTP статус код
+    status_code = status.HTTP_200_OK if health_status["healthy"] else status.HTTP_503_SERVICE_UNAVAILABLE
+    
+    return {
+        "status_code": status_code,
+        "content": health_status
+    }

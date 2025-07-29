@@ -12,13 +12,13 @@ const cspPlugin = () => {
       handler(html, context) {
         // В production используем более строгую CSP политику
         if (context.server) {
-          // Development CSP - более разрешающая
+          // Development CSP - более разрешающая для requify.local доменов
           return html.replace(
-            /script-src 'self' 'unsafe-inline' 'unsafe-eval'/,
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+            /connect-src 'self' ws: wss: http:\/\/localhost:\* http:\/\/backend:\*;/,
+            "connect-src 'self' ws: wss: http://localhost:* http://backend:* http://*.requify.local;"
           );
         } else {
-          // Production CSP - более строгая, без unsafe-eval
+          // Production CSP - более строгая
           return html.replace(
             /<meta http-equiv="Content-Security-Policy"[^>]*>/,
             `<meta http-equiv="Content-Security-Policy" content="
@@ -27,7 +27,7 @@ const cspPlugin = () => {
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
               font-src 'self' https://fonts.gstatic.com;
               img-src 'self' data: blob:;
-              connect-src 'self' https:;
+              connect-src 'self' https: http://*.requify.local;
               worker-src 'self' blob:;
             ">`
           );
@@ -82,9 +82,14 @@ export default defineConfig({
     allowedHosts: [
       "backend",
       "localhost",
+      "requify.local",
+      "api.requify.local",
+      "cdn.requify.local",
+      "admin.requify.local",
+      "docs.requify.local",
       "127.0.0.1",
       "requify_frontend",
-      "requify-frontend-dev",
+      "requify-frontend-dev", 
     ],
     proxy: {
       "/api": {

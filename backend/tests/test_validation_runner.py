@@ -202,7 +202,7 @@ async def test_crud_operations(results: TestValidationResults):
 async def test_api_endpoints(results: TestValidationResults):
     """Test API endpoints"""
     try:
-        base_url = f"http://localhost:{settings.app_config.port}"
+        base_url = f"http://localhost:{settings.run.port}"
         timeout = httpx.Timeout(connect=5.0, read=5.0, write=5.0, pool=5.0)
 
         async with httpx.AsyncClient(timeout=timeout) as client:

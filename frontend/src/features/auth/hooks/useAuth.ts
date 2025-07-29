@@ -32,23 +32,35 @@ export const useAuth = (): UseAuthReturn => {
       setIsLoading(true);
       setError(null);
 
+      console.log("🔍 Checking authentication...");
+
       // Используем apiUtils для проверки аутентификации
       if (apiUtils.isAuthenticated()) {
+        console.log("✅ Token found, fetching user data...");
         const userData = await userDAO.getCurrentUserProfile();
         setUser(userData);
+        console.log("✅ Authentication check successful");
       } else {
+        console.log("❌ No valid token found");
         setUser(null);
-        // Очищаем токены если аутентификация не прошла
-        apiUtils.tokens.clear();
+        // НЕ очищаем токены здесь - они могут быть валидными, но истекшими
+        // Пусть axios interceptor обработает обновление токена
       }
     } catch (error) {
-      console.error("Auth check failed:", error);
+      console.error("❌ Auth check failed:", error);
       setUser(null);
       setError(
         error instanceof Error ? error.message : "Authentication failed"
       );
-      // Очищаем токены при ошибке
-      apiUtils.tokens.clear();
+
+      // Очищаем токены только при явных ошибках аутентификации (401, 403)
+      if (error && typeof error === "object" && "status" in error) {
+        const status = (error as any).status;
+        if (status === 401 || status === 403) {
+          console.log("🗑️ Clearing tokens due to auth error:", status);
+          apiUtils.tokens.clear();
+        }
+      }
     } finally {
       setIsLoading(false);
     }
@@ -63,19 +75,26 @@ export const useAuth = (): UseAuthReturn => {
       setIsLoading(true);
       setError(null);
 
+      console.log("🔐 Attempting login...");
+
       // Используем authApi для логина
       const response = await authApi.login(credentials);
 
       // Сохраняем токены
       if (response.access_token && response.refresh_token) {
-        apiUtils.tokens.save(response.access_token, response.refresh_token);
+        apiUtils.tokens.save(
+          response.access_token,
+          response.refresh_token,
+          response.expires_in
+        );
 
         // Получаем полную информацию о пользователе
         const userData = await userDAO.getCurrentUserProfile();
         setUser(userData);
+        console.log("✅ Login successful");
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("❌ Login failed:", error);
       setError(error instanceof Error ? error.message : "Login failed");
       throw error;
     } finally {
@@ -88,6 +107,8 @@ export const useAuth = (): UseAuthReturn => {
       setIsLoading(true);
       setError(null);
 
+      console.log("📝 Attempting registration...");
+
       // Преобразуем данные формы в формат API
       const registerData: RegisterRequest = {
         email: userData.email,
@@ -97,7 +118,9 @@ export const useAuth = (): UseAuthReturn => {
         first_name: userData.first_name,
         last_name: userData.last_name,
         // Если есть first_name и last_name, объединяем их в name
-        name: [userData.first_name, userData.last_name].filter(Boolean).join(' ') || userData.username,
+        name:
+          [userData.first_name, userData.last_name].filter(Boolean).join(" ") ||
+          userData.username,
       };
 
       // Регистрация через API
@@ -106,14 +129,19 @@ export const useAuth = (): UseAuthReturn => {
       // Автоматический логин после регистрации
       if (response.access_token && response.refresh_token) {
         // Сохраняем токены
-        apiUtils.tokens.save(response.access_token, response.refresh_token);
+        apiUtils.tokens.save(
+          response.access_token,
+          response.refresh_token,
+          response.expires_in
+        );
 
         // Получаем полную информацию о пользователе
         const fullUserData = await userDAO.getCurrentUserProfile();
         setUser(fullUserData);
+        console.log("✅ Registration successful");
       }
     } catch (error) {
-      console.error("Registration failed:", error);
+      console.error("❌ Registration failed:", error);
       setError(error instanceof Error ? error.message : "Registration failed");
       throw error;
     } finally {
@@ -126,12 +154,15 @@ export const useAuth = (): UseAuthReturn => {
       setIsLoading(true);
       setError(null);
 
+      console.log("🚪 Attempting logout...");
+
       // Используем authApi для выхода
       await authApi.logout();
       setUser(null);
       apiUtils.tokens.clear();
+      console.log("✅ Logout successful");
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("❌ Logout failed:", error);
       // Очищаем состояние даже при ошибке выхода
       setUser(null);
       apiUtils.tokens.clear();
@@ -174,7 +205,7 @@ export const useAuth = (): UseAuthReturn => {
 
   return {
     user,
-    isAuthenticated: apiUtils.isAuthenticated() && !!user,
+    isAuthenticated: apiUtils.isAuthenticated(),
     isLoading,
     error,
     login,

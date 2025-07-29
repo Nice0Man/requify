@@ -14,10 +14,12 @@ import uuid
 import hashlib
 import socket
 import asyncio
+
 try:
     import aiosmtplib
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
+
     SMTP_AVAILABLE = True
 except ImportError:
     SMTP_AVAILABLE = False
@@ -118,7 +120,9 @@ class FileService:
 
             # Вирусная проверка (если включена)
             if self.config.enable_virus_scan:
-                await self._scan_for_viruses(content, file.filename or "unknown", user_id)
+                await self._scan_for_viruses(
+                    content, file.filename or "unknown", user_id
+                )
 
             # Изменение размера изображения
             processed_images = await self._resize_avatar_image(content)
@@ -297,33 +301,69 @@ class FileService:
                     # Пример: http://localhost/cdn/avatars/users/1/2025/01/28/avatars_256x256_uuid.jpg
                     path_part = avatar_url.replace(self.config.cdn_base_url, "")
                     if path_part.startswith(self.config.cdn_avatar_path):
-                        object_name = path_part.replace(self.config.cdn_avatar_path + "/", "")
-                        
-                        # Удаляем все размеры аватара
-                        # Поскольку в object_name есть размер, заменяем его на * для поиска
-                        base_name = object_name.replace("_256x256_", "_*_")
-                        
-                        # Список объектов для удаления
-                        try:
-                            objects = self.minio_client.list_objects(
-                                self.config.minio_bucket_avatars, 
-                                prefix=object_name.rsplit("_", 2)[0]  # Базовое имя без размера и UUID
-                            )
-                            
-                            deleted_count = 0
-                            for obj in objects:
-                                self.minio_client.remove_object(
-                                    self.config.minio_bucket_avatars, 
-                                    obj.object_name
+                        object_name = path_part.replace(
+                            self.config.cdn_avatar_path + "/", ""
+                        )
+
+                        # Удаляем все размеры аватара для КОНКРЕТНОГО UUID
+                        # Извлекаем UUID из имени файла
+                        if "_" in object_name:
+                            # Пример: users/5/2025/07/29/avatars_256x256_be9bbae6-f664-4e38-9b13-10fb59780da2.jpg
+                            # Извлекаем UUID: be9bbae6-f664-4e38-9b13-10fb59780da2
+                            try:
+                                parts = object_name.split("_")
+                                if len(parts) >= 3:
+                                    uuid_part = parts[-1].split(".")[
+                                        0
+                                    ]  # UUID без расширения
+
+                                    # Создаем префикс для поиска всех размеров этого конкретного аватара
+                                    # Пример: users/5/2025/07/29/avatars_
+                                    base_prefix = "_".join(parts[:-2]) + "_"
+
+                                    # Список объектов для удаления с конкретным UUID
+                                    objects = self.minio_client.list_objects(
+                                        self.config.minio_bucket_avatars,
+                                        prefix=base_prefix,
+                                    )
+
+                                    deleted_count = 0
+                                    for obj in objects:
+                                        # Проверяем что объект содержит наш UUID
+                                        if uuid_part in obj.object_name:
+                                            self.minio_client.remove_object(
+                                                self.config.minio_bucket_avatars,
+                                                obj.object_name,
+                                            )
+                                            deleted_count += 1
+                                            logger.info(
+                                                f"Deleted MinIO object: {obj.object_name}"
+                                            )
+
+                                    return deleted_count > 0
+                                else:
+                                    # Если структура имени нестандартная, удаляем только конкретный файл
+                                    self.minio_client.remove_object(
+                                        self.config.minio_bucket_avatars, object_name
+                                    )
+                                    logger.info(f"Deleted MinIO object: {object_name}")
+                                    return True
+                            except Exception as parse_error:
+                                logger.warning(
+                                    f"Could not parse object name {object_name}, deleting single file: {str(parse_error)}"
                                 )
-                                deleted_count += 1
-                                logger.info(f"Deleted MinIO object: {obj.object_name}")
-                            
-                            return deleted_count > 0
-                            
-                        except S3Error as e:
-                            logger.error(f"Failed to delete avatar from MinIO: {str(e)}")
-                            return False
+                                # Fallback: удаляем только конкретный файл
+                                self.minio_client.remove_object(
+                                    self.config.minio_bucket_avatars, object_name
+                                )
+                                logger.info(f"Deleted MinIO object: {object_name}")
+                                return True
+
+                            except S3Error as e:
+                                logger.error(
+                                    f"Failed to delete avatar from MinIO: {str(e)}"
+                                )
+                                return False
             else:
                 # Локальное удаление
                 if avatar_url.startswith("/uploads/"):
@@ -332,7 +372,7 @@ class FileService:
                         file_path.unlink()
                         logger.info(f"Avatar deleted: {file_path}")
                         return True
-            
+
             return False
 
         except Exception as e:
@@ -417,21 +457,23 @@ class FileService:
 
         return processed_images
 
-    async def _scan_for_viruses(self, content: bytes, filename: str = "", user_id: int = 0) -> None:
+    async def _scan_for_viruses(
+        self, content: bytes, filename: str = "", user_id: int = 0
+    ) -> None:
         """
         Комплексная антивирусная проверка файлов с логированием и уведомлениями.
-        
+
         Args:
             content: Содержимое файла в байтах
             filename: Имя файла (для логирования)
             user_id: ID пользователя (для логирования)
-            
+
         Raises:
             HTTPException: При обнаружении угроз
         """
         file_hash = self._generate_file_hash(content)
         scan_start = datetime.now()
-        
+
         try:
             # Инициализируем результаты сканирования
             scan_results = {
@@ -442,69 +484,78 @@ class FileService:
                 "scan_timestamp": scan_start.isoformat(),
                 "threats_found": [],
                 "scan_engine": self.config.virus_scan_engine,
-                "scan_duration_ms": 0
+                "scan_duration_ms": 0,
             }
-            
+
             threats_found = []
-            
+
             # 1. Проверка паттернов (быстрая проверка)
             if self.config.scan_patterns_enabled:
                 pattern_threats = await self._scan_patterns(content, filename)
                 threats_found.extend(pattern_threats)
-            
+
             # 2. Проверка магических байтов
             if self.config.scan_magic_bytes:
                 magic_threats = await self._scan_magic_bytes(content, filename)
                 threats_found.extend(magic_threats)
-            
+
             # 3. Проверка встроенного контента
             if self.config.scan_embedded_content:
                 embedded_threats = await self._scan_embedded_content(content, filename)
                 threats_found.extend(embedded_threats)
-            
+
             # 4. ClamAV сканирование (если доступно)
             if self.config.virus_scan_engine in ["clamav", "both"]:
                 clamav_threats = await self._scan_with_clamav(content, filename)
                 threats_found.extend(clamav_threats)
-            
+
             scan_end = datetime.now()
-            scan_results["scan_duration_ms"] = int((scan_end - scan_start).total_seconds() * 1000)
+            scan_results["scan_duration_ms"] = int(
+                (scan_end - scan_start).total_seconds() * 1000
+            )
             scan_results["threats_found"] = threats_found
-            
+
             # Логирование результатов
             if threats_found:
                 await self._log_security_incident(scan_results, "VIRUS_DETECTED")
                 await self._quarantine_file(content, filename, user_id, threats_found)
                 await self._notify_admin_security_incident(scan_results)
-                
+
                 # Выбрасываем исключение с детальной информацией
                 threat_details = "; ".join([t["description"] for t in threats_found])
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Security threat detected: {threat_details}"
+                    detail=f"Security threat detected: {threat_details}",
                 )
             else:
                 # Логируем успешную проверку
                 if self.config.security_log_enabled:
-                    logger.info(f"File scan completed successfully: {filename} (hash: {file_hash[:8]}...)")
-                    
+                    logger.info(
+                        f"File scan completed successfully: {filename} (hash: {file_hash[:8]}...)"
+                    )
+
         except HTTPException:
             # Перебрасываем HTTP исключения
             raise
         except Exception as e:
             # Логируем ошибки сканирования
             error_msg = f"Virus scan failed for file {filename}: {str(e)}"
-            await self._log_security_incident({
-                **scan_results,
-                "error": str(e),
-                "scan_duration_ms": int((datetime.now() - scan_start).total_seconds() * 1000)
-            }, "SCAN_ERROR")
-            
+            await self._log_security_incident(
+                {
+                    **scan_results,
+                    "error": str(e),
+                    "scan_duration_ms": int(
+                        (datetime.now() - scan_start).total_seconds() * 1000
+                    ),
+                },
+                "SCAN_ERROR",
+            )
+
             # В случае ошибки сканирования - по умолчанию блокируем файл
             logger.error(error_msg)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Virus scan failed - file rejected for security"
+                detail="Virus scan failed - file rejected for security",
             )
 
     def _get_file_extension(self, filename: Optional[str]) -> str:
@@ -512,12 +563,14 @@ class FileService:
         if not filename:
             return ""
         return Path(filename).suffix.lower()
-    
-    async def _scan_patterns(self, content: bytes, filename: str) -> List[Dict[str, Any]]:
+
+    async def _scan_patterns(
+        self, content: bytes, filename: str
+    ) -> List[Dict[str, Any]]:
         """Проверка на подозрительные паттерны в содержимом файла."""
         threats = []
         content_lower = content.lower()
-        
+
         # Расширенные подозрительные паттерны
         suspicious_patterns = {
             # Веб-скрипты
@@ -525,13 +578,11 @@ class FileService:
             b"javascript:": "JavaScript protocol detected",
             b"vbscript:": "VBScript detected",
             b"data:text/html": "Data URI HTML injection",
-            
             # Серверные скрипты
             b"<?php": "PHP code detected",
-            b"<%": "Server-side script detected", 
+            b"<%": "Server-side script detected",
             b"<%=": "ASP expression detected",
             b"<jsp:": "JSP tag detected",
-            
             # Исполняемые команды
             b"exec(": "Code execution attempt",
             b"eval(": "Code evaluation attempt",
@@ -540,12 +591,10 @@ class FileService:
             b"cmd.exe": "Windows command prompt",
             b"/bin/sh": "Unix shell detected",
             b"/bin/bash": "Bash shell detected",
-            
             # Макросы Office
             b"auto_open": "Office macro autorun",
             b"autoexec": "Macro autoexecution",
             b"workbook_open": "Excel workbook macro",
-            
             # Потенциально опасные расширения в содержимом
             b".exe": "Executable file reference",
             b".bat": "Batch file reference",
@@ -553,63 +602,72 @@ class FileService:
             b".scr": "Screen saver executable",
             b".pif": "Program information file",
         }
-        
+
         for pattern, description in suspicious_patterns.items():
             if pattern in content_lower:
-                threats.append({
-                    "type": "PATTERN_MATCH",
-                    "pattern": pattern.decode('utf-8', errors='ignore'),
-                    "description": description,
-                    "severity": "HIGH" if pattern in [b"<script", b"exec(", b"eval(", b"cmd.exe"] else "MEDIUM"
-                })
-        
+                threats.append(
+                    {
+                        "type": "PATTERN_MATCH",
+                        "pattern": pattern.decode("utf-8", errors="ignore"),
+                        "description": description,
+                        "severity": (
+                            "HIGH"
+                            if pattern in [b"<script", b"exec(", b"eval(", b"cmd.exe"]
+                            else "MEDIUM"
+                        ),
+                    }
+                )
+
         # Проверка соотношения исполняемого кода
         executable_patterns = [b"<script", b"<?php", b"exec(", b"eval("]
-        exec_count = sum(1 for pattern in executable_patterns if pattern in content_lower)
+        exec_count = sum(
+            1 for pattern in executable_patterns if pattern in content_lower
+        )
         if exec_count > 2:
-            threats.append({
-                "type": "MULTIPLE_EXECUTABLE_PATTERNS",
-                "description": f"Multiple executable patterns detected ({exec_count})",
-                "severity": "HIGH"
-            })
-        
+            threats.append(
+                {
+                    "type": "MULTIPLE_EXECUTABLE_PATTERNS",
+                    "description": f"Multiple executable patterns detected ({exec_count})",
+                    "severity": "HIGH",
+                }
+            )
+
         return threats
-    
-    async def _scan_magic_bytes(self, content: bytes, filename: str) -> List[Dict[str, Any]]:
+
+    async def _scan_magic_bytes(
+        self, content: bytes, filename: str
+    ) -> List[Dict[str, Any]]:
         """Проверка магических байтов для определения реального типа файла."""
         threats = []
-        
+
         if len(content) < 16:
             return threats
-        
+
         # Получаем расширение из имени файла
         file_ext = self._get_file_extension(filename).lower()
-        
+
         # Магические байты известных форматов
         magic_signatures = {
             # Исполняемые файлы
             b"MZ": ("exe", "Windows executable"),
             b"\x7fELF": ("elf", "Linux executable"),
             b"\xca\xfe\xba\xbe": ("macho", "macOS executable"),
-            
             # Архивы
             b"PK\x03\x04": ("zip", "ZIP archive"),
             b"Rar!": ("rar", "RAR archive"),
             b"7z\xbc\xaf\x27\x1c": ("7z", "7-Zip archive"),
-            
             # Офисные документы (которые могут содержать макросы)
             b"\xd0\xcf\x11\xe0": ("ole", "OLE document (may contain macros)"),
-            
             # Изображения (для проверки соответствия)
             b"\xff\xd8\xff": ("jpg", "JPEG image"),
             b"\x89PNG": ("png", "PNG image"),
             b"GIF8": ("gif", "GIF image"),
             b"RIFF": ("webp", "WebP/RIFF format"),
         }
-        
+
         # Проверяем первые 16 байтов
         file_header = content[:16]
-        
+
         for magic_bytes, (detected_type, description) in magic_signatures.items():
             if file_header.startswith(magic_bytes):
                 # Проверяем соответствие расширения файла реальному типу
@@ -623,56 +681,66 @@ class FileService:
                     "jpg": [".jpg", ".jpeg"],
                     "png": [".png"],
                     "gif": [".gif"],
-                    "webp": [".webp"]
+                    "webp": [".webp"],
                 }
-                
+
                 # Если это исполняемый файл - всегда угроза
                 if detected_type in ["exe", "elf", "macho"]:
-                    threats.append({
-                        "type": "EXECUTABLE_FILE",
-                        "description": f"{description} detected",
-                        "severity": "CRITICAL"
-                    })
-                
+                    threats.append(
+                        {
+                            "type": "EXECUTABLE_FILE",
+                            "description": f"{description} detected",
+                            "severity": "CRITICAL",
+                        }
+                    )
+
                 # Если расширение не соответствует содержимому - подозрительно
                 elif detected_type in expected_extensions:
                     if file_ext not in expected_extensions[detected_type]:
-                        threats.append({
-                            "type": "FILE_TYPE_MISMATCH",
-                            "description": f"File extension {file_ext} doesn't match content type {detected_type}",
-                            "severity": "HIGH"
-                        })
-        
+                        threats.append(
+                            {
+                                "type": "FILE_TYPE_MISMATCH",
+                                "description": f"File extension {file_ext} doesn't match content type {detected_type}",
+                                "severity": "HIGH",
+                            }
+                        )
+
         return threats
 
     def _generate_file_hash(self, content: bytes) -> str:
         """Генерация хэша файла для дедупликации."""
         return hashlib.sha256(content).hexdigest()
-    
-    async def _scan_embedded_content(self, content: bytes, filename: str) -> List[Dict[str, Any]]:
+
+    async def _scan_embedded_content(
+        self, content: bytes, filename: str
+    ) -> List[Dict[str, Any]]:
         """Проверка на встроенный подозрительный контент."""
         threats = []
-        
+
         # Поиск встроенных файлов и архивов
         embedded_patterns = {
             b"PK\x03\x04": "Embedded ZIP archive",
-            b"Rar!": "Embedded RAR archive", 
+            b"Rar!": "Embedded RAR archive",
             b"MZ": "Embedded Windows executable",
             b"\x7fELF": "Embedded Linux executable",
         }
-        
+
         # Ищем паттерны не в начале файла (встроенное содержимое)
-        for i in range(100, min(len(content) - 4, 10000)):  # Проверяем первые 10KB после первых 100 байт
-            chunk = content[i:i+4]
+        for i in range(
+            100, min(len(content) - 4, 10000)
+        ):  # Проверяем первые 10KB после первых 100 байт
+            chunk = content[i : i + 4]
             for pattern, description in embedded_patterns.items():
                 if chunk == pattern:
-                    threats.append({
-                        "type": "EMBEDDED_CONTENT",
-                        "description": f"{description} found at offset {i}",
-                        "severity": "HIGH",
-                        "offset": i
-                    })
-        
+                    threats.append(
+                        {
+                            "type": "EMBEDDED_CONTENT",
+                            "description": f"{description} found at offset {i}",
+                            "severity": "HIGH",
+                            "offset": i,
+                        }
+                    )
+
         # Проверка на подозрительные URL
         url_patterns = [
             b"http://",
@@ -680,22 +748,26 @@ class FileService:
             b"ftp://",
             b"file://",
         ]
-        
+
         total_urls = sum(content.count(pattern) for pattern in url_patterns)
-        
+
         if total_urls > 10:  # Много URL в файле
-            threats.append({
-                "type": "SUSPICIOUS_URL_COUNT",
-                "description": f"File contains {total_urls} URLs",
-                "severity": "MEDIUM"
-            })
-        
+            threats.append(
+                {
+                    "type": "SUSPICIOUS_URL_COUNT",
+                    "description": f"File contains {total_urls} URLs",
+                    "severity": "MEDIUM",
+                }
+            )
+
         return threats
-    
-    async def _scan_with_clamav(self, content: bytes, filename: str) -> List[Dict[str, Any]]:
+
+    async def _scan_with_clamav(
+        self, content: bytes, filename: str
+    ) -> List[Dict[str, Any]]:
         """Сканирование с помощью ClamAV антивируса."""
         threats = []
-        
+
         try:
             # Пытаемся подключиться к ClamAV
             if os.path.exists(self.config.clamav_socket_path):
@@ -704,99 +776,107 @@ class FileService:
             else:
                 # TCP подключение
                 result = await self._clamav_scan_tcp(content)
-            
+
             if result and result != "OK":
-                threats.append({
-                    "type": "CLAMAV_DETECTION",
-                    "description": f"ClamAV detected: {result}",
-                    "severity": "CRITICAL"
-                })
-        
+                threats.append(
+                    {
+                        "type": "CLAMAV_DETECTION",
+                        "description": f"ClamAV detected: {result}",
+                        "severity": "CRITICAL",
+                    }
+                )
+
         except Exception as e:
             logger.warning(f"ClamAV scan failed for {filename}: {str(e)}")
             # Не выбрасываем исключение - продолжаем с другими методами
-        
+
         return threats
-    
+
     async def _clamav_scan_unix_socket(self, content: bytes) -> str:
         """ClamAV сканирование через Unix socket."""
         try:
             reader, writer = await asyncio.wait_for(
                 asyncio.open_unix_connection(self.config.clamav_socket_path),
-                timeout=self.config.clamav_timeout
+                timeout=self.config.clamav_timeout,
             )
-            
+
             # Отправляем команду INSTREAM
             writer.write(b"zINSTREAM\0")
             await writer.drain()
-            
+
             # Отправляем размер данных
             size = len(content)
-            writer.write(size.to_bytes(4, byteorder='big'))
+            writer.write(size.to_bytes(4, byteorder="big"))
             await writer.drain()
-            
+
             # Отправляем данные
             writer.write(content)
             await writer.drain()
-            
+
             # Сигнализируем об окончании
-            writer.write(b'\0\0\0\0')
+            writer.write(b"\0\0\0\0")
             await writer.drain()
-            
+
             # Читаем ответ
             response = await reader.read(1024)
             writer.close()
             await writer.wait_closed()
-            
+
             result = response.decode().strip()
-            return result.split(': ')[1] if ': ' in result else result
-            
+            return result.split(": ")[1] if ": " in result else result
+
         except Exception as e:
             logger.error(f"ClamAV Unix socket scan failed: {str(e)}")
             raise
-    
+
     async def _clamav_scan_tcp(self, content: bytes) -> str:
         """ClamAV сканирование через TCP."""
         try:
             reader, writer = await asyncio.wait_for(
-                asyncio.open_connection(self.config.clamav_host, self.config.clamav_port),
-                timeout=self.config.clamav_timeout
+                asyncio.open_connection(
+                    self.config.clamav_host, self.config.clamav_port
+                ),
+                timeout=self.config.clamav_timeout,
             )
-            
+
             # Аналогично Unix socket версии
             writer.write(b"zINSTREAM\0")
             await writer.drain()
-            
+
             size = len(content)
-            writer.write(size.to_bytes(4, byteorder='big'))
+            writer.write(size.to_bytes(4, byteorder="big"))
             await writer.drain()
-            
+
             writer.write(content)
             await writer.drain()
-            
-            writer.write(b'\0\0\0\0')
+
+            writer.write(b"\0\0\0\0")
             await writer.drain()
-            
+
             response = await reader.read(1024)
             writer.close()
             await writer.wait_closed()
-            
+
             result = response.decode().strip()
-            return result.split(': ')[1] if ': ' in result else result
-            
+            return result.split(": ")[1] if ": " in result else result
+
         except Exception as e:
             logger.error(f"ClamAV TCP scan failed: {str(e)}")
             raise
-    
-    async def _log_security_incident(self, scan_results: Dict[str, Any], incident_type: str) -> None:
+
+    async def _log_security_incident(
+        self, scan_results: Dict[str, Any], incident_type: str
+    ) -> None:
         """Логирование инцидентов безопасности."""
         if not self.config.security_log_enabled:
             return
-        
+
         try:
             # Формируем детальное сообщение об инциденте
             log_entry = {
-                "timestamp": scan_results.get("scan_timestamp", datetime.now().isoformat()),
+                "timestamp": scan_results.get(
+                    "scan_timestamp", datetime.now().isoformat()
+                ),
                 "incident_type": incident_type,
                 "filename": scan_results.get("filename", "unknown"),
                 "user_id": scan_results.get("user_id", 0),
@@ -806,15 +886,17 @@ class FileService:
                 "scan_engine": scan_results.get("scan_engine", "unknown"),
                 "threats_found": scan_results.get("threats_found", []),
                 "client_ip": "unknown",  # TODO: Получать IP из запроса
-                "user_agent": "unknown"  # TODO: Получать User-Agent из запроса
+                "user_agent": "unknown",  # TODO: Получать User-Agent из запроса
             }
-            
+
             # Формируем сообщение для лога
             if incident_type == "VIRUS_DETECTED":
-                threat_details = "; ".join([
-                    f"{t.get('type', 'UNKNOWN')}: {t.get('description', 'No description')}"
-                    for t in scan_results.get("threats_found", [])
-                ])
+                threat_details = "; ".join(
+                    [
+                        f"{t.get('type', 'UNKNOWN')}: {t.get('description', 'No description')}"
+                        for t in scan_results.get("threats_found", [])
+                    ]
+                )
                 message = (
                     f"SECURITY ALERT - Virus detected: {scan_results.get('filename', 'unknown')} "
                     f"(user_id: {scan_results.get('user_id', 0)}, "
@@ -822,7 +904,7 @@ class FileService:
                     f"threats: {threat_details})"
                 )
                 logger.error(message, extra={"security_incident": log_entry})
-                
+
             elif incident_type == "SCAN_ERROR":
                 message = (
                     f"SECURITY WARNING - Virus scan failed: {scan_results.get('filename', 'unknown')} "
@@ -830,36 +912,43 @@ class FileService:
                     f"error: {scan_results.get('error', 'unknown')})"
                 )
                 logger.warning(message, extra={"security_incident": log_entry})
-            
+
             # Дополнительное логирование в специальный файл безопасности
             security_log_path = Path(self.config.security_log_file)
             security_log_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            async with aiofiles.open(security_log_path, 'a') as f:
+
+            async with aiofiles.open(security_log_path, "a") as f:
                 import json
+
                 await f.write(f"{json.dumps(log_entry, ensure_ascii=False)}\n")
-                
+
         except Exception as e:
             logger.error(f"Failed to log security incident: {str(e)}")
-    
-    async def _quarantine_file(self, content: bytes, filename: str, user_id: int, threats: List[Dict[str, Any]]) -> None:
+
+    async def _quarantine_file(
+        self, content: bytes, filename: str, user_id: int, threats: List[Dict[str, Any]]
+    ) -> None:
         """Помещение файла в карантин."""
         try:
             # Создаем директорию карантина
             quarantine_path = Path(self.config.quarantine_dir)
             quarantine_path.mkdir(parents=True, exist_ok=True)
-            
+
             # Генерируем уникальное имя файла в карантине
             file_hash = self._generate_file_hash(content)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            safe_filename = "".join(c for c in filename if c.isalnum() or c in "._-")[:50]
-            quarantine_filename = f"{timestamp}_{user_id}_{file_hash[:8]}_{safe_filename}.quarantine"
+            safe_filename = "".join(c for c in filename if c.isalnum() or c in "._-")[
+                :50
+            ]
+            quarantine_filename = (
+                f"{timestamp}_{user_id}_{file_hash[:8]}_{safe_filename}.quarantine"
+            )
             quarantine_file_path = quarantine_path / quarantine_filename
-            
+
             # Сохраняем файл в карантине
-            async with aiofiles.open(quarantine_file_path, 'wb') as f:
+            async with aiofiles.open(quarantine_file_path, "wb") as f:
                 await f.write(content)
-            
+
             # Создаем метаданные файла в карантине
             metadata = {
                 "original_filename": filename,
@@ -868,90 +957,119 @@ class FileService:
                 "file_hash": file_hash,
                 "file_size": len(content),
                 "threats_detected": threats,
-                "retention_until": (datetime.now() + timedelta(days=self.config.quarantine_retention_days)).isoformat()
+                "retention_until": (
+                    datetime.now()
+                    + timedelta(days=self.config.quarantine_retention_days)
+                ).isoformat(),
             }
-            
-            metadata_path = quarantine_file_path.with_suffix('.metadata.json')
-            async with aiofiles.open(metadata_path, 'w') as f:
+
+            metadata_path = quarantine_file_path.with_suffix(".metadata.json")
+            async with aiofiles.open(metadata_path, "w") as f:
                 import json
+
                 await f.write(json.dumps(metadata, ensure_ascii=False, indent=2))
-            
-            logger.warning(f"File quarantined: {quarantine_filename} (threats: {len(threats)})")
-            
+
+            logger.warning(
+                f"File quarantined: {quarantine_filename} (threats: {len(threats)})"
+            )
+
         except Exception as e:
             logger.error(f"Failed to quarantine file {filename}: {str(e)}")
-    
-    async def _notify_admin_security_incident(self, scan_results: Dict[str, Any]) -> None:
+
+    async def _notify_admin_security_incident(
+        self, scan_results: Dict[str, Any]
+    ) -> None:
         """Уведомление администратора о инциденте безопасности."""
         if not self.config.admin_notifications_enabled:
             return
-        
+
         try:
             # Подсчитываем количество недавних инцидентов
             incident_count = await self._count_recent_incidents()
-            
+
             # Уведомляем только если превышен порог
             if incident_count >= self.config.admin_notification_threshold:
-                
+
                 notification_methods = [
-                    method.strip() 
+                    method.strip()
                     for method in self.config.admin_notification_methods.split(",")
                 ]
-                
+
                 for method in notification_methods:
                     if method == "email":
-                        await self._send_admin_email_notification(scan_results, incident_count)
+                        await self._send_admin_email_notification(
+                            scan_results, incident_count
+                        )
                     elif method == "log":
-                        await self._send_admin_log_notification(scan_results, incident_count)
-                    elif method == "webhook" and self.config.admin_notification_webhook_url:
-                        await self._send_admin_webhook_notification(scan_results, incident_count)
-                        
+                        await self._send_admin_log_notification(
+                            scan_results, incident_count
+                        )
+                    elif (
+                        method == "webhook"
+                        and self.config.admin_notification_webhook_url
+                    ):
+                        await self._send_admin_webhook_notification(
+                            scan_results, incident_count
+                        )
+
         except Exception as e:
             logger.error(f"Failed to send admin notification: {str(e)}")
-    
+
     async def _count_recent_incidents(self) -> int:
         """Подсчет количества недавних инцидентов безопасности."""
         try:
             security_log_path = Path(self.config.security_log_file)
             if not security_log_path.exists():
                 return 0
-            
+
             recent_incidents = 0
             cutoff_time = datetime.now() - timedelta(hours=1)  # За последний час
-            
-            async with aiofiles.open(security_log_path, 'r') as f:
+
+            async with aiofiles.open(security_log_path, "r") as f:
                 async for line in f:
                     try:
                         import json
+
                         incident = json.loads(line.strip())
-                        incident_time = datetime.fromisoformat(incident.get("timestamp", ""))
-                        if incident_time > cutoff_time and incident.get("incident_type") == "VIRUS_DETECTED":
+                        incident_time = datetime.fromisoformat(
+                            incident.get("timestamp", "")
+                        )
+                        if (
+                            incident_time > cutoff_time
+                            and incident.get("incident_type") == "VIRUS_DETECTED"
+                        ):
                             recent_incidents += 1
                     except (json.JSONDecodeError, ValueError):
                         continue
-            
+
             return recent_incidents
-            
+
         except Exception:
             return 0
-    
-    async def _send_admin_email_notification(self, scan_results: Dict[str, Any], incident_count: int) -> None:
+
+    async def _send_admin_email_notification(
+        self, scan_results: Dict[str, Any], incident_count: int
+    ) -> None:
         """Отправка email уведомления администратору."""
         try:
             if not SMTP_AVAILABLE:
-                logger.warning("Email notifications disabled - aiosmtplib not installed")
+                logger.warning(
+                    "Email notifications disabled - aiosmtplib not installed"
+                )
                 return
-                
+
             if not settings.email.smtp_host:
                 logger.warning("Email notifications disabled - no SMTP configuration")
                 return
-            
+
             # Формируем тело письма
-            threat_details = "\n".join([
-                f"- {t.get('type', 'UNKNOWN')}: {t.get('description', 'No description')} (Severity: {t.get('severity', 'UNKNOWN')})"
-                for t in scan_results.get("threats_found", [])
-            ])
-            
+            threat_details = "\n".join(
+                [
+                    f"- {t.get('type', 'UNKNOWN')}: {t.get('description', 'No description')} (Severity: {t.get('severity', 'UNKNOWN')})"
+                    for t in scan_results.get("threats_found", [])
+                ]
+            )
+
             email_body = f"""
 SECURITY ALERT - Virus Detection Report
 
@@ -970,15 +1088,17 @@ Recent incident count (last hour): {incident_count}
 This is an automated security alert from Requify File Security System.
 The file has been quarantined and access blocked.
 """
-            
+
             # Создаем email сообщение
             msg = MIMEMultipart()
-            msg['From'] = settings.email.from_email
-            msg['To'] = settings.admin.email
-            msg['Subject'] = f"[SECURITY ALERT] Virus Detected - {scan_results.get('filename', 'unknown')}"
-            
-            msg.attach(MIMEText(email_body, 'plain'))
-            
+            msg["From"] = settings.email.from_email
+            msg["To"] = settings.admin.email
+            msg["Subject"] = (
+                f"[SECURITY ALERT] Virus Detected - {scan_results.get('filename', 'unknown')}"
+            )
+
+            msg.attach(MIMEText(email_body, "plain"))
+
             # Отправляем email
             await aiosmtplib.send(
                 msg,
@@ -987,28 +1107,32 @@ The file has been quarantined and access blocked.
                 username=settings.email.smtp_user,
                 password=settings.email.smtp_password,
                 use_tls=settings.email.smtp_tls,
-                timeout=30
+                timeout=30,
             )
-            
+
             logger.info(f"Security alert email sent to admin: {settings.admin.email}")
-            
+
         except Exception as e:
             logger.error(f"Failed to send admin email notification: {str(e)}")
-    
-    async def _send_admin_log_notification(self, scan_results: Dict[str, Any], incident_count: int) -> None:
+
+    async def _send_admin_log_notification(
+        self, scan_results: Dict[str, Any], incident_count: int
+    ) -> None:
         """Отправка log уведомления администратору."""
-        threat_summary = ", ".join([
-            t.get("type", "UNKNOWN") for t in scan_results.get("threats_found", [])
-        ])
-        
+        threat_summary = ", ".join(
+            [t.get("type", "UNKNOWN") for t in scan_results.get("threats_found", [])]
+        )
+
         logger.critical(
             f"ADMIN ALERT: Multiple security incidents detected! "
             f"Recent count: {incident_count}, "
             f"Latest threat: {threat_summary} in file {scan_results.get('filename', 'unknown')} "
             f"(user: {scan_results.get('user_id', 0)})"
         )
-    
-    async def _send_admin_webhook_notification(self, scan_results: Dict[str, Any], incident_count: int) -> None:
+
+    async def _send_admin_webhook_notification(
+        self, scan_results: Dict[str, Any], incident_count: int
+    ) -> None:
         """Отправка webhook уведомления администратору."""
         try:
             try:
@@ -1016,26 +1140,26 @@ The file has been quarantined and access blocked.
             except ImportError:
                 logger.warning("Webhook notifications disabled - httpx not installed")
                 return
-            
+
             webhook_payload = {
                 "alert_type": "security_incident",
                 "severity": "critical",
                 "incident_count": incident_count,
                 "latest_incident": scan_results,
                 "timestamp": datetime.now().isoformat(),
-                "system": "requify_file_security"
+                "system": "requify_file_security",
             }
-            
+
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     self.config.admin_notification_webhook_url,
                     json=webhook_payload,
-                    timeout=10
+                    timeout=10,
                 )
                 response.raise_for_status()
-                
+
             logger.info(f"Security webhook notification sent: {response.status_code}")
-            
+
         except Exception as e:
             logger.error(f"Failed to send webhook notification: {str(e)}")
 

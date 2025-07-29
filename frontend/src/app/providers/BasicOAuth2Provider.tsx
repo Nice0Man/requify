@@ -92,13 +92,17 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
+        
+        console.log('🚀 BasicOAuth2Provider: Initializing authentication...');
 
         // Проверяем есть ли токен
         const hasValidToken = apiUtils.isAuthenticated();
+        console.log('🔍 BasicOAuth2Provider: Token check result:', hasValidToken);
 
         if (hasValidToken) {
           // Получаем данные пользователя из storage
           const storedUser = getUserFromStorage();
+          console.log('📱 BasicOAuth2Provider: Stored user data:', storedUser ? 'found' : 'not found');
 
           if (storedUser) {
             setUser(storedUser);
@@ -106,12 +110,10 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
           } else {
             // Если нет данных пользователя, пытаемся получить с сервера
             try {
+              console.log('📱 BasicOAuth2Provider: Fetching user data from server...');
               // Простой запрос к /users/me для получения данных пользователя
               const response = await fetch(
-                `${
-                  import.meta.env.VITE_API_BASE_URL ||
-                  "http://localhost:8000/api/v1"
-                }/users/me`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/v1/users/me`,
                 {
                   headers: apiUtils.getAuthHeaders(),
                 }
@@ -129,25 +131,33 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
                 setUser(user);
                 saveUserToStorage(user);
                 setIsAuthenticated(true);
-              } else {
-                // Если не удалось получить пользователя, очищаем токены
+                console.log('✅ BasicOAuth2Provider: User data fetched successfully');
+              } else if (response.status === 401 || response.status === 403) {
+                // Очищаем токены только при явных ошибках аутентификации
+                console.log('🗑️ BasicOAuth2Provider: Clearing tokens due to auth error:', response.status);
                 apiUtils.tokens.clear();
+                setIsAuthenticated(false);
+              } else {
+                // При других ошибках (сеть, 500, etc) не очищаем токены
+                console.warn('⚠️ BasicOAuth2Provider: Failed to fetch user data, but keeping tokens:', response.status);
                 setIsAuthenticated(false);
               }
             } catch (fetchError) {
-              console.warn("Failed to fetch user data:", fetchError);
-              apiUtils.tokens.clear();
+              console.warn("⚠️ BasicOAuth2Provider: Network error fetching user data, keeping tokens:", fetchError);
+              // НЕ очищаем токены при сетевых ошибках
               setIsAuthenticated(false);
             }
           }
         } else {
+          console.log('❌ BasicOAuth2Provider: No valid token found');
           setIsAuthenticated(false);
         }
       } catch (initError) {
-        console.error("Auth initialization failed:", initError);
+        console.error("❌ BasicOAuth2Provider: Auth initialization failed:", initError);
         setError(initError as Error);
         setIsAuthenticated(false);
       } finally {
+        console.log('🏁 BasicOAuth2Provider: Initialization complete');
         setIsLoading(false);
       }
     };
@@ -162,16 +172,21 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
         setIsLoading(true);
         setError(undefined);
 
+        console.log('🔐 BasicOAuth2Provider: Attempting login...');
+
+        // OAuth2 API ожидает form data для /auth/login
+        const formData = new URLSearchParams();
+        formData.append("username", credentials.email);
+        formData.append("password", credentials.password);
+
         const response = await fetch(
-          `${
-            import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1"
-          }/auth/login`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/login`,
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: JSON.stringify(credentials),
+            body: formData,
           }
         );
 
@@ -182,8 +197,8 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
         const data = await response.json();
 
         if (data.access_token && data.refresh_token) {
-          // Сохраняем токены
-          apiUtils.tokens.save(data.access_token, data.refresh_token);
+          // Сохраняем токены с правильным expires_in
+          apiUtils.tokens.save(data.access_token, data.refresh_token, data.expires_in);
 
           // Создаем объект пользователя
           const userData: BasicOAuth2User = {
@@ -196,11 +211,12 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
           setUser(userData);
           saveUserToStorage(userData);
           setIsAuthenticated(true);
+          console.log('✅ BasicOAuth2Provider: Login successful');
         } else {
           throw new Error("Invalid login response");
         }
       } catch (loginError) {
-        console.error("Login failed:", loginError);
+        console.error("❌ BasicOAuth2Provider: Login failed:", loginError);
         setError(loginError as Error);
         setIsAuthenticated(false);
         throw loginError;
@@ -214,23 +230,29 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
   // Выход из системы
   const logout = useCallback((options?: { returnTo?: string }): void => {
     try {
+      console.log('🚪 BasicOAuth2Provider: Logging out...');
+      
       // Очищаем все данные
       apiUtils.tokens.clear();
       setUser(undefined);
       setIsAuthenticated(false);
       setError(undefined);
 
+      console.log('✅ BasicOAuth2Provider: Logout successful');
+
       // Перенаправляем если указан returnTo
       if (options?.returnTo && typeof window !== "undefined") {
+        console.log('🔄 Redirecting to:', options.returnTo);
         window.location.href = options.returnTo;
       } else {
         // По умолчанию перенаправляем на страницу входа
         if (typeof window !== "undefined") {
+          console.log('🔄 Redirecting to auth page');
           window.location.href = "/auth";
         }
       }
     } catch (logoutError) {
-      console.error("Logout failed:", logoutError);
+      console.error("❌ BasicOAuth2Provider: Logout failed:", logoutError);
     }
   }, []);
 
@@ -249,10 +271,7 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
         try {
           // Обновляем токен через прямой запрос
           const response = await fetch(
-            `${
-              import.meta.env.VITE_API_BASE_URL ||
-              "http://localhost:8000/api/v1"
-            }/auth/refresh`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh`,
             {
               method: "POST",
               headers: {
@@ -265,13 +284,17 @@ export const BasicOAuth2Provider: React.FC<BasicOAuth2ProviderProps> = ({
           if (response.ok) {
             const data = await response.json();
             if (data.access_token && data.refresh_token) {
-              apiUtils.tokens.save(data.access_token, data.refresh_token);
+              apiUtils.tokens.save(data.access_token, data.refresh_token, data.expires_in);
               return data.access_token;
             }
+          } else {
+            console.warn('⚠️ BasicOAuth2Provider: Token refresh failed with status:', response.status);
+            throw new Error(`Token refresh failed: ${response.status}`);
           }
         } catch (refreshError) {
-          console.error("Token refresh failed:", refreshError);
-          logout();
+          console.error("❌ BasicOAuth2Provider: Token refresh failed:", refreshError);
+          // НЕ вызываем logout здесь - это может вызвать циклическую очистку токенов
+          // Пусть вызывающий код решает что делать
           throw new Error("Token refresh failed");
         }
       }
