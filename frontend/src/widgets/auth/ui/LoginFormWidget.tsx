@@ -85,9 +85,8 @@ export const LoginFormWidget: React.FC<LoginFormWidgetProps> = ({
       await login(formData);
       if (onSuccess) {
         onSuccess();
-      } else {
-        navigate("/dashboard", { replace: true });
       }
+      // Removed fallback redirect to dashboard
     } catch (error: any) {
       console.log("Login error:", error);
       const status = error?.response?.status;

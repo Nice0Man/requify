@@ -53,12 +53,12 @@ export const AuthContainerWidget: React.FC = () => {
   // Tab management
   const [activeTab, setActiveTab] = useState(mode === "register" ? 1 : 0);
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
+  // Redirect if already authenticated - REMOVED
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     navigate("/dashboard", { replace: true });
+  //   }
+  // }, [isAuthenticated, navigate]);
 
   // Event Handlers
   const handleTabChange = (newValue: number) => {
@@ -68,19 +68,17 @@ export const AuthContainerWidget: React.FC = () => {
   const handleSocialLogin = async (provider: "google" | "github") => {
     try {
       await loginWithSocial(provider);
-      navigate("/dashboard", { replace: true });
+      // Navigate to dashboard removed
+      console.log(`Social login with ${provider} successful`);
     } catch (error) {
       console.error(`Social login with ${provider} failed:`, error);
     }
   };
 
   const handleFormSuccess = () => {
-    // Для login - переходим на dashboard  
-    // Для register - RegisterFormWidget сам управляет навигацией
-    if (activeTab === 0 || mode === "login") {
-      navigate("/dashboard", { replace: true });
-    }
-    // Для register ничего не делаем, так как RegisterFormWidget уже перенаправил
+    // Dashboard redirect removed
+    console.log(`Form success for tab: ${activeTab === 0 ? 'login' : 'register'}`);
+    // No automatic redirect to dashboard
   };
 
   // Brand Header
@@ -137,9 +135,10 @@ export const AuthContainerWidget: React.FC = () => {
     </Fade>
   );
 
-  if (isAuthenticated) {
-    return null;
-  }
+  // Removed early return for authenticated users
+  // if (isAuthenticated) {
+  //   return null;
+  // }
 
   return (
     <Box

@@ -27,10 +27,10 @@ export const API_ENDPOINTS = {
     ME: {
       ROOT: "/users/me",
       UPDATE: "/users/me",
-      SETTINGS: "/users/me/settings", // TODO: implement sidebar preferences on backend
+      SETTINGS: "/users/me/settings", 
       ACTIVITY: "/users/me/activity",
       PROFILE: "/users/me/profile",
-      AVATAR: "/users/me/avatar", // TODO: implement avatar upload on backend
+      AVATAR: "/users/me/avatar", 
     },
     GET: (id: string) => `/users/${id}`,
     UPDATE: (id: string) => `/users/${id}`,

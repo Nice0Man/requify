@@ -97,7 +97,8 @@ const EmailVerificationPage: React.FC = () => {
   };
 
   const handleGoToDashboard = () => {
-    navigate("/dashboard", { replace: true });
+    // Dashboard redirect removed
+    console.log("Dashboard navigation disabled");
   };
 
   const handleRequestNewLink = () => {

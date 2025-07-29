@@ -16,15 +16,7 @@ import type {
   UserQueryParams,
   UserBulkOperation,
   UserValidationResult,
-  UserStatistics,
-  UserActivityLog,
-  UserSession,
-  UserRole,
-  UserPermission,
-  UserNotification,
   UserPreferences,
-  UserAuditLog,
-  UserSearchResult,
 } from "../model/types";
 
 /**
@@ -493,6 +485,17 @@ export class UserDAO {
       return response.data;
     } catch (error) {
       console.error("Failed to update current user settings:", error);
+      throw error;
+    }
+  }
+
+
+  async getUserAvatar(): Promise<string> {
+    try {
+      const response = await client.get<string>(API_ENDPOINTS.USERS.ME.AVATAR);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to get user avatar:", error);
       throw error;
     }
   }
