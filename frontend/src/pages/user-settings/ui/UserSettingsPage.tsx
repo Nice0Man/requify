@@ -22,12 +22,18 @@ import {
   Security as SecurityIcon,
   Palette as ThemeIcon,
   Save as SaveIcon,
+  Email as EmailIcon,
+  ExitToApp as LogoutIcon,
+  CheckCircle as CheckCircleIcon,
 } from "@mui/icons-material";
 import { PageLayout } from "@/shared/ui/PageLayout";
 import { SettingsNavigationWidget } from "@/widgets/settings-navigation";
 import { ProfileFormWidget } from "@/features/user-profile-settings";
 import { NotificationSettingsWidget } from "@/features/notification-settings";
-import type { SettingsTabItem } from "@/entities/settings";
+import { SecuritySettingsWidget } from "@/features/security-settings";
+import { InterfaceSettingsWidget } from "@/features/interface-settings";
+import type { SettingsTabItem } from "@/entities/user-settings";
+import { authApi, useAuth } from "@/features/auth";
 
 // Современная цветовая схема
 const SETTINGS_COLORS = {
@@ -99,9 +105,11 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
 
 export const SettingsPage: React.FC = () => {
   const theme = useTheme();
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState(0);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
 
   const handleTabChange = useCallback((newValue: number) => {
     setActiveTab(newValue);
@@ -111,6 +119,28 @@ export const SettingsPage: React.FC = () => {
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   }, []);
+
+  const handleVerifyEmail = useCallback(async () => {
+    if (!user?.email) {
+      console.error("No user email available for verification");
+      return;
+    }
+    
+    setIsVerifyingEmail(true);
+    try {
+      await authApi.requestEmailVerification({ email: user.email });
+      setIsVerifyingEmail(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error("Failed to send email verification:", error);
+      setIsVerifyingEmail(false);
+    }
+  }, [user?.email]);
+
+  const handleLogout = useCallback(() => {
+    logout();
+  }, [logout]);
 
   const renderBrandHeader = () => (
     <Fade in timeout={600}>
@@ -182,31 +212,81 @@ export const SettingsPage: React.FC = () => {
             </Box>
           </Box>
 
-          <Button
-            variant="contained"
-            startIcon={<SaveIcon />}
-            onClick={handleSave}
-            disabled={isLoading}
-            sx={{
-              borderRadius: 3,
-              textTransform: "none",
-              fontWeight: 600,
-              px: 4,
-              py: 1.5,
-              background: `linear-gradient(135deg, ${SETTINGS_COLORS.accent.primary} 0%, ${SETTINGS_COLORS.accent.purple} 100%)`,
-              boxShadow: `0 4px 16px ${alpha(SETTINGS_COLORS.accent.primary, 0.3)}`,
-              color: "white",
-              fontSize: "1rem",
-              "&:hover": {
-                background: `linear-gradient(135deg, ${SETTINGS_COLORS.accent.purple} 0%, ${SETTINGS_COLORS.accent.primary} 100%)`,
-                boxShadow: `0 6px 20px ${alpha(SETTINGS_COLORS.accent.primary, 0.4)}`,
-                transform: "translateY(-2px)",
-              },
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            }}
-          >
-            Сохранить изменения
-          </Button>
+          <Stack direction="row" spacing={2}>
+            {/* Email Verification Button */}
+            {user && !user.email_verified && (
+              <Button
+                variant="outlined"
+                startIcon={isVerifyingEmail ? <CheckCircleIcon /> : <EmailIcon />}
+                onClick={handleVerifyEmail}
+                disabled={isVerifyingEmail}
+                sx={{
+                  borderRadius: 3,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  px: 3,
+                  py: 1.5,
+                  color: SETTINGS_COLORS.accent.warning,
+                  borderColor: SETTINGS_COLORS.accent.warning,
+                  "&:hover": {
+                    borderColor: SETTINGS_COLORS.accent.warning,
+                    backgroundColor: alpha(SETTINGS_COLORS.accent.warning, 0.1),
+                  },
+                }}
+              >
+                {isVerifyingEmail ? "Отправка..." : "Подтвердить email"}
+              </Button>
+            )}
+
+            {/* Save Button */}
+            <Button
+              variant="contained"
+              startIcon={<SaveIcon />}
+              onClick={handleSave}
+              disabled={isLoading}
+              sx={{
+                borderRadius: 3,
+                textTransform: "none",
+                fontWeight: 600,
+                px: 4,
+                py: 1.5,
+                background: `linear-gradient(135deg, ${SETTINGS_COLORS.accent.primary} 0%, ${SETTINGS_COLORS.accent.purple} 100%)`,
+                boxShadow: `0 4px 16px ${alpha(SETTINGS_COLORS.accent.primary, 0.3)}`,
+                color: "white",
+                fontSize: "1rem",
+                "&:hover": {
+                  background: `linear-gradient(135deg, ${SETTINGS_COLORS.accent.purple} 0%, ${SETTINGS_COLORS.accent.primary} 100%)`,
+                  boxShadow: `0 6px 20px ${alpha(SETTINGS_COLORS.accent.primary, 0.4)}`,
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              }}
+            >
+              Сохранить изменения
+            </Button>
+
+            {/* Logout Button */}
+            <Button
+              variant="outlined"
+              startIcon={<LogoutIcon />}
+              onClick={handleLogout}
+              sx={{
+                borderRadius: 3,
+                textTransform: "none",
+                fontWeight: 600,
+                px: 3,
+                py: 1.5,
+                color: SETTINGS_COLORS.accent.error,
+                borderColor: SETTINGS_COLORS.accent.error,
+                "&:hover": {
+                  borderColor: SETTINGS_COLORS.accent.error,
+                  backgroundColor: alpha(SETTINGS_COLORS.accent.error, 0.1),
+                },
+              }}
+            >
+              Выйти
+            </Button>
+          </Stack>
         </Box>
 
         {saveSuccess && (
@@ -224,7 +304,7 @@ export const SettingsPage: React.FC = () => {
               }}
             >
               <Typography sx={{ fontWeight: 600 }}>
-                Настройки успешно сохранены!
+                {isVerifyingEmail ? "Письмо для подтверждения отправлено!" : "Настройки успешно сохранены!"}
               </Typography>
             </Alert>
           </Fade>
@@ -312,26 +392,12 @@ export const SettingsPage: React.FC = () => {
 
               {/* Security Tab */}
               <TabPanel value={activeTab} index={2}>
-                <Box sx={{ p: 4, textAlign: "center" }}>
-                  <Typography variant="h6" color="text.secondary">
-                    🔒 Настройки безопасности
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Компонент в разработке
-                  </Typography>
-                </Box>
+                <SecuritySettingsWidget />
               </TabPanel>
 
               {/* Interface Tab */}
               <TabPanel value={activeTab} index={3}>
-                <Box sx={{ p: 4, textAlign: "center" }}>
-                  <Typography variant="h6" color="text.secondary">
-                    🎨 Настройки интерфейса
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Компонент в разработке
-                  </Typography>
-                </Box>
+                <InterfaceSettingsWidget />
               </TabPanel>
             </Box>
           </Paper>

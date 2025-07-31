@@ -2,7 +2,7 @@
  * Settings Navigation Widget Types
  */
 
-import type { SettingsTabItem } from "@/entities/settings";
+import type { SettingsTabItem } from "@/entities/user-settings";
 
 export interface SettingsNavigationProps {
   activeTab: number;

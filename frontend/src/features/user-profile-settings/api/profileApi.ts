@@ -2,11 +2,11 @@
  * Profile Settings API
  */
 
-import { settingsDAO } from "@/entities/settings";
+import { settingsDAO } from "@/entities/user-settings";
 import type {
   UserProfileSettings,
   SettingsResponse,
-} from "@/entities/settings";
+} from "@/entities/user-settings";
 import type { ProfileUpdatePayload } from "../model/types";
 
 export class ProfileApi {

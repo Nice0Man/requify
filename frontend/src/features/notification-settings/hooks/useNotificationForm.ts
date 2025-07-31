@@ -3,13 +3,13 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { settingsDAO } from "@/entities/settings";
+import { settingsDAO } from "@/entities/user-settings";
 import type {
   NotificationFormData,
   NotificationFormState,
   UseNotificationFormReturn,
 } from "../model/types";
-import type { NotificationSettings } from "@/entities/settings";
+import type { NotificationSettings } from "@/entities/user-settings";
 
 const initialFormData: NotificationFormData = {
   email_notifications: true,

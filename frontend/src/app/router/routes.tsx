@@ -17,7 +17,7 @@ const RequirementsPage = React.lazy(() => import("@/pages/requirements"));
 const ReleasesPage = React.lazy(() => import("@/pages/releases"));
 const TestingPage = React.lazy(() => import("@/pages/testing"));
 const ReportsPage = React.lazy(() => import("@/pages/reports"));
-const SettingsPage = React.lazy(() => import("@/pages/settings"));
+const SettingsPage = React.lazy(() => import("@/pages/user-settings"));
 const AdminPage = React.lazy(() => import("@/pages/admin"));
 const NotFoundPage = React.lazy(() => import("@/pages/not-found"));
 const KanbanPage = React.lazy(() => import("@/pages/kanban"));

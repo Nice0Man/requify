@@ -3,12 +3,18 @@
 // Core entities
 export * from "./auth";
 export * from "./user";
+export * from "./company";
+export * from "./department";
+export * from "./role";
 export * from "./project";
 export * from "./requirement";
 export * from "./release";
 export * from "./team";
 export * from "./comment";
 export * from "./test-case";
+export * from "./test-plan";
+export * from "./trace-matrix";
+export * from "./report";
 
 // Business entities
 export * from "./pricing";

@@ -57,7 +57,13 @@ help:
 	@echo "  db-migrate     - Run database migrations"
 	@echo "  db-migration   - Create new database migration (use: make db-migration message='your message')"
 	@echo "  db-seed        - Seed database with initial data"
-	@echo "  db-reset       - Reset database"
+	@echo "  db-clear       - Clear database data"
+	@echo "  db-reset       - Reset database (downgrade + upgrade)"
+	@echo "  db-init        - Full database initialization (migrate + seed + admin)"
+	@echo "  db-create-admin- Create admin user (interactive)"
+	@echo "  db-create      - Create database"
+	@echo "  db-drop        - Drop database"
+	@echo "  db-backup      - Create database backup"
 	@echo ""
 	@echo "Testing:"
 	@echo "  test           - Run all tests"
@@ -407,11 +413,34 @@ db-migration:	## Create new database migration
 
 db-seed:	## Seed database with initial data
 	@echo "Seeding database with initial data..."
-	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts.seed_db seed
+	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts seed_db seed
 
 db-clear:	## Clear database
 	@echo "Clearing database..."
-	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts.seed_db clear
+	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts seed_db clear
+
+db-create-admin:	## Create admin user (interactive)
+	@echo "Creating admin user..."
+	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts create_admin
+
+db-create:	## Create database
+	@echo "Creating database..."
+	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts db_utils create
+
+db-drop:	## Drop database
+	@echo "Dropping database..."
+	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts db_utils drop
+
+db-backup:	## Create database backup
+	@echo "Creating database backup..."
+	@docker compose -f $(COMPOSE_BASE) -f $(COMPOSE_DEV) exec backend python -m scripts db_utils backup
+
+db-init:	## Initialize database (migrate + seed + create admin)
+	@echo "Initializing database..."
+	@$(MAKE) db-migrate
+	@$(MAKE) db-seed
+	@echo "Database initialized! Now create an admin user:"
+	@$(MAKE) db-create-admin
 
 db-reset:	## Reset database
 	@echo "Resetting database..."

@@ -5,7 +5,7 @@
 import type {
   UserProfileSettings,
   SettingsResponse,
-} from "@/entities/settings";
+} from "@/entities/user-settings";
 
 export interface ProfileFormData extends UserProfileSettings {
   // Дополнительные поля для формы

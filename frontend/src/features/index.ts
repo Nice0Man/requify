@@ -77,6 +77,12 @@ export * from "./actions";
 // Scroll navigation features
 export * from "./scroll-navigation";
 
+// Settings features
+export * from "./user-profile-settings";
+export * from "./notification-settings";
+export * from "./security-settings";
+export * from "./interface-settings";
+
 // Новые features для декомпозиции sidebar
 export * from "./sidebar-dnd";
 export * from "./sidebar-management";

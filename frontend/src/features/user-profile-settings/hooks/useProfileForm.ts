@@ -4,14 +4,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ProfileApi } from "../api/profileApi";
-import { validateProfileSettings } from "@/entities/settings";
+import { validateProfileSettings } from "@/entities/user-settings";
 import type {
   ProfileFormData,
   ProfileFormState,
   ProfileUpdatePayload,
   UseProfileFormReturn,
 } from "../model/types";
-import type { UserProfileSettings } from "@/entities/settings";
+import type { UserProfileSettings } from "@/entities/user-settings";
 
 const initialFormData: ProfileFormData = {
   firstName: "",

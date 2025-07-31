@@ -2,7 +2,6 @@ import React, { memo, useMemo, useCallback } from "react";
 import {
   ListItemButton,
   ListItemIcon,
-  ListItemText,
   Avatar,
   Badge,
   Box,
@@ -10,17 +9,8 @@ import {
   Tooltip,
   alpha,
   useTheme,
-  Typography,
-  Divider,
-  Fade,
   Paper,
 } from "@mui/material";
-import {
-  Settings as SettingsIcon,
-  ExitToApp as LogoutIcon,
-  AccountCircle as AccountCircleIcon,
-  VpnKey as VpnKeyIcon,
-} from "@mui/icons-material";
 import type { User } from "@/entities/user";
 
 // Мемоизированные цвета для предотвращения пересоздания
@@ -79,8 +69,6 @@ const getRoleColor = (role: string): string => {
 export interface UserProfileProps {
   user: User;
   isCollapsed: boolean;
-  onClick?: () => void;
-  onLogout?: () => void;
   onSettings?: () => void;
   className?: string;
   sx?: any;
@@ -91,7 +79,7 @@ export interface UserProfileProps {
  * Предотвращает ненужные ре-рендеры профиля пользователя
  */
 export const UserProfile: React.FC<UserProfileProps> = memo(
-  ({ user, isCollapsed, onClick, onLogout, onSettings, className, sx }) => {
+  ({ user, isCollapsed, onSettings, className, sx }) => {
     const theme = useTheme();
 
     // Мемоизированное имя для отображения
@@ -112,26 +100,10 @@ export const UserProfile: React.FC<UserProfileProps> = memo(
     // Мемоизированный статус активности
     const isOnline = useMemo(() => user.is_active, [user.is_active]);
 
-    // Мемоизированные обработчики событий
-    const handleProfileClick = useCallback(
+    // Мемоизированный обработчик клика по аватару - открывает настройки
+    const handleAvatarClick = useCallback(
       (e: React.MouseEvent) => {
         e.preventDefault();
-        onClick?.();
-      },
-      [onClick]
-    );
-
-    const handleLogoutClick = useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation();
-        onLogout?.();
-      },
-      [onLogout]
-    );
-
-    const handleSettingsClick = useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation();
         onSettings?.();
       },
       [onSettings]
@@ -186,7 +158,7 @@ export const UserProfile: React.FC<UserProfileProps> = memo(
       () =>
         !isCollapsed && (
           <Box sx={{ flex: 1, minWidth: 0, m: 0 }}>
-            {/* Primary content - имя пользователя и статус верификации */}
+            {/* Primary content - имя пользователя */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
               <Box
                 component="span"
@@ -200,22 +172,9 @@ export const UserProfile: React.FC<UserProfileProps> = memo(
               >
                 {displayName}
               </Box>
-              {!user.email_verified && (
-                <Chip
-                  label="Не подтверждён"
-                  size="small"
-                  sx={{
-                    height: 16,
-                    fontSize: "0.65rem",
-                    bgcolor: alpha(SIDEBAR_COLORS.accent.warning, 0.1),
-                    color: SIDEBAR_COLORS.accent.warning,
-                    "& .MuiChip-label": { px: 0.8 },
-                  }}
-                />
-              )}
             </Box>
             
-            {/* Secondary content - роль и email */}
+            {/* Secondary content - роль */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Chip
                 label={roleData.label}
@@ -229,88 +188,16 @@ export const UserProfile: React.FC<UserProfileProps> = memo(
                   "& .MuiChip-label": { px: 1 },
                 }}
               />
-              {user.email && (
-                <Box
-                  component="span"
-                  sx={{
-                    color: SIDEBAR_COLORS.text.muted,
-                    fontSize: "0.7rem",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    maxWidth: 120,
-                    fontFamily: "inherit",
-                  }}
-                >
-                  {user.email}
-                </Box>
-              )}
             </Box>
           </Box>
         ),
-      [isCollapsed, displayName, user.email_verified, user.email, roleData]
+      [isCollapsed, displayName, roleData]
     );
 
-    // Мемоизированные кнопки действий
-    const actionButtons = useMemo(
-      () =>
-        !isCollapsed && (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, ml: 1 }}>
-            <Tooltip title="Настройки" placement="right">
-              <Box
-                component="button"
-                onClick={handleSettingsClick}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 28,
-                  height: 28,
-                  borderRadius: 1.5,
-                  border: "none",
-                  background: alpha(SIDEBAR_COLORS.text.muted, 0.1),
-                  color: SIDEBAR_COLORS.text.muted,
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    background: alpha(SIDEBAR_COLORS.accent.primary, 0.1),
-                    color: SIDEBAR_COLORS.accent.primary,
-                    transform: "scale(1.05)",
-                  },
-                }}
-              >
-                <SettingsIcon sx={{ fontSize: 16 }} />
-              </Box>
-            </Tooltip>
-
-            <Tooltip title="Выйти" placement="right">
-              <Box
-                component="button"
-                onClick={handleLogoutClick}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 28,
-                  height: 28,
-                  borderRadius: 1.5,
-                  border: "none",
-                  background: alpha(SIDEBAR_COLORS.accent.warning, 0.1),
-                  color: SIDEBAR_COLORS.accent.warning,
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    background: alpha(SIDEBAR_COLORS.accent.warning, 0.2),
-                    transform: "scale(1.05)",
-                  },
-                }}
-              >
-                <LogoutIcon sx={{ fontSize: 16 }} />
-              </Box>
-            </Tooltip>
-          </Box>
-        ),
-      [isCollapsed, handleSettingsClick, handleLogoutClick]
+    // Мемоизированная подсказка для клика
+    const tooltipTitle = useMemo(
+      () => isCollapsed ? "Открыть настройки" : "Настройки профиля",
+      [isCollapsed]
     );
 
     // Контейнер с Paper для лучшего визуального отделения
@@ -329,33 +216,34 @@ export const UserProfile: React.FC<UserProfileProps> = memo(
           py: isCollapsed ? 1 : 0,
         }}
       >
-        <ListItemButton className={className} sx={containerStyles} onClick={handleProfileClick}>
-          <ListItemIcon sx={{ minWidth: "auto", mr: isCollapsed ? 0 : 1.5 }}>
-            <Badge
-              overlap="circular"
-              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              badgeContent={
-                <Box
-                  sx={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: "50%",
-                    bgcolor: isOnline ? SIDEBAR_COLORS.accent.success : SIDEBAR_COLORS.text.muted,
-                    border: `2px solid ${SIDEBAR_COLORS.background.primary}`,
-                    boxShadow: SIDEBAR_COLORS.shadow.sm,
-                  }}
-                />
-              }
-            >
-              <Avatar src={user.avatar_url} sx={avatarStyles}>
-                {!user.avatar_url && (displayName.charAt(0).toUpperCase() || "U")}
-              </Avatar>
-            </Badge>
-          </ListItemIcon>
+        <Tooltip title={tooltipTitle} placement="right">
+          <ListItemButton className={className} sx={containerStyles} onClick={handleAvatarClick}>
+            <ListItemIcon sx={{ minWidth: "auto", mr: isCollapsed ? 0 : 1.5 }}>
+              <Badge
+                overlap="circular"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                badgeContent={
+                  <Box
+                    sx={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: "50%",
+                      bgcolor: isOnline ? SIDEBAR_COLORS.accent.success : SIDEBAR_COLORS.text.muted,
+                      border: `2px solid ${SIDEBAR_COLORS.background.primary}`,
+                      boxShadow: SIDEBAR_COLORS.shadow.sm,
+                    }}
+                  />
+                }
+              >
+                <Avatar src={user.avatar_url} sx={avatarStyles}>
+                  {!user.avatar_url && (displayName.charAt(0).toUpperCase() || "U")}
+                </Avatar>
+              </Badge>
+            </ListItemIcon>
 
-          {expandedContent}
-          {actionButtons}
-        </ListItemButton>
+            {expandedContent}
+          </ListItemButton>
+        </Tooltip>
       </Paper>
     );
   }

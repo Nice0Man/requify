@@ -2,7 +2,7 @@
  * Notification Settings Feature Types
  */
 
-import type { NotificationSettings, SettingsResponse } from "@/entities/settings";
+import type { NotificationSettings, SettingsResponse } from "@/entities/user-settings";
 
 export interface NotificationFormData extends NotificationSettings {
   _hasChanges?: boolean;

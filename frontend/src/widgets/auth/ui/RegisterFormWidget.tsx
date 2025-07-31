@@ -144,7 +144,7 @@ export const RegisterFormWidget: React.FC<RegisterFormWidgetProps> = ({
       localStorage.setItem("pendingEmailConfirmation", formData.email);
       setPendingEmail(formData.email);
 
-      // Показываем уведомление о проверке email
+      // Показываем уведомление о проверке email только после успешного ответа
       setShowEmailNotification(true);
 
       if (onSuccess) {
@@ -301,11 +301,6 @@ export const RegisterFormWidget: React.FC<RegisterFormWidgetProps> = ({
         );
       }
     }
-  };
-
-  const redirectToEmailCheck = () => {
-    setShowEmailNotification(true);
-    setPendingEmail(formData.email);
   };
 
   return (
@@ -516,7 +511,6 @@ export const RegisterFormWidget: React.FC<RegisterFormWidgetProps> = ({
         icon={<PersonAdd />}
         iconPosition="end"
         fullWidth={true}
-        onClick={() => redirectToEmailCheck()}
       >
         Create Account
       </AuthButton>
