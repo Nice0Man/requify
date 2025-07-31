@@ -30,6 +30,7 @@ aiofiles = "^24.0.0"
 minio = "^7.2.0"
 aiosmtplib = "^3.0.0"
 httpx = "^0.28.0"
+pydantic = {extras = ["email"], version = "^2.11.7"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

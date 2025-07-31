@@ -281,6 +281,23 @@ from .dashboard import (
     UserPreferences,
 )
 
+# Company schemas
+from .company import (
+    CompanyCreate,
+    CompanyUpdate,
+    CompanyResponse,
+    CompanyListResponse,
+    CompanyContactResponse,
+    CompanySubscriptionResponse,
+    CompanySettingsResponse,
+    CompanyBrandingResponse,
+    CompanyFilter,
+    CompanyStats,
+    CompanyWithStats,
+    CompanyTypeEnum,
+    CompanyStatusEnum,
+)
+
 __all__ = [
     # User
     "User",
@@ -296,6 +313,20 @@ __all__ = [
     "UserAvailability",
     "UserAudit",
     "UserSettings",
+    # Company
+    CompanyCreate,
+    CompanyUpdate,
+    CompanyResponse,
+    CompanyListResponse,
+    CompanyContactResponse,
+    CompanySubscriptionResponse,
+    CompanySettingsResponse,
+    CompanyBrandingResponse,
+    CompanyFilter,
+    CompanyStats,
+    CompanyWithStats,
+    CompanyTypeEnum,
+    CompanyStatusEnum,
     # Team
     "TeamBase",
     "TeamCreate",

@@ -229,7 +229,9 @@ class IntegrationsConfig(BaseModel):
     email_service_api_url: str = "http://localhost:8004/api/v1"
     email_service_api_key: str = "email-service-api-key-change-in-production"
     notification_service_api_url: str = "http://localhost:8005/api/v1"
-    notification_service_api_key: str = "notification-service-api-key-change-in-production"
+    notification_service_api_key: str = (
+        "notification-service-api-key-change-in-production"
+    )
     security_service_api_url: str = "http://localhost:8006/api/v1"
 
 
@@ -479,6 +481,7 @@ class Settings(BaseSettings):
             # In development, log the error but don't fail startup
             if self.run.env == "development":
                 import logging
+
                 logger = logging.getLogger(__name__)
                 logger.warning(f"Settings validation warning: {e}")
             else:

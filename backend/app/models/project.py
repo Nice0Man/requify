@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from .requirement_group import RequirementGroup
     from .user import User
     from .team import Team
+    from .company import Company
+    from .department import Department
     from .dashboard import DashboardNotification, DashboardActivity
 
 
@@ -30,6 +32,9 @@ class Project(Base, TimestampedMixin):
     __table_args__ = (
         Index("ix_projects_status_created", "status", "created_at"),
         Index("ix_projects_code_unique", "code", unique=True),
+        Index("ix_projects_company_id", "company_id"),
+        Index("ix_projects_department_id", "department_id"),
+        Index("ix_projects_team_id", "team_id"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -48,6 +53,26 @@ class Project(Base, TimestampedMixin):
         comment="Статус проекта",
         nullable=False,
     )
+
+    # =============================================================================
+    # Организационная принадлежность
+    # =============================================================================
+
+    company_id: Mapped[int] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="ID компании (для партиционирования данных)",
+    )
+    department_id: Mapped[int] = mapped_column(
+        ForeignKey("departments.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="ID департамента (проект принадлежит департаменту)",
+    )
+
+    # =============================================================================
+    # Управление проектом
+    # =============================================================================
+
     owner_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("users.id", ondelete="RESTRICT"),
@@ -58,10 +83,22 @@ class Project(Base, TimestampedMixin):
         Integer,
         ForeignKey("teams.id", ondelete="SET NULL"),
         nullable=True,
-        comment="Команда проекта",
+        comment="Основная команда проекта (может быть NULL)",
     )
 
+    # =============================================================================
     # Отношения
+    # =============================================================================
+
+    # Организационные связи
+    company: Mapped["Company"] = relationship(
+        "Company", back_populates="projects", lazy="select"
+    )
+    department: Mapped["Department"] = relationship(
+        "Department", back_populates="projects", lazy="select"
+    )
+
+    # Управление
     owner: Mapped["User"] = relationship(
         "User", back_populates="owned_projects", lazy="select"
     )

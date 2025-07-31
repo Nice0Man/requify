@@ -1,27 +1,52 @@
 """
 Схемы для модели User.
+Обновлены в соответствии с 4NF архитектурой.
 """
 
 from datetime import datetime
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, TYPE_CHECKING
 from pydantic import BaseModel, Field, EmailStr, field_validator, model_validator
 import re
 
+# Импорт новых схем настроек
+from app.schemas.settings import (
+    UserSettings,
+    UserSettingsUpdate,
+    UserProfileSettings,
+    NotificationSettings,
+    InterfaceSettings,
+    SecuritySettings,
+    PrivacySettings,
+    SettingsResponse,
+    UserSession,
+    UserSessionsResponse,
+    RevokeSessionsRequest,
+    ChangePasswordRequest,
+    ExportSettingsResponse,
+    ImportSettingsRequest,
+)
+
+if TYPE_CHECKING:
+    from app.schemas.user_profile import UserProfile
+    from app.schemas.company import Company
+
 
 class UserBase(BaseModel):
-    """Базовая схема пользователя."""
+    """
+    Базовая схема пользователя.
+    
+    Обновлена в соответствии с 4NF архитектурой:
+    - Профильные данные (first_name, last_name, department, phone, avatar_url) 
+      вынесены в UserProfile
+    - Добавлена связь с компанией через company_id
+    """
 
     username: str = Field(
         ..., min_length=2, max_length=50, description="Имя пользователя"
     )
     email: EmailStr = Field(..., description="Email пользователя")
-    role: str = Field(..., min_length=1, max_length=20, description="Роль пользователя")
-    first_name: Optional[str] = Field(None, description="Имя пользователя")
-    last_name: Optional[str] = Field(None, description="Фамилия пользователя")
-    department: Optional[str] = Field(None, description="Отдел пользователя")
-    phone: Optional[str] = Field(None, description="Телефон пользователя")
+    company_id: Optional[int] = Field(None, description="ID основной компании пользователя")
     auth0_id: Optional[str] = Field(None, description="Auth0 ID пользователя")
-    avatar_url: Optional[str] = Field(None, description="URL аватара пользователя")
 
     @field_validator("username")
     def validate_username(cls, v):
@@ -68,88 +93,12 @@ class UserBase(BaseModel):
 
         return email_str
 
-    @field_validator("role")
-    def validate_role(cls, v):
-        """Валидация роли пользователя"""
-        if not v or not v.strip():
-            raise ValueError("User role cannot be empty")
-
-        v = v.strip().lower()
-
-        # Предопределенные роли
-        valid_roles = [
-            "admin",
-            "manager",
-            "analyst",
-            "developer",
-            "tester",
-            "viewer",
-            "guest",
-        ]
-
-        if v not in valid_roles:
-            raise ValueError(f"Invalid user role. Must be one of: {valid_roles}")
-
-        return v
-
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        """Валидация номера телефона"""
+    @field_validator("company_id")
+    def validate_company_id(cls, v):
+        """Валидация ID компании"""
         if v is not None:
-            v = v.strip()
-            if not v:
-                return None
-
-            # Удаляем все символы кроме цифр и +
-            phone_digits = re.sub(r"[^\d+]", "", v)
-
-            # Проверяем формат телефона (международный или российский)
-            if not re.match(r"^(\+7|8|7)?[0-9]{10}$", phone_digits):
-                raise ValueError("Invalid phone number format")
-
-            # Нормализуем к формату +7XXXXXXXXXX
-            if phone_digits.startswith("8"):
-                phone_digits = "+7" + phone_digits[1:]
-            elif phone_digits.startswith("7") and not phone_digits.startswith("+7"):
-                phone_digits = "+" + phone_digits
-            elif not phone_digits.startswith("+7"):
-                phone_digits = "+7" + phone_digits
-
-            return phone_digits
-        return v
-
-    @field_validator("first_name", "last_name")
-    def validate_names(cls, v):
-        """Валидация имени и фамилии"""
-        if v is not None:
-            v = v.strip()
-            if not v:
-                return None
-
-            # Проверяем, что содержит только буквы, пробелы и дефисы
-            if not re.match(r"^[a-zA-Zа-яА-ЯёЁ\s\-]+$", v):
-                raise ValueError("Name can only contain letters, spaces and hyphens")
-
-            # Проверяем длину
-            if len(v) > 50:
-                raise ValueError("Name cannot exceed 50 characters")
-
-            return v.title()  # Приводим к правильному регистру
-        return v
-
-    @field_validator("department")
-    def validate_department(cls, v):
-        """Валидация отдела"""
-        if v is not None:
-            v = v.strip()
-            if not v:
-                return None
-
-            # Проверяем длину
-            if len(v) > 100:
-                raise ValueError("Department name cannot exceed 100 characters")
-
-            return v
+            if v <= 0:
+                raise ValueError("Company ID must be a positive integer")
         return v
 
 
@@ -191,7 +140,7 @@ class UserCreate(UserBase):
             "monkey123",
             "123456789",
             "football123",
-        ]
+        ] # TODO in future get from db with common passwords
 
         if v.lower() in common_passwords:
             raise ValueError(
@@ -226,7 +175,13 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(BaseModel):
-    """Схема для обновления пользователя."""
+    """
+    Схема для обновления пользователя.
+    
+    Обновлена в соответствии с 4NF архитектурой:
+    - Убраны поля профиля (first_name, last_name, department, phone)
+    - Они теперь обновляются через UserProfile отдельно
+    """
 
     username: Optional[str] = Field(
         None, min_length=2, max_length=50, description="Имя пользователя"
@@ -238,10 +193,7 @@ class UserUpdate(BaseModel):
     password: Optional[str] = Field(
         None, min_length=8, description="Пароль пользователя"
     )
-    first_name: Optional[str] = Field(None, description="Имя пользователя")
-    last_name: Optional[str] = Field(None, description="Фамилия пользователя")
-    department: Optional[str] = Field(None, description="Отдел пользователя")
-    phone: Optional[str] = Field(None, description="Телефон пользователя")
+    company_id: Optional[int] = Field(None, description="ID основной компании пользователя")
     auth0_id: Optional[str] = Field(None, description="Auth0 ID пользователя")
 
     @field_validator("username")
@@ -365,64 +317,12 @@ class UserUpdate(BaseModel):
             return v
         return v
 
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        """Валидация номера телефона при обновлении"""
+    @field_validator("company_id")
+    def validate_company_id(cls, v):
+        """Валидация ID компании при обновлении"""
         if v is not None:
-            v = v.strip()
-            if not v:
-                return None
-
-            # Удаляем все символы кроме цифр и +
-            phone_digits = re.sub(r"[^\d+]", "", v)
-
-            # Проверяем формат телефона (международный или российский)
-            if not re.match(r"^(\+7|8|7)?[0-9]{10}$", phone_digits):
-                raise ValueError("Invalid phone number format")
-
-            # Нормализуем к формату +7XXXXXXXXXX
-            if phone_digits.startswith("8"):
-                phone_digits = "+7" + phone_digits[1:]
-            elif phone_digits.startswith("7") and not phone_digits.startswith("+7"):
-                phone_digits = "+" + phone_digits
-            elif not phone_digits.startswith("+7"):
-                phone_digits = "+7" + phone_digits
-
-            return phone_digits
-        return v
-
-    @field_validator("first_name", "last_name")
-    def validate_names(cls, v):
-        """Валидация имени и фамилии при обновлении"""
-        if v is not None:
-            v = v.strip()
-            if not v:
-                return None
-
-            # Проверяем, что содержит только буквы, пробелы и дефисы
-            if not re.match(r"^[a-zA-Zа-яА-ЯёЁ\s\-]+$", v):
-                raise ValueError("Name can only contain letters, spaces and hyphens")
-
-            # Проверяем длину
-            if len(v) > 50:
-                raise ValueError("Name cannot exceed 50 characters")
-
-            return v.title()  # Приводим к правильному регистру
-        return v
-
-    @field_validator("department")
-    def validate_department(cls, v):
-        """Валидация отдела при обновлении"""
-        if v is not None:
-            v = v.strip()
-            if not v:
-                return None
-
-            # Проверяем длину
-            if len(v) > 100:
-                raise ValueError("Department name cannot exceed 100 characters")
-
-            return v
+            if v <= 0:
+                raise ValueError("Company ID must be a positive integer")
         return v
 
     @model_validator(mode="before")
@@ -440,8 +340,13 @@ class UserInDBBase(UserBase):
 
     id: int
     created_at: datetime
+    updated_at: Optional[datetime] = None
     email_verified: bool = False
     email_verified_at: Optional[datetime] = None
+    is_active: bool = True
+    is_superuser: bool = False
+    is_verified: bool = False
+    last_activity: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -451,6 +356,37 @@ class User(UserInDBBase):
     """Схема пользователя для ответов API."""
 
     pass
+
+
+class UserWithProfile(User):
+    """Схема пользователя с профилем."""
+    
+    # Эти поля будут добавлены из профиля при сериализации
+    profile: Optional["UserProfile"] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class UserWithCompany(User):
+    """Схема пользователя с информацией о компании."""
+    
+    # Эти поля будут добавлены из компании при сериализации
+    company: Optional["Company"] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class UserComplete(User):
+    """Полная схема пользователя с профилем, настройками и компанией."""
+    
+    profile: Optional["UserProfile"] = None
+    user_settings: Optional["UserSettings"] = None
+    company: Optional["Company"] = None
+    
+    class Config:
+        from_attributes = True
 
 
 class UserWithStats(User):
@@ -696,82 +632,6 @@ class UserActivity(BaseModel):
     timestamp: str = Field(..., description="Временная метка")
     entity_type: Optional[str] = Field(None, description="Тип сущности")
     entity_id: Optional[int] = Field(None, description="ID сущности")
-
-    class Config:
-        from_attributes = True
-
-
-class UserSettings(BaseModel):
-    """Схема настроек пользователя."""
-
-    user_id: int = Field(..., description="ID пользователя")
-    theme: str = Field("light", description="Тема интерфейса")
-    language: str = Field("ru", description="Язык интерфейса")
-    timezone: str = Field("UTC", description="Часовой пояс")
-    
-    # Настройки уведомлений
-    notifications: Dict[str, bool] = Field(
-        default_factory=lambda: {
-            "email": True, 
-            "browser": True, 
-            "mentions": True,
-            "comments": True,
-            "status_changes": True
-        },
-        description="Настройки уведомлений",
-    )
-    
-    # Настройки приватности
-    privacy: Dict[str, bool] = Field(
-        default_factory=lambda: {
-            "profile_visible": True, 
-            "activity_visible": False
-        },
-        description="Настройки приватности",
-    )
-    
-    # Настройки дашборда (соответствуют frontend/src/shared/types/user.ts)
-    dashboard: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "layout": "grid",
-            "widgets": [],
-            "refresh_interval": 30
-        },
-        description="Настройки дашборда",
-    )
-    
-    # Настройки сайдбара (соответствуют frontend/src/entities/sidebar/model/types.ts)
-    sidebar: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "isCollapsed": False,
-            "isPinned": True,
-            "width": 280,
-            "itemOrder": [],
-            "hiddenItems": [],
-            "pinnedItems": [],
-            "expandedGroups": []
-        },
-        description="Настройки сайдбара",
-    )
-    
-    # Настройки навигации (соответствуют frontend/src/entities/navigation/model/types.ts)
-    navigation: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "favoriteItems": [],
-            "hiddenItems": [],
-            "customOrder": [],
-            "displayPreferences": {
-                "showIcons": True,
-                "showBadges": True,
-                "showDescriptions": True,
-                "compactMode": False,
-                "groupByCategory": True
-            }
-        },
-        description="Настройки навигации",
-    )
-    
-    updated_at: Optional[str] = Field(None, description="Дата обновления")
 
     class Config:
         from_attributes = True

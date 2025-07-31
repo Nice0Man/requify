@@ -15,15 +15,6 @@ import hashlib
 import socket
 import asyncio
 
-try:
-    import aiosmtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-
-    SMTP_AVAILABLE = True
-except ImportError:
-    SMTP_AVAILABLE = False
-
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional, List, Tuple, BinaryIO, Dict, Any
@@ -38,6 +29,7 @@ from minio.error import S3Error
 
 from app.core.config import settings
 from app.utils.logger import logger
+from app.services.email_service import email_service
 
 
 class FileService:
@@ -525,7 +517,7 @@ class FileService:
                 threat_details = "; ".join([t["description"] for t in threats_found])
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Security threat detected: {threat_details}",
+                    detail=f"Invalid file. Please load another one or contact support.",
                 )
             else:
                 # Логируем успешную проверку
@@ -1052,16 +1044,6 @@ class FileService:
     ) -> None:
         """Отправка email уведомления администратору."""
         try:
-            if not SMTP_AVAILABLE:
-                logger.warning(
-                    "Email notifications disabled - aiosmtplib not installed"
-                )
-                return
-
-            if not settings.email.smtp_host:
-                logger.warning("Email notifications disabled - no SMTP configuration")
-                return
-
             # Формируем тело письма
             threat_details = "\n".join(
                 [
@@ -1089,28 +1071,30 @@ This is an automated security alert from Requify File Security System.
 The file has been quarantined and access blocked.
 """
 
-            # Создаем email сообщение
-            msg = MIMEMultipart()
-            msg["From"] = settings.email.from_email
-            msg["To"] = settings.admin.email
-            msg["Subject"] = (
-                f"[SECURITY ALERT] Virus Detected - {scan_results.get('filename', 'unknown')}"
+            subject = f"[SECURITY ALERT] Virus Detected - {scan_results.get('filename', 'unknown')}"
+
+            # Используем email_service для отправки уведомления
+            await email_service.send_notification_email(
+                subject=subject,
+                template_data={
+                    "filename": scan_results.get("filename", "unknown"),
+                    "user_id": scan_results.get("user_id", 0),
+                    "file_hash": scan_results.get("file_hash", "unknown"),
+                    "file_size": scan_results.get("file_size", 0),
+                    "scan_duration_ms": scan_results.get("scan_duration_ms", 0),
+                    "scan_timestamp": scan_results.get("scan_timestamp", "unknown"),
+                    "threat_details": threat_details,
+                    "incident_count": incident_count,
+                },
+                template_name="security_alert",
+                recipients=(
+                    [settings.admin.email]
+                    if hasattr(settings, "admin") and hasattr(settings.admin, "email")
+                    else []
+                ),
             )
 
-            msg.attach(MIMEText(email_body, "plain"))
-
-            # Отправляем email
-            await aiosmtplib.send(
-                msg,
-                hostname=settings.email.smtp_host,
-                port=settings.email.smtp_port,
-                username=settings.email.smtp_user,
-                password=settings.email.smtp_password,
-                use_tls=settings.email.smtp_tls,
-                timeout=30,
-            )
-
-            logger.info(f"Security alert email sent to admin: {settings.admin.email}")
+            logger.info("Security alert email sent to admin via email_service")
 
         except Exception as e:
             logger.error(f"Failed to send admin email notification: {str(e)}")

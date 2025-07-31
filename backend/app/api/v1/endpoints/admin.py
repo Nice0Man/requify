@@ -860,28 +860,31 @@ async def get_audit_log(
             }
         ]
 
+
 @router.get("/file-service/health", response_model=Dict[str, Any])
 async def get_file_service_health():
     """
     Проверка здоровья файлового сервиса и CDN.
-    
+
     Returns:
         dict: Статус файлового сервиса, MinIO и CDN
     """
     from app.services.file_service import file_service
-    
+
     health_status = file_service.get_health_status()
-    
+
     # Добавляем общий статус
     health_status["healthy"] = (
-        health_status.get("minio_connected", False) if health_status["storage_type"] == "minio" 
+        health_status.get("minio_connected", False)
+        if health_status["storage_type"] == "minio"
         else True  # Для локального хранилища всегда здоров
     )
-    
+
     # HTTP статус код
-    status_code = status.HTTP_200_OK if health_status["healthy"] else status.HTTP_503_SERVICE_UNAVAILABLE
-    
-    return {
-        "status_code": status_code,
-        "content": health_status
-    }
+    status_code = (
+        status.HTTP_200_OK
+        if health_status["healthy"]
+        else status.HTTP_503_SERVICE_UNAVAILABLE
+    )
+
+    return {"status_code": status_code, "content": health_status}

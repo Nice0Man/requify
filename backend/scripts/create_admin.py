@@ -130,11 +130,12 @@ async def interactive_create_admin():
     return success
 
 
-if __name__ == "__main__":
+async def main():
+    """Main function for module execution."""
     if len(sys.argv) == 4:
         # Command line arguments provided
         username, email, password = sys.argv[1], sys.argv[2], sys.argv[3]
-        success = asyncio.run(create_admin_user(username, email, password))
+        success = await create_admin_user(username, email, password)
         if success:
             print(f"✅ Admin user '{username}' created successfully!")
         else:
@@ -142,5 +143,9 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         # Interactive mode
-        success = asyncio.run(interactive_create_admin())
+        success = await interactive_create_admin()
         sys.exit(0 if success else 1)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

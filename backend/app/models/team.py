@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from .user import User
     from .project import Project
     from .team_member import TeamMember
+    from .department import Department
     from .dashboard import DashboardNotification, DashboardActivity
 
 
@@ -26,6 +27,7 @@ class Team(Base, TimestampedMixin):
     __table_args__ = (
         Index("ix_teams_name", "name"),
         Index("ix_teams_code_unique", "code", unique=True),
+        Index("ix_teams_department_id", "department_id"),
         Index("ix_teams_owner_status", "owner_id", "status"),
         Index("ix_teams_status_created", "status", "created_at"),
     )
@@ -53,7 +55,18 @@ class Team(Base, TimestampedMixin):
         Integer, nullable=True, comment="Максимальное количество участников"
     )
 
-    # Владелец команды
+    # =============================================================================
+    # Связи с организационной структурой
+    # =============================================================================
+
+    # Департамент (обязательно - команда всегда принадлежит департаменту)
+    department_id: Mapped[int] = mapped_column(
+        ForeignKey("departments.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="ID департамента",
+    )
+
+    # Владелец команды (лидер, обычно из того же департамента)
     owner_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("users.id", ondelete="RESTRICT"),
@@ -61,11 +74,21 @@ class Team(Base, TimestampedMixin):
         comment="Владелец команды",
     )
 
+    # =============================================================================
     # Отношения
+    # =============================================================================
+
+    # Департамент (команда принадлежит департаменту)
+    department: Mapped["Department"] = relationship(
+        "Department", back_populates="teams", lazy="select"
+    )
+
+    # Владелец команды
     owner: Mapped["User"] = relationship(
         "User", back_populates="owned_teams", lazy="select"
     )
 
+    # Участники команды
     members: Mapped[List["TeamMember"]] = relationship(
         "TeamMember",
         back_populates="team",

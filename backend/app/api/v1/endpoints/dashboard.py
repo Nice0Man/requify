@@ -23,6 +23,7 @@ from app.core.exceptions import ServiceError
 from app.schemas.dashboard import (
     DashboardStats,
     DashboardOverviewStats,
+    Notification,
     QuickProject,
     QuickRequirement,
     ActivityItem,
@@ -34,6 +35,7 @@ from app.schemas.dashboard import (
     ProjectTrendDataPoint,
     TimelineQueryParams,
     DistributionQueryParams,
+    UserPreferences,
 )
 from app.services.dashboard_service import dashboard_service
 from app.crud import user_preferences, notification, activity
@@ -573,7 +575,7 @@ async def get_dashboard_activity(
 
 @router.post("/preferences")
 async def update_user_preferences(
-    preferences_data: Dict[str, Any],
+    preferences_data: UserPreferences,
     current_user: UserProfile = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -597,7 +599,7 @@ async def update_user_preferences(
 
 @router.post("/notifications")
 async def create_notification(
-    notification_data: Dict[str, Any],
+    notification_data: Notification,
     current_user: UserProfile = Depends(get_dashboard_admin_user),
     db: AsyncSession = Depends(get_db),
 ):

@@ -177,7 +177,7 @@ async def get_current_user(
             raise credentials_exception
 
         # Extract data from token
-        user_id = payload.get("user_id")        
+        user_id = payload.get("user_id")
         email = payload.get("sub")
         token_scopes = payload.get("scopes", [])
 

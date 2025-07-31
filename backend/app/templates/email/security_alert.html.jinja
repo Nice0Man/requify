@@ -1,116 +1,264 @@
 {% extends "base.html.jinja" %}
 
-{% block title %}Оповещение о безопасности - Requify{% endblock %}
+{% block title %}🚨 БЕЗОПАСНОСТЬ: Обнаружена угроза - {{ filename }}{% endblock %}
 
 {% block content %}
-<h1 class="email-title">
-    <span class="icon">🔒</span>Оповещение о безопасности
+<h1 class="email-title alert-danger">
+    <span class="icon">🚨</span>КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ
 </h1>
 
-<p class="email-text">
-    Здравствуйте, <strong>{{ user_name | default(user_email) }}</strong>!
-</p>
-
-<div class="alert alert-error">
+<div class="alert alert-danger">
     <div class="alert-title">
-        <span class="icon">⚠️</span>Обнаружена подозрительная активность
+        <span class="icon">⚠️</span>Обнаружена угроза в загруженном файле
     </div>
     <div class="alert-text">
-        Мы зафиксировали {{ event_type }} в вашей учетной записи <strong>Requify</strong>, 
-        которая может указывать на попытку несанкционированного доступа.
+        Система безопасности Requify обнаружила потенциальную угрозу в загруженном файле.
+        Файл был заблокирован и помещен в карантин для предотвращения возможного ущерба.
     </div>
 </div>
 
-<div class="alert alert-info">
-    <div class="alert-title">
-        <span class="icon">📋</span>Детали события
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">📁 Имя файла</div>
+        <div class="info-value code">{{ filename }}</div>
     </div>
-    <div class="alert-text">
-        <strong>🕐 Время:</strong> {{ timestamp | default(now()) | strftime('%d.%m.%Y в %H:%M') }}<br>
-        <strong>🌐 IP-адрес:</strong> <span class="code">{{ ip_address | default('неизвестен') }}</span><br>
-        <strong>📱 Устройство:</strong> {{ user_agent | default('неизвестно') }}<br>
-        <strong>📍 Местоположение:</strong> {{ location | default('неизвестно') }}
+    
+    <div class="info-item">
+        <div class="info-label">👤 ID пользователя</div>
+        <div class="info-value">{{ user_id }}</div>
+    </div>
+    
+    <div class="info-item">
+        <div class="info-label">🔍 Хэш файла</div>
+        <div class="info-value code">{{ file_hash[:16] }}...</div>
+    </div>
+    
+    <div class="info-item">
+        <div class="info-label">📊 Размер файла</div>
+        <div class="info-value">{{ (file_size / 1024) | round(2) }} КБ</div>
+    </div>
+    
+    <div class="info-item">
+        <div class="info-label">⏱️ Время сканирования</div>
+        <div class="info-value">{{ scan_duration_ms }} мс</div>
+    </div>
+    
+    <div class="info-item">
+        <div class="info-label">🕐 Время обнаружения</div>
+        <div class="info-value">{{ scan_timestamp }}</div>
     </div>
 </div>
 
-{% if event_type == "failed_login" %}
 <div class="alert alert-warning">
     <div class="alert-title">
-        <span class="icon">🚫</span>Неудачная попытка входа
+        <span class="icon">🎯</span>Обнаруженные угрозы
     </div>
     <div class="alert-text">
-        Была предпринята неудачная попытка входа в вашу учетную запись. 
-        Если это были не вы, рекомендуем немедленно сменить пароль.
+        <pre class="threat-details">{{ threat_details }}</pre>
     </div>
 </div>
-{% elif event_type == "password_changed" %}
-<div class="alert alert-success">
-    <div class="alert-title">
-        <span class="icon">🔄</span>Пароль изменен
-    </div>
-    <div class="alert-text">
-        Пароль для вашей учетной записи был успешно изменен. 
-        Если это были не вы, немедленно свяжитесь с нашей службой поддержки.
-    </div>
-</div>
-{% elif event_type == "login_from_new_device" %}
+
+{% if incident_count > 1 %}
 <div class="alert alert-info">
     <div class="alert-title">
-        <span class="icon">📱</span>Вход с нового устройства
+        <span class="icon">📊</span>Статистика инцидентов
     </div>
     <div class="alert-text">
-        Обнаружен вход в систему с нового устройства или браузера. 
-        Если это были вы, можете проигнорировать это сообщение.
+        За последний час было обнаружено <strong>{{ incident_count }}</strong> инцидентов безопасности.
+        Рекомендуется немедленная проверка системы.
     </div>
 </div>
 {% endif %}
 
-<p class="email-text">
-    <strong>Если это были вы</strong> — никаких действий не требуется.
-</p>
-
-<p class="email-text">
-    <strong>Если это были НЕ вы</strong> — немедленно примите меры для защиты учетной записи:
-</p>
+<div class="action-section">
+    <h3 class="section-title">
+        <span class="icon">⚡</span>Необходимые действия
+    </h3>
+    
+    <div class="action-list">
+        <div class="action-item completed">
+            <span class="action-icon">✅</span>
+            <span class="action-text">Файл автоматически заблокирован и помещен в карантин</span>
+        </div>
+        
+        <div class="action-item">
+            <span class="action-icon">🔍</span>
+            <span class="action-text">Проверьте активность пользователя #{{ user_id }}</span>
+        </div>
+        
+        <div class="action-item">
+            <span class="action-icon">📋</span>
+            <span class="action-text">Проанализируйте журналы безопасности</span>
+        </div>
+        
+        {% if incident_count > 3 %}
+        <div class="action-item urgent">
+            <span class="action-icon">🚨</span>
+            <span class="action-text">СРОЧНО: Множественные инциденты - возможна атака</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
 <div class="button-container">
-    <a href="{{ reset_password_url }}" class="button">
-        <span class="icon">🔐</span>Сменить пароль
+    <a href="{{ admin_panel_url | default('#') }}" class="button button-danger">
+        <span class="icon">🛡️</span>Перейти в панель безопасности
     </a>
 </div>
-
-<div class="alert alert-warning">
-    <div class="alert-title">
-        <span class="icon">🛡️</span>Рекомендации по безопасности
-    </div>
-    <div class="alert-text">
-        <strong>🔑 Смените пароль</strong> - Используйте надежный уникальный пароль<br>
-        <strong>📱 Включите 2FA</strong> - Активируйте двухфакторную аутентификацию<br>
-        <strong>👀 Проверьте сессии</strong> - Просмотрите активные сеансы в настройках<br>
-        <strong>📧 Проверьте email</strong> - Убедитесь в безопасности почтового ящика
-    </div>
-</div>
-
-<div class="button-container">
-    <a href="{{ account_security_url }}" class="button button-secondary">
-        <span class="icon">⚙️</span>Настройки безопасности
-    </a>
-</div>
-
-<div class="spacer"></div>
 
 <div class="alert alert-info">
     <div class="alert-title">
-        <span class="icon">📞</span>Нужна помощь?
+        <span class="icon">ℹ️</span>Информация о системе
     </div>
     <div class="alert-text">
-        Если у вас есть подозрения о компрометации учетной записи или вам нужна помощь, 
-        немедленно свяжитесь с нашей службой поддержки. Мы поможем восстановить безопасность аккаунта.
+        Это автоматическое уведомление от системы безопасности Requify.
+        Файл был обработан антивирусным сканером и заблокирован до дальнейшего анализа.
+        <br><br>
+        <strong>Система:</strong> Requify File Security Scanner<br>
+        <strong>Версия:</strong> 2.0<br>
+        <strong>Время отправки:</strong> {{ scan_timestamp }}
     </div>
 </div>
 
-<p class="email-text text-small text-muted">
-    Это автоматическое уведомление системы безопасности Requify. 
-    Мы следим за безопасностью вашей учетной записи 24/7.
-</p>
+<style>
+.alert-danger .alert-title {
+    color: #d32f2f;
+    border-left: 4px solid #d32f2f;
+    padding-left: 12px;
+}
+
+.email-title.alert-danger {
+    color: #d32f2f;
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border: 2px solid #ef5350;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.info-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid #2196f3;
+}
+
+.info-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.info-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.info-value.code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: #f1f3f4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.threat-details {
+    background: #2c2c2c;
+    color: #ff6b6b;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+.action-section {
+    margin: 32px 0;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.action-list {
+    list-style: none;
+    padding: 0;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #ffc107;
+}
+
+.action-item.completed {
+    border-left-color: #4caf50;
+    background: #f1f8e9;
+}
+
+.action-item.urgent {
+    border-left-color: #f44336;
+    background: #ffebee;
+    animation: pulse 2s infinite;
+}
+
+.action-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.action-text {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.button-danger {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+    border: none;
+}
+
+.button-danger:hover {
+    background: linear-gradient(135deg, #d32f2f, #b71c1c);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(244, 67, 54, 0.3);
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-item {
+        padding: 8px 12px;
+    }
+    
+    .threat-details {
+        font-size: 12px;
+        padding: 12px;
+    }
+}
+</style>
 {% endblock %} 

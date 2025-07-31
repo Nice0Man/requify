@@ -496,16 +496,18 @@ async def get_user_audit_log(
 
 
 @router.get("/me/avatar")
-async def get_current_user_avatar(current_user: User = Depends(get_current_active_user)):
+async def get_current_user_avatar(
+    current_user: User = Depends(get_current_active_user),
+):
     """
     Получить URL аватара текущего пользователя.
-    
+
     Returns:
         dict: Информация об аватаре пользователя
     """
     return {
         "avatar_url": current_user.avatar_url,
-        "has_avatar": current_user.avatar_url is not None
+        "has_avatar": current_user.avatar_url is not None,
     }
 
 
@@ -513,27 +515,29 @@ async def get_current_user_avatar(current_user: User = Depends(get_current_activ
 async def get_file_service_health():
     """
     Проверка здоровья файлового сервиса и CDN.
-    
+
     Returns:
         dict: Статус файлового сервиса, MinIO и CDN
     """
     from app.services.file_service import file_service
-    
+
     health_status = file_service.get_health_status()
-    
+
     # Добавляем общий статус
     health_status["healthy"] = (
-        health_status.get("minio_connected", False) if health_status["storage_type"] == "minio" 
+        health_status.get("minio_connected", False)
+        if health_status["storage_type"] == "minio"
         else True  # Для локального хранилища всегда здоров
     )
-    
+
     # HTTP статус код
-    status_code = status.HTTP_200_OK if health_status["healthy"] else status.HTTP_503_SERVICE_UNAVAILABLE
-    
-    return JSONResponse(
-        status_code=status_code,
-        content=health_status
+    status_code = (
+        status.HTTP_200_OK
+        if health_status["healthy"]
+        else status.HTTP_503_SERVICE_UNAVAILABLE
     )
+
+    return JSONResponse(status_code=status_code, content=health_status)
 
 
 @router.post("/me/avatar")
@@ -544,46 +548,44 @@ async def upload_avatar(
 ):
     """
     Загрузить аватар для текущего пользователя.
-    
+
     Args:
         file: Файл изображения для аватара
         db: Сессия базы данных
         current_user: Текущий пользователь
-        
+
     Returns:
         dict: Информация о загруженном аватаре
-        
+
     Raises:
         HTTPException: При ошибках валидации или загрузки
     """
     from app.services.file_service import file_service
-    
+
     try:
         # Загружаем аватар через файловый сервис
         avatar_url = await file_service.upload_avatar(
-            file=file,
-            user_id=current_user.id,
-            db=db
+            file=file, user_id=current_user.id, db=db
         )
-        
+
         # Обновляем пользователя в БД
         updated_user = await crud.user.update_avatar(
             db, user_id=current_user.id, avatar_url=avatar_url
         )
-        
+
         return {
             "message": "Avatar uploaded successfully",
             "avatar_url": avatar_url,
-            "user_id": current_user.id
+            "user_id": current_user.id,
         }
-        
+
     except HTTPException:
         # Перебрасываем HTTP исключения без изменений
         raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload avatar: {str(e)}"
+            detail=f"Failed to upload avatar: {str(e)}",
         )
 
 
@@ -594,111 +596,24 @@ async def delete_avatar(
 ):
     """
     Удалить аватар текущего пользователя.
-    
+
     Args:
         db: Сессия базы данных
         current_user: Текущий пользователь
-        
+
     Returns:
         dict: Результат удаления аватара
     """
     try:
         # Удаляем аватар через CRUD
         await crud.user.remove_avatar(db, user_id=current_user.id)
-        return {
-            "message": "Avatar deleted successfully",
-            "user_id": current_user.id
-        }
-        
+        return {"message": "Avatar deleted successfully", "user_id": current_user.id}
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete avatar: {str(e)}"
+            detail=f"Failed to delete avatar: {str(e)}",
         )
-
-
-@router.get("/me/settings", response_model=schemas.UserSettings)
-async def get_my_settings(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
-):
-    """
-    Получить мои настройки.
-    """
-    settings = await crud.user.get_user_settings(db, user_id=current_user.id)
-    return settings
-
-
-@router.put("/me/settings", response_model=schemas.UserSettings)
-async def update_my_settings(
-    settings_data: Dict[str, Any],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
-):
-    """
-    Обновить мои настройки.
-    """
-    settings = await crud.user.update_user_settings(
-        db, user_id=current_user.id, settings_data=settings_data
-    )
-    return settings
-
-
-@router.get("/{user_id}/settings", response_model=schemas.UserSettings)
-async def get_user_settings(
-    user_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
-):
-    """
-    Получить настройки пользователя.
-    """
-    # Проверяем, что пользователь может видеть настройки
-    if current_user.id != user_id and not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав для просмотра настроек",
-        )
-
-    user = await crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
-        )
-
-    # Получаем настройки пользователя
-    settings = await crud.user.get_user_settings(db, user_id=user_id)
-    return settings
-
-
-@router.put("/{user_id}/settings", response_model=schemas.UserSettings)
-async def update_user_settings(
-    user_id: int,
-    settings_data: Dict[str, Any],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
-):
-    """
-    Обновить настройки пользователя.
-    """
-    # Проверяем, что пользователь может изменять настройки
-    if current_user.id != user_id and not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Недостаточно прав для изменения настроек",
-        )
-
-    user = await crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
-        )
-
-    # Обновляем настройки пользователя
-    settings = await crud.user.update_user_settings(
-        db, user_id=user_id, settings_data=settings_data
-    )
-    return settings
 
 
 @router.get("/search", response_model=List[schemas.User])

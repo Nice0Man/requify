@@ -18,6 +18,9 @@ from app.core.config import settings
 from app.db.db_helper import get_async_session, main_db_helper
 from app.core.security import get_password_hash
 from app.models.user import User
+from app.models.user_profile import UserProfile
+from app.models.company import Company, CompanyType, CompanyStatus
+from app.models.department import Department, DepartmentType
 from app.models.project import Project
 from app.models.requirement import Requirement
 from app.models.release import Release
@@ -30,6 +33,7 @@ from app.models.requirement_group import RequirementGroup
 from app.models.test_result import TestResult
 from app.models.comment import Comment
 from app.crud import user as crud_user
+from app.crud import department as crud_department
 from app.crud import project as crud_project
 from app.crud import requirement as crud_requirement
 from app.crud import release as crud_release
@@ -39,6 +43,7 @@ from app.crud import requirement_group as crud_requirement_group
 from app.crud import test_result as crud_test_result
 from app.crud import comment as crud_comment
 from app.schemas.user import UserCreate
+from app.schemas.department import DepartmentCreate
 from app.schemas.project import ProjectCreate
 from app.schemas.requirement import RequirementCreate
 from app.schemas.release import ReleaseCreate
@@ -194,71 +199,174 @@ async def create_reference_data(db: AsyncSession):
     }
 
 
-async def create_sample_users(db: AsyncSession):
+async def create_sample_companies(db: AsyncSession):
+    """Создать примеры компаний."""
+    print("🔄 Создание компаний...")
+
+    companies_data = [
+        {
+            "name": "IT Solutions Company",
+            "slug": "it-solutions",
+            "legal_name": "ООО ИТ Солюшнс Компани",
+            "description": "Компания по разработке программного обеспечения",
+            "type": CompanyType.SMALL_BUSINESS,
+            "industry": "Информационные технологии",
+            "size_category": "small",
+            "employee_count": 25,
+            "status": CompanyStatus.ACTIVE,
+            "is_active": True,
+        },
+        {
+            "name": "Demo Enterprise",
+            "slug": "demo-enterprise",
+            "legal_name": "АО Демо Энтерпрайз",
+            "description": "Демонстрационная крупная компания",
+            "type": CompanyType.ENTERPRISE,
+            "industry": "Производство",
+            "size_category": "large",
+            "employee_count": 500,
+            "status": CompanyStatus.TRIAL,
+            "is_active": True,
+        },
+    ]
+
+    created_companies = []
+    for company_data in companies_data:
+        # Проверяем, существует ли компания по slug
+        existing_company = await db.execute(
+            text("SELECT * FROM companies WHERE slug = :slug"),
+            {"slug": company_data["slug"]},
+        )
+        if not existing_company.first():
+            company = Company(**company_data)
+            db.add(company)
+            await db.flush()
+            created_companies.append(company)
+        else:
+            # Получаем существующую компанию
+            result = await db.execute(
+                text("SELECT * FROM companies WHERE slug = :slug"),
+                {"slug": company_data["slug"]},
+            )
+            row = result.first()
+            existing_company = Company(
+                id=row[0], 
+                name=row[1], 
+                slug=row[2]
+            )
+            created_companies.append(existing_company)
+
+    print(f"✅ Создано {len(created_companies)} компаний")
+    return created_companies
+
+
+async def create_sample_departments(db: AsyncSession, companies: list[Company]):
+    """Создать примеры департаментов."""
+    print("🔄 Создание департаментов...")
+    
+    if not companies:
+        print("❌ Нет компаний для создания департаментов")
+        return []
+
+    created_departments = []
+    for company in companies:
+        departments_data = [
+            {
+                "name": "Инженерный департамент",
+                "slug": "engineering",
+                "description": "Департамент разработки программного обеспечения",
+                "type": DepartmentType.ENGINEERING.value,
+                "company_id": company.id,
+                "is_active": True,
+            },
+            {
+                "name": "Продуктовый департамент", 
+                "slug": "product",
+                "description": "Департамент управления продуктом и аналитики",
+                "type": DepartmentType.PRODUCT.value,
+                "company_id": company.id,
+                "is_active": True,
+            },
+            {
+                "name": "QA департамент",
+                "slug": "qa",
+                "description": "Департамент обеспечения качества",
+                "type": DepartmentType.QA.value,
+                "company_id": company.id,
+                "is_active": True,
+            },
+        ]
+
+        for dept_data in departments_data:
+            try:
+                # Проверяем, существует ли департамент
+                result = await db.execute(
+                    text("SELECT * FROM departments WHERE slug = :slug AND company_id = :company_id"),
+                    {"slug": dept_data["slug"], "company_id": company.id},
+                )
+                if not result.first():
+                    department = Department(**dept_data)
+                    db.add(department)
+                    await db.flush()
+                    created_departments.append(department)
+                else:
+                    print(f"Департамент {dept_data['slug']} уже существует в компании {company.name}")
+                    # Получаем существующий департамент
+                    result = await db.execute(
+                        text("SELECT * FROM departments WHERE slug = :slug AND company_id = :company_id"),
+                        {"slug": dept_data["slug"], "company_id": company.id},
+                    )
+                    row = result.first()
+                    existing_dept = Department(
+                        id=row[0],
+                        name=row[2],
+                        slug=row[3],
+                        company_id=company.id
+                    )
+                    created_departments.append(existing_dept)
+            except Exception as e:
+                print(f"❌ Ошибка при создании департамента '{dept_data.get('slug', 'Unknown')}': {e}")
+                continue
+
+    print(f"✅ Создано {len(created_departments)} департаментов")
+    return created_departments
+
+
+async def create_sample_users(db: AsyncSession, companies: list[Company]):
     """Создать примеры пользователей."""
     print("🔄 Создание пользователей...")
+
+    if not companies:
+        print("❌ Нет компаний для создания пользователей")
+        return []
+
+    # Используем первую компанию как основную
+    main_company = companies[0]
 
     users_data = [
         {
             "username": "adminuser",
             "email": "admin@example.com",
-            "first_name": "Админ",
-            "last_name": "Системный",
-            "name": "Администратор",
-            "department": "ИТ-отдел",
-            "phone": "+79001234567",
-            "role": "admin",
             "password": "SecurePass123!",
-            "is_active": True,
-            "is_superuser": True,
-            "email_verified": True,
-            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
-            "last_login": datetime.now(UTC).replace(tzinfo=None),
+            "company_id": main_company.id,
         },
         {
             "username": "manager",
             "email": "manager@example.com",
-            "first_name": "Анна",
-            "last_name": "Менеджерова",
-            "name": "Менеджер проекта",
-            "department": "Управление проектами",
-            "phone": "+79001234568",
-            "role": "manager",
             "password": "ProjectLead456#",
-            "is_active": True,
-            "is_superuser": False,
-            "email_verified": True,
-            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
+            "company_id": main_company.id,
         },
         {
             "username": "developer",
             "email": "developer@example.com",
-            "first_name": "Иван",
-            "last_name": "Разработчиков",
-            "name": "Разработчик",
-            "department": "Разработка",
-            "phone": "+79001234569",
-            "role": "developer",
             "password": "CodeMaster789$",
-            "is_active": True,
-            "is_superuser": False,
-            "email_verified": True,
-            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
+            "company_id": main_company.id,
         },
         {
             "username": "tester",
             "email": "tester@example.com",
-            "first_name": "Мария",
-            "last_name": "Тестировщикова",
-            "name": "Тестировщик",
-            "department": "Обеспечение качества",
-            "phone": "+79001234570",
-            "role": "tester",
             "password": "QualityCheck101%",
-            "is_active": True,
-            "is_superuser": False,
-            "email_verified": True,
-            "email_verified_at": datetime.now(UTC).replace(tzinfo=None),
+            "company_id": main_company.id,
         },
     ]
 
@@ -279,9 +387,95 @@ async def create_sample_users(db: AsyncSession):
     return created_users
 
 
-async def create_sample_projects(db: AsyncSession, owner_user: User):
+async def create_sample_user_profiles(db: AsyncSession, users: list[User]):
+    """Создать примеры профилей пользователей."""
+    print("🔄 Создание профилей пользователей...")
+
+    if not users:
+        print("❌ Нет пользователей для создания профилей")
+        return []
+
+    profiles_data = [
+        {
+            "user_id": users[0].id,
+            "first_name": "Админ",
+            "last_name": "Системный",
+            "display_name": "Администратор",
+            "department": "ИТ-отдел",
+            "phone": "+79001234567",
+            "position": "Системный администратор",
+            "bio": "Ответственный за техническую инфраструктуру",
+        },
+        {
+            "user_id": users[1].id if len(users) > 1 else users[0].id,
+            "first_name": "Анна",
+            "last_name": "Менеджерова",
+            "display_name": "Анна Менеджерова",
+            "department": "Управление проектами",
+            "phone": "+79001234568",
+            "position": "Менеджер проекта",
+            "bio": "Управление проектами и координация команд",
+        },
+        {
+            "user_id": users[2].id if len(users) > 2 else users[0].id,
+            "first_name": "Иван",
+            "last_name": "Разработчиков",
+            "display_name": "Иван Разработчиков",
+            "department": "Разработка",
+            "phone": "+79001234569",
+            "position": "Ведущий разработчик",
+            "bio": "Разработка бэкенд-систем и архитектура",
+        },
+        {
+            "user_id": users[3].id if len(users) > 3 else users[0].id,
+            "first_name": "Мария",
+            "last_name": "Тестировщикова",
+            "display_name": "Мария Тестировщикова",
+            "department": "Обеспечение качества",
+            "phone": "+79001234570",
+            "position": "QA инженер",
+            "bio": "Тестирование и обеспечение качества продукта",
+        },
+    ]
+
+    # Создание профилей через ORM
+    created_profiles = []
+    for profile_data in profiles_data:
+        # Проверяем, существует ли профиль
+        existing_profile = await db.execute(
+            text("SELECT * FROM user_profiles WHERE user_id = :user_id"),
+            {"user_id": profile_data["user_id"]},
+        )
+        if not existing_profile.first():
+            profile = UserProfile(**profile_data)
+            # Обновляем статус заполненности
+            profile.update_completion_status()
+            db.add(profile)
+            await db.flush()
+            created_profiles.append(profile)
+        else:
+            print(f"Профиль для пользователя {profile_data['user_id']} уже существует")
+
+    print(f"✅ Создано {len(created_profiles)} профилей пользователей")
+    return created_profiles
+
+
+async def create_sample_projects(db: AsyncSession, owner_user: User, companies: list[Company], departments: list[Department]):
     """Создать примеры проектов."""
     print("🔄 Создание проектов...")
+
+    if not companies:
+        print("❌ Нет компаний для создания проектов")
+        return []
+        
+    if not departments:
+        print("❌ Нет департаментов для создания проектов")
+        return []
+
+    # Используем первую компанию как основную
+    main_company = companies[0]
+    # Используем первый департамент (engineering)
+    main_department = departments[0]
 
     projects_data = [
         {
@@ -289,18 +483,27 @@ async def create_sample_projects(db: AsyncSession, owner_user: User):
             "code": "RMS",
             "description": "Основной проект для управления требованиями и тестированием",
             "status": "active",
+            "company_id": main_company.id,
+            "department_id": main_department.id,
+            "owner_id": owner_user.id,
         },
         {
             "name": "Мобильное приложение",
             "code": "MOBILE",
             "description": "Проект разработки мобильного приложения",
             "status": "planning",
+            "company_id": main_company.id,
+            "department_id": main_department.id,
+            "owner_id": owner_user.id,
         },
         {
             "name": "Интеграция с внешними системами",
             "code": "INTEGRATION",
             "description": "Проект интеграции с АСУТс и другими системами",
             "status": "active",
+            "company_id": main_company.id,
+            "department_id": main_department.id,
+            "owner_id": owner_user.id,
         },
     ]
 
@@ -309,18 +512,28 @@ async def create_sample_projects(db: AsyncSession, owner_user: User):
     for project_data in projects_data:
         try:
             # Проверяем, существует ли проект
-            existing_project = await crud_project.get_by_code(
-                db, code=project_data["code"]
+            existing_project = await db.execute(
+                text("SELECT * FROM projects WHERE code = :code"),
+                {"code": project_data["code"]},
             )
-            if not existing_project:
-                project_create = ProjectCreate(**project_data)
-                # Используем подход как в API - добавляем owner_id к данным схемы
-                project_dict = project_create.model_dump()
-                project_dict["owner_id"] = owner_user.id
-                project = await crud_project.create(db, obj_in=project_dict)
+            if not existing_project.first():
+                project = Project(**project_data)
+                db.add(project)
+                await db.flush()
                 created_projects.append(project)
             else:
                 print(f"Проект {project_data['code']} уже существует")
+                # Получаем существующий проект
+                result = await db.execute(
+                    text("SELECT * FROM projects WHERE code = :code"),
+                    {"code": project_data["code"]},
+                )
+                row = result.first()
+                existing_project = Project(
+                    id=row[0], 
+                    code=row[1], 
+                    name=row[2]
+                )
                 created_projects.append(existing_project)
         except Exception as e:
             print(
@@ -746,16 +959,25 @@ async def seed_database():
             # Создаем справочные данные
             reference_data = await create_reference_data(session)
 
+            # Создаем компании
+            companies = await create_sample_companies(session)
+
+            # Создаем департаменты
+            departments = await create_sample_departments(session, companies)
+
             # Создаем пользователей
-            users = await create_sample_users(session)
+            users = await create_sample_users(session, companies)
             admin_user = users[0] if users else None
 
             if not admin_user:
                 print("❌ Не удалось создать администратора")
                 return
 
+            # Создаем профили пользователей
+            profiles = await create_sample_user_profiles(session, users)
+
             # Создаем проекты
-            projects = await create_sample_projects(session, admin_user)
+            projects = await create_sample_projects(session, admin_user, companies, departments)
 
             # Создаем спецификации
             specs = await create_sample_specs(session, projects)
@@ -781,6 +1003,25 @@ async def seed_database():
             # Создаем комментарии
             comments = await create_sample_comments(session, requirements, users)
 
+            # Собираем данные для вывода ДО коммита (чтобы избежать greenlet_spawn error)
+            companies_info = []
+            departments_info = []
+            
+            # Используем .flush() чтобы получить данные из текущей транзакции
+            await session.flush()
+            
+            for company in companies:
+                companies_info.append({
+                    "name": company.name,
+                    "slug": company.slug
+                })
+                
+            for department in departments:
+                departments_info.append({
+                    "name": department.name,
+                    "company_id": department.company_id
+                })
+
             # Коммитим все изменения
             await session.commit()
 
@@ -790,6 +1031,13 @@ async def seed_database():
             print("   manager@example.com / ProjectLead456# (Менеджер)")
             print("   developer@example.com / CodeMaster789$ (Разработчик)")
             print("   tester@example.com / QualityCheck101% (Тестировщик)")
+            print("\n🏢 Созданные компании:")
+            for company_info in companies_info:
+                print(f"   {company_info['name']} ({company_info['slug']})")
+                
+            print("\n🏬 Созданные департаменты:")
+            for dept_info in departments_info:
+                print(f"   {dept_info['name']}")
 
         finally:
             await session.close()
@@ -841,7 +1089,18 @@ async def clear_database():
             await session.execute(text("DELETE FROM releases"))
             await session.execute(text("DELETE FROM projects"))
             await session.execute(text("DELETE FROM refresh_tokens"))
+            
+            # Удаляем профили пользователей (связанные с users)
+            await session.execute(text("DELETE FROM user_profiles"))
+            
+            # Удаляем пользователей
             await session.execute(text("DELETE FROM users"))
+            
+            # Удаляем департаменты (связанные с компаниями)
+            await session.execute(text("DELETE FROM departments"))
+            
+            # Удаляем компании (должны быть последними среди основных данных)
+            await session.execute(text("DELETE FROM companies"))
 
             # Удаляем справочные данные
             await session.execute(text("DELETE FROM relationship_types"))
