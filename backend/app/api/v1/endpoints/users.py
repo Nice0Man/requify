@@ -9,13 +9,12 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import JSONResponse
 
-from app.api.deps import (
-    get_db,
+from app.api.dependencies import (
+    SessionDep,
     get_current_active_user,
-    get_users_read_user,
-    get_users_write_user,
-    get_users_delete_user,
     get_superuser,
+    UserPermissions,
+    ValidationDependencies,
 )
 from app.core.config import settings
 from app import crud, models
@@ -24,7 +23,7 @@ from app.schemas.user import (
     UserCreate,
     UserUpdate,
     User as UserSchema,
-    UserComplete,
+    UserDetailed,
     UserWithProfile,
     UserWithStats,
     UserStats,
@@ -42,8 +41,9 @@ from app.schemas.user_profile import (
 router = APIRouter()
 
 
-@router.get("/", response_model=List[UserComplete])
+@router.get("/", response_model=List[UserDetailed])
 async def get_users(
+    db: SessionDep,
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -54,8 +54,7 @@ async def get_users(
         None,
         description="Поиск по username, email, first_name, last_name, department, phone",
     ),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
+    current_user: User = Depends(UserPermissions.read()),
 ):
     """
     Получить список пользователей с фильтрацией.
@@ -100,8 +99,8 @@ async def get_users(
 @router.post("/", response_model=UserWithProfile, status_code=status.HTTP_201_CREATED)
 async def create_user(
     user_in: UserCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_write_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.write()),
 ):
     """
     Создать нового пользователя.
@@ -157,10 +156,10 @@ async def create_user(
     return user
 
 
-@router.get("/me", response_model=UserComplete)
+@router.get("/me", response_model=UserDetailed)
 async def get_current_user_info(
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
 ):
     """
     Получить информацию о текущем пользователе.
@@ -170,17 +169,17 @@ async def get_current_user_info(
         db: Сессия базы данных
 
     Returns:
-        UserComplete: Полная информация о текущем пользователе
+        UserDetailed: Полная информация о текущем пользователе
     """
     # Получаем пользователя с профилем
     user_with_profile = await crud.user.get_with_profile(db, id=current_user.id)
     return user_with_profile or current_user
 
 
-@router.put("/me", response_model=UserComplete)
+@router.put("/me", response_model=UserDetailed)
 async def update_current_user(
     user_in: UserUpdate,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """
@@ -232,11 +231,11 @@ async def update_current_user(
     return updated_user or user
 
 
-@router.get("/{user_id}", response_model=UserComplete)
+@router.get("/{user_id}", response_model=UserDetailed)
 async def get_user(
     user_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.read()),
 ):
     """
     Получить пользователя по ID.
@@ -247,7 +246,7 @@ async def get_user(
         current_user: Текущий пользователь
 
     Returns:
-        schemas.User: Данные пользователя
+        UserDetailed: Данные пользователя
 
     Raises:
         HTTPException: Если пользователь не найден
@@ -260,12 +259,12 @@ async def get_user(
     return user
 
 
-@router.put("/{user_id}", response_model=UserComplete)
+@router.put("/{user_id}", response_model=UserDetailed)
 async def update_user(
     user_id: int,
     user_in: UserUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_write_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.write()),
 ):
     """
     Обновить данные пользователя.
@@ -277,7 +276,7 @@ async def update_user(
         current_user: Текущий пользователь
 
     Returns:
-        schemas.User: Обновленный пользователь
+        UserDetailed: Обновленный пользователь
 
     Raises:
         HTTPException: Если пользователь не найден или email/username уже используются
@@ -318,8 +317,8 @@ async def update_user(
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(
     user_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_delete_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.delete()),
 ):
     """
     Удалить пользователя.
@@ -341,10 +340,10 @@ async def delete_user(
     await crud.user.remove(db, id=user_id)
 
 
-@router.post("/{user_id}/activate", response_model=UserComplete)
+@router.post("/{user_id}/activate", response_model=UserDetailed)
 async def activate_user(
     user_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_superuser),
 ):
     """
@@ -356,7 +355,7 @@ async def activate_user(
         current_user: Текущий пользователь (должен быть суперпользователем)
 
     Returns:
-        schemas.User: Активированный пользователь
+        UserDetailed: Активированный пользователь
 
     Raises:
         HTTPException: Если пользователь не найден
@@ -374,10 +373,10 @@ async def activate_user(
     return updated_user or user
 
 
-@router.post("/{user_id}/deactivate", response_model=UserComplete)
+@router.post("/{user_id}/deactivate", response_model=UserDetailed)
 async def deactivate_user(
     user_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_superuser),
 ):
     """
@@ -389,7 +388,7 @@ async def deactivate_user(
         current_user: Текущий пользователь (должен быть суперпользователем)
 
     Returns:
-        schemas.User: Деактивированный пользователь
+        UserDetailed: Деактивированный пользователь
 
     Raises:
         HTTPException: Если пользователь не найден
@@ -407,11 +406,11 @@ async def deactivate_user(
     return updated_user or user
 
 
-@router.get("/username/{username}", response_model=UserComplete)
+@router.get("/username/{username}", response_model=UserDetailed)
 async def get_user_by_username(
     username: str,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.read()),
 ):
     """
     Получить пользователя по username.
@@ -424,11 +423,11 @@ async def get_user_by_username(
     return user
 
 
-@router.get("/email/{email}", response_model=UserComplete)
+@router.get("/email/{email}", response_model=UserDetailed)
 async def get_user_by_email(
     email: str,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.read()),
 ):
     """
     Получить пользователя по email.
@@ -444,8 +443,8 @@ async def get_user_by_email(
 @router.get("/{user_id}/profile", response_model=UserProfileResponse)
 async def get_user_profile(
     user_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.read()),
 ):
     """
     Получить профиль пользователя.
@@ -468,8 +467,8 @@ async def get_user_profile(
 @router.get("/{user_id}/stats", response_model=UserStats)
 async def get_user_stats(
     user_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.read()),
 ):
     """
     Получить статистику пользователя.
@@ -488,9 +487,9 @@ async def get_user_stats(
 @router.get("/{user_id}/activity", response_model=List[UserActivity])
 async def get_user_activity(
     user_id: int,
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.read()),
     limit: int = Query(20, ge=1, le=100),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
 ):
     """
     Получить активность пользователя.
@@ -509,7 +508,7 @@ async def get_user_activity(
 @router.post("/validate", response_model=UserValidation)
 async def validate_user_data(
     user_data: Dict[str, Any],
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Валидация данных пользователя.
@@ -521,7 +520,7 @@ async def validate_user_data(
 @router.get("/check-username/{username}", response_model=UserAvailability)
 async def check_username_availability(
     username: str,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Проверить доступность username.
@@ -533,7 +532,7 @@ async def check_username_availability(
 @router.get("/check-email/{email}", response_model=UserAvailability)
 async def check_email_availability(
     email: str,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Проверить доступность email.
@@ -545,9 +544,9 @@ async def check_email_availability(
 @router.get("/{user_id}/audit", response_model=List[UserAudit])
 async def get_user_audit_log(
     user_id: int,
-    limit: int = Query(50, ge=1, le=200),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_superuser),
+    limit: int = Query(50, ge=1, le=200),
 ):
     """
     Получить журнал аудита пользователя (только для админов).
@@ -565,8 +564,8 @@ async def get_user_audit_log(
 
 @router.get("/me/avatar")
 async def get_current_user_avatar(
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
 ):
     """
     Получить URL аватара текущего пользователя.
@@ -624,7 +623,7 @@ async def get_file_service_health():
 @router.post("/me/avatar")
 async def upload_avatar(
     file: UploadFile,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """
@@ -691,7 +690,7 @@ async def upload_avatar(
 
 @router.delete("/me/avatar")
 async def delete_avatar(
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """
@@ -734,12 +733,12 @@ async def delete_avatar(
         )
 
 
-@router.get("/search", response_model=List[UserComplete])
+@router.get("/search", response_model=List[UserDetailed])
 async def search_users(
     q: str = Query(..., min_length=1),
+    db: SessionDep,
+    current_user: User = Depends(UserPermissions.read()),
     limit: int = Query(20, ge=1, le=100),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_users_read_user),
 ):
     """
     Поиск пользователей.

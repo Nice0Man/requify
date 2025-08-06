@@ -14,15 +14,30 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-from app.api.deps import (
+from app.api.dependencies import (
     get_db,
     get_current_user,
     get_current_active_user,
     get_optional_user,
     get_user_from_auth0_token,
-    check_user_permission,
+    get_admin_write_user,
+    SessionDep,
+    UserPermissions,
+    PermissionDependencyFactory,
+    ValidationDependencies,
 )
-from app.services import auth0_service
+from app.services import (
+    auth0_service,
+    authentication_service,
+    token_service,
+    user_registration_service,
+    password_service,
+    session_service,
+    AuthenticationError,
+    InvalidCredentialsError,
+    InactiveUserError,
+    TokenValidationError,
+)
 from app.core.config import settings
 from app.core.security import (
     JWTTokenManager,
@@ -59,15 +74,29 @@ from app.schemas.auth import (
 )
 from app.schemas import (
     UserCreate,
-    UserComplete,
+    UserDetailed,
     UserWithProfile,
     User,
     UserInDB,
     UserProfileResponse,
     UserProfileCreate,
 )
+from app.core.constants import CompanyRole, Permission, ProjectRole, SystemRole, RoleScope
 
 router = APIRouter()
+
+
+# === Error Handling Classes (imported from services) ===
+
+
+class PermissionDeniedError(HTTPException):
+    """Raised when user lacks required permissions."""
+
+    def __init__(self, detail: str = "Insufficient permissions"):
+        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+
+
+# === Services are now imported from app.services ===
 
 
 # === Authentication Endpoints ===
@@ -78,10 +107,15 @@ router = APIRouter()
 )
 async def register_user(
     user_in: UserCreate,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ) -> Any:
     """
     Регистрация нового пользователя.
+
+    Применяет принципы SOLID:
+    - Single Responsibility: каждый сервис отвечает за свою область
+    - Open/Closed: легко расширяется новой логикой
+    - Dependency Inversion: зависит от абстракций, а не реализаций
 
     Args:
         user_in: Данные нового пользователя
@@ -93,72 +127,45 @@ async def register_user(
     Raises:
         HTTPException: Если пользователь с таким email или username уже существует
     """
-    # Проверяем уникальность email
-    existing_user = await crud_user.get_by_email(db, email=user_in.email)
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User with this email already exists",
-        )
-
-    # Проверяем уникальность username
-    if user_in.username:
-        existing_username = await crud_user.get_by_username(
-            db, username=user_in.username
-        )
-        if existing_username:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User with this username already exists",
-            )
-
-    # Создаем пользователя
-    user = await crud_user.create(db, obj_in=user_in)
-
-    # Создаем профиль пользователя (если не создался автоматически)
-    from app.crud import user_profile as crud_user_profile
-
-    if not user.profile:
-        profile_data = UserProfileCreate(
-            display_name=user.username,
-            first_name=getattr(user_in, "first_name", None),
-            last_name=getattr(user_in, "last_name", None),
-        )
-        profile = await crud_user_profile.create_for_user(
-            db, user_id=user.id, obj_in=profile_data
-        )
-        # Присваиваем профиль пользователю для избежания дополнительного запроса
-        user.profile = profile
-
-    # Отправляем email для верификации
     try:
-        verification_token = JWTTokenManager.create_email_verification_token(user.email)
-        user_display_name = user.profile.display_name if user.profile else user.username
-        await email_service.send_email_verification(
-            user_email=user.email,
-            verification_token=verification_token,
-            user_name=user_display_name,
-        )
-        logger.info(f"Verification email sent to {user.email}")
-    except Exception as e:
-        logger.error(f"Failed to send verification email to {user.email}: {e}")
-        # Не прерываем регистрацию из-за ошибки отправки email
+        # Валидация уникальности (Single Responsibility)
+        await user_registration_service.validate_unique_user(db, user_in)
 
-    # Возвращаем пользователя с профилем
-    return UserWithProfile.model_validate(user)
+        # Создание пользователя с профилем (Single Responsibility)
+        user = await user_registration_service.create_user_with_profile(db, user_in)
+
+        # Отправка email верификации (Single Responsibility)
+        await user_registration_service.send_verification_email(user)
+
+        # Возвращаем пользователя с профилем
+        return UserWithProfile.model_validate(user)
+
+    except HTTPException:
+        # Re-raise HTTP exceptions (уже правильно сформированы)
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error during user registration: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Registration failed due to internal error",
+        )
 
 
 @router.post("/login", response_model=LoginResponse)
 async def login_for_access_token(
     request: Request,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Any:
     """
     OAuth2 совместимый эндпоинт для получения токенов доступа.
 
-    Создает пару access/refresh токенов для аутентифицированного пользователя.
-    Поддерживает вход по email или username.
+    Реализует принципы SOLID:
+    - Single Responsibility: аутентификация разделена на отдельные сервисы
+    - Open/Closed: легко добавить новые методы аутентификации
+    - Liskov Substitution: можно заменить сервисы на другие реализации
+    - Interface Segregation: каждый сервис имеет четкий интерфейс
+    - Dependency Inversion: зависит от абстракций сервисов
 
     Args:
         request: HTTP запрос
@@ -171,80 +178,43 @@ async def login_for_access_token(
     Raises:
         HTTPException: Если учетные данные неверны или пользователь неактивен
     """
-    # Пытаемся найти пользователя по email или username через CRUD методы
-    user = await crud_user.get_by_email_with_profile(db, email=form_data.username)
-    if not user:
-        user = await crud_user.get_by_username_with_profile(
-            db, username=form_data.username
+    try:
+        # Аутентификация пользователя (Single Responsibility)
+        user = await authentication_service.authenticate_user(
+            db, form_data.username, form_data.password
         )
 
-    # Проверяем существование пользователя и правильность пароля
-    if not user or not verify_password(form_data.password, user.hashed_password):
+        # Создание токенов (Single Responsibility)
+        tokens = await authentication_service.create_user_tokens(db, user, request)
+
+        # Обновление времени последнего входа (Single Responsibility)
+        await authentication_service.update_last_login(db, user)
+
+        # Формирование ответа
+        return LoginResponse(
+            access_token=tokens["access_token"],
+            refresh_token=tokens["refresh_token"],
+            expires_in=tokens["expires_in"],
+            refresh_expires_in=tokens["refresh_expires_in"],
+            user=UserDetailed.model_validate(user),
+        )
+
+    except (InvalidCredentialsError, InactiveUserError, AuthenticationError):
+        # Re-raise authentication errors (уже правильно сформированы)
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error during login: {e}")
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username/email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Login failed due to internal error",
         )
-
-    # Проверяем активность пользователя
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="User account is deactivated",
-        )
-
-    # Получаем информацию о клиенте
-    ip_address = get_client_ip(request)
-    user_agent = get_user_agent(request)
-
-    # Создаем refresh токен в базе данных
-    refresh_token_expires = timedelta(days=settings.security.refresh_token_expire_days)
-    refresh_token_record = await crud_refresh_token.create_for_user(
-        db,
-        user_id=user.id,
-        expires_at=datetime.now(UTC).replace(tzinfo=None) + refresh_token_expires,
-        user_agent=user_agent,
-        ip_address=ip_address,
-    )
-
-    # Создаем JWT токены
-    access_token_expires = timedelta(
-        minutes=settings.security.access_token_expire_minutes
-    )
-
-    access_token = JWTTokenManager.create_access_token(
-        subject=user.email,
-        user_id=user.id,
-        scopes=_get_user_scopes(user),
-        expires_delta=access_token_expires,
-    )
-
-    refresh_token = JWTTokenManager.create_refresh_token(
-        subject=user.email,
-        user_id=user.id,
-        token_id=refresh_token_record.token,
-        expires_delta=refresh_token_expires,
-    )
-
-    # Обновляем время последнего входа
-    user.last_login = datetime.now(UTC).replace(tzinfo=None)
-    await db.commit()
-
-    # Используем уже загруженного пользователя с профилем
-    return LoginResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        expires_in=settings.security.access_token_expire_minutes * 60,
-        refresh_expires_in=settings.security.refresh_token_expire_days * 24 * 60 * 60,
-        user=UserComplete.model_validate(user),
-    )
 
 
 @router.post("/refresh", response_model=RefreshTokenResponse)
 async def refresh_token(
     request: Request,
     refresh_request: RefreshTokenRequest,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ) -> Any:
     """
     Обновить access токен используя refresh токен.
@@ -260,96 +230,15 @@ async def refresh_token(
     Raises:
         HTTPException: Если refresh токен недействителен
     """
-    # Проверяем JWT токен
-    payload = JWTTokenManager.verify_token(
-        refresh_request.refresh_token, TokenType.REFRESH
-    )
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token",
-        )
-
-    # Получаем токен из базы данных
-    token_id = payload.get("token_id")
-    if not token_id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token format",
-        )
-
-    refresh_token_record = await crud_refresh_token.get_valid_token(db, token=token_id)
-    if not refresh_token_record:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token expired or revoked",
-        )
-
-    # Проверяем пользователя
-    user = refresh_token_record.user
-    if not user or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account is deactivated",
-        )
-
-    # Отмечаем токен как использованный
-    await crud_refresh_token.mark_as_used(db, token=refresh_token_record)
-
-    # Создаем новый access токен
-    access_token_expires = timedelta(
-        minutes=settings.security.access_token_expire_minutes
-    )
-    access_token = JWTTokenManager.create_access_token(
-        subject=user.email,
-        user_id=user.id,
-        scopes=_get_user_scopes(user),
-        expires_delta=access_token_expires,
+    # Валидируем refresh токен и получаем пользователя
+    user, refresh_token_record = await token_service.validate_refresh_token(
+        db, refresh_request.refresh_token
     )
 
-    response_data = {
-        "access_token": access_token,
-        "expires_in": settings.security.access_token_expire_minutes * 60,
-    }
-
-    # Ротация refresh токена (если включена)
-    if settings.security.refresh_token_rotate:
-        # Отзываем старый токен
-        await crud_refresh_token.revoke_token(
-            db, token=refresh_token_record, reason="token_rotation"
-        )
-
-        # Создаем новый refresh токен
-        ip_address = get_client_ip(request)
-        user_agent = get_user_agent(request)
-
-        refresh_token_expires = timedelta(
-            days=settings.security.refresh_token_expire_days
-        )
-        new_refresh_token_record = await crud_refresh_token.create_for_user(
-            db,
-            user_id=user.id,
-            expires_at=datetime.now(UTC).replace(tzinfo=None) + refresh_token_expires,
-            user_agent=user_agent,
-            ip_address=ip_address,
-        )
-
-        new_refresh_token = JWTTokenManager.create_refresh_token(
-            subject=user.email,
-            user_id=user.id,
-            token_id=new_refresh_token_record.token,
-            expires_delta=refresh_token_expires,
-        )
-
-        response_data.update(
-            {
-                "refresh_token": new_refresh_token,
-                "refresh_expires_in": settings.security.refresh_token_expire_days
-                * 24
-                * 60
-                * 60,
-            }
-        )
+    # Создаем новые токены
+    response_data = await token_service.refresh_access_token(
+        db, user, refresh_token_record, request
+    )
 
     return RefreshTokenResponse(**response_data)
 
@@ -357,7 +246,7 @@ async def refresh_token(
 @router.post("/logout", response_model=LogoutResponse)
 async def logout(
     logout_request: LogoutRequest,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
@@ -371,12 +260,10 @@ async def logout(
     Returns:
         LogoutResponse: Результат операции
     """
-    revoked_count = 0
-
     if logout_request.logout_all:
         # Отзываем все токены пользователя
-        revoked_count = await crud_refresh_token.revoke_user_tokens(
-            db, user_id=current_user.id, reason="logout_all"
+        revoked_count = await token_service.revoke_user_tokens(
+            db, current_user.id, reason="logout_all"
         )
     elif logout_request.refresh_token:
         # Отзываем конкретный токен
@@ -385,18 +272,13 @@ async def logout(
         )
         if payload:
             token_id = payload.get("token_id")
-            if token_id:
-                refresh_token_record = await crud_refresh_token.get_by_token(
-                    db, token=token_id
-                )
-                if (
-                    refresh_token_record
-                    and refresh_token_record.user_id == current_user.id
-                ):
-                    await crud_refresh_token.revoke_token(
-                        db, token=refresh_token_record, reason="logout"
-                    )
-                    revoked_count = 1
+            revoked_count = await token_service.revoke_user_tokens(
+                db, current_user.id, reason="logout", specific_token_id=token_id
+            )
+        else:
+            revoked_count = 0
+    else:
+        revoked_count = 0
 
     return LogoutResponse(
         message="Successfully logged out", revoked_tokens=revoked_count
@@ -420,26 +302,17 @@ async def validate_token(
     Returns:
         TokenValidationResponse: Результат валидации
     """
-    payload = JWTTokenManager.verify_token(token_request.token, TokenType.ACCESS)
+    user = await token_service.validate_access_token(db, token_request.token)
 
-    if not payload:
-        return TokenValidationResponse(valid=False)
+    if user:
+        payload = JWTTokenManager.verify_token(token_request.token, TokenType.ACCESS)
+        expires_at = datetime.fromtimestamp(payload["exp"], tz=UTC).replace(tzinfo=None)
 
-    # Получаем пользователя через CRUD метод с предварительной загрузкой профиля
-    user_id = payload.get("user_id")
-    if user_id:
-        user = await crud_user.get_with_profile(db, id=user_id)
-
-        if user and user.is_active:
-            expires_at = datetime.fromtimestamp(payload["exp"], tz=UTC).replace(
-                tzinfo=None
-            )
-
-            return TokenValidationResponse(
-                valid=True,
-                expires_at=expires_at,
-                user=UserComplete.model_validate(user),
-            )
+        return TokenValidationResponse(
+            valid=True,
+            expires_at=expires_at,
+            user=UserDetailed.model_validate(user),
+        )
 
     return TokenValidationResponse(valid=False)
 
@@ -450,7 +323,7 @@ async def validate_token(
 @router.post("/change-password")
 async def change_password(
     password_request: PasswordChangeRequest,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ) -> dict:
     """
@@ -464,33 +337,11 @@ async def change_password(
     Returns:
         dict: Результат операции
     """
-    # Проверяем текущий пароль
-    if not verify_password(
-        password_request.current_password, current_user.hashed_password
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect current password"
-        )
-
-    # Валидируем новый пароль
-    is_valid, errors = PasswordManager.validate_password_strength(
-        password_request.new_password
-    )[:2]
-    if not is_valid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "Password does not meet requirements", "errors": errors},
-        )
-
-    # Обновляем пароль
-    hashed_password = PasswordManager.hash_password(password_request.new_password)
-    await crud_user.update(
-        db, db_obj=current_user, obj_in={"hashed_password": hashed_password}
-    )
-
-    # Отзываем все refresh токены для безопасности
-    await crud_refresh_token.revoke_user_tokens(
-        db, user_id=current_user.id, reason="password_change"
+    await password_service.change_password(
+        db,
+        current_user,
+        password_request.current_password,
+        password_request.new_password,
     )
 
     return {"message": "Password changed successfully"}
@@ -510,18 +361,7 @@ async def request_password_reset(
     Returns:
         dict: Результат операции
     """
-    user = await crud_user.get_by_email(db, email=reset_request.email)
-
-    # Всегда возвращаем успех для безопасности (не раскрываем существование email)
-    if user and user.is_active:
-        reset_token = JWTTokenManager.create_password_reset_token(user.email)
-        # Отправляем email с токеном сброса
-        await email_service.send_password_reset_email(
-            user_email=user.email,
-            reset_token=reset_token,
-            user_name=user.name or user.email,
-        )
-
+    await password_service.request_password_reset(db, reset_request.email)
     return {"message": "If the email exists, a password reset link has been sent"}
 
 
@@ -539,20 +379,7 @@ async def forgot_password(
     Returns:
         dict: Результат операции
     """
-    user = await crud_user.get_by_email(db, email=reset_request.email)
-
-    # Всегда возвращаем успех для безопасности (не раскрываем существование email)
-    if user and user.is_active:
-        reset_token = JWTTokenManager.create_password_reset_token(user.email)
-        # Отправляем email с токеном восстановления
-        await email_service.send_password_reset_email(
-            user_email=user.email,
-            reset_token=reset_token,
-            user_name=user.name or user.email,
-        )
-
-        logger.info(f"Password reset requested for user: {user.email}")
-
+    await password_service.request_password_reset(db, reset_request.email)
     return {"message": "If the email exists, a password recovery link has been sent"}
 
 
@@ -570,38 +397,9 @@ async def confirm_password_reset(
     Returns:
         dict: Результат операции
     """
-    email = JWTTokenManager.verify_password_reset_token(reset_confirm.token)
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired password reset token",
-        )
-
-    user = await crud_user.get_by_email(db, email=email)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
-
-    # Валидируем новый пароль
-    is_valid, errors = PasswordManager.validate_password_strength(
-        reset_confirm.new_password
-    )[:2]
-    if not is_valid:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"message": "Password does not meet requirements", "errors": errors},
-        )
-
-    # Обновляем пароль
-    hashed_password = PasswordManager.hash_password(reset_confirm.new_password)
-    await crud_user.update(db, db_obj=user, obj_in={"hashed_password": hashed_password})
-
-    # Отзываем все refresh токены
-    await crud_refresh_token.revoke_user_tokens(
-        db, user_id=user.id, reason="password_reset"
+    await password_service.reset_password(
+        db, reset_confirm.token, reset_confirm.new_password
     )
-
     return {"message": "Password reset successfully"}
 
 
@@ -622,26 +420,9 @@ async def request_email_verification(
     Returns:
         dict: Результат операции
     """
-    user = await crud_user.get_by_email(db, email=verification_request.email)
-
-    # Всегда возвращаем успех для безопасности (не раскрываем существование email)
-    if user and user.is_active:
-        if user.email_verified:
-            return {"message": "Email is already verified"}
-
-        try:
-            verification_token = JWTTokenManager.create_email_verification_token(
-                user.email
-            )
-            await email_service.send_email_verification(
-                user_email=user.email,
-                verification_token=verification_token,
-                user_name=user.name or user.username,
-            )
-            logger.info(f"Verification email resent to {user.email}")
-        except Exception as e:
-            logger.error(f"Failed to send verification email to {user.email}: {e}")
-
+    await user_registration_service.resend_verification_email(
+        db, verification_request.email
+    )
     return {
         "message": "If the email exists and is not verified, a verification link has been sent"
     }
@@ -661,40 +442,11 @@ async def confirm_email_verification(
     Returns:
         EmailVerificationResponse: Результат верификации
     """
-    email = JWTTokenManager.verify_email_verification_token(verification_confirm.token)
-    if not email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid or expired verification token",
-        )
-
-    user = await crud_user.get_by_email(db, email=email)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-        )
-
-    if user.email_verified:
-        return EmailVerificationResponse(
-            message="Email is already verified", verified=True
-        )
-
-    # Помечаем email как подтвержденный
-    from datetime import datetime, timezone
-
-    await crud_user.update(
-        db,
-        db_obj=user,
-        obj_in={
-            "email_verified": True,
-            "email_verified_at": datetime.now(timezone.utc).replace(tzinfo=None),
-        },
-    )
-
-    logger.info(f"Email verified for user {user.email}")
-
+    user = await user_registration_service.verify_email(db, verification_confirm.token)
     return EmailVerificationResponse(
-        message="Email verified successfully", verified=True
+        message="Email verified successfully",
+        verified=True,
+        user=UserDetailed.model_validate(user),
     )
 
 
@@ -704,7 +456,7 @@ async def confirm_email_verification(
 @router.get("/sessions", response_model=SessionListResponse)
 async def get_user_sessions(
     request: Request,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
@@ -718,50 +470,14 @@ async def get_user_sessions(
     Returns:
         SessionListResponse: Список сессий
     """
-    tokens = await crud_refresh_token.get_user_tokens(
-        db, user_id=current_user.id, active_only=True
-    )
-
-    # Получаем IP и User-Agent текущего запроса для определения текущей сессии
-    current_ip = get_client_ip(request)
-    current_user_agent = get_user_agent(request)
-
-    sessions = []
-    for token in tokens:
-        # Определяем текущую сессию по IP и User-Agent
-        is_current = False
-        if (
-            token.ip_address == current_ip
-            and token.user_agent == current_user_agent
-            and token.last_used_at
-        ):
-            try:
-                time_since_last_use = (
-                    datetime.now(UTC).replace(tzinfo=None) - token.last_used_at
-                ).total_seconds()
-                is_current = time_since_last_use < 300  # активность в последние 5 минут
-            except Exception:
-                is_current = False
-
-        sessions.append(
-            ActiveSession(
-                id=token.id,
-                created_at=token.created_at,
-                last_used_at=token.last_used_at,
-                expires_at=token.expires_at,
-                ip_address=token.ip_address,
-                user_agent=token.user_agent,
-                is_current=bool(is_current),
-            )
-        )
-
+    sessions = await session_service.get_user_sessions(db, current_user, request)
     return SessionListResponse(sessions=sessions, total=len(sessions))
 
 
 @router.post("/sessions/revoke")
 async def revoke_sessions(
     revoke_request: RevokeSessionRequest,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ) -> dict:
     """
@@ -775,32 +491,14 @@ async def revoke_sessions(
     Returns:
         dict: Результат операции
     """
-    if revoke_request.revoke_all:
-        revoked_count = await crud_refresh_token.revoke_user_tokens(
-            db, user_id=current_user.id, reason="session_revoke_all"
-        )
-        return {"message": f"Revoked {revoked_count} sessions"}
-
-    elif revoke_request.session_id:
-        tokens = await crud_refresh_token.get_user_tokens(
-            db, user_id=current_user.id, active_only=True
-        )
-
-        for token in tokens:
-            if token.id == revoke_request.session_id:
-                await crud_refresh_token.revoke_token(
-                    db, token=token, reason="session_revoke"
-                )
-                return {"message": "Session revoked successfully"}
-
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
-        )
-
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        detail="Either session_id or revoke_all must be specified",
+    revoked_count = await session_service.revoke_user_session(
+        db, current_user, revoke_request.session_id, revoke_request.revoke_all
     )
+
+    if revoke_request.revoke_all:
+        return {"message": f"Revoked {revoked_count} sessions"}
+    else:
+        return {"message": "Session revoked successfully"}
 
 
 # === Utility Functions ===
@@ -1160,8 +858,8 @@ async def get_user_enhanced_permissions(user: User, db: AsyncSession) -> list[st
 
 @router.get("/roles/my-roles")
 async def get_my_roles(
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
 ) -> dict:
     """
     Получить все роли текущего пользователя.
@@ -1271,8 +969,8 @@ async def get_my_roles(
 
 @router.get("/permissions/my-permissions")
 async def get_my_permissions(
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
 ) -> dict:
     """
     Получить все права текущего пользователя.
@@ -1298,8 +996,8 @@ async def get_my_permissions(
 
 @router.get("/roles/available")
 async def get_available_roles(
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
     scope: Optional[str] = None,
 ) -> dict:
     """
@@ -1314,18 +1012,6 @@ async def get_available_roles(
         dict: Список доступных ролей
     """
     from sqlalchemy import select
-
-    # Проверяем права на просмотр ролей
-    is_system_admin = getattr(current_user, "is_system_admin", False)
-    if not (
-        is_system_admin
-        or check_user_permission(current_user, Permission.MANAGE_COMPANY_USERS)
-        or check_user_permission(current_user, Permission.VIEW_COMPANY_USERS)
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to view roles",
-        )
 
     # Строим запрос
     stmt = select(EnhancedRole).where(
@@ -1348,10 +1034,10 @@ async def get_available_roles(
     roles_data = []
     for role in roles:
         # Проверяем, может ли текущий пользователь назначать эту роль
+        # Если роль требует одобрения, проверяем админские права
+        is_system_admin = getattr(current_user, "is_system_admin", False)
         can_assign = True
-        if role.requires_approval and not getattr(
-            current_user, "is_system_admin", False
-        ):
+        if role.requires_approval and not is_system_admin:
             can_assign = False
 
         roles_data.append(
@@ -1386,14 +1072,14 @@ async def get_available_roles(
 async def assign_role_to_user(
     user_id: int,
     role_id: int,
+    db: SessionDep,
     company_id: Optional[int] = None,
     department_id: Optional[int] = None,
     team_id: Optional[int] = None,
     project_id: Optional[int] = None,
     expires_at: Optional[datetime] = None,
     assignment_reason: Optional[str] = None,
-    current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(UserPermissions.write()),
 ) -> dict:
     """
     Назначить роль пользователю.
@@ -1415,17 +1101,6 @@ async def assign_role_to_user(
     """
     from sqlalchemy import select
 
-    # Проверяем права на назначение ролей
-    is_system_admin = getattr(current_user, "is_system_admin", False)
-    if not (
-        is_system_admin
-        or check_user_permission(current_user, Permission.MANAGE_COMPANY_USERS)
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to assign roles",
-        )
-
     # Получаем пользователя
     target_user = await crud_user.get(db, id=user_id)
     if not target_user:
@@ -1445,7 +1120,7 @@ async def assign_role_to_user(
         )
 
     # Проверяем, требует ли роль одобрения
-    needs_approval = role.requires_approval and not is_system_admin
+    needs_approval = role.requires_approval
 
     # Создаем назначение роли
     assignment = UserRoleAssignment(
@@ -1485,9 +1160,9 @@ async def assign_role_to_user(
 @router.delete("/roles/revoke/{assignment_id}")
 async def revoke_role_assignment(
     assignment_id: int,
+    db: SessionDep,
     reason: Optional[str] = None,
-    current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(UserPermissions.write()),
 ) -> dict:
     """
     Отозвать назначение роли.
@@ -1520,20 +1195,11 @@ async def revoke_role_assignment(
             status_code=status.HTTP_404_NOT_FOUND, detail="Role assignment not found"
         )
 
-    # Проверяем права на отзыв роли
-    is_system_admin = getattr(current_user, "is_system_admin", False)
-    can_revoke = (
-        is_system_admin
-        or assignment.user_id
-        == current_user.id  # Пользователь может отозвать свою роль
-        or check_user_permission(current_user, Permission.MANAGE_COMPANY_USERS)
-    )
-
-    if not can_revoke:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Insufficient permissions to revoke this role",
-        )
+    # Проверяем, может ли пользователь отозвать свою собственную роль
+    if assignment.user_id == current_user.id:
+        # Пользователь может отозвать свою роль
+        pass
+    # Иначе права уже проверены через dependency get_users_write_user
 
     # Отзываем назначение
     assignment.revoke(revoked_by=current_user.id, reason=reason)
@@ -1560,7 +1226,7 @@ async def revoke_role_assignment(
 async def auth0_oauth2_callback(
     request: Request,
     token: str,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ) -> Any:
     """
     Auth0 OAuth2 callback endpoint для обработки токенов от Auth0.
@@ -1643,14 +1309,14 @@ async def auth0_oauth2_callback(
         refresh_token=refresh_token,
         token_type="bearer",
         expires_in=int(access_token_expires.total_seconds()),
-        user=UserComplete.model_validate(user),
+        user=UserDetailed.model_validate(user),
     )
 
 
 @router.get("/oauth2/auth0/userinfo")
 async def get_auth0_user_info(
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
 ) -> dict:
     """
     Получить информацию о пользователе для совместимости с Auth0.

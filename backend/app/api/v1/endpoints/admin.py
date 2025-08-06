@@ -18,18 +18,23 @@ from sqlalchemy import text
 from app.api.deps import get_db, get_admin_user, get_dashboard_admin_user
 from app.core.config import settings
 from app.models.user import User
-from app.schemas.user import UserComplete
-from app import crud
+from app.schemas.user import UserDetailed
+from app.services import (
+    admin_service,
+    system_info_service,
+    user_management_service,
+    backup_service,
+)
 
 router = APIRouter()
 
 
-@router.get("/users", response_model=List[UserComplete])
+@router.get("/users", response_model=List[UserDetailed])
 async def get_admin_users(
     skip: int = 0,
     limit: int = 100,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_dashboard_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить список всех пользователей для администрирования.
@@ -41,15 +46,15 @@ async def get_admin_users(
         current_user: Администратор
 
     Returns:
-        List[Dict[str, Any]]: Список пользователей с подробной информацией
+        List[UserDetailed]: Список пользователей с подробной информацией
     """
-    users = await crud.user.get_multi(db, skip=skip, limit=limit)
-    return [UserComplete.model_validate(user) for user in users]
+    users = await user_management_service.get_users_list(db, skip=skip, limit=limit)
+    return [UserDetailed.model_validate(user) for user in users]
 
 
 @router.get("/system-info", response_model=Dict[str, Any])
 async def get_system_info(
-    current_user: User = Depends(get_dashboard_admin_user),
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить информацию о системе.
@@ -60,48 +65,13 @@ async def get_system_info(
     Returns:
         Dict[str, Any]: Информация о системе
     """
-    # Получаем реальную информацию о системе
-    try:
-        cpu_count = psutil.cpu_count()
-        memory = psutil.virtual_memory()
-        disk = psutil.disk_usage("/")
-
-        return {
-            "platform": platform.system(),
-            "platform_version": platform.version(),
-            "python_version": platform.python_version(),
-            "cpu_count": cpu_count,
-            "memory": {
-                "total": memory.total // (1024**3),  # GB
-                "available": memory.available // (1024**3),  # GB
-                "percent": memory.percent,
-            },
-            "disk": {
-                "total": disk.total // (1024**3),  # GB
-                "free": disk.free // (1024**3),  # GB
-                "used": disk.used // (1024**3),  # GB
-                "percent": round((disk.used / disk.total) * 100, 2),
-            },
-            "app_version": settings.run.version,
-            "debug_mode": settings.run.debug,
-            "environment": settings.run.env,
-        }
-    except Exception as e:
-        # Fallback в случае ошибки
-        return {
-            "platform": platform.system(),
-            "python_version": platform.python_version(),
-            "error": f"Could not gather full system info: {str(e)}",
-            "app_version": settings.run.version,
-            "debug_mode": settings.run.debug,
-            "environment": settings.run.env,
-        }
+    return system_info_service.get_system_info()
 
 
 @router.get("/health", response_model=Dict[str, Any])
 async def health_check(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_dashboard_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Проверить здоровье системы.
@@ -113,16 +83,13 @@ async def health_check(
     Returns:
         Dict[str, Any]: Статус здоровья компонентов
     """
-    health_status = {
-        "status": "healthy",
-        "components": {},
-        "timestamp": datetime.now(UTC).isoformat(),
-    }
+    health_status = system_info_service.get_health_status()
 
     # Проверка базы данных
     try:
         result = await db.execute(text("SELECT 1"))
         if result.scalar() == 1:
+            health_status["components"] = health_status.get("components", {})
             health_status["components"]["database"] = {
                 "status": "healthy",
                 "response_time": "< 10ms",
@@ -132,6 +99,7 @@ async def health_check(
                 "status": "unhealthy",
                 "error": "Invalid response",
             }
+            health_status["status"] = "degraded"
     except Exception as e:
         health_status["components"]["database"] = {
             "status": "unhealthy",
@@ -139,60 +107,13 @@ async def health_check(
         }
         health_status["status"] = "degraded"
 
-    # Проверка файловой системы
-    try:
-        disk = psutil.disk_usage("/")
-        disk_usage_percent = (disk.used / disk.total) * 100
-
-        if disk_usage_percent < 80:
-            fs_status = "healthy"
-        elif disk_usage_percent < 90:
-            fs_status = "warning"
-        else:
-            fs_status = "critical"
-
-        health_status["components"]["filesystem"] = {
-            "status": fs_status,
-            "disk_usage": f"{disk_usage_percent:.1f}%",
-            "free_space": f"{disk.free // (1024**3)} GB",
-        }
-
-        if fs_status == "critical":
-            health_status["status"] = "unhealthy"
-    except Exception as e:
-        health_status["components"]["filesystem"] = {
-            "status": "unknown",
-            "error": str(e),
-        }
-
-    # Проверка памяти
-    try:
-        memory = psutil.virtual_memory()
-        if memory.percent < 80:
-            memory_status = "healthy"
-        elif memory.percent < 90:
-            memory_status = "warning"
-        else:
-            memory_status = "critical"
-
-        health_status["components"]["memory"] = {
-            "status": memory_status,
-            "usage": f"{memory.percent}%",
-            "available": f"{memory.available // (1024**3)} GB",
-        }
-
-        if memory_status == "critical":
-            health_status["status"] = "unhealthy"
-    except Exception as e:
-        health_status["components"]["memory"] = {"status": "unknown", "error": str(e)}
-
     return health_status
 
 
 @router.get("/metrics", response_model=Dict[str, Any])
 async def get_metrics(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_dashboard_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить метрики системы.
@@ -255,7 +176,7 @@ async def get_metrics(
 async def get_system_logs(
     level: str = "info",
     limit: int = 100,
-    current_user: User = Depends(get_dashboard_admin_user),
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить системные логи.
@@ -336,8 +257,8 @@ async def get_system_logs(
 
 @router.get("/users-stats", response_model=Dict[str, Any])
 async def get_users_statistics(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_dashboard_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить статистику пользователей.
@@ -407,8 +328,8 @@ async def get_users_statistics(
 
 @router.get("/projects-stats", response_model=Dict[str, Any])
 async def get_projects_statistics(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_dashboard_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить статистику проектов.
@@ -502,7 +423,7 @@ async def get_projects_statistics(
 @router.post("/backup", response_model=Dict[str, Any])
 async def create_backup(
     include_data: bool = True,
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(AdminPermissions.write()),
 ):
     """
     Создать резервную копию системы.
@@ -586,7 +507,7 @@ async def create_backup(
 
 @router.get("/backups", response_model=List[Dict[str, Any]])
 async def get_backups(
-    current_user: User = Depends(get_dashboard_admin_user),
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить список резервных копий.
@@ -665,7 +586,7 @@ async def get_backups(
 @router.post("/system-settings", response_model=Dict[str, Any])
 async def update_system_settings(
     settings_data: Dict[str, Any],
-    current_user: User = Depends(get_admin_user),
+    current_user: User = Depends(AdminPermissions.write()),
 ):
     """
     Обновить системные настройки.
@@ -743,8 +664,8 @@ async def get_audit_log(
     user_id: int = None,
     action: str = None,
     limit: int = 100,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_dashboard_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.analytics()),
 ):
     """
     Получить журнал аудита.

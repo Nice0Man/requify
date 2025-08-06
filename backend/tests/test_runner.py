@@ -1,281 +1,214 @@
+#!/usr/bin/env python3
 """
-Test Runner for Comprehensive API Tests.
+Скрипт для запуска различных категорий тестов совместимости.
 
-Provides utilities to run all API tests with different configurations and reporting.
+Предоставляет удобный интерфейс для запуска тестов
+с различными конфигурациями и отчетами.
 """
 
-import pytest
 import sys
-import os
+import subprocess
+import argparse
 from pathlib import Path
-import asyncio
 from typing import List, Optional
-import click
 
 
-class APITestRunner:
-    """Main test runner class for API tests."""
-
-    def __init__(self, test_dir: str = None):
-        """Initialize test runner."""
-        if test_dir is None:
-            self.test_dir = Path(__file__).parent
-        else:
-            self.test_dir = Path(test_dir)
-
-    def run_all_tests(self, verbose: bool = True, coverage: bool = False) -> int:
-        """Run all API tests."""
-        args = [
-            str(self.test_dir),
-            "-v" if verbose else "",
-            "--tb=short",
-            "--strict-markers",
-            "--asyncio-mode=auto",
-        ]
-
+class TestRunner:
+    """Класс для управления запуском тестов."""
+    
+    def __init__(self, base_dir: Path = None):
+        self.base_dir = base_dir or Path(__file__).parent
+    
+    def run_compatibility_tests(self, verbose: bool = True, coverage: bool = True) -> int:
+        """Запускает тесты совместимости моделей и схем."""
+        cmd = ["python", "-m", "pytest"]
+        
+        # Основные файлы тестов
+        cmd.extend([
+            "test_models_schemas_compatibility.py",
+            "test_schema_validation_edge_cases.py"
+        ])
+        
+        # Маркеры
+        cmd.extend(["-m", "compatibility or unit"])
+        
+        # Дополнительные опции
+        if verbose:
+            cmd.extend(["-v", "-s"])
+        
         if coverage:
-            args.extend(
-                [
-                    "--cov=requify.app",
-                    "--cov-report=html:htmlcov",
-                    "--cov-report=term",
-                    "--cov-report=xml",
-                ]
-            )
-
-        # Filter out empty strings
-        args = [arg for arg in args if arg]
-
-        return pytest.main(args)
-
-    def run_specific_test_file(self, test_file: str, verbose: bool = True) -> int:
-        """Run tests from a specific file."""
-        test_path = self.test_dir / test_file
-        if not test_path.exists():
-            print(f"Test file {test_path} does not exist")
-            return 1
-
-        args = [
-            str(test_path),
+            cmd.extend([
+                "--cov=app.models",
+                "--cov=app.schemas", 
+                "--cov-report=term-missing",
+                "--cov-report=html:htmlcov/compatibility"
+            ])
+        
+        cmd.extend([
+            "--tb=short",
+            "--color=yes"
+        ])
+        
+        print(f"Запуск тестов совместимости: {' '.join(cmd)}")
+        return subprocess.run(cmd, cwd=self.base_dir).returncode
+    
+    def run_performance_tests(self, verbose: bool = True) -> int:
+        """Запускает тесты производительности."""
+        cmd = ["python", "-m", "pytest"]
+        
+        cmd.extend([
+            "test_database_performance.py",
+            "-m", "performance",
+            "-v", "-s",
+            "--tb=short",
+            "--color=yes",
+            "--durations=0"  # Показать время выполнения всех тестов
+        ])
+        
+        print(f"Запуск тестов производительности: {' '.join(cmd)}")
+        return subprocess.run(cmd, cwd=self.base_dir).returncode
+    
+    def run_edge_case_tests(self, verbose: bool = True) -> int:
+        """Запускает тесты крайних случаев."""
+        cmd = ["python", "-m", "pytest"]
+        
+        cmd.extend([
+            "test_schema_validation_edge_cases.py",
+            "-m", "edge_case",
             "-v" if verbose else "",
             "--tb=short",
-            "--asyncio-mode=auto",
-        ]
-
-        # Filter out empty strings
-        args = [arg for arg in args if arg]
-
-        return pytest.main(args)
-
-    def run_tests_by_pattern(self, pattern: str, verbose: bool = True) -> int:
-        """Run tests matching a specific pattern."""
-        args = [
-            str(self.test_dir),
-            "-k",
-            pattern,
-            "-v" if verbose else "",
+            "--color=yes"
+        ])
+        
+        # Убираем пустые строки
+        cmd = [arg for arg in cmd if arg]
+        
+        print(f"Запуск тестов крайних случаев: {' '.join(cmd)}")
+        return subprocess.run(cmd, cwd=self.base_dir).returncode
+    
+    def run_all_tests(self, verbose: bool = True, coverage: bool = True) -> int:
+        """Запускает все тесты совместимости."""
+        cmd = ["python", "-m", "pytest"]
+        
+        # Все файлы тестов
+        cmd.extend([
+            "test_models_schemas_compatibility.py",
+            "test_schema_validation_edge_cases.py",
+            "test_database_performance.py"
+        ])
+        
+        if verbose:
+            cmd.extend(["-v", "-s"])
+        
+        if coverage:
+            cmd.extend([
+                "--cov=app",
+                "--cov-report=term-missing",
+                "--cov-report=html:htmlcov/full"
+            ])
+        
+        cmd.extend([
             "--tb=short",
-            "--asyncio-mode=auto",
-        ]
-
-        # Filter out empty strings
-        args = [arg for arg in args if arg]
-
-        return pytest.main(args)
-
-    def run_parallel_tests(self, num_workers: int = 4, verbose: bool = True) -> int:
-        """Run tests in parallel using pytest-xdist."""
-        args = [
-            str(self.test_dir),
-            f"-n{num_workers}",
-            "-v" if verbose else "",
-            "--tb=short",
-            "--asyncio-mode=auto",
-        ]
-
-        # Filter out empty strings
-        args = [arg for arg in args if arg]
-
-        return pytest.main(args)
-
-    def run_smoke_tests(self, verbose: bool = True) -> int:
-        """Run only smoke tests (basic CRUD operations)."""
-        pattern = "test_create_user_success or test_create_project_success or test_get_users_list or test_get_projects_list"
-        return self.run_tests_by_pattern(pattern, verbose)
-
-    def run_crud_tests(self, entity: str, verbose: bool = True) -> int:
-        """Run CRUD tests for a specific entity."""
-        test_file_map = {
-            "users": "test_users_api.py",
-            "projects": "test_projects_api.py",
-            "requirements": "test_requirements_api.py",
-            "releases": "test_releases_api.py",
-            "reference": "test_reference_api.py",
-            "testing": "test_testing_api.py",
-        }
-
-        if entity not in test_file_map:
-            print(f"Unknown entity: {entity}")
-            print(f"Available entities: {', '.join(test_file_map.keys())}")
-            return 1
-
-        return self.run_specific_test_file(test_file_map[entity], verbose)
-
-    def generate_test_report(self, output_file: str = "test_report.html") -> int:
-        """Generate a comprehensive test report."""
-        args = [
-            str(self.test_dir),
-            "--html=" + output_file,
+            "--color=yes",
+            "--durations=10"
+        ])
+        
+        print(f"Запуск всех тестов: {' '.join(cmd)}")
+        return subprocess.run(cmd, cwd=self.base_dir).returncode
+    
+    def run_fast_tests(self) -> int:
+        """Запускает только быстрые тесты для CI/CD."""
+        cmd = ["python", "-m", "pytest"]
+        
+        cmd.extend([
+            "test_models_schemas_compatibility.py",
+            "test_schema_validation_edge_cases.py",
+            "-m", "unit and not slow",
+            "--tb=line",
+            "--color=yes",
+            "--durations=5"
+        ])
+        
+        print(f"Запуск быстрых тестов: {' '.join(cmd)}")
+        return subprocess.run(cmd, cwd=self.base_dir).returncode
+    
+    def generate_report(self, output_dir: str = "test_reports") -> int:
+        """Генерирует подробный отчет о тестах."""
+        output_path = Path(self.base_dir) / output_dir
+        output_path.mkdir(exist_ok=True)
+        
+        cmd = ["python", "-m", "pytest"]
+        
+        cmd.extend([
+            "test_models_schemas_compatibility.py",
+            "test_schema_validation_edge_cases.py",
+            "--html=" + str(output_path / "report.html"),
             "--self-contained-html",
-            "--tb=short",
-            "--asyncio-mode=auto",
-        ]
-
-        return pytest.main(args)
-
-
-@click.command()
-@click.option(
-    "--test-type",
-    "-t",
-    type=click.Choice(
-        [
-            "all",
-            "smoke",
-            "users",
-            "projects",
-            "requirements",
-            "releases",
-            "reference",
-            "testing",
-        ]
-    ),
-    default="all",
-    help="Type of tests to run",
-)
-@click.option("--verbose", "-v", is_flag=True, default=True, help="Verbose output")
-@click.option("--coverage", "-c", is_flag=True, help="Generate coverage report")
-@click.option("--parallel", "-p", type=int, help="Run tests in parallel with N workers")
-@click.option("--pattern", "-k", help="Run tests matching pattern")
-@click.option("--report", "-r", help="Generate HTML report file")
-@click.option("--test-dir", help="Test directory path")
-def run_tests(
-    test_type: str,
-    verbose: bool,
-    coverage: bool,
-    parallel: Optional[int],
-    pattern: Optional[str],
-    report: Optional[str],
-    test_dir: Optional[str],
-):
-    """
-    Run comprehensive API tests for Requify.
-
-    Examples:
-        python test_runner.py --test-type all --coverage
-        python test_runner.py --test-type smoke
-        python test_runner.py --test-type users --verbose
-        python test_runner.py --parallel 4
-        python test_runner.py --pattern "test_create*"
-        python test_runner.py --report test_report.html
-    """
-    runner = APITestRunner(test_dir)
-
-    if report:
-        print(f"Generating test report: {report}")
-        return runner.generate_test_report(report)
-
-    if pattern:
-        print(f"Running tests matching pattern: {pattern}")
-        return runner.run_tests_by_pattern(pattern, verbose)
-
-    if parallel:
-        print(f"Running tests in parallel with {parallel} workers")
-        return runner.run_parallel_tests(parallel, verbose)
-
-    if test_type == "all":
-        print("Running all API tests")
-        return runner.run_all_tests(verbose, coverage)
-    elif test_type == "smoke":
-        print("Running smoke tests")
-        return runner.run_smoke_tests(verbose)
-    else:
-        print(f"Running {test_type} tests")
-        return runner.run_crud_tests(test_type, verbose)
+            "--cov=app",
+            "--cov-report=html:" + str(output_path / "coverage"),
+            "--junitxml=" + str(output_path / "junit.xml"),
+            "-v"
+        ])
+        
+        print(f"Генерация отчета в {output_path}")
+        return subprocess.run(cmd, cwd=self.base_dir).returncode
 
 
-if __name__ == "__main__":
-    sys.exit(run_tests())
-
-
-# Additional utility functions for test management
-def setup_test_environment():
-    """Setup test environment variables and configurations."""
-    os.environ.setdefault("TESTING", "1")
-    os.environ.setdefault(
-        "DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/requify_test"
+def main():
+    """Главная функция для запуска из командной строки."""
+    parser = argparse.ArgumentParser(
+        description="Запуск тестов совместимости моделей и схем"
     )
-
-
-def cleanup_test_data():
-    """Cleanup test data after running tests."""
-    # This would typically clean up any test databases or files
-    pass
-
-
-def validate_test_environment():
-    """Validate that the test environment is properly configured."""
-    required_env_vars = [
-        "DATABASE_URL",
-        "REDIS_URL",
-    ]
-
-    missing_vars = []
-    for var in required_env_vars:
-        if not os.getenv(var):
-            missing_vars.append(var)
-
-    if missing_vars:
-        print(f"Missing required environment variables: {', '.join(missing_vars)}")
-        return False
-
-    return True
-
-
-class TestConfiguration:
-    """Configuration management for tests."""
-
-    @staticmethod
-    def get_test_database_url():
-        """Get test database URL."""
-        return os.getenv(
-            "TEST_DATABASE_URL",
-            "postgresql://postgres:postgres@localhost:5432/requify_test",
-        )
-
-    @staticmethod
-    def get_test_redis_url():
-        """Get test Redis URL."""
-        return os.getenv("TEST_REDIS_URL", "redis://localhost:6379/1")
-
-    @staticmethod
-    def is_integration_testing_enabled():
-        """Check if integration testing is enabled."""
-        return os.getenv("ENABLE_INTEGRATION_TESTS", "false").lower() == "true"
-
-    @staticmethod
-    def get_test_timeout():
-        """Get test timeout in seconds."""
-        return int(os.getenv("TEST_TIMEOUT", "30"))
+    
+    parser.add_argument(
+        "test_type",
+        choices=[
+            "compatibility", "performance", "edge_cases", 
+            "all", "fast", "report"
+        ],
+        help="Тип тестов для запуска"
+    )
+    
+    parser.add_argument(
+        "--no-verbose", 
+        action="store_true",
+        help="Отключить подробный вывод"
+    )
+    
+    parser.add_argument(
+        "--no-coverage",
+        action="store_true", 
+        help="Отключить сбор покрытия кода"
+    )
+    
+    parser.add_argument(
+        "--output-dir",
+        default="test_reports",
+        help="Директория для отчетов (только для --report)"
+    )
+    
+    args = parser.parse_args()
+    
+    runner = TestRunner()
+    verbose = not args.no_verbose
+    coverage = not args.no_coverage
+    
+    if args.test_type == "compatibility":
+        return runner.run_compatibility_tests(verbose, coverage)
+    elif args.test_type == "performance":
+        return runner.run_performance_tests(verbose)
+    elif args.test_type == "edge_cases":
+        return runner.run_edge_case_tests(verbose)
+    elif args.test_type == "all":
+        return runner.run_all_tests(verbose, coverage)
+    elif args.test_type == "fast":
+        return runner.run_fast_tests()
+    elif args.test_type == "report":
+        return runner.generate_report(args.output_dir)
+    else:
+        print(f"Неизвестный тип тестов: {args.test_type}")
+        return 1
 
 
 if __name__ == "__main__":
-    # Setup environment
-    setup_test_environment()
-
-    # Validate environment
-    if not validate_test_environment():
-        sys.exit(1)
-
-    # Run the CLI
-    sys.exit(run_tests())
+    sys.exit(main())

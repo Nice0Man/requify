@@ -841,23 +841,37 @@ class ProjectPerformanceStats(BaseSchema):
     projects_total: int = Field(0, ge=0, description="Общее количество проектов")
     projects_active: int = Field(0, ge=0, description="Активные проекты")
     completion_rate: float = Field(0.0, ge=0, le=100, description="Процент завершения")
-    average_duration: Optional[int] = Field(None, description="Средняя длительность в днях")
+    average_duration: Optional[int] = Field(
+        None, description="Средняя длительность в днях"
+    )
 
 
 class TrendingMetricsData(BaseSchema):
     """Данные трендинговых метрик."""
 
-    requirements_trend: List[Dict[str, Any]] = Field(default_factory=list, description="Тренд требований")
-    projects_trend: List[Dict[str, Any]] = Field(default_factory=list, description="Тренд проектов")
-    activity_trend: List[Dict[str, Any]] = Field(default_factory=list, description="Тренд активности")
+    requirements_trend: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Тренд требований"
+    )
+    projects_trend: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Тренд проектов"
+    )
+    activity_trend: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Тренд активности"
+    )
 
 
 class QuickAccess(BaseSchema):
     """Быстрый доступ к данным."""
 
-    recent_projects: List[QuickProject] = Field(default_factory=list, description="Недавние проекты")
-    recent_requirements: List[QuickRequirement] = Field(default_factory=list, description="Недавние требования")
-    pinned_items: List[Dict[str, Any]] = Field(default_factory=list, description="Закрепленные элементы")
+    recent_projects: List[QuickProject] = Field(
+        default_factory=list, description="Недавние проекты"
+    )
+    recent_requirements: List[QuickRequirement] = Field(
+        default_factory=list, description="Недавние требования"
+    )
+    pinned_items: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Закрепленные элементы"
+    )
 
 
 class SystemMetrics(BaseSchema):
@@ -890,7 +904,9 @@ class ProjectTrendDataPoint(BaseSchema):
 
     project_id: int = Field(..., gt=0, description="ID проекта")
     project_name: str = Field(..., description="Название проекта")
-    trend_data: List[TimelineDataPoint] = Field(default_factory=list, description="Данные тренда")
+    trend_data: List[TimelineDataPoint] = Field(
+        default_factory=list, description="Данные тренда"
+    )
 
 
 class TimelineQueryParams(BaseSchema):
@@ -921,18 +937,28 @@ class ProjectTrendsQueryParams(BaseSchema):
 class MyDashboardResponse(BaseSchema):
     """Ответ пользовательского дашборда."""
 
-    user_preferences: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Настройки пользователя")
+    user_preferences: Optional[Dict[str, Any]] = Field(
+        default_factory=dict, description="Настройки пользователя"
+    )
     widgets: List[Dict[str, Any]] = Field(default_factory=list, description="Виджеты")
-    layout: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Макет дашборда")
+    layout: Optional[Dict[str, Any]] = Field(
+        default_factory=dict, description="Макет дашборда"
+    )
 
 
 class DashboardStats(BaseSchema):
     """Комплексная статистика дашборда."""
 
     overview: DashboardOverviewStats = Field(..., description="Обзорная статистика")
-    recent_activity: List[ActivityItem] = Field(default_factory=list, description="Недавняя активность")
-    project_performance: ProjectPerformanceStats = Field(..., description="Производительность проектов")
-    trending_metrics: TrendingMetricsData = Field(..., description="Трендинговые метрики")
+    recent_activity: List[ActivityItem] = Field(
+        default_factory=list, description="Недавняя активность"
+    )
+    project_performance: ProjectPerformanceStats = Field(
+        ..., description="Производительность проектов"
+    )
+    trending_metrics: TrendingMetricsData = Field(
+        ..., description="Трендинговые метрики"
+    )
     quick_access: QuickAccess = Field(..., description="Быстрый доступ")
 
 

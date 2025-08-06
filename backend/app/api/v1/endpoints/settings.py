@@ -36,7 +36,7 @@ router = APIRouter()
 @router.get("/", response_model=UserSettings)
 async def get_all_settings(
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Получить все настройки текущего пользователя.
@@ -55,7 +55,7 @@ async def get_all_settings(
 @router.get("/profile", response_model=UserProfileSettings)
 async def get_profile_settings(
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Получить настройки профиля.
@@ -82,7 +82,7 @@ async def get_profile_settings(
 async def update_all_settings(
     settings_update: UserSettingsUpdate,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Обновить настройки пользователя (частичное обновление).
@@ -96,7 +96,7 @@ async def update_all_settings(
 async def update_profile_settings(
     profile_settings: UserProfileSettings,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Обновить настройки профиля.
@@ -111,7 +111,7 @@ async def update_profile_settings(
 async def update_notification_settings(
     notification_settings: NotificationSettings,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Обновить настройки уведомлений.
@@ -126,7 +126,7 @@ async def update_notification_settings(
 async def update_interface_settings(
     interface_settings: InterfaceSettings,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Обновить настройки интерфейса.
@@ -141,7 +141,7 @@ async def update_interface_settings(
 async def update_security_settings(
     security_settings: SecuritySettings,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Обновить настройки безопасности.
@@ -155,7 +155,7 @@ async def update_security_settings(
 async def update_privacy_settings(
     privacy_settings: PrivacySettings,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Обновить настройки приватности.
@@ -174,7 +174,7 @@ async def update_privacy_settings(
 async def change_password(
     password_data: ChangePasswordRequest,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Изменить пароль пользователя.
@@ -193,7 +193,7 @@ async def change_password(
 @router.get("/sessions", response_model=UserSessionsResponse)
 async def get_user_sessions(
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Получить активные сессии пользователя.
@@ -206,7 +206,7 @@ async def get_user_sessions(
 async def revoke_sessions(
     revoke_data: RevokeSessionsRequest,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Отозвать сессии пользователя.
@@ -225,7 +225,7 @@ async def revoke_sessions(
 @router.get("/export")
 async def export_settings(
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Экспортировать настройки пользователя в JSON файл.
@@ -256,7 +256,7 @@ async def import_settings(
     file: UploadFile = File(...),
     overwrite: bool = False,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Импортировать настройки пользователя из JSON файла.
@@ -302,7 +302,7 @@ async def import_settings(
 async def get_user_settings_admin(
     user_id: int,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Получить настройки пользователя (только для администраторов).
@@ -330,7 +330,7 @@ async def update_user_settings_admin(
     user_id: int,
     settings_update: UserSettingsUpdate,
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Обновить настройки пользователя (только для администраторов).
@@ -355,7 +355,7 @@ async def update_user_settings_admin(
 async def reset_settings(
     section: str = None,  # profile, notifications, interface, security, privacy, all
     current_user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Сбросить настройки к значениям по умолчанию.

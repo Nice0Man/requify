@@ -9,13 +9,13 @@ from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
-    get_db,
+from app.api.dependencies import (
     get_current_active_user,
-    get_dashboard_read_user,
     get_dashboard_admin_user,
-    get_stats_read_user,
+    get_dashboard_user,
+    get_db,
     get_export_user,
+    get_stats_read_user,
 )
 
 from app.services.dashboard_service import dashboard_service
@@ -46,7 +46,7 @@ router = APIRouter()
 @router.get("/stats", response_model=DashboardStats)
 async def get_dashboard_stats(
     current_user: UserProfileResponse = Depends(get_stats_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Get comprehensive dashboard statistics"""
     try:
@@ -67,8 +67,8 @@ async def get_dashboard_stats(
 
 @router.get("/", response_model=DashboardStats)
 async def get_dashboard_overview(
-    current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: UserProfileResponse = Depends(get_dashboard_user),
+    db: SessionDep,
 ):
     """Get dashboard overview - same as /stats for backward compatibility"""
     return await get_dashboard_stats(current_user, db)
@@ -77,7 +77,7 @@ async def get_dashboard_overview(
 @router.get("/overview", response_model=DashboardOverviewStats)
 async def get_dashboard_overview_stats(
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Get dashboard overview statistics only"""
     try:
@@ -97,7 +97,7 @@ async def get_dashboard_overview_stats(
 @router.get("/my-projects", response_model=List[QuickProject])
 async def get_my_projects(
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     page: int = Query(1, ge=1),
     size: int = Query(10, ge=1, le=100),
 ):
@@ -125,7 +125,7 @@ async def get_my_projects(
 @router.get("/my-requirements", response_model=List[QuickRequirement])
 async def get_my_requirements(
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Get user's requirements"""
     try:
@@ -146,7 +146,7 @@ async def get_my_requirements(
 @router.get("/my-activity", response_model=List[ActivityItem])
 async def get_my_activity(
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     limit: int = Query(20, ge=1, le=100),
 ):
     """Get user's activity"""
@@ -169,7 +169,7 @@ async def get_my_activity(
 @router.get("/my-notifications", response_model=List[NotificationSchema])
 async def get_my_notifications(
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     limit: int = Query(10, ge=1, le=100),
 ):
     """Get user's notifications"""
@@ -205,7 +205,7 @@ async def get_my_notifications(
 @router.get("/activity/recent", response_model=List[ActivityItem])
 async def get_recent_dashboard_activity(
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     limit: int = Query(10, ge=1, le=100),
 ):
     """Get recent dashboard activity"""
@@ -226,7 +226,7 @@ async def get_recent_dashboard_activity(
 @router.get("/projects/stats", response_model=Dict[str, Any])
 async def get_dashboard_projects_stats(
     current_user: UserProfileResponse = Depends(get_stats_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Get dashboard projects statistics"""
     try:
@@ -258,7 +258,7 @@ async def get_dashboard_projects_stats(
 @router.get("/projects/recent", response_model=List[QuickProject])
 async def get_recent_projects_dashboard(
     current_user: UserProfileResponse = Depends(get_stats_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     limit: int = Query(5, ge=1, le=20),
 ):
     """Get recent projects for dashboard"""
@@ -280,7 +280,7 @@ async def get_recent_projects_dashboard(
 @router.get("/requirements/stats", response_model=Dict[str, Any])
 async def get_dashboard_requirements_stats(
     current_user: UserProfileResponse = Depends(get_stats_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Get dashboard requirements statistics"""
     try:
@@ -311,7 +311,7 @@ async def get_dashboard_requirements_stats(
 @router.get("/requirements/recent", response_model=List[QuickRequirement])
 async def get_recent_requirements_dashboard(
     current_user: UserProfileResponse = Depends(get_stats_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     limit: int = Query(5, ge=1, le=20),
 ):
     """Get recent requirements for dashboard"""
@@ -332,8 +332,8 @@ async def get_recent_requirements_dashboard(
 
 @router.get("/health", response_model=Dict[str, str])
 async def get_dashboard_health(
-    current_user: UserProfileResponse = Depends(get_dashboard_admin_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: UserProfileResponse = Depends(AdminPermissions.analytics()),
+    db: SessionDep,
 ):
     """Get dashboard health status"""
     return {"status": "healthy", "service": "dashboard"}
@@ -341,8 +341,8 @@ async def get_dashboard_health(
 
 @router.get("/metrics", response_model=Dict[str, Any])
 async def get_dashboard_metrics(
-    current_user: UserProfileResponse = Depends(get_dashboard_admin_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: UserProfileResponse = Depends(AdminPermissions.analytics()),
+    db: SessionDep,
 ):
     """Get dashboard metrics"""
     try:
@@ -372,7 +372,7 @@ async def get_dashboard_metrics(
 async def search_dashboard(
     query: str = Query(..., min_length=1),
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Search across dashboard items"""
     try:
@@ -397,7 +397,7 @@ async def filter_dashboard(
     date_from: Optional[str] = Query(None),
     date_to: Optional[str] = Query(None),
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Filter dashboard items by various criteria"""
     try:
@@ -451,7 +451,7 @@ async def filter_dashboard(
 @router.get("/export/stats", response_model=Dict[str, Any])
 async def export_dashboard_stats(
     current_user: UserProfileResponse = Depends(get_export_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Export dashboard statistics"""
     try:
@@ -481,7 +481,7 @@ async def export_dashboard_stats(
 @router.get("/export/activity", response_model=Dict[str, Any])
 async def export_dashboard_activity(
     current_user: UserProfileResponse = Depends(get_export_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     limit: int = Query(100, ge=1, le=1000),
 ):
     """Export dashboard activity"""
@@ -509,7 +509,7 @@ async def export_dashboard_activity(
 @router.get("/my-dashboard", response_model=MyDashboardResponse)
 async def get_my_dashboard(
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Get user's personalized dashboard"""
     try:
@@ -533,7 +533,7 @@ async def get_dashboard_activity(
     project_id: Optional[int] = Query(None),
     user_id: Optional[int] = Query(None),
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Get dashboard activity with filtering"""
     try:
@@ -576,7 +576,7 @@ async def get_dashboard_activity(
 async def update_user_preferences(
     preferences_data: UserPreferences,
     current_user: UserProfileResponse = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Update user dashboard preferences"""
     try:
@@ -599,8 +599,8 @@ async def update_user_preferences(
 @router.post("/notifications")
 async def create_notification(
     notification_data: Notification,
-    current_user: UserProfileResponse = Depends(get_dashboard_admin_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: UserProfileResponse = Depends(AdminPermissions.analytics()),
+    db: SessionDep,
 ):
     """Create a new dashboard notification"""
     try:
@@ -633,7 +633,7 @@ async def create_notification(
 async def mark_notification_read(
     notification_id: int,
     current_user: UserProfileResponse = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Mark a notification as read"""
     try:
@@ -661,7 +661,7 @@ async def mark_notification_read(
 async def create_activity_record(
     activity_data: Dict[str, Any],
     current_user: UserProfileResponse = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """Create a new activity record"""
     try:
@@ -696,8 +696,8 @@ async def create_activity_record(
 
 @router.get("/metrics/system", response_model=SystemMetrics)
 async def get_system_metrics(
-    current_user: UserProfileResponse = Depends(get_dashboard_admin_user),
-    db: AsyncSession = Depends(get_db),
+    current_user: UserProfileResponse = Depends(AdminPermissions.analytics()),
+    db: SessionDep,
 ):
     """
     Get real system metrics (enhanced version)
@@ -721,7 +721,7 @@ async def get_system_metrics(
 async def get_timeline_data(
     params: TimelineQueryParams = Depends(),
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Get timeline chart data with comprehensive filtering
@@ -757,7 +757,7 @@ async def get_timeline_data(
 async def get_distribution_data(
     params: DistributionQueryParams = Depends(),
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Get distribution chart data with comprehensive filtering
@@ -792,7 +792,7 @@ async def get_distribution_data(
 async def get_project_trends(
     period: str = Query("12m", description="Time period for trends (6m, 12m, 24m)"),
     current_user: UserProfileResponse = Depends(get_dashboard_read_user),
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
 ):
     """
     Get project trends data over specified period

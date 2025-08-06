@@ -59,9 +59,7 @@ class UserSettings(Base, TimestampedMixin):
     )
 
     # Связь с пользователем
-    user: Mapped["User"] = relationship(
-        "User", uselist=False
-    )
+    user: Mapped["User"] = relationship("User", uselist=False)
 
     def __repr__(self) -> str:
         return f"<UserSettings(user_id={self.user_id}, version={self.version})>"
@@ -105,7 +103,9 @@ class UserSettingsHistory(Base, TimestampedMixin):
     )
 
     # Связь с пользователем
-    user: Mapped["User"] = relationship("User", foreign_keys=[user_id])
+    user: Mapped["User"] = relationship(
+        "User", foreign_keys=[user_id], overlaps="settings_history"
+    )
 
     def __repr__(self) -> str:
         return f"<UserSettingsHistory(user_id={self.user_id}, version={self.version})>"

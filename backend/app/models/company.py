@@ -11,10 +11,15 @@ if TYPE_CHECKING:
     from .user import User
     from .project import Project
     from .department import Department
+    from .company_contact import CompanyContact
+    from .company_settings import CompanySettings
+    from .company_branding import CompanyBranding
+    from .company_subscription import CompanySubscription
 
 
 class CompanyStatus(PyEnum):
     """Статусы компании"""
+
     ACTIVE = "active"
     SUSPENDED = "suspended"
     INACTIVE = "inactive"
@@ -24,6 +29,7 @@ class CompanyStatus(PyEnum):
 
 class CompanyType(PyEnum):
     """Типы компаний"""
+
     STARTUP = "startup"
     SMALL_BUSINESS = "small_business"
     MEDIUM_BUSINESS = "medium_business"
@@ -36,7 +42,7 @@ class CompanyType(PyEnum):
 class Company(Base, TimestampedMixin):
     """
     Основная модель компании.
-    
+
     Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 
@@ -59,7 +65,7 @@ class Company(Base, TimestampedMixin):
     description: Mapped[Optional[str]] = mapped_column(
         String(1000), nullable=True, comment="Описание компании"
     )
-    
+
     # Статус и тип
     status: Mapped[str] = mapped_column(
         Enum(CompanyStatus),
@@ -73,7 +79,7 @@ class Company(Base, TimestampedMixin):
         nullable=False,
         comment="Тип компании",
     )
-    
+
     is_active: Mapped[bool] = mapped_column(
         Boolean, default=True, nullable=False, comment="Активна ли компания"
     )
@@ -92,6 +98,35 @@ class Company(Base, TimestampedMixin):
 
     departments: Mapped[List["Department"]] = relationship(
         "Department", back_populates="company", lazy="select"
+    )
+
+    # Extended company models relationships
+    contacts: Mapped[List["CompanyContact"]] = relationship(
+        "CompanyContact",
+        back_populates="company",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    settings: Mapped[List["CompanySettings"]] = relationship(
+        "CompanySettings",
+        back_populates="company",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    branding: Mapped[List["CompanyBranding"]] = relationship(
+        "CompanyBranding",
+        back_populates="company",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    subscriptions: Mapped[List["CompanySubscription"]] = relationship(
+        "CompanySubscription",
+        back_populates="company",
+        lazy="select",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self) -> str:

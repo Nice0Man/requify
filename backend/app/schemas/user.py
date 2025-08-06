@@ -5,9 +5,9 @@
 """
 
 from datetime import datetime
-from typing import Optional, Dict, Any, List, TYPE_CHECKING
+from typing import Optional, Dict, Any, List, Union, TYPE_CHECKING
 from sqlmodel import SQLModel, Field
-from pydantic import EmailStr, field_validator, model_validator
+from pydantic import EmailStr, field_validator, model_validator, field_serializer
 from enum import Enum
 import re
 
@@ -66,18 +66,24 @@ class UserBase(BaseSchema, ValidationMixin):
     """
     Базовая схема пользователя.
     Содержит основные поля без служебных данных.
-    
+
     NOTE: Поле user_type было удалено, так как система использует Enhanced Role System
     для управления ролями пользователей через UserRoleAssignment и EnhancedRole.
     """
 
-    username: str = Field(
-        ...,
+    username: Optional[str] = Field(
+        None,
         min_length=2,
         max_length=FieldLimits.SHORT_STRING_MAX,
         description="Имя пользователя (уникальное)",
     )
     email: EmailStr = Field(..., description="Email пользователя (уникальный)")
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=100,
+        description="Полное имя пользователя",
+    )
     status: UserStatus = Field(UserStatus.ACTIVE, description="Статус пользователя")
     auth_provider: AuthProvider = Field(
         AuthProvider.LOCAL, description="Провайдер аутентификации"
@@ -120,8 +126,11 @@ class UserBase(BaseSchema, ValidationMixin):
 
     @field_validator("username")
     @classmethod
-    def validate_username(cls, v: str) -> str:
+    def validate_username(cls, v: Optional[str]) -> Optional[str]:
         """Валидация имени пользователя"""
+        if v is None:
+            return None
+            
         v = cls.validate_non_empty_string(v, "username")
         v = v.strip().lower()
 
@@ -141,11 +150,10 @@ class UserBase(BaseSchema, ValidationMixin):
         if any(combo in v for combo in ["..", "--", "__", ".-", "-_", "_."]):
             raise ValueError("Username cannot contain consecutive special characters")
 
-        # Проверка зарезервированных имен
+        # Проверка зарезервированных имен (admin разрешен для админа)
         reserved_usernames = [
-            "admin",
             "root",
-            "administrator",
+            "administrator", 
             "superuser",
             "api",
             "www",
@@ -437,13 +445,82 @@ class UserWithRelations(UserResponse):
     """
 
     company_name: Optional[str] = Field(None, description="Название компании")
-    profile: Optional[Dict[str, Any]] = Field(None, description="Данные профиля")
+    profile: Optional[Union[Dict[str, Any], Any]] = Field(None, description="Данные профиля")
     roles: List[Dict[str, Any]] = Field(
         default_factory=list, description="Назначенные роли"
     )
     teams: List[Dict[str, Any]] = Field(
         default_factory=list, description="Команды пользователя"
     )
+    
+    model_config = {"from_attributes": True}
+    
+    @field_validator("profile", mode="before")
+    @classmethod
+    def validate_profile(cls, value):
+        """Валидация и преобразование profile объекта в словарь"""
+        if value is None:
+            return None
+        
+        # Если это уже словарь, возвращаем как есть
+        if isinstance(value, dict):
+            return value
+            
+        # Если это ORM объект, пытаемся безопасно его сериализовать
+        if hasattr(value, '__dict__'):
+            try:
+                # Используем только доступные атрибуты SQLAlchemy
+                result = {}
+                # Получаем загруженные атрибуты из SQLAlchemy
+                mapper = value.__class__.__mapper__
+                for column in mapper.columns:
+                    column_name = column.name
+                    try:
+                        # Проверяем, загружен ли атрибут
+                        if hasattr(value, column_name):
+                            attr_value = getattr(value, column_name, None)
+                            result[column_name] = attr_value
+                    except Exception:
+                        # Пропускаем проблемные атрибуты
+                        continue
+                return result if result else None
+            except Exception:
+                # Fallback - возвращаем None если не можем сериализовать
+                return None
+        return value
+    
+    @field_serializer("profile")
+    def serialize_profile(self, value, _info):
+        """Сериализация profile объекта в словарь"""
+        if value is None:
+            return None
+        
+        # Если это уже словарь, возвращаем как есть
+        if isinstance(value, dict):
+            return value
+            
+        # Если это ORM объект, пытаемся безопасно его сериализовать
+        if hasattr(value, '__dict__'):
+            try:
+                # Используем только доступные атрибуты SQLAlchemy
+                result = {}
+                # Получаем загруженные атрибуты из SQLAlchemy
+                mapper = value.__class__.__mapper__
+                for column in mapper.columns:
+                    column_name = column.name
+                    try:
+                        # Проверяем, загружен ли атрибут
+                        if hasattr(value, column_name):
+                            attr_value = getattr(value, column_name, None)
+                            result[column_name] = attr_value
+                    except Exception:
+                        # Пропускаем проблемные атрибуты
+                        continue
+                return result if result else None
+            except Exception:
+                # Fallback - возвращаем None если не можем сериализовать
+                return None
+        return value
 
 
 class UserDetailed(UserWithRelations):
@@ -462,7 +539,7 @@ class UserDetailed(UserWithRelations):
     )
 
     # Настройки и предпочтения
-    settings: Optional[Dict[str, Any]] = Field(
+    settings: Optional[Union[Dict[str, Any], Any]] = Field(
         None, description="Пользовательские настройки"
     )
 
@@ -471,6 +548,73 @@ class UserDetailed(UserWithRelations):
     can_delete: bool = Field(False, description="Можно ли удалить")
     can_assign_roles: bool = Field(False, description="Можно ли назначать роли")
     can_reset_password: bool = Field(False, description="Можно ли сбросить пароль")
+    
+    @field_validator("settings", mode="before")
+    @classmethod
+    def validate_settings(cls, value):
+        """Валидация и преобразование settings объекта в словарь"""
+        if value is None:
+            return None
+            
+        # Если это уже словарь, возвращаем как есть
+        if isinstance(value, dict):
+            return value
+            
+        # Если это ORM объект, пытаемся безопасно его сериализовать
+        if hasattr(value, '__dict__'):
+            try:
+                # Используем только доступные атрибуты SQLAlchemy
+                result = {}
+                # Получаем загруженные атрибуты из SQLAlchemy
+                mapper = value.__class__.__mapper__
+                for column in mapper.columns:
+                    column_name = column.name
+                    try:
+                        # Проверяем, загружен ли атрибут
+                        if hasattr(value, column_name):
+                            attr_value = getattr(value, column_name, None)
+                            result[column_name] = attr_value
+                    except Exception:
+                        # Пропускаем проблемные атрибуты
+                        continue
+                return result if result else None
+            except Exception:
+                # Fallback - возвращаем None если не можем сериализовать
+                return None
+        return value
+    
+    @field_serializer("settings")
+    def serialize_settings(self, value, _info):
+        """Сериализация settings объекта в словарь"""
+        if value is None:
+            return None
+            
+        # Если это уже словарь, возвращаем как есть
+        if isinstance(value, dict):
+            return value
+            
+        # Если это ORM объект, пытаемся безопасно его сериализовать
+        if hasattr(value, '__dict__'):
+            try:
+                # Используем только доступные атрибуты SQLAlchemy
+                result = {}
+                # Получаем загруженные атрибуты из SQLAlchemy
+                mapper = value.__class__.__mapper__
+                for column in mapper.columns:
+                    column_name = column.name
+                    try:
+                        # Проверяем, загружен ли атрибут
+                        if hasattr(value, column_name):
+                            attr_value = getattr(value, column_name, None)
+                            result[column_name] = attr_value
+                    except Exception:
+                        # Пропускаем проблемные атрибуты
+                        continue
+                return result if result else None
+            except Exception:
+                # Fallback - возвращаем None если не можем сериализовать
+                return None
+        return value
 
 
 # === Списки и пагинация ===
@@ -799,7 +943,7 @@ class UserComplete(UserDetailed):
     Псевдоним для UserDetailed с полной информацией о пользователе.
     Используется для обратной совместимости в auth схемах.
     """
-    
+
     pass
 
 
@@ -808,7 +952,7 @@ class UserWithProfile(UserWithRelations):
     Псевдоним для UserWithRelations с профилем пользователя.
     Используется для обратной совместимости в auth схемах.
     """
-    
+
     pass
 
 

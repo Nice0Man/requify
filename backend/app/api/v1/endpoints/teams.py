@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 # Team endpoints
 @router.get("/", response_model=TeamListResponse, summary="Получить список команд")
 async def get_teams(
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
@@ -81,7 +81,7 @@ async def get_teams(
 @router.post("/", response_model=TeamResponse, summary="Создать команду")
 async def create_team(
     team_in: TeamCreate,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -105,7 +105,7 @@ async def create_team(
 @router.get("/{team_id}", response_model=TeamDetailResponse, summary="Получить команду")
 async def get_team(
     team_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -128,7 +128,7 @@ async def get_team(
 async def update_team(
     team_id: int,
     team_in: TeamUpdate,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -151,7 +151,7 @@ async def update_team(
 @router.delete("/{team_id}", summary="Удалить команду")
 async def delete_team(
     team_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -174,7 +174,7 @@ async def delete_team(
 )
 async def archive_team(
     team_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -199,7 +199,7 @@ async def archive_team(
 )
 async def restore_team(
     team_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -227,7 +227,7 @@ async def restore_team(
 )
 async def get_team_members(
     team_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
     active_only: bool = Query(True),
 ):
@@ -255,7 +255,7 @@ async def get_team_members(
 async def add_team_member(
     team_id: int,
     member_in: TeamMemberCreate,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -284,7 +284,7 @@ async def update_team_member(
     team_id: int,
     user_id: int,
     member_in: TeamMemberUpdate,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -312,7 +312,7 @@ async def update_team_member(
 async def remove_team_member(
     team_id: int,
     user_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -341,7 +341,7 @@ async def change_member_role(
     team_id: int,
     user_id: int,
     role: TeamRole,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -373,7 +373,7 @@ async def change_member_role(
 )
 async def bulk_create_teams(
     bulk_data: TeamBulkCreate,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -401,7 +401,7 @@ async def bulk_create_teams(
 async def bulk_add_members(
     team_id: int,
     bulk_data: TeamMemberBulkAdd,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -423,7 +423,7 @@ async def bulk_add_members(
 # Statistics endpoints
 @router.get("/stats/overview", response_model=TeamStats, summary="Статистика команд")
 async def get_team_stats(
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
     period: Optional[str] = Query(
         None, description="Period filter (current, last_month, etc.)"
@@ -452,7 +452,7 @@ async def get_team_stats(
 )
 async def get_team_member_stats(
     team_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """
@@ -479,7 +479,7 @@ async def get_team_member_stats(
 )
 async def check_permission(
     permission_check: TeamPermissionCheck,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_user),
 ):
     """

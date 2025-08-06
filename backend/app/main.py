@@ -29,6 +29,15 @@ async def lifespan(app: FastAPI):
             logger.info(f"Environment: {settings.run.env}")
             logger.info(f"Debug mode: {settings.run.debug}")
 
+            # Rebuild Pydantic models with forward references
+            try:
+                from app.schemas.auth import rebuild_auth_models
+
+                rebuild_auth_models()
+                logger.info("Pydantic models rebuilt successfully")
+            except Exception as e:
+                logger.warning(f"Failed to rebuild Pydantic models: {e}")
+
             # Проверка подключения к базе данных
             try:
                 from app.db.session import check_async_db_connection

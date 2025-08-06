@@ -11,7 +11,7 @@
 """
 
 from datetime import datetime, UTC
-from typing import Optional, List, Dict, Any, TYPE_CHECKING
+from typing import Annotated, Optional, List, Dict, Any, TYPE_CHECKING
 
 from pydantic import Field, EmailStr, field_validator, model_validator
 
@@ -26,7 +26,34 @@ from .base import (
 )
 
 if TYPE_CHECKING:
-    from app.schemas.user import UserComplete
+    from app.schemas.user import UserDetailed
+
+
+def rebuild_auth_models():
+    """Rebuild models to resolve forward references."""
+    try:
+        from app.schemas.user import UserDetailed
+
+        # Import all response models that use UserDetailed
+        globals_dict = globals()
+        models_to_rebuild = [
+            "LoginResponse",
+            "RegisterResponse",
+            "TokenValidationResponse",
+            "EmailVerificationResponse",
+        ]
+
+        for model_name in models_to_rebuild:
+            if model_name in globals_dict:
+                model_class = globals_dict[model_name]
+                if hasattr(model_class, "model_rebuild"):
+                    try:
+                        model_class.model_rebuild()
+                    except Exception:
+                        pass  # Ignore rebuild errors
+    except Exception:
+        pass  # Ignore any import or rebuild errors
+
 
 # === Base Token Schemas (Single Responsibility Principle) ===
 
@@ -130,7 +157,7 @@ class LoginResponse(BaseSchema):
     )
 
     # Полная информация о пользователе
-    user: "UserComplete" = Field(..., description="Полная информация о пользователе")
+    user: "UserDetailed" = Field(..., description="Полная информация о пользователе")
 
 
 class RefreshTokenRequest(CreateSchema, ValidationMixin):
@@ -271,7 +298,7 @@ class RegisterResponse(BaseSchema):
     о необходимости верификации email.
     """
 
-    user: "UserComplete" = Field(..., description="Созданный пользователь")
+    user: "UserDetailed" = Field(..., description="Созданный пользователь")
     message: str = Field(
         default="User registered successfully", description="Сообщение"
     )
@@ -365,10 +392,10 @@ class TokenValidationResponse(BaseSchema):
 
     valid: bool = Field(..., description="Валиден ли токен")
     expires_at: Optional[datetime] = Field(None, description="Время истечения")
-    user: Optional["UserComplete"] = Field(
-        None, description="Информация о пользователе"
-    )
     scopes: List[str] = Field(default_factory=list, description="Права доступа токена")
+    user: Optional["UserDetailed"] = Field(
+        None, description="Информация о пользователе если токен валиден"
+    )
 
 
 # === Session Management Schemas ===
@@ -468,7 +495,7 @@ class EmailVerificationResponse(BaseSchema):
 
     message: str = Field(..., description="Сообщение о результате")
     verified: bool = Field(..., description="Успешно ли подтвержден email")
-    user: Optional["UserComplete"] = Field(
+    user: Optional["UserDetailed"] = Field(
         None, description="Информация о пользователе после верификации"
     )
 

@@ -234,7 +234,7 @@ class CompanySubscription(Base, TimestampedMixin):
     # =============================================================================
 
     company: Mapped["Company"] = relationship(
-        "Company", back_populates="subscription", lazy="select"
+        "Company", back_populates="subscriptions", lazy="select"
     )
 
     def __repr__(self) -> str:

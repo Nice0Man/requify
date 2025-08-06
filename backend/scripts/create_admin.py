@@ -18,9 +18,9 @@ logger = get_logger(__name__)
 
 
 async def create_admin_user(
-    username: str,
     email: str,
     password: str,
+    username: str,
     first_name: Optional[str] = None,
     last_name: Optional[str] = None,
 ) -> bool:
@@ -28,7 +28,6 @@ async def create_admin_user(
     Create an admin user.
 
     Args:
-        username: Username for the admin
         email: Email for the admin
         password: Password for the admin
         first_name: Optional first name
@@ -40,17 +39,9 @@ async def create_admin_user(
     try:
         async with AsyncSessionLocal() as session:
             # Check if user already exists
-            stmt_username = select(User).where(User.username == username)
-            result_username = await session.execute(stmt_username)
-            existing_user_by_username = result_username.scalar_one_or_none()
-
             stmt_email = select(User).where(User.email == email)
             result_email = await session.execute(stmt_email)
             existing_user_by_email = result_email.scalar_one_or_none()
-
-            if existing_user_by_username:
-                logger.error(f"User with username '{username}' already exists")
-                return False
 
             if existing_user_by_email:
                 logger.error(f"User with email '{email}' already exists")
@@ -59,12 +50,16 @@ async def create_admin_user(
             # Create new admin user
             hashed_password = get_password_hash(password)
 
+            # Combine first and last names for the 'name' field
+            full_name = f"{first_name or 'Admin'} {last_name or 'User'}".strip()
+
             new_user = User(
                 username=username,
                 email=email,
-                hashed_password=hashed_password,
+                password_hash=hashed_password,
+                name=full_name,
                 is_active=True,
-                email_verified=True,  # Updated field name
+                is_email_verified=True,
             )
 
             session.add(new_user)
@@ -127,7 +122,7 @@ async def create_admin_user(
             await session.refresh(new_user)
 
             logger.info(
-                f"Admin user '{username}' created successfully with ID: {new_user.id}"
+                f"Admin user '{email}' created successfully with ID: {new_user.id}"
             )
             return True
 
@@ -192,11 +187,10 @@ async def interactive_create_admin():
     if confirm != "y":
         print("Admin creation cancelled.")
         return False
-
-    success = await create_admin_user(username, email, password, first_name, last_name)
+    success = await create_admin_user(email, password, username, first_name, last_name)
 
     if success:
-        print(f"\n✅ Admin user '{username}' created successfully!")
+        print(f"\n✅ Admin user '{email}' created successfully!")
         print("You can now log in to the system with these credentials.")
     else:
         print("\n❌ Failed to create admin user. Check logs for details.")
@@ -206,12 +200,12 @@ async def interactive_create_admin():
 
 async def main():
     """Main function for module execution."""
-    if len(sys.argv) == 4:
+    if len(sys.argv) == 3:
         # Command line arguments provided
-        username, email, password = sys.argv[1], sys.argv[2], sys.argv[3]
-        success = await create_admin_user(username, email, password)
+        email, password = sys.argv[1], sys.argv[2]
+        success = await create_admin_user(email, password, "admin")
         if success:
-            print(f"✅ Admin user '{username}' created successfully!")
+            print(f"✅ Admin user '{email}' created successfully!")
         else:
             print("❌ Failed to create admin user.")
             sys.exit(1)

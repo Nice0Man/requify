@@ -14,13 +14,13 @@ from sqlalchemy.orm import Mapped, mapped_column
 class AuthMixin:
     """Миксин для аутентификации и базовых данных пользователя"""
 
-    username: Mapped[str] = mapped_column(
-        String(50), unique=True, nullable=False, comment="Уникальное имя пользователя"
+    username: Mapped[Optional[str]] = mapped_column(
+        String(50), unique=True, nullable=True, comment="Уникальное имя пользователя"
     )
     email: Mapped[str] = mapped_column(
         String(100), unique=True, nullable=False, comment="Email адрес пользователя"
     )
-    hashed_password: Mapped[str] = mapped_column(
+    password_hash: Mapped[str] = mapped_column(
         String(128), nullable=False, comment="Хэшированный пароль"
     )
 
@@ -34,7 +34,10 @@ class AuthMixin:
         String(20), default="local", nullable=False, comment="Провайдер аутентификации"
     )
     auth_provider_id: Mapped[Optional[str]] = mapped_column(
-        String(255), unique=True, nullable=True, comment="ID пользователя у внешнего провайдера"
+        String(255),
+        unique=True,
+        nullable=True,
+        comment="ID пользователя у внешнего провайдера",
     )
 
     # Security fields
@@ -42,12 +45,14 @@ class AuthMixin:
         Integer, default=0, nullable=False, comment="Количество неудачных попыток входа"
     )
     locked_until: Mapped[Optional[datetime]] = mapped_column(
-        DateTime, nullable=True, comment="Заблокирован до (после множественных неудачных попыток)"
+        DateTime,
+        nullable=True,
+        comment="Заблокирован до (после множественных неудачных попыток)",
     )
     password_changed_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime, nullable=True, comment="Дата последней смены пароля"
     )
-    
+
     # User agreements
     terms_accepted_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime, nullable=True, comment="Дата принятия условий использования"
@@ -55,7 +60,7 @@ class AuthMixin:
     privacy_policy_accepted_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime, nullable=True, comment="Дата принятия политики конфиденциальности"
     )
-    
+
     # User data
     preferences: Mapped[Optional[dict]] = mapped_column(
         JSON, nullable=True, comment="Пользовательские настройки"

@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 class DepartmentType(PyEnum):
     """Типы департаментов"""
+
     ENGINEERING = "engineering"
     PRODUCT = "product"
     DESIGN = "design"
@@ -32,7 +33,7 @@ class DepartmentType(PyEnum):
 class Department(Base, TimestampedMixin):
     """
     Модель департамента компании.
-    
+
     Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 

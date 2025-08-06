@@ -723,23 +723,33 @@ class TeamConfig:
 class TeamDetailResponse(TeamResponse):
     """Детальная схема ответа для команды с дополнительной информацией."""
 
-    members: List[TeamMemberResponse] = Field(default_factory=list, description="Список участников")
+    members: List[TeamMemberResponse] = Field(
+        default_factory=list, description="Список участников"
+    )
     statistics: Optional[TeamStats] = Field(None, description="Статистика команды")
-    permissions: List[str] = Field(default_factory=list, description="Права текущего пользователя")
+    permissions: List[str] = Field(
+        default_factory=list, description="Права текущего пользователя"
+    )
 
 
 class TeamBulkCreate(BaseSchema):
     """Схема для массового создания команд."""
 
-    teams: List[TeamCreate] = Field(..., min_length=1, max_length=50, description="Список команд для создания")
-    assign_creator_as_owner: bool = Field(True, description="Назначить создателя владельцем")
+    teams: List[TeamCreate] = Field(
+        ..., min_length=1, max_length=50, description="Список команд для создания"
+    )
+    assign_creator_as_owner: bool = Field(
+        True, description="Назначить создателя владельцем"
+    )
 
 
 class TeamMemberBulkAdd(BaseSchema):
     """Схема для массового добавления участников в команду."""
 
     team_id: int = Field(..., gt=0, description="ID команды")
-    members: List[TeamMemberCreate] = Field(..., min_length=1, max_length=100, description="Список участников")
+    members: List[TeamMemberCreate] = Field(
+        ..., min_length=1, max_length=100, description="Список участников"
+    )
     send_invitations: bool = Field(True, description="Отправить приглашения")
 
 
@@ -755,6 +765,10 @@ class TeamPermissionResponse(BaseSchema):
     """Схема ответа на проверку прав доступа."""
 
     has_permission: bool = Field(..., description="Есть ли право доступа")
-    user_role: Optional[TeamRole] = Field(None, description="Роль пользователя в команде")
+    user_role: Optional[TeamRole] = Field(
+        None, description="Роль пользователя в команде"
+    )
     reason: Optional[str] = Field(None, description="Причина отказа в доступе")
-    available_permissions: List[str] = Field(default_factory=list, description="Доступные права")
+    available_permissions: List[str] = Field(
+        default_factory=list, description="Доступные права"
+    )

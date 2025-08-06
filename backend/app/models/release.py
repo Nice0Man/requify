@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 
 class ReleaseStatus(PyEnum):
     """Статусы релиза"""
+
     PLANNED = "planned"
     IN_DEVELOPMENT = "in_development"
     TESTING = "testing"
@@ -26,7 +27,7 @@ class ReleaseStatus(PyEnum):
 class Release(Base, TimestampedMixin):
     """
     Модель релиза.
-    
+
     Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 
@@ -55,7 +56,7 @@ class Release(Base, TimestampedMixin):
         nullable=False,
         comment="Статус релиза",
     )
-    
+
     # Даты
     planned_date: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True, comment="Планируемая дата релиза"

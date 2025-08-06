@@ -359,7 +359,7 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
 
             # Проверяем текущий пароль
             if not verify_password(
-                password_data.current_password, user.hashed_password
+                password_data.current_password, user.password_hash
             ):
                 return SettingsResponse(
                     success=False, message="Неверный текущий пароль"
@@ -373,7 +373,7 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
                 update(User)
                 .where(User.id == user_id)
                 .values(
-                    hashed_password=new_hashed_password, updated_at=datetime.utcnow()
+                    password_hash=new_hashed_password, updated_at=datetime.utcnow()
                 )
             )
             await db.commit()

@@ -8,12 +8,12 @@ from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
-    get_db,
+from app.api.dependencies import (
     get_current_active_user,
+    get_db,
+    get_projects_delete_user,
     get_projects_read_user,
     get_projects_write_user,
-    get_projects_delete_user,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -30,8 +30,8 @@ async def get_projects(
     ),
     status: Optional[str] = Query(None, description="Фильтр по статусу"),
     search: Optional[str] = Query(None, description="Поиск по названию или описанию"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить список проектов с фильтрацией и поиском.
@@ -64,8 +64,8 @@ async def get_projects(
 @router.post("/", response_model=schemas.Project, status_code=status.HTTP_201_CREATED)
 async def create_project(
     project_in: schemas.ProjectCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Создать новый проект.
@@ -100,8 +100,8 @@ async def create_project(
 @router.get("/{project_id}", response_model=schemas.ProjectWithStats)
 async def get_project(
     project_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить проект по ID с подробной информацией.
@@ -129,8 +129,8 @@ async def get_project(
 async def update_project(
     project_id: int,
     project_in: schemas.ProjectUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Обновить данные проекта.
@@ -169,8 +169,8 @@ async def update_project(
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_project(
     project_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_delete_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.delete()),
 ):
     """
     Удалить проект.
@@ -200,8 +200,8 @@ async def get_project_requirements(
     status_id: Optional[int] = Query(None, description="Фильтр по ID статуса"),
     priority_id: Optional[int] = Query(None, description="Фильтр по ID приоритета"),
     type_id: Optional[int] = Query(None, description="Фильтр по ID типа"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить все требования проекта.
@@ -252,8 +252,8 @@ async def sync_project_requirements_to_release(
     release_id: int,
     requirement_ids: Optional[List[int]] = None,
     sync_all: bool = False,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Синхронизировать требования проекта с релизом.
@@ -338,8 +338,8 @@ async def get_project_releases(
     project_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить все релизы проекта.
@@ -375,8 +375,8 @@ async def get_project_releases(
 @router.get("/{project_id}/stats", response_model=dict)
 async def get_project_stats(
     project_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить статистику проекта.
@@ -422,8 +422,8 @@ async def get_project_stats(
 async def remove_team_member_from_project(
     project_id: int,
     user_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Удалить участника команды из проекта.
@@ -447,8 +447,8 @@ async def remove_team_member_from_project(
 @router.post("/bulk", response_model=List[schemas.Project])
 async def bulk_create_projects(
     projects_data: List[schemas.ProjectCreate],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Массовое создание проектов.
@@ -466,8 +466,8 @@ async def bulk_create_projects(
 @router.put("/bulk", response_model=List[schemas.Project])
 async def bulk_update_projects(
     projects_data: List[Dict[str, Any]],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Массовое обновление проектов.
@@ -491,8 +491,8 @@ async def bulk_update_projects(
 @router.delete("/bulk", status_code=status.HTTP_204_NO_CONTENT)
 async def bulk_delete_projects(
     project_ids: List[int],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_delete_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.delete()),
 ):
     """
     Массовое удаление проектов.
@@ -506,8 +506,8 @@ async def bulk_delete_projects(
 @router.post("/import", response_model=List[schemas.Project])
 async def import_projects(
     import_data: Dict[str, Any],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Импорт проектов из файла/данных.
@@ -522,8 +522,8 @@ async def import_projects(
 async def export_projects(
     format: str = Query("json", regex="^(json|csv|xlsx)$"),
     project_ids: Optional[List[int]] = Query(None),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Экспорт проектов в различных форматах.
@@ -537,8 +537,8 @@ async def export_projects(
 @router.post("/{project_id}/archive", response_model=schemas.Project)
 async def archive_project(
     project_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Архивировать проект.
@@ -556,8 +556,8 @@ async def archive_project(
 @router.post("/{project_id}/unarchive", response_model=schemas.Project)
 async def unarchive_project(
     project_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Разархивировать проект.
@@ -575,7 +575,7 @@ async def unarchive_project(
 @router.post("/{project_id}/favorite", response_model=Dict[str, Any])
 async def toggle_project_favorite(
     project_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """

@@ -33,35 +33,50 @@ def _import_all_models():
 
     # Определяем порядок импорта по уровням зависимостей
     # Уровень 1: Базовые модели без FK или справочники
-    level1 = ['base', 'mixins', 'constants']
-    
+    level1 = ["base", "mixins", "constants"]
+
     # Уровень 2: User должен быть первым!
-    level2 = ['user']
-    
+    level2 = ["user"]
+
     # Уровень 2.5: Справочники
-    level2_5 = ['requirement_types', 'requirement_priorities', 'requirement_statuses', 'relationship_types']
-    
+    level2_5 = [
+        "requirement_types",
+        "requirement_priorities",
+        "requirement_statuses",
+        "relationship_types",
+    ]
+
     # Уровень 3: Модели с FK на базовые сущности
-    level3 = ['company', 'refresh_token', 'user_settings', 'user_profile']
-    
+    level3 = ["company", "refresh_token", "user_settings", "user_profile"]
+
     # Уровень 4: Организационные структуры
-    level4 = ['department', 'team', 'team_member', 'company_contact', 'company_subscription', 'company_settings', 'company_branding']
-    
+    level4 = [
+        "department",
+        "team",
+        "team_member",
+        "company_contact",
+        "company_subscription",
+        "company_settings",
+        "company_branding",
+    ]
+
     # Уровень 5: Проекты и связанные сущности
-    level5 = ['project', 'spec', 'requirement_group', 'requirement_group_version']
-    
+    level5 = ["project", "spec", "requirement_group", "requirement_group_version"]
+
     # Уровень 6: Требования и релизы (зависят от проектов)
-    level6 = ['requirement', 'release', 'relationship']
-    
+    level6 = ["requirement", "release", "relationship"]
+
     # Уровень 7: Комментарии, тестирование, дашборд
-    level7 = ['comment', 'test_result', 'dashboard']
-    
+    level7 = ["comment", "test_result", "dashboard"]
+
     # Уровень 8: Продвинутые системы
-    level8 = ['enhanced_role_system']
-    
+    level8 = ["enhanced_role_system"]
+
     # Собираем все уровни в правильном порядке
-    ordered_modules = level1 + level2 + level2_5 + level3 + level4 + level5 + level6 + level7 + level8
-    
+    ordered_modules = (
+        level1 + level2 + level2_5 + level3 + level4 + level5 + level6 + level7 + level8
+    )
+
     # Добавляем оставшиеся модули, которые не указаны явно
     remaining_modules = [m for m in model_files if m not in ordered_modules]
     ordered_modules.extend(sorted(remaining_modules))
@@ -69,7 +84,7 @@ def _import_all_models():
     for module_name in ordered_modules:
         if module_name not in model_files:
             continue  # Пропускаем несуществующие модули
-            
+
         try:
             module = importlib.import_module(f".{module_name}", package=__name__)
 

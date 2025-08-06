@@ -8,12 +8,12 @@ from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
+from app.api.dependencies import (
+    get_analyst_user,
     get_db,
+    get_releases_delete_user,
     get_releases_read_user,
     get_releases_write_user,
-    get_releases_delete_user,
-    get_analyst_user,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -31,8 +31,9 @@ router = APIRouter()
 
 
 async def _analyze_requirement_relationships(
-    db: AsyncSession, requirements: List[Requirement], project_id: int
-) -> Dict[str, Any]:
+    db: AsyncSession, requirements: List[Requirement], project_id: int,
+    ) -> Dict[str, Any]:,
+
     """
     Analyze requirement relationships for release creation.
 
@@ -181,8 +182,8 @@ async def get_releases(
     skip: int = 0,
     limit: int = 100,
     project_id: Optional[int] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_read_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.read()),
 ):
     """
     Получить список релизов.
@@ -210,8 +211,8 @@ async def get_releases(
 @router.post("/", response_model=schemas.Release, status_code=status.HTTP_201_CREATED)
 async def create_release(
     release_data: ReleaseCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_write_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.write()),
 ):
     """
     Создать новый релиз.
@@ -248,8 +249,8 @@ async def create_release(
 @router.get("/{release_id}", response_model=schemas.Release)
 async def get_release(
     release_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_read_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.read()),
 ):
     """
     Получить релиз по ID.
@@ -278,8 +279,8 @@ async def get_release(
 async def update_release(
     release_id: int,
     release_data: ReleaseUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_write_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.write()),
 ):
     """
     Обновить данные релиза.
@@ -320,8 +321,8 @@ async def update_release(
 @router.delete("/{release_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_release(
     release_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_delete_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.delete()),
 ):
     """
     Удалить релиз.
@@ -350,8 +351,8 @@ async def delete_release(
 )
 async def create_release_from_requirements(
     release_data: ReleaseFromRequirementsCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_write_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.write()),
 ):
     """
     Create release from requirements.
@@ -599,7 +600,7 @@ async def create_release_from_requirements(
 async def generate_release_specification(
     release_id: int,
     spec_options: schemas.SpecificationGenerationOptions = None,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user=Depends(get_analyst_user),  # Changed to analyst role as per TZ
 ):
     """
@@ -839,8 +840,8 @@ async def generate_release_specification(
 @router.post("/{release_id}/publish", response_model=dict)
 async def publish_release(
     release_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_write_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.write()),
 ):
     """
     Опубликовать релиз.
@@ -902,8 +903,8 @@ async def get_release_requirements(
     status_id: Optional[int] = Query(None, description="Фильтр по ID статуса"),
     priority_id: Optional[int] = Query(None, description="Фильтр по ID приоритета"),
     type_id: Optional[int] = Query(None, description="Фильтр по ID типа"),
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_read_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.read()),
 ):
     """
     Получить все требования релиза.
@@ -951,8 +952,8 @@ async def get_release_requirements(
 @router.get("/{release_id}/changelog", response_model=dict)
 async def get_release_changelog(
     release_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_read_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.read()),
 ):
     """
     Получить changelog релиза.
@@ -1055,8 +1056,8 @@ async def sync_project_requirements_to_release(
     release_id: int,
     project_id: Optional[int] = None,
     requirement_ids: Optional[List[int]] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_releases_write_user),
+    db: SessionDep,
+    current_user=Depends(ReleasePermissions.write()),
 ):
     """
     Синхронизировать требования проекта с релизом.

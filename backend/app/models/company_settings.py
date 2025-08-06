@@ -281,7 +281,7 @@ class CompanySettings(Base, TimestampedMixin):
     # =============================================================================
 
     company: Mapped["Company"] = relationship(
-        "Company", back_populates="company_settings_rel", lazy="select"
+        "Company", back_populates="settings", lazy="select"
     )
 
     def __repr__(self) -> str:

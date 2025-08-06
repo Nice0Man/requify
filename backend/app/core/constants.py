@@ -1,6 +1,74 @@
 from enum import Enum as PyEnum
 
 
+class Permission(PyEnum):
+    """Системные разрешения"""
+    
+    # Basic permissions
+    USE_API = "use_api"
+    
+    # User management
+    VIEW_COMPANY_USERS = "view_company_users"
+    MANAGE_COMPANY_USERS = "manage_company_users"
+    INVITE_USERS = "invite_users"
+    REMOVE_USERS = "remove_users"
+    
+    # Company management
+    MANAGE_COMPANY = "manage_company"
+    VIEW_COMPANY_SETTINGS = "view_company_settings"
+    MANAGE_COMPANY_SETTINGS = "manage_company_settings"
+    VIEW_COMPANY_ANALYTICS = "view_company_analytics"
+    EXPORT_COMPANY_DATA = "export_company_data"
+    
+    # Project management
+    VIEW_PROJECT = "view_project"
+    CREATE_PROJECT = "create_project"
+    MANAGE_PROJECT = "manage_project"
+    DELETE_PROJECT = "delete_project"
+    ARCHIVE_PROJECT = "archive_project"
+    MANAGE_PROJECT_SETTINGS = "manage_project_settings"
+    MANAGE_PROJECT_MEMBERS = "manage_project_members"
+    VIEW_PROJECT_MEMBERS = "view_project_members"
+    VIEW_PROJECT_ANALYTICS = "view_project_analytics"
+    
+    # Requirements
+    VIEW_REQUIREMENT = "view_requirement"
+    CREATE_REQUIREMENT = "create_requirement"
+    EDIT_REQUIREMENT = "edit_requirement"
+    DELETE_REQUIREMENT = "delete_requirement"
+    APPROVE_REQUIREMENT = "approve_requirement"
+    REJECT_REQUIREMENT = "reject_requirement"
+    LINK_REQUIREMENTS = "link_requirements"
+    MANAGE_REQUIREMENT_VERSIONS = "manage_requirement_versions"
+    EXPORT_REQUIREMENTS = "export_requirements"
+    IMPORT_REQUIREMENTS = "import_requirements"
+    
+    # Releases
+    VIEW_RELEASE = "view_release"
+    CREATE_RELEASE = "create_release"
+    MANAGE_RELEASE = "manage_release"
+    DELETE_RELEASE = "delete_release"
+    PUBLISH_RELEASE = "publish_release"
+    DEPLOY_RELEASE = "deploy_release"
+    
+    # Testing
+    VIEW_TEST_RESULTS = "view_test_results"
+    CREATE_TEST = "create_test"
+    EXECUTE_TEST = "execute_test"
+    MANAGE_TEST_PLANS = "manage_test_plans"
+    
+    # System administration
+    MANAGE_SYSTEM = "manage_system"
+    VIEW_SYSTEM_LOGS = "view_system_logs"
+    MANAGE_SYSTEM_SETTINGS = "manage_system_settings"
+    
+    # Reports and analytics
+    VIEW_REPORTS = "view_reports"
+    CREATE_REPORTS = "create_reports"
+    EXPORT_REPORTS = "export_reports"
+    VIEW_ADVANCED_ANALYTICS = "view_advanced_analytics"
+
+
 class RoleScope(PyEnum):
     """Области действия ролей"""
 
@@ -60,18 +128,18 @@ class TeamRole(PyEnum):
     TECH_LEAD = "tech_lead"  # Технический лидер
     SCRUM_MASTER = "scrum_master"  # Скрам-мастер
     PRODUCT_OWNER = "product_owner"  # Владелец продукта
-    
+
     # Участники разработки
     SENIOR_DEVELOPER = "senior_developer"  # Старший разработчик
     DEVELOPER = "developer"  # Разработчик
     JUNIOR_DEVELOPER = "junior_developer"  # Младший разработчик
-    
+
     # Специализированные роли
     ANALYST = "analyst"  # Аналитик
     DESIGNER = "designer"  # Дизайнер
     TESTER = "tester"  # Тестировщик
     DEVOPS = "devops"  # DevOps инженер
-    
+
     # Вспомогательные роли
     SENIOR_MEMBER = "senior_member"  # Старший участник
     MEMBER = "member"  # Участник команды

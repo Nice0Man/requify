@@ -9,11 +9,11 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
+from app.api.dependencies import (
     get_db,
+    get_testing_execute_user,
     get_testing_read_user,
     get_testing_write_user,
-    get_testing_execute_user,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -28,8 +28,8 @@ async def get_test_results(
     limit: int = 100,
     requirement_id: Optional[int] = None,
     status: Optional[str] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_read_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.read()),
 ):
     """
     Получить список результатов тестирования.
@@ -64,8 +64,8 @@ async def get_test_plans(
     skip: int = 0,
     limit: int = 100,
     project_id: Optional[int] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_read_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.read()),
 ):
     """
     Получить список тестовых планов.
@@ -130,8 +130,8 @@ async def get_test_plans(
 @router.post("/plans", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def create_test_plan(
     plan_data: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_write_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.write()),
 ):
     """
     Создать новый тестовый план.
@@ -176,8 +176,8 @@ async def create_test_plan(
 @router.get("/plans/{plan_id}", response_model=schemas.TestPlan)
 async def get_test_plan(
     plan_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_read_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.read()),
 ):
     """
     Получить тестовый план по ID.
@@ -220,8 +220,8 @@ async def get_test_cases(
     limit: int = 100,
     plan_id: Optional[int] = None,
     requirement_id: Optional[int] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_read_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.read()),
 ):
     """
     Получить список тестовых случаев.
@@ -304,8 +304,8 @@ async def get_test_cases(
 )
 async def create_test_case(
     case_data: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_write_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.write()),
 ):
     """
     Создать новый тестовый случай.
@@ -366,8 +366,8 @@ async def get_test_executions(
     limit: int = 100,
     case_id: Optional[int] = None,
     status_filter: Optional[str] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_read_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.read()),
 ):
     """
     Получить список выполнений тестов.
@@ -432,8 +432,8 @@ async def get_test_executions(
 )
 async def execute_test_case(
     execution_data: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_execute_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.execute()),
 ):
     """
     Выполнить тестовый случай.
@@ -540,8 +540,8 @@ async def execute_test_case(
 async def get_testing_summary(
     project_id: Optional[int] = None,
     plan_id: Optional[int] = None,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_read_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.read()),
 ):
     """
     Получить сводку по тестированию.
@@ -620,8 +620,8 @@ async def get_testing_summary(
 @router.post("/asuts/requirement-status", response_model=schemas.TestResult)
 async def request_requirement_testing_status(
     request_data: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_write_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.write()),
 ):
     """
     Запросить статус тестирования требования из АСУТс.
@@ -696,8 +696,8 @@ async def request_requirement_testing_status(
 @router.post("/asuts/release-status", response_model=schemas.TestResult)
 async def request_release_testing_status(
     request_data: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_write_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.write()),
 ):
     """
     Запросить статус тестирования релиза из АСУТс.
@@ -750,8 +750,8 @@ async def request_release_testing_status(
 @router.post("/integration/run", response_model=schemas.TestResult)
 async def run_integration_tests(
     test_config: dict,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_write_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.write()),
 ):
     """
     Запустить интеграционные тесты.
@@ -774,8 +774,8 @@ async def run_integration_tests(
 @router.get("/integration/status/{job_id}", response_model=schemas.TestResult)
 async def get_integration_test_status(
     job_id: str,
-    db: AsyncSession = Depends(get_db),
-    current_user=Depends(get_testing_read_user),
+    db: SessionDep,
+    current_user=Depends(TestingPermissions.read()),
 ):
     """
     Получить статус выполнения интеграционных тестов.

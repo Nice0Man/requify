@@ -10,12 +10,14 @@ if TYPE_CHECKING:
     from .user import User
     from .department import Department
     from .project import Project
+    from .team_member import TeamMember
+    from .dashboard import DashboardNotification, DashboardActivity
 
 
 class Team(Base, TimestampedMixin):
     """
     Модель команды.
-    
+
     Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 
@@ -66,6 +68,26 @@ class Team(Base, TimestampedMixin):
 
     projects: Mapped[List["Project"]] = relationship(
         "Project", back_populates="team", lazy="select"
+    )
+
+    # Участники команды
+    members: Mapped[List["TeamMember"]] = relationship(
+        "TeamMember", back_populates="team", lazy="select", cascade="all, delete-orphan"
+    )
+
+    # Dashboard relationships
+    notifications: Mapped[List["DashboardNotification"]] = relationship(
+        "DashboardNotification",
+        back_populates="team",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    activities: Mapped[List["DashboardActivity"]] = relationship(
+        "DashboardActivity",
+        back_populates="team",
+        lazy="select",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self) -> str:

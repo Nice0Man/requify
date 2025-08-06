@@ -77,7 +77,7 @@ class EnhancedRole(Base, TimestampedMixin):
     # Классификация роли
     # =============================================================================
 
-    scope: Mapped[RoleScope] = mapped_column(
+    scope: Mapped[str] = mapped_column(
         String(20), nullable=False, comment="Область действия роли"
     )
     role_level: Mapped[int] = mapped_column(
@@ -88,19 +88,19 @@ class EnhancedRole(Base, TimestampedMixin):
     )
 
     # Конкретные типы ролей
-    system_role: Mapped[Optional[SystemRole]] = mapped_column(
+    system_role: Mapped[Optional[str]] = mapped_column(
         String(50), nullable=True, comment="Системная роль"
     )
-    company_role: Mapped[Optional[CompanyRole]] = mapped_column(
+    company_role: Mapped[Optional[str]] = mapped_column(
         String(50), nullable=True, comment="Роль в компании"
     )
-    department_role: Mapped[Optional[DepartmentRole]] = mapped_column(
+    department_role: Mapped[Optional[str]] = mapped_column(
         String(50), nullable=True, comment="Роль в департаменте"
     )
-    team_role: Mapped[Optional[TeamRole]] = mapped_column(
+    team_role: Mapped[Optional[str]] = mapped_column(
         String(50), nullable=True, comment="Роль в команде"
     )
-    project_role: Mapped[Optional[ProjectRole]] = mapped_column(
+    project_role: Mapped[Optional[str]] = mapped_column(
         String(50), nullable=True, comment="Роль в проекте"
     )
 
@@ -271,7 +271,9 @@ class UserRoleAssignment(Base, TimestampedMixin):
     # Отношения
     # =============================================================================
 
-    user: Mapped["User"] = relationship("User", foreign_keys=[user_id])
+    user: Mapped["User"] = relationship(
+        "User", foreign_keys=[user_id], back_populates="role_assignments"
+    )
     role: Mapped[EnhancedRole] = relationship("EnhancedRole", foreign_keys=[role_id])
     company: Mapped[Optional["Company"]] = relationship(
         "Company", foreign_keys=[company_id]
@@ -304,7 +306,7 @@ class UserRoleAssignment(Base, TimestampedMixin):
         """Истекло ли назначение роли"""
         if not self.expires_at:
             return False
-        return datetime.now(UTC) > self.expires_at
+        return datetime.now(UTC).replace(tzinfo=None) > self.expires_at
 
     @property
     def is_valid(self) -> bool:
@@ -312,24 +314,24 @@ class UserRoleAssignment(Base, TimestampedMixin):
         if not self.is_active or self.is_expired:
             return False
 
-        if self.starts_at and datetime.now(UTC) < self.starts_at:
+        if self.starts_at and datetime.now(UTC).replace(tzinfo=None) < self.starts_at:
             return False
 
         return True
 
     @property
-    def scope_level(self) -> RoleScope:
+    def scope_level(self) -> str:
         """Определить уровень области действия назначения"""
         if self.project_id:
-            return RoleScope.PROJECT
+            return RoleScope.PROJECT.value
         elif self.team_id:
-            return RoleScope.TEAM
+            return RoleScope.TEAM.value
         elif self.department_id:
-            return RoleScope.DEPARTMENT
+            return RoleScope.DEPARTMENT.value
         elif self.company_id:
-            return RoleScope.COMPANY
+            return RoleScope.COMPANY.value
         else:
-            return RoleScope.SYSTEM
+            return RoleScope.SYSTEM.value
 
     def _get_context_string(self) -> str:
         """Получить строковое представление контекста"""

@@ -13,12 +13,15 @@ if TYPE_CHECKING:
     from .project import Project
     from .user import User
     from .comment import Comment
+    from .relationship import Relationship
+    from .dashboard import DashboardNotification, DashboardActivity
+    from .test_result import TestResult
 
 
 class Requirement(Base, TimestampedMixin):
     """
     Модель требования.
-    
+
     Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 
@@ -31,7 +34,7 @@ class Requirement(Base, TimestampedMixin):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    
+
     # Основные поля
     title: Mapped[str] = mapped_column(
         String(200), nullable=False, comment="Заголовок требования"
@@ -39,7 +42,7 @@ class Requirement(Base, TimestampedMixin):
     description: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True, comment="Описание требования"
     )
-    
+
     # Связи
     project_id: Mapped[int] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE"),
@@ -80,19 +83,57 @@ class Requirement(Base, TimestampedMixin):
     )
 
     type: Mapped["RequirementType"] = relationship(
-        "RequirementType", lazy="select"
+        "RequirementType", back_populates="requirements", lazy="select"
     )
 
     priority: Mapped["RequirementPriority"] = relationship(
-        "RequirementPriority", lazy="select"
+        "RequirementPriority", back_populates="requirements", lazy="select"
     )
 
     status: Mapped["RequirementStatus"] = relationship(
-        "RequirementStatus", lazy="select"
+        "RequirementStatus", back_populates="requirements", lazy="select"
     )
 
     comments: Mapped[List["Comment"]] = relationship(
         "Comment", back_populates="requirement", lazy="select"
+    )
+
+    # Relationship links
+    source_relationships: Mapped[List["Relationship"]] = relationship(
+        "Relationship",
+        foreign_keys="Relationship.source_id",
+        back_populates="source",
+        lazy="select",
+    )
+
+    target_relationships: Mapped[List["Relationship"]] = relationship(
+        "Relationship",
+        foreign_keys="Relationship.target_id",
+        back_populates="target",
+        lazy="select",
+    )
+
+    # Dashboard relationships
+    notifications: Mapped[List["DashboardNotification"]] = relationship(
+        "DashboardNotification",
+        back_populates="requirement",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    activities: Mapped[List["DashboardActivity"]] = relationship(
+        "DashboardActivity",
+        back_populates="requirement",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    # Test results
+    test_results: Mapped[List["TestResult"]] = relationship(
+        "TestResult",
+        back_populates="requirement",
+        lazy="select",
+        cascade="all, delete-orphan",
     )
 
     def __repr__(self) -> str:

@@ -53,6 +53,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             .where(User.email == email)
             .options(
                 selectinload(User.profile),
+                selectinload(User.settings),
                 selectinload(User.role_assignments).selectinload(
                     UserRoleAssignment.role
                 ),
@@ -98,6 +99,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             .where(User.username == username)
             .options(
                 selectinload(User.profile),
+                selectinload(User.settings),
                 selectinload(User.role_assignments).selectinload(
                     UserRoleAssignment.role
                 ),
@@ -124,6 +126,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             .where(User.id == id)
             .options(
                 selectinload(User.profile),
+                selectinload(User.settings),
                 selectinload(User.role_assignments).selectinload(
                     UserRoleAssignment.role
                 ),
@@ -188,13 +191,20 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         hashed_password = get_password_hash(obj_in.password)
 
         # Создаем пользователя, исключая поля которые есть только в схеме
-        user_data = obj_in.model_dump(exclude={
-            "password", "confirm_password", "invite_token", 
-            "first_name", "last_name", "timezone", "language"
-        })
+        user_data = obj_in.model_dump(
+            exclude={
+                "password",
+                "confirm_password",
+                "invite_token",
+                "first_name",
+                "last_name",
+                "timezone",
+                "language",
+            }
+        )
         db_obj = User(
             **user_data,
-            hashed_password=hashed_password,
+            password_hash=hashed_password,
         )
 
         db.add(db_obj)
@@ -219,7 +229,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         user = await self.get_by_email(db, email=email)
         if not user:
             return None
-        if not verify_password(password, user.hashed_password):
+        if not verify_password(password, user.password_hash):
             return None
         return user
 
@@ -238,7 +248,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             Обновленный пользователь
         """
         hashed_password = get_password_hash(new_password)
-        user.hashed_password = hashed_password
+        user.password_hash = hashed_password
 
         db.add(user)
         await db.commit()

@@ -9,12 +9,14 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
-    get_db,
+from app.api.dependencies import (
     get_current_active_user,
+    get_db,
+    get_requirements_delete_user,
     get_requirements_read_user,
     get_requirements_write_user,
-    get_requirements_delete_user,
+    RequirementPermissions,
+    SessionDep,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -34,8 +36,8 @@ async def get_relationships(
     ),
     target_id: Optional[int] = Query(None, description="Фильтр по целевому требованию"),
     type_id: Optional[int] = Query(None, description="Фильтр по типу связи"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить список связей между требованиями.
@@ -72,8 +74,8 @@ async def get_relationships(
 )
 async def create_relationship(
     relationship_in: schemas.RelationshipCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Создать новую связь между требованиями.
@@ -134,8 +136,8 @@ async def create_relationship(
 @router.get("/{relationship_id}", response_model=schemas.Relationship)
 async def get_relationship(
     relationship_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить связь по ID.
@@ -164,8 +166,8 @@ async def get_relationship(
 async def update_relationship(
     relationship_id: int,
     relationship_in: schemas.RelationshipUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Обновить связь между требованиями.
@@ -207,8 +209,8 @@ async def update_relationship(
 @router.delete("/{relationship_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_relationship(
     relationship_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_delete_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.delete()),
 ):
     """
     Удалить связь между требованиями.
@@ -245,8 +247,8 @@ async def get_requirement_relationships(
     ),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить все связи требования.
@@ -295,8 +297,8 @@ async def get_requirement_relationships(
 async def create_requirement_relationship(
     requirement_id: int,
     relationship_in: schemas.RelationshipCreateForRequirement,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Создать связь для конкретного требования.
@@ -329,8 +331,8 @@ async def create_requirement_relationship(
 async def get_requirement_dependencies(
     requirement_id: int,
     recursive: bool = Query(False, description="Получить все зависимости рекурсивно"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить зависимости требования (требования, от которых зависит данное).
@@ -375,8 +377,8 @@ async def get_requirement_dependents(
     recursive: bool = Query(
         False, description="Получить все зависимые требования рекурсивно"
     ),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить зависимые требования (требования, которые зависят от данного).
@@ -418,8 +420,8 @@ async def get_requirement_dependents(
 async def get_requirement_trace_matrix(
     requirement_id: int,
     depth: int = Query(3, ge=1, le=10, description="Глубина трассировки"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить матрицу трассируемости для требования.

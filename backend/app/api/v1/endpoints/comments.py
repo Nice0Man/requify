@@ -9,9 +9,9 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
-    get_db,
+from app.api.dependencies import (
     get_current_active_user,
+    get_db,
     get_requirements_read_user,
     get_requirements_write_user,
 )
@@ -31,8 +31,8 @@ async def get_comments(
     ),
     requirement_id: Optional[int] = Query(None, description="Фильтр по ID требования"),
     author_id: Optional[int] = Query(None, description="Фильтр по автору"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить список комментариев с фильтрацией.
@@ -74,8 +74,8 @@ async def get_comments(
 @router.post("/", response_model=schemas.Comment, status_code=status.HTTP_201_CREATED)
 async def create_comment(
     comment_in: schemas.CommentCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Создать новый комментарий к требованию.
@@ -122,8 +122,8 @@ async def create_comment(
 @router.get("/{comment_id}", response_model=schemas.CommentWithAuthor)
 async def get_comment(
     comment_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить комментарий по ID.
@@ -160,8 +160,8 @@ async def get_comment(
 async def update_comment(
     comment_id: int,
     comment_in: schemas.CommentUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Обновить комментарий.
@@ -202,8 +202,8 @@ async def update_comment(
 @router.delete("/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_comment(
     comment_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Удалить комментарий.
@@ -249,8 +249,8 @@ async def get_requirement_comments(
     limit: int = Query(100, ge=1, le=1000),
     order_by: str = Query("created_at", description="Поле для сортировки"),
     order_desc: bool = Query(True, description="Сортировка по убыванию"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить комментарии к конкретному требованию.
@@ -304,8 +304,8 @@ async def get_requirement_comments(
 async def create_requirement_comment(
     requirement_id: int,
     comment_in: schemas.CommentCreateForRequirement,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Создать комментарий к конкретному требованию.
@@ -336,8 +336,8 @@ async def get_recent_comments(
         50, ge=1, le=100, description="Количество последних комментариев"
     ),
     project_id: Optional[int] = Query(None, description="Фильтр по проекту"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить последние комментарии.
@@ -377,8 +377,8 @@ async def get_recent_comments(
 async def get_comments_statistics(
     project_id: Optional[int] = Query(None, description="Фильтр по проекту"),
     requirement_id: Optional[int] = Query(None, description="Фильтр по требованию"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Получить статистику комментариев.

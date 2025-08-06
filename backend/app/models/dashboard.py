@@ -2,10 +2,10 @@
 Dashboard-related models for user preferences, notifications, and activity tracking.
 """
 
-from datetime import datetime
+from datetime import datetime, UTC
+from typing import TYPE_CHECKING, List, Optional
 from sqlalchemy import (
     Boolean,
-    Column,
     DateTime,
     Integer,
     String,
@@ -14,155 +14,193 @@ from sqlalchemy import (
     Float,
     JSON,
 )
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
-import uuid
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from .base import Base, TimestampedMixin
+
+if TYPE_CHECKING:
+    from .user import User
+    from .project import Project
+    from .requirement import Requirement
+    from .team import Team
 
 
-class UserDashboardPreferences(Base):
+class UserDashboardPreferences(Base, TimestampedMixin):
     """User dashboard preferences model"""
 
     __tablename__ = "user_dashboard_preferences"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False, unique=True
+    )
 
     # Layout preferences
-    show_quick_stats = Column(Boolean, default=True)
-    show_recent_activity = Column(Boolean, default=True)
-    show_my_projects = Column(Boolean, default=True)
-    show_pending_approvals = Column(Boolean, default=True)
+    show_quick_stats: Mapped[bool] = mapped_column(Boolean, default=True)
+    show_recent_activity: Mapped[bool] = mapped_column(Boolean, default=True)
+    show_my_projects: Mapped[bool] = mapped_column(Boolean, default=True)
+    show_pending_approvals: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Filter preferences
-    default_project_filter = Column(String(100), nullable=True)
-    activity_limit = Column(Integer, default=20)
-    refresh_interval = Column(Integer, default=300)  # seconds
+    default_project_filter: Mapped[Optional[str]] = mapped_column(
+        String(100), nullable=True
+    )
+    activity_limit: Mapped[int] = mapped_column(Integer, default=20)
+    refresh_interval: Mapped[int] = mapped_column(Integer, default=300)  # seconds
 
     # Display preferences
-    theme = Column(String(20), default="light")
-    notifications_enabled = Column(Boolean, default=True)
-    email_notifications = Column(Boolean, default=True)
-    timezone = Column(String(50), default="UTC")
+    theme: Mapped[str] = mapped_column(String(20), default="light")
+    notifications_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    email_notifications: Mapped[bool] = mapped_column(Boolean, default=True)
+    timezone: Mapped[str] = mapped_column(String(50), default="UTC")
 
     # Custom dashboard settings
-    custom_settings = Column(JSON, nullable=True)
-
-    # Timestamps
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    custom_settings: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
     # Relationships
-    user = relationship("User", back_populates="dashboard_preferences")
+    user: Mapped["User"] = relationship("User", back_populates="dashboard_preferences")
 
 
-class DashboardNotification(Base):
+class DashboardNotification(Base, TimestampedMixin):
     """Dashboard notifications model"""
 
     __tablename__ = "dashboard_notifications"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False
+    )
 
     # Notification content
-    type = Column(String(20), nullable=False)  # info, warning, error, success
-    title = Column(String(200), nullable=False)
-    message = Column(Text, nullable=False)
+    type: Mapped[str] = mapped_column(
+        String(20), nullable=False
+    )  # info, warning, error, success
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
 
     # Action details
-    action_url = Column(String(255), nullable=True)
-    action_text = Column(String(100), nullable=True)
+    action_url: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    action_text: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     # Status
-    is_read = Column(Boolean, default=False)
-    priority = Column(String(20), default="medium")  # low, medium, high, critical
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
+    priority: Mapped[str] = mapped_column(
+        String(20), default="medium"
+    )  # low, medium, high, critical
 
     # Related entities
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
-    requirement_id = Column(Integer, ForeignKey("requirements.id"), nullable=True)
-    team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
+    project_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("projects.id"), nullable=True
+    )
+    requirement_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("requirements.id"), nullable=True
+    )
+    team_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("teams.id"), nullable=True
+    )
 
-    # Timestamps
-    created_at = Column(DateTime, default=datetime.now)
-    read_at = Column(DateTime, nullable=True)
-    expires_at = Column(DateTime, nullable=True)
+    # Additional timestamps
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     # Relationships
-    user = relationship("User", back_populates="notifications")
-    project = relationship("Project", back_populates="notifications")
-    requirement = relationship("Requirement", back_populates="notifications")
-    team = relationship("Team", back_populates="notifications")
+    user: Mapped["User"] = relationship("User", back_populates="notifications")
+    project: Mapped[Optional["Project"]] = relationship(
+        "Project", back_populates="notifications"
+    )
+    requirement: Mapped[Optional["Requirement"]] = relationship(
+        "Requirement", back_populates="notifications"
+    )
+    team: Mapped[Optional["Team"]] = relationship(
+        "Team", back_populates="notifications"
+    )
 
 
-class DashboardActivity(Base):
+class DashboardActivity(Base, TimestampedMixin):
     """Dashboard activity tracking model"""
 
     __tablename__ = "dashboard_activities"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     # Activity details
-    activity_type = Column(
+    activity_type: Mapped[str] = mapped_column(
         String(50), nullable=False
     )  # project_created, requirement_added, etc.
-    activity_title = Column(String(200), nullable=False)
-    activity_description = Column(Text, nullable=True)
+    activity_title: Mapped[str] = mapped_column(String(200), nullable=False)
+    activity_description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Actor information
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    user_name = Column(String(100), nullable=False)  # Denormalized for performance
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False
+    )
+    user_name: Mapped[str] = mapped_column(
+        String(100), nullable=False
+    )  # Denormalized for performance
 
     # Related entities
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
-    requirement_id = Column(Integer, ForeignKey("requirements.id"), nullable=True)
-    team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
+    project_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("projects.id"), nullable=True
+    )
+    requirement_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("requirements.id"), nullable=True
+    )
+    team_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("teams.id"), nullable=True
+    )
 
     # Entity details (denormalized for performance)
-    entity_type = Column(
+    entity_type: Mapped[Optional[str]] = mapped_column(
         String(50), nullable=True
     )  # project, requirement, user, team, etc.
-    entity_id = Column(Integer, nullable=True)
-    entity_name = Column(String(200), nullable=True)
+    entity_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    entity_name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
     # Activity metadata
-    status = Column(String(50), nullable=True)
-    priority = Column(String(20), nullable=True)
-    extra_data = Column(JSON, nullable=True)  # Additional activity-specific data
-
-    # Timestamps
-    created_at = Column(DateTime, default=datetime.now)
+    status: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    priority: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    extra_data: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True
+    )  # Additional activity-specific data
 
     # Relationships
-    user = relationship("User", back_populates="activities")
-    project = relationship("Project", back_populates="activities")
-    requirement = relationship("Requirement", back_populates="activities")
-    team = relationship("Team", back_populates="activities")
+    user: Mapped["User"] = relationship("User", back_populates="activities")
+    project: Mapped[Optional["Project"]] = relationship(
+        "Project", back_populates="activities"
+    )
+    requirement: Mapped[Optional["Requirement"]] = relationship(
+        "Requirement", back_populates="activities"
+    )
+    team: Mapped[Optional["Team"]] = relationship("Team", back_populates="activities")
 
 
-class DashboardWidget(Base):
+class DashboardWidget(Base, TimestampedMixin):
     """Dashboard widget configuration model"""
 
     __tablename__ = "dashboard_widgets"
 
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False
+    )
 
     # Widget details
-    widget_type = Column(String(50), nullable=False)  # stats, projects, activity, etc.
-    widget_title = Column(String(100), nullable=False)
+    widget_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # stats, projects, activity, etc.
+    widget_title: Mapped[str] = mapped_column(String(100), nullable=False)
 
     # Layout
-    position = Column(Integer, default=0)
-    size = Column(String(20), default="medium")  # small, medium, large
-    is_visible = Column(Boolean, default=True)
+    position: Mapped[int] = mapped_column(Integer, default=0)
+    size: Mapped[str] = mapped_column(
+        String(20), default="medium"
+    )  # small, medium, large
+    is_visible: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Configuration
-    config = Column(JSON, nullable=True)  # Widget-specific configuration
-
-    # Timestamps
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    config: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True
+    )  # Widget-specific configuration
 
     # Relationships
-    user = relationship("User", back_populates="dashboard_widgets")
+    user: Mapped["User"] = relationship("User", back_populates="dashboard_widgets")

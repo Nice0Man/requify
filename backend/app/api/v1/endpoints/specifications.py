@@ -9,12 +9,12 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
-    get_db,
+from app.api.dependencies import (
     get_current_active_user,
+    get_db,
+    get_projects_delete_user,
     get_projects_read_user,
     get_projects_write_user,
-    get_projects_delete_user,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -37,8 +37,8 @@ async def get_specifications(
     ),
     project_id: Optional[int] = Query(None, description="Фильтр по ID проекта"),
     search: Optional[str] = Query(None, description="Поиск по названию или описанию"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить список спецификаций с фильтрацией и поиском.
@@ -71,8 +71,8 @@ async def get_specifications(
 @router.post("/", response_model=schemas.Spec, status_code=status.HTTP_201_CREATED)
 async def create_specification(
     spec_in: schemas.SpecCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Создать новую спецификацию.
@@ -113,8 +113,8 @@ async def create_specification(
 @router.get("/{spec_id}", response_model=schemas.Spec)
 async def get_specification(
     spec_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить спецификацию по ID.
@@ -144,8 +144,8 @@ async def get_specification(
 async def update_specification(
     spec_id: int,
     spec_in: schemas.SpecUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_write_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.write()),
 ):
     """
     Обновить спецификацию.
@@ -187,8 +187,8 @@ async def update_specification(
 @router.delete("/{spec_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_specification(
     spec_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_delete_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.delete()),
 ):
     """
     Удалить спецификацию.
@@ -219,8 +219,8 @@ async def get_specification_requirements(
     status_id: Optional[int] = Query(None, description="Фильтр по статусу"),
     type_id: Optional[int] = Query(None, description="Фильтр по типу"),
     priority_id: Optional[int] = Query(None, description="Фильтр по приоритету"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Получить требования спецификации.
@@ -256,8 +256,8 @@ async def get_specification_requirements(
 async def generate_specification_document(
     spec_id: int,
     format: str = Query("html", description="Формат документа (html, pdf, docx)"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_projects_read_user),
+    db: SessionDep,
+    current_user: User = Depends(ProjectPermissions.read()),
 ):
     """
     Сгенерировать документ спецификации.

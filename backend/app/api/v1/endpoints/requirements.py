@@ -8,11 +8,13 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import (
+from app.api.dependencies import (
     get_db,
+    get_requirements_delete_user,
     get_requirements_read_user,
     get_requirements_write_user,
-    get_requirements_delete_user,
+    RequirementPermissions,
+    SessionDep,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -30,8 +32,8 @@ async def search_requirements(
     type_id: Optional[int] = Query(None, description="Filter by type ID"),
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(100, le=1000, description="Maximum number of returned records"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Search requirements by various criteria.
@@ -77,8 +79,8 @@ async def get_requirements(
     status_id: Optional[int] = Query(None, description="Filter by status ID"),
     priority_id: Optional[int] = Query(None, description="Filter by priority ID"),
     type_id: Optional[int] = Query(None, description="Filter by type ID"),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Get list of requirements with filtering.
@@ -121,8 +123,8 @@ async def get_requirements(
 )
 async def create_requirement(
     requirement_in: schemas.RequirementCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Create a new requirement.
@@ -200,8 +202,8 @@ async def create_requirement(
 @router.get("/{requirement_id}", response_model=schemas.RequirementWithDetails)
 async def get_requirement(
     requirement_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Get requirement by ID with detailed information.
@@ -229,8 +231,8 @@ async def get_requirement(
 async def update_requirement(
     requirement_id: int,
     requirement_in: schemas.RequirementUpdate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Update requirement data.
@@ -318,8 +320,8 @@ async def update_requirement(
 @router.delete("/{requirement_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_requirement(
     requirement_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_delete_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.delete()),
 ):
     """
     Delete requirement.
@@ -345,8 +347,8 @@ async def delete_requirement(
 async def change_requirement_status(
     requirement_id: int,
     status_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Change requirement status.
@@ -391,8 +393,8 @@ async def update_requirement_progress(
     progress: float = Query(
         ..., ge=0.0, le=100.0, description="Progress percentage (0.0-100.0)"
     ),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Update requirement progress.
@@ -429,8 +431,8 @@ async def get_requirement_tests(
     requirement_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Get requirement testing results.
@@ -465,8 +467,8 @@ async def get_requirement_tests(
 )
 async def get_requirement_relationships(
     requirement_id: int,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_read_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.read()),
 ):
     """
     Get requirement relationships with other requirements.
@@ -502,8 +504,8 @@ async def get_requirement_relationships(
 async def create_requirement_relationship(
     requirement_id: int,
     relationship_in: schemas.RelationshipCreateForRequirement,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_requirements_write_user),
+    db: SessionDep,
+    current_user: User = Depends(RequirementPermissions.write()),
 ):
     """
     Create relationship between requirements.

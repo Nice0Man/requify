@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Comment(Base, TimestampedMixin):
     """
     Модель комментария.
-    
+
     Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 

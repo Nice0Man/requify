@@ -20,7 +20,7 @@ router = APIRouter()
 async def get_requirement_types(
     skip: int = 0,
     limit: int = 100,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """Получить список типов требований."""
@@ -35,8 +35,8 @@ async def get_requirement_types(
 )
 async def create_requirement_type(
     type_in: schemas.RequirementTypeCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.write()),
 ):
     """Создать новый тип требования."""
     # Проверяем уникальность названия
@@ -56,7 +56,7 @@ async def create_requirement_type(
 async def get_requirement_priorities(
     skip: int = 0,
     limit: int = 100,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """Получить список приоритетов требований."""
@@ -73,8 +73,8 @@ async def get_requirement_priorities(
 )
 async def create_requirement_priority(
     priority_in: schemas.RequirementPriorityCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.write()),
 ):
     """Создать новый приоритет требования."""
     # Проверяем уникальность названия
@@ -96,7 +96,7 @@ async def create_requirement_priority(
 async def get_requirement_statuses(
     skip: int = 0,
     limit: int = 100,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """Получить список статусов требований."""
@@ -113,8 +113,8 @@ async def get_requirement_statuses(
 )
 async def create_requirement_status(
     status_in: schemas.RequirementStatusCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.write()),
 ):
     """Создать новый статус требования."""
     # Проверяем уникальность названия
@@ -134,7 +134,7 @@ async def create_requirement_status(
 async def get_relationship_types(
     skip: int = 0,
     limit: int = 100,
-    db: AsyncSession = Depends(get_db),
+    db: SessionDep,
     current_user: User = Depends(get_current_active_user),
 ):
     """Получить список типов связей между требованиями."""
@@ -151,8 +151,8 @@ async def get_relationship_types(
 )
 async def create_relationship_type(
     type_in: schemas.RelationshipTypeCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_admin_user),
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.write()),
 ):
     """Создать новый тип связи."""
     # Проверяем уникальность названия

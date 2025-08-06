@@ -102,7 +102,7 @@ class RefreshToken(Base):
 
     # Отношения
     user: Mapped["User"] = relationship(
-        "User", lazy="select"
+        "User", back_populates="refresh_tokens", lazy="select"
     )
 
     def __repr__(self) -> str:
