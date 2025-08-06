@@ -1,6 +1,5 @@
 """
 API endpoints для настроек пользователя.
-Соответствует структуре в frontend/src/entities/settings/api/settingsDAO.ts
 """
 
 from typing import Dict, Any, List

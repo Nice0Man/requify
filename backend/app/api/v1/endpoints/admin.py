@@ -18,13 +18,13 @@ from sqlalchemy import text
 from app.api.deps import get_db, get_admin_user, get_dashboard_admin_user
 from app.core.config import settings
 from app.models.user import User
-from app.schemas.auth import UserProfile
+from app.schemas.user import UserComplete
 from app import crud
 
 router = APIRouter()
 
 
-@router.get("/users", response_model=List[UserProfile])
+@router.get("/users", response_model=List[UserComplete])
 async def get_admin_users(
     skip: int = 0,
     limit: int = 100,
@@ -44,7 +44,7 @@ async def get_admin_users(
         List[Dict[str, Any]]: Список пользователей с подробной информацией
     """
     users = await crud.user.get_multi(db, skip=skip, limit=limit)
-    return [UserProfile.model_validate(user) for user in users]
+    return [UserComplete.model_validate(user) for user in users]
 
 
 @router.get("/system-info", response_model=Dict[str, Any])

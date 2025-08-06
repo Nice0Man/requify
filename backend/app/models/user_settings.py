@@ -60,7 +60,7 @@ class UserSettings(Base, TimestampedMixin):
 
     # Связь с пользователем
     user: Mapped["User"] = relationship(
-        "User", back_populates="user_settings", uselist=False
+        "User", uselist=False
     )
 
     def __repr__(self) -> str:

@@ -7,7 +7,7 @@
 from datetime import UTC, datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, DateTime, String, Index
+from sqlalchemy import Boolean, DateTime, String, Index, Enum, JSON, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -24,9 +24,44 @@ class AuthMixin:
         String(128), nullable=False, comment="Хэшированный пароль"
     )
 
-    # Auth0 integration
-    auth0_id: Mapped[Optional[str]] = mapped_column(
-        String(255), unique=True, nullable=True, comment="Auth0 user ID для интеграции"
+    # Status field
+    status: Mapped[str] = mapped_column(
+        String(20), default="active", nullable=False, comment="Статус пользователя"
+    )
+
+    # Authentication provider
+    auth_provider: Mapped[str] = mapped_column(
+        String(20), default="local", nullable=False, comment="Провайдер аутентификации"
+    )
+    auth_provider_id: Mapped[Optional[str]] = mapped_column(
+        String(255), unique=True, nullable=True, comment="ID пользователя у внешнего провайдера"
+    )
+
+    # Security fields
+    login_attempts: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False, comment="Количество неудачных попыток входа"
+    )
+    locked_until: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True, comment="Заблокирован до (после множественных неудачных попыток)"
+    )
+    password_changed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True, comment="Дата последней смены пароля"
+    )
+    
+    # User agreements
+    terms_accepted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True, comment="Дата принятия условий использования"
+    )
+    privacy_policy_accepted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True, comment="Дата принятия политики конфиденциальности"
+    )
+    
+    # User data
+    preferences: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True, comment="Пользовательские настройки"
+    )
+    user_metadata: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True, comment="Дополнительные метаданные"
     )
 
 
@@ -38,10 +73,11 @@ class PermissionsMixin:
         Boolean, default=True, nullable=False, comment="Активен ли пользователь"
     )
 
+
 class EmailVerificationMixin:
     """Миксин для подтверждения email"""
 
-    email_verified: Mapped[bool] = mapped_column(
+    is_email_verified: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
         nullable=False,
@@ -56,7 +92,7 @@ class ActivityMixin:
     """Миксин для отслеживания активности пользователя"""
 
     # Временные метки активности
-    last_login: Mapped[Optional[datetime]] = mapped_column(
+    last_login_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime, nullable=True, comment="Время последнего входа в систему"
     )
 
@@ -67,9 +103,12 @@ class UserIndexesMixin:
     __table_args__ = (
         Index("ix_users_email_unique", "email", unique=True),
         Index("ix_users_username_unique", "username", unique=True),
-        Index("ix_users_auth0_id_unique", "auth0_id", unique=True),
+        Index("ix_users_auth_provider_id_unique", "auth_provider_id", unique=True),
         Index("ix_users_is_active", "is_active"),
-        Index("ix_users_last_login", "last_login"),
-        Index("ix_users_email_verified", "email_verified"),
-        Index("ix_users_company_id", "company_id"),  # Новый индекс для компании
+        Index("ix_users_status", "status"),
+        Index("ix_users_auth_provider", "auth_provider"),
+        Index("ix_users_last_login_at", "last_login_at"),
+        Index("ix_users_is_email_verified", "is_email_verified"),
+        Index("ix_users_company_id", "company_id"),
+        Index("ix_users_login_attempts", "login_attempts"),
     )

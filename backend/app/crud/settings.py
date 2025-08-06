@@ -34,9 +34,12 @@ from app.schemas.settings import (
 )
 from app.utils.logger import logger
 from app.core.security import get_password_hash, verify_password
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-class CRUDSettings:
+class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate]):
     """CRUD для настроек пользователя"""
 
     # =============================================================================
@@ -418,12 +421,34 @@ class CRUDSettings:
     ) -> SettingsResponse:
         """Отозвать сессии пользователя"""
         try:
-            # TODO: Реализовать когда будет таблица сессий
-            logger.info(
-                f"Sessions revoked for user {user_id}: {revoke_data.session_ids}"
-            )
+            from app.crud.refresh_token import crud_refresh_token
 
-            return SettingsResponse(success=True, message="Сессии успешно отозваны")
+            if revoke_data.revoke_all:
+                # Отозвать все сессии пользователя
+                revoked_count = await crud_refresh_token.revoke_user_tokens(
+                    db, user_id=user_id, reason="user_revoke_all_sessions"
+                )
+                logger.info(
+                    f"All sessions revoked for user {user_id}: {revoked_count} tokens"
+                )
+                message = f"Все сессии отозваны ({revoked_count})"
+            else:
+                # Отозвать конкретные сессии по ID токенов
+                revoked_count = 0
+                for session_id in revoke_data.session_ids:
+                    token = await crud_refresh_token.get_by_token(db, token=session_id)
+                    if token and token.user_id == user_id:
+                        await crud_refresh_token.revoke_token(
+                            db, token=token, reason="user_revoke_session"
+                        )
+                        revoked_count += 1
+
+                logger.info(
+                    f"Sessions revoked for user {user_id}: {revoked_count} of {len(revoke_data.session_ids)}"
+                )
+                message = f"Отозвано сессий: {revoked_count}"
+
+            return SettingsResponse(success=True, message=message)
 
         except Exception as e:
             logger.error(f"Failed to revoke sessions for user {user_id}: {e}")
@@ -605,4 +630,4 @@ class CRUDSettings:
 
 
 # Создаем singleton instance
-settings_crud = CRUDSettings()
+settings_crud = CRUDSettings(UserSettingsModel)

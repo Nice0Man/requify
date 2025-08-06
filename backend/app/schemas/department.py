@@ -1,11 +1,25 @@
 """
 Схемы для модели Department.
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from typing import Optional, List
-from pydantic import BaseModel, field_validator
+from sqlmodel import Field
+from pydantic import field_validator
 from datetime import datetime
 from enum import Enum
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ListResponseSchema,
+    CompanyRelatedSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
 class DepartmentType(str, Enum):
@@ -33,32 +47,54 @@ class DepartmentType(str, Enum):
     OTHER = "other"
 
 
-class DepartmentBase(BaseModel):
+class DepartmentBase(BaseSchema, ValidationMixin):
     """Базовая схема для департамента"""
 
-    name: str
-    slug: Optional[str] = None
-    description: Optional[str] = None
-    type: DepartmentType
+    name: str = Field(
+        ...,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description=StandardDescriptions.NAME,
+    )
+    slug: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="URL-слаг департамента",
+    )
+    description: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.TEXT_MAX,
+        description=StandardDescriptions.DESCRIPTION,
+    )
+    type: DepartmentType = Field(..., description="Тип департамента")
 
     # Иерархия
-    parent_id: Optional[int] = None
+    parent_id: Optional[int] = Field(
+        None, gt=0, description="ID родительского департамента"
+    )
 
     # Руководство
-    head_id: Optional[int] = None
+    head_id: Optional[int] = Field(None, gt=0, description="ID руководителя")
 
     # Статус
-    is_active: bool = True
+    is_active: bool = Field(True, description=StandardDescriptions.IS_ACTIVE)
 
     # Метаданные
-    employee_count: int = 0
-    team_count: int = 0
-    budget_allocated: Optional[float] = None
+    employee_count: int = Field(0, ge=0, description="Количество сотрудников")
+    team_count: int = Field(0, ge=0, description="Количество команд")
+    budget_allocated: Optional[float] = Field(
+        None, ge=0, description="Выделенный бюджет"
+    )
 
     # Контактная информация
-    location: Optional[str] = None
-    email: Optional[str] = None
-    phone: Optional[str] = None
+    location: Optional[str] = Field(
+        None, max_length=FieldLimits.MEDIUM_STRING_MAX, description="Местоположение"
+    )
+    email: Optional[str] = Field(
+        None, max_length=FieldLimits.EMAIL_MAX, description="Email департамента"
+    )
+    phone: Optional[str] = Field(
+        None, max_length=FieldLimits.PHONE_MAX, description="Телефон департамента"
+    )
 
     @field_validator("slug")
     def generate_slug(cls, v, values):
@@ -69,10 +105,8 @@ class DepartmentBase(BaseModel):
         return None
 
 
-class DepartmentCreate(DepartmentBase):
+class DepartmentCreate(CreateSchema, DepartmentBase, CompanyRelatedSchema):
     """Схема для создания департамента"""
-
-    company_id: int
 
     @field_validator("name")
     def validate_name(cls, v):
@@ -81,76 +115,73 @@ class DepartmentCreate(DepartmentBase):
         return v.strip()
 
 
-class DepartmentUpdate(BaseModel):
+class DepartmentUpdate(UpdateSchema):
     """Схема для обновления департамента"""
 
-    name: Optional[str] = None
-    slug: Optional[str] = None
-    description: Optional[str] = None
+    name: Optional[str] = Field(None, max_length=FieldLimits.MEDIUM_STRING_MAX)
+    slug: Optional[str] = Field(None, max_length=FieldLimits.SHORT_STRING_MAX)
+    description: Optional[str] = Field(None, max_length=FieldLimits.TEXT_MAX)
     type: Optional[DepartmentType] = None
-    parent_id: Optional[int] = None
-    head_id: Optional[int] = None
+    parent_id: Optional[int] = Field(None, gt=0)
+    head_id: Optional[int] = Field(None, gt=0)
     is_active: Optional[bool] = None
-    employee_count: Optional[int] = None
-    team_count: Optional[int] = None
-    budget_allocated: Optional[float] = None
-    location: Optional[str] = None
-    email: Optional[str] = None
-    phone: Optional[str] = None
+    employee_count: Optional[int] = Field(None, ge=0)
+    team_count: Optional[int] = Field(None, ge=0)
+    budget_allocated: Optional[float] = Field(None, ge=0)
+    location: Optional[str] = Field(None, max_length=FieldLimits.MEDIUM_STRING_MAX)
+    email: Optional[str] = Field(None, max_length=FieldLimits.EMAIL_MAX)
+    phone: Optional[str] = Field(None, max_length=FieldLimits.PHONE_MAX)
 
 
-class DepartmentInDB(DepartmentBase):
-    """Схема для данных из базы данных"""
-
-    id: int
-    company_id: int
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class DepartmentResponse(DepartmentInDB):
+class DepartmentResponse(ResponseSchema, DepartmentBase, CompanyRelatedSchema):
     """Схема для ответа API"""
 
     # Добавляем вычисляемые поля
-    level: Optional[int] = None
-    full_name: Optional[str] = None
-    has_children: Optional[bool] = None
-    is_root: Optional[bool] = None
+    level: Optional[int] = Field(None, ge=0, description="Уровень в иерархии")
+    full_name: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.LONG_STRING_MAX,
+        description="Полное название с иерархией",
+    )
+    has_children: Optional[bool] = Field(
+        None, description="Есть ли дочерние департаменты"
+    )
+    is_root: Optional[bool] = Field(None, description="Корневой департамент")
 
 
-class DepartmentListResponse(BaseModel):
+class DepartmentListResponse(ListResponseSchema[DepartmentResponse]):
     """Схема для списка департаментов"""
 
-    departments: List[DepartmentResponse]
-    total: int
-    page: int
-    per_page: int
-    has_next: bool
-    has_prev: bool
+    pass
 
 
 class DepartmentHierarchy(DepartmentResponse):
     """Схема для иерархии департаментов"""
 
-    children: List["DepartmentHierarchy"] = []
-    parent: Optional[DepartmentResponse] = None
+    children: List["DepartmentHierarchy"] = Field(
+        default_factory=list, description="Дочерние департаменты"
+    )
+    parent: Optional[DepartmentResponse] = Field(
+        None, description="Родительский департамент"
+    )
 
 
 # Обновляем forward reference
 DepartmentHierarchy.model_rebuild()
 
 
-class DepartmentStats(BaseModel):
+class DepartmentStats(BaseSchema):
     """Схема для статистики департамента"""
 
-    department_id: int
-    total_employees: int
-    total_teams: int
-    total_projects: int
-    active_projects: int
-    completed_projects: int
-    budget_utilized: Optional[float] = None
-    budget_remaining: Optional[float] = None
+    department_id: int = Field(..., gt=0, description="ID департамента")
+    total_employees: int = Field(0, ge=0, description="Общее количество сотрудников")
+    total_teams: int = Field(0, ge=0, description="Общее количество команд")
+    total_projects: int = Field(0, ge=0, description="Общее количество проектов")
+    active_projects: int = Field(0, ge=0, description="Активные проекты")
+    completed_projects: int = Field(0, ge=0, description="Завершенные проекты")
+    budget_utilized: Optional[float] = Field(
+        None, ge=0, description="Использованный бюджет"
+    )
+    budget_remaining: Optional[float] = Field(
+        None, ge=0, description="Оставшийся бюджет"
+    )

@@ -4,10 +4,20 @@
 
 from datetime import datetime
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
-class ReportBase(BaseModel):
+class ReportBase(BaseSchema):
     """Базовая схема отчета."""
 
     status: str = Field(..., description="Статус генерации отчета")
@@ -15,7 +25,7 @@ class ReportBase(BaseModel):
     generated_at: str = Field(..., description="Время генерации")
 
 
-class ReportCreate(ReportBase):
+class ReportCreate(CreateSchema):
     """Схема для создания отчета."""
 
     generated_by: str = Field(..., description="Email пользователя, создавшего отчет")
@@ -24,7 +34,7 @@ class ReportCreate(ReportBase):
     )
 
 
-class ReportUpdate(BaseModel):
+class ReportUpdate(UpdateSchema):
     """Схема для обновления отчета."""
 
     status: Optional[str] = Field(None, description="Статус отчета")
@@ -48,7 +58,7 @@ class ReportInDBBase(ReportBase):
         from_attributes = True
 
 
-class Report(BaseModel):
+class Report(BaseSchema):
     """Схема отчета для ответов API."""
 
     id: Optional[int] = None
@@ -84,7 +94,7 @@ class ReportInDB(ReportInDBBase):
 # Схемы для конфигурации отчетов
 
 
-class ReportFilter(BaseModel):
+class ReportFilter(BaseSchema):
     """Фильтры для отчетов."""
 
     project_ids: Optional[List[int]] = None
@@ -96,7 +106,7 @@ class ReportFilter(BaseModel):
     author_ids: Optional[List[int]] = None
 
 
-class ReportConfig(BaseModel):
+class ReportConfig(BaseSchema):
     """Конфигурация отчета."""
 
     type: str = Field(..., description="Тип отчета")

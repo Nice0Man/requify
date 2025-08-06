@@ -41,8 +41,12 @@ def main():
     elif script_name == "create_admin":
         from scripts.create_admin import main as admin_main
         import asyncio
+        import inspect
 
-        asyncio.run(admin_main()) if hasattr(admin_main, "__await__") else admin_main()
+        if inspect.iscoroutinefunction(admin_main):
+            asyncio.run(admin_main())
+        else:
+            admin_main()
     elif script_name == "migrations":
         from scripts.migrations import main as migrations_main
 

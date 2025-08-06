@@ -20,6 +20,7 @@ from app.api.deps import (
     get_current_active_user,
     get_optional_user,
     get_user_from_auth0_token,
+    check_user_permission,
 )
 from app.services import auth0_service
 from app.core.config import settings
@@ -33,6 +34,7 @@ from app.core.security import (
 )
 from app.crud import user as crud_user, crud_refresh_token
 from app.models.user import User
+from app.models.enhanced_role_system import EnhancedRole, UserRoleAssignment
 from app.services import email_service
 from app.utils.logger import logger
 from app.schemas.auth import (
@@ -50,13 +52,20 @@ from app.schemas.auth import (
     SessionListResponse,
     RevokeSessionRequest,
     ActiveSession,
-    UserProfile,
     AuthError,
     EmailVerificationRequest,
     EmailVerificationConfirm,
     EmailVerificationResponse,
 )
-from app.schemas.user import UserCreate
+from app.schemas import (
+    UserCreate,
+    UserComplete,
+    UserWithProfile,
+    User,
+    UserInDB,
+    UserProfileResponse,
+    UserProfileCreate,
+)
 
 router = APIRouter()
 
@@ -65,7 +74,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/register", response_model=UserProfile, status_code=status.HTTP_201_CREATED
+    "/register", response_model=UserWithProfile, status_code=status.HTTP_201_CREATED
 )
 async def register_user(
     user_in: UserCreate,
@@ -79,7 +88,7 @@ async def register_user(
         db: Сессия базы данных
 
     Returns:
-        UserProfile: Профиль зарегистрированного пользователя
+        UserWithProfile: Пользователь с профилем
 
     Raises:
         HTTPException: Если пользователь с таким email или username уже существует
@@ -106,21 +115,37 @@ async def register_user(
     # Создаем пользователя
     user = await crud_user.create(db, obj_in=user_in)
 
+    # Создаем профиль пользователя (если не создался автоматически)
+    from app.crud import user_profile as crud_user_profile
+
+    if not user.profile:
+        profile_data = UserProfileCreate(
+            display_name=user.username,
+            first_name=getattr(user_in, "first_name", None),
+            last_name=getattr(user_in, "last_name", None),
+        )
+        profile = await crud_user_profile.create_for_user(
+            db, user_id=user.id, obj_in=profile_data
+        )
+        # Присваиваем профиль пользователю для избежания дополнительного запроса
+        user.profile = profile
+
     # Отправляем email для верификации
     try:
         verification_token = JWTTokenManager.create_email_verification_token(user.email)
+        user_display_name = user.profile.display_name if user.profile else user.username
         await email_service.send_email_verification(
             user_email=user.email,
             verification_token=verification_token,
-            user_name=user.first_name or user.username,
+            user_name=user_display_name,
         )
         logger.info(f"Verification email sent to {user.email}")
     except Exception as e:
         logger.error(f"Failed to send verification email to {user.email}: {e}")
         # Не прерываем регистрацию из-за ошибки отправки email
 
-    # Возвращаем профиль пользователя
-    return UserProfile.model_validate(user)
+    # Возвращаем пользователя с профилем
+    return UserWithProfile.model_validate(user)
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -146,10 +171,12 @@ async def login_for_access_token(
     Raises:
         HTTPException: Если учетные данные неверны или пользователь неактивен
     """
-    # Пытаемся найти пользователя по email или username
-    user = await crud_user.get_by_email(db, email=form_data.username)
+    # Пытаемся найти пользователя по email или username через CRUD методы
+    user = await crud_user.get_by_email_with_profile(db, email=form_data.username)
     if not user:
-        user = await crud_user.get_by_username(db, username=form_data.username)
+        user = await crud_user.get_by_username_with_profile(
+            db, username=form_data.username
+        )
 
     # Проверяем существование пользователя и правильность пароля
     if not user or not verify_password(form_data.password, user.hashed_password):
@@ -203,16 +230,13 @@ async def login_for_access_token(
     user.last_login = datetime.now(UTC).replace(tzinfo=None)
     await db.commit()
 
-    # Формируем профиль пользователя
-    user_profile = UserProfile.model_validate(user)
-
+    # Используем уже загруженного пользователя с профилем
     return LoginResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         expires_in=settings.security.access_token_expire_minutes * 60,
         refresh_expires_in=settings.security.refresh_token_expire_days * 24 * 60 * 60,
-        user=user_profile,
-        permissions=_get_user_scopes(user),
+        user=UserComplete.model_validate(user),
     )
 
 
@@ -401,18 +425,20 @@ async def validate_token(
     if not payload:
         return TokenValidationResponse(valid=False)
 
-    # Получаем пользователя
+    # Получаем пользователя через CRUD метод с предварительной загрузкой профиля
     user_id = payload.get("user_id")
     if user_id:
-        user = await crud_user.get(db, id=user_id)
+        user = await crud_user.get_with_profile(db, id=user_id)
+
         if user and user.is_active:
             expires_at = datetime.fromtimestamp(payload["exp"], tz=UTC).replace(
                 tzinfo=None
             )
-            user_profile = UserProfile.model_validate(user)
 
             return TokenValidationResponse(
-                valid=True, expires_at=expires_at, user=user_profile
+                valid=True,
+                expires_at=expires_at,
+                user=UserComplete.model_validate(user),
             )
 
     return TokenValidationResponse(valid=False)
@@ -610,7 +636,7 @@ async def request_email_verification(
             await email_service.send_email_verification(
                 user_email=user.email,
                 verification_token=verification_token,
-                user_name=user.first_name or user.username,
+                user_name=user.name or user.username,
             )
             logger.info(f"Verification email resent to {user.email}")
         except Exception as e:
@@ -782,160 +808,749 @@ async def revoke_sessions(
 
 def _get_user_scopes(user: User) -> list[str]:
     """
-    Получить права доступа пользователя на основе роли.
+    Получить права доступа пользователя на основе Enhanced Role System.
 
     Args:
         user: Пользователь
 
     Returns:
-        list[str]: Список прав доступа (scopes)
+        list[str]: Список прав доступа (scopes) в соответствии с Permission enum
     """
-    scopes = ["me"]  # Базовый scope для всех пользователей
+    scopes = ["me", "use_api"]  # Базовые scopes для всех пользователей
 
-    if user.is_superuser:
-        # Суперпользователь имеет все права
+    # Системные администраторы получают все права
+    try:
+        is_system_admin = user.is_system_admin
+    except (AttributeError, Exception):
+        # Fallback если role_assignments не загружены или есть другие проблемы
+        is_system_admin = False
+
+    if is_system_admin:
+        scopes.extend([perm.value for perm in Permission])
+        return scopes
+
+    # Суперпользователи получают широкие права
+    try:
+        is_superuser = getattr(user, "is_superuser", False)
+    except (AttributeError, Exception):
+        is_superuser = False
+
+    if is_superuser:
         scopes.extend(
             [
-                "users:read",
-                "users:write",
-                "users:delete",
-                "projects:read",
-                "projects:write",
-                "projects:delete",
-                "requirements:read",
-                "requirements:write",
-                "requirements:delete",
-                "releases:read",
-                "releases:write",
-                "releases:delete",
-                "testing:read",
-                "testing:write",
-                "testing:execute",
-                "admin:read",
-                "admin:write",
-                "system:admin",
+                # Основные права управления
+                Permission.MANAGE_COMPANY.value,
+                Permission.VIEW_COMPANY_SETTINGS.value,
+                Permission.MANAGE_COMPANY_SETTINGS.value,
+                Permission.MANAGE_COMPANY_USERS.value,
+                Permission.VIEW_COMPANY_USERS.value,
+                Permission.INVITE_USERS.value,
+                Permission.REMOVE_USERS.value,
+                Permission.VIEW_COMPANY_ANALYTICS.value,
+                Permission.EXPORT_COMPANY_DATA.value,
+                # Проектные права
+                Permission.CREATE_PROJECT.value,
+                Permission.MANAGE_PROJECT.value,
+                Permission.VIEW_PROJECT.value,
+                Permission.DELETE_PROJECT.value,
+                Permission.ARCHIVE_PROJECT.value,
+                Permission.MANAGE_PROJECT_SETTINGS.value,
+                Permission.MANAGE_PROJECT_MEMBERS.value,
+                Permission.VIEW_PROJECT_MEMBERS.value,
+                Permission.VIEW_PROJECT_ANALYTICS.value,
+                # Права на требования
+                Permission.CREATE_REQUIREMENT.value,
+                Permission.EDIT_REQUIREMENT.value,
+                Permission.VIEW_REQUIREMENT.value,
+                Permission.DELETE_REQUIREMENT.value,
+                Permission.APPROVE_REQUIREMENT.value,
+                Permission.REJECT_REQUIREMENT.value,
+                Permission.LINK_REQUIREMENTS.value,
+                Permission.MANAGE_REQUIREMENT_VERSIONS.value,
+                Permission.EXPORT_REQUIREMENTS.value,
+                Permission.IMPORT_REQUIREMENTS.value,
+                # Права на релизы
+                Permission.CREATE_RELEASE.value,
+                Permission.MANAGE_RELEASE.value,
+                Permission.VIEW_RELEASE.value,
+                Permission.DELETE_RELEASE.value,
+                Permission.PUBLISH_RELEASE.value,
+                Permission.DEPLOY_RELEASE.value,
+                Permission.ROLLBACK_RELEASE.value,
+                Permission.APPROVE_RELEASE.value,
+                # Права на тестирование
+                Permission.CREATE_TEST.value,
+                Permission.EXECUTE_TEST.value,
+                Permission.VIEW_TEST_RESULTS.value,
+                Permission.MANAGE_TEST_PLANS.value,
+                Permission.APPROVE_TEST_RESULTS.value,
+                Permission.CREATE_TEST_AUTOMATION.value,
+                Permission.MANAGE_TEST_ENVIRONMENTS.value,
+                # Права на документацию
+                Permission.CREATE_SPECIFICATION.value,
+                Permission.EDIT_SPECIFICATION.value,
+                Permission.VIEW_SPECIFICATION.value,
+                Permission.DELETE_SPECIFICATION.value,
+                Permission.APPROVE_SPECIFICATION.value,
+                Permission.GENERATE_DOCUMENTATION.value,
+                # Права на комментарии
+                Permission.CREATE_COMMENT.value,
+                Permission.EDIT_COMMENT.value,
+                Permission.DELETE_COMMENT.value,
+                Permission.MODERATE_COMMENTS.value,
+                # Права на отчеты
+                Permission.VIEW_REPORTS.value,
+                Permission.CREATE_REPORTS.value,
+                Permission.EXPORT_REPORTS.value,
+                Permission.VIEW_ADVANCED_ANALYTICS.value,
+                # Права на интеграции
+                Permission.MANAGE_INTEGRATIONS.value,
+                Permission.VIEW_API_LOGS.value,
+                Permission.CREATE_API_KEYS.value,
             ]
         )
-    elif user.role == "admin":
-        # Администратор имеет широкие права, но не системные
+        return scopes
+
+    # NOTE: Убираем обращения к role_assignments здесь, чтобы избежать greenlet ошибок
+    # Функция _get_user_scopes должна быть быстрой и без обращений к БД
+    # Enhanced role permissions будут получены через отдельные endpoints
+
+    # Добавляем базовые права для всех пользователей
+    if not any(
+        scope in scopes
+        for scope in [Permission.VIEW_PROJECT.value, Permission.VIEW_REQUIREMENT.value]
+    ):
         scopes.extend(
             [
-                "users:read",
-                "users:write",
-                "users:delete",
-                "projects:read",
-                "projects:write",
-                "projects:delete",
-                "requirements:read",
-                "requirements:write",
-                "requirements:delete",
-                "releases:read",
-                "releases:write",
-                "releases:delete",
-                "testing:read",
-                "testing:write",
-                "testing:execute",
-                "admin:read",
-                "admin:write",
+                Permission.VIEW_PROJECT.value,
+                Permission.VIEW_REQUIREMENT.value,
+                Permission.VIEW_RELEASE.value,
+                Permission.VIEW_TEST_RESULTS.value,
+                Permission.VIEW_SPECIFICATION.value,
+                Permission.CREATE_COMMENT.value,
             ]
         )
-    elif user.role == "product_manager":
-        # Продуктовый менеджер - ключевая роль по ТЗ для управления требованиями и релизами
-        scopes.extend(
-            [
-                "users:read",
-                "projects:read",
-                "projects:write",
-                "projects:delete",  # PM создает и удаляет проекты по ТЗ
-                "requirements:read",
-                "requirements:write",
-                "requirements:delete",  # PM управляет требованиями по ТЗ
-                "releases:read",
-                "releases:write",
-                "releases:delete",  # PM формирует релизы по ТЗ
-                "testing:read",
-                "admin:read",  # Доступ к мониторингу
-            ]
-        )
-    elif user.role == "manager":
-        # Менеджер может управлять проектами и требованиями, имеет доступ к админ панели для мониторинга
-        scopes.extend(
-            [
-                "users:read",
-                "projects:read",
-                "projects:write",
-                "projects:delete",  # Менеджеры могут удалять проекты
-                "requirements:read",
-                "requirements:write",
-                "requirements:delete",
-                "releases:read",
-                "releases:write",
-                "releases:delete",  # Менеджеры могут удалять релизы
-                "testing:read",
-                "testing:write",
-                "admin:read",  # Менеджеры могут читать админ данные для мониторинга
-            ]
-        )
-    elif user.role == "senior_developer":
-        # Старший разработчик - расширенные права по сравнению с обычным разработчиком
-        scopes.extend(
-            [
-                "projects:read",
-                "requirements:read",
-                "releases:read",
-                "releases:write",
-                "releases:delete",  # Старший разработчик может удалять релизы
-                "testing:read",
-                "testing:write",  # Может участвовать в планировании тестирования
-                "admin:read",  # Доступ к мониторингу системы
-            ]
-        )
-    elif user.role == "developer":
-        # Разработчик читает требования и работает с релизами, имеет доступ к админ панели для мониторинга
-        scopes.extend(
-            [
-                "projects:read",
-                "requirements:read",
-                "releases:read",
-                "releases:write",
-                "testing:read",
-                "admin:read",  # Разработчики могут читать админ данные для мониторинга системы
-            ]
-        )
-    elif user.role == "analyst":
-        # Аналитик только читает данные согласно ТЗ (убираем write права)
-        scopes.extend(
-            [
-                "projects:read",  # Только чтение проектов
-                "requirements:read",  # Только чтение требований
-                "releases:read",
-                "testing:read",
-            ]
-        )
-    elif user.role == "tester":
-        # Тестировщик работает с тестированием и читает требования
-        scopes.extend(
-            [
-                "projects:read",
-                "requirements:read",
-                "releases:read",
-                "testing:read",
-                "testing:write",
-                "testing:execute",
-            ]
-        )
-    elif user.role == "viewer" or user.role == "user":
-        # Пользователь по умолчанию имеет только права чтения
-        scopes.extend(
-            ["projects:read", "requirements:read", "releases:read", "testing:read"]
-        )
-    else:
-        # Fallback для неизвестных ролей - только базовые права чтения
-        scopes.extend(
-            ["projects:read", "requirements:read", "releases:read", "testing:read"]
-        )
+
+    return list(set(scopes))  # Убираем дубликаты
+
+
+def _get_role_specific_scopes(
+    role: EnhancedRole, assignment: UserRoleAssignment
+) -> list[str]:
+    """
+    Получить права для конкретной Enhanced роли.
+
+    Args:
+        role: Enhanced роль
+        assignment: Назначение роли
+
+    Returns:
+        list[str]: Список прав доступа
+    """
+    scopes = []
+
+    # Системные роли
+    if role.system_role:
+        if role.system_role == SystemRole.SYSTEM_ADMIN:
+            scopes.extend([perm.value for perm in Permission])
+        elif role.system_role in [SystemRole.PLATFORM_ADMIN, SystemRole.SUPPORT_ADMIN]:
+            scopes.extend(
+                [
+                    Permission.MANAGE_ALL_COMPANIES.value,
+                    Permission.VIEW_SYSTEM_LOGS.value,
+                    Permission.MANAGE_SYSTEM_SETTINGS.value,
+                    Permission.AUDIT_SYSTEM.value,
+                ]
+            )
+
+    # Компанийные роли
+    if role.company_role:
+        if role.company_role in [CompanyRole.COMPANY_ADMIN, CompanyRole.COMPANY_OWNER]:
+            scopes.extend(
+                [
+                    Permission.MANAGE_COMPANY.value,
+                    Permission.MANAGE_COMPANY_SETTINGS.value,
+                    Permission.MANAGE_COMPANY_USERS.value,
+                    Permission.INVITE_USERS.value,
+                    Permission.REMOVE_USERS.value,
+                    Permission.VIEW_COMPANY_ANALYTICS.value,
+                    Permission.EXPORT_COMPANY_DATA.value,
+                ]
+            )
+        elif role.company_role == CompanyRole.BILLING_MANAGER:
+            scopes.extend(
+                [
+                    Permission.MANAGE_COMPANY_BILLING.value,
+                    Permission.VIEW_COMPANY_BILLING.value,
+                    Permission.MANAGE_COMPANY_SUBSCRIPTION.value,
+                ]
+            )
+
+    # Проектные роли
+    if role.project_role:
+        if role.project_role == ProjectRole.PROJECT_MANAGER:
+            scopes.extend(
+                [
+                    Permission.MANAGE_PROJECT.value,
+                    Permission.MANAGE_PROJECT_SETTINGS.value,
+                    Permission.MANAGE_PROJECT_MEMBERS.value,
+                    Permission.VIEW_PROJECT_ANALYTICS.value,
+                    Permission.CREATE_REQUIREMENT.value,
+                    Permission.EDIT_REQUIREMENT.value,
+                    Permission.APPROVE_REQUIREMENT.value,
+                    Permission.CREATE_RELEASE.value,
+                    Permission.MANAGE_RELEASE.value,
+                ]
+            )
+        elif role.project_role in [ProjectRole.SENIOR_DEVELOPER, ProjectRole.ARCHITECT]:
+            scopes.extend(
+                [
+                    Permission.VIEW_PROJECT.value,
+                    Permission.VIEW_REQUIREMENT.value,
+                    Permission.EDIT_REQUIREMENT.value,
+                    Permission.CREATE_RELEASE.value,
+                    Permission.MANAGE_RELEASE.value,
+                    Permission.DEPLOY_RELEASE.value,
+                    Permission.CREATE_TEST.value,
+                    Permission.EXECUTE_TEST.value,
+                ]
+            )
+        elif role.project_role == ProjectRole.DEVELOPER:
+            scopes.extend(
+                [
+                    Permission.VIEW_PROJECT.value,
+                    Permission.VIEW_REQUIREMENT.value,
+                    Permission.VIEW_RELEASE.value,
+                    Permission.CREATE_TEST.value,
+                    Permission.EXECUTE_TEST.value,
+                ]
+            )
+        elif role.project_role in [
+            ProjectRole.QA_ENGINEER,
+            ProjectRole.TEST_AUTOMATION_ENGINEER,
+        ]:
+            scopes.extend(
+                [
+                    Permission.VIEW_PROJECT.value,
+                    Permission.VIEW_REQUIREMENT.value,
+                    Permission.CREATE_TEST.value,
+                    Permission.EXECUTE_TEST.value,
+                    Permission.VIEW_TEST_RESULTS.value,
+                    Permission.MANAGE_TEST_PLANS.value,
+                    Permission.CREATE_TEST_AUTOMATION.value,
+                ]
+            )
+        elif role.project_role in [
+            ProjectRole.BUSINESS_ANALYST,
+            ProjectRole.PRODUCT_ANALYST,
+        ]:
+            scopes.extend(
+                [
+                    Permission.VIEW_PROJECT.value,
+                    Permission.CREATE_REQUIREMENT.value,
+                    Permission.EDIT_REQUIREMENT.value,
+                    Permission.VIEW_REQUIREMENT.value,
+                    Permission.CREATE_SPECIFICATION.value,
+                    Permission.EDIT_SPECIFICATION.value,
+                    Permission.VIEW_REPORTS.value,
+                    Permission.CREATE_REPORTS.value,
+                ]
+            )
 
     return scopes
+
+
+async def get_user_enhanced_permissions(user: User, db: AsyncSession) -> list[str]:
+    """
+    Асинхронно получить полные права пользователя с Enhanced Role System.
+
+    Args:
+        user: Пользователь
+        db: Сессия базы данных
+
+    Returns:
+        list[str]: Полный список прав доступа включая Enhanced роли
+    """
+    # Начинаем с базовых прав
+    permissions = set(["me", "use_api"])
+
+    # Системные администраторы получают все права
+    try:
+        is_system_admin = user.is_system_admin
+    except (AttributeError, Exception):
+        is_system_admin = False
+
+    if is_system_admin:
+        permissions.update([perm.value for perm in Permission])
+        return sorted(list(permissions))
+
+    # Суперпользователи получают широкие права
+    try:
+        is_superuser = getattr(user, "is_superuser", False)
+    except (AttributeError, Exception):
+        is_superuser = False
+
+    if is_superuser:
+        permissions.update(
+            [
+                Permission.MANAGE_COMPANY.value,
+                Permission.VIEW_COMPANY_SETTINGS.value,
+                Permission.MANAGE_COMPANY_SETTINGS.value,
+                Permission.MANAGE_COMPANY_USERS.value,
+                Permission.VIEW_COMPANY_USERS.value,
+                Permission.INVITE_USERS.value,
+                Permission.REMOVE_USERS.value,
+                Permission.VIEW_COMPANY_ANALYTICS.value,
+                Permission.EXPORT_COMPANY_DATA.value,
+                Permission.CREATE_PROJECT.value,
+                Permission.MANAGE_PROJECT.value,
+                Permission.VIEW_PROJECT.value,
+                Permission.DELETE_PROJECT.value,
+                Permission.CREATE_REQUIREMENT.value,
+                Permission.EDIT_REQUIREMENT.value,
+                Permission.VIEW_REQUIREMENT.value,
+                Permission.DELETE_REQUIREMENT.value,
+                Permission.APPROVE_REQUIREMENT.value,
+                Permission.CREATE_RELEASE.value,
+                Permission.MANAGE_RELEASE.value,
+                Permission.VIEW_RELEASE.value,
+                Permission.DELETE_RELEASE.value,
+                Permission.PUBLISH_RELEASE.value,
+            ]
+        )
+        return sorted(list(permissions))
+
+    # Получаем все активные назначения ролей пользователя через CRUD
+    assignments = await crud_user.get_user_role_assignments(db, user_id=user.id)
+
+    # Обрабатываем Enhanced роли
+    for assignment in assignments:
+        if not assignment.is_valid:
+            continue
+
+        role = assignment.role
+        if not role or not role.is_active:
+            continue
+
+        # Добавляем права на основе конкретных ролей
+        role_permissions = _get_role_specific_scopes(role, assignment)
+        permissions.update(role_permissions)
+
+    # Добавляем базовые права для всех пользователей
+    if not any(
+        perm in permissions
+        for perm in [Permission.VIEW_PROJECT.value, Permission.VIEW_REQUIREMENT.value]
+    ):
+        permissions.update(
+            [
+                Permission.VIEW_PROJECT.value,
+                Permission.VIEW_REQUIREMENT.value,
+                Permission.VIEW_RELEASE.value,
+                Permission.VIEW_TEST_RESULTS.value,
+                Permission.VIEW_SPECIFICATION.value,
+                Permission.CREATE_COMMENT.value,
+            ]
+        )
+
+    return sorted(list(permissions))
+
+
+# === Enhanced Role Management Endpoints ===
+
+
+@router.get("/roles/my-roles")
+async def get_my_roles(
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Получить все роли текущего пользователя.
+
+    Args:
+        current_user: Текущий пользователь
+        db: Сессия базы данных
+
+    Returns:
+        dict: Информация о ролях пользователя
+    """
+    from sqlalchemy.orm import selectinload
+    from sqlalchemy import select
+
+    # Получаем все активные назначения ролей пользователя
+    stmt = (
+        select(UserRoleAssignment)
+        .where(
+            UserRoleAssignment.user_id == current_user.id,
+            UserRoleAssignment.is_active == True,
+        )
+        .options(
+            selectinload(UserRoleAssignment.role),
+            selectinload(UserRoleAssignment.company),
+            selectinload(UserRoleAssignment.department),
+            selectinload(UserRoleAssignment.team),
+            selectinload(UserRoleAssignment.project),
+        )
+    )
+    result = await db.execute(stmt)
+    assignments = result.scalars().all()
+
+    # Группируем роли по контексту
+    roles_by_context = {
+        "system": [],
+        "company": [],
+        "department": [],
+        "team": [],
+        "project": [],
+    }
+
+    permissions = set()
+
+    for assignment in assignments:
+        if not assignment.is_valid:
+            continue
+
+        role_info = {
+            "id": assignment.role.id,
+            "name": assignment.role.name,
+            "display_name": assignment.role.display_name,
+            "description": assignment.role.description,
+            "scope": assignment.role.scope.value,
+            "role_level": assignment.role.role_level,
+            "assigned_at": assignment.created_at.isoformat(),
+            "expires_at": (
+                assignment.expires_at.isoformat() if assignment.expires_at else None
+            ),
+            "context_id": None,
+            "context_name": None,
+        }
+
+        # Определяем контекст
+        context_key = assignment.scope_level.value
+        if assignment.company_id:
+            role_info["context_id"] = assignment.company_id
+            role_info["context_name"] = (
+                assignment.company.name if assignment.company else None
+            )
+        elif assignment.department_id:
+            role_info["context_id"] = assignment.department_id
+            role_info["context_name"] = (
+                assignment.department.name if assignment.department else None
+            )
+        elif assignment.team_id:
+            role_info["context_id"] = assignment.team_id
+            role_info["context_name"] = (
+                assignment.team.name if assignment.team else None
+            )
+        elif assignment.project_id:
+            role_info["context_id"] = assignment.project_id
+            role_info["context_name"] = (
+                assignment.project.name if assignment.project else None
+            )
+
+        roles_by_context[context_key].append(role_info)
+
+        # Собираем разрешения
+        role_permissions = _get_role_specific_scopes(assignment.role, assignment)
+        permissions.update(role_permissions)
+
+    # Получаем все права пользователя асинхронно (Enhanced роли)
+    all_permissions = await get_user_enhanced_permissions(current_user, db)
+    permissions.update(all_permissions)
+
+    return {
+        "user_id": current_user.id,
+        "roles_by_context": roles_by_context,
+        "permissions": sorted(list(permissions)),
+        "total_roles": sum(
+            len(roles) for roles in roles_by_context.values() if isinstance(roles, list)
+        ),
+        "has_system_admin": getattr(current_user, "is_system_admin", False),
+        "has_superuser": getattr(current_user, "is_superuser", False),
+    }
+
+
+@router.get("/permissions/my-permissions")
+async def get_my_permissions(
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Получить все права текущего пользователя.
+
+    Args:
+        current_user: Текущий пользователь
+        db: Сессия базы данных
+
+    Returns:
+        dict: Полный список прав пользователя
+    """
+    permissions = await get_user_enhanced_permissions(current_user, db)
+
+    return {
+        "user_id": current_user.id,
+        "permissions": permissions,
+        "total_permissions": len(permissions),
+        "has_system_admin": getattr(current_user, "is_system_admin", False),
+        "has_superuser": getattr(current_user, "is_superuser", False),
+        "generated_at": datetime.now(UTC).isoformat(),
+    }
+
+
+@router.get("/roles/available")
+async def get_available_roles(
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    scope: Optional[str] = None,
+) -> dict:
+    """
+    Получить доступные роли для назначения.
+
+    Args:
+        current_user: Текущий пользователь
+        db: Сессия базы данных
+        scope: Фильтр по области действия роли
+
+    Returns:
+        dict: Список доступных ролей
+    """
+    from sqlalchemy import select
+
+    # Проверяем права на просмотр ролей
+    is_system_admin = getattr(current_user, "is_system_admin", False)
+    if not (
+        is_system_admin
+        or check_user_permission(current_user, Permission.MANAGE_COMPANY_USERS)
+        or check_user_permission(current_user, Permission.VIEW_COMPANY_USERS)
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to view roles",
+        )
+
+    # Строим запрос
+    stmt = select(EnhancedRole).where(
+        EnhancedRole.is_active == True, EnhancedRole.is_assignable == True
+    )
+
+    if scope:
+        try:
+            scope_enum = RoleScope(scope)
+            stmt = stmt.where(EnhancedRole.scope == scope_enum)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid scope: {scope}",
+            )
+
+    result = await db.execute(stmt)
+    roles = result.scalars().all()
+
+    roles_data = []
+    for role in roles:
+        # Проверяем, может ли текущий пользователь назначать эту роль
+        can_assign = True
+        if role.requires_approval and not getattr(
+            current_user, "is_system_admin", False
+        ):
+            can_assign = False
+
+        roles_data.append(
+            {
+                "id": role.id,
+                "name": role.name,
+                "display_name": role.display_name,
+                "description": role.description,
+                "scope": role.scope.value,
+                "role_level": role.role_level,
+                "requires_approval": role.requires_approval,
+                "can_assign": can_assign,
+                "max_assignees": role.max_assignees,
+                "system_role": role.system_role.value if role.system_role else None,
+                "company_role": role.company_role.value if role.company_role else None,
+                "department_role": (
+                    role.department_role.value if role.department_role else None
+                ),
+                "team_role": role.team_role.value if role.team_role else None,
+                "project_role": role.project_role.value if role.project_role else None,
+            }
+        )
+
+    return {
+        "roles": roles_data,
+        "total": len(roles_data),
+        "scopes": [scope.value for scope in RoleScope],
+    }
+
+
+@router.post("/roles/assign")
+async def assign_role_to_user(
+    user_id: int,
+    role_id: int,
+    company_id: Optional[int] = None,
+    department_id: Optional[int] = None,
+    team_id: Optional[int] = None,
+    project_id: Optional[int] = None,
+    expires_at: Optional[datetime] = None,
+    assignment_reason: Optional[str] = None,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Назначить роль пользователю.
+
+    Args:
+        user_id: ID пользователя
+        role_id: ID роли
+        company_id: ID компании (опционально)
+        department_id: ID департамента (опционально)
+        team_id: ID команды (опционально)
+        project_id: ID проекта (опционально)
+        expires_at: Дата истечения (опционально)
+        assignment_reason: Причина назначения (опционально)
+        current_user: Текущий пользователь
+        db: Сессия базы данных
+
+    Returns:
+        dict: Результат операции
+    """
+    from sqlalchemy import select
+
+    # Проверяем права на назначение ролей
+    is_system_admin = getattr(current_user, "is_system_admin", False)
+    if not (
+        is_system_admin
+        or check_user_permission(current_user, Permission.MANAGE_COMPANY_USERS)
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to assign roles",
+        )
+
+    # Получаем пользователя
+    target_user = await crud_user.get(db, id=user_id)
+    if not target_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    # Получаем роль
+    role_stmt = select(EnhancedRole).where(EnhancedRole.id == role_id)
+    role_result = await db.execute(role_stmt)
+    role = role_result.scalar_one_or_none()
+
+    if not role or not role.is_active or not role.is_assignable:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Role not found or not assignable",
+        )
+
+    # Проверяем, требует ли роль одобрения
+    needs_approval = role.requires_approval and not is_system_admin
+
+    # Создаем назначение роли
+    assignment = UserRoleAssignment(
+        user_id=user_id,
+        role_id=role_id,
+        company_id=company_id,
+        department_id=department_id,
+        team_id=team_id,
+        project_id=project_id,
+        expires_at=expires_at,
+        assigned_by=current_user.id,
+        assignment_reason=assignment_reason,
+        is_active=not needs_approval,  # Если требует одобрения, то неактивно
+    )
+
+    db.add(assignment)
+    await db.commit()
+    await db.refresh(assignment)
+
+    logger.info(
+        f"Role {role.name} assigned to user {target_user.email} by {current_user.email} "
+        f"(context: company={company_id}, department={department_id}, team={team_id}, project={project_id})"
+    )
+
+    return {
+        "message": (
+            "Role assigned successfully"
+            if not needs_approval
+            else "Role assignment pending approval"
+        ),
+        "assignment_id": assignment.id,
+        "requires_approval": needs_approval,
+        "is_active": assignment.is_active,
+    }
+
+
+@router.delete("/roles/revoke/{assignment_id}")
+async def revoke_role_assignment(
+    assignment_id: int,
+    reason: Optional[str] = None,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Отозвать назначение роли.
+
+    Args:
+        assignment_id: ID назначения роли
+        reason: Причина отзыва (опционально)
+        current_user: Текущий пользователь
+        db: Сессия базы данных
+
+    Returns:
+        dict: Результат операции
+    """
+    from sqlalchemy import select
+    from sqlalchemy.orm import selectinload
+
+    # Получаем назначение роли
+    stmt = (
+        select(UserRoleAssignment)
+        .where(UserRoleAssignment.id == assignment_id)
+        .options(
+            selectinload(UserRoleAssignment.role), selectinload(UserRoleAssignment.user)
+        )
+    )
+    result = await db.execute(stmt)
+    assignment = result.scalar_one_or_none()
+
+    if not assignment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Role assignment not found"
+        )
+
+    # Проверяем права на отзыв роли
+    is_system_admin = getattr(current_user, "is_system_admin", False)
+    can_revoke = (
+        is_system_admin
+        or assignment.user_id
+        == current_user.id  # Пользователь может отозвать свою роль
+        or check_user_permission(current_user, Permission.MANAGE_COMPANY_USERS)
+    )
+
+    if not can_revoke:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to revoke this role",
+        )
+
+    # Отзываем назначение
+    assignment.revoke(revoked_by=current_user.id, reason=reason)
+    await db.commit()
+
+    logger.info(
+        f"Role assignment {assignment_id} revoked by {current_user.email} "
+        f"(user: {assignment.user.email}, role: {assignment.role.name}, reason: {reason})"
+    )
+
+    return {
+        "message": "Role assignment revoked successfully",
+        "assignment_id": assignment_id,
+        "revoked_at": (
+            assignment.expires_at.isoformat() if assignment.expires_at else None
+        ),
+    }
 
 
 # === Auth0 OAuth2 Endpoints ===
@@ -1028,38 +1643,45 @@ async def auth0_oauth2_callback(
         refresh_token=refresh_token,
         token_type="bearer",
         expires_in=int(access_token_expires.total_seconds()),
-        user=UserProfile.model_validate(user),
-        message="Successfully authenticated via Auth0",
+        user=UserComplete.model_validate(user),
     )
 
 
 @router.get("/oauth2/auth0/userinfo")
 async def get_auth0_user_info(
     current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
     """
     Получить информацию о пользователе для совместимости с Auth0.
 
     Args:
         current_user: Текущий пользователь
+        db: Сессия базы данных
 
     Returns:
         dict: Информация о пользователе в формате Auth0
     """
+    # Получаем пользователя с профилем для полной информации
+    user_with_profile = await crud_user.get_with_profile(db, id=current_user.id)
+    if not user_with_profile:
+        user_with_profile = current_user
+
+    profile = user_with_profile.profile
+
     return {
         "sub": current_user.auth0_id or str(current_user.id),
         "email": current_user.email,
         "email_verified": current_user.email_verified,
-        "name": current_user.name
-        or f"{current_user.first_name} {current_user.last_name}".strip(),
-        "given_name": current_user.first_name,
-        "family_name": current_user.last_name,
+        "name": profile.full_name if profile else current_user.username,
+        "given_name": profile.first_name if profile else None,
+        "family_name": profile.last_name if profile else None,
         "nickname": current_user.username,
-        "picture": None,  # Можно добавить поддержку аватаров в будущем
+        "picture": profile.avatar_url if profile else None,
         "updated_at": (
             current_user.updated_at.isoformat() if current_user.updated_at else None
         ),
-        "locale": "ru-RU",  # По умолчанию русская локаль
+        "locale": profile.locale if profile else "ru-RU",
     }
 
 

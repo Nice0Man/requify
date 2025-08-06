@@ -3,9 +3,19 @@
 """
 
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, field_validator, EmailStr
+from pydantic import field_validator, EmailStr
 from datetime import datetime
 from enum import Enum
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
 class SSOProvider(str, Enum):
@@ -36,7 +46,7 @@ class ProjectVisibility(str, Enum):
     PRIVATE = "private"
 
 
-class CompanySettingsBase(BaseModel):
+class CompanySettingsBase(BaseSchema):
     """Базовая схема для настроек компании"""
 
     # Домен и безопасность
@@ -184,7 +194,7 @@ class CompanySettingsCreate(CompanySettingsBase):
     pass
 
 
-class CompanySettingsUpdate(BaseModel):
+class CompanySettingsUpdate(BaseSchema):
     """Схема для обновления настроек компании"""
 
     # Все поля опциональны для обновления
@@ -274,7 +284,7 @@ class CompanySettingsResponse(CompanySettingsInDB):
     storage_usage_mb: Optional[float] = None
 
 
-class CompanySettingsProfile(BaseModel):
+class CompanySettingsProfile(BaseSchema):
     """Схема для профиля настроек (упрощенная)"""
 
     domain: Optional[str]
@@ -293,7 +303,7 @@ class CompanySettingsProfile(BaseModel):
     max_file_size_mb: int
 
 
-class PasswordPolicySettings(BaseModel):
+class PasswordPolicySettings(BaseSchema):
     """Схема для настроек политики паролей"""
 
     min_length: int = 8
@@ -325,7 +335,7 @@ class PasswordPolicySettings(BaseModel):
         return v
 
 
-class NotificationSettings(BaseModel):
+class NotificationSettings(BaseSchema):
     """Схема для настроек уведомлений"""
 
     requirement_created: bool = True
@@ -343,7 +353,7 @@ class NotificationSettings(BaseModel):
     quiet_hours_end: Optional[str] = "08:00"
 
 
-class SSOConfiguration(BaseModel):
+class SSOConfiguration(BaseSchema):
     """Схема для конфигурации SSO"""
 
     provider: SSOProvider
@@ -364,7 +374,7 @@ class SSOConfiguration(BaseModel):
         return v.strip()
 
 
-class IntegrationSettings(BaseModel):
+class IntegrationSettings(BaseSchema):
     """Схема для настроек интеграций"""
 
     enabled: List[str] = []
@@ -374,7 +384,7 @@ class IntegrationSettings(BaseModel):
     gitlab_group_id: Optional[int] = None
 
 
-class CustomFieldDefinition(BaseModel):
+class CustomFieldDefinition(BaseSchema):
     """Схема для определения кастомного поля"""
 
     name: str
@@ -407,7 +417,7 @@ class CustomFieldDefinition(BaseModel):
         return v.strip()
 
 
-class CompanySettingsValidation(BaseModel):
+class CompanySettingsValidation(BaseSchema):
     """Схема для валидации настроек"""
 
     is_valid: bool

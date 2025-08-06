@@ -18,13 +18,31 @@ from app.api.deps import (
     get_superuser,
 )
 from app.core.config import settings
-from app import crud, schemas, models
+from app import crud, models
 from app.models.user import User
+from app.schemas.user import (
+    UserCreate,
+    UserUpdate,
+    User as UserSchema,
+    UserComplete,
+    UserWithProfile,
+    UserWithStats,
+    UserStats,
+    UserActivity,
+    UserValidation,
+    UserAvailability,
+    UserAudit,
+    UserPublicProfile,
+)
+from app.schemas.user_profile import (
+    UserProfileResponse,
+    UserProfileUpdate,
+)
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.User])
+@router.get("/", response_model=List[UserComplete])
 async def get_users(
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
@@ -67,12 +85,21 @@ async def get_users(
     else:
         users = await crud.user.get_multi(db, skip=skip, limit=limit)
 
-    return users
+    # Загружаем профили для всех пользователей, если они не загружены
+    complete_users = []
+    for user in users:
+        if not hasattr(user, "profile") or user.profile is None:
+            user_with_profile = await crud.user.get_with_profile(db, id=user.id)
+            complete_users.append(user_with_profile or user)
+        else:
+            complete_users.append(user)
+
+    return complete_users
 
 
-@router.post("/", response_model=schemas.User, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=UserWithProfile, status_code=status.HTTP_201_CREATED)
 async def create_user(
-    user_in: schemas.UserCreate,
+    user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_users_write_user),
 ):
@@ -109,27 +136,50 @@ async def create_user(
                 detail="Пользователь с таким именем уже существует",
             )
 
+    # Создаем пользователя
     user = await crud.user.create(db, obj_in=user_in)
+
+    # Создаем профиль пользователя (если не создался автоматически)
+    if not user.profile:
+        from app.crud import user_profile as crud_user_profile
+        from app.schemas.user_profile import UserProfileCreate
+
+        profile_data = UserProfileCreate(
+            display_name=user.username,
+            first_name=getattr(user_in, "first_name", None),
+            last_name=getattr(user_in, "last_name", None),
+        )
+        profile = await crud_user_profile.create_for_user(
+            db, user_id=user.id, obj_in=profile_data
+        )
+        user.profile = profile
+
     return user
 
 
-@router.get("/me", response_model=schemas.User)
-async def get_current_user_info(current_user: User = Depends(get_current_active_user)):
+@router.get("/me", response_model=UserComplete)
+async def get_current_user_info(
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     Получить информацию о текущем пользователе.
 
     Args:
         current_user: Текущий пользователь
+        db: Сессия базы данных
 
     Returns:
-        schemas.User: Информация о текущем пользователе
+        UserComplete: Полная информация о текущем пользователе
     """
-    return current_user
+    # Получаем пользователя с профилем
+    user_with_profile = await crud.user.get_with_profile(db, id=current_user.id)
+    return user_with_profile or current_user
 
 
-@router.put("/me", response_model=schemas.User)
+@router.put("/me", response_model=UserComplete)
 async def update_current_user(
-    user_in: schemas.UserUpdate,
+    user_in: UserUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
@@ -176,10 +226,13 @@ async def update_current_user(
             )
 
     user = await crud.user.update(db, db_obj=user_in_session, obj_in=user_in)
-    return user
+
+    # Получаем обновленного пользователя с профилем
+    updated_user = await crud.user.get_with_profile(db, id=user.id)
+    return updated_user or user
 
 
-@router.get("/{user_id}", response_model=schemas.User)
+@router.get("/{user_id}", response_model=UserComplete)
 async def get_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
@@ -199,7 +252,7 @@ async def get_user(
     Raises:
         HTTPException: Если пользователь не найден
     """
-    user = await crud.user.get(db, id=user_id)
+    user = await crud.user.get_with_profile(db, id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
@@ -207,10 +260,10 @@ async def get_user(
     return user
 
 
-@router.put("/{user_id}", response_model=schemas.User)
+@router.put("/{user_id}", response_model=UserComplete)
 async def update_user(
     user_id: int,
-    user_in: schemas.UserUpdate,
+    user_in: UserUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_users_write_user),
 ):
@@ -256,7 +309,10 @@ async def update_user(
             )
 
     user = await crud.user.update(db, db_obj=user, obj_in=user_in)
-    return user
+
+    # Получаем обновленного пользователя с профилем
+    updated_user = await crud.user.get_with_profile(db, id=user.id)
+    return updated_user or user
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -285,7 +341,7 @@ async def delete_user(
     await crud.user.remove(db, id=user_id)
 
 
-@router.post("/{user_id}/activate", response_model=schemas.User)
+@router.post("/{user_id}/activate", response_model=UserComplete)
 async def activate_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
@@ -312,10 +368,13 @@ async def activate_user(
         )
 
     user = await crud.user.activate(db, user_id=user_id)
-    return user
+
+    # Получаем активированного пользователя с профилем
+    updated_user = await crud.user.get_with_profile(db, id=user.id)
+    return updated_user or user
 
 
-@router.post("/{user_id}/deactivate", response_model=schemas.User)
+@router.post("/{user_id}/deactivate", response_model=UserComplete)
 async def deactivate_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
@@ -342,10 +401,13 @@ async def deactivate_user(
         )
 
     user = await crud.user.deactivate(db, user_id=user_id)
-    return user
+
+    # Получаем деактивированного пользователя с профилем
+    updated_user = await crud.user.get_with_profile(db, id=user.id)
+    return updated_user or user
 
 
-@router.get("/username/{username}", response_model=schemas.User)
+@router.get("/username/{username}", response_model=UserComplete)
 async def get_user_by_username(
     username: str,
     db: AsyncSession = Depends(get_db),
@@ -354,7 +416,7 @@ async def get_user_by_username(
     """
     Получить пользователя по username.
     """
-    user = await crud.user.get_by_username(db, username=username)
+    user = await crud.user.get_by_username_with_profile(db, username=username)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
@@ -362,7 +424,7 @@ async def get_user_by_username(
     return user
 
 
-@router.get("/email/{email}", response_model=schemas.User)
+@router.get("/email/{email}", response_model=UserComplete)
 async def get_user_by_email(
     email: str,
     db: AsyncSession = Depends(get_db),
@@ -371,7 +433,7 @@ async def get_user_by_email(
     """
     Получить пользователя по email.
     """
-    user = await crud.user.get_by_email(db, email=email)
+    user = await crud.user.get_by_email_with_profile(db, email=email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
@@ -379,7 +441,7 @@ async def get_user_by_email(
     return user
 
 
-@router.get("/{user_id}/profile", response_model=schemas.UserProfile)
+@router.get("/{user_id}/profile", response_model=UserProfileResponse)
 async def get_user_profile(
     user_id: int,
     db: AsyncSession = Depends(get_db),
@@ -388,16 +450,22 @@ async def get_user_profile(
     """
     Получить профиль пользователя.
     """
-    user = await crud.user.get(db, id=user_id)
+    user = await crud.user.get_with_profile(db, id=user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Пользователь не найден"
         )
 
-    return user
+    if not user.profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Профиль пользователя не найден",
+        )
+
+    return user.profile
 
 
-@router.get("/{user_id}/stats", response_model=schemas.UserStats)
+@router.get("/{user_id}/stats", response_model=UserStats)
 async def get_user_stats(
     user_id: int,
     db: AsyncSession = Depends(get_db),
@@ -417,7 +485,7 @@ async def get_user_stats(
     return stats
 
 
-@router.get("/{user_id}/activity", response_model=List[schemas.UserActivity])
+@router.get("/{user_id}/activity", response_model=List[UserActivity])
 async def get_user_activity(
     user_id: int,
     limit: int = Query(20, ge=1, le=100),
@@ -438,7 +506,7 @@ async def get_user_activity(
     return activity
 
 
-@router.post("/validate", response_model=schemas.UserValidation)
+@router.post("/validate", response_model=UserValidation)
 async def validate_user_data(
     user_data: Dict[str, Any],
     db: AsyncSession = Depends(get_db),
@@ -450,7 +518,7 @@ async def validate_user_data(
     return result
 
 
-@router.get("/check-username/{username}", response_model=schemas.UserAvailability)
+@router.get("/check-username/{username}", response_model=UserAvailability)
 async def check_username_availability(
     username: str,
     db: AsyncSession = Depends(get_db),
@@ -462,7 +530,7 @@ async def check_username_availability(
     return {"available": user is None}
 
 
-@router.get("/check-email/{email}", response_model=schemas.UserAvailability)
+@router.get("/check-email/{email}", response_model=UserAvailability)
 async def check_email_availability(
     email: str,
     db: AsyncSession = Depends(get_db),
@@ -474,7 +542,7 @@ async def check_email_availability(
     return {"available": user is None}
 
 
-@router.get("/{user_id}/audit", response_model=List[schemas.UserAudit])
+@router.get("/{user_id}/audit", response_model=List[UserAudit])
 async def get_user_audit_log(
     user_id: int,
     limit: int = Query(50, ge=1, le=200),
@@ -498,6 +566,7 @@ async def get_user_audit_log(
 @router.get("/me/avatar")
 async def get_current_user_avatar(
     current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Получить URL аватара текущего пользователя.
@@ -505,9 +574,21 @@ async def get_current_user_avatar(
     Returns:
         dict: Информация об аватаре пользователя
     """
+    # Получаем пользователя с профилем
+    user_with_profile = await crud.user.get_with_profile(db, id=current_user.id)
+
+    # Приоритет: аватар из профиля, затем из основной модели пользователя (устаревшее)
+    avatar_url = None
+    if user_with_profile and user_with_profile.profile:
+        avatar_url = user_with_profile.profile.avatar_url
+
+    # Fallback на устаревшее поле в User модели
+    if not avatar_url:
+        avatar_url = getattr(current_user, "avatar_url", None)
+
     return {
-        "avatar_url": current_user.avatar_url,
-        "has_avatar": current_user.avatar_url is not None,
+        "avatar_url": avatar_url,
+        "has_avatar": avatar_url is not None,
     }
 
 
@@ -568,10 +649,29 @@ async def upload_avatar(
             file=file, user_id=current_user.id, db=db
         )
 
-        # Обновляем пользователя в БД
-        updated_user = await crud.user.update_avatar(
-            db, user_id=current_user.id, avatar_url=avatar_url
-        )
+        # Обновляем аватар в профиле пользователя
+        from app.crud import user_profile as crud_user_profile
+
+        # Получаем или создаем профиль пользователя
+        user_with_profile = await crud.user.get_with_profile(db, id=current_user.id)
+        if not user_with_profile or not user_with_profile.profile:
+            # Создаем профиль, если его нет
+            from app.schemas.user_profile import UserProfileCreate
+
+            profile_data = UserProfileCreate(
+                display_name=current_user.username, avatar_url=avatar_url
+            )
+            await crud_user_profile.create_for_user(
+                db, user_id=current_user.id, obj_in=profile_data
+            )
+        else:
+            # Обновляем существующий профиль
+            from app.schemas.user_profile import UserProfileUpdate
+
+            profile_update = UserProfileUpdate(avatar_url=avatar_url)
+            await crud_user_profile.update(
+                db, db_obj=user_with_profile.profile, obj_in=profile_update
+            )
 
         return {
             "message": "Avatar uploaded successfully",
@@ -605,8 +705,26 @@ async def delete_avatar(
         dict: Результат удаления аватара
     """
     try:
-        # Удаляем аватар через CRUD
-        await crud.user.remove_avatar(db, user_id=current_user.id)
+        # Удаляем аватар из профиля пользователя
+        from app.crud import user_profile as crud_user_profile
+
+        user_with_profile = await crud.user.get_with_profile(db, id=current_user.id)
+        if user_with_profile and user_with_profile.profile:
+            # Обновляем профиль, убирая аватар
+            from app.schemas.user_profile import UserProfileUpdate
+
+            profile_update = UserProfileUpdate(avatar_url=None)
+            await crud_user_profile.update(
+                db, db_obj=user_with_profile.profile, obj_in=profile_update
+            )
+
+        # Также удаляем из основной модели пользователя (для совместимости)
+        try:
+            await crud.user.remove_avatar(db, user_id=current_user.id)
+        except AttributeError:
+            # Метод может не существовать в новой версии CRUD
+            pass
+
         return {"message": "Avatar deleted successfully", "user_id": current_user.id}
 
     except Exception as e:
@@ -616,7 +734,7 @@ async def delete_avatar(
         )
 
 
-@router.get("/search", response_model=List[schemas.User])
+@router.get("/search", response_model=List[UserComplete])
 async def search_users(
     q: str = Query(..., min_length=1),
     limit: int = Query(20, ge=1, le=100),
@@ -626,5 +744,5 @@ async def search_users(
     """
     Поиск пользователей.
     """
-    users = await crud.user.search_users(db, query=q, limit=limit)
+    users = await crud.user.search_users(db, search_term=q, limit=limit)
     return users

@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from sqlalchemy import func, select, or_, and_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.crud.base import CRUDBase
 from app.models.user import User
@@ -32,6 +33,34 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_email_with_profile(
+        self, db: AsyncSession, *, email: str
+    ) -> Optional[User]:
+        """
+        Получить пользователя по email с предварительной загрузкой профиля и ролей.
+
+        Args:
+            db: Сессия базы данных
+            email: Email пользователя
+
+        Returns:
+            Пользователь с загруженным профилем и ролями или None если не найден
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(User)
+            .where(User.email == email)
+            .options(
+                selectinload(User.profile),
+                selectinload(User.role_assignments).selectinload(
+                    UserRoleAssignment.role
+                ),
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def get_by_username(
         self, db: AsyncSession, *, username: str
     ) -> Optional[User]:
@@ -48,6 +77,84 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         stmt = select(User).where(User.username == username)
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def get_by_username_with_profile(
+        self, db: AsyncSession, *, username: str
+    ) -> Optional[User]:
+        """
+        Получить пользователя по имени пользователя с предварительной загрузкой профиля и ролей.
+
+        Args:
+            db: Сессия базы данных
+            username: Имя пользователя
+
+        Returns:
+            Пользователь с загруженным профилем и ролями или None если не найден
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(User)
+            .where(User.username == username)
+            .options(
+                selectinload(User.profile),
+                selectinload(User.role_assignments).selectinload(
+                    UserRoleAssignment.role
+                ),
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_with_profile(self, db: AsyncSession, id: Any) -> Optional[User]:
+        """
+        Получить пользователя по ID с предварительной загрузкой профиля и ролей.
+
+        Args:
+            db: Сессия базы данных
+            id: ID пользователя
+
+        Returns:
+            Пользователь с загруженным профилем и ролями или None если не найден
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(User)
+            .where(User.id == id)
+            .options(
+                selectinload(User.profile),
+                selectinload(User.role_assignments).selectinload(
+                    UserRoleAssignment.role
+                ),
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_user_role_assignments(self, db: AsyncSession, *, user_id: int):
+        """
+        Получить активные назначения ролей пользователя.
+
+        Args:
+            db: Сессия базы данных
+            user_id: ID пользователя
+
+        Returns:
+            Список активных назначений ролей
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(UserRoleAssignment)
+            .where(
+                UserRoleAssignment.user_id == user_id,
+                UserRoleAssignment.is_active == True,
+            )
+            .options(selectinload(UserRoleAssignment.role))
+        )
+        result = await db.execute(stmt)
+        return result.scalars().all()
 
     async def get_by_auth0_id(
         self, db: AsyncSession, *, auth0_id: str
@@ -80,8 +187,11 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         # Хэшируем пароль
         hashed_password = get_password_hash(obj_in.password)
 
-        # Создаем пользователя, исключая password из схемы
-        user_data = obj_in.model_dump(exclude={"password"})
+        # Создаем пользователя, исключая поля которые есть только в схеме
+        user_data = obj_in.model_dump(exclude={
+            "password", "confirm_password", "invite_token", 
+            "first_name", "last_name", "timezone", "language"
+        })
         db_obj = User(
             **user_data,
             hashed_password=hashed_password,

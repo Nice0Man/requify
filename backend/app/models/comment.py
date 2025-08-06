@@ -1,38 +1,59 @@
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, Text
+from sqlalchemy import Integer, String, Text, Index, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
-    from .requirement import Requirement
     from .user import User
+    from .requirement import Requirement
 
 
-class Comment(Base):
+class Comment(Base, TimestampedMixin):
     """
-    Модель комментария к требованию.
+    Модель комментария.
+    
+    Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 
     __tablename__ = "comments"
+    __table_args__ = (
+        Index("ix_comments_requirement_id", "requirement_id"),
+        Index("ix_comments_author_id", "author_id"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    content: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # Основные поля
+    content: Mapped[str] = mapped_column(
+        Text, nullable=False, comment="Содержание комментария"
+    )
+
+    # Связи
     requirement_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("requirements.id"), nullable=False
+        ForeignKey("requirements.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="ID требования",
     )
     author_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=lambda: datetime.now(UTC).replace(tzinfo=None), nullable=False
+        ForeignKey("users.id", ondelete="RESTRICT"),
+        nullable=False,
+        comment="Автор комментария",
     )
 
+    # =============================================================================
     # Отношения
+    # =============================================================================
+
     requirement: Mapped["Requirement"] = relationship(
-        "Requirement", back_populates="comments"
+        "Requirement", back_populates="comments", lazy="select"
     )
 
-    author: Mapped["User"] = relationship("User", back_populates="comments")
+    author: Mapped["User"] = relationship(
+        "User", back_populates="comments", lazy="select"
+    )
+
+    def __repr__(self) -> str:
+        return f"<Comment(id={self.id}, requirement_id={self.requirement_id}, author_id={self.author_id})>"

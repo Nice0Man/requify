@@ -52,7 +52,13 @@ class RefreshToken(Base):
         nullable=False,
         comment="ID пользователя",
     )
-
+    # Связь с компанией
+    company_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=True,
+        comment="ID компании",
+    )
     # Временные метки
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -96,7 +102,7 @@ class RefreshToken(Base):
 
     # Отношения
     user: Mapped["User"] = relationship(
-        "User", back_populates="refresh_tokens", lazy="select"
+        "User", lazy="select"
     )
 
     def __repr__(self) -> str:

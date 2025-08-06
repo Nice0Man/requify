@@ -18,7 +18,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
 
-from app.models.base import Base
+from .base import Base
 
 
 class UserDashboardPreferences(Base):

@@ -1,11 +1,22 @@
 """
 Схемы для настроек пользователя.
 Соответствуют структуре в frontend/src/entities/settings/api/settingsDAO.ts
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Literal
-from pydantic import BaseModel, Field, EmailStr, field_validator
+from pydantic import Field, EmailStr, field_validator
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
 # =============================================================================
@@ -13,7 +24,7 @@ from pydantic import BaseModel, Field, EmailStr, field_validator
 # =============================================================================
 
 
-class UserProfileSettings(BaseModel):
+class UserProfileSettings(BaseSchema):
     """Настройки профиля пользователя"""
 
     firstName: Optional[str] = Field(None, max_length=50, description="Имя")
@@ -33,22 +44,8 @@ class UserProfileSettings(BaseModel):
             v = "+" + v.strip()
         return v
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "firstName": "Иван",
-                "lastName": "Петров",
-                "email": "ivan.petrov@example.com",
-                "phone": "+7 900 123-45-67",
-                "position": "Менеджер проектов",
-                "bio": "Опытный специалист в области управления проектами",
-                "avatar_url": "http://cdn.requify.local/avatars/user123.jpg",
-                "timezone": "Europe/Moscow",
-            }
-        }
 
-
-class NotificationSettings(BaseModel):
+class NotificationSettings(BaseSchema):
     """Настройки уведомлений"""
 
     email_notifications: bool = Field(True, description="Email уведомления")
@@ -61,23 +58,8 @@ class NotificationSettings(BaseModel):
     weekly_digest: bool = Field(True, description="Еженедельная сводка")
     mention_notifications: bool = Field(True, description="Уведомления об упоминаниях")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email_notifications": True,
-                "push_notifications": True,
-                "project_updates": True,
-                "requirement_changes": True,
-                "release_notifications": True,
-                "team_invitations": True,
-                "system_notifications": False,
-                "weekly_digest": True,
-                "mention_notifications": True,
-            }
-        }
 
-
-class InterfaceSettings(BaseModel):
+class InterfaceSettings(BaseSchema):
     """Настройки интерфейса"""
 
     theme: Literal["light", "dark", "auto"] = Field(
@@ -94,23 +76,8 @@ class InterfaceSettings(BaseModel):
     show_hints: bool = Field(True, description="Показывать подсказки")
     animations_enabled: bool = Field(True, description="Включить анимации")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "theme": "light",
-                "language": "ru",
-                "timezone": "Europe/Moscow",
-                "date_format": "DD.MM.YYYY",
-                "time_format": "24h",
-                "compact_mode": False,
-                "sidebar_collapsed": False,
-                "show_hints": True,
-                "animations_enabled": True,
-            }
-        }
 
-
-class SecuritySettings(BaseModel):
+class SecuritySettings(BaseSchema):
     """Настройки безопасности"""
 
     two_factor_auth: bool = Field(False, description="Двухфакторная аутентификация")
@@ -123,19 +90,8 @@ class SecuritySettings(BaseModel):
     )
     auto_logout: bool = Field(False, description="Автоматический выход")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "two_factor_auth": False,
-                "login_notifications": True,
-                "session_timeout": 30,
-                "allow_multiple_sessions": True,
-                "auto_logout": False,
-            }
-        }
 
-
-class PrivacySettings(BaseModel):
+class PrivacySettings(BaseSchema):
     """Настройки приватности"""
 
     profile_visibility: Literal["public", "team", "private"] = Field(
@@ -145,23 +101,13 @@ class PrivacySettings(BaseModel):
     show_phone: bool = Field(False, description="Показывать телефон")
     activity_visibility: bool = Field(True, description="Показывать активность")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "profile_visibility": "team",
-                "show_email": False,
-                "show_phone": False,
-                "activity_visibility": True,
-            }
-        }
-
 
 # =============================================================================
 # Комплексные схемы
 # =============================================================================
 
 
-class UserSettings(BaseModel):
+class UserSettings(BaseSchema):
     """Полные настройки пользователя (соответствует frontend)
 
     ВАЖНО: Профильные данные (profile) всегда берутся из User модели,
@@ -179,21 +125,8 @@ class UserSettings(BaseModel):
     security: SecuritySettings = Field(..., description="Настройки безопасности")
     privacy: PrivacySettings = Field(..., description="Настройки приватности")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "profile": UserProfileSettings.Config.json_schema_extra["example"],
-                "notifications": NotificationSettings.Config.json_schema_extra[
-                    "example"
-                ],
-                "interface": InterfaceSettings.Config.json_schema_extra["example"],
-                "security": SecuritySettings.Config.json_schema_extra["example"],
-                "privacy": PrivacySettings.Config.json_schema_extra["example"],
-            }
-        }
 
-
-class UserSettingsUpdate(BaseModel):
+class UserSettingsUpdate(UpdateSchema):
     """Схема для обновления настроек (частичное обновление)
 
     ВАЖНО:
@@ -224,24 +157,15 @@ class UserSettingsUpdate(BaseModel):
 # =============================================================================
 
 
-class SettingsResponse(BaseModel):
+class SettingsResponse(BaseSchema):
     """Ответ на операции с настройками"""
 
     success: bool = Field(..., description="Успешность операции")
     message: str = Field(..., description="Сообщение")
     data: Optional[Dict[str, Any]] = Field(None, description="Дополнительные данные")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "success": True,
-                "message": "Настройки успешно обновлены",
-                "data": None,
-            }
-        }
 
-
-class UserSettingsRead(BaseModel):
+class UserSettingsRead(BaseSchema):
     """Схема для чтения настроек пользователя"""
 
     user_id: int = Field(..., description="ID пользователя")
@@ -249,16 +173,13 @@ class UserSettingsRead(BaseModel):
     updated_at: Optional[datetime] = Field(None, description="Дата обновления")
     created_at: Optional[datetime] = Field(None, description="Дата создания")
 
-    class Config:
-        from_attributes = True
-
 
 # =============================================================================
 # Схемы для сессий
 # =============================================================================
 
 
-class UserSession(BaseModel):
+class UserSession(BaseSchema):
     """Схема пользовательской сессии"""
 
     session_id: str = Field(..., description="ID сессии")
@@ -269,36 +190,15 @@ class UserSession(BaseModel):
     last_active: datetime = Field(..., description="Последняя активность")
     is_current: bool = Field(False, description="Текущая сессия")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "session_id": "sess_123456789",
-                "device_info": "Chrome 120.0.0 on Windows 11",
-                "ip_address": "192.168.1.100",
-                "location": "Москва, Россия",
-                "created_at": "2025-01-29T10:00:00Z",
-                "last_active": "2025-01-29T14:30:00Z",
-                "is_current": True,
-            }
-        }
 
-
-class UserSessionsResponse(BaseModel):
+class UserSessionsResponse(BaseSchema):
     """Ответ со списком сессий"""
 
     sessions: List[UserSession] = Field(..., description="Список сессий")
     total_count: int = Field(..., description="Общее количество")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "sessions": [UserSession.Config.json_schema_extra["example"]],
-                "total_count": 1,
-            }
-        }
 
-
-class RevokeSessionsRequest(BaseModel):
+class RevokeSessionsRequest(BaseSchema):
     """Запрос на отзыв сессий"""
 
     session_ids: Optional[List[str]] = Field(
@@ -306,18 +206,13 @@ class RevokeSessionsRequest(BaseModel):
         description="ID сессий для отзыва (если None - отзывать все кроме текущей)",
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {"session_ids": ["sess_123456789", "sess_987654321"]}
-        }
-
 
 # =============================================================================
 # Схемы для смены пароля
 # =============================================================================
 
 
-class ChangePasswordRequest(BaseModel):
+class ChangePasswordRequest(BaseSchema):
     """Запрос на смену пароля"""
 
     current_password: str = Field(..., min_length=8, description="Текущий пароль")
@@ -357,50 +252,24 @@ class ChangePasswordRequest(BaseModel):
             raise ValueError("Пароли не совпадают")
         return values
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "current_password": "OldPassword123!",
-                "new_password": "NewPassword123!",
-                "confirm_password": "NewPassword123!",
-            }
-        }
-
 
 # =============================================================================
 # Схемы для импорта/экспорта настроек
 # =============================================================================
 
 
-class ExportSettingsResponse(BaseModel):
+class ExportSettingsResponse(BaseSchema):
     """Ответ на экспорт настроек"""
 
     export_url: str = Field(..., description="URL для скачивания файла")
     filename: str = Field(..., description="Имя файла")
     expires_at: datetime = Field(..., description="Время истечения ссылки")
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "export_url": "http://cdn.requify.local/exports/settings_user123_20250129.json",
-                "filename": "settings_user123_20250129.json",
-                "expires_at": "2025-01-30T14:30:00Z",
-            }
-        }
 
-
-class ImportSettingsRequest(BaseModel):
+class ImportSettingsRequest(BaseSchema):
     """Запрос на импорт настроек"""
 
     settings_data: UserSettings = Field(..., description="Данные настроек для импорта")
     overwrite_existing: bool = Field(
         False, description="Перезаписать существующие настройки"
     )
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "settings_data": UserSettings.Config.json_schema_extra["example"],
-                "overwrite_existing": False,
-            }
-        }

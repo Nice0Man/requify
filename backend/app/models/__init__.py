@@ -3,175 +3,94 @@ SQLAlchemy модели.
 Полностью обновлено для 4NF архитектуры с многопользовательской поддержкой.
 """
 
-# Импортируем все модели для Alembic автогенерации миграций
+import os
+import importlib
+from typing import List
 
-# =============================================================================
-# Core models (базовые модели)
-# =============================================================================
-from .user import User
-from .user_profile import UserProfile
-from .user_settings import UserSettings, UserSettingsHistory
 
-# =============================================================================
-# Company models (4NF декомпозиция)
-# =============================================================================
-from .company import Company, CompanyStatus, CompanyType
-from .company_contact import CompanyContact
-from .company_subscription import (
-    CompanySubscription,
-    SubscriptionStatus,
-    SubscriptionPlan,
-    BillingPeriod,
-)
-from .company_settings import CompanySettings
-from .company_branding import CompanyBranding
+# Автоматический импорт всех моделей из папки models
+def _import_all_models():
+    """
+    Автоматически импортирует все модели из текущей директории.
+    Исключает служебные файлы и __init__.py
+    """
+    current_dir = os.path.dirname(__file__)
+    model_files = []
 
-# =============================================================================
-# Organization models (организационная структура)
-# =============================================================================
-from .department import Department, DepartmentType
+    # Получаем все Python файлы в директории
+    for filename in os.listdir(current_dir):
+        if (
+            filename.endswith(".py")
+            and not filename.startswith("__")
+            and filename != "__init__.py"
+        ):
+            module_name = filename[:-3]  # убираем .py
+            model_files.append(module_name)
 
-# =============================================================================
-# Enhanced Role System (расширенная система ролей)
-# =============================================================================
-from .enhanced_role_system import (
-    EnhancedRole,
-    UserRoleAssignment,
-    RoleScope,
-    SystemRole,
-    CompanyRole,
-    DepartmentRole,
-    TeamRole,
-    ProjectRole,
-    Permission,
-)
+    # Импортируем модули и собираем все экспортируемые объекты
+    all_exports = []
+    globals_dict = globals()
 
-# =============================================================================
-# Authentication
-# =============================================================================
-from .refresh_token import RefreshToken
+    # Определяем порядок импорта по уровням зависимостей
+    # Уровень 1: Базовые модели без FK или справочники
+    level1 = ['base', 'mixins', 'constants']
+    
+    # Уровень 2: User должен быть первым!
+    level2 = ['user']
+    
+    # Уровень 2.5: Справочники
+    level2_5 = ['requirement_types', 'requirement_priorities', 'requirement_statuses', 'relationship_types']
+    
+    # Уровень 3: Модели с FK на базовые сущности
+    level3 = ['company', 'refresh_token', 'user_settings', 'user_profile']
+    
+    # Уровень 4: Организационные структуры
+    level4 = ['department', 'team', 'team_member', 'company_contact', 'company_subscription', 'company_settings', 'company_branding']
+    
+    # Уровень 5: Проекты и связанные сущности
+    level5 = ['project', 'spec', 'requirement_group', 'requirement_group_version']
+    
+    # Уровень 6: Требования и релизы (зависят от проектов)
+    level6 = ['requirement', 'release', 'relationship']
+    
+    # Уровень 7: Комментарии, тестирование, дашборд
+    level7 = ['comment', 'test_result', 'dashboard']
+    
+    # Уровень 8: Продвинутые системы
+    level8 = ['enhanced_role_system']
+    
+    # Собираем все уровни в правильном порядке
+    ordered_modules = level1 + level2 + level2_5 + level3 + level4 + level5 + level6 + level7 + level8
+    
+    # Добавляем оставшиеся модули, которые не указаны явно
+    remaining_modules = [m for m in model_files if m not in ordered_modules]
+    ordered_modules.extend(sorted(remaining_modules))
 
-# =============================================================================
-# Business models
-# =============================================================================
-from .project import Project
-from .requirement import Requirement
-from .requirement_group import RequirementGroup
-from .requirement_group_version import RequirementGroupVersion
-from .spec import Spec
-from .release import Release
-from .relationship import Relationship
-from .comment import Comment
-from .test_result import TestResult
+    for module_name in ordered_modules:
+        if module_name not in model_files:
+            continue  # Пропускаем несуществующие модули
+            
+        try:
+            module = importlib.import_module(f".{module_name}", package=__name__)
 
-# =============================================================================
-# Team models
-# =============================================================================
-from .team import Team
-from .team_member import TeamMember
+            # Получаем все публичные атрибуты модуля
+            for attr_name in dir(module):
+                if not attr_name.startswith("_"):
+                    attr = getattr(module, attr_name)
+                    # Проверяем, что это класс или важная константа
+                    if hasattr(attr, "__module__") and attr.__module__.startswith(
+                        "app.models"
+                    ):
+                        globals_dict[attr_name] = attr
+                        all_exports.append(attr_name)
+        except ImportError as e:
+            print(f"Warning: Could not import model from {module_name}: {e}")
 
-# =============================================================================
-# Dashboard models
-# =============================================================================
-from .dashboard import (
-    UserDashboardPreferences,
-    DashboardNotification,
-    DashboardActivity,
-    DashboardWidget,
-)
+    return all_exports
 
-# =============================================================================
-# Testing models
-# =============================================================================
-# from .test_plan import TestPlan
-# from .test_case import TestCase
-# from .test_execution import TestExecution
 
-# =============================================================================
-# Reference data (Enums)
-# =============================================================================
-from .requirement_statuses import RequirementStatus
-from .requirement_priorities import RequirementPriority
-from .requirement_types import RequirementType
-from .relationship_types import RelationshipType
+# Выполняем автоматический импорт
+__all__ = _import_all_models()
 
-__all__ = [
-    # =============================================================================
-    # Core models
-    # =============================================================================
-    "User",
-    "UserProfile",
-    "UserSettings",
-    "UserSettingsHistory",
-    # =============================================================================
-    # Company models (4NF)
-    # =============================================================================
-    "Company",
-    "CompanyStatus",
-    "CompanyType",
-    "CompanyContact",
-    "CompanySubscription",
-    "SubscriptionStatus",
-    "SubscriptionPlan",
-    "BillingPeriod",
-    "CompanySettings",
-    "CompanyBranding",
-    # =============================================================================
-    # Organization models
-    # =============================================================================
-    "Department",
-    "DepartmentType",
-    # =============================================================================
-    # Enhanced Role System
-    # =============================================================================
-    "EnhancedRole",
-    "UserRoleAssignment",
-    "RoleScope",
-    "SystemRole",
-    "CompanyRole",
-    "DepartmentRole",
-    "TeamRole",
-    "ProjectRole",
-    "Permission",
-    # =============================================================================
-    # Authentication
-    # =============================================================================
-    "RefreshToken",
-    # =============================================================================
-    # Business models
-    # =============================================================================
-    "Project",
-    "Requirement",
-    "RequirementGroup",
-    "RequirementGroupVersion",
-    "Spec",
-    "Release",
-    "Relationship",
-    "Comment",
-    "TestResult",
-    # =============================================================================
-    # Team models
-    # =============================================================================
-    "Team",
-    "TeamMember",
-    # =============================================================================
-    # Dashboard models
-    # =============================================================================
-    "UserDashboardPreferences",
-    "DashboardNotification",
-    "DashboardActivity",
-    "DashboardWidget",
-    # =============================================================================
-    # Testing models
-    # =============================================================================
-    # "TestPlan",
-    # "TestCase",
-    # "TestExecution",
-    # =============================================================================
-    # Reference data (Enums)
-    # =============================================================================
-    "RequirementStatus",
-    "RequirementPriority",
-    "RequirementType",
-    "RelationshipType",
-]
+# Удаляем дубликаты и сортируем
+__all__ = sorted(list(set(__all__)))

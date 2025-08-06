@@ -44,7 +44,6 @@ __all__ = [
     "dashboard_router",
     "teams_router",
     "settings_router",
-    # Новые роутеры
     "departments_router",
     "company_contact_router",
     "company_subscription_router",

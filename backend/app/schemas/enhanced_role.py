@@ -1,135 +1,89 @@
 """
 Схемы для Enhanced Role System.
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, field_validator
+from sqlmodel import Field
+from pydantic import field_validator
 from datetime import datetime
-from enum import Enum
 
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ListResponseSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
-class RoleScope(str, Enum):
-    """Области действия ролей"""
-
-    SYSTEM = "system"
-    COMPANY = "company"
-    DEPARTMENT = "department"
-    TEAM = "team"
-    PROJECT = "project"
-    RESOURCE = "resource"
-
-
-class SystemRole(str, Enum):
-    """Системные роли"""
-
-    SYSTEM_ADMIN = "system_admin"
-    PLATFORM_ADMIN = "platform_admin"
-    SUPPORT_ADMIN = "support_admin"
-    SUPPORT_AGENT = "support_agent"
-    BILLING_ADMIN = "billing_admin"
-    SECURITY_AUDITOR = "security_auditor"
-    COMPLIANCE_OFFICER = "compliance_officer"
-    DEVELOPER = "developer"
-    DATA_ANALYST = "data_analyst"
-
-
-class CompanyRole(str, Enum):
-    """Роли на уровне компании"""
-
-    COMPANY_ADMIN = "company_admin"
-    COMPANY_OWNER = "company_owner"
-    BILLING_MANAGER = "billing_manager"
-    HR_MANAGER = "hr_manager"
-    COMPLIANCE_MANAGER = "compliance_manager"
-    SECURITY_MANAGER = "security_manager"
-    COMPANY_VIEWER = "company_viewer"
-
-
-class DepartmentRole(str, Enum):
-    """Роли на уровне департамента"""
-
-    DEPARTMENT_HEAD = "department_head"
-    DEPARTMENT_ADMIN = "department_admin"
-    DEPUTY_HEAD = "deputy_head"
-    SENIOR_MANAGER = "senior_manager"
-    MANAGER = "manager"
-    COORDINATOR = "coordinator"
-    DEPARTMENT_VIEWER = "department_viewer"
-
-
-class TeamRole(str, Enum):
-    """Роли на уровне команды"""
-
-    TEAM_LEAD = "team_lead"
-    TECH_LEAD = "tech_lead"
-    SENIOR_MEMBER = "senior_member"
-    MEMBER = "member"
-    MENTOR = "mentor"
-    SCRUM_MASTER = "scrum_master"
-    PRODUCT_OWNER = "product_owner"
-    TEAM_VIEWER = "team_viewer"
-
-
-class ProjectRole(str, Enum):
-    """Роли на уровне проекта"""
-
-    PROJECT_MANAGER = "project_manager"
-    PROJECT_OWNER = "project_owner"
-    ARCHITECT = "architect"
-    SENIOR_DEVELOPER = "senior_developer"
-    DEVELOPER = "developer"
-    FRONTEND_DEVELOPER = "frontend_developer"
-    BACKEND_DEVELOPER = "backend_developer"
-    MOBILE_DEVELOPER = "mobile_developer"
-    DEVOPS_ENGINEER = "devops_engineer"
-    QA_ENGINEER = "qa_engineer"
-    TEST_AUTOMATION_ENGINEER = "test_automation_engineer"
-    BUSINESS_ANALYST = "business_analyst"
-    PRODUCT_ANALYST = "product_analyst"
-    DATA_ANALYST = "data_analyst"
-    UX_DESIGNER = "ux_designer"
-    UI_DESIGNER = "ui_designer"
-    TECHNICAL_WRITER = "technical_writer"
-    PROJECT_VIEWER = "project_viewer"
-    STAKEHOLDER = "stakeholder"
-    CLIENT = "client"
+# Импортируем роли из централизованного файла констант
+from app.core.constants import (
+    RoleScope,
+    SystemRole,
+    CompanyRole,
+    DepartmentRole,
+    TeamRole,
+    ProjectRole,
+    Permission,
+)
 
 
 # Enhanced Role Schemas
-class EnhancedRoleBase(BaseModel):
+class EnhancedRoleBase(BaseSchema, ValidationMixin):
     """Базовая схема для расширенной роли"""
 
-    name: str
-    display_name: str
-    description: Optional[str] = None
-    scope: RoleScope
-    role_level: int = 0
+    name: str = Field(
+        ..., max_length=FieldLimits.SHORT_STRING_MAX, description="Название роли"
+    )
+    display_name: str = Field(
+        ...,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Отображаемое название",
+    )
+    description: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.TEXT_MAX,
+        description=StandardDescriptions.DESCRIPTION,
+    )
+    scope: RoleScope = Field(..., description="Область действия роли")
+    role_level: int = Field(0, ge=0, description="Уровень роли")
 
     # Конкретные типы ролей
-    system_role: Optional[SystemRole] = None
-    company_role: Optional[CompanyRole] = None
-    department_role: Optional[DepartmentRole] = None
-    team_role: Optional[TeamRole] = None
-    project_role: Optional[ProjectRole] = None
+    system_role: Optional[SystemRole] = Field(None, description="Системная роль")
+    company_role: Optional[CompanyRole] = Field(None, description="Роль компании")
+    department_role: Optional[DepartmentRole] = Field(
+        None, description="Роль департамента"
+    )
+    team_role: Optional[TeamRole] = Field(None, description="Роль команды")
+    project_role: Optional[ProjectRole] = Field(None, description="Проектная роль")
 
     # Статус и настройки
-    is_system: bool = False
-    is_active: bool = True
-    is_default: bool = False
-    is_assignable: bool = True
-    requires_approval: bool = False
+    is_system: bool = Field(False, description="Системная роль")
+    is_active: bool = Field(True, description=StandardDescriptions.IS_ACTIVE)
+    is_default: bool = Field(False, description="Роль по умолчанию")
+    is_assignable: bool = Field(True, description="Можно назначать")
+    requires_approval: bool = Field(False, description="Требует одобрения")
 
     # Приоритет и иерархия
-    priority: int = 0
-    max_assignees: Optional[int] = None
+    priority: int = Field(0, description=StandardDescriptions.PRIORITY)
+    max_assignees: Optional[int] = Field(
+        None, ge=0, description="Макс. количество назначений"
+    )
 
     # Расширенные настройки
-    permissions_config: Optional[Dict[str, Any]] = None
-    restrictions: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    permissions_config: Optional[Dict[str, Any]] = Field(
+        None, description="Конфигурация разрешений"
+    )
+    restrictions: Optional[Dict[str, Any]] = Field(None, description="Ограничения")
+    role_metadata: Optional[Dict[str, Any]] = Field(
+        None, description="Метаданные роли", alias="metadata"
+    )
 
 
-class EnhancedRoleCreate(EnhancedRoleBase):
+class EnhancedRoleCreate(CreateSchema, EnhancedRoleBase):
     """Схема для создания роли"""
 
     @field_validator("name")
@@ -145,14 +99,14 @@ class EnhancedRoleCreate(EnhancedRoleBase):
         return v.strip()
 
 
-class EnhancedRoleUpdate(BaseModel):
+class EnhancedRoleUpdate(UpdateSchema):
     """Схема для обновления роли"""
 
-    name: Optional[str] = None
-    display_name: Optional[str] = None
-    description: Optional[str] = None
+    name: Optional[str] = Field(None, max_length=FieldLimits.SHORT_STRING_MAX)
+    display_name: Optional[str] = Field(None, max_length=FieldLimits.SHORT_STRING_MAX)
+    description: Optional[str] = Field(None, max_length=FieldLimits.TEXT_MAX)
     scope: Optional[RoleScope] = None
-    role_level: Optional[int] = None
+    role_level: Optional[int] = Field(None, ge=0)
 
     system_role: Optional[SystemRole] = None
     company_role: Optional[CompanyRole] = None
@@ -167,57 +121,52 @@ class EnhancedRoleUpdate(BaseModel):
     requires_approval: Optional[bool] = None
 
     priority: Optional[int] = None
-    max_assignees: Optional[int] = None
+    max_assignees: Optional[int] = Field(None, ge=0)
 
     permissions_config: Optional[Dict[str, Any]] = None
     restrictions: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    role_metadata: Optional[Dict[str, Any]] = Field(None, alias="metadata")
 
 
-class EnhancedRoleInDB(EnhancedRoleBase):
-    """Схема для данных из базы данных"""
-
-    id: int
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class EnhancedRoleResponse(EnhancedRoleInDB):
+class EnhancedRoleResponse(ResponseSchema, EnhancedRoleBase):
     """Схема для ответа API"""
 
     pass
 
 
 # User Role Assignment Schemas
-class UserRoleAssignmentBase(BaseModel):
+class UserRoleAssignmentBase(BaseSchema):
     """Базовая схема для назначения роли"""
 
-    user_id: int
-    role_id: int
+    user_id: int = Field(..., gt=0, description=StandardDescriptions.USER_ID)
+    role_id: int = Field(..., gt=0, description="ID роли")
 
     # Контекст назначения
-    company_id: Optional[int] = None
-    department_id: Optional[int] = None
-    team_id: Optional[int] = None
-    project_id: Optional[int] = None
+    company_id: Optional[int] = Field(
+        None, gt=0, description=StandardDescriptions.COMPANY_ID
+    )
+    department_id: Optional[int] = Field(None, gt=0, description="ID департамента")
+    team_id: Optional[int] = Field(None, gt=0, description="ID команды")
+    project_id: Optional[int] = Field(
+        None, gt=0, description=StandardDescriptions.PROJECT_ID
+    )
 
     # Метаданные
-    is_active: bool = True
-    is_primary: bool = False
+    is_active: bool = Field(True, description=StandardDescriptions.IS_ACTIVE)
+    is_primary: bool = Field(False, description="Основная роль")
 
     # Временные рамки
-    starts_at: Optional[datetime] = None
-    expires_at: Optional[datetime] = None
+    starts_at: Optional[datetime] = Field(None, description="Начало действия")
+    expires_at: Optional[datetime] = Field(None, description="Окончание действия")
 
     # Дополнительная информация
-    assignment_reason: Optional[str] = None
-    conditions: Optional[Dict[str, Any]] = None
+    assignment_reason: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Причина назначения"
+    )
+    conditions: Optional[Dict[str, Any]] = Field(None, description="Условия назначения")
 
 
-class UserRoleAssignmentCreate(UserRoleAssignmentBase):
+class UserRoleAssignmentCreate(CreateSchema, UserRoleAssignmentBase):
     """Схема для создания назначения роли"""
 
     @field_validator("user_id")
@@ -233,38 +182,28 @@ class UserRoleAssignmentCreate(UserRoleAssignmentBase):
         return v
 
 
-class UserRoleAssignmentUpdate(BaseModel):
+class UserRoleAssignmentUpdate(UpdateSchema):
     """Схема для обновления назначения роли"""
 
     is_active: Optional[bool] = None
     is_primary: Optional[bool] = None
     starts_at: Optional[datetime] = None
     expires_at: Optional[datetime] = None
-    assignment_reason: Optional[str] = None
+    assignment_reason: Optional[str] = Field(None, max_length=FieldLimits.TEXT_MAX)
     conditions: Optional[Dict[str, Any]] = None
 
 
-class UserRoleAssignmentInDB(UserRoleAssignmentBase):
-    """Схема для данных из базы данных"""
-
-    id: int
-    assigned_by: Optional[int] = None
-    approved_by: Optional[int] = None
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class UserRoleAssignmentResponse(UserRoleAssignmentInDB):
+class UserRoleAssignmentResponse(ResponseSchema, UserRoleAssignmentBase):
     """Схема для ответа API"""
 
+    assigned_by: Optional[int] = Field(None, description="ID назначившего")
+    approved_by: Optional[int] = Field(None, description="ID одобрившего")
+
     # Добавляем вычисляемые поля
-    is_expired: Optional[bool] = None
-    is_valid: Optional[bool] = None
-    scope_level: Optional[RoleScope] = None
-    context_string: Optional[str] = None
+    is_expired: Optional[bool] = Field(None, description="Истекла ли роль")
+    is_valid: Optional[bool] = Field(None, description="Действительна ли роль")
+    scope_level: Optional[RoleScope] = Field(None, description="Уровень области")
+    context_string: Optional[str] = Field(None, description="Строка контекста")
 
 
 class UserRoleAssignmentWithDetails(UserRoleAssignmentResponse):
@@ -279,47 +218,43 @@ class UserRoleAssignmentWithDetails(UserRoleAssignmentResponse):
 
 
 # List and Filter Schemas
-class RoleListResponse(BaseModel):
+class RoleListResponse(ListResponseSchema[EnhancedRoleResponse]):
     """Схема для списка ролей"""
 
-    roles: List[EnhancedRoleResponse]
-    total: int
-    page: int
-    per_page: int
-    has_next: bool
-    has_prev: bool
+    pass
 
 
-class UserRoleAssignmentListResponse(BaseModel):
+class UserRoleAssignmentListResponse(ListResponseSchema[UserRoleAssignmentResponse]):
     """Схема для списка назначений ролей"""
 
-    assignments: List[UserRoleAssignmentResponse]
-    total: int
-    page: int
-    per_page: int
-    has_next: bool
-    has_prev: bool
+    pass
 
 
-class RoleFilter(BaseModel):
+class RoleFilter(BaseSchema):
     """Схема для фильтрации ролей"""
 
-    scope: Optional[RoleScope] = None
-    is_system: Optional[bool] = None
-    is_active: Optional[bool] = None
-    is_assignable: Optional[bool] = None
-    min_level: Optional[int] = None
-    max_level: Optional[int] = None
+    scope: Optional[RoleScope] = Field(None, description="Фильтр по области")
+    is_system: Optional[bool] = Field(None, description="Фильтр по системности")
+    is_active: Optional[bool] = Field(None, description="Фильтр по активности")
+    is_assignable: Optional[bool] = Field(
+        None, description="Фильтр по возможности назначения"
+    )
+    min_level: Optional[int] = Field(None, ge=0, description="Минимальный уровень")
+    max_level: Optional[int] = Field(None, ge=0, description="Максимальный уровень")
 
 
-class AssignmentFilter(BaseModel):
+class AssignmentFilter(BaseSchema):
     """Схема для фильтрации назначений ролей"""
 
-    user_id: Optional[int] = None
-    role_id: Optional[int] = None
-    company_id: Optional[int] = None
-    department_id: Optional[int] = None
-    team_id: Optional[int] = None
-    project_id: Optional[int] = None
-    is_active: Optional[bool] = None
-    scope: Optional[RoleScope] = None
+    user_id: Optional[int] = Field(None, gt=0, description=StandardDescriptions.USER_ID)
+    role_id: Optional[int] = Field(None, gt=0, description="ID роли")
+    company_id: Optional[int] = Field(
+        None, gt=0, description=StandardDescriptions.COMPANY_ID
+    )
+    department_id: Optional[int] = Field(None, gt=0, description="ID департамента")
+    team_id: Optional[int] = Field(None, gt=0, description="ID команды")
+    project_id: Optional[int] = Field(
+        None, gt=0, description=StandardDescriptions.PROJECT_ID
+    )
+    is_active: Optional[bool] = Field(None, description="Фильтр по активности")
+    scope: Optional[RoleScope] = Field(None, description="Фильтр по области")

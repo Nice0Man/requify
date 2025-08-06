@@ -1,13 +1,25 @@
 """
 Схемы для модели RequirementGroupVersion (версии групп требований).
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from datetime import datetime
 from typing import Optional, Dict, Any
-from pydantic import BaseModel, Field
+from sqlmodel import Field
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    UserRelatedSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
-class RequirementGroupVersionBase(BaseModel):
+class RequirementGroupVersionBase(BaseSchema):
     """Базовая схема версии группы требований."""
 
     version: int = Field(..., ge=1, description="Номер версии")
@@ -16,13 +28,13 @@ class RequirementGroupVersionBase(BaseModel):
     )
 
 
-class RequirementGroupVersionCreate(RequirementGroupVersionBase):
+class RequirementGroupVersionCreate(CreateSchema, RequirementGroupVersionBase):
     """Схема для создания версии группы требований."""
 
     group_id: int = Field(..., gt=0, description="ID группы требований")
 
 
-class RequirementGroupVersionUpdate(BaseModel):
+class RequirementGroupVersionUpdate(UpdateSchema):
     """Схема для обновления версии группы требований."""
 
     snapshot_data: Optional[Dict[str, Any]] = Field(
@@ -30,32 +42,19 @@ class RequirementGroupVersionUpdate(BaseModel):
     )
 
 
-class RequirementGroupVersionInDBBase(RequirementGroupVersionBase):
-    """Базовая схема версии группы требований с данными из БД."""
-
-    id: int
-    group_id: int
-    created_by: int
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class RequirementGroupVersion(RequirementGroupVersionInDBBase):
+class RequirementGroupVersion(ResponseSchema, RequirementGroupVersionBase):
     """Схема версии группы требований для ответов API."""
 
-    pass
+    group_id: int = Field(..., description="ID группы требований")
+    created_by: int = Field(..., description=StandardDescriptions.CREATED_BY)
 
 
 class RequirementGroupVersionWithDetails(RequirementGroupVersion):
     """Схема версии группы требований с подробной информацией."""
 
-    group_name: Optional[str] = None
-    created_by_name: Optional[str] = None
-
-
-class RequirementGroupVersionInDB(RequirementGroupVersionInDBBase):
-    """Схема версии группы требований в БД."""
-
-    pass
+    group_name: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Название группы"
+    )
+    created_by_name: Optional[str] = Field(
+        None, max_length=FieldLimits.MEDIUM_STRING_MAX, description="Имя создателя"
+    )

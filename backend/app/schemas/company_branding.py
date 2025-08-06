@@ -1,12 +1,25 @@
 """
 Схемы для модели CompanyBranding.
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, field_validator, HttpUrl
+from sqlmodel import Field
+from pydantic import field_validator, HttpUrl
 from datetime import datetime
 from enum import Enum
 import re
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    CompanyRelatedSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
 class ThemeName(str, Enum):
@@ -28,98 +41,186 @@ class LayoutType(str, Enum):
     FLUID = "fluid"
 
 
-class CompanyBrandingBase(BaseModel):
+class CompanyBrandingBase(BaseSchema, ValidationMixin):
     """Базовая схема для брендинга компании"""
 
     # Логотип и изображения
-    logo_url: Optional[str] = None
-    logo_dark_url: Optional[str] = None
-    logo_light_url: Optional[str] = None
-    favicon_url: Optional[str] = None
+    logo_url: Optional[str] = Field(
+        None, max_length=FieldLimits.URL_MAX, description="URL логотипа"
+    )
+    logo_dark_url: Optional[str] = Field(
+        None, max_length=FieldLimits.URL_MAX, description="URL темного логотипа"
+    )
+    logo_light_url: Optional[str] = Field(
+        None, max_length=FieldLimits.URL_MAX, description="URL светлого логотипа"
+    )
+    favicon_url: Optional[str] = Field(
+        None, max_length=FieldLimits.URL_MAX, description="URL favicon"
+    )
 
     # Дополнительные изображения
-    banner_url: Optional[str] = None
-    background_url: Optional[str] = None
-    watermark_url: Optional[str] = None
+    banner_url: Optional[str] = Field(
+        None, max_length=FieldLimits.URL_MAX, description="URL баннера"
+    )
+    background_url: Optional[str] = Field(
+        None, max_length=FieldLimits.URL_MAX, description="URL фона"
+    )
+    watermark_url: Optional[str] = Field(
+        None, max_length=FieldLimits.URL_MAX, description="URL водяного знака"
+    )
 
     # Основные цвета
-    primary_color: Optional[str] = None
-    secondary_color: Optional[str] = None
-    accent_color: Optional[str] = None
+    primary_color: Optional[str] = Field(
+        None, max_length=7, description="Основной цвет"
+    )
+    secondary_color: Optional[str] = Field(
+        None, max_length=7, description="Вторичный цвет"
+    )
+    accent_color: Optional[str] = Field(
+        None, max_length=7, description="Акцентный цвет"
+    )
 
     # Нейтральные цвета
-    background_color: Optional[str] = None
-    surface_color: Optional[str] = None
-    text_color: Optional[str] = None
-    text_secondary_color: Optional[str] = None
+    background_color: Optional[str] = Field(None, max_length=7, description="Цвет фона")
+    surface_color: Optional[str] = Field(
+        None, max_length=7, description="Цвет поверхности"
+    )
+    text_color: Optional[str] = Field(None, max_length=7, description="Цвет текста")
+    text_secondary_color: Optional[str] = Field(
+        None, max_length=7, description="Цвет вторичного текста"
+    )
 
     # Статусные цвета
-    success_color: Optional[str] = "#28a745"
-    warning_color: Optional[str] = "#ffc107"
-    error_color: Optional[str] = "#dc3545"
-    info_color: Optional[str] = "#17a2b8"
+    success_color: Optional[str] = Field(
+        "#28a745", max_length=7, description="Цвет успеха"
+    )
+    warning_color: Optional[str] = Field(
+        "#ffc107", max_length=7, description="Цвет предупреждения"
+    )
+    error_color: Optional[str] = Field(
+        "#dc3545", max_length=7, description="Цвет ошибки"
+    )
+    info_color: Optional[str] = Field(
+        "#17a2b8", max_length=7, description="Цвет информации"
+    )
 
     # Шрифты
-    primary_font_family: Optional[str] = "Inter, sans-serif"
-    secondary_font_family: Optional[str] = "Roboto, sans-serif"
-    monospace_font_family: Optional[str] = "Fira Code, monospace"
+    primary_font_family: Optional[str] = Field(
+        "Inter, sans-serif",
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Основной шрифт",
+    )
+    secondary_font_family: Optional[str] = Field(
+        "Roboto, sans-serif",
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Дополнительный шрифт",
+    )
+    monospace_font_family: Optional[str] = Field(
+        "Fira Code, monospace",
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Моноширинный шрифт",
+    )
 
     # Размеры шрифтов
-    font_size_base: Optional[str] = "14px"
-    font_size_small: Optional[str] = "12px"
-    font_size_large: Optional[str] = "16px"
+    font_size_base: Optional[str] = Field(
+        "14px", max_length=10, description="Базовый размер шрифта"
+    )
+    font_size_small: Optional[str] = Field(
+        "12px", max_length=10, description="Малый размер шрифта"
+    )
+    font_size_large: Optional[str] = Field(
+        "16px", max_length=10, description="Большой размер шрифта"
+    )
 
     # Заголовки
-    h1_font_size: Optional[str] = "32px"
-    h2_font_size: Optional[str] = "24px"
-    h3_font_size: Optional[str] = "20px"
+    h1_font_size: Optional[str] = Field("32px", max_length=10, description="Размер H1")
+    h2_font_size: Optional[str] = Field("24px", max_length=10, description="Размер H2")
+    h3_font_size: Optional[str] = Field("20px", max_length=10, description="Размер H3")
 
     # UI компоненты - кнопки
-    button_border_radius: Optional[str] = "4px"
-    button_padding: Optional[str] = "8px 16px"
+    button_border_radius: Optional[str] = Field(
+        "4px", max_length=20, description="Радиус границы кнопки"
+    )
+    button_padding: Optional[str] = Field(
+        "8px 16px", max_length=20, description="Отступы кнопки"
+    )
 
     # UI компоненты - карточки
-    card_border_radius: Optional[str] = "8px"
-    card_shadow: Optional[str] = "0 2px 4px rgba(0,0,0,0.1)"
+    card_border_radius: Optional[str] = Field(
+        "8px", max_length=20, description="Радиус границы карточки"
+    )
+    card_shadow: Optional[str] = Field(
+        "0 2px 4px rgba(0,0,0,0.1)", max_length=50, description="Тень карточки"
+    )
 
     # UI компоненты - поля ввода
-    input_border_radius: Optional[str] = "4px"
-    input_border_color: Optional[str] = "#ddd"
+    input_border_radius: Optional[str] = Field(
+        "4px", max_length=20, description="Радиус границы поля ввода"
+    )
+    input_border_color: Optional[str] = Field(
+        "#ddd", max_length=7, description="Цвет границы поля ввода"
+    )
 
     # Тема и стиль
-    theme_name: ThemeName = ThemeName.DEFAULT
-    is_dark_theme: bool = False
+    theme_name: ThemeName = Field(ThemeName.DEFAULT, description="Название темы")
+    is_dark_theme: bool = Field(False, description="Темная тема")
 
     # Кастомные стили
-    custom_css: Optional[str] = None
-    custom_js: Optional[str] = None
+    custom_css: Optional[str] = Field(
+        None, max_length=10000, description="Пользовательский CSS"
+    )
+    custom_js: Optional[str] = Field(
+        None, max_length=10000, description="Пользовательский JavaScript"
+    )
 
     # Макет
-    layout_type: LayoutType = LayoutType.FULL_WIDTH
-    sidebar_width: Optional[str] = "250px"
-    header_height: Optional[str] = "60px"
+    layout_type: LayoutType = Field(LayoutType.FULL_WIDTH, description="Тип макета")
+    sidebar_width: Optional[str] = Field(
+        "250px", max_length=20, description="Ширина бокового меню"
+    )
+    header_height: Optional[str] = Field(
+        "60px", max_length=20, description="Высота заголовка"
+    )
 
     # Анимации
-    enable_animations: bool = True
-    animation_duration: Optional[str] = "0.3s"
+    enable_animations: bool = Field(True, description="Включить анимации")
+    animation_duration: Optional[str] = Field(
+        "0.3s", max_length=10, description="Длительность анимации"
+    )
 
     # Брендинг компании
-    company_slogan: Optional[str] = None
-    brand_description: Optional[str] = None
-    social_links: Optional[Dict[str, Any]] = None
+    company_slogan: Optional[str] = Field(
+        None, max_length=200, description="Слоган компании"
+    )
+    brand_description: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Описание бренда"
+    )
+    social_links: Optional[Dict[str, Any]] = Field(None, description="Социальные сети")
 
     # White Label настройки
-    product_name: Optional[str] = None
-    login_page_title: Optional[str] = None
-    dashboard_title: Optional[str] = None
-    hide_powered_by: bool = False
-    hide_help_links: bool = False
+    product_name: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Название продукта"
+    )
+    login_page_title: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Заголовок страницы входа",
+    )
+    dashboard_title: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Заголовок дашборда"
+    )
+    hide_powered_by: bool = Field(False, description="Скрыть 'Powered by'")
+    hide_help_links: bool = Field(False, description="Скрыть ссылки помощи")
 
     # Статус и метаданные
-    is_active: bool = True
-    is_default: bool = False
-    version: str = "1.0"
-    advanced_settings: Optional[Dict[str, Any]] = None
+    is_active: bool = Field(True, description=StandardDescriptions.IS_ACTIVE)
+    is_default: bool = Field(False, description="По умолчанию")
+    version: str = Field(
+        "1.0", max_length=FieldLimits.VERSION_MAX, description="Версия"
+    )
+    advanced_settings: Optional[Dict[str, Any]] = Field(
+        None, description="Расширенные настройки"
+    )
 
     @field_validator(
         "primary_color",
@@ -165,113 +266,121 @@ class CompanyBrandingBase(BaseModel):
         return v
 
 
-class CompanyBrandingCreate(CompanyBrandingBase):
+class CompanyBrandingCreate(CreateSchema, CompanyBrandingBase):
     """Схема для создания брендинга компании"""
 
     pass
 
 
-class CompanyBrandingUpdate(BaseModel):
+class CompanyBrandingUpdate(UpdateSchema):
     """Схема для обновления брендинга компании"""
 
-    # Все поля опциональны для обновления
-    logo_url: Optional[str] = None
-    logo_dark_url: Optional[str] = None
-    logo_light_url: Optional[str] = None
-    favicon_url: Optional[str] = None
+    # Все поля опциональны для обновления (с ограничениями)
+    logo_url: Optional[str] = Field(None, max_length=FieldLimits.URL_MAX)
+    logo_dark_url: Optional[str] = Field(None, max_length=FieldLimits.URL_MAX)
+    logo_light_url: Optional[str] = Field(None, max_length=FieldLimits.URL_MAX)
+    favicon_url: Optional[str] = Field(None, max_length=FieldLimits.URL_MAX)
 
-    banner_url: Optional[str] = None
-    background_url: Optional[str] = None
-    watermark_url: Optional[str] = None
+    banner_url: Optional[str] = Field(None, max_length=FieldLimits.URL_MAX)
+    background_url: Optional[str] = Field(None, max_length=FieldLimits.URL_MAX)
+    watermark_url: Optional[str] = Field(None, max_length=FieldLimits.URL_MAX)
 
-    primary_color: Optional[str] = None
-    secondary_color: Optional[str] = None
-    accent_color: Optional[str] = None
+    primary_color: Optional[str] = Field(None, max_length=7)
+    secondary_color: Optional[str] = Field(None, max_length=7)
+    accent_color: Optional[str] = Field(None, max_length=7)
 
-    background_color: Optional[str] = None
-    surface_color: Optional[str] = None
-    text_color: Optional[str] = None
-    text_secondary_color: Optional[str] = None
+    background_color: Optional[str] = Field(None, max_length=7)
+    surface_color: Optional[str] = Field(None, max_length=7)
+    text_color: Optional[str] = Field(None, max_length=7)
+    text_secondary_color: Optional[str] = Field(None, max_length=7)
 
-    success_color: Optional[str] = None
-    warning_color: Optional[str] = None
-    error_color: Optional[str] = None
-    info_color: Optional[str] = None
+    success_color: Optional[str] = Field(None, max_length=7)
+    warning_color: Optional[str] = Field(None, max_length=7)
+    error_color: Optional[str] = Field(None, max_length=7)
+    info_color: Optional[str] = Field(None, max_length=7)
 
-    primary_font_family: Optional[str] = None
-    secondary_font_family: Optional[str] = None
-    monospace_font_family: Optional[str] = None
+    primary_font_family: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX
+    )
+    secondary_font_family: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX
+    )
+    monospace_font_family: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX
+    )
 
-    font_size_base: Optional[str] = None
-    font_size_small: Optional[str] = None
-    font_size_large: Optional[str] = None
+    font_size_base: Optional[str] = Field(None, max_length=10)
+    font_size_small: Optional[str] = Field(None, max_length=10)
+    font_size_large: Optional[str] = Field(None, max_length=10)
 
-    h1_font_size: Optional[str] = None
-    h2_font_size: Optional[str] = None
-    h3_font_size: Optional[str] = None
+    h1_font_size: Optional[str] = Field(None, max_length=10)
+    h2_font_size: Optional[str] = Field(None, max_length=10)
+    h3_font_size: Optional[str] = Field(None, max_length=10)
 
-    button_border_radius: Optional[str] = None
-    button_padding: Optional[str] = None
+    button_border_radius: Optional[str] = Field(None, max_length=20)
+    button_padding: Optional[str] = Field(None, max_length=20)
 
-    card_border_radius: Optional[str] = None
-    card_shadow: Optional[str] = None
+    card_border_radius: Optional[str] = Field(None, max_length=20)
+    card_shadow: Optional[str] = Field(None, max_length=50)
 
-    input_border_radius: Optional[str] = None
-    input_border_color: Optional[str] = None
+    input_border_radius: Optional[str] = Field(None, max_length=20)
+    input_border_color: Optional[str] = Field(None, max_length=7)
 
     theme_name: Optional[ThemeName] = None
     is_dark_theme: Optional[bool] = None
 
-    custom_css: Optional[str] = None
-    custom_js: Optional[str] = None
+    custom_css: Optional[str] = Field(None, max_length=10000)
+    custom_js: Optional[str] = Field(None, max_length=10000)
 
     layout_type: Optional[LayoutType] = None
-    sidebar_width: Optional[str] = None
-    header_height: Optional[str] = None
+    sidebar_width: Optional[str] = Field(None, max_length=20)
+    header_height: Optional[str] = Field(None, max_length=20)
 
     enable_animations: Optional[bool] = None
-    animation_duration: Optional[str] = None
+    animation_duration: Optional[str] = Field(None, max_length=10)
 
-    company_slogan: Optional[str] = None
-    brand_description: Optional[str] = None
+    company_slogan: Optional[str] = Field(None, max_length=200)
+    brand_description: Optional[str] = Field(None, max_length=FieldLimits.TEXT_MAX)
     social_links: Optional[Dict[str, Any]] = None
 
-    product_name: Optional[str] = None
-    login_page_title: Optional[str] = None
-    dashboard_title: Optional[str] = None
+    product_name: Optional[str] = Field(None, max_length=FieldLimits.SHORT_STRING_MAX)
+    login_page_title: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX
+    )
+    dashboard_title: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX
+    )
     hide_powered_by: Optional[bool] = None
     hide_help_links: Optional[bool] = None
 
     is_active: Optional[bool] = None
     is_default: Optional[bool] = None
-    version: Optional[str] = None
+    version: Optional[str] = Field(None, max_length=FieldLimits.VERSION_MAX)
     advanced_settings: Optional[Dict[str, Any]] = None
 
 
-class CompanyBrandingInDB(CompanyBrandingBase):
-    """Схема для данных из базы данных"""
-
-    id: int
-    company_id: int
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class CompanyBrandingResponse(CompanyBrandingInDB):
+class CompanyBrandingResponse(
+    ResponseSchema, CompanyBrandingBase, CompanyRelatedSchema
+):
     """Схема для ответа API"""
 
     # Добавляем вычисляемые поля
-    color_palette: Optional[Dict[str, str]] = None
-    typography_config: Optional[Dict[str, Any]] = None
-    component_styles: Optional[Dict[str, Any]] = None
-    layout_config: Optional[Dict[str, Any]] = None
-    css_variables: Optional[str] = None
+    color_palette: Optional[Dict[str, str]] = Field(
+        None, description="Цветовая палитра"
+    )
+    typography_config: Optional[Dict[str, Any]] = Field(
+        None, description="Конфигурация типографики"
+    )
+    component_styles: Optional[Dict[str, Any]] = Field(
+        None, description="Стили компонентов"
+    )
+    layout_config: Optional[Dict[str, Any]] = Field(
+        None, description="Конфигурация макета"
+    )
+    css_variables: Optional[str] = Field(None, description="CSS переменные")
 
 
-class CompanyBrandingProfile(BaseModel):
+class CompanyBrandingProfile(BaseSchema):
     """Схема для профиля брендинга (упрощенная)"""
 
     logo_url: Optional[str]
@@ -284,7 +393,7 @@ class CompanyBrandingProfile(BaseModel):
     is_active: bool
 
 
-class ColorPalette(BaseModel):
+class ColorPalette(BaseSchema):
     """Схема для цветовой палитры"""
 
     primary: str = "#007bff"
@@ -306,7 +415,7 @@ class ColorPalette(BaseModel):
         return v
 
 
-class TypographyConfig(BaseModel):
+class TypographyConfig(BaseSchema):
     """Схема для конфигурации типографики"""
 
     font_families: Dict[str, str] = {
@@ -324,7 +433,7 @@ class TypographyConfig(BaseModel):
     }
 
 
-class ComponentStyles(BaseModel):
+class ComponentStyles(BaseSchema):
     """Схема для стилей UI компонентов"""
 
     buttons: Dict[str, str] = {"border_radius": "4px", "padding": "8px 16px"}
@@ -335,7 +444,7 @@ class ComponentStyles(BaseModel):
     inputs: Dict[str, str] = {"border_radius": "4px", "border_color": "#ddd"}
 
 
-class LayoutConfig(BaseModel):
+class LayoutConfig(BaseSchema):
     """Схема для конфигурации макета"""
 
     type: LayoutType = LayoutType.FULL_WIDTH
@@ -344,7 +453,7 @@ class LayoutConfig(BaseModel):
     animations: Dict[str, Any] = {"enabled": True, "duration": "0.3s"}
 
 
-class SocialLinks(BaseModel):
+class SocialLinks(BaseSchema):
     """Схема для ссылок на социальные сети"""
 
     website: Optional[str] = None
@@ -362,7 +471,7 @@ class SocialLinks(BaseModel):
         return v
 
 
-class ThemePreset(BaseModel):
+class ThemePreset(BaseSchema):
     """Схема для предустановленных тем"""
 
     name: str
@@ -384,7 +493,7 @@ class ThemePreset(BaseModel):
         return v.strip()
 
 
-class BrandingValidation(BaseModel):
+class BrandingValidation(BaseSchema):
     """Схема для валидации брендинга"""
 
     is_valid: bool
@@ -395,7 +504,7 @@ class BrandingValidation(BaseModel):
     accessibility_score: Optional[float] = None
 
 
-class BrandingTemplate(BaseModel):
+class BrandingTemplate(BaseSchema):
     """Схема для шаблона брендинга"""
 
     id: int
@@ -431,7 +540,7 @@ class BrandingTemplate(BaseModel):
         return v
 
 
-class AssetUpload(BaseModel):
+class AssetUpload(BaseSchema):
     """Схема для загрузки ресурсов брендинга"""
 
     asset_type: str  # logo, favicon, banner, background, watermark
@@ -462,7 +571,7 @@ class AssetUpload(BaseModel):
         return v
 
 
-class BrandingExport(BaseModel):
+class BrandingExport(BaseSchema):
     """Схема для экспорта брендинга"""
 
     format: str  # css, json, scss, less
@@ -477,7 +586,7 @@ class BrandingExport(BaseModel):
         return v
 
 
-class BrandingImport(BaseModel):
+class BrandingImport(BaseSchema):
     """Схема для импорта брендинга"""
 
     source_format: str  # json, css

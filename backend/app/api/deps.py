@@ -23,37 +23,190 @@ from app.crud import user as crud_user
 from app.models.user import User
 from app.utils.logger import logger
 from app.core.exceptions import UserNotFoundError, PermissionDeniedError
+from app.core.constants import (
+    Permission,
+    RoleScope,
+    SystemRole,
+    CompanyRole,
+    DepartmentRole,
+    TeamRole,
+    ProjectRole,
+)
 from app.services import auth0_service, Auth0UserInfo
 
 # OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.run.api_v1_str}/auth/login",
     scopes={
+        # Basic user permissions
         "me": "Read information about the current user",
-        "users:read": "Read users information",
-        "users:write": "Create and update users",
-        "users:delete": "Delete users",
-        "projects:read": "Read projects information",
-        "projects:write": "Create and update projects",
-        "projects:delete": "Delete projects",
-        "requirements:read": "Read requirements information",
-        "requirements:write": "Create and update requirements",
-        "requirements:delete": "Delete requirements",
-        "releases:read": "Read releases information",
-        "releases:write": "Create and update releases",
-        "releases:delete": "Delete releases",
-        "testing:read": "Read testing information",
-        "testing:write": "Create and update tests",
-        "testing:execute": "Execute tests",
-        "admin:read": "Read admin information",
-        "admin:write": "Admin write operations",
-        "system:admin": "System administration operations",
+        "use_api": "Basic API access",
+        # Company level permissions
+        "view_company_users": "View users in company",
+        "manage_company_users": "Manage users in company",
+        "view_company_settings": "View company settings",
+        "manage_company_settings": "Manage company settings",
+        "view_company_analytics": "View company analytics",
+        # Project permissions
+        "view_project": "View projects information",
+        "create_project": "Create new projects",
+        "manage_project": "Manage projects",
+        "delete_project": "Delete projects",
+        "view_project_analytics": "View project analytics",
+        # Requirements permissions
+        "view_requirement": "View requirements information",
+        "create_requirement": "Create new requirements",
+        "edit_requirement": "Edit requirements",
+        "delete_requirement": "Delete requirements",
+        "approve_requirement": "Approve requirements",
+        "export_requirements": "Export requirements",
+        # Release permissions
+        "view_release": "View releases information",
+        "create_release": "Create new releases",
+        "manage_release": "Manage releases",
+        "delete_release": "Delete releases",
+        "publish_release": "Publish releases",
+        "deploy_release": "Deploy releases",
+        # Testing permissions
+        "view_test_results": "View testing information",
+        "create_test": "Create tests",
+        "execute_test": "Execute tests",
+        "manage_test_plans": "Manage test plans",
+        # Admin permissions
+        "manage_company": "Manage company",
+        "manage_system": "System administration operations",
+        "view_reports": "View reports",
+        "create_reports": "Create reports",
+        "export_reports": "Export reports",
+        # Documentation permissions
+        "view_specification": "View specifications",
+        "create_specification": "Create specifications",
+        "edit_specification": "Edit specifications",
+        # Comment permissions
+        "create_comment": "Create comments",
+        "edit_comment": "Edit comments",
+        "moderate_comments": "Moderate comments",
     },
     auto_error=True,  # Enable proper error handling
 )
 
 # Simplified HTTPBearer for cases where OAuth2 doesn't work
 security = HTTPBearer(auto_error=False)
+
+
+# === Enhanced Role System Utilities ===
+
+
+def check_user_permission(
+    user: User,
+    permission: Permission,
+    company_id: Optional[int] = None,
+    department_id: Optional[int] = None,
+    team_id: Optional[int] = None,
+    project_id: Optional[int] = None,
+) -> bool:
+    """
+    Проверить, есть ли у пользователя указанное разрешение в заданном контексте.
+
+    Args:
+        user: Пользователь
+        permission: Требуемое разрешение
+        company_id: ID компании (опционально)
+        department_id: ID департамента (опционально)
+        team_id: ID команды (опционально)
+        project_id: ID проекта (опционально)
+
+    Returns:
+        bool: True если разрешение есть, False иначе
+    """
+    # Системные админы имеют все права
+    if user.is_system_admin:
+        return True
+
+    # Если указана компания - проверяем права в компании
+    if company_id:
+        return user.has_permission_in_company(permission, company_id)
+
+    # Проверяем права в основной компании пользователя
+    if user.company_id:
+        return user.has_permission_in_company(permission, user.company_id)
+
+    return False
+
+
+def require_permission(permission: Permission) -> callable:
+    """
+    Декоратор для создания dependency, требующего определенное разрешение.
+
+    Args:
+        permission: Требуемое разрешение
+
+    Returns:
+        callable: Dependency функция
+    """
+
+    async def permission_dependency(
+        current_user: User = Security(get_current_user, scopes=[permission.value]),
+    ) -> User:
+        if not check_user_permission(current_user, permission):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission '{permission.value}' required",
+            )
+        return current_user
+
+    return permission_dependency
+
+
+def require_company_permission(permission: Permission) -> callable:
+    """
+    Декоратор для создания dependency, требующего разрешение в контексте компании.
+
+    Args:
+        permission: Требуемое разрешение
+
+    Returns:
+        callable: Dependency функция
+    """
+
+    async def company_permission_dependency(
+        company_id: int,
+        current_user: User = Security(get_current_user, scopes=[permission.value]),
+    ) -> User:
+        if not check_user_permission(current_user, permission, company_id=company_id):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission '{permission.value}' required in company {company_id}",
+            )
+        return current_user
+
+    return company_permission_dependency
+
+
+def require_system_role(system_role: SystemRole) -> callable:
+    """
+    Декоратор для создания dependency, требующего системную роль.
+
+    Args:
+        system_role: Требуемая системная роль
+
+    Returns:
+        callable: Dependency функция
+    """
+
+    async def system_role_dependency(
+        current_user: User = Security(get_current_user, scopes=["manage_system"]),
+    ) -> User:
+        if not current_user.is_system_admin and not current_user.has_system_role(
+            system_role
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"System role '{system_role.value}' required",
+            )
+        return current_user
+
+    return system_role_dependency
 
 
 # === Database Dependencies ===
@@ -365,125 +518,210 @@ async def get_optional_user(
         return None
 
 
-# === Scope-based Dependencies ===
+# === Permission-based Dependencies (Enhanced Role System) ===
 
 
 async def get_users_read_user(
-    current_user: User = Security(get_current_user, scopes=["users:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_company_users"]),
 ) -> User:
     """Пользователь с правами чтения пользователей."""
+    if not check_user_permission(current_user, Permission.VIEW_COMPANY_USERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view company users required",
+        )
     return current_user
 
 
 async def get_users_write_user(
-    current_user: User = Security(get_current_user, scopes=["users:write"]),
+    current_user: User = Security(get_current_user, scopes=["manage_company_users"]),
 ) -> User:
     """Пользователь с правами записи пользователей."""
+    if not check_user_permission(current_user, Permission.MANAGE_COMPANY_USERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage company users required",
+        )
     return current_user
 
 
 async def get_users_delete_user(
-    current_user: User = Security(get_current_user, scopes=["users:delete"]),
+    current_user: User = Security(get_current_user, scopes=["manage_company_users"]),
 ) -> User:
     """Пользователь с правами удаления пользователей."""
+    if not check_user_permission(current_user, Permission.REMOVE_USERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to remove users required",
+        )
     return current_user
 
 
 async def get_projects_read_user(
-    current_user: User = Security(get_current_user, scopes=["projects:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_project"]),
 ) -> User:
     """Пользователь с правами чтения проектов."""
+    if not check_user_permission(current_user, Permission.VIEW_PROJECT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view projects required",
+        )
     return current_user
 
 
 async def get_projects_write_user(
-    current_user: User = Security(get_current_user, scopes=["projects:write"]),
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
 ) -> User:
     """Пользователь с правами записи проектов."""
+    if not check_user_permission(current_user, Permission.MANAGE_PROJECT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage projects required",
+        )
     return current_user
 
 
 async def get_projects_delete_user(
-    current_user: User = Security(get_current_user, scopes=["projects:delete"]),
+    current_user: User = Security(get_current_user, scopes=["delete_project"]),
 ) -> User:
     """Пользователь с правами удаления проектов."""
+    if not check_user_permission(current_user, Permission.DELETE_PROJECT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to delete projects required",
+        )
     return current_user
 
 
 async def get_requirements_read_user(
-    current_user: User = Security(get_current_user, scopes=["requirements:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_requirement"]),
 ) -> User:
     """Пользователь с правами чтения требований."""
+    if not check_user_permission(current_user, Permission.VIEW_REQUIREMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view requirements required",
+        )
     return current_user
 
 
 async def get_requirements_write_user(
-    current_user: User = Security(get_current_user, scopes=["requirements:write"]),
+    current_user: User = Security(get_current_user, scopes=["edit_requirement"]),
 ) -> User:
     """Пользователь с правами записи требований."""
+    if not check_user_permission(current_user, Permission.EDIT_REQUIREMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to edit requirements required",
+        )
     return current_user
 
 
 async def get_requirements_delete_user(
-    current_user: User = Security(get_current_user, scopes=["requirements:delete"]),
+    current_user: User = Security(get_current_user, scopes=["delete_requirement"]),
 ) -> User:
     """Пользователь с правами удаления требований."""
+    if not check_user_permission(current_user, Permission.DELETE_REQUIREMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to delete requirements required",
+        )
     return current_user
 
 
 async def get_releases_read_user(
-    current_user: User = Security(get_current_user, scopes=["releases:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_release"]),
 ) -> User:
     """Пользователь с правами чтения релизов."""
+    if not check_user_permission(current_user, Permission.VIEW_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view releases required",
+        )
     return current_user
 
 
 async def get_releases_write_user(
-    current_user: User = Security(get_current_user, scopes=["releases:write"]),
+    current_user: User = Security(get_current_user, scopes=["manage_release"]),
 ) -> User:
     """Пользователь с правами записи релизов."""
+    if not check_user_permission(current_user, Permission.MANAGE_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage releases required",
+        )
     return current_user
 
 
 async def get_releases_delete_user(
-    current_user: User = Security(get_current_user, scopes=["releases:delete"]),
+    current_user: User = Security(get_current_user, scopes=["delete_release"]),
 ) -> User:
     """Пользователь с правами удаления релизов."""
+    if not check_user_permission(current_user, Permission.DELETE_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to delete releases required",
+        )
     return current_user
 
 
 async def get_testing_read_user(
-    current_user: User = Security(get_current_user, scopes=["testing:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_test_results"]),
 ) -> User:
     """Пользователь с правами чтения тестирования."""
+    if not check_user_permission(current_user, Permission.VIEW_TEST_RESULTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view test results required",
+        )
     return current_user
 
 
 async def get_testing_write_user(
-    current_user: User = Security(get_current_user, scopes=["testing:write"]),
+    current_user: User = Security(get_current_user, scopes=["create_test"]),
 ) -> User:
     """Пользователь с правами записи тестирования."""
+    if not check_user_permission(current_user, Permission.CREATE_TEST):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create tests required",
+        )
     return current_user
 
 
 async def get_testing_execute_user(
-    current_user: User = Security(get_current_user, scopes=["testing:execute"]),
+    current_user: User = Security(get_current_user, scopes=["execute_test"]),
 ) -> User:
     """Пользователь с правами выполнения тестов."""
+    if not check_user_permission(current_user, Permission.EXECUTE_TEST):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to execute tests required",
+        )
     return current_user
 
 
 async def get_admin_read_user(
-    current_user: User = Security(get_current_user, scopes=["admin:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_company_settings"]),
 ) -> User:
     """Пользователь с правами чтения админских данных."""
+    if not check_user_permission(current_user, Permission.VIEW_COMPANY_SETTINGS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view company settings required",
+        )
     return current_user
 
 
 async def get_admin_write_user(
-    current_user: User = Security(get_current_user, scopes=["admin:write"]),
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
 ) -> User:
     """Пользователь с правами записи админских данных."""
+    if not check_user_permission(current_user, Permission.MANAGE_COMPANY):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage company required",
+        )
     return current_user
 
 
@@ -503,11 +741,12 @@ async def get_dashboard_read_user(
     Returns:
         User: Пользователь с правами на чтение дашборда
     """
+    # Базовый доступ для всех активных пользователей
     return current_user
 
 
 async def get_dashboard_admin_user(
-    current_user: User = Security(get_current_user, scopes=["admin:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_company_analytics"]),
 ) -> User:
     """
     Зависимость для доступа к административным данным дашборда.
@@ -518,11 +757,16 @@ async def get_dashboard_admin_user(
     Returns:
         User: Пользователь с правами на чтение админ данных
     """
+    if not check_user_permission(current_user, Permission.VIEW_COMPANY_ANALYTICS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view company analytics required",
+        )
     return current_user
 
 
 async def get_stats_read_user(
-    current_user: User = Security(get_current_user, scopes=["projects:read"]),
+    current_user: User = Security(get_current_user, scopes=["view_project"]),
 ) -> User:
     """
     Зависимость для чтения статистических данных.
@@ -533,11 +777,16 @@ async def get_stats_read_user(
     Returns:
         User: Пользователь с правами на чтение статистики
     """
+    if not check_user_permission(current_user, Permission.VIEW_PROJECT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view project statistics required",
+        )
     return current_user
 
 
 async def get_export_user(
-    current_user: User = Security(get_current_user, scopes=["admin:read"]),
+    current_user: User = Security(get_current_user, scopes=["export_reports"]),
 ) -> User:
     """
     Зависимость для экспорта данных.
@@ -548,6 +797,11 @@ async def get_export_user(
     Returns:
         User: Пользователь с правами на экспорт данных
     """
+    if not check_user_permission(current_user, Permission.EXPORT_REPORTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to export reports required",
+        )
     return current_user
 
 
@@ -555,7 +809,7 @@ async def get_export_user(
 
 
 async def get_admin_user(
-    current_user: User = Security(get_current_user, scopes=["admin:write"]),
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
 ) -> User:
     """
     Зависимость для проверки прав администратора с записью.
@@ -569,8 +823,11 @@ async def get_admin_user(
     Raises:
         HTTPException: Если пользователь не является администратором
     """
-    # Дополнительная проверка роли для критических операций
-    if not (current_user.is_superuser or current_user.role in ["admin", "manager"]):
+    # Проверка через Enhanced Role System
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.MANAGE_COMPANY)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Administrator privileges required for this operation",
@@ -580,7 +837,7 @@ async def get_admin_user(
 
 async def get_product_manager_user(
     current_user: User = Security(
-        get_current_user, scopes=["requirements:write", "projects:write"]
+        get_current_user, scopes=["edit_requirement", "manage_project"]
     ),
 ) -> User:
     """
@@ -597,17 +854,24 @@ async def get_product_manager_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["product_manager", "admin"]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    # Проверяем права на управление требованиями и проектами
+    has_requirement_rights = check_user_permission(
+        current_user, Permission.EDIT_REQUIREMENT
+    )
+    has_project_rights = check_user_permission(current_user, Permission.MANAGE_PROJECT)
+
+    if not (
+        current_user.is_system_admin or (has_requirement_rights and has_project_rights)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Product Manager role or higher required.",
+            detail="Access denied. Product Manager permissions required.",
         )
     return current_user
 
 
 async def get_manager_user(
-    current_user: User = Security(get_current_user, scopes=["projects:write"]),
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
 ) -> User:
     """
     Зависимость для менеджеров и выше.
@@ -623,17 +887,19 @@ async def get_manager_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["manager", "product_manager", "admin"]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.MANAGE_PROJECT)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Manager role or higher required.",
+            detail="Access denied. Manager permissions required.",
         )
     return current_user
 
 
 async def get_senior_developer_user(
-    current_user: User = Security(get_current_user, scopes=["releases:write"]),
+    current_user: User = Security(get_current_user, scopes=["manage_release"]),
 ) -> User:
     """
     Зависимость для старших разработчиков и выше.
@@ -649,22 +915,24 @@ async def get_senior_developer_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["senior_developer", "product_manager", "manager", "admin"]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.MANAGE_RELEASE)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Senior Developer role or higher required.",
+            detail="Access denied. Senior Developer permissions required.",
         )
     return current_user
 
 
 async def get_analyst_user(
-    current_user: User = Security(get_current_user, scopes=["me"]),
+    current_user: User = Security(get_current_user, scopes=["view_requirement"]),
 ) -> User:
     """
     Зависимость для аналитиков и выше.
 
-    Аналитики имеют только права чтения согласно ТЗ.
+    Аналитики имеют права чтения требований и проектов согласно ТЗ.
 
     Args:
         current_user: Текущий пользователь
@@ -675,25 +943,19 @@ async def get_analyst_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = [
-        "analyst",
-        "developer",
-        "senior_developer",
-        "tester",
-        "product_manager",
-        "manager",
-        "admin",
-    ]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.VIEW_REQUIREMENT)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Analyst role or higher required.",
+            detail="Access denied. Analyst permissions required.",
         )
     return current_user
 
 
 async def get_developer_user(
-    current_user: User = Security(get_current_user, scopes=["releases:write"]),
+    current_user: User = Security(get_current_user, scopes=["view_release"]),
 ) -> User:
     """
     Зависимость для разработчиков и выше.
@@ -709,23 +971,19 @@ async def get_developer_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = [
-        "developer",
-        "senior_developer",
-        "product_manager",
-        "manager",
-        "admin",
-    ]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.VIEW_RELEASE)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Developer role or higher required.",
+            detail="Access denied. Developer permissions required.",
         )
     return current_user
 
 
 async def get_tester_user(
-    current_user: User = Security(get_current_user, scopes=["testing:write"]),
+    current_user: User = Security(get_current_user, scopes=["execute_test"]),
 ) -> User:
     """
     Зависимость для тестировщиков и выше.
@@ -741,24 +999,19 @@ async def get_tester_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = [
-        "tester",
-        "developer",
-        "senior_developer",
-        "product_manager",
-        "manager",
-        "admin",
-    ]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.EXECUTE_TEST)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Tester role or higher required.",
+            detail="Access denied. Tester permissions required.",
         )
     return current_user
 
 
 async def get_spec_creator_user(
-    current_user: User = Security(get_current_user, scopes=["projects:write"]),
+    current_user: User = Security(get_current_user, scopes=["create_specification"]),
 ) -> User:
     """
     Зависимость для создания спецификаций.
@@ -774,17 +1027,19 @@ async def get_spec_creator_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["analyst", "manager", "admin"]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.CREATE_SPECIFICATION)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Analyst role or higher required to create specifications.",
+            detail="Access denied. Permission to create specifications required.",
         )
     return current_user
 
 
 async def get_release_manager_user(
-    current_user: User = Security(get_current_user, scopes=["releases:write"]),
+    current_user: User = Security(get_current_user, scopes=["publish_release"]),
 ) -> User:
     """
     Зависимость для управления релизами.
@@ -800,11 +1055,13 @@ async def get_release_manager_user(
     Raises:
         HTTPException: Если у пользователя недостаточно прав
     """
-    allowed_roles = ["manager", "admin"]
-    if not (current_user.is_superuser or current_user.role in allowed_roles):
+    if not (
+        current_user.is_system_admin
+        or check_user_permission(current_user, Permission.PUBLISH_RELEASE)
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied. Manager role or higher required for release management.",
+            detail="Access denied. Permission to publish releases required.",
         )
     return current_user
 
@@ -945,6 +1202,958 @@ async def get_user_by_username_or_404(db: AsyncSession, username: str) -> User:
         raise UserNotFoundError(username)
     return user
 
+
+# === Complete Permission-based Dependencies for Enhanced Role System ===
+# Автоматически генерируем dependency функции для всех Permission
+
+
+# =============================================================================
+# Системные разрешения
+# =============================================================================
+
+
+async def get_system_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_system"]),
+) -> User:
+    """Пользователь с правами управления системой."""
+    if not check_user_permission(current_user, Permission.MANAGE_SYSTEM):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage system required",
+        )
+    return current_user
+
+
+async def get_all_companies_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_system"]),
+) -> User:
+    """Пользователь с правами управления всеми компаниями."""
+    if not check_user_permission(current_user, Permission.MANAGE_ALL_COMPANIES):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage all companies required",
+        )
+    return current_user
+
+
+async def get_system_logs_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["manage_system"]),
+) -> User:
+    """Пользователь с правами просмотра системных логов."""
+    if not check_user_permission(current_user, Permission.VIEW_SYSTEM_LOGS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view system logs required",
+        )
+    return current_user
+
+
+async def get_system_settings_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_system"]),
+) -> User:
+    """Пользователь с правами управления системными настройками."""
+    if not check_user_permission(current_user, Permission.MANAGE_SYSTEM_SETTINGS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage system settings required",
+        )
+    return current_user
+
+
+async def get_global_billing_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_system"]),
+) -> User:
+    """Пользователь с правами управления глобальным биллингом."""
+    if not check_user_permission(current_user, Permission.MANAGE_GLOBAL_BILLING):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage global billing required",
+        )
+    return current_user
+
+
+async def get_system_auditor_user(
+    current_user: User = Security(get_current_user, scopes=["manage_system"]),
+) -> User:
+    """Пользователь с правами аудита системы."""
+    if not check_user_permission(current_user, Permission.AUDIT_SYSTEM):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to audit system required",
+        )
+    return current_user
+
+
+async def get_security_policies_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_system"]),
+) -> User:
+    """Пользователь с правами управления политиками безопасности."""
+    if not check_user_permission(current_user, Permission.MANAGE_SECURITY_POLICIES):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage security policies required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Компанийные разрешения
+# =============================================================================
+
+
+async def get_company_settings_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_company_settings"]),
+) -> User:
+    """Пользователь с правами просмотра настроек компании."""
+    if not check_user_permission(current_user, Permission.VIEW_COMPANY_SETTINGS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view company settings required",
+        )
+    return current_user
+
+
+async def get_company_settings_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company_settings"]),
+) -> User:
+    """Пользователь с правами управления настройками компании."""
+    if not check_user_permission(current_user, Permission.MANAGE_COMPANY_SETTINGS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage company settings required",
+        )
+    return current_user
+
+
+async def get_user_inviter_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company_users"]),
+) -> User:
+    """Пользователь с правами приглашения пользователей."""
+    if not check_user_permission(current_user, Permission.INVITE_USERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to invite users required",
+        )
+    return current_user
+
+
+async def get_user_remover_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company_users"]),
+) -> User:
+    """Пользователь с правами удаления пользователей."""
+    if not check_user_permission(current_user, Permission.REMOVE_USERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to remove users required",
+        )
+    return current_user
+
+
+async def get_company_billing_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами управления биллингом компании."""
+    if not check_user_permission(current_user, Permission.MANAGE_COMPANY_BILLING):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage company billing required",
+        )
+    return current_user
+
+
+async def get_company_billing_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_company_analytics"]),
+) -> User:
+    """Пользователь с правами просмотра биллинга компании."""
+    if not check_user_permission(current_user, Permission.VIEW_COMPANY_BILLING):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view company billing required",
+        )
+    return current_user
+
+
+async def get_company_subscription_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами управления подпиской компании."""
+    if not check_user_permission(current_user, Permission.MANAGE_COMPANY_SUBSCRIPTION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage company subscription required",
+        )
+    return current_user
+
+
+async def get_company_data_exporter_user(
+    current_user: User = Security(get_current_user, scopes=["export_reports"]),
+) -> User:
+    """Пользователь с правами экспорта данных компании."""
+    if not check_user_permission(current_user, Permission.EXPORT_COMPANY_DATA):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to export company data required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Департаментские разрешения
+# =============================================================================
+
+
+async def get_department_creator_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами создания департаментов."""
+    if not check_user_permission(current_user, Permission.CREATE_DEPARTMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create department required",
+        )
+    return current_user
+
+
+async def get_department_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами управления департаментом."""
+    if not check_user_permission(current_user, Permission.MANAGE_DEPARTMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage department required",
+        )
+    return current_user
+
+
+async def get_department_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_company_settings"]),
+) -> User:
+    """Пользователь с правами просмотра департамента."""
+    if not check_user_permission(current_user, Permission.VIEW_DEPARTMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view department required",
+        )
+    return current_user
+
+
+async def get_department_deleter_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами удаления департамента."""
+    if not check_user_permission(current_user, Permission.DELETE_DEPARTMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to delete department required",
+        )
+    return current_user
+
+
+async def get_department_users_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company_users"]),
+) -> User:
+    """Пользователь с правами управления пользователями департамента."""
+    if not check_user_permission(current_user, Permission.MANAGE_DEPARTMENT_USERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage department users required",
+        )
+    return current_user
+
+
+async def get_department_users_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_company_users"]),
+) -> User:
+    """Пользователь с правами просмотра пользователей департамента."""
+    if not check_user_permission(current_user, Permission.VIEW_DEPARTMENT_USERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view department users required",
+        )
+    return current_user
+
+
+async def get_department_budget_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами управления бюджетом департамента."""
+    if not check_user_permission(current_user, Permission.MANAGE_DEPARTMENT_BUDGET):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage department budget required",
+        )
+    return current_user
+
+
+async def get_department_analytics_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_company_analytics"]),
+) -> User:
+    """Пользователь с правами просмотра аналитики департамента."""
+    if not check_user_permission(current_user, Permission.VIEW_DEPARTMENT_ANALYTICS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view department analytics required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Командные разрешения
+# =============================================================================
+
+
+async def get_team_creator_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами создания команд."""
+    if not check_user_permission(current_user, Permission.CREATE_TEAM):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create team required",
+        )
+    return current_user
+
+
+async def get_team_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами управления командой."""
+    if not check_user_permission(current_user, Permission.MANAGE_TEAM):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage team required",
+        )
+    return current_user
+
+
+async def get_team_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_project"]),
+) -> User:
+    """Пользователь с правами просмотра команды."""
+    if not check_user_permission(current_user, Permission.VIEW_TEAM):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view team required",
+        )
+    return current_user
+
+
+async def get_team_deleter_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами удаления команды."""
+    if not check_user_permission(current_user, Permission.DELETE_TEAM):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to delete team required",
+        )
+    return current_user
+
+
+async def get_team_members_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами управления участниками команды."""
+    if not check_user_permission(current_user, Permission.MANAGE_TEAM_MEMBERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage team members required",
+        )
+    return current_user
+
+
+async def get_team_members_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_project"]),
+) -> User:
+    """Пользователь с правами просмотра участников команды."""
+    if not check_user_permission(current_user, Permission.VIEW_TEAM_MEMBERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view team members required",
+        )
+    return current_user
+
+
+async def get_team_roles_assigner_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами назначения ролей в команде."""
+    if not check_user_permission(current_user, Permission.ASSIGN_TEAM_ROLES):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to assign team roles required",
+        )
+    return current_user
+
+
+async def get_team_performance_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_project_analytics"]),
+) -> User:
+    """Пользователь с правами просмотра производительности команды."""
+    if not check_user_permission(current_user, Permission.VIEW_TEAM_PERFORMANCE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view team performance required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Проектные разрешения
+# =============================================================================
+
+
+async def get_project_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_project"]),
+) -> User:
+    """Пользователь с правами создания проектов."""
+    if not check_user_permission(current_user, Permission.CREATE_PROJECT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create project required",
+        )
+    return current_user
+
+
+async def get_project_archiver_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами архивирования проектов."""
+    if not check_user_permission(current_user, Permission.ARCHIVE_PROJECT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to archive project required",
+        )
+    return current_user
+
+
+async def get_project_settings_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами управления настройками проекта."""
+    if not check_user_permission(current_user, Permission.MANAGE_PROJECT_SETTINGS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage project settings required",
+        )
+    return current_user
+
+
+async def get_project_members_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами управления участниками проекта."""
+    if not check_user_permission(current_user, Permission.MANAGE_PROJECT_MEMBERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage project members required",
+        )
+    return current_user
+
+
+async def get_project_members_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_project"]),
+) -> User:
+    """Пользователь с правами просмотра участников проекта."""
+    if not check_user_permission(current_user, Permission.VIEW_PROJECT_MEMBERS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view project members required",
+        )
+    return current_user
+
+
+async def get_project_budget_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_project"]),
+) -> User:
+    """Пользователь с правами управления бюджетом проекта."""
+    if not check_user_permission(current_user, Permission.MANAGE_PROJECT_BUDGET):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage project budget required",
+        )
+    return current_user
+
+
+async def get_project_analytics_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_project_analytics"]),
+) -> User:
+    """Пользователь с правами просмотра аналитики проекта."""
+    if not check_user_permission(current_user, Permission.VIEW_PROJECT_ANALYTICS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view project analytics required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Требования
+# =============================================================================
+
+
+async def get_requirement_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_requirement"]),
+) -> User:
+    """Пользователь с правами создания требований."""
+    if not check_user_permission(current_user, Permission.CREATE_REQUIREMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create requirement required",
+        )
+    return current_user
+
+
+async def get_requirement_approver_user(
+    current_user: User = Security(get_current_user, scopes=["approve_requirement"]),
+) -> User:
+    """Пользователь с правами утверждения требований."""
+    if not check_user_permission(current_user, Permission.APPROVE_REQUIREMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to approve requirement required",
+        )
+    return current_user
+
+
+async def get_requirement_rejector_user(
+    current_user: User = Security(get_current_user, scopes=["approve_requirement"]),
+) -> User:
+    """Пользователь с правами отклонения требований."""
+    if not check_user_permission(current_user, Permission.REJECT_REQUIREMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to reject requirement required",
+        )
+    return current_user
+
+
+async def get_requirements_linker_user(
+    current_user: User = Security(get_current_user, scopes=["edit_requirement"]),
+) -> User:
+    """Пользователь с правами связывания требований."""
+    if not check_user_permission(current_user, Permission.LINK_REQUIREMENTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to link requirements required",
+        )
+    return current_user
+
+
+async def get_requirement_versions_manager_user(
+    current_user: User = Security(get_current_user, scopes=["edit_requirement"]),
+) -> User:
+    """Пользователь с правами управления версиями требований."""
+    if not check_user_permission(current_user, Permission.MANAGE_REQUIREMENT_VERSIONS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage requirement versions required",
+        )
+    return current_user
+
+
+async def get_requirements_exporter_user(
+    current_user: User = Security(get_current_user, scopes=["export_requirements"]),
+) -> User:
+    """Пользователь с правами экспорта требований."""
+    if not check_user_permission(current_user, Permission.EXPORT_REQUIREMENTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to export requirements required",
+        )
+    return current_user
+
+
+async def get_requirements_importer_user(
+    current_user: User = Security(get_current_user, scopes=["edit_requirement"]),
+) -> User:
+    """Пользователь с правами импорта требований."""
+    if not check_user_permission(current_user, Permission.IMPORT_REQUIREMENTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to import requirements required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Релизы
+# =============================================================================
+
+
+async def get_release_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_release"]),
+) -> User:
+    """Пользователь с правами создания релизов."""
+    if not check_user_permission(current_user, Permission.CREATE_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create release required",
+        )
+    return current_user
+
+
+async def get_release_publisher_user(
+    current_user: User = Security(get_current_user, scopes=["publish_release"]),
+) -> User:
+    """Пользователь с правами публикации релизов."""
+    if not check_user_permission(current_user, Permission.PUBLISH_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to publish release required",
+        )
+    return current_user
+
+
+async def get_release_deployer_user(
+    current_user: User = Security(get_current_user, scopes=["deploy_release"]),
+) -> User:
+    """Пользователь с правами развертывания релизов."""
+    if not check_user_permission(current_user, Permission.DEPLOY_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to deploy release required",
+        )
+    return current_user
+
+
+async def get_release_rollbacker_user(
+    current_user: User = Security(get_current_user, scopes=["deploy_release"]),
+) -> User:
+    """Пользователь с правами отката релизов."""
+    if not check_user_permission(current_user, Permission.ROLLBACK_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to rollback release required",
+        )
+    return current_user
+
+
+async def get_release_approver_user(
+    current_user: User = Security(get_current_user, scopes=["publish_release"]),
+) -> User:
+    """Пользователь с правами утверждения релизов."""
+    if not check_user_permission(current_user, Permission.APPROVE_RELEASE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to approve release required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Тестирование
+# =============================================================================
+
+
+async def get_test_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_test"]),
+) -> User:
+    """Пользователь с правами создания тестов."""
+    if not check_user_permission(current_user, Permission.CREATE_TEST):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create test required",
+        )
+    return current_user
+
+
+async def get_test_plans_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_test_plans"]),
+) -> User:
+    """Пользователь с правами управления планами тестирования."""
+    if not check_user_permission(current_user, Permission.MANAGE_TEST_PLANS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage test plans required",
+        )
+    return current_user
+
+
+async def get_test_results_approver_user(
+    current_user: User = Security(get_current_user, scopes=["manage_test_plans"]),
+) -> User:
+    """Пользователь с правами утверждения результатов тестирования."""
+    if not check_user_permission(current_user, Permission.APPROVE_TEST_RESULTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to approve test results required",
+        )
+    return current_user
+
+
+async def get_test_automation_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_test"]),
+) -> User:
+    """Пользователь с правами создания автотестов."""
+    if not check_user_permission(current_user, Permission.CREATE_TEST_AUTOMATION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create test automation required",
+        )
+    return current_user
+
+
+async def get_test_environments_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_test_plans"]),
+) -> User:
+    """Пользователь с правами управления тестовыми средами."""
+    if not check_user_permission(current_user, Permission.MANAGE_TEST_ENVIRONMENTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage test environments required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Документация и спецификации
+# =============================================================================
+
+
+async def get_specification_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_specification"]),
+) -> User:
+    """Пользователь с правами создания спецификаций."""
+    if not check_user_permission(current_user, Permission.CREATE_SPECIFICATION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create specification required",
+        )
+    return current_user
+
+
+async def get_specification_editor_user(
+    current_user: User = Security(get_current_user, scopes=["edit_specification"]),
+) -> User:
+    """Пользователь с правами редактирования спецификаций."""
+    if not check_user_permission(current_user, Permission.EDIT_SPECIFICATION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to edit specification required",
+        )
+    return current_user
+
+
+async def get_specification_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_specification"]),
+) -> User:
+    """Пользователь с правами просмотра спецификаций."""
+    if not check_user_permission(current_user, Permission.VIEW_SPECIFICATION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view specification required",
+        )
+    return current_user
+
+
+async def get_specification_deleter_user(
+    current_user: User = Security(get_current_user, scopes=["edit_specification"]),
+) -> User:
+    """Пользователь с правами удаления спецификаций."""
+    if not check_user_permission(current_user, Permission.DELETE_SPECIFICATION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to delete specification required",
+        )
+    return current_user
+
+
+async def get_specification_approver_user(
+    current_user: User = Security(get_current_user, scopes=["edit_specification"]),
+) -> User:
+    """Пользователь с правами утверждения спецификаций."""
+    if not check_user_permission(current_user, Permission.APPROVE_SPECIFICATION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to approve specification required",
+        )
+    return current_user
+
+
+async def get_documentation_generator_user(
+    current_user: User = Security(get_current_user, scopes=["create_specification"]),
+) -> User:
+    """Пользователь с правами генерации документации."""
+    if not check_user_permission(current_user, Permission.GENERATE_DOCUMENTATION):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to generate documentation required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Комментарии и обратная связь
+# =============================================================================
+
+
+async def get_comment_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_comment"]),
+) -> User:
+    """Пользователь с правами создания комментариев."""
+    if not check_user_permission(current_user, Permission.CREATE_COMMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create comment required",
+        )
+    return current_user
+
+
+async def get_comment_editor_user(
+    current_user: User = Security(get_current_user, scopes=["edit_comment"]),
+) -> User:
+    """Пользователь с правами редактирования комментариев."""
+    if not check_user_permission(current_user, Permission.EDIT_COMMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to edit comment required",
+        )
+    return current_user
+
+
+async def get_comment_deleter_user(
+    current_user: User = Security(get_current_user, scopes=["edit_comment"]),
+) -> User:
+    """Пользователь с правами удаления комментариев."""
+    if not check_user_permission(current_user, Permission.DELETE_COMMENT):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to delete comment required",
+        )
+    return current_user
+
+
+async def get_comments_moderator_user(
+    current_user: User = Security(get_current_user, scopes=["moderate_comments"]),
+) -> User:
+    """Пользователь с правами модерации комментариев."""
+    if not check_user_permission(current_user, Permission.MODERATE_COMMENTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to moderate comments required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Интеграции и API
+# =============================================================================
+
+
+async def get_api_user(
+    current_user: User = Security(get_current_user, scopes=["use_api"]),
+) -> User:
+    """Пользователь с правами использования API."""
+    if not check_user_permission(current_user, Permission.USE_API):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to use API required",
+        )
+    return current_user
+
+
+async def get_integrations_manager_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами управления интеграциями."""
+    if not check_user_permission(current_user, Permission.MANAGE_INTEGRATIONS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to manage integrations required",
+        )
+    return current_user
+
+
+async def get_api_logs_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_company_analytics"]),
+) -> User:
+    """Пользователь с правами просмотра логов API."""
+    if not check_user_permission(current_user, Permission.VIEW_API_LOGS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view API logs required",
+        )
+    return current_user
+
+
+async def get_api_keys_creator_user(
+    current_user: User = Security(get_current_user, scopes=["manage_company"]),
+) -> User:
+    """Пользователь с правами создания API ключей."""
+    if not check_user_permission(current_user, Permission.CREATE_API_KEYS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create API keys required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Отчеты и аналитика
+# =============================================================================
+
+
+async def get_reports_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_reports"]),
+) -> User:
+    """Пользователь с правами просмотра отчетов."""
+    if not check_user_permission(current_user, Permission.VIEW_REPORTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view reports required",
+        )
+    return current_user
+
+
+async def get_reports_creator_user(
+    current_user: User = Security(get_current_user, scopes=["create_reports"]),
+) -> User:
+    """Пользователь с правами создания отчетов."""
+    if not check_user_permission(current_user, Permission.CREATE_REPORTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to create reports required",
+        )
+    return current_user
+
+
+async def get_reports_exporter_user(
+    current_user: User = Security(get_current_user, scopes=["export_reports"]),
+) -> User:
+    """Пользователь с правами экспорта отчетов."""
+    if not check_user_permission(current_user, Permission.EXPORT_REPORTS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to export reports required",
+        )
+    return current_user
+
+
+async def get_advanced_analytics_viewer_user(
+    current_user: User = Security(get_current_user, scopes=["view_company_analytics"]),
+) -> User:
+    """Пользователь с правами просмотра расширенной аналитики."""
+    if not check_user_permission(current_user, Permission.VIEW_ADVANCED_ANALYTICS):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission to view advanced analytics required",
+        )
+    return current_user
+
+
+# =============================================================================
+# Алиасы для обратной совместимости и краткие формы
+# =============================================================================
+
+# Краткие алиасы для часто используемых dependency
+get_project_creator = get_project_creator_user
+get_requirement_creator = get_requirement_creator_user
+get_release_creator = get_release_creator_user
+get_test_creator = get_test_creator_user
+get_spec_creator = get_specification_creator_user
+get_comment_creator = get_comment_creator_user
 
 # Алиасы для обратной совместимости
 get_current_user_dep = get_current_user

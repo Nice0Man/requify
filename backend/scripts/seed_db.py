@@ -249,11 +249,7 @@ async def create_sample_companies(db: AsyncSession):
                 {"slug": company_data["slug"]},
             )
             row = result.first()
-            existing_company = Company(
-                id=row[0], 
-                name=row[1], 
-                slug=row[2]
-            )
+            existing_company = Company(id=row[0], name=row[1], slug=row[2])
             created_companies.append(existing_company)
 
     print(f"✅ Создано {len(created_companies)} компаний")
@@ -263,7 +259,7 @@ async def create_sample_companies(db: AsyncSession):
 async def create_sample_departments(db: AsyncSession, companies: list[Company]):
     """Создать примеры департаментов."""
     print("🔄 Создание департаментов...")
-    
+
     if not companies:
         print("❌ Нет компаний для создания департаментов")
         return []
@@ -280,7 +276,7 @@ async def create_sample_departments(db: AsyncSession, companies: list[Company]):
                 "is_active": True,
             },
             {
-                "name": "Продуктовый департамент", 
+                "name": "Продуктовый департамент",
                 "slug": "product",
                 "description": "Департамент управления продуктом и аналитики",
                 "type": DepartmentType.PRODUCT.value,
@@ -301,7 +297,9 @@ async def create_sample_departments(db: AsyncSession, companies: list[Company]):
             try:
                 # Проверяем, существует ли департамент
                 result = await db.execute(
-                    text("SELECT * FROM departments WHERE slug = :slug AND company_id = :company_id"),
+                    text(
+                        "SELECT * FROM departments WHERE slug = :slug AND company_id = :company_id"
+                    ),
                     {"slug": dept_data["slug"], "company_id": company.id},
                 )
                 if not result.first():
@@ -310,22 +308,25 @@ async def create_sample_departments(db: AsyncSession, companies: list[Company]):
                     await db.flush()
                     created_departments.append(department)
                 else:
-                    print(f"Департамент {dept_data['slug']} уже существует в компании {company.name}")
+                    print(
+                        f"Департамент {dept_data['slug']} уже существует в компании {company.name}"
+                    )
                     # Получаем существующий департамент
                     result = await db.execute(
-                        text("SELECT * FROM departments WHERE slug = :slug AND company_id = :company_id"),
+                        text(
+                            "SELECT * FROM departments WHERE slug = :slug AND company_id = :company_id"
+                        ),
                         {"slug": dept_data["slug"], "company_id": company.id},
                     )
                     row = result.first()
                     existing_dept = Department(
-                        id=row[0],
-                        name=row[2],
-                        slug=row[3],
-                        company_id=company.id
+                        id=row[0], name=row[2], slug=row[3], company_id=company.id
                     )
                     created_departments.append(existing_dept)
             except Exception as e:
-                print(f"❌ Ошибка при создании департамента '{dept_data.get('slug', 'Unknown')}': {e}")
+                print(
+                    f"❌ Ошибка при создании департамента '{dept_data.get('slug', 'Unknown')}': {e}"
+                )
                 continue
 
     print(f"✅ Создано {len(created_departments)} департаментов")
@@ -460,14 +461,19 @@ async def create_sample_user_profiles(db: AsyncSession, users: list[User]):
     return created_profiles
 
 
-async def create_sample_projects(db: AsyncSession, owner_user: User, companies: list[Company], departments: list[Department]):
+async def create_sample_projects(
+    db: AsyncSession,
+    owner_user: User,
+    companies: list[Company],
+    departments: list[Department],
+):
     """Создать примеры проектов."""
     print("🔄 Создание проектов...")
 
     if not companies:
         print("❌ Нет компаний для создания проектов")
         return []
-        
+
     if not departments:
         print("❌ Нет департаментов для создания проектов")
         return []
@@ -529,11 +535,7 @@ async def create_sample_projects(db: AsyncSession, owner_user: User, companies: 
                     {"code": project_data["code"]},
                 )
                 row = result.first()
-                existing_project = Project(
-                    id=row[0], 
-                    code=row[1], 
-                    name=row[2]
-                )
+                existing_project = Project(id=row[0], code=row[1], name=row[2])
                 created_projects.append(existing_project)
         except Exception as e:
             print(
@@ -977,7 +979,9 @@ async def seed_database():
             profiles = await create_sample_user_profiles(session, users)
 
             # Создаем проекты
-            projects = await create_sample_projects(session, admin_user, companies, departments)
+            projects = await create_sample_projects(
+                session, admin_user, companies, departments
+            )
 
             # Создаем спецификации
             specs = await create_sample_specs(session, projects)
@@ -1006,21 +1010,17 @@ async def seed_database():
             # Собираем данные для вывода ДО коммита (чтобы избежать greenlet_spawn error)
             companies_info = []
             departments_info = []
-            
+
             # Используем .flush() чтобы получить данные из текущей транзакции
             await session.flush()
-            
+
             for company in companies:
-                companies_info.append({
-                    "name": company.name,
-                    "slug": company.slug
-                })
-                
+                companies_info.append({"name": company.name, "slug": company.slug})
+
             for department in departments:
-                departments_info.append({
-                    "name": department.name,
-                    "company_id": department.company_id
-                })
+                departments_info.append(
+                    {"name": department.name, "company_id": department.company_id}
+                )
 
             # Коммитим все изменения
             await session.commit()
@@ -1034,7 +1034,7 @@ async def seed_database():
             print("\n🏢 Созданные компании:")
             for company_info in companies_info:
                 print(f"   {company_info['name']} ({company_info['slug']})")
-                
+
             print("\n🏬 Созданные департаменты:")
             for dept_info in departments_info:
                 print(f"   {dept_info['name']}")
@@ -1089,16 +1089,16 @@ async def clear_database():
             await session.execute(text("DELETE FROM releases"))
             await session.execute(text("DELETE FROM projects"))
             await session.execute(text("DELETE FROM refresh_tokens"))
-            
+
             # Удаляем профили пользователей (связанные с users)
             await session.execute(text("DELETE FROM user_profiles"))
-            
+
             # Удаляем пользователей
             await session.execute(text("DELETE FROM users"))
-            
+
             # Удаляем департаменты (связанные с компаниями)
             await session.execute(text("DELETE FROM departments"))
-            
+
             # Удаляем компании (должны быть последними среди основных данных)
             await session.execute(text("DELETE FROM companies"))
 
