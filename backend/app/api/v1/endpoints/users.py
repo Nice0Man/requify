@@ -9,12 +9,13 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import JSONResponse
 
-from app.api.dependencies import (
+from app.api.dependencies import (,
     SessionDep,
     get_current_active_user,
     get_superuser,
     UserPermissions,
     ValidationDependencies,
+    SessionDep,
 )
 from app.core.config import settings
 from app import crud, models

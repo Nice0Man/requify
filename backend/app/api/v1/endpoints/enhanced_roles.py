@@ -4,9 +4,10 @@ API endpoints для расширенной системы ролей.
 
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
+    AdminPermissions,
+from app.api.dependencies import get_db, get_current_active_user, SessionDep,
 from app.models.user import User
 from app.services.enhanced_role_service import enhanced_role_service
 from app.schemas.enhanced_role import (
@@ -33,11 +34,11 @@ router = APIRouter()
 @router.post(
     "/roles", response_model=EnhancedRoleResponse, status_code=status.HTTP_201_CREATED
 )
-def create_role(
+async def create_role(
     *,
     role_in: EnhancedRoleCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> EnhancedRoleResponse:
     """
     Создать новую роль.
@@ -52,10 +53,10 @@ def create_role(
 
 
 @router.get("/roles/{role_id}", response_model=EnhancedRoleResponse)
-def get_role(
+async def get_role(
     role_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> EnhancedRoleResponse:
     """
     Получить роль по ID.
@@ -73,12 +74,12 @@ def get_role(
 
 
 @router.put("/roles/{role_id}", response_model=EnhancedRoleResponse)
-def update_role(
+async def update_role(
     *,
     role_id: int,
     role_in: EnhancedRoleUpdate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> EnhancedRoleResponse:
     """
     Обновить роль.
@@ -93,10 +94,10 @@ def update_role(
 
 
 @router.delete("/roles/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_role(
+async def delete_role(
     role_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ):
     """
     Удалить роль.
@@ -108,9 +109,9 @@ def delete_role(
 
 
 @router.get("/roles", response_model=List[EnhancedRoleResponse])
-def list_roles(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def list_roles(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     scope: Optional[RoleScope] = Query(None, description="Фильтр по области действия"),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
@@ -140,9 +141,9 @@ def list_roles(
 
 
 @router.get("/roles/assignable", response_model=List[EnhancedRoleResponse])
-def get_assignable_roles(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_assignable_roles(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     scope: Optional[RoleScope] = Query(None, description="Фильтр по области действия"),
 ) -> List[EnhancedRoleResponse]:
     """
@@ -158,10 +159,10 @@ def get_assignable_roles(
 
 
 @router.get("/roles/search", response_model=List[EnhancedRoleResponse])
-def search_roles(
+async def search_roles(
     q: str = Query(..., min_length=1, description="Поисковый запрос"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     scope: Optional[RoleScope] = Query(None, description="Фильтр по области действия"),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
@@ -186,11 +187,11 @@ def search_roles(
     response_model=UserRoleAssignmentResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def assign_role(
+async def assign_role(
     *,
     assignment_in: UserRoleAssignmentCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserRoleAssignmentResponse:
     """
     Назначить роль пользователю в определенном контексте.
@@ -207,11 +208,11 @@ def assign_role(
 @router.delete(
     "/assignments/{assignment_id}", response_model=UserRoleAssignmentResponse
 )
-def revoke_role_assignment(
+async def revoke_role_assignment(
     assignment_id: int,
     reason: Optional[str] = Query(None, description="Причина отзыва роли"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserRoleAssignmentResponse:
     """
     Отозвать назначение роли.
@@ -228,10 +229,10 @@ def revoke_role_assignment(
 @router.post(
     "/assignments/{assignment_id}/approve", response_model=UserRoleAssignmentResponse
 )
-def approve_role_assignment(
+async def approve_role_assignment(
     assignment_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserRoleAssignmentResponse:
     """
     Одобрить назначение роли.
@@ -248,11 +249,11 @@ def approve_role_assignment(
 @router.post(
     "/assignments/{assignment_id}/extend", response_model=UserRoleAssignmentResponse
 )
-def extend_role_assignment(
+async def extend_role_assignment(
     assignment_id: int,
     days: int = Query(..., ge=1, le=365, description="Количество дней для продления"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserRoleAssignmentResponse:
     """
     Продлить назначение роли.
@@ -269,10 +270,10 @@ def extend_role_assignment(
 @router.get(
     "/users/{user_id}/assignments", response_model=List[UserRoleAssignmentResponse]
 )
-def get_user_role_assignments(
+async def get_user_role_assignments(
     user_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     active_only: bool = Query(True, description="Показать только активные назначения"),
 ) -> List[UserRoleAssignmentResponse]:
     """
@@ -294,11 +295,11 @@ def get_user_role_assignments(
     "/assignments/context/{scope}/{context_id}",
     response_model=List[UserRoleAssignmentResponse],
 )
-def get_assignments_by_context(
+async def get_assignments_by_context(
     scope: RoleScope,
     context_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     active_only: bool = Query(True, description="Показать только активные назначения"),
 ) -> List[UserRoleAssignmentResponse]:
     """
@@ -323,9 +324,9 @@ def get_assignments_by_context(
 
 
 @router.post("/assignments/cleanup", response_model=Dict[str, Any])
-def cleanup_expired_assignments(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def cleanup_expired_assignments(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Очистить истекшие назначения ролей.
@@ -342,7 +343,7 @@ def cleanup_expired_assignments(
 
 
 @router.get("/scopes", response_model=List[str])
-def get_available_scopes() -> List[str]:
+async def get_available_scopes() -> List[str]:
     """
     Получить доступные области действия ролей.
     """
@@ -352,12 +353,12 @@ def get_available_scopes() -> List[str]:
 @router.get(
     "/permissions/user/{user_id}/context/{scope}/{context_id}", response_model=List[str]
 )
-def get_user_permissions_in_context(
+async def get_user_permissions_in_context(
     user_id: int,
     scope: RoleScope,
     context_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[str]:
     """
     Получить разрешения пользователя в определенном контексте.
@@ -371,13 +372,13 @@ def get_user_permissions_in_context(
 
 
 @router.get("/permissions/check", response_model=Dict[str, bool])
-def check_permissions(
+async def check_permissions(
     user_id: int,
     permissions: List[str] = Query(..., description="Список разрешений для проверки"),
     scope: Optional[RoleScope] = Query(None, description="Область действия"),
     context_id: Optional[int] = Query(None, description="ID контекста"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, bool]:
     """
     Проверить наличие разрешений у пользователя.

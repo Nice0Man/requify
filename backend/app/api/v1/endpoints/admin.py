@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 
-from app.api.deps import get_db, get_admin_user, get_dashboard_admin_user
+from app.api.dependencies import get_db, get_admin_user, get_dashboard_admin_user, SessionDep, AdminPermissions
 from app.core.config import settings
 from app.models.user import User
 from app.schemas.user import UserDetailed

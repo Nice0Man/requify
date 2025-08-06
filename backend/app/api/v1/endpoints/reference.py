@@ -8,7 +8,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db, get_current_active_user, get_admin_user
+from app.api.dependencies import get_db, get_current_active_user, get_admin_user, SessionDep
 from app import crud, schemas
 from app.models.user import User
 

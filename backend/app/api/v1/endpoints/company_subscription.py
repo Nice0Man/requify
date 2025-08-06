@@ -4,9 +4,10 @@ API endpoints для подписок компании.
 
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
+    AdminPermissions,
+from app.api.dependencies import get_db, get_current_active_user, SessionDep,
 from app.models.user import User
 from app.services.company_subscription_service import company_subscription_service
 from app.schemas.company_subscription import (
@@ -26,10 +27,10 @@ router = APIRouter()
 @router.get(
     "/company/{company_id}/subscription", response_model=CompanySubscriptionResponse
 )
-def get_company_subscription(
+async def get_company_subscription(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Получить подписку компании.
@@ -60,12 +61,12 @@ def get_company_subscription(
     response_model=CompanySubscriptionResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_company_subscription(
+async def create_company_subscription(
     *,
     company_id: int,
     subscription_in: CompanySubscriptionCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Создать подписку для компании.
@@ -85,12 +86,12 @@ def create_company_subscription(
 @router.put(
     "/company/{company_id}/subscription", response_model=CompanySubscriptionResponse
 )
-def update_company_subscription(
+async def update_company_subscription(
     *,
     company_id: int,
     subscription_in: CompanySubscriptionUpdate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Обновить подписку компании.
@@ -111,12 +112,12 @@ def update_company_subscription(
     "/company/{company_id}/subscription/upgrade",
     response_model=CompanySubscriptionResponse,
 )
-def upgrade_subscription(
+async def upgrade_subscription(
     *,
     company_id: int,
     new_plan: SubscriptionPlan,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Обновить план подписки компании.
@@ -134,10 +135,10 @@ def upgrade_subscription(
     "/company/{company_id}/subscription/activate",
     response_model=CompanySubscriptionResponse,
 )
-def activate_subscription(
+async def activate_subscription(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Активировать подписку компании.
@@ -155,11 +156,11 @@ def activate_subscription(
     "/company/{company_id}/subscription/suspend",
     response_model=CompanySubscriptionResponse,
 )
-def suspend_subscription(
+async def suspend_subscription(
     company_id: int,
     reason: Optional[str] = Query(None, description="Причина приостановки"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Приостановить подписку компании.
@@ -177,13 +178,13 @@ def suspend_subscription(
     "/company/{company_id}/subscription/cancel",
     response_model=CompanySubscriptionResponse,
 )
-def cancel_subscription(
+async def cancel_subscription(
     company_id: int,
     immediate: bool = Query(
         False, description="Немедленная отмена или в конце периода"
     ),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Отменить подписку компании.
@@ -202,13 +203,13 @@ def cancel_subscription(
     "/company/{company_id}/subscription/renew",
     response_model=CompanySubscriptionResponse,
 )
-def renew_subscription(
+async def renew_subscription(
     company_id: int,
     billing_period: Optional[BillingPeriod] = Query(
         None, description="Новый период биллинга"
     ),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySubscriptionResponse:
     """
     Продлить подписку компании.
@@ -228,10 +229,10 @@ def renew_subscription(
 @router.get(
     "/company/{company_id}/subscription/usage", response_model=SubscriptionUsageStats
 )
-def get_subscription_usage(
+async def get_subscription_usage(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> SubscriptionUsageStats:
     """
     Получить статистику использования подписки компании.
@@ -244,7 +245,7 @@ def get_subscription_usage(
 
 
 @router.get("/subscription/plans", response_model=List[SubscriptionPlanDetails])
-def get_available_plans() -> List[SubscriptionPlanDetails]:
+async def get_available_plans() -> List[SubscriptionPlanDetails]:
     """
     Получить доступные планы подписки.
 
@@ -254,10 +255,10 @@ def get_available_plans() -> List[SubscriptionPlanDetails]:
 
 
 @router.get("/subscription/expiring", response_model=List[CompanySubscriptionResponse])
-def get_expiring_subscriptions(
+async def get_expiring_subscriptions(
     days_until_expiry: int = Query(7, ge=1, le=365, description="Дней до истечения"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -280,9 +281,9 @@ def get_expiring_subscriptions(
 
 
 @router.get("/subscription/statistics", response_model=Dict[str, Any])
-def get_subscription_statistics(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_subscription_statistics(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить общую статистику по подпискам.

@@ -13,9 +13,10 @@ from fastapi import (
     UploadFile,
     File,
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
+    AdminPermissions,
+from app.api.dependencies import get_db, get_current_active_user, SessionDep,
 from app.models.user import User
 from app.services.company_branding_service import company_branding_service
 from app.schemas.company_branding import (
@@ -40,10 +41,10 @@ router = APIRouter()
 
 
 @router.get("/company/{company_id}/branding", response_model=CompanyBrandingResponse)
-def get_company_branding(
+async def get_company_branding(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Получить брендинг компании.
@@ -72,10 +73,10 @@ def get_company_branding(
 @router.get(
     "/company/{company_id}/branding/active", response_model=CompanyBrandingResponse
 )
-def get_active_branding(
+async def get_active_branding(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Получить активный брендинг компании.
@@ -107,12 +108,12 @@ def get_active_branding(
     response_model=CompanyBrandingResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_or_update_company_branding(
+async def create_or_update_company_branding(
     *,
     company_id: int,
     branding_in: CompanyBrandingCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Создать или обновить брендинг компании.
@@ -130,12 +131,12 @@ def create_or_update_company_branding(
 
 
 @router.put("/company/{company_id}/branding", response_model=CompanyBrandingResponse)
-def update_company_branding(
+async def update_company_branding(
     *,
     company_id: int,
     branding_in: CompanyBrandingUpdate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Обновить брендинг компании.
@@ -155,10 +156,10 @@ def update_company_branding(
 @router.get(
     "/company/{company_id}/branding/profile", response_model=CompanyBrandingProfile
 )
-def get_company_branding_profile(
+async def get_company_branding_profile(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingProfile:
     """
     Получить упрощенный профиль брендинга компании.
@@ -190,10 +191,10 @@ def get_company_branding_profile(
 
 
 @router.get("/company/{company_id}/branding/colors", response_model=ColorPalette)
-def get_color_palette(
+async def get_color_palette(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> ColorPalette:
     """
     Получить цветовую палитру компании.
@@ -214,12 +215,12 @@ def get_color_palette(
 @router.put(
     "/company/{company_id}/branding/colors", response_model=CompanyBrandingResponse
 )
-def update_color_palette(
+async def update_color_palette(
     *,
     company_id: int,
     colors: ColorPalette,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Обновить цветовую палитру компании.
@@ -239,10 +240,10 @@ def update_color_palette(
 @router.get(
     "/company/{company_id}/branding/typography", response_model=TypographyConfig
 )
-def get_typography(
+async def get_typography(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> TypographyConfig:
     """
     Получить конфигурацию типографики компании.
@@ -263,12 +264,12 @@ def get_typography(
 @router.put(
     "/company/{company_id}/branding/typography", response_model=CompanyBrandingResponse
 )
-def update_typography(
+async def update_typography(
     *,
     company_id: int,
     typography: TypographyConfig,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Обновить типографику компании.
@@ -286,10 +287,10 @@ def update_typography(
 
 
 @router.get("/company/{company_id}/branding/components", response_model=ComponentStyles)
-def get_component_styles(
+async def get_component_styles(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> ComponentStyles:
     """
     Получить стили UI компонентов компании.
@@ -310,12 +311,12 @@ def get_component_styles(
 @router.put(
     "/company/{company_id}/branding/components", response_model=CompanyBrandingResponse
 )
-def update_component_styles(
+async def update_component_styles(
     *,
     company_id: int,
     styles: ComponentStyles,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Обновить стили UI компонентов компании.
@@ -333,10 +334,10 @@ def update_component_styles(
 
 
 @router.get("/company/{company_id}/branding/social", response_model=SocialLinks)
-def get_social_links(
+async def get_social_links(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> SocialLinks:
     """
     Получить ссылки на социальные сети компании.
@@ -357,12 +358,12 @@ def get_social_links(
 @router.put(
     "/company/{company_id}/branding/social", response_model=CompanyBrandingResponse
 )
-def update_social_links(
+async def update_social_links(
     *,
     company_id: int,
     social_links: SocialLinks,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Обновить ссылки на социальные сети компании.
@@ -383,7 +384,7 @@ def update_social_links(
 
 
 @router.get("/branding/presets", response_model=List[ThemePreset])
-def get_available_presets() -> List[ThemePreset]:
+async def get_available_presets() -> List[ThemePreset]:
     """
     Получить доступные предустановленные темы.
     """
@@ -394,11 +395,11 @@ def get_available_presets() -> List[ThemePreset]:
     "/company/{company_id}/branding/preset/{preset_name}",
     response_model=CompanyBrandingResponse,
 )
-def apply_preset_theme(
+async def apply_preset_theme(
     company_id: int,
     preset_name: str,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Применить предустановленную тему.
@@ -416,10 +417,10 @@ def apply_preset_theme(
 
 
 @router.get("/company/{company_id}/branding/css", response_class=Response)
-def generate_css(
+async def generate_css(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Response:
     """
     Сгенерировать CSS переменные для компании.
@@ -437,12 +438,12 @@ def generate_css(
 @router.post(
     "/company/{company_id}/branding/validate", response_model=BrandingValidation
 )
-def validate_branding(
+async def validate_branding(
     *,
     company_id: int,
     branding_in: CompanyBrandingCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> BrandingValidation:
     """
     Валидировать брендинг компании без сохранения.
@@ -459,10 +460,10 @@ def validate_branding(
 
 
 @router.get("/company/{company_id}/branding/validation", response_model=Dict[str, Any])
-def get_branding_validation(
+async def get_branding_validation(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить результаты валидации текущего брендинга компании.
@@ -479,11 +480,11 @@ def get_branding_validation(
     "/company/{company_id}/branding/{branding_id}/activate",
     response_model=CompanyBrandingResponse,
 )
-def activate_branding(
+async def activate_branding(
     company_id: int,
     branding_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Активировать брендинг.
@@ -500,10 +501,10 @@ def activate_branding(
 @router.post(
     "/company/{company_id}/branding/deactivate", response_model=Dict[str, bool]
 )
-def deactivate_branding(
+async def deactivate_branding(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, bool]:
     """
     Деактивировать все схемы брендинга компании.
@@ -524,11 +525,11 @@ def deactivate_branding(
     "/company/{target_company_id}/branding/clone/{source_company_id}",
     response_model=CompanyBrandingResponse,
 )
-def clone_branding(
+async def clone_branding(
     target_company_id: int,
     source_company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Клонировать брендинг от одной компании к другой.
@@ -553,13 +554,13 @@ def clone_branding(
     "/company/{company_id}/branding/similar",
     response_model=List[CompanyBrandingProfile],
 )
-def get_similar_themes(
+async def get_similar_themes(
     company_id: int,
     limit: int = Query(
         5, ge=1, le=20, description="Максимальное количество похожих тем"
     ),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[CompanyBrandingProfile]:
     """
     Получить похожие темы для вдохновения.
@@ -587,10 +588,10 @@ def get_similar_themes(
 
 
 @router.post("/company/{company_id}/branding/backup", response_model=Dict[str, Any])
-def backup_branding(
+async def backup_branding(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Создать резервную копию брендинга компании.
@@ -605,12 +606,12 @@ def backup_branding(
 @router.post(
     "/company/{company_id}/branding/restore", response_model=CompanyBrandingResponse
 )
-def restore_branding(
+async def restore_branding(
     *,
     company_id: int,
     backup_data: Dict[str, Any],
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyBrandingResponse:
     """
     Восстановить брендинг компании из резервной копии.
@@ -628,11 +629,11 @@ def restore_branding(
 
 
 @router.get("/company/{company_id}/branding/export/{format}", response_class=Response)
-def export_branding(
+async def export_branding(
     company_id: int,
     format: str,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Response:
     """
     Экспортировать брендинг в различных форматах.
@@ -657,9 +658,9 @@ def export_branding(
 
 
 @router.get("/branding/statistics", response_model=Dict[str, Any])
-def get_branding_statistics(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_branding_statistics(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить статистику брендинга компаний.
@@ -672,7 +673,7 @@ def get_branding_statistics(
 
 
 @router.get("/branding/themes", response_model=List[str])
-def get_available_themes() -> List[str]:
+async def get_available_themes() -> List[str]:
     """
     Получить список доступных тем.
     """
@@ -680,7 +681,7 @@ def get_available_themes() -> List[str]:
 
 
 @router.get("/branding/layouts", response_model=List[str])
-def get_available_layouts() -> List[str]:
+async def get_available_layouts() -> List[str]:
     """
     Получить доступные типы макета.
     """

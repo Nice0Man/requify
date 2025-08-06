@@ -8,12 +8,13 @@ from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import (
+from app.api.dependencies import (,
     get_analyst_user,
     get_db,
     get_releases_delete_user,
     get_releases_read_user,
     get_releases_write_user,
+    SessionDep,
 )
 from app.core.config import settings
 from app import crud, schemas
@@ -124,7 +125,7 @@ async def _analyze_requirement_relationships(
     rec_stack = set()
     circular_deps = []
 
-    def has_cycle(node_id, path):
+    async def has_cycle(node_id, path):
         if node_id in rec_stack:
             # Found a cycle, extract the cycle path
             cycle_start = path.index(node_id)

@@ -25,6 +25,7 @@ from app.api.dependencies import (
     UserPermissions,
     PermissionDependencyFactory,
     ValidationDependencies,
+    SessionDep,
 )
 from app.services import (
     auth0_service,
@@ -76,7 +77,7 @@ from app.schemas import (
     UserCreate,
     UserDetailed,
     UserWithProfile,
-    User,
+    User as UserSchema,
     UserInDB,
     UserProfileResponse,
     UserProfileCreate,
@@ -87,13 +88,7 @@ router = APIRouter()
 
 
 # === Error Handling Classes (imported from services) ===
-
-
-class PermissionDeniedError(HTTPException):
-    """Raised when user lacks required permissions."""
-
-    def __init__(self, detail: str = "Insufficient permissions"):
-        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+# Using proper exception classes from services
 
 
 # === Services are now imported from app.services ===
@@ -290,7 +285,8 @@ async def logout(
 
 @router.post("/validate-token", response_model=TokenValidationResponse)
 async def validate_token(
-    token_request: TokenValidationRequest, db: AsyncSession = Depends(get_db)
+    token_request: TokenValidationRequest,
+    db: SessionDep,
 ) -> Any:
     """
     Валидировать токен доступа.
@@ -349,7 +345,8 @@ async def change_password(
 
 @router.post("/reset-password")
 async def request_password_reset(
-    reset_request: PasswordResetRequest, db: AsyncSession = Depends(get_db)
+    reset_request: PasswordResetRequest,
+    db: SessionDep,
 ) -> dict:
     """
     Запросить сброс пароля.
@@ -367,7 +364,8 @@ async def request_password_reset(
 
 @router.post("/forgot-password")
 async def forgot_password(
-    reset_request: PasswordResetRequest, db: AsyncSession = Depends(get_db)
+    reset_request: PasswordResetRequest,
+    db: SessionDep,
 ) -> dict:
     """
     Запросить восстановление пароля (альтернативный эндпоинт).
@@ -385,7 +383,8 @@ async def forgot_password(
 
 @router.post("/reset-password/confirm")
 async def confirm_password_reset(
-    reset_confirm: PasswordResetConfirm, db: AsyncSession = Depends(get_db)
+    reset_confirm: PasswordResetConfirm,
+    db: SessionDep,
 ) -> dict:
     """
     Подтвердить сброс пароля.
@@ -408,7 +407,8 @@ async def confirm_password_reset(
 
 @router.post("/verify-email/request")
 async def request_email_verification(
-    verification_request: EmailVerificationRequest, db: AsyncSession = Depends(get_db)
+    verification_request: EmailVerificationRequest,
+    db: SessionDep,
 ) -> dict:
     """
     Запросить повторную отправку email для верификации.
@@ -430,7 +430,8 @@ async def request_email_verification(
 
 @router.post("/verify-email/confirm", response_model=EmailVerificationResponse)
 async def confirm_email_verification(
-    verification_confirm: EmailVerificationConfirm, db: AsyncSession = Depends(get_db)
+    verification_confirm: EmailVerificationConfirm,
+    db: SessionDep,
 ) -> EmailVerificationResponse:
     """
     Подтвердить верификацию email.

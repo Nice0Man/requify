@@ -4,9 +4,10 @@ API endpoints для контактных данных компании.
 
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
+    AdminPermissions,
+from app.api.dependencies import get_db, get_current_active_user, SessionDep,
 from app.models.user import User
 from app.services.company_contact_service import company_contact_service
 from app.schemas.company_contact import (
@@ -19,10 +20,10 @@ router = APIRouter()
 
 
 @router.get("/company/{company_id}/contact", response_model=CompanyContactResponse)
-def get_company_contact(
+async def get_company_contact(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyContactResponse:
     """
     Получить контактные данные компании.
@@ -44,12 +45,12 @@ def get_company_contact(
     response_model=CompanyContactResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_or_update_company_contact(
+async def create_or_update_company_contact(
     *,
     company_id: int,
     contact_in: CompanyContactCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyContactResponse:
     """
     Создать или обновить контактные данные компании.
@@ -73,12 +74,12 @@ def create_or_update_company_contact(
 
 
 @router.put("/company/{company_id}/contact", response_model=CompanyContactResponse)
-def update_company_contact(
+async def update_company_contact(
     *,
     company_id: int,
     contact_in: CompanyContactUpdate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanyContactResponse:
     """
     Обновить контактные данные компании.
@@ -93,10 +94,10 @@ def update_company_contact(
 
 
 @router.get("/contact/search/email", response_model=List[CompanyContactResponse])
-def search_companies_by_email(
+async def search_companies_by_email(
     email: str = Query(..., description="Email адрес для поиска"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[CompanyContactResponse]:
     """
     Поиск компаний по email адресу.
@@ -111,10 +112,10 @@ def search_companies_by_email(
 
 
 @router.get("/contact/search/phone", response_model=List[CompanyContactResponse])
-def search_companies_by_phone(
+async def search_companies_by_phone(
     phone: str = Query(..., description="Номер телефона для поиска"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[CompanyContactResponse]:
     """
     Поиск компаний по номеру телефона.
@@ -129,9 +130,9 @@ def search_companies_by_phone(
 
 
 @router.get("/contact/search/location", response_model=List[CompanyContactResponse])
-def search_companies_by_location(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def search_companies_by_location(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     country: Optional[str] = Query(None, description="Страна для поиска"),
     city: Optional[str] = Query(None, description="Город для поиска"),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
@@ -157,10 +158,10 @@ def search_companies_by_location(
 
 
 @router.get("/contact/search/timezone", response_model=List[CompanyContactResponse])
-def search_companies_by_timezone(
+async def search_companies_by_timezone(
     timezone: str = Query(..., description="Временная зона для поиска"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -179,10 +180,10 @@ def search_companies_by_timezone(
 
 
 @router.get("/contact/search", response_model=List[CompanyContactResponse])
-def search_company_contacts(
+async def search_company_contacts(
     q: str = Query(..., min_length=1, description="Поисковый запрос"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -202,9 +203,9 @@ def search_company_contacts(
 
 
 @router.get("/contact/incomplete", response_model=List[CompanyContactResponse])
-def get_incomplete_contacts(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_incomplete_contacts(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -225,9 +226,9 @@ def get_incomplete_contacts(
 
 
 @router.get("/contact/statistics", response_model=Dict[str, Any])
-def get_contact_statistics(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_contact_statistics(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить статистику контактных данных компаний.
@@ -241,12 +242,12 @@ def get_contact_statistics(
 
 
 @router.post("/company/{company_id}/contact/validate", response_model=Dict[str, Any])
-def validate_contact_data(
+async def validate_contact_data(
     *,
     company_id: int,
     contact_in: CompanyContactCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Валидация контактных данных компании без сохранения.

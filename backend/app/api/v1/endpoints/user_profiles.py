@@ -12,9 +12,9 @@ from fastapi import (
     UploadFile,
     File,
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
+from app.api.dependencies import get_db, get_current_active_user, SessionDep, UserPermissions
 from app.models.user import User
 from app.services.user_profile_service import user_profile_service
 from app.schemas.user_profile import (
@@ -36,9 +36,9 @@ router = APIRouter()
 
 
 @router.get("/profiles/me", response_model=UserProfileResponse)
-def get_my_profile(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_my_profile(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Получить профиль текущего пользователя.
@@ -67,11 +67,11 @@ def get_my_profile(
     response_model=UserProfileResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_or_update_my_profile(
+async def create_or_update_my_profile(
     *,
     profile_in: UserProfileCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Создать или обновить профиль текущего пользователя.
@@ -87,11 +87,11 @@ def create_or_update_my_profile(
 
 
 @router.put("/profiles/me", response_model=UserProfileResponse)
-def update_my_profile(
+async def update_my_profile(
     *,
     profile_in: UserProfileUpdate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить профиль текущего пользователя.
@@ -107,10 +107,10 @@ def update_my_profile(
 
 
 @router.get("/profiles/{user_id}", response_model=UserProfileResponse)
-def get_user_profile(
+async def get_user_profile(
     user_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Получить профиль пользователя по ID.
@@ -137,10 +137,10 @@ def get_user_profile(
 
 
 @router.get("/profiles/{user_id}/public", response_model=UserProfilePublic)
-def get_user_public_profile(
+async def get_user_public_profile(
     user_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfilePublic:
     """
     Получить публичную версию профиля пользователя.
@@ -153,12 +153,12 @@ def get_user_public_profile(
 
 
 @router.put("/profiles/{user_id}", response_model=UserProfileResponse)
-def update_user_profile(
+async def update_user_profile(
     *,
     user_id: int,
     profile_in: UserProfileUpdate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить профиль пользователя.
@@ -176,9 +176,9 @@ def update_user_profile(
 
 
 @router.get("/profiles/me/completion", response_model=UserProfileCompletion)
-def get_my_profile_completion(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_my_profile_completion(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileCompletion:
     """
     Получить статус заполненности профиля текущего пользователя.
@@ -189,10 +189,10 @@ def get_my_profile_completion(
 
 
 @router.get("/profiles/{user_id}/completion", response_model=UserProfileCompletion)
-def get_user_profile_completion(
+async def get_user_profile_completion(
     user_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileCompletion:
     """
     Получить статус заполненности профиля пользователя.
@@ -208,11 +208,11 @@ def get_user_profile_completion(
 
 
 @router.put("/profiles/me/avatar", response_model=UserProfileResponse)
-def update_my_avatar(
+async def update_my_avatar(
     *,
     avatar_url: str,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить аватар текущего пользователя.
@@ -225,12 +225,12 @@ def update_my_avatar(
 
 
 @router.put("/profiles/{user_id}/avatar", response_model=UserProfileResponse)
-def update_user_avatar(
+async def update_user_avatar(
     *,
     user_id: int,
     avatar_url: str,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить аватар пользователя.
@@ -248,11 +248,11 @@ def update_user_avatar(
 
 
 @router.put("/profiles/me/contact", response_model=UserProfileResponse)
-def update_my_contact_info(
+async def update_my_contact_info(
     *,
     contact_info: ContactInfo,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить контактную информацию текущего пользователя.
@@ -268,12 +268,12 @@ def update_my_contact_info(
 
 
 @router.put("/profiles/{user_id}/contact", response_model=UserProfileResponse)
-def update_user_contact_info(
+async def update_user_contact_info(
     *,
     user_id: int,
     contact_info: ContactInfo,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить контактную информацию пользователя.
@@ -291,11 +291,11 @@ def update_user_contact_info(
 
 
 @router.put("/profiles/me/work", response_model=UserProfileResponse)
-def update_my_work_info(
+async def update_my_work_info(
     *,
     work_info: WorkInfo,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить рабочую информацию текущего пользователя.
@@ -308,12 +308,12 @@ def update_my_work_info(
 
 
 @router.put("/profiles/{user_id}/work", response_model=UserProfileResponse)
-def update_user_work_info(
+async def update_user_work_info(
     *,
     user_id: int,
     work_info: WorkInfo,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить рабочую информацию пользователя.
@@ -331,11 +331,11 @@ def update_user_work_info(
 
 
 @router.put("/profiles/me/localization", response_model=UserProfileResponse)
-def update_my_localization(
+async def update_my_localization(
     *,
     localization: LocalizationSettings,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить настройки локализации текущего пользователя.
@@ -351,12 +351,12 @@ def update_my_localization(
 
 
 @router.put("/profiles/{user_id}/localization", response_model=UserProfileResponse)
-def update_user_localization(
+async def update_user_localization(
     *,
     user_id: int,
     localization: LocalizationSettings,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Обновить настройки локализации пользователя.
@@ -374,9 +374,9 @@ def update_user_localization(
 
 
 @router.post("/profiles/me/verify-phone", response_model=UserProfileResponse)
-def verify_my_phone(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def verify_my_phone(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Подтвердить номер телефона текущего пользователя.
@@ -391,10 +391,10 @@ def verify_my_phone(
 
 
 @router.post("/profiles/{user_id}/verify-phone", response_model=UserProfileResponse)
-def verify_user_phone(
+async def verify_user_phone(
     user_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileResponse:
     """
     Подтвердить номер телефона пользователя.
@@ -412,12 +412,12 @@ def verify_user_phone(
 
 
 @router.get("/profiles/search", response_model=List[UserProfileSummary])
-def search_profiles(
+async def search_profiles(
     q: str = Query(..., min_length=2, description="Поисковый запрос"),
     skip: int = Query(0, ge=0, description="Количество записей для пропуска"),
     limit: int = Query(50, ge=1, le=100, description="Максимальное количество записей"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[UserProfileSummary]:
     """
     Поиск профилей пользователей по имени, должности или отделу.
@@ -430,12 +430,12 @@ def search_profiles(
 
 
 @router.get("/profiles/company/{company_id}", response_model=List[UserProfileSummary])
-def get_company_profiles(
+async def get_company_profiles(
     company_id: int,
     skip: int = Query(0, ge=0, description="Количество записей для пропуска"),
     limit: int = Query(50, ge=1, le=100, description="Максимальное количество записей"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[UserProfileSummary]:
     """
     Получить профили пользователей компании.
@@ -450,12 +450,12 @@ def get_company_profiles(
 @router.get(
     "/profiles/department/{department}", response_model=List[UserProfileSummary]
 )
-def get_department_profiles(
+async def get_department_profiles(
     department: str,
     skip: int = Query(0, ge=0, description="Количество записей для пропуска"),
     limit: int = Query(50, ge=1, le=100, description="Максимальное количество записей"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[UserProfileSummary]:
     """
     Получить профили пользователей отдела.
@@ -471,9 +471,9 @@ def get_department_profiles(
 
 
 @router.post("/profiles/me/validate", response_model=Dict[str, Any])
-def validate_my_profile(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def validate_my_profile(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Валидировать профиль текущего пользователя.
@@ -486,10 +486,10 @@ def validate_my_profile(
 
 
 @router.post("/profiles/{user_id}/validate", response_model=Dict[str, Any])
-def validate_user_profile(
+async def validate_user_profile(
     user_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Валидировать профиль пользователя.
@@ -505,9 +505,9 @@ def validate_user_profile(
 
 
 @router.get("/profiles/statistics", response_model=UserProfileStats)
-def get_profile_statistics(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_profile_statistics(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> UserProfileStats:
     """
     Получить статистику профилей пользователей.
@@ -518,9 +518,9 @@ def get_profile_statistics(
 
 
 @router.post("/profiles/bulk/update-completion", response_model=Dict[str, int])
-def bulk_update_completion_status(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def bulk_update_completion_status(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, int]:
     """
     Пересчитать статус заполненности для всех профилей.
@@ -536,7 +536,7 @@ def bulk_update_completion_status(
 
 
 @router.get("/profiles/timezones", response_model=List[str])
-def get_available_timezones() -> List[str]:
+async def get_available_timezones() -> List[str]:
     """
     Получить список доступных часовых поясов.
     """
@@ -554,7 +554,7 @@ def get_available_timezones() -> List[str]:
 
 
 @router.get("/profiles/languages", response_model=List[str])
-def get_available_languages() -> List[str]:
+async def get_available_languages() -> List[str]:
     """
     Получить список доступных языков интерфейса.
     """

@@ -7489,38 +7489,6 @@
         "documentation": {}
     },
     {
-        "label": "select",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "update",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "select",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "update",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
         "label": "asyncio",
         "kind": 6,
         "isExtraImport": true,
@@ -7563,6 +7531,62 @@
     },
     {
         "label": "async_engine_from_config",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
+        "importPath": "sqlalchemy.ext.asyncio",
+        "description": "sqlalchemy.ext.asyncio",
+        "isExtraImport": true,
+        "detail": "sqlalchemy.ext.asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "AsyncSession",
         "importPath": "sqlalchemy.ext.asyncio",
         "description": "sqlalchemy.ext.asyncio",
         "isExtraImport": true,
@@ -7923,22 +7947,6 @@
     },
     {
         "label": "create_async_engine",
-        "importPath": "sqlalchemy.ext.asyncio",
-        "description": "sqlalchemy.ext.asyncio",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.ext.asyncio",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncSession",
-        "importPath": "sqlalchemy.ext.asyncio",
-        "description": "sqlalchemy.ext.asyncio",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.ext.asyncio",
-        "documentation": {}
-    },
-    {
-        "label": "AsyncSession",
         "importPath": "sqlalchemy.ext.asyncio",
         "description": "sqlalchemy.ext.asyncio",
         "isExtraImport": true,
@@ -12594,22 +12602,6 @@
         "documentation": {}
     },
     {
-        "label": "User",
-        "importPath": "app.models.user",
-        "description": "app.models.user",
-        "isExtraImport": true,
-        "detail": "app.models.user",
-        "documentation": {}
-    },
-    {
-        "label": "User",
-        "importPath": "app.models.user",
-        "description": "app.models.user",
-        "isExtraImport": true,
-        "detail": "app.models.user",
-        "documentation": {}
-    },
-    {
         "label": "logger",
         "importPath": "app.utils.logger",
         "description": "app.utils.logger",
@@ -12915,22 +12907,6 @@
     },
     {
         "label": "main_db_helper",
-        "importPath": "app.db.db_helper",
-        "description": "app.db.db_helper",
-        "isExtraImport": true,
-        "detail": "app.db.db_helper",
-        "documentation": {}
-    },
-    {
-        "label": "get_async_session",
-        "importPath": "app.db.db_helper",
-        "description": "app.db.db_helper",
-        "isExtraImport": true,
-        "detail": "app.db.db_helper",
-        "documentation": {}
-    },
-    {
-        "label": "get_async_session",
         "importPath": "app.db.db_helper",
         "description": "app.db.db_helper",
         "isExtraImport": true,
@@ -14801,82 +14777,914 @@
     },
     {
         "label": "get_db",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
         "isExtraImport": true,
-        "detail": "app.api.deps",
+        "detail": "app.api.dependencies",
         "documentation": {}
     },
     {
         "label": "get_admin_user",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
         "isExtraImport": true,
-        "detail": "app.api.deps",
+        "detail": "app.api.dependencies",
         "documentation": {}
     },
     {
         "label": "get_dashboard_admin_user",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
         "isExtraImport": true,
-        "detail": "app.api.deps",
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "AdminPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
         "documentation": {}
     },
     {
         "label": "get_db",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
         "isExtraImport": true,
-        "detail": "app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
-        "isExtraImport": true,
-        "detail": "app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_admin_user",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
-        "isExtraImport": true,
-        "detail": "app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
-        "isExtraImport": true,
-        "detail": "app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
-        "isExtraImport": true,
-        "detail": "app.api.deps",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
-        "isExtraImport": true,
-        "detail": "app.api.deps",
+        "detail": "app.api.dependencies",
         "documentation": {}
     },
     {
         "label": "get_current_user",
-        "importPath": "app.api.deps",
-        "description": "app.api.deps",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
         "isExtraImport": true,
-        "detail": "app.api.deps",
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_optional_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_user_from_auth0_token",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_admin_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "UserPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "PermissionDependencyFactory",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationDependencies",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_dashboard_admin_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_dashboard_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_export_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "DashboardPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_stats_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_projects_delete_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_projects_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_projects_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_admin_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_delete_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_analyst_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_releases_delete_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_releases_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_releases_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_delete_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_requirements_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "UserPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_projects_delete_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_projects_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_projects_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "UserPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_testing_execute_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_testing_read_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_testing_write_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_superuser",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "UserPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationDependencies",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_db",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "UserPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "*",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "UserPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "ProjectPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "RequirementPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "AnalyticsDependencies",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationDependencies",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "CachedDependency",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
         "documentation": {}
     },
     {
@@ -15213,526 +16021,6 @@
         "description": "app.schemas.user",
         "isExtraImport": true,
         "detail": "app.schemas.user",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_optional_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_user_from_auth0_token",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_admin_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "SessionDep",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "UserPermissions",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "PermissionDependencyFactory",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "ValidationDependencies",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_dashboard_admin_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_dashboard_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_export_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_stats_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_projects_delete_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_projects_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_projects_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_delete_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "RequirementPermissions",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "SessionDep",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_analyst_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_releases_delete_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_releases_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_releases_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_delete_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_requirements_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "RequirementPermissions",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "SessionDep",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_projects_delete_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_projects_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_projects_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_db",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_testing_execute_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_testing_read_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_testing_write_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "SessionDep",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_current_active_user",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "get_superuser",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "UserPermissions",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "ValidationDependencies",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "*",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "SessionDep",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "UserPermissions",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "ProjectPermissions",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "RequirementPermissions",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "AnalyticsDependencies",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "ValidationDependencies",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
-        "label": "CachedDependency",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
         "documentation": {}
     },
     {
@@ -16357,62 +16645,6 @@
         "description": "app.services.notification_service",
         "isExtraImport": true,
         "detail": "app.services.notification_service",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "Session",
-        "importPath": "sqlalchemy.orm",
-        "description": "sqlalchemy.orm",
-        "isExtraImport": true,
-        "detail": "sqlalchemy.orm",
         "documentation": {}
     },
     {
@@ -17549,62 +17781,6 @@
         "description": "sqlalchemy.orm",
         "isExtraImport": true,
         "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
-        "isExtraImport": true,
-        "detail": "app.api",
-        "documentation": {}
-    },
-    {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
-        "isExtraImport": true,
-        "detail": "app.api",
-        "documentation": {}
-    },
-    {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
-        "isExtraImport": true,
-        "detail": "app.api",
-        "documentation": {}
-    },
-    {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
-        "isExtraImport": true,
-        "detail": "app.api",
-        "documentation": {}
-    },
-    {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
-        "isExtraImport": true,
-        "detail": "app.api",
-        "documentation": {}
-    },
-    {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
-        "isExtraImport": true,
-        "detail": "app.api",
-        "documentation": {}
-    },
-    {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
-        "isExtraImport": true,
-        "detail": "app.api",
         "documentation": {}
     },
     {
@@ -23268,15 +23444,6 @@
         "documentation": {}
     },
     {
-        "label": "glob",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "glob",
-        "description": "glob",
-        "detail": "glob",
-        "documentation": {}
-    },
-    {
         "label": "upgrade",
         "kind": 2,
         "importPath": "backend.alembic.versions.2025_08_06_1909-6cf0164b538b_add_all_models_and_relationships",
@@ -24231,20 +24398,11 @@
         "documentation": {}
     },
     {
-        "label": "PermissionDeniedError",
-        "kind": 6,
-        "importPath": "backend.app.api.v1.endpoints.auth",
-        "description": "backend.app.api.v1.endpoints.auth",
-        "peekOfCode": "class PermissionDeniedError(HTTPException):\n    \"\"\"Raised when user lacks required permissions.\"\"\"\n    def __init__(self, detail: str = \"Insufficient permissions\"):\n        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)\n# === Services are now imported from app.services ===\n# === Authentication Endpoints ===\n@router.post(\n    \"/register\", response_model=UserWithProfile, status_code=status.HTTP_201_CREATED\n)\nasync def register_user(",
-        "detail": "backend.app.api.v1.endpoints.auth",
-        "documentation": {}
-    },
-    {
         "label": "router",
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.auth",
         "description": "backend.app.api.v1.endpoints.auth",
-        "peekOfCode": "router = APIRouter()\n# === Error Handling Classes (imported from services) ===\nclass PermissionDeniedError(HTTPException):\n    \"\"\"Raised when user lacks required permissions.\"\"\"\n    def __init__(self, detail: str = \"Insufficient permissions\"):\n        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)\n# === Services are now imported from app.services ===\n# === Authentication Endpoints ===\n@router.post(",
+        "peekOfCode": "router = APIRouter()\n# === Error Handling Classes (imported from services) ===\n# Using proper exception classes from services\n# === Services are now imported from app.services ===\n# === Authentication Endpoints ===\n@router.post(\n    \"/register\", response_model=UserWithProfile, status_code=status.HTTP_201_CREATED\n)\nasync def register_user(\n    user_in: UserCreate,",
         "detail": "backend.app.api.v1.endpoints.auth",
         "documentation": {}
     },
@@ -24411,363 +24569,12 @@
         "documentation": {}
     },
     {
-        "label": "get_company_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_company_branding(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Получить брендинг компании.\n    \"\"\"\n    branding = company_branding_service.get_company_branding(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_active_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_active_branding(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Получить активный брендинг компании.\n    \"\"\"\n    branding = company_branding_service.get_active_branding(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "create_or_update_company_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def create_or_update_company_branding(\n    *,\n    company_id: int,\n    branding_in: CompanyBrandingCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Создать или обновить брендинг компании.\n    Требует права на управление брендингом компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "update_company_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def update_company_branding(\n    *,\n    company_id: int,\n    branding_in: CompanyBrandingUpdate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Обновить брендинг компании.\n    Требует права на управление брендингом компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_branding_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_company_branding_profile(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingProfile:\n    \"\"\"\n    Получить упрощенный профиль брендинга компании.\n    Возвращает только основные настройки без чувствительных данных.\n    \"\"\"\n    branding = company_branding_service.get_company_branding(",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_color_palette",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_color_palette(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> ColorPalette:\n    \"\"\"\n    Получить цветовую палитру компании.\n    \"\"\"\n    branding = company_branding_service.get_company_branding(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "update_color_palette",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def update_color_palette(\n    *,\n    company_id: int,\n    colors: ColorPalette,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Обновить цветовую палитру компании.\n    Требует права на управление брендингом компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_typography",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_typography(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> TypographyConfig:\n    \"\"\"\n    Получить конфигурацию типографики компании.\n    \"\"\"\n    branding = company_branding_service.get_company_branding(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "update_typography",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def update_typography(\n    *,\n    company_id: int,\n    typography: TypographyConfig,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Обновить типографику компании.\n    Требует права на управление брендингом компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_component_styles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_component_styles(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> ComponentStyles:\n    \"\"\"\n    Получить стили UI компонентов компании.\n    \"\"\"\n    branding = company_branding_service.get_company_branding(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "update_component_styles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def update_component_styles(\n    *,\n    company_id: int,\n    styles: ComponentStyles,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Обновить стили UI компонентов компании.\n    Требует права на управление брендингом компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_social_links",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_social_links(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> SocialLinks:\n    \"\"\"\n    Получить ссылки на социальные сети компании.\n    \"\"\"\n    branding = company_branding_service.get_company_branding(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "update_social_links",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def update_social_links(\n    *,\n    company_id: int,\n    social_links: SocialLinks,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Обновить ссылки на социальные сети компании.\n    Требует права на управление брендингом компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_presets",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_available_presets() -> List[ThemePreset]:\n    \"\"\"\n    Получить доступные предустановленные темы.\n    \"\"\"\n    return company_branding_service.get_available_presets()\n@router.post(\n    \"/company/{company_id}/branding/preset/{preset_name}\",\n    response_model=CompanyBrandingResponse,\n)\ndef apply_preset_theme(",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "apply_preset_theme",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def apply_preset_theme(\n    company_id: int,\n    preset_name: str,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Применить предустановленную тему.\n    Требует права на управление брендингом компании.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "generate_css",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def generate_css(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Response:\n    \"\"\"\n    Сгенерировать CSS переменные для компании.\n    \"\"\"\n    css = company_branding_service.generate_css(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "validate_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def validate_branding(\n    *,\n    company_id: int,\n    branding_in: CompanyBrandingCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> BrandingValidation:\n    \"\"\"\n    Валидировать брендинг компании без сохранения.\n    Проверяет корректность настроек и возвращает рекомендации.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_branding_validation",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_branding_validation(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить результаты валидации текущего брендинга компании.\n    \"\"\"\n    return company_branding_service.validate_branding(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "activate_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def activate_branding(\n    company_id: int,\n    branding_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Активировать брендинг.\n    Требует права на управление брендингом компании.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "deactivate_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def deactivate_branding(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, bool]:\n    \"\"\"\n    Деактивировать все схемы брендинга компании.\n    Требует права на управление брендингом компании.\n    \"\"\"\n    success = company_branding_service.deactivate_branding(",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "clone_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def clone_branding(\n    target_company_id: int,\n    source_company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Клонировать брендинг от одной компании к другой.\n    Требует права на управление брендингом целевой компании\n    и права доступа к исходной компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_similar_themes",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_similar_themes(\n    company_id: int,\n    limit: int = Query(\n        5, ge=1, le=20, description=\"Максимальное количество похожих тем\"\n    ),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[CompanyBrandingProfile]:\n    \"\"\"\n    Получить похожие темы для вдохновения.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "backup_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def backup_branding(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Создать резервную копию брендинга компании.\n    Требует права на управление брендингом компании.\n    \"\"\"\n    return company_branding_service.backup_branding(",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "restore_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def restore_branding(\n    *,\n    company_id: int,\n    backup_data: Dict[str, Any],\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Восстановить брендинг компании из резервной копии.\n    Требует права на управление брендингом компании.",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "export_branding",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def export_branding(\n    company_id: int,\n    format: str,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Response:\n    \"\"\"\n    Экспортировать брендинг в различных форматах.\n    Поддерживаемые форматы: css, json\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_branding_statistics",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_branding_statistics(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить статистику брендинга компаний.\n    Доступно только системным администраторам.\n    \"\"\"\n    return company_branding_service.get_branding_statistics(\n        db=db, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_themes",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_available_themes() -> List[str]:\n    \"\"\"\n    Получить список доступных тем.\n    \"\"\"\n    return [theme.value for theme in ThemeName]\n@router.get(\"/branding/layouts\", response_model=List[str])\ndef get_available_layouts() -> List[str]:\n    \"\"\"\n    Получить доступные типы макета.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_layouts",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_branding",
-        "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "def get_available_layouts() -> List[str]:\n    \"\"\"\n    Получить доступные типы макета.\n    \"\"\"\n    return [layout.value for layout in LayoutType]",
-        "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
         "label": "router",
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.company_branding",
         "description": "backend.app.api.v1.endpoints.company_branding",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/company/{company_id}/branding\", response_model=CompanyBrandingResponse)\ndef get_company_branding(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Получить брендинг компании.\n    \"\"\"",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/company/{company_id}/branding\", response_model=CompanyBrandingResponse)\nasync def get_company_branding(\n    company_id: int,\n    db: SessionDep,\n    current_user: User = Depends(get_current_active_user),\n) -> CompanyBrandingResponse:\n    \"\"\"\n    Получить брендинг компании.\n    \"\"\"",
         "detail": "backend.app.api.v1.endpoints.company_branding",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_contact",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def get_company_contact(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyContactResponse:\n    \"\"\"\n    Получить контактные данные компании.\n    \"\"\"\n    contact = company_contact_service.get_company_contact(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "create_or_update_company_contact",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def create_or_update_company_contact(\n    *,\n    company_id: int,\n    contact_in: CompanyContactCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyContactResponse:\n    \"\"\"\n    Создать или обновить контактные данные компании.\n    Если контактные данные уже существуют, они будут обновлены.",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "update_company_contact",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def update_company_contact(\n    *,\n    company_id: int,\n    contact_in: CompanyContactUpdate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyContactResponse:\n    \"\"\"\n    Обновить контактные данные компании.\n    Требует права на редактирование компании.",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "search_companies_by_email",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def search_companies_by_email(\n    email: str = Query(..., description=\"Email адрес для поиска\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[CompanyContactResponse]:\n    \"\"\"\n    Поиск компаний по email адресу.\n    Доступно только системным администраторам.\n    \"\"\"\n    contacts = company_contact_service.search_companies_by_email(",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "search_companies_by_phone",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def search_companies_by_phone(\n    phone: str = Query(..., description=\"Номер телефона для поиска\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[CompanyContactResponse]:\n    \"\"\"\n    Поиск компаний по номеру телефона.\n    Доступно только системным администраторам.\n    \"\"\"\n    contacts = company_contact_service.search_companies_by_phone(",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "search_companies_by_location",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def search_companies_by_location(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    country: Optional[str] = Query(None, description=\"Страна для поиска\"),\n    city: Optional[str] = Query(None, description=\"Город для поиска\"),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[CompanyContactResponse]:",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "search_companies_by_timezone",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def search_companies_by_timezone(\n    timezone: str = Query(..., description=\"Временная зона для поиска\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[CompanyContactResponse]:\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "search_company_contacts",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def search_company_contacts(\n    q: str = Query(..., min_length=1, description=\"Поисковый запрос\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[CompanyContactResponse]:\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "get_incomplete_contacts",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def get_incomplete_contacts(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[CompanyContactResponse]:\n    \"\"\"\n    Получить компании с неполными контактными данными.",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "get_contact_statistics",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def get_contact_statistics(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить статистику контактных данных компаний.\n    Возвращает общую статистику по заполненности контактных данных.\n    Доступно только системным администраторам.\n    \"\"\"\n    return company_contact_service.get_contact_statistics(",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
-        "documentation": {}
-    },
-    {
-        "label": "validate_contact_data",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_contact",
-        "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "def validate_contact_data(\n    *,\n    company_id: int,\n    contact_in: CompanyContactCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Валидация контактных данных компании без сохранения.\n    Проверяет корректность введенных данных и возвращает список ошибок.",
-        "detail": "backend.app.api.v1.endpoints.company_contact",
         "documentation": {}
     },
     {
@@ -24775,341 +24582,17 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.company_contact",
         "description": "backend.app.api.v1.endpoints.company_contact",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/company/{company_id}/contact\", response_model=CompanyContactResponse)\ndef get_company_contact(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanyContactResponse:\n    \"\"\"\n    Получить контактные данные компании.\n    \"\"\"",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/company/{company_id}/contact\", response_model=CompanyContactResponse)\nasync def get_company_contact(\n    company_id: int,\n    db: SessionDep,\n    current_user: User = Depends(get_current_active_user),\n) -> CompanyContactResponse:\n    \"\"\"\n    Получить контактные данные компании.\n    \"\"\"",
         "detail": "backend.app.api.v1.endpoints.company_contact",
         "documentation": {}
     },
     {
-        "label": "get_company_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_company_settings(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Получить настройки компании.\n    \"\"\"\n    settings = company_settings_service.get_company_settings(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "create_or_update_company_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def create_or_update_company_settings(\n    *,\n    company_id: int,\n    settings_in: CompanySettingsCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Создать или обновить настройки компании.\n    Требует права на управление настройками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "update_company_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def update_company_settings(\n    *,\n    company_id: int,\n    settings_in: CompanySettingsUpdate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Обновить настройки компании.\n    Требует права на управление настройками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_settings_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_company_settings_profile(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsProfile:\n    \"\"\"\n    Получить упрощенный профиль настроек компании.\n    Возвращает только основные настройки без чувствительных данных.\n    \"\"\"\n    settings = company_settings_service.get_company_settings(",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_password_policy",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_password_policy(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> PasswordPolicySettings:\n    \"\"\"\n    Получить политику паролей компании.\n    \"\"\"\n    return company_settings_service.get_password_policy(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "update_password_policy",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def update_password_policy(\n    *,\n    company_id: int,\n    policy_in: PasswordPolicySettings,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Обновить политику паролей компании.\n    Требует права на управление настройками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_notification_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_notification_settings(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> NotificationSettings:\n    \"\"\"\n    Получить настройки уведомлений компании.\n    \"\"\"\n    return company_settings_service.get_notification_settings(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "update_notification_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def update_notification_settings(\n    *,\n    company_id: int,\n    notification_in: NotificationSettings,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Обновить настройки уведомлений компании.\n    Требует права на управление настройками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_sso_configuration",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_sso_configuration(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить конфигурацию SSO компании.\n    Требует права на управление настройками компании.\n    \"\"\"\n    config = company_settings_service.get_sso_configuration(",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "configure_sso",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def configure_sso(\n    *,\n    company_id: int,\n    sso_config: SSOConfiguration,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Настроить SSO для компании.\n    Требует права на управление настройками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "disable_sso",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def disable_sso(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Отключить SSO для компании.\n    Требует права на управление настройками компании.\n    \"\"\"\n    settings = company_settings_service.disable_sso(",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_file_upload_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_file_upload_settings(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить настройки загрузки файлов компании.\n    \"\"\"\n    return company_settings_service.get_file_upload_settings(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "validate_file_upload",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def validate_file_upload(\n    company_id: int,\n    file_size_bytes: int = Query(..., description=\"Размер файла в байтах\"),\n    file_extension: str = Query(..., description=\"Расширение файла (без точки)\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Валидировать возможность загрузки файла.\n    Проверяет размер файла и тип согласно настройкам компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_export_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_export_settings(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить настройки экспорта данных компании.\n    \"\"\"\n    return company_settings_service.get_export_settings(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "check_export_format",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def check_export_format(\n    company_id: int,\n    format_name: str,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, bool]:\n    \"\"\"\n    Проверить, разрешен ли формат экспорта.\n    \"\"\"\n    allowed = company_settings_service.can_export_format(",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "update_custom_setting",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def update_custom_setting(\n    *,\n    company_id: int,\n    key: str,\n    value: Dict[str, Any],\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Обновить кастомную настройку компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "delete_custom_setting",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def delete_custom_setting(\n    company_id: int,\n    key: str,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Удалить кастомную настройку компании.\n    Требует права на управление настройками компании.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "backup_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def backup_settings(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Создать резервную копию настроек компании.\n    Требует права на управление настройками компании.\n    \"\"\"\n    return company_settings_service.backup_settings(",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "restore_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def restore_settings(\n    *,\n    company_id: int,\n    backup_data: Dict[str, Any],\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Восстановить настройки компании из резервной копии.\n    Требует права на управление настройками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_settings_statistics",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_settings_statistics(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить статистику настроек компаний.\n    Доступно только системным администраторам.\n    \"\"\"\n    return company_settings_service.get_settings_statistics(\n        db=db, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_sso_providers",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_available_sso_providers() -> List[str]:\n    \"\"\"\n    Получить список доступных провайдеров SSO.\n    \"\"\"\n    return [provider.value for provider in SSOProvider]\n@router.get(\"/settings/providers/storage\", response_model=List[str])\ndef get_available_storage_providers() -> List[str]:\n    \"\"\"\n    Получить список доступных провайдеров хранения файлов.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_storage_providers",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_available_storage_providers() -> List[str]:\n    \"\"\"\n    Получить список доступных провайдеров хранения файлов.\n    \"\"\"\n    return [provider.value for provider in FileStorageProvider]\n@router.get(\"/settings/visibility/levels\", response_model=List[str])\ndef get_project_visibility_levels() -> List[str]:\n    \"\"\"\n    Получить доступные уровни видимости проектов.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_project_visibility_levels",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def get_project_visibility_levels() -> List[str]:\n    \"\"\"\n    Получить доступные уровни видимости проектов.\n    \"\"\"\n    return [level.value for level in ProjectVisibility]\n@router.post(\n    \"/company/{company_id}/settings/validate\", response_model=CompanySettingsValidation\n)\ndef validate_settings(\n    *,",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "validate_settings",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_settings",
-        "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "def validate_settings(\n    *,\n    company_id: int,\n    settings_in: CompanySettingsCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsValidation:\n    \"\"\"\n    Валидировать настройки компании без сохранения.\n    Проверяет корректность настроек и возвращает рекомендации.",
-        "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
         "label": "router",
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.company_settings",
         "description": "backend.app.api.v1.endpoints.company_settings",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/company/{company_id}/settings\", response_model=CompanySettingsResponse)\ndef get_company_settings(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Получить настройки компании.\n    \"\"\"",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/company/{company_id}/settings\", response_model=CompanySettingsResponse)\nasync def get_company_settings(\n    company_id: int,\n    db: SessionDep,\n    current_user: User = Depends(get_current_active_user),\n) -> CompanySettingsResponse:\n    \"\"\"\n    Получить настройки компании.\n    \"\"\"",
         "detail": "backend.app.api.v1.endpoints.company_settings",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def get_company_subscription(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Получить подписку компании.\n    \"\"\"\n    subscription = company_subscription_service.get_company_subscription(\n        db=db, company_id=company_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "create_company_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def create_company_subscription(\n    *,\n    company_id: int,\n    subscription_in: CompanySubscriptionCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Создать подписку для компании.\n    Требует права на управление подписками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "update_company_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def update_company_subscription(\n    *,\n    company_id: int,\n    subscription_in: CompanySubscriptionUpdate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Обновить подписку компании.\n    Требует права на управление подписками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "upgrade_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def upgrade_subscription(\n    *,\n    company_id: int,\n    new_plan: SubscriptionPlan,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Обновить план подписки компании.\n    Требует права на управление подписками компании.",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "activate_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def activate_subscription(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Активировать подписку компании.\n    Требует права на управление подписками компании.\n    \"\"\"\n    subscription = company_subscription_service.activate_subscription(",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "suspend_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def suspend_subscription(\n    company_id: int,\n    reason: Optional[str] = Query(None, description=\"Причина приостановки\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Приостановить подписку компании.\n    Доступно только системным администраторам.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "cancel_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def cancel_subscription(\n    company_id: int,\n    immediate: bool = Query(\n        False, description=\"Немедленная отмена или в конце периода\"\n    ),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Отменить подписку компании.",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "renew_subscription",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def renew_subscription(\n    company_id: int,\n    billing_period: Optional[BillingPeriod] = Query(\n        None, description=\"Новый период биллинга\"\n    ),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"\n    Продлить подписку компании.",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "get_subscription_usage",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def get_subscription_usage(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> SubscriptionUsageStats:\n    \"\"\"\n    Получить статистику использования подписки компании.\n    Показывает текущее использование лимитов и предупреждения.\n    \"\"\"\n    return company_subscription_service.get_subscription_usage_stats(",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_plans",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def get_available_plans() -> List[SubscriptionPlanDetails]:\n    \"\"\"\n    Получить доступные планы подписки.\n    Возвращает информацию о всех доступных планах с ценами и возможностями.\n    \"\"\"\n    return company_subscription_service.get_available_plans()\n@router.get(\"/subscription/expiring\", response_model=List[CompanySubscriptionResponse])\ndef get_expiring_subscriptions(\n    days_until_expiry: int = Query(7, ge=1, le=365, description=\"Дней до истечения\"),\n    db: Session = Depends(deps.get_db),",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "get_expiring_subscriptions",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def get_expiring_subscriptions(\n    days_until_expiry: int = Query(7, ge=1, le=365, description=\"Дней до истечения\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[CompanySubscriptionResponse]:\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
-        "documentation": {}
-    },
-    {
-        "label": "get_subscription_statistics",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.company_subscription",
-        "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "def get_subscription_statistics(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Получить общую статистику по подпискам.\n    Включает распределение по планам, доходы, конверсию.\n    Доступно только системным администраторам.\n    \"\"\"\n    return company_subscription_service.get_subscription_statistics(",
-        "detail": "backend.app.api.v1.endpoints.company_subscription",
         "documentation": {}
     },
     {
@@ -25117,7 +24600,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.company_subscription",
         "description": "backend.app.api.v1.endpoints.company_subscription",
-        "peekOfCode": "router = APIRouter()\n@router.get(\n    \"/company/{company_id}/subscription\", response_model=CompanySubscriptionResponse\n)\ndef get_company_subscription(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"",
+        "peekOfCode": "router = APIRouter()\n@router.get(\n    \"/company/{company_id}/subscription\", response_model=CompanySubscriptionResponse\n)\nasync def get_company_subscription(\n    company_id: int,\n    db: SessionDep,\n    current_user: User = Depends(get_current_active_user),\n) -> CompanySubscriptionResponse:\n    \"\"\"",
         "detail": "backend.app.api.v1.endpoints.company_subscription",
         "documentation": {}
     },
@@ -25140,273 +24623,12 @@
         "documentation": {}
     },
     {
-        "label": "create_department",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def create_department(\n    *,\n    db: Session = Depends(deps.get_db),\n    department_in: DepartmentCreate,\n    current_user: User = Depends(deps.get_current_active_user),\n) -> DepartmentResponse:\n    \"\"\"\n    Создать новый департамент.\n    Требует права на создание департаментов в компании.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "get_department",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def get_department(\n    department_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> DepartmentResponse:\n    \"\"\"\n    Получить департамент по ID.\n    \"\"\"\n    department = department_service.get_department(\n        db=db, department_id=department_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "update_department",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def update_department(\n    *,\n    db: Session = Depends(deps.get_db),\n    department_id: int,\n    department_in: DepartmentUpdate,\n    current_user: User = Depends(deps.get_current_active_user),\n) -> DepartmentResponse:\n    \"\"\"\n    Обновить департамент.\n    Требует права на редактирование департамента.",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "delete_department",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def delete_department(\n    department_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> None:\n    \"\"\"\n    Удалить департамент.\n    Требует права на удаление департамента.\n    Нельзя удалить департамент с дочерними департаментами, командами или проектами.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_departments",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def get_company_departments(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    include_inactive: bool = Query(\n        False, description=\"Включить неактивные департаменты\"",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_department_hierarchy",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def get_company_department_hierarchy(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    parent_id: Optional[int] = Query(None, description=\"ID родительского департамента\"),\n) -> List[DepartmentHierarchy]:\n    \"\"\"\n    Получить иерархию департаментов компании.\n    Если parent_id не указан, возвращает корневые департаменты с их дочерними элементами.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_department_tree",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def get_company_department_tree(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[Dict[str, Any]]:\n    \"\"\"\n    Получить полное дерево департаментов компании.\n    Возвращает компактное представление дерева для UI компонентов.\n    \"\"\"\n    return department_service.get_company_department_tree(",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "get_department_statistics",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def get_department_statistics(\n    department_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> DepartmentStats:\n    \"\"\"\n    Получить статистику департамента.\n    Включает количество команд, проектов, сотрудников и другие метрики.\n    \"\"\"\n    return department_service.get_department_statistics(",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "search_departments",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def search_departments(\n    company_id: int,\n    q: str = Query(..., min_length=1, description=\"Поисковый запрос\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[DepartmentResponse]:",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "get_root_departments",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def get_root_departments(\n    company_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[DepartmentResponse]:\n    \"\"\"\n    Получить корневые департаменты компании.\n    Возвращает только департаменты верхнего уровня (без родительского департамента).\n    \"\"\"\n    # Проверяем права доступа",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "get_department_children",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def get_department_children(\n    department_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[DepartmentResponse]:\n    \"\"\"\n    Получить дочерние департаменты.\n    \"\"\"\n    # Сначала получаем департамент для проверки прав\n    department = department_service.get_department(",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "update_department_counts",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.departments",
-        "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "def update_department_counts(\n    department_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> DepartmentResponse:\n    \"\"\"\n    Обновить счетчики департамента (количество сотрудников и команд).\n    Полезно после изменений в командах или участниках.\n    \"\"\"\n    # Проверяем существование и права",
-        "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
         "label": "router",
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.departments",
         "description": "backend.app.api.v1.endpoints.departments",
-        "peekOfCode": "router = APIRouter()\n@router.post(\n    \"/\", response_model=DepartmentResponse, status_code=status.HTTP_201_CREATED\n)\ndef create_department(\n    *,\n    db: Session = Depends(deps.get_db),\n    department_in: DepartmentCreate,\n    current_user: User = Depends(deps.get_current_active_user),\n) -> DepartmentResponse:",
+        "peekOfCode": "router = APIRouter()\n@router.post(\n    \"/\", response_model=DepartmentResponse, status_code=status.HTTP_201_CREATED\n)\nasync def create_department(\n    *,\n    db: SessionDep,\n    department_in: DepartmentCreate,\n    current_user: User = Depends(get_current_active_user),\n) -> DepartmentResponse:",
         "detail": "backend.app.api.v1.endpoints.departments",
-        "documentation": {}
-    },
-    {
-        "label": "create_role",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def create_role(\n    *,\n    role_in: EnhancedRoleCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> EnhancedRoleResponse:\n    \"\"\"\n    Создать новую роль.\n    Требует права на создание ролей (системный администратор).\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "get_role",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def get_role(\n    role_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> EnhancedRoleResponse:\n    \"\"\"\n    Получить роль по ID.\n    \"\"\"\n    role = enhanced_role_service.get_role(\n        db=db, role_id=role_id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "update_role",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def update_role(\n    *,\n    role_id: int,\n    role_in: EnhancedRoleUpdate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> EnhancedRoleResponse:\n    \"\"\"\n    Обновить роль.\n    Требует права на редактирование ролей.",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "delete_role",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def delete_role(\n    role_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n):\n    \"\"\"\n    Удалить роль.\n    Требует права на удаление ролей.\n    Роль не может быть удалена, если она назначена пользователям.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "list_roles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def list_roles(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    scope: Optional[RoleScope] = Query(None, description=\"Фильтр по области действия\"),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[EnhancedRoleResponse]:\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "get_assignable_roles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def get_assignable_roles(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    scope: Optional[RoleScope] = Query(None, description=\"Фильтр по области действия\"),\n) -> List[EnhancedRoleResponse]:\n    \"\"\"\n    Получить роли, которые можно назначать.\n    Возвращает только активные роли с флагом is_assignable=True.\n    \"\"\"\n    roles = enhanced_role_service.get_assignable_roles(",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "search_roles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def search_roles(\n    q: str = Query(..., min_length=1, description=\"Поисковый запрос\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    scope: Optional[RoleScope] = Query(None, description=\"Фильтр по области действия\"),\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n) -> List[EnhancedRoleResponse]:",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "assign_role",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def assign_role(\n    *,\n    assignment_in: UserRoleAssignmentCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserRoleAssignmentResponse:\n    \"\"\"\n    Назначить роль пользователю в определенном контексте.\n    Требует права на назначение ролей.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "revoke_role_assignment",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def revoke_role_assignment(\n    assignment_id: int,\n    reason: Optional[str] = Query(None, description=\"Причина отзыва роли\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserRoleAssignmentResponse:\n    \"\"\"\n    Отозвать назначение роли.\n    Требует права на отзыв назначений ролей.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "approve_role_assignment",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def approve_role_assignment(\n    assignment_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserRoleAssignmentResponse:\n    \"\"\"\n    Одобрить назначение роли.\n    Используется для ролей, которые требуют одобрения.\n    \"\"\"\n    assignment = enhanced_role_service.approve_role_assignment(",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "extend_role_assignment",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def extend_role_assignment(\n    assignment_id: int,\n    days: int = Query(..., ge=1, le=365, description=\"Количество дней для продления\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserRoleAssignmentResponse:\n    \"\"\"\n    Продлить назначение роли.\n    Продлевает срок действия роли на указанное количество дней.\n    \"\"\"",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "get_user_role_assignments",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def get_user_role_assignments(\n    user_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    active_only: bool = Query(True, description=\"Показать только активные назначения\"),\n) -> List[UserRoleAssignmentResponse]:\n    \"\"\"\n    Получить назначения ролей пользователя.\n    Пользователь может просматривать свои назначения,\n    администраторы могут просматривать назначения любых пользователей.",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "get_assignments_by_context",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def get_assignments_by_context(\n    scope: RoleScope,\n    context_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n    active_only: bool = Query(True, description=\"Показать только активные назначения\"),\n) -> List[UserRoleAssignmentResponse]:\n    \"\"\"\n    Получить назначения ролей в определенном контексте.\n    Например, все роли в конкретной компании, департаменте, команде или проекте.",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "cleanup_expired_assignments",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def cleanup_expired_assignments(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Очистить истекшие назначения ролей.\n    Удаляет все назначения ролей с истекшим сроком действия.\n    Доступно только системным администраторам.\n    \"\"\"\n    return enhanced_role_service.cleanup_expired_assignments(",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_scopes",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def get_available_scopes() -> List[str]:\n    \"\"\"\n    Получить доступные области действия ролей.\n    \"\"\"\n    return [scope.value for scope in RoleScope]\n@router.get(\n    \"/permissions/user/{user_id}/context/{scope}/{context_id}\", response_model=List[str]\n)\ndef get_user_permissions_in_context(\n    user_id: int,",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "get_user_permissions_in_context",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def get_user_permissions_in_context(\n    user_id: int,\n    scope: RoleScope,\n    context_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[str]:\n    \"\"\"\n    Получить разрешения пользователя в определенном контексте.\n    Возвращает список всех разрешений, которые пользователь имеет",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
-        "documentation": {}
-    },
-    {
-        "label": "check_permissions",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
-        "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "def check_permissions(\n    user_id: int,\n    permissions: List[str] = Query(..., description=\"Список разрешений для проверки\"),\n    scope: Optional[RoleScope] = Query(None, description=\"Область действия\"),\n    context_id: Optional[int] = Query(None, description=\"ID контекста\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, bool]:\n    \"\"\"\n    Проверить наличие разрешений у пользователя.",
-        "detail": "backend.app.api.v1.endpoints.enhanced_roles",
         "documentation": {}
     },
     {
@@ -25414,7 +24636,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.enhanced_roles",
         "description": "backend.app.api.v1.endpoints.enhanced_roles",
-        "peekOfCode": "router = APIRouter()\n# Endpoints для управления ролями\n@router.post(\n    \"/roles\", response_model=EnhancedRoleResponse, status_code=status.HTTP_201_CREATED\n)\ndef create_role(\n    *,\n    role_in: EnhancedRoleCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),",
+        "peekOfCode": "router = APIRouter()\n# Endpoints для управления ролями\n@router.post(\n    \"/roles\", response_model=EnhancedRoleResponse, status_code=status.HTTP_201_CREATED\n)\nasync def create_role(\n    *,\n    role_in: EnhancedRoleCreate,\n    db: SessionDep,\n    current_user: User = Depends(get_current_active_user),",
         "detail": "backend.app.api.v1.endpoints.enhanced_roles",
         "documentation": {}
     },
@@ -25518,254 +24740,11 @@
         "documentation": {}
     },
     {
-        "label": "get_my_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_my_profile(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Получить профиль текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.get_current_user_profile(\n        db=db, current_user=current_user\n    )",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "create_or_update_my_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def create_or_update_my_profile(\n    *,\n    profile_in: UserProfileCreate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Создать или обновить профиль текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.create_or_update_profile(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_my_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_my_profile(\n    *,\n    profile_in: UserProfileUpdate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить профиль текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.update_profile(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_user_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_user_profile(\n    user_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Получить профиль пользователя по ID.\n    Требует права на просмотр профиля.\n    \"\"\"\n    profile = user_profile_service.get_user_profile(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_user_public_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_user_public_profile(\n    user_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfilePublic:\n    \"\"\"\n    Получить публичную версию профиля пользователя.\n    Возвращает только публичную информацию без чувствительных данных.\n    \"\"\"\n    return user_profile_service.get_public_profile(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_user_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_user_profile(\n    *,\n    user_id: int,\n    profile_in: UserProfileUpdate,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить профиль пользователя.\n    Требует права на редактирование профиля.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_my_profile_completion",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_my_profile_completion(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileCompletion:\n    \"\"\"\n    Получить статус заполненности профиля текущего пользователя.\n    \"\"\"\n    return user_profile_service.get_profile_completion_status(\n        db=db, user_id=current_user.id, current_user=current_user\n    )",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_user_profile_completion",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_user_profile_completion(\n    user_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileCompletion:\n    \"\"\"\n    Получить статус заполненности профиля пользователя.\n    Требует права на просмотр профиля.\n    \"\"\"\n    return user_profile_service.get_profile_completion_status(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_my_avatar",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_my_avatar(\n    *,\n    avatar_url: str,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить аватар текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.update_avatar(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_user_avatar",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_user_avatar(\n    *,\n    user_id: int,\n    avatar_url: str,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить аватар пользователя.\n    Требует права на редактирование профиля.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_my_contact_info",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_my_contact_info(\n    *,\n    contact_info: ContactInfo,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить контактную информацию текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.update_contact_info(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_user_contact_info",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_user_contact_info(\n    *,\n    user_id: int,\n    contact_info: ContactInfo,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить контактную информацию пользователя.\n    Требует права на редактирование профиля.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_my_work_info",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_my_work_info(\n    *,\n    work_info: WorkInfo,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить рабочую информацию текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.update_work_info(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_user_work_info",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_user_work_info(\n    *,\n    user_id: int,\n    work_info: WorkInfo,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить рабочую информацию пользователя.\n    Требует права на редактирование профиля.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_my_localization",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_my_localization(\n    *,\n    localization: LocalizationSettings,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить настройки локализации текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.update_localization(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "update_user_localization",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def update_user_localization(\n    *,\n    user_id: int,\n    localization: LocalizationSettings,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Обновить настройки локализации пользователя.\n    Требует права на редактирование профиля.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "verify_my_phone",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def verify_my_phone(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Подтвердить номер телефона текущего пользователя.\n    В реальной реализации здесь должна быть логика отправки и проверки SMS-кода.\n    \"\"\"\n    profile = user_profile_service.verify_phone(\n        db=db, user_id=current_user.id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "verify_user_phone",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def verify_user_phone(\n    user_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Подтвердить номер телефона пользователя.\n    Требует права на редактирование профиля.\n    \"\"\"\n    profile = user_profile_service.verify_phone(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "search_profiles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def search_profiles(\n    q: str = Query(..., min_length=2, description=\"Поисковый запрос\"),\n    skip: int = Query(0, ge=0, description=\"Количество записей для пропуска\"),\n    limit: int = Query(50, ge=1, le=100, description=\"Максимальное количество записей\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[UserProfileSummary]:\n    \"\"\"\n    Поиск профилей пользователей по имени, должности или отделу.\n    Требует аутентификации.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_company_profiles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_company_profiles(\n    company_id: int,\n    skip: int = Query(0, ge=0, description=\"Количество записей для пропуска\"),\n    limit: int = Query(50, ge=1, le=100, description=\"Максимальное количество записей\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[UserProfileSummary]:\n    \"\"\"\n    Получить профили пользователей компании.\n    Требует права доступа к компании.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_department_profiles",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_department_profiles(\n    department: str,\n    skip: int = Query(0, ge=0, description=\"Количество записей для пропуска\"),\n    limit: int = Query(50, ge=1, le=100, description=\"Максимальное количество записей\"),\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> List[UserProfileSummary]:\n    \"\"\"\n    Получить профили пользователей отдела.\n    Требует права доступа к отделу.",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "validate_my_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def validate_my_profile(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Валидировать профиль текущего пользователя.\n    Проверяет корректность и полноту данных профиля.\n    \"\"\"\n    return user_profile_service.validate_profile(\n        db=db, user_id=current_user.id, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "validate_user_profile",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def validate_user_profile(\n    user_id: int,\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, Any]:\n    \"\"\"\n    Валидировать профиль пользователя.\n    Требует права на просмотр профиля.\n    \"\"\"\n    return user_profile_service.validate_profile(",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_profile_statistics",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_profile_statistics(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileStats:\n    \"\"\"\n    Получить статистику профилей пользователей.\n    Доступно только системным администраторам.\n    \"\"\"\n    return user_profile_service.get_profile_statistics(db=db, current_user=current_user)\n@router.post(\"/profiles/bulk/update-completion\", response_model=Dict[str, int])",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "bulk_update_completion_status",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def bulk_update_completion_status(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> Dict[str, int]:\n    \"\"\"\n    Пересчитать статус заполненности для всех профилей.\n    Доступно только системным администраторам.\n    \"\"\"\n    return user_profile_service.bulk_update_completion_status(\n        db=db, current_user=current_user",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_timezones",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_available_timezones() -> List[str]:\n    \"\"\"\n    Получить список доступных часовых поясов.\n    \"\"\"\n    return [\n        \"Europe/Moscow\",\n        \"Europe/London\",\n        \"Europe/Berlin\",\n        \"America/New_York\",\n        \"America/Los_Angeles\",",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
-        "label": "get_available_languages",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.user_profiles",
-        "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "def get_available_languages() -> List[str]:\n    \"\"\"\n    Получить список доступных языков интерфейса.\n    \"\"\"\n    return [\"ru\", \"en\", \"de\", \"fr\", \"es\", \"zh\", \"ja\"]",
-        "detail": "backend.app.api.v1.endpoints.user_profiles",
-        "documentation": {}
-    },
-    {
         "label": "router",
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.user_profiles",
         "description": "backend.app.api.v1.endpoints.user_profiles",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/profiles/me\", response_model=UserProfileResponse)\ndef get_my_profile(\n    db: Session = Depends(deps.get_db),\n    current_user: User = Depends(deps.get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Получить профиль текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.get_current_user_profile(",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/profiles/me\", response_model=UserProfileResponse)\nasync def get_my_profile(\n    db: SessionDep,\n    current_user: User = Depends(get_current_active_user),\n) -> UserProfileResponse:\n    \"\"\"\n    Получить профиль текущего пользователя.\n    \"\"\"\n    profile = user_profile_service.get_current_user_profile(",
         "detail": "backend.app.api.v1.endpoints.user_profiles",
         "documentation": {}
     },
@@ -34344,60 +33323,6 @@
         "description": "backend.tests.test_validation_simple",
         "peekOfCode": "class TestSimpleValidation:\n    \"\"\"Упрощенные тесты валидации.\"\"\"\n    def test_valid_user_creation(self):\n        \"\"\"Тестирует валидное создание пользователя.\"\"\"\n        user_data = {\n            \"username\": \"validuser\",\n            \"email\": \"user@company.com\",  # Изменяем email\n            \"name\": \"Valid User\",\n            \"password\": \"SafePassword123!\"  # Безопасный пароль, не содержащий части email\n        }",
         "detail": "backend.tests.test_validation_simple",
-        "documentation": {}
-    },
-    {
-        "label": "update_imports",
-        "kind": 2,
-        "importPath": "backend.fix_all_endpoints",
-        "description": "backend.fix_all_endpoints",
-        "peekOfCode": "def update_imports(content):\n    \"\"\"Update import statements.\"\"\"\n    # Replace main import\n    content = re.sub(\n        r'from app\\.api\\.deps import \\(',\n        'from app.api.dependencies import (',\n        content\n    )\n    # Add new imports if needed\n    new_imports = set()",
-        "detail": "backend.fix_all_endpoints",
-        "documentation": {}
-    },
-    {
-        "label": "update_dependencies",
-        "kind": 2,
-        "importPath": "backend.fix_all_endpoints",
-        "description": "backend.fix_all_endpoints",
-        "peekOfCode": "def update_dependencies(content):\n    \"\"\"Update dependency usage.\"\"\"\n    # Replace db parameter\n    content = re.sub(\n        r'db: AsyncSession = Depends\\(get_db\\),?',\n        'db: SessionDep,',\n        content\n    )\n    # Replace permission dependencies\n    for old_dep, new_dep in DEPENDENCY_MAPPING.items():",
-        "detail": "backend.fix_all_endpoints",
-        "documentation": {}
-    },
-    {
-        "label": "fix_parameter_order",
-        "kind": 2,
-        "importPath": "backend.fix_all_endpoints",
-        "description": "backend.fix_all_endpoints",
-        "peekOfCode": "def fix_parameter_order(content):\n    \"\"\"Fix parameter order in function definitions.\"\"\"\n    def fix_single_function(match):\n        func_def = match.group(0)\n        lines = func_def.split('\\n')\n        if len(lines) < 3:\n            return func_def\n        # Extract function signature\n        func_line = lines[0]\n        param_lines = []",
-        "detail": "backend.fix_all_endpoints",
-        "documentation": {}
-    },
-    {
-        "label": "process_file",
-        "kind": 2,
-        "importPath": "backend.fix_all_endpoints",
-        "description": "backend.fix_all_endpoints",
-        "peekOfCode": "def process_file(filepath):\n    \"\"\"Process a single endpoint file.\"\"\"\n    print(f\"Processing {filepath}...\")\n    try:\n        with open(filepath, 'r', encoding='utf-8') as f:\n            content = f.read()\n        # Skip if already uses new system\n        if 'from app.api.dependencies import' in content and 'from app.api.deps import' not in content:\n            print(f\"  Already using new dependency system\")\n            return True",
-        "detail": "backend.fix_all_endpoints",
-        "documentation": {}
-    },
-    {
-        "label": "main",
-        "kind": 2,
-        "importPath": "backend.fix_all_endpoints",
-        "description": "backend.fix_all_endpoints",
-        "peekOfCode": "def main():\n    \"\"\"Main function.\"\"\"\n    endpoint_files = glob.glob('app/api/v1/endpoints/*.py')\n    endpoint_files = [f for f in endpoint_files if not f.endswith('__init__.py')]\n    print(f\"Found {len(endpoint_files)} endpoint files to process:\")\n    success_count = 0\n    for filepath in endpoint_files:\n        if process_file(filepath):\n            success_count += 1\n    print(f\"\\n✅ Successfully processed {success_count}/{len(endpoint_files)} files\")",
-        "detail": "backend.fix_all_endpoints",
-        "documentation": {}
-    },
-    {
-        "label": "DEPENDENCY_MAPPING",
-        "kind": 5,
-        "importPath": "backend.fix_all_endpoints",
-        "description": "backend.fix_all_endpoints",
-        "peekOfCode": "DEPENDENCY_MAPPING = {\n    'from app.api.deps import': 'from app.api.dependencies import',\n    'get_db': 'SessionDep',\n    'AsyncSession = Depends(get_db)': 'SessionDep',\n    'get_users_read_user': 'UserPermissions.read()',\n    'get_users_write_user': 'UserPermissions.write()',\n    'get_users_delete_user': 'UserPermissions.delete()',\n    'get_projects_read_user': 'ProjectPermissions.read()',\n    'get_projects_write_user': 'ProjectPermissions.write()',\n    'get_projects_delete_user': 'ProjectPermissions.delete()',",
-        "detail": "backend.fix_all_endpoints",
         "documentation": {}
     },
     {

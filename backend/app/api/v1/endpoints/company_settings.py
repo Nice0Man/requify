@@ -4,9 +4,10 @@ API endpoints для настроек компании.
 
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
+    AdminPermissions,
+from app.api.dependencies import get_db, get_current_active_user, SessionDep,
 from app.models.user import User
 from app.services.company_settings_service import company_settings_service
 from app.schemas.company_settings import (
@@ -27,10 +28,10 @@ router = APIRouter()
 
 
 @router.get("/company/{company_id}/settings", response_model=CompanySettingsResponse)
-def get_company_settings(
+async def get_company_settings(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Получить настройки компании.
@@ -59,12 +60,12 @@ def get_company_settings(
     response_model=CompanySettingsResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_or_update_company_settings(
+async def create_or_update_company_settings(
     *,
     company_id: int,
     settings_in: CompanySettingsCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Создать или обновить настройки компании.
@@ -82,12 +83,12 @@ def create_or_update_company_settings(
 
 
 @router.put("/company/{company_id}/settings", response_model=CompanySettingsResponse)
-def update_company_settings(
+async def update_company_settings(
     *,
     company_id: int,
     settings_in: CompanySettingsUpdate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Обновить настройки компании.
@@ -107,10 +108,10 @@ def update_company_settings(
 @router.get(
     "/company/{company_id}/settings/profile", response_model=CompanySettingsProfile
 )
-def get_company_settings_profile(
+async def get_company_settings_profile(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsProfile:
     """
     Получить упрощенный профиль настроек компании.
@@ -153,10 +154,10 @@ def get_company_settings_profile(
     "/company/{company_id}/settings/password-policy",
     response_model=PasswordPolicySettings,
 )
-def get_password_policy(
+async def get_password_policy(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> PasswordPolicySettings:
     """
     Получить политику паролей компании.
@@ -170,12 +171,12 @@ def get_password_policy(
     "/company/{company_id}/settings/password-policy",
     response_model=CompanySettingsResponse,
 )
-def update_password_policy(
+async def update_password_policy(
     *,
     company_id: int,
     policy_in: PasswordPolicySettings,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Обновить политику паролей компании.
@@ -195,10 +196,10 @@ def update_password_policy(
 @router.get(
     "/company/{company_id}/settings/notifications", response_model=NotificationSettings
 )
-def get_notification_settings(
+async def get_notification_settings(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> NotificationSettings:
     """
     Получить настройки уведомлений компании.
@@ -212,12 +213,12 @@ def get_notification_settings(
     "/company/{company_id}/settings/notifications",
     response_model=CompanySettingsResponse,
 )
-def update_notification_settings(
+async def update_notification_settings(
     *,
     company_id: int,
     notification_in: NotificationSettings,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Обновить настройки уведомлений компании.
@@ -238,10 +239,10 @@ def update_notification_settings(
 
 
 @router.get("/company/{company_id}/settings/sso", response_model=Dict[str, Any])
-def get_sso_configuration(
+async def get_sso_configuration(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить конфигурацию SSO компании.
@@ -264,12 +265,12 @@ def get_sso_configuration(
 @router.post(
     "/company/{company_id}/settings/sso", response_model=CompanySettingsResponse
 )
-def configure_sso(
+async def configure_sso(
     *,
     company_id: int,
     sso_config: SSOConfiguration,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Настроить SSO для компании.
@@ -286,10 +287,10 @@ def configure_sso(
 @router.delete(
     "/company/{company_id}/settings/sso", response_model=CompanySettingsResponse
 )
-def disable_sso(
+async def disable_sso(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Отключить SSO для компании.
@@ -307,10 +308,10 @@ def disable_sso(
 
 
 @router.get("/company/{company_id}/settings/file-upload", response_model=Dict[str, Any])
-def get_file_upload_settings(
+async def get_file_upload_settings(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить настройки загрузки файлов компании.
@@ -323,12 +324,12 @@ def get_file_upload_settings(
 @router.post(
     "/company/{company_id}/settings/validate-file", response_model=Dict[str, Any]
 )
-def validate_file_upload(
+async def validate_file_upload(
     company_id: int,
     file_size_bytes: int = Query(..., description="Размер файла в байтах"),
     file_extension: str = Query(..., description="Расширение файла (без точки)"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Валидировать возможность загрузки файла.
@@ -348,10 +349,10 @@ def validate_file_upload(
 
 
 @router.get("/company/{company_id}/settings/export", response_model=Dict[str, Any])
-def get_export_settings(
+async def get_export_settings(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить настройки экспорта данных компании.
@@ -365,11 +366,11 @@ def get_export_settings(
     "/company/{company_id}/settings/export/check/{format_name}",
     response_model=Dict[str, bool],
 )
-def check_export_format(
+async def check_export_format(
     company_id: int,
     format_name: str,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, bool]:
     """
     Проверить, разрешен ли формат экспорта.
@@ -388,13 +389,13 @@ def check_export_format(
     "/company/{company_id}/settings/custom/{key}",
     response_model=CompanySettingsResponse,
 )
-def update_custom_setting(
+async def update_custom_setting(
     *,
     company_id: int,
     key: str,
     value: Dict[str, Any],
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Обновить кастомную настройку компании.
@@ -416,11 +417,11 @@ def update_custom_setting(
     "/company/{company_id}/settings/custom/{key}",
     response_model=CompanySettingsResponse,
 )
-def delete_custom_setting(
+async def delete_custom_setting(
     company_id: int,
     key: str,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Удалить кастомную настройку компании.
@@ -438,10 +439,10 @@ def delete_custom_setting(
 
 
 @router.post("/company/{company_id}/settings/backup", response_model=Dict[str, Any])
-def backup_settings(
+async def backup_settings(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Создать резервную копию настроек компании.
@@ -456,12 +457,12 @@ def backup_settings(
 @router.post(
     "/company/{company_id}/settings/restore", response_model=CompanySettingsResponse
 )
-def restore_settings(
+async def restore_settings(
     *,
     company_id: int,
     backup_data: Dict[str, Any],
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsResponse:
     """
     Восстановить настройки компании из резервной копии.
@@ -479,9 +480,9 @@ def restore_settings(
 
 
 @router.get("/settings/statistics", response_model=Dict[str, Any])
-def get_settings_statistics(
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+async def get_settings_statistics(
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> Dict[str, Any]:
     """
     Получить статистику настроек компаний.
@@ -494,7 +495,7 @@ def get_settings_statistics(
 
 
 @router.get("/settings/providers/sso", response_model=List[str])
-def get_available_sso_providers() -> List[str]:
+async def get_available_sso_providers() -> List[str]:
     """
     Получить список доступных провайдеров SSO.
     """
@@ -502,7 +503,7 @@ def get_available_sso_providers() -> List[str]:
 
 
 @router.get("/settings/providers/storage", response_model=List[str])
-def get_available_storage_providers() -> List[str]:
+async def get_available_storage_providers() -> List[str]:
     """
     Получить список доступных провайдеров хранения файлов.
     """
@@ -510,7 +511,7 @@ def get_available_storage_providers() -> List[str]:
 
 
 @router.get("/settings/visibility/levels", response_model=List[str])
-def get_project_visibility_levels() -> List[str]:
+async def get_project_visibility_levels() -> List[str]:
     """
     Получить доступные уровни видимости проектов.
     """
@@ -520,12 +521,12 @@ def get_project_visibility_levels() -> List[str]:
 @router.post(
     "/company/{company_id}/settings/validate", response_model=CompanySettingsValidation
 )
-def validate_settings(
+async def validate_settings(
     *,
     company_id: int,
     settings_in: CompanySettingsCreate,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> CompanySettingsValidation:
     """
     Валидировать настройки компании без сохранения.

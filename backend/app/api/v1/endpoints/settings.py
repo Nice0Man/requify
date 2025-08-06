@@ -6,7 +6,12 @@ from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_active_user, get_db
+from app.api.dependencies import (
+    get_current_active_user,
+    get_db,
+    SessionDep,
+    UserPermissions,
+)
 from app.models.user import User
 from app.crud.settings import settings_crud
 from app.schemas.settings import (

@@ -9,13 +9,14 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import (
+from app.api.dependencies import (,
     get_current_active_user,
     get_db,
     get_requirements_delete_user,
     get_requirements_read_user,
     get_requirements_write_user,
     RequirementPermissions,
+    SessionDep,
     SessionDep,
 )
 from app.core.config import settings

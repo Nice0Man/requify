@@ -4,9 +4,10 @@ API endpoints для департаментов.
 
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api import deps
+    AdminPermissions,
+from app.api.dependencies import get_db, get_current_active_user, SessionDep,
 from app.models.user import User
 from app.services.department_service import department_service
 from app.schemas.department import (
@@ -25,11 +26,11 @@ router = APIRouter()
 @router.post(
     "/", response_model=DepartmentResponse, status_code=status.HTTP_201_CREATED
 )
-def create_department(
+async def create_department(
     *,
-    db: Session = Depends(deps.get_db),
+    db: SessionDep,
     department_in: DepartmentCreate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(get_current_active_user),
 ) -> DepartmentResponse:
     """
     Создать новый департамент.
@@ -50,10 +51,10 @@ def create_department(
 
 
 @router.get("/{department_id}", response_model=DepartmentResponse)
-def get_department(
+async def get_department(
     department_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> DepartmentResponse:
     """
     Получить департамент по ID.
@@ -77,12 +78,12 @@ def get_department(
 
 
 @router.put("/{department_id}", response_model=DepartmentResponse)
-def update_department(
+async def update_department(
     *,
-    db: Session = Depends(deps.get_db),
+    db: SessionDep,
     department_id: int,
     department_in: DepartmentUpdate,
-    current_user: User = Depends(deps.get_current_active_user),
+    current_user: User = Depends(get_current_active_user),
 ) -> DepartmentResponse:
     """
     Обновить департамент.
@@ -106,10 +107,10 @@ def update_department(
 
 
 @router.delete("/{department_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_department(
+async def delete_department(
     department_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> None:
     """
     Удалить департамент.
@@ -123,10 +124,10 @@ def delete_department(
 
 
 @router.get("/company/{company_id}", response_model=List[DepartmentResponse])
-def get_company_departments(
+async def get_company_departments(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -183,10 +184,10 @@ def get_company_departments(
 
 
 @router.get("/company/{company_id}/hierarchy", response_model=List[DepartmentHierarchy])
-def get_company_department_hierarchy(
+async def get_company_department_hierarchy(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     parent_id: Optional[int] = Query(None, description="ID родительского департамента"),
 ) -> List[DepartmentHierarchy]:
     """
@@ -200,10 +201,10 @@ def get_company_department_hierarchy(
 
 
 @router.get("/company/{company_id}/tree", response_model=List[Dict[str, Any]])
-def get_company_department_tree(
+async def get_company_department_tree(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[Dict[str, Any]]:
     """
     Получить полное дерево департаментов компании.
@@ -216,10 +217,10 @@ def get_company_department_tree(
 
 
 @router.get("/{department_id}/statistics", response_model=DepartmentStats)
-def get_department_statistics(
+async def get_department_statistics(
     department_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> DepartmentStats:
     """
     Получить статистику департамента.
@@ -232,11 +233,11 @@ def get_department_statistics(
 
 
 @router.get("/company/{company_id}/search", response_model=List[DepartmentResponse])
-def search_departments(
+async def search_departments(
     company_id: int,
     q: str = Query(..., min_length=1, description="Поисковый запрос"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
     skip: int = Query(0, ge=0, description="Количество пропускаемых записей"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -269,10 +270,10 @@ def search_departments(
 
 
 @router.get("/company/{company_id}/roots", response_model=List[DepartmentResponse])
-def get_root_departments(
+async def get_root_departments(
     company_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[DepartmentResponse]:
     """
     Получить корневые департаменты компании.
@@ -302,10 +303,10 @@ def get_root_departments(
 
 
 @router.get("/{department_id}/children", response_model=List[DepartmentResponse])
-def get_department_children(
+async def get_department_children(
     department_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> List[DepartmentResponse]:
     """
     Получить дочерние департаменты.
@@ -339,10 +340,10 @@ def get_department_children(
 
 
 @router.post("/{department_id}/update-counts", response_model=DepartmentResponse)
-def update_department_counts(
+async def update_department_counts(
     department_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
+    db: SessionDep,
+    current_user: User = Depends(get_current_active_user),
 ) -> DepartmentResponse:
     """
     Обновить счетчики департамента (количество сотрудников и команд).

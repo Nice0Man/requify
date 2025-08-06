@@ -7,7 +7,12 @@ from typing import List, Optional, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db, get_current_user
+from app.api.dependencies import (
+    get_db,
+    get_current_user,
+    SessionDep,
+    UserPermissions,
+)
 from app.models.user import User
 from app.models.constants import TeamRole, TeamStatus
 from app.schemas.team import (

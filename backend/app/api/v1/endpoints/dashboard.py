@@ -9,14 +9,16 @@ from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import (
+from app.api.dependencies import (,
     get_current_active_user,
     get_dashboard_admin_user,
     get_dashboard_user,
     get_db,
     get_export_user,
+    DashboardPermissions,
     get_stats_read_user,
 )
+    SessionDep,
 
 from app.services.dashboard_service import dashboard_service
 from app.core.exceptions import ServiceError
