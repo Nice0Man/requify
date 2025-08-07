@@ -12,9 +12,14 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 
-from app.api import deps
+from app.api.dependencies import (
+    SessionDep,
+    get_current_active_user,
+    AdminPermissions,
+    UserPermissions,
+)
 from app.models.user import User
-from app.crud.company import company as company_crud
+from app.services.company_service import CompanyService
 from app.schemas.company import (
     CompanyCreate,
     CompanyUpdate,
@@ -31,7 +36,9 @@ router = APIRouter()
 
 
 @router.get("/companies/", response_model=List[CompanyListResponse])
-def get_companies(
+async def get_companies(
+    db: SessionDep,
+    current_user: User = Depends(AdminPermissions.read()),
     skip: int = Query(0, ge=0, description="Количество записей для пропуска"),
     limit: int = Query(
         100, ge=1, le=1000, description="Максимальное количество записей"
@@ -40,8 +47,6 @@ def get_companies(
     company_type: Optional[CompanyTypeEnum] = Query(None, description="Фильтр по типу"),
     status: Optional[CompanyStatusEnum] = Query(None, description="Фильтр по статусу"),
     is_active: Optional[bool] = Query(None, description="Фильтр по активности"),
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user),
 ) -> List[CompanyListResponse]:
     """
     Получить список компаний с фильтрацией.

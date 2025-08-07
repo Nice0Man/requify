@@ -12794,23 +12794,7 @@
         "documentation": {}
     },
     {
-        "label": "authentication_service",
-        "importPath": "app.services",
-        "description": "app.services",
-        "isExtraImport": true,
-        "detail": "app.services",
-        "documentation": {}
-    },
-    {
         "label": "token_service",
-        "importPath": "app.services",
-        "description": "app.services",
-        "isExtraImport": true,
-        "detail": "app.services",
-        "documentation": {}
-    },
-    {
-        "label": "user_registration_service",
         "importPath": "app.services",
         "description": "app.services",
         "isExtraImport": true,
@@ -12827,38 +12811,6 @@
     },
     {
         "label": "session_service",
-        "importPath": "app.services",
-        "description": "app.services",
-        "isExtraImport": true,
-        "detail": "app.services",
-        "documentation": {}
-    },
-    {
-        "label": "AuthenticationError",
-        "importPath": "app.services",
-        "description": "app.services",
-        "isExtraImport": true,
-        "detail": "app.services",
-        "documentation": {}
-    },
-    {
-        "label": "InvalidCredentialsError",
-        "importPath": "app.services",
-        "description": "app.services",
-        "isExtraImport": true,
-        "detail": "app.services",
-        "documentation": {}
-    },
-    {
-        "label": "InactiveUserError",
-        "importPath": "app.services",
-        "description": "app.services",
-        "isExtraImport": true,
-        "detail": "app.services",
-        "documentation": {}
-    },
-    {
-        "label": "TokenValidationError",
         "importPath": "app.services",
         "description": "app.services",
         "isExtraImport": true,
@@ -14944,6 +14896,38 @@
         "documentation": {}
     },
     {
+        "label": "SessionDep",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "get_current_active_user",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "AdminPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
+        "label": "UserPermissions",
+        "importPath": "app.api.dependencies",
+        "description": "app.api.dependencies",
+        "isExtraImport": true,
+        "detail": "app.api.dependencies",
+        "documentation": {}
+    },
+    {
         "label": "get_db",
         "importPath": "app.api.dependencies",
         "description": "app.api.dependencies",
@@ -15560,14 +15544,6 @@
         "documentation": {}
     },
     {
-        "label": "get_superuser",
-        "importPath": "app.api.dependencies",
-        "description": "app.api.dependencies",
-        "isExtraImport": true,
-        "detail": "app.api.dependencies",
-        "documentation": {}
-    },
-    {
         "label": "UserPermissions",
         "importPath": "app.api.dependencies",
         "description": "app.api.dependencies",
@@ -15576,7 +15552,7 @@
         "documentation": {}
     },
     {
-        "label": "ValidationDependencies",
+        "label": "AdminPermissions",
         "importPath": "app.api.dependencies",
         "description": "app.api.dependencies",
         "isExtraImport": true,
@@ -15584,7 +15560,7 @@
         "documentation": {}
     },
     {
-        "label": "SessionDep",
+        "label": "RolePermissions",
         "importPath": "app.api.dependencies",
         "description": "app.api.dependencies",
         "isExtraImport": true,
@@ -16021,6 +15997,54 @@
         "description": "app.schemas.user",
         "isExtraImport": true,
         "detail": "app.schemas.user",
+        "documentation": {}
+    },
+    {
+        "label": "AuthService",
+        "importPath": "app.services.auth_service",
+        "description": "app.services.auth_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth_service",
+        "documentation": {}
+    },
+    {
+        "label": "AuthenticationError",
+        "importPath": "app.services.auth_service",
+        "description": "app.services.auth_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth_service",
+        "documentation": {}
+    },
+    {
+        "label": "InvalidCredentialsError",
+        "importPath": "app.services.auth_service",
+        "description": "app.services.auth_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth_service",
+        "documentation": {}
+    },
+    {
+        "label": "InactiveUserError",
+        "importPath": "app.services.auth_service",
+        "description": "app.services.auth_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth_service",
+        "documentation": {}
+    },
+    {
+        "label": "TokenValidationError",
+        "importPath": "app.services.auth_service",
+        "description": "app.services.auth_service",
+        "isExtraImport": true,
+        "detail": "app.services.auth_service",
+        "documentation": {}
+    },
+    {
+        "label": "UserRegistrationService",
+        "importPath": "app.services.user_registration_service",
+        "description": "app.services.user_registration_service",
+        "isExtraImport": true,
+        "detail": "app.services.user_registration_service",
         "documentation": {}
     },
     {
@@ -16593,22 +16617,6 @@
     },
     {
         "label": "schemas",
-        "importPath": "app",
-        "description": "app",
-        "isExtraImport": true,
-        "detail": "app",
-        "documentation": {}
-    },
-    {
-        "label": "crud",
-        "importPath": "app",
-        "description": "app",
-        "isExtraImport": true,
-        "detail": "app",
-        "documentation": {}
-    },
-    {
-        "label": "models",
         "importPath": "app",
         "description": "app",
         "isExtraImport": true,
@@ -17784,51 +17792,11 @@
         "documentation": {}
     },
     {
-        "label": "deps",
-        "importPath": "app.api",
-        "description": "app.api",
+        "label": "CompanyService",
+        "importPath": "app.services.company_service",
+        "description": "app.services.company_service",
         "isExtraImport": true,
-        "detail": "app.api",
-        "documentation": {}
-    },
-    {
-        "label": "company",
-        "importPath": "app.crud.company",
-        "description": "app.crud.company",
-        "isExtraImport": true,
-        "detail": "app.crud.company",
-        "documentation": {}
-    },
-    {
-        "label": "company",
-        "importPath": "app.crud.company",
-        "description": "app.crud.company",
-        "isExtraImport": true,
-        "detail": "app.crud.company",
-        "documentation": {}
-    },
-    {
-        "label": "company",
-        "importPath": "app.crud.company",
-        "description": "app.crud.company",
-        "isExtraImport": true,
-        "detail": "app.crud.company",
-        "documentation": {}
-    },
-    {
-        "label": "company",
-        "importPath": "app.crud.company",
-        "description": "app.crud.company",
-        "isExtraImport": true,
-        "detail": "app.crud.company",
-        "documentation": {}
-    },
-    {
-        "label": "company",
-        "importPath": "app.crud.company",
-        "description": "app.crud.company",
-        "isExtraImport": true,
-        "detail": "app.crud.company",
+        "detail": "app.services.company_service",
         "documentation": {}
     },
     {
@@ -19873,227 +19841,19 @@
         "documentation": {}
     },
     {
-        "label": "UserProfileResponse",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
+        "label": "UserService",
+        "importPath": "app.services.user_service",
+        "description": "app.services.user_service",
         "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
+        "detail": "app.services.user_service",
         "documentation": {}
     },
     {
-        "label": "UserProfileUpdate",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
+        "label": "UserProfileService",
+        "importPath": "app.services.user_profile_service",
+        "description": "app.services.user_profile_service",
         "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileCreate",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileUpdate",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileResponse",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfilePublic",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileSummary",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileCompletion",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileStats",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "ContactInfo",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "WorkInfo",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "PersonalInfo",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "LocalizationSettings",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "ProfileValidation",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileCreate",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileUpdate",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileCreate",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileUpdate",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileResponse",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfilePublic",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileSummary",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileCompletion",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "UserProfileStats",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "ContactInfo",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "WorkInfo",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "PersonalInfo",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "LocalizationSettings",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
-        "documentation": {}
-    },
-    {
-        "label": "ProfileValidation",
-        "importPath": "app.schemas.user_profile",
-        "description": "app.schemas.user_profile",
-        "isExtraImport": true,
-        "detail": "app.schemas.user_profile",
+        "detail": "app.services.user_profile_service",
         "documentation": {}
     },
     {
@@ -20102,6 +19862,238 @@
         "description": "app.services.user_profile_service",
         "isExtraImport": true,
         "detail": "app.services.user_profile_service",
+        "documentation": {}
+    },
+    {
+        "label": "AdminService",
+        "importPath": "app.services.admin_service",
+        "description": "app.services.admin_service",
+        "isExtraImport": true,
+        "detail": "app.services.admin_service",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileResponse",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileUpdate",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileCreate",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileUpdate",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileResponse",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfilePublic",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileSummary",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileCompletion",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileStats",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "ContactInfo",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "WorkInfo",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "PersonalInfo",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "LocalizationSettings",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "ProfileValidation",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileCreate",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileUpdate",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileCreate",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileUpdate",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileResponse",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfilePublic",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileSummary",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileCompletion",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "UserProfileStats",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "ContactInfo",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "WorkInfo",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "PersonalInfo",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "LocalizationSettings",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
+        "documentation": {}
+    },
+    {
+        "label": "ProfileValidation",
+        "importPath": "app.schemas.user_profile",
+        "description": "app.schemas.user_profile",
+        "isExtraImport": true,
+        "detail": "app.schemas.user_profile",
         "documentation": {}
     },
     {
@@ -23023,6 +23015,38 @@
         "documentation": {}
     },
     {
+        "label": "company",
+        "importPath": "app.crud.company",
+        "description": "app.crud.company",
+        "isExtraImport": true,
+        "detail": "app.crud.company",
+        "documentation": {}
+    },
+    {
+        "label": "company",
+        "importPath": "app.crud.company",
+        "description": "app.crud.company",
+        "isExtraImport": true,
+        "detail": "app.crud.company",
+        "documentation": {}
+    },
+    {
+        "label": "company",
+        "importPath": "app.crud.company",
+        "description": "app.crud.company",
+        "isExtraImport": true,
+        "detail": "app.crud.company",
+        "documentation": {}
+    },
+    {
+        "label": "company",
+        "importPath": "app.crud.company",
+        "description": "app.crud.company",
+        "isExtraImport": true,
+        "detail": "app.crud.company",
+        "documentation": {}
+    },
+    {
         "label": "company_settings",
         "importPath": "app.crud.company_settings",
         "description": "app.crud.company_settings",
@@ -24416,15 +24440,6 @@
         "documentation": {}
     },
     {
-        "label": "get_companies",
-        "kind": 2,
-        "importPath": "backend.app.api.v1.endpoints.companies",
-        "description": "backend.app.api.v1.endpoints.companies",
-        "peekOfCode": "def get_companies(\n    skip: int = Query(0, ge=0, description=\"Количество записей для пропуска\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    name: Optional[str] = Query(None, description=\"Фильтр по названию\"),\n    company_type: Optional[CompanyTypeEnum] = Query(None, description=\"Фильтр по типу\"),\n    status: Optional[CompanyStatusEnum] = Query(None, description=\"Фильтр по статусу\"),\n    is_active: Optional[bool] = Query(None, description=\"Фильтр по активности\"),\n    db: Session = Depends(deps.get_db),",
-        "detail": "backend.app.api.v1.endpoints.companies",
-        "documentation": {}
-    },
-    {
         "label": "create_company",
         "kind": 2,
         "importPath": "backend.app.api.v1.endpoints.companies",
@@ -24564,7 +24579,7 @@
         "kind": 5,
         "importPath": "backend.app.api.v1.endpoints.companies",
         "description": "backend.app.api.v1.endpoints.companies",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/companies/\", response_model=List[CompanyListResponse])\ndef get_companies(\n    skip: int = Query(0, ge=0, description=\"Количество записей для пропуска\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    name: Optional[str] = Query(None, description=\"Фильтр по названию\"),\n    company_type: Optional[CompanyTypeEnum] = Query(None, description=\"Фильтр по типу\"),\n    status: Optional[CompanyStatusEnum] = Query(None, description=\"Фильтр по статусу\"),",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/companies/\", response_model=List[CompanyListResponse])\nasync def get_companies(\n    db: SessionDep,\n    current_user: User = Depends(AdminPermissions.read()),\n    skip: int = Query(0, ge=0, description=\"Количество записей для пропуска\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    name: Optional[str] = Query(None, description=\"Фильтр по названию\"),",
         "detail": "backend.app.api.v1.endpoints.companies",
         "documentation": {}
     },

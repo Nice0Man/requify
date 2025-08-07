@@ -29,16 +29,18 @@ from app.api.dependencies import (
 )
 from app.services import (
     auth0_service,
-    authentication_service,
     token_service,
-    user_registration_service,
     password_service,
     session_service,
+)
+from app.services.auth_service import (
+    AuthService,
     AuthenticationError,
     InvalidCredentialsError,
     InactiveUserError,
     TokenValidationError,
 )
+from app.services.user_registration_service import UserRegistrationService
 from app.core.config import settings
 from app.core.security import (
     JWTTokenManager,
