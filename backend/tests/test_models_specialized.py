@@ -473,17 +473,17 @@ class TestUserProfileAndSettings:
         assert settings.security_settings["two_factor_enabled"] is True
         assert settings.privacy_settings["profile_visibility"] == "company"
 
-                # Test settings modification
+        # Test settings modification
         new_notifications = settings.notification_settings.copy()
         new_notifications["push"] = True
         settings.notification_settings = new_notifications
-        
+
         new_interface = settings.interface_settings.copy()
         new_interface["theme"] = "light"
         settings.interface_settings = new_interface
-        
+
         specialized_db_session.commit()
-        
+
         specialized_db_session.refresh(settings)
         assert settings.notification_settings["push"] is True
         assert settings.interface_settings["theme"] == "light"
@@ -981,7 +981,9 @@ class TestComprehensiveIntegration:
 
         # Create complete organizational structure
         department = Department(
-            name="Product Engineering", company_id=company.id, type=DepartmentType.ENGINEERING
+            name="Product Engineering",
+            company_id=company.id,
+            type=DepartmentType.ENGINEERING,
         )
         specialized_db_session.add(department)
         specialized_db_session.commit()

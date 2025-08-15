@@ -3,7 +3,8 @@
 """
 
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
 from fastapi import HTTPException, status
 from datetime import datetime, timezone, timedelta
 from decimal import Decimal
@@ -12,6 +13,10 @@ from app.crud.company_subscription import company_subscription as subscription_c
 from app.crud.company import company as company_crud
 from app.models.company_subscription import CompanySubscription
 from app.models.user import User
+from app.models.project import Project
+from app.models.team import Team
+from app.services.permission_service import permission_service
+from app.core.constants import Permission, RoleScope
 from app.schemas.company_subscription import (
     CompanySubscriptionCreate,
     CompanySubscriptionUpdate,
@@ -34,7 +39,7 @@ class CompanySubscriptionService:
         self.plan_configs = self._get_plan_configurations()
 
     def get_company_subscription(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Optional[CompanySubscription]:
         """Получить подписку компании"""
 
@@ -48,7 +53,7 @@ class CompanySubscriptionService:
 
     def create_subscription(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         subscription_data: CompanySubscriptionCreate,
@@ -82,7 +87,7 @@ class CompanySubscriptionService:
 
     def update_subscription(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         subscription_data: CompanySubscriptionUpdate,
@@ -114,7 +119,7 @@ class CompanySubscriptionService:
 
     def upgrade_subscription(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         new_plan: SubscriptionPlan,
@@ -155,7 +160,7 @@ class CompanySubscriptionService:
         return subscription
 
     def activate_subscription(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> CompanySubscription:
         """Активировать подписку"""
 
@@ -177,7 +182,12 @@ class CompanySubscriptionService:
         return subscription
 
     def suspend_subscription(
-        self, db: Session, *, company_id: int, reason: Optional[str], current_user: User
+        self,
+        db: AsyncSession,
+        *,
+        company_id: int,
+        reason: Optional[str],
+        current_user: User,
     ) -> CompanySubscription:
         """Приостановить подписку"""
 
@@ -202,7 +212,7 @@ class CompanySubscriptionService:
 
     def cancel_subscription(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         immediate: bool = False,
@@ -231,7 +241,7 @@ class CompanySubscriptionService:
 
     def renew_subscription(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         billing_period: Optional[BillingPeriod],
@@ -258,8 +268,8 @@ class CompanySubscriptionService:
 
         return subscription
 
-    def get_subscription_usage_stats(
-        self, db: Session, *, company_id: int, current_user: User
+    async def get_subscription_usage_stats(
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> SubscriptionUsageStats:
         """Получить статистику использования подписки"""
 
@@ -281,12 +291,29 @@ class CompanySubscriptionService:
 
         # Подсчитать текущее использование
         current_users = company.current_user_count if company else 0
-        current_projects = 0  # TODO: Подсчитать из проектов
+
+        # Подсчитать количество проектов
+        projects_result = await db.execute(
+            select(func.count(Project.id)).where(Project.company_id == company_id)
+        )
+        current_projects = projects_result.scalar() or 0
+
         current_departments = company.current_department_count if company else 0
-        current_teams = 0  # TODO: Подсчитать из команд
-        storage_used_gb = 0.0  # TODO: Подсчитать использование хранилища
-        api_calls_this_month = 0  # TODO: Подсчитать API вызовы
-        integrations_count = 0  # TODO: Подсчитать интеграции
+
+        # Подсчитать количество команд
+        teams_result = await db.execute(
+            select(func.count(Team.id)).where(Team.company_id == company_id)
+        )
+        current_teams = teams_result.scalar() or 0
+
+        # TODO: Реализовать подсчет использования хранилища из файлового сервиса
+        storage_used_gb = 0.0
+
+        # TODO: Реализовать подсчет API вызовов из логов
+        api_calls_this_month = 0
+
+        # TODO: Реализовать подсчет интеграций из системы интеграций
+        integrations_count = 0
 
         # Вычислить процент использования
         usage_stats = SubscriptionUsageStats(
@@ -389,7 +416,7 @@ class CompanySubscriptionService:
 
     def get_expiring_subscriptions(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         days_until_expiry: int = 7,
         current_user: User,
@@ -410,7 +437,7 @@ class CompanySubscriptionService:
         )
 
     def get_subscription_statistics(
-        self, db: Session, *, current_user: User
+        self, db: AsyncSession, *, current_user: User
     ) -> Dict[str, Any]:
         """Получить статистику подписок"""
 
@@ -611,7 +638,9 @@ class CompanySubscriptionService:
             return 0.0
         return (current / limit) * 100
 
-    def _can_access_company(self, user: User, company_id: int) -> bool:
+    async def _can_access_company(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права доступа к компании"""
         if user.is_system_admin:
             return True
@@ -619,10 +648,18 @@ class CompanySubscriptionService:
         if user.company_id == company_id:
             return True
 
-        # TODO: Проверить доступ через Enhanced Role System
-        return False
+        # Проверить доступ через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.VIEW_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
-    def _can_manage_company_subscription(self, user: User, company_id: int) -> bool:
+    async def _can_manage_company_subscription(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права на управление подпиской компании"""
         if user.is_system_admin:
             return True
@@ -630,8 +667,14 @@ class CompanySubscriptionService:
         if user.company_id == company_id and user.is_company_admin:
             return True
 
-        # TODO: Проверить права через Enhanced Role System
-        return False
+        # Проверить права через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.MANAGE_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
 
 # Создаем экземпляр сервиса

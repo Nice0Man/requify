@@ -16,7 +16,12 @@ from app.models.company import Company, CompanyStatus, CompanyType
 from app.models.company_settings import CompanySettings
 from app.models.company_branding import CompanyBranding
 from app.models.company_contact import CompanyContact
-from app.models.company_subscription import CompanySubscription, SubscriptionPlan, SubscriptionStatus, BillingPeriod
+from app.models.company_subscription import (
+    CompanySubscription,
+    SubscriptionPlan,
+    SubscriptionStatus,
+    BillingPeriod,
+)
 from app.models.user import User
 from app.models.project import Project
 from app.models.requirement import Requirement
@@ -147,14 +152,17 @@ class TestCompanySettingsModel:
         assert "email" in settings.notification_settings
 
         # Test sso_config JSON field (should be None for google provider initially)
-        settings.sso_config = {"client_id": "test_client", "client_secret": "test_secret"}
+        settings.sso_config = {
+            "client_id": "test_client",
+            "client_secret": "test_secret",
+        }
         advanced_db_session.commit()
 
         # Update JSON fields
         new_notifications = settings.notification_settings.copy()
         new_notifications["push"] = True
         settings.notification_settings = new_notifications
-        
+
         sso_config = settings.sso_config.copy()
         sso_config["domain"] = "testcompany.com"
         settings.sso_config = sso_config
@@ -173,9 +181,9 @@ class TestCompanySettingsModel:
 
         # Test invalid session timeout (negative value)
         invalid_settings = CompanySettings(
-            company_id=company.id, 
+            company_id=company.id,
             session_timeout_minutes=-1,  # Should be invalid
-            api_rate_limit=-10  # Should be invalid
+            api_rate_limit=-10,  # Should be invalid
         )
 
         # Note: In a real application, you would have validators

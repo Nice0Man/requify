@@ -3,7 +3,7 @@
 """
 
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
 from app.crud.department import department as department_crud
@@ -11,6 +11,8 @@ from app.crud.user import user as user_crud
 from app.crud.company import company as company_crud
 from app.models.department import Department
 from app.models.user import User
+from app.services.permission_service import permission_service
+from app.core.constants import Permission, RoleScope
 from app.schemas.department import (
     DepartmentCreate,
     DepartmentUpdate,
@@ -27,7 +29,7 @@ class DepartmentService:
         self.crud = department_crud
 
     def create_department(
-        self, db: Session, *, department_data: DepartmentCreate, current_user: User
+        self, db: AsyncSession, *, department_data: DepartmentCreate, current_user: User
     ) -> Department:
         """Создать новый департамент"""
 
@@ -86,7 +88,7 @@ class DepartmentService:
         )
 
     def get_department(
-        self, db: Session, *, department_id: int, current_user: User
+        self, db: AsyncSession, *, department_id: int, current_user: User
     ) -> Optional[Department]:
         """Получить департамент по ID"""
 
@@ -104,7 +106,7 @@ class DepartmentService:
 
     def get_company_departments(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         current_user: User,
@@ -130,7 +132,7 @@ class DepartmentService:
 
     def get_department_hierarchy(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         current_user: User,
@@ -168,7 +170,7 @@ class DepartmentService:
 
     def update_department(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         department_id: int,
         department_data: DepartmentUpdate,
@@ -241,7 +243,7 @@ class DepartmentService:
         return self.crud.update(db, db_obj=department, obj_in=department_data)
 
     def delete_department(
-        self, db: Session, *, department_id: int, current_user: User
+        self, db: AsyncSession, *, department_id: int, current_user: User
     ) -> bool:
         """Удалить департамент"""
 
@@ -270,7 +272,7 @@ class DepartmentService:
         return True
 
     def get_department_statistics(
-        self, db: Session, *, department_id: int, current_user: User
+        self, db: AsyncSession, *, department_id: int, current_user: User
     ) -> DepartmentStats:
         """Получить статистику департамента"""
 
@@ -290,7 +292,7 @@ class DepartmentService:
 
     def search_departments(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         query: str,
@@ -310,7 +312,7 @@ class DepartmentService:
         )
 
     def get_company_department_tree(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> List[Dict[str, Any]]:
         """Получить полное дерево департаментов компании"""
 
@@ -333,14 +335,24 @@ class DepartmentService:
         if user.company_id == company_id and user.is_company_admin:
             return True
 
-        # TODO: Проверить роли через Enhanced Role System
-        return False
+        # Проверить роли через Enhanced Role System
+        return permission_service.check_user_permission(
+            db=None,  # TODO: передать db в метод
+            user=user,
+            permission=Permission.MANAGE_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
-    def _can_access_department(self, user: User, department: Department) -> bool:
+    async def _can_access_department(
+        self, db: AsyncSession, user: User, department: Department
+    ) -> bool:
         """Проверить права доступа к департаменту"""
-        return self._can_access_company(user, department.company_id)
+        return await self._can_access_company(db, user, department.company_id)
 
-    def _can_access_company(self, user: User, company_id: int) -> bool:
+    async def _can_access_company(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права доступа к компании"""
         if user.is_system_admin:
             return True
@@ -348,10 +360,18 @@ class DepartmentService:
         if user.company_id == company_id:
             return True
 
-        # TODO: Проверить доступ через Enhanced Role System
-        return False
+        # Проверить доступ через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.VIEW_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
-    def _can_edit_department(self, user: User, department: Department) -> bool:
+    async def _can_edit_department(
+        self, db: AsyncSession, user: User, department: Department
+    ) -> bool:
         """Проверить права на редактирование департамента"""
         if user.is_system_admin:
             return True
@@ -359,15 +379,21 @@ class DepartmentService:
         if user.company_id == department.company_id and user.is_company_admin:
             return True
 
-        # TODO: Проверить права через Enhanced Role System
-        return False
+        # Проверить права через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.MANAGE_PROJECT,
+            scope=RoleScope.DEPARTMENT,
+            context_id=department.id,
+        )
 
     def _can_delete_department(self, user: User, department: Department) -> bool:
         """Проверить права на удаление департамента"""
         return self._can_edit_department(user, department)
 
     def _creates_cycle(
-        self, db: Session, department_id: int, new_parent_id: int
+        self, db: AsyncSession, department_id: int, new_parent_id: int
     ) -> bool:
         """Проверить создаст ли новый parent циклическую зависимость"""
         current_id = new_parent_id

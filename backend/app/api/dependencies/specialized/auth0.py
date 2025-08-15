@@ -20,13 +20,13 @@ async def get_user_from_auth0_token(
 ) -> Optional[User]:
     """
     Get user from Auth0 token.
-    
+
     Integrates with Auth0 service for external authentication.
-    
+
     Args:
         token: Auth0 JWT token
         db: Database session
-        
+
     Returns:
         Optional[User]: User object or None if invalid token
     """
@@ -48,9 +48,7 @@ async def get_user_from_auth0_token(
         if existing_user:
             # Link existing user to Auth0
             user = await crud_user.update(
-                db, 
-                db_obj=existing_user, 
-                obj_in={"auth0_id": user_info.sub}
+                db, db_obj=existing_user, obj_in={"auth0_id": user_info.sub}
             )
         else:
             # Create new user from Auth0 data

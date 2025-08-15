@@ -12,12 +12,15 @@ if TYPE_CHECKING:
     from .requirement import Requirement
     from .release import Release
     from .spec import Spec
+    from .specification import Specification
     from .requirement_group import RequirementGroup
+    from .test_case import TestCase, TestPlan
     from .user import User
     from .team import Team
     from .company import Company
     from .department import Department
     from .dashboard import DashboardNotification, DashboardActivity
+    from .activity import Activity
 
 
 class Project(Base, TimestampedMixin):
@@ -121,11 +124,24 @@ class Project(Base, TimestampedMixin):
         "Spec", back_populates="project", cascade="all, delete-orphan", lazy="select"
     )
 
+    specifications: Mapped[List["Specification"]] = relationship(
+        "Specification", back_populates="project", cascade="all, delete-orphan", lazy="select"
+    )
+
     requirement_groups: Mapped[List["RequirementGroup"]] = relationship(
         "RequirementGroup",
         back_populates="project",
         cascade="all, delete-orphan",
         lazy="select",
+    )
+
+    # Testing relationships
+    test_cases: Mapped[List["TestCase"]] = relationship(
+        "TestCase", back_populates="project", cascade="all, delete-orphan", lazy="select"
+    )
+
+    test_plans: Mapped[List["TestPlan"]] = relationship(
+        "TestPlan", back_populates="project", cascade="all, delete-orphan", lazy="select"
     )
 
     # Dashboard relationships
@@ -136,9 +152,22 @@ class Project(Base, TimestampedMixin):
         cascade="all, delete-orphan",
     )
 
-    activities: Mapped[List["DashboardActivity"]] = relationship(
+    dashboard_activities: Mapped[List["DashboardActivity"]] = relationship(
         "DashboardActivity",
         back_populates="project",
         lazy="select",
         cascade="all, delete-orphan",
     )
+
+    # Collaboration relationships
+    activities: Mapped[List["Activity"]] = relationship(
+        "Activity",
+        back_populates="project",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    @property
+    def dashboard_notifications(self):
+        """Alias for notifications for backward compatibility."""
+        return self.notifications

@@ -459,8 +459,12 @@ class DashboardService:
                         project_name=project_name or "Unknown Project",
                         status=status,
                         priority=priority,
-                        assigned_to=None,  # TODO: Реализовать назначение позже
-                        due_date=None,  # TODO: Реализовать сроки выполнения позже
+                        assigned_to=(
+                            req.assigned_to_id
+                            if hasattr(req, "assigned_to_id")
+                            else None
+                        ),
+                        due_date=req.due_date if hasattr(req, "due_date") else None,
                         progress=progress,
                     )
                 )
@@ -468,7 +472,7 @@ class DashboardService:
             return QuickAccess(
                 my_projects=quick_projects,
                 my_requirements=quick_requirements,
-                pending_approvals=[],  # TODO: Реализовать workflow одобрений позже
+                pending_approvals=await self._get_pending_approvals(db, user_id),
             )
         except Exception as e:
             logger.error(f"Error getting quick access for user {user_id}: {e}")
@@ -1357,6 +1361,31 @@ class DashboardService:
         except Exception as e:
             logger.error(f"Error filtering dashboard: {e}")
             raise ServiceError("dashboard", f"Failed to filter dashboard: {str(e)}")
+
+    async def _get_pending_approvals(
+        self, db: AsyncSession, user_id: int
+    ) -> List[Dict[str, Any]]:
+        """
+        Получить список ожидающих одобрения элементов.
+
+        В будущем здесь будет реализована полноценная система workflow.
+        Пока возвращаем пустой список как базовую реализацию.
+        """
+        try:
+            # TODO: Реализовать полноценную систему workflow одобрений
+            # Это может включать:
+            # - Требования, ожидающие одобрения
+            # - Запросы на изменения
+            # - Релизы, ожидающие подтверждения
+            # - Пользователи, ожидающие активации
+
+            # Базовая реализация - возвращаем пустой список
+            return []
+
+        except Exception as e:
+            logger.error(f"Error getting pending approvals for user {user_id}: {e}")
+            # Возвращаем пустой список при ошибке, чтобы не сломать dashboard
+            return []
 
 
 # Create service instance

@@ -1,105 +1,156 @@
 """
-Основной роутер для API версии 1.
+Основной роутер для API версии 2.
 
-Собирает все эндпоинты в единый роутер.
+Современная доменно-ориентированная архитектура с улучшенной организацией endpoints.
 """
 
 from fastapi import APIRouter
 
 from app import __version__
-
-from .endpoints import (
+from .domains import (
     auth_router,
-    users_router,
+    identity_router,
+    organizations_router,
     projects_router,
-    requirements_router,
-    releases_router,
-    testing_router,
-    admin_router,
-    reference_router,
-    specifications_router,
-    relationships_router,
-    comments_router,
-    dashboard_router,
-    teams_router,
-    settings_router,
-    # Company related routers
-    companies_router,
-    company_contact_router,
-    company_subscription_router,
-    company_settings_router,
-    company_branding_router,
-    departments_router,
-    # User related routers
-    user_profiles_router,
-    enhanced_roles_router,
+    quality_router,
+    collaboration_router,
+    analytics_router,
+    configuration_router,
+    system_router,
 )
 
-# Создаем основной роутер для API v1
+# Создаем основной роутер для API v2
 api_router = APIRouter()
 
-# Core authentication
-api_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
-
-# User management
-api_router.include_router(users_router, prefix="/users", tags=["users"])
-api_router.include_router(user_profiles_router, prefix="/users", tags=["user-profiles"])
+# Authentication & Authorization Domain
 api_router.include_router(
-    enhanced_roles_router, prefix="/roles", tags=["enhanced-roles"]
+    auth_router,
+    prefix="/auth",
+    tags=["Authentication"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        429: {"description": "Rate limit exceeded"},
+    },
 )
 
-# Company management
-api_router.include_router(companies_router, prefix="/companies", tags=["companies"])
+# Identity Management Domain
 api_router.include_router(
-    company_contact_router, prefix="/companies", tags=["company-contact"]
-)
-api_router.include_router(
-    company_subscription_router, prefix="/companies", tags=["company-subscription"]
-)
-api_router.include_router(
-    company_settings_router, prefix="/companies", tags=["company-settings"]
-)
-api_router.include_router(
-    company_branding_router, prefix="/companies", tags=["company-branding"]
-)
-api_router.include_router(
-    departments_router, prefix="/departments", tags=["departments"]
+    identity_router,
+    prefix="/identity",
+    tags=["Identity Management"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "User not found"},
+    },
 )
 
-# Project management
-api_router.include_router(projects_router, prefix="/projects", tags=["projects"])
-api_router.include_router(teams_router, prefix="/teams", tags=["teams"])
-
-# Requirements management
+# Organization Management Domain
 api_router.include_router(
-    requirements_router, prefix="/requirements", tags=["requirements"]
-)
-api_router.include_router(
-    specifications_router, prefix="/specifications", tags=["specifications"]
-)
-api_router.include_router(
-    relationships_router, prefix="/relationships", tags=["relationships"]
+    organizations_router,
+    prefix="/organizations",
+    tags=["Organizations"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Organization resource not found"},
+    },
 )
 
-# Release management
-api_router.include_router(releases_router, prefix="/releases", tags=["releases"])
+# Project Management Domain
+api_router.include_router(
+    projects_router,
+    prefix="/projects",
+    tags=["Projects"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Project not found"},
+    },
+)
 
-# Testing
-api_router.include_router(testing_router, prefix="/testing", tags=["testing"])
+# Quality Assurance Domain
+api_router.include_router(
+    quality_router,
+    prefix="/quality",
+    tags=["Quality Assurance"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Quality resource not found"},
+    },
+)
 
-# Collaboration
-api_router.include_router(comments_router, prefix="/comments", tags=["comments"])
+# Collaboration Domain
+api_router.include_router(
+    collaboration_router,
+    prefix="/collaboration",
+    tags=["Collaboration"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Collaboration resource not found"},
+    },
+)
 
-# Analytics & Monitoring
-api_router.include_router(dashboard_router, prefix="/dashboard", tags=["dashboard"])
+# Analytics & Reporting Domain
+api_router.include_router(
+    analytics_router,
+    prefix="/analytics",
+    tags=["Analytics"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Analytics resource not found"},
+    },
+)
 
-# System & Configuration
-api_router.include_router(reference_router, prefix="/reference", tags=["reference"])
-api_router.include_router(settings_router, prefix="/settings", tags=["settings"])
-api_router.include_router(admin_router, prefix="/admin", tags=["admin"])
+# Configuration Domain
+api_router.include_router(
+    configuration_router,
+    prefix="/configuration",
+    tags=["Configuration"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "Configuration not found"},
+    },
+)
+
+# System Administration Domain
+api_router.include_router(
+    system_router,
+    prefix="/system",
+    tags=["System Administration"],
+    responses={
+        401: {"description": "Authentication required"},
+        403: {"description": "Insufficient permissions"},
+        404: {"description": "System resource not found"},
+    },
+)
 
 
-@api_router.get("/")
+@api_router.get(
+    "/",
+    summary="API Root",
+    description="Root endpoint for Requify API v2 with domain-oriented architecture",
+)
 async def root():
     """Корневой эндпоинт API v1."""
-    return {"message": "Requify API v1", "version": __version__, "docs": "/docs"}
+    return {
+        "message": "Requify API v1 - Domain-Oriented Architecture",
+        "version": __version__,
+        "docs": "/docs",
+        "domains": {
+            "auth": "Authentication & Authorization",
+            "identity": "User & Role Management",
+            "organizations": "Company & Team Structure",
+            "projects": "Project & Requirements Management",
+            "quality": "Testing & Quality Assurance",
+            "collaboration": "Comments & Relationships",
+            "analytics": "Dashboard & Reporting",
+            "configuration": "Settings & Reference Data",
+            "system": "Administration & Monitoring",
+        },
+    }

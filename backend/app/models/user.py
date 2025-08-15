@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from .user_profile import UserProfile
     from .project import Project
     from .requirement import Requirement
+    from .specification import Specification
+    from .test_case import TestCase, TestPlan, TestExecution
     from .comment import Comment
     from .team import Team
     from .team_member import TeamMember
@@ -26,9 +28,18 @@ if TYPE_CHECKING:
     from .test_result import TestResult
     from .user_settings import UserSettings, UserSettingsHistory
     from .refresh_token import RefreshToken
+    from .activity import Activity
+    from .notification import Notification
 
 
-class User(Base, AuthMixin, PermissionsMixin, EmailVerificationMixin, ActivityMixin, TimestampedMixin):
+class User(
+    Base,
+    AuthMixin,
+    PermissionsMixin,
+    EmailVerificationMixin,
+    ActivityMixin,
+    TimestampedMixin,
+):
     """
     Основная модель пользователя системы.
 
@@ -95,6 +106,44 @@ class User(Base, AuthMixin, PermissionsMixin, EmailVerificationMixin, ActivityMi
         "Requirement", back_populates="author", lazy="select"
     )
 
+    # Спецификации автора
+    authored_specifications: Mapped[List["Specification"]] = relationship(
+        "Specification", 
+        foreign_keys="Specification.author_id",
+        back_populates="author", 
+        lazy="select"
+    )
+
+    # Утвержденные спецификации
+    approved_specifications: Mapped[List["Specification"]] = relationship(
+        "Specification",
+        foreign_keys="Specification.approved_by_id", 
+        back_populates="approved_by",
+        lazy="select"
+    )
+
+    # Тестовые сущности
+    authored_test_cases: Mapped[List["TestCase"]] = relationship(
+        "TestCase",
+        foreign_keys="TestCase.author_id",
+        back_populates="author",
+        lazy="select"
+    )
+
+    authored_test_plans: Mapped[List["TestPlan"]] = relationship(
+        "TestPlan",
+        foreign_keys="TestPlan.author_id",
+        back_populates="author",
+        lazy="select"
+    )
+
+    executed_tests: Mapped[List["TestExecution"]] = relationship(
+        "TestExecution",
+        foreign_keys="TestExecution.executor_id",
+        back_populates="executor",
+        lazy="select"
+    )
+
     # Комментарии
     comments: Mapped[List["Comment"]] = relationship(
         "Comment", back_populates="author", lazy="select"
@@ -126,7 +175,7 @@ class User(Base, AuthMixin, PermissionsMixin, EmailVerificationMixin, ActivityMi
         cascade="all, delete-orphan",
     )
 
-    activities: Mapped[List["DashboardActivity"]] = relationship(
+    dashboard_activities: Mapped[List["DashboardActivity"]] = relationship(
         "DashboardActivity",
         back_populates="user",
         lazy="select",
@@ -135,6 +184,21 @@ class User(Base, AuthMixin, PermissionsMixin, EmailVerificationMixin, ActivityMi
 
     dashboard_widgets: Mapped[List["DashboardWidget"]] = relationship(
         "DashboardWidget",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    # Новые отношения для collaboration
+    activities: Mapped[List["Activity"]] = relationship(
+        "Activity",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    user_notifications: Mapped[List["Notification"]] = relationship(
+        "Notification",
         back_populates="user",
         lazy="select",
         cascade="all, delete-orphan",
@@ -169,6 +233,37 @@ class User(Base, AuthMixin, PermissionsMixin, EmailVerificationMixin, ActivityMi
     settings_history: Mapped[List["UserSettingsHistory"]] = relationship(
         "UserSettingsHistory", lazy="select", cascade="all, delete-orphan"
     )
+
+    @property
+    def roles(self) -> List[dict]:
+        """Получить список ролей пользователя из role_assignments."""
+        if not hasattr(self, "role_assignments") or not self.role_assignments:
+            return []
+
+        roles = []
+        for assignment in self.role_assignments:
+            if assignment.is_active and hasattr(assignment, "role") and assignment.role:
+                role_data = {
+                    "id": assignment.role.id,
+                    "name": assignment.role.name,
+                    "display_name": getattr(
+                        assignment.role, "display_name", assignment.role.name
+                    ),
+                    "scope": assignment.role.scope,
+                    "assignment_id": assignment.id,
+                    "assigned_at": (
+                        assignment.created_at.isoformat()
+                        if assignment.created_at
+                        else None
+                    ),
+                    "expires_at": (
+                        assignment.expires_at.isoformat()
+                        if assignment.expires_at
+                        else None
+                    ),
+                }
+                roles.append(role_data)
+        return roles
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email='{self.email}', name='{self.name}')>"

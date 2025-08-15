@@ -17,10 +17,10 @@ from app.db.db_helper import get_async_session
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Core database session dependency.
-    
+
     Provides async SQLAlchemy session with proper lifecycle management.
     Uses context manager pattern for automatic cleanup.
-    
+
     Yields:
         AsyncSession: Database session for request lifecycle
     """

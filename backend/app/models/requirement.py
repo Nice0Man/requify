@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from .requirement_statuses import RequirementStatus
     from .project import Project
     from .user import User
+    from .specification import Specification
+    from .test_case import TestCase
     from .comment import Comment
     from .relationship import Relationship
     from .dashboard import DashboardNotification, DashboardActivity
@@ -96,6 +98,19 @@ class Requirement(Base, TimestampedMixin):
 
     comments: Mapped[List["Comment"]] = relationship(
         "Comment", back_populates="requirement", lazy="select"
+    )
+
+    # Связь many-to-many со спецификациями
+    specifications: Mapped[List["Specification"]] = relationship(
+        "Specification",
+        secondary="specification_requirements",
+        back_populates="requirements",
+        lazy="select"
+    )
+
+    # Тестовые случаи для требования
+    test_cases: Mapped[List["TestCase"]] = relationship(
+        "TestCase", back_populates="requirement", lazy="select"
     )
 
     # Relationship links

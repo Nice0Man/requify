@@ -9,45 +9,40 @@ from .factory import PermissionDependencyFactory
 
 class ReleasePermissions:
     """Release management permission dependencies."""
-    
+
     @staticmethod
     def read() -> Callable:
         """Dependency for reading releases."""
         return PermissionDependencyFactory.create_simple(
-            Permission.VIEW_RELEASE,
-            ["view_release"]
+            Permission.VIEW_RELEASE, ["view_release"]
         )
-    
+
     @staticmethod
     def create() -> Callable:
         """Dependency for creating releases."""
         return PermissionDependencyFactory.create_simple(
-            Permission.CREATE_RELEASE,
-            ["create_release"]
+            Permission.CREATE_RELEASE, ["create_release"]
         )
-    
+
     @staticmethod
     def write() -> Callable:
         """Dependency for updating releases."""
         return PermissionDependencyFactory.create_simple(
-            Permission.MANAGE_RELEASE,
-            ["manage_release"]
+            Permission.MANAGE_RELEASE, ["manage_release"]
         )
-    
+
     @staticmethod
     def delete() -> Callable:
         """Dependency for deleting releases."""
         return PermissionDependencyFactory.create_simple(
-            Permission.DELETE_RELEASE,
-            ["delete_release"]
+            Permission.DELETE_RELEASE, ["delete_release"]
         )
-    
+
     @staticmethod
     def publish() -> Callable:
         """Dependency for publishing releases."""
         return PermissionDependencyFactory.create_simple(
-            Permission.PUBLISH_RELEASE,
-            ["publish_release"]
+            Permission.PUBLISH_RELEASE, ["publish_release"]
         )
 
 

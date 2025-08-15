@@ -315,12 +315,20 @@ async def validation_exception_handler(
     # Преобразуем ошибки в более понятный формат
     validation_errors = []
     for error in exc.errors():
+        # Handle bytes input that cannot be JSON serialized
+        input_value = error.get("input")
+        if isinstance(input_value, bytes):
+            try:
+                input_value = input_value.decode("utf-8")
+            except UnicodeDecodeError:
+                input_value = str(input_value)
+
         validation_errors.append(
             {
                 "field": ".".join(str(loc) for loc in error["loc"]),
                 "message": error["msg"],
                 "type": error["type"],
-                "input": error.get("input"),
+                "input": input_value,
             }
         )
 

@@ -3,7 +3,7 @@
 """
 
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from datetime import datetime, timezone
 
@@ -11,6 +11,8 @@ from app.crud.company_settings import company_settings as settings_crud
 from app.crud.company import company as company_crud
 from app.models.company_settings import CompanySettings
 from app.models.user import User
+from app.services.permission_service import permission_service
+from app.core.constants import Permission, RoleScope
 from app.schemas.company_settings import (
     CompanySettingsCreate,
     CompanySettingsUpdate,
@@ -30,7 +32,7 @@ class CompanySettingsService:
         self.crud = settings_crud
 
     def get_company_settings(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Optional[CompanySettings]:
         """Получить настройки компании"""
 
@@ -44,7 +46,7 @@ class CompanySettingsService:
 
     def create_or_update_settings(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         settings_data: CompanySettingsCreate,
@@ -83,7 +85,7 @@ class CompanySettingsService:
 
     def update_settings(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         settings_data: CompanySettingsUpdate,
@@ -120,7 +122,7 @@ class CompanySettingsService:
         return updated_settings
 
     def get_password_policy(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> PasswordPolicySettings:
         """Получить политику паролей компании"""
 
@@ -135,7 +137,7 @@ class CompanySettingsService:
 
     def update_password_policy(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         policy_data: PasswordPolicySettings,
@@ -163,7 +165,7 @@ class CompanySettingsService:
         return settings
 
     def get_notification_settings(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> NotificationSettings:
         """Получить настройки уведомлений"""
 
@@ -178,7 +180,7 @@ class CompanySettingsService:
 
     def update_notification_settings(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         notification_data: NotificationSettings,
@@ -207,7 +209,7 @@ class CompanySettingsService:
 
     def configure_sso(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         sso_config: SSOConfiguration,
@@ -245,7 +247,7 @@ class CompanySettingsService:
         return settings
 
     def disable_sso(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> CompanySettings:
         """Отключить SSO"""
 
@@ -267,7 +269,7 @@ class CompanySettingsService:
         return settings
 
     def get_sso_configuration(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Optional[Dict[str, Any]]:
         """Получить конфигурацию SSO"""
 
@@ -282,7 +284,7 @@ class CompanySettingsService:
 
     def validate_file_upload(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         file_size_bytes: int,
@@ -305,7 +307,7 @@ class CompanySettingsService:
         )
 
     def get_file_upload_settings(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Dict[str, Any]:
         """Получить настройки загрузки файлов"""
 
@@ -318,7 +320,7 @@ class CompanySettingsService:
         return self.crud.get_file_upload_settings(db, company_id=company_id)
 
     def can_export_format(
-        self, db: Session, *, company_id: int, format_name: str, current_user: User
+        self, db: AsyncSession, *, company_id: int, format_name: str, current_user: User
     ) -> bool:
         """Проверить, разрешен ли формат экспорта"""
 
@@ -331,7 +333,7 @@ class CompanySettingsService:
         )
 
     def get_export_settings(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Dict[str, Any]:
         """Получить настройки экспорта"""
 
@@ -344,7 +346,13 @@ class CompanySettingsService:
         return self.crud.get_export_settings(db, company_id=company_id)
 
     def update_custom_setting(
-        self, db: Session, *, company_id: int, key: str, value: Any, current_user: User
+        self,
+        db: AsyncSession,
+        *,
+        company_id: int,
+        key: str,
+        value: Any,
+        current_user: User,
     ) -> CompanySettings:
         """Обновить кастомную настройку"""
 
@@ -368,7 +376,7 @@ class CompanySettingsService:
         return settings
 
     def delete_custom_setting(
-        self, db: Session, *, company_id: int, key: str, current_user: User
+        self, db: AsyncSession, *, company_id: int, key: str, current_user: User
     ) -> CompanySettings:
         """Удалить кастомную настройку"""
 
@@ -390,7 +398,7 @@ class CompanySettingsService:
         return settings
 
     def backup_settings(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Dict[str, Any]:
         """Создать резервную копию настроек"""
 
@@ -413,7 +421,7 @@ class CompanySettingsService:
 
     def restore_settings(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         backup_data: Dict[str, Any],
@@ -441,7 +449,7 @@ class CompanySettingsService:
         return settings
 
     def get_settings_statistics(
-        self, db: Session, *, current_user: User
+        self, db: AsyncSession, *, current_user: User
     ) -> Dict[str, Any]:
         """Получить статистику настроек"""
 
@@ -520,7 +528,9 @@ class CompanySettingsService:
 
         return True
 
-    def _can_access_company(self, user: User, company_id: int) -> bool:
+    async def _can_access_company(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права доступа к компании"""
         if user.is_system_admin:
             return True
@@ -528,10 +538,18 @@ class CompanySettingsService:
         if user.company_id == company_id:
             return True
 
-        # TODO: Проверить доступ через Enhanced Role System
-        return False
+        # Проверить доступ через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.VIEW_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
-    def _can_manage_company_settings(self, user: User, company_id: int) -> bool:
+    async def _can_manage_company_settings(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права на управление настройками компании"""
         if user.is_system_admin:
             return True
@@ -539,8 +557,14 @@ class CompanySettingsService:
         if user.company_id == company_id and user.is_company_admin:
             return True
 
-        # TODO: Проверить права через Enhanced Role System
-        return False
+        # Проверить права через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.MANAGE_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
 
 # Создаем экземпляр сервиса

@@ -215,7 +215,7 @@ class SecurityConfig(BaseModel):
 
 class AdminConfig(BaseModel):
     email: str = "admin@example.com"
-    password: str = "SecurePass1!"
+    password: str = "SecurePass123!"
     name: str = "Admin User"
 
 
@@ -274,7 +274,7 @@ class FileStorageConfig(BaseModel):
     )
 
     # MinIO Object Storage settings
-    use_minio: bool = True  # Enable MinIO by default
+    use_minio: bool = True
     minio_endpoint: str = "localhost:9000"
     minio_access_key: str = "admin"
     minio_secret_key: str = "minioadmin123"
@@ -287,7 +287,7 @@ class FileStorageConfig(BaseModel):
     minio_bucket_documents: str = "requify-documents"
 
     # CDN Configuration
-    cdn_enabled: bool = True
+    cdn_enabled: bool = False  # Disable CDN when using local storage
     cdn_base_url: str = (
         "http://localhost"  # NGINX CDN proxy (изменил порт с 8080 на 80)
     )

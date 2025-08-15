@@ -3,13 +3,15 @@
 """
 
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
 from app.crud.company_contact import company_contact as company_contact_crud
 from app.crud.company import company as company_crud
 from app.models.company_contact import CompanyContact
 from app.models.user import User
+from app.services.permission_service import permission_service
+from app.core.constants import Permission, RoleScope
 from app.schemas.company_contact import (
     CompanyContactCreate,
     CompanyContactUpdate,
@@ -24,7 +26,7 @@ class CompanyContactService:
         self.crud = company_contact_crud
 
     def get_company_contact(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Optional[CompanyContact]:
         """Получить контактные данные компании"""
 
@@ -38,7 +40,7 @@ class CompanyContactService:
 
     def create_or_update_company_contact(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         contact_data: CompanyContactCreate,
@@ -69,7 +71,7 @@ class CompanyContactService:
 
     def update_company_contact(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         contact_data: CompanyContactUpdate,
@@ -106,7 +108,7 @@ class CompanyContactService:
         return updated_contact
 
     def search_companies_by_email(
-        self, db: Session, *, email: str, current_user: User
+        self, db: AsyncSession, *, email: str, current_user: User
     ) -> List[CompanyContact]:
         """Поиск компаний по email"""
 
@@ -120,7 +122,7 @@ class CompanyContactService:
         return self.crud.get_companies_by_email(db, email=email)
 
     def search_companies_by_phone(
-        self, db: Session, *, phone: str, current_user: User
+        self, db: AsyncSession, *, phone: str, current_user: User
     ) -> List[CompanyContact]:
         """Поиск компаний по телефону"""
 
@@ -135,7 +137,7 @@ class CompanyContactService:
 
     def get_companies_by_location(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         country: Optional[str] = None,
         city: Optional[str] = None,
@@ -168,7 +170,7 @@ class CompanyContactService:
 
     def get_companies_by_timezone(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         timezone: str,
         current_user: User,
@@ -188,7 +190,7 @@ class CompanyContactService:
 
     def search_company_contacts(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         query: str,
         current_user: User,
@@ -207,7 +209,7 @@ class CompanyContactService:
         return self.crud.search_contacts(db, query=query, skip=skip, limit=limit)
 
     def get_incomplete_contacts(
-        self, db: Session, *, current_user: User, skip: int = 0, limit: int = 100
+        self, db: AsyncSession, *, current_user: User, skip: int = 0, limit: int = 100
     ) -> List[CompanyContact]:
         """Получить компании с неполными контактными данными"""
 
@@ -221,7 +223,7 @@ class CompanyContactService:
         return self.crud.get_incomplete_contacts(db, skip=skip, limit=limit)
 
     def get_contact_statistics(
-        self, db: Session, *, current_user: User
+        self, db: AsyncSession, *, current_user: User
     ) -> Dict[str, Any]:
         """Получить статистику контактных данных"""
 
@@ -292,7 +294,9 @@ class CompanyContactService:
 
     # Приватные методы для проверки прав доступа
 
-    def _can_access_company(self, user: User, company_id: int) -> bool:
+    async def _can_access_company(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права доступа к компании"""
         if user.is_system_admin:
             return True
@@ -300,10 +304,18 @@ class CompanyContactService:
         if user.company_id == company_id:
             return True
 
-        # TODO: Проверить доступ через Enhanced Role System
-        return False
+        # Проверить доступ через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.VIEW_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
-    def _can_edit_company(self, user: User, company_id: int) -> bool:
+    async def _can_edit_company(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права на редактирование компании"""
         if user.is_system_admin:
             return True
@@ -311,8 +323,14 @@ class CompanyContactService:
         if user.company_id == company_id and user.is_company_admin:
             return True
 
-        # TODO: Проверить права через Enhanced Role System
-        return False
+        # Проверить права через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.MANAGE_PROJECT,
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
 
 # Создаем экземпляр сервиса

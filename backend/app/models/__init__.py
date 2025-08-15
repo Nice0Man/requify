@@ -64,13 +64,13 @@ def _import_all_models():
     level5 = ["project", "spec", "requirement_group", "requirement_group_version"]
 
     # Уровень 6: Требования и релизы (зависят от проектов)
-    level6 = ["requirement", "release", "relationship"]
+    level6 = ["requirement", "release", "specification", "relationship"]
 
     # Уровень 7: Комментарии, тестирование, дашборд
-    level7 = ["comment", "test_result", "dashboard"]
+    level7 = ["comment", "test_result", "test_case", "dashboard"]
 
     # Уровень 8: Продвинутые системы
-    level8 = ["enhanced_role_system"]
+    level8 = ["enhanced_role_system", "user_role_assignments"]
 
     # Собираем все уровни в правильном порядке
     ordered_modules = (

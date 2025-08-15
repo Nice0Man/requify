@@ -290,6 +290,7 @@ class FieldLimits:
     MEDIUM_STRING_MAX = 255
     LONG_STRING_MAX = 1000
     TEXT_MAX = 10000
+    LARGE_TEXT_MAX = 100000
 
     # Специальные поля
     URL_MAX = 512

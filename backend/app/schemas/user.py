@@ -7,7 +7,13 @@
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Union, TYPE_CHECKING
 from sqlmodel import SQLModel, Field
-from pydantic import EmailStr, field_validator, model_validator, field_serializer
+from pydantic import (
+    EmailStr,
+    field_validator,
+    model_validator,
+    field_serializer,
+    computed_field,
+)
 from enum import Enum
 import re
 
@@ -130,7 +136,7 @@ class UserBase(BaseSchema, ValidationMixin):
         """Валидация имени пользователя"""
         if v is None:
             return None
-            
+
         v = cls.validate_non_empty_string(v, "username")
         v = v.strip().lower()
 
@@ -153,7 +159,7 @@ class UserBase(BaseSchema, ValidationMixin):
         # Проверка зарезервированных имен (admin разрешен для админа)
         reserved_usernames = [
             "root",
-            "administrator", 
+            "administrator",
             "superuser",
             "api",
             "www",
@@ -445,62 +451,65 @@ class UserWithRelations(UserResponse):
     """
 
     company_name: Optional[str] = Field(None, description="Название компании")
-    profile: Optional[Union[Dict[str, Any], Any]] = Field(None, description="Данные профиля")
+    profile: Optional[Union[Dict[str, Any], Any]] = Field(
+        None, description="Данные профиля"
+    )
     roles: List[Dict[str, Any]] = Field(
         default_factory=list, description="Назначенные роли"
     )
     teams: List[Dict[str, Any]] = Field(
         default_factory=list, description="Команды пользователя"
     )
-    
+
     model_config = {"from_attributes": True}
-    
+
     @field_validator("profile", mode="before")
     @classmethod
     def validate_profile(cls, value):
         """Валидация и преобразование profile объекта в словарь"""
         if value is None:
             return None
-        
+
         # Если это уже словарь, возвращаем как есть
         if isinstance(value, dict):
             return value
-            
+
         # Если это ORM объект, пытаемся безопасно его сериализовать
-        if hasattr(value, '__dict__'):
+        if hasattr(value, "__dict__"):
             try:
-                # Используем только доступные атрибуты SQLAlchemy
+                from sqlalchemy.inspection import inspect
+
+                # Используем SQLAlchemy инспектор для безопасного доступа к атрибутам
+                state = inspect(value)
                 result = {}
-                # Получаем загруженные атрибуты из SQLAlchemy
-                mapper = value.__class__.__mapper__
-                for column in mapper.columns:
-                    column_name = column.name
-                    try:
-                        # Проверяем, загружен ли атрибут
-                        if hasattr(value, column_name):
-                            attr_value = getattr(value, column_name, None)
-                            result[column_name] = attr_value
-                    except Exception:
-                        # Пропускаем проблемные атрибуты
-                        continue
+
+                # Получаем только загруженные атрибуты
+                for attr in state.attrs:
+                    if attr.loaded_value is not None:
+                        try:
+                            result[attr.key] = attr.loaded_value
+                        except Exception:
+                            # Пропускаем проблемные атрибуты
+                            continue
+
                 return result if result else None
             except Exception:
                 # Fallback - возвращаем None если не можем сериализовать
                 return None
         return value
-    
+
     @field_serializer("profile")
     def serialize_profile(self, value, _info):
         """Сериализация profile объекта в словарь"""
         if value is None:
             return None
-        
+
         # Если это уже словарь, возвращаем как есть
         if isinstance(value, dict):
             return value
-            
+
         # Если это ORM объект, пытаемся безопасно его сериализовать
-        if hasattr(value, '__dict__'):
+        if hasattr(value, "__dict__"):
             try:
                 # Используем только доступные атрибуты SQLAlchemy
                 result = {}
@@ -548,53 +557,60 @@ class UserDetailed(UserWithRelations):
     can_delete: bool = Field(False, description="Можно ли удалить")
     can_assign_roles: bool = Field(False, description="Можно ли назначать роли")
     can_reset_password: bool = Field(False, description="Можно ли сбросить пароль")
-    
+
     @field_validator("settings", mode="before")
     @classmethod
     def validate_settings(cls, value):
         """Валидация и преобразование settings объекта в словарь"""
         if value is None:
             return None
-            
+
         # Если это уже словарь, возвращаем как есть
         if isinstance(value, dict):
             return value
-            
+
         # Если это ORM объект, пытаемся безопасно его сериализовать
-        if hasattr(value, '__dict__'):
+        if hasattr(value, "__dict__"):
             try:
-                # Используем только доступные атрибуты SQLAlchemy
+                from sqlalchemy.inspection import inspect
+
+                # Используем SQLAlchemy инспектор для безопасного доступа к атрибутам
+                state = inspect(value)
                 result = {}
-                # Получаем загруженные атрибуты из SQLAlchemy
-                mapper = value.__class__.__mapper__
-                for column in mapper.columns:
-                    column_name = column.name
-                    try:
-                        # Проверяем, загружен ли атрибут
-                        if hasattr(value, column_name):
-                            attr_value = getattr(value, column_name, None)
-                            result[column_name] = attr_value
-                    except Exception:
-                        # Пропускаем проблемные атрибуты
-                        continue
+
+                # Получаем только загруженные атрибуты
+                for attr in state.attrs:
+                    if attr.loaded_value is not None:
+                        try:
+                            result[attr.key] = attr.loaded_value
+                        except Exception:
+                            # Пропускаем проблемные атрибуты
+                            continue
+
                 return result if result else None
             except Exception:
                 # Fallback - возвращаем None если не можем сериализовать
                 return None
         return value
-    
+
+    @field_serializer("roles")
+    def serialize_roles(self, value, _info):
+        """Сериализация ролей пользователя"""
+        # Роли обрабатываются через property в модели User
+        return value if value is not None else []
+
     @field_serializer("settings")
     def serialize_settings(self, value, _info):
         """Сериализация settings объекта в словарь"""
         if value is None:
             return None
-            
+
         # Если это уже словарь, возвращаем как есть
         if isinstance(value, dict):
             return value
-            
+
         # Если это ORM объект, пытаемся безопасно его сериализовать
-        if hasattr(value, '__dict__'):
+        if hasattr(value, "__dict__"):
             try:
                 # Используем только доступные атрибуты SQLAlchemy
                 result = {}

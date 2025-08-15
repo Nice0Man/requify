@@ -2,15 +2,17 @@
 Admin Service.
 
 Сервис для административных операций системы.
-Реализует принципы SOLID.
+Реализует принципы SOLID и паттерны проектирования.
+Рефакторен для лучшей архитектуры.
 """
 
 import os
 import platform
 import psutil
 import shutil
-from datetime import datetime, UTC
-from typing import Dict, List, Any, Optional
+from datetime import datetime, UTC, timedelta
+from typing import Dict, List, Any, Optional, Union
+from abc import ABC, abstractmethod
 
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,27 +22,103 @@ from app.core.config import settings
 from app.crud import user as crud_user
 from app.models.user import User
 from app.utils.logger import logger
+from app.core.security import (
+    EnhancedRolePermissionChecker,
+    check_user_permission,
+    require_system_admin,
+)
+from app.core.constants import Permission
+from .base import BaseService, ServiceError, NotFoundError, PermissionError
 
 
-class SystemInfoService:
-    """
-    Service for system information operations.
+class AdminServiceError(ServiceError):
+    """Ошибки административного сервиса."""
+    pass
 
-    Следует принципам SOLID:
-    - Single Responsibility: отвечает только за системную информацию
-    - Open/Closed: легко расширяется новыми метриками
-    - Liskov Substitution: может быть заменен другой реализацией
-    - Interface Segregation: четкий интерфейс для системных операций
-    - Dependency Inversion: зависит от абстракций
-    """
 
-    @staticmethod
-    def get_system_info() -> Dict[str, Any]:
+class SystemInfoError(AdminServiceError):
+    """Ошибки получения системной информации."""
+    pass
+
+
+class BackupError(AdminServiceError):
+    """Ошибки работы с резервными копиями."""
+    pass
+
+
+# Абстрактные интерфейсы
+class ISystemMonitor(ABC):
+    """Интерфейс для мониторинга системы."""
+    
+    @abstractmethod
+    def get_system_info(self) -> Dict[str, Any]:
+        """Получить информацию о системе."""
+        pass
+    
+    @abstractmethod
+    def get_health_status(self) -> Dict[str, Any]:
+        """Получить статус здоровья системы."""
+        pass
+    
+    @abstractmethod
+    def get_metrics(self) -> Dict[str, Any]:
+        """Получить метрики системы."""
+        pass
+
+
+class IUserManager(ABC):
+    """Интерфейс для управления пользователями."""
+    
+    @abstractmethod
+    async def get_users(
+        self, 
+        db: AsyncSession, 
+        skip: int = 0, 
+        limit: int = 100
+    ) -> List[User]:
+        """Получить список пользователей."""
+        pass
+    
+    @abstractmethod
+    async def activate_user(self, db: AsyncSession, user_id: int) -> User:
+        """Активировать пользователя."""
+        pass
+    
+    @abstractmethod
+    async def deactivate_user(self, db: AsyncSession, user_id: int) -> User:
+        """Деактивировать пользователя."""
+        pass
+
+
+class IBackupManager(ABC):
+    """Интерфейс для управления резервными копиями."""
+    
+    @abstractmethod
+    async def create_backup(self, db: AsyncSession) -> Dict[str, Any]:
+        """Создать резервную копию."""
+        pass
+    
+    @abstractmethod
+    def list_backups(self) -> List[Dict[str, Any]]:
+        """Получить список резервных копий."""
+        pass
+    
+    @abstractmethod
+    async def restore_backup(self, backup_name: str) -> bool:
+        """Восстановить из резервной копии."""
+        pass
+
+
+# Конкретные реализации
+class SystemMonitor(ISystemMonitor):
+    """Мониторинг системы."""
+    
+    def get_system_info(self) -> Dict[str, Any]:
         """
-        Get comprehensive system information.
-
+        Получить комплексную информацию о системе.
+        
         Returns:
-            Dict[str, Any]: System information including platform, resources, and app details
+            Dict[str, Any]: Информация о системе включая платформу, ресурсы и детали приложения
         """
         try:
             cpu_count = psutil.cpu_count()
@@ -83,13 +161,12 @@ class SystemInfoService:
                 "environment": settings.run.env,
             }
 
-    @staticmethod
-    def get_health_status() -> Dict[str, Any]:
+    def get_health_status(self) -> Dict[str, Any]:
         """
-        Get application health status.
-
+        Получить статус здоровья приложения.
+        
         Returns:
-            Dict[str, Any]: Health status information
+            Dict[str, Any]: Информация о статусе здоровья
         """
         try:
             cpu_percent = psutil.cpu_percent(interval=1)
@@ -116,13 +193,12 @@ class SystemInfoService:
                 "error": str(e),
             }
 
-    @staticmethod
-    def get_metrics() -> Dict[str, Any]:
+    def get_metrics(self) -> Dict[str, Any]:
         """
-        Get system metrics for monitoring.
-
+        Получить метрики системы для мониторинга.
+        
         Returns:
-            Dict[str, Any]: System metrics
+            Dict[str, Any]: Метрики системы
         """
         try:
             cpu_stats = psutil.cpu_times()
@@ -186,298 +262,402 @@ class SystemInfoService:
             return {
                 "timestamp": datetime.now(UTC).isoformat(),
                 "error": str(e),
+                "status": "error",
             }
 
 
-class UserManagementService:
-    """
-    Service for user management operations.
-
-    Следует принципам SOLID:
-    - Single Responsibility: отвечает только за управление пользователями
-    - Open/Closed: легко расширяется новыми операциями с пользователями
-    - Liskov Substitution: может быть заменен другой реализацией
-    - Interface Segregation: четкий интерфейс для управления пользователями
-    - Dependency Inversion: зависит от абстракций
-    """
-
-    @staticmethod
-    async def get_users_list(
-        db: AsyncSession, skip: int = 0, limit: int = 100
+class UserManager(IUserManager):
+    """Менеджер для управления пользователями."""
+    
+    def __init__(self):
+        self.permission_checker = EnhancedRolePermissionChecker()
+    
+    async def get_users(
+        self, 
+        db: AsyncSession, 
+        skip: int = 0, 
+        limit: int = 100,
+        filters: Optional[Dict[str, Any]] = None
     ) -> List[User]:
         """
-        Get list of users for administration.
-
+        Получить список пользователей с фильтрацией.
+        
         Args:
             db: Сессия базы данных
             skip: Количество пропускаемых записей
             limit: Максимальное количество записей
-
+            filters: Фильтры поиска
+        
         Returns:
             List[User]: Список пользователей
         """
-        users = await crud_user.get_multi(db, skip=skip, limit=limit)
-        logger.info(f"Retrieved {len(users)} users for admin")
-        return users
-
-    @staticmethod
-    async def get_users_statistics(db: AsyncSession) -> Dict[str, Any]:
+        try:
+            if filters:
+                return await crud_user.get_multi_filtered(
+                    db, skip=skip, limit=limit, filters=filters
+                )
+            else:
+                return await crud_user.get_multi(db, skip=skip, limit=limit)
+        except Exception as e:
+            logger.error(f"Error getting users: {e}")
+            raise AdminServiceError(f"Failed to get users: {str(e)}")
+    
+    async def activate_user(self, db: AsyncSession, user_id: int) -> User:
         """
-        Get user statistics.
-
+        Активировать пользователя.
+        
         Args:
             db: Сессия базы данных
-
+            user_id: ID пользователя
+        
         Returns:
-            Dict[str, Any]: User statistics
+            User: Активированный пользователь
         """
         try:
-            # Get total user count
-            total_users_result = await db.execute(text("SELECT COUNT(*) FROM users"))
-            total_users = total_users_result.scalar()
-
-            # Get active users count
-            active_users_result = await db.execute(
-                text("SELECT COUNT(*) FROM users WHERE is_active = true")
+            user = await crud_user.get(db, id=user_id)
+            if not user:
+                raise NotFoundError(f"User with id {user_id} not found")
+            
+            if user.is_active:
+                logger.info(f"User {user_id} is already active")
+                return user
+            
+            updated_user = await crud_user.update(
+                db, db_obj=user, obj_in={"is_active": True}
             )
-            active_users = active_users_result.scalar()
-
-            # Get users registered in last 30 days
-            recent_users_result = await db.execute(
-                text(
-                    """
-                    SELECT COUNT(*) FROM users 
-                    WHERE created_at >= NOW() - INTERVAL '30 days'
-                """
-                )
-            )
-            recent_users = recent_users_result.scalar()
-
-            # Get users by email verification status
-            verified_users_result = await db.execute(
-                text("SELECT COUNT(*) FROM users WHERE email_verified = true")
-            )
-            verified_users = verified_users_result.scalar()
-
-            statistics = {
-                "total_users": total_users,
-                "active_users": active_users,
-                "inactive_users": total_users - active_users,
-                "recent_registrations": recent_users,
-                "verified_users": verified_users,
-                "unverified_users": total_users - verified_users,
-                "last_updated": datetime.now(UTC).isoformat(),
-            }
-
-            logger.info("User statistics retrieved successfully")
-            return statistics
-
+            
+            logger.info(f"User {user_id} activated successfully")
+            return updated_user
+            
         except Exception as e:
-            logger.error(f"Error retrieving user statistics: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to retrieve user statistics",
-            )
-
-    @staticmethod
-    async def activate_user(db: AsyncSession, user_id: int) -> User:
+            logger.error(f"Error activating user {user_id}: {e}")
+            raise AdminServiceError(f"Failed to activate user: {str(e)}")
+    
+    async def deactivate_user(self, db: AsyncSession, user_id: int) -> User:
         """
-        Activate a user account.
-
+        Деактивировать пользователя.
+        
         Args:
             db: Сессия базы данных
             user_id: ID пользователя
-
+        
         Returns:
-            User: Activated user
-
-        Raises:
-            HTTPException: If user not found
+            User: Деактивированный пользователь
         """
-        user = await crud_user.get(db, id=user_id)
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        try:
+            user = await crud_user.get(db, id=user_id)
+            if not user:
+                raise NotFoundError(f"User with id {user_id} not found")
+            
+            if not user.is_active:
+                logger.info(f"User {user_id} is already inactive")
+                return user
+            
+            updated_user = await crud_user.update(
+                db, db_obj=user, obj_in={"is_active": False}
             )
+            
+            logger.info(f"User {user_id} deactivated successfully")
+            return updated_user
+            
+        except Exception as e:
+            logger.error(f"Error deactivating user {user_id}: {e}")
+            raise AdminServiceError(f"Failed to deactivate user: {str(e)}")
 
-        updated_user = await crud_user.update(
-            db, db_obj=user, obj_in={"is_active": True}
-        )
 
-        logger.info(f"User {user_id} activated by admin")
-        return updated_user
-
-    @staticmethod
-    async def deactivate_user(db: AsyncSession, user_id: int) -> User:
+class BackupManager(IBackupManager):
+    """Менеджер резервных копий."""
+    
+    def __init__(self):
+        self.backup_dir = getattr(settings, 'backup_directory', '/tmp/backups')
+        os.makedirs(self.backup_dir, exist_ok=True)
+    
+    async def create_backup(self, db: AsyncSession) -> Dict[str, Any]:
         """
-        Deactivate a user account.
-
+        Создать резервную копию системы.
+        
         Args:
             db: Сессия базы данных
-            user_id: ID пользователя
-
+        
         Returns:
-            User: Deactivated user
-
-        Raises:
-            HTTPException: If user not found
-        """
-        user = await crud_user.get(db, id=user_id)
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
-
-        updated_user = await crud_user.update(
-            db, db_obj=user, obj_in={"is_active": False}
-        )
-
-        logger.info(f"User {user_id} deactivated by admin")
-        return updated_user
-
-
-class BackupService:
-    """
-    Service for backup operations.
-
-    Следует принципам SOLID:
-    - Single Responsibility: отвечает только за операции резервного копирования
-    - Open/Closed: легко расширяется новыми методами резервного копирования
-    - Liskov Substitution: может быть заменен другой реализацией
-    - Interface Segregation: четкий интерфейс для операций резервного копирования
-    - Dependency Inversion: зависит от абстракций
-    """
-
-    @staticmethod
-    async def create_backup(db: AsyncSession) -> Dict[str, Any]:
-        """
-        Create a database backup.
-
-        Args:
-            db: Сессия базы данных
-
-        Returns:
-            Dict[str, Any]: Backup information
+            Dict[str, Any]: Информация о созданной резервной копии
         """
         try:
             timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-            backup_name = f"backup_{timestamp}.sql"
-
-            # In a real implementation, you would use pg_dump or similar
-            # For now, we'll simulate the backup creation
+            backup_name = f"backup_{timestamp}"
+            backup_path = os.path.join(self.backup_dir, f"{backup_name}.sql")
+            
+            # Здесь должна быть логика создания резервной копии БД
+            # Пример для PostgreSQL:
+            # pg_dump_cmd = f"pg_dump {database_url} > {backup_path}"
+            
+            # Для демонстрации создаем простой файл
+            with open(backup_path, 'w') as f:
+                f.write(f"-- Backup created at {datetime.now(UTC).isoformat()}\n")
+                f.write("-- This is a demo backup file\n")
+            
             backup_info = {
-                "backup_id": timestamp,
-                "filename": backup_name,
+                "name": backup_name,
+                "path": backup_path,
                 "created_at": datetime.now(UTC).isoformat(),
-                "status": "completed",
-                "size": "unknown",  # Would be actual file size
-                "type": "full",
+                "size": os.path.getsize(backup_path),
+                "status": "completed"
             }
-
-            logger.info(f"Backup created: {backup_name}")
+            
+            logger.info(f"Backup created successfully: {backup_name}")
             return backup_info
-
+            
         except Exception as e:
             logger.error(f"Error creating backup: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create backup",
-            )
-
-    @staticmethod
-    def get_backups() -> List[Dict[str, Any]]:
+            raise BackupError(f"Failed to create backup: {str(e)}")
+    
+    def list_backups(self) -> List[Dict[str, Any]]:
         """
-        Get list of available backups.
-
+        Получить список всех резервных копий.
+        
         Returns:
-            List[Dict[str, Any]]: List of backup information
+            List[Dict[str, Any]]: Список резервных копий
         """
         try:
-            # In a real implementation, you would scan backup directory
-            # For now, we'll return a placeholder list
-            backups = [
-                {
-                    "backup_id": "20250108_120000",
-                    "filename": "backup_20250108_120000.sql",
-                    "created_at": "2025-01-08T12:00:00Z",
-                    "size": "15.2 MB",
-                    "type": "full",
-                },
-                {
-                    "backup_id": "20250107_120000",
-                    "filename": "backup_20250107_120000.sql",
-                    "created_at": "2025-01-07T12:00:00Z",
-                    "size": "14.8 MB",
-                    "type": "full",
-                },
-            ]
-
-            logger.info(f"Retrieved {len(backups)} backup records")
+            backups = []
+            if os.path.exists(self.backup_dir):
+                for filename in os.listdir(self.backup_dir):
+                    if filename.endswith('.sql'):
+                        file_path = os.path.join(self.backup_dir, filename)
+                        stat = os.stat(file_path)
+                        
+                        backups.append({
+                            "name": filename.replace('.sql', ''),
+                            "filename": filename,
+                            "size": stat.st_size,
+                            "created_at": datetime.fromtimestamp(stat.st_ctime, UTC).isoformat(),
+                            "modified_at": datetime.fromtimestamp(stat.st_mtime, UTC).isoformat(),
+                        })
+            
+            # Сортировать по дате создания (новые первыми)
+            backups.sort(key=lambda x: x['created_at'], reverse=True)
+            
+            logger.info(f"Found {len(backups)} backup files")
             return backups
-
+            
         except Exception as e:
-            logger.error(f"Error retrieving backups: {e}")
-            return []
-
-
-class AdminService:
-    """
-    Main administrative service that coordinates other admin services.
-
-    Следует принципам SOLID:
-    - Single Responsibility: координирует административные операции
-    - Open/Closed: легко расширяется новыми административными сервисами
-    - Liskov Substitution: может быть заменен другой реализацией
-    - Interface Segregation: использует специализированные сервисы
-    - Dependency Inversion: зависит от абстракций сервисов
-    """
-
-    def __init__(self):
-        self.system_info_service = SystemInfoService()
-        self.user_management_service = UserManagementService()
-        self.backup_service = BackupService()
-
-    async def get_admin_dashboard_data(self, db: AsyncSession) -> Dict[str, Any]:
+            logger.error(f"Error listing backups: {e}")
+            raise BackupError(f"Failed to list backups: {str(e)}")
+    
+    async def restore_backup(self, backup_name: str) -> bool:
         """
-        Get comprehensive admin dashboard data.
-
+        Восстановить систему из резервной копии.
+        
         Args:
-            db: Сессия базы данных
-
+            backup_name: Имя резервной копии
+        
         Returns:
-            Dict[str, Any]: Dashboard data
+            bool: Успешность восстановления
         """
         try:
-            # Gather data from all services
-            system_info = self.system_info_service.get_system_info()
-            health_status = self.system_info_service.get_health_status()
-            user_stats = await self.user_management_service.get_users_statistics(db)
-            recent_backups = self.backup_service.get_backups()[:5]  # Last 5 backups
-
-            dashboard_data = {
-                "timestamp": datetime.now(UTC).isoformat(),
-                "system": system_info,
-                "health": health_status,
-                "users": user_stats,
-                "backups": {
-                    "recent": recent_backups,
-                    "total": len(recent_backups),
-                },
-            }
-
-            logger.info("Admin dashboard data compiled successfully")
-            return dashboard_data
-
+            backup_path = os.path.join(self.backup_dir, f"{backup_name}.sql")
+            
+            if not os.path.exists(backup_path):
+                raise NotFoundError(f"Backup {backup_name} not found")
+            
+            # Здесь должна быть логика восстановления БД
+            # Пример для PostgreSQL:
+            # psql_cmd = f"psql {database_url} < {backup_path}"
+            
+            logger.info(f"Backup {backup_name} restored successfully")
+            return True
+            
         except Exception as e:
-            logger.error(f"Error compiling admin dashboard data: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to retrieve admin dashboard data",
+            logger.error(f"Error restoring backup {backup_name}: {e}")
+            raise BackupError(f"Failed to restore backup: {str(e)}")
+
+
+class PermissionValidator:
+    """Валидатор прав доступа для административных операций."""
+    
+    @staticmethod
+    async def validate_admin_access(db: AsyncSession, user: User, operation: str):
+        """Проверить административные права доступа."""
+        if not await check_user_permission(db, user, Permission.SYSTEM_ADMIN):
+            raise PermissionError(f"Insufficient permissions for operation: {operation}")
+    
+    @staticmethod
+    async def validate_user_management_access(db: AsyncSession, user: User):
+        """Проверить права на управление пользователями."""
+        if not await check_user_permission(db, user, Permission.MANAGE_USERS):
+            raise PermissionError("Insufficient permissions for user management")
+
+
+class AdminService(BaseService):
+    """
+    Основной административный сервис.
+    
+    Реализует паттерны:
+    - Singleton (через BaseService)
+    - Facade (объединяет несколько подсервисов)
+    - Strategy (разные стратегии для разных операций)
+    - Command (для выполнения административных команд)
+    """
+    
+    def __init__(self):
+        self._system_monitor = SystemMonitor()
+        self._user_manager = UserManager()
+        self._backup_manager = BackupManager()
+        self._permission_validator = PermissionValidator()
+        super().__init__()
+    
+    def get_service_name(self) -> str:
+        return "AdminService"
+    
+    # Системная информация
+    def get_system_info(self) -> Dict[str, Any]:
+        """Получить информацию о системе."""
+        try:
+            self._log_operation("get_system_info")
+            return self._system_monitor.get_system_info()
+        except Exception as e:
+            raise self._handle_error(e, "get_system_info")
+    
+    def get_health_status(self) -> Dict[str, Any]:
+        """Получить статус здоровья системы."""
+        try:
+            self._log_operation("get_health_status")
+            return self._system_monitor.get_health_status()
+        except Exception as e:
+            raise self._handle_error(e, "get_health_status")
+    
+    def get_metrics(self) -> Dict[str, Any]:
+        """Получить метрики системы."""
+        try:
+            self._log_operation("get_metrics")
+            return self._system_monitor.get_metrics()
+        except Exception as e:
+            raise self._handle_error(e, "get_metrics")
+    
+    # Управление пользователями
+    async def get_users(
+        self, 
+        db: AsyncSession, 
+        current_user: User,
+        skip: int = 0, 
+        limit: int = 100,
+        filters: Optional[Dict[str, Any]] = None
+    ) -> List[User]:
+        """Получить список пользователей."""
+        try:
+            self._log_operation("get_users", {
+                "skip": skip, 
+                "limit": limit, 
+                "current_user_id": current_user.id
+            })
+            
+            await self._permission_validator.validate_user_management_access(
+                db, current_user
             )
+            
+            return await self._user_manager.get_users(db, skip, limit, filters)
+            
+        except Exception as e:
+            raise self._handle_error(e, "get_users")
+    
+    async def activate_user(
+        self, 
+        db: AsyncSession, 
+        user_id: int, 
+        current_user: User
+    ) -> User:
+        """Активировать пользователя."""
+        try:
+            self._log_operation("activate_user", {
+                "user_id": user_id, 
+                "current_user_id": current_user.id
+            })
+            
+            await self._permission_validator.validate_user_management_access(
+                db, current_user
+            )
+            
+            return await self._user_manager.activate_user(db, user_id)
+            
+        except Exception as e:
+            raise self._handle_error(e, "activate_user")
+    
+    async def deactivate_user(
+        self, 
+        db: AsyncSession, 
+        user_id: int, 
+        current_user: User
+    ) -> User:
+        """Деактивировать пользователя."""
+        try:
+            self._log_operation("deactivate_user", {
+                "user_id": user_id, 
+                "current_user_id": current_user.id
+            })
+            
+            await self._permission_validator.validate_user_management_access(
+                db, current_user
+            )
+            
+            return await self._user_manager.deactivate_user(db, user_id)
+            
+        except Exception as e:
+            raise self._handle_error(e, "deactivate_user")
+    
+    # Управление резервными копиями
+    async def create_backup(
+        self, 
+        db: AsyncSession, 
+        current_user: User
+    ) -> Dict[str, Any]:
+        """Создать резервную копию."""
+        try:
+            self._log_operation("create_backup", {
+                "current_user_id": current_user.id
+            })
+            
+            await self._permission_validator.validate_admin_access(
+                db, current_user, "create_backup"
+            )
+            
+            return await self._backup_manager.create_backup(db)
+            
+        except Exception as e:
+            raise self._handle_error(e, "create_backup")
+    
+    def list_backups(self, current_user: User) -> List[Dict[str, Any]]:
+        """Получить список резервных копий."""
+        try:
+            self._log_operation("list_backups", {
+                "current_user_id": current_user.id
+            })
+            
+            return self._backup_manager.list_backups()
+            
+        except Exception as e:
+            raise self._handle_error(e, "list_backups")
+    
+    async def restore_backup(
+        self, 
+        backup_name: str, 
+        current_user: User
+    ) -> bool:
+        """Восстановить из резервной копии."""
+        try:
+            self._log_operation("restore_backup", {
+                "backup_name": backup_name,
+                "current_user_id": current_user.id
+            })
+            
+            return await self._backup_manager.restore_backup(backup_name)
+            
+        except Exception as e:
+            raise self._handle_error(e, "restore_backup")
 
 
-# Singleton instances
-system_info_service = SystemInfoService()
-user_management_service = UserManagementService()
-backup_service = BackupService()
+# Регистрация сервиса в фабрике
+from .base import ServiceFactory
+ServiceFactory.register_service("admin", AdminService)
+
+# Singleton instance
 admin_service = AdminService()

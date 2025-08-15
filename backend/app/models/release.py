@@ -1,5 +1,5 @@
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, List
 from enum import Enum as PyEnum
 
 from sqlalchemy import String, DateTime, Integer, Index, ForeignKey, Enum
@@ -9,6 +9,7 @@ from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
     from .project import Project
+    from .specification import Specification
 
 
 class ReleaseStatus(PyEnum):
@@ -78,6 +79,10 @@ class Release(Base, TimestampedMixin):
 
     project: Mapped["Project"] = relationship(
         "Project", back_populates="releases", lazy="select"
+    )
+
+    specifications: Mapped[List["Specification"]] = relationship(
+        "Specification", back_populates="release", cascade="all, delete-orphan", lazy="select"
     )
 
     def __repr__(self) -> str:

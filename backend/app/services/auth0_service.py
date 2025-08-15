@@ -194,6 +194,40 @@ class Auth0Service:
             logger.error(f"Ошибка при получении пользователя {user_id}: {e}")
             return None
 
+    async def validate_token_and_get_user(self, token: str, db) -> Optional[object]:
+        """
+        Validate Auth0 token and get user from database.
+
+        Args:
+            token: JWT token from Auth0
+            db: Database session
+
+        Returns:
+            User object from database or None
+        """
+        if not self.is_enabled:
+            return None
+
+        # Validate token first
+        payload = self.validate_token(token)
+        if not payload:
+            return None
+
+        # Extract user info
+        user_info = self.get_user_info(token)
+        if not user_info or not user_info.email:
+            return None
+
+        # Get user from database by email
+        from app.crud import user as crud_user
+
+        try:
+            user = await crud_user.get_by_email(db, email=user_info.email)
+            return user
+        except Exception as e:
+            logger.error(f"Error getting user from database: {e}")
+            return None
+
     async def create_user(
         self, email: str, password: str, name: str = None
     ) -> Optional[Dict[str, Any]]:

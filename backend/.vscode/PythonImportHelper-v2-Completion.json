@@ -11926,7 +11926,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.admin",
         "description": "app.api.v1.endpoints.admin",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/users\", response_model=List[UserProfile])\nasync def get_admin_users(\n    skip: int = 0,\n    limit: int = 100,\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_dashboard_admin_user),\n):\n    \"\"\"\n    Получить список всех пользователей для администрирования.",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/users\", response_model=List[UserProfile])\nasync def get_admin_users(\n    skip: int = 0,\n    limit: int = 100,\n    db: SessionDep,\n    current_user: User = Depends(get_dashboard_admin_user),\n):\n    \"\"\"\n    Получить список всех пользователей для администрирования.",
         "detail": "app.api.v1.endpoints.admin",
         "documentation": {}
     },
@@ -11935,7 +11935,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.auth",
         "description": "app.api.v1.endpoints.auth",
-        "peekOfCode": "router = APIRouter()\n# === Authentication Endpoints ===\n@router.post(\n    \"/register\", response_model=UserProfile, status_code=status.HTTP_201_CREATED\n)\nasync def register_user(\n    user_in: UserCreate,\n    db: AsyncSession = Depends(get_db),\n) -> Any:\n    \"\"\"",
+        "peekOfCode": "router = APIRouter()\n# === Authentication Endpoints ===\n@router.post(\n    \"/register\", response_model=UserProfile, status_code=status.HTTP_201_CREATED\n)\nasync def register_user(\n    user_in: UserCreate,\n    db: SessionDep,\n) -> Any:\n    \"\"\"",
         "detail": "app.api.v1.endpoints.auth",
         "documentation": {}
     },
@@ -11944,7 +11944,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.comments",
         "description": "app.api.v1.endpoints.comments",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.CommentWithAuthor])\nasync def get_comments(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    requirement_id: Optional[int] = Query(None, description=\"Фильтр по ID требования\"),\n    author_id: Optional[int] = Query(None, description=\"Фильтр по автору\"),\n    db: AsyncSession = Depends(get_db),",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.CommentWithAuthor])\nasync def get_comments(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    requirement_id: Optional[int] = Query(None, description=\"Фильтр по ID требования\"),\n    author_id: Optional[int] = Query(None, description=\"Фильтр по автору\"),\n    db: SessionDep,",
         "detail": "app.api.v1.endpoints.comments",
         "documentation": {}
     },
@@ -11953,7 +11953,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.dashboard",
         "description": "app.api.v1.endpoints.dashboard",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/stats\", response_model=DashboardStats)\nasync def get_dashboard_stats(\n    current_user: UserProfile = Depends(get_stats_read_user),\n    db: AsyncSession = Depends(get_db),\n):\n    \"\"\"Get comprehensive dashboard statistics\"\"\"\n    try:\n        return await dashboard_service.get_comprehensive_dashboard_data(\n            db, current_user.id",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/stats\", response_model=DashboardStats)\nasync def get_dashboard_stats(\n    current_user: UserProfile = Depends(get_stats_read_user),\n    db: SessionDep,\n):\n    \"\"\"Get comprehensive dashboard statistics\"\"\"\n    try:\n        return await dashboard_service.get_comprehensive_dashboard_data(\n            db, current_user.id",
         "detail": "app.api.v1.endpoints.dashboard",
         "documentation": {}
     },
@@ -11971,7 +11971,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.projects",
         "description": "app.api.v1.endpoints.projects",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Project])\nasync def get_projects(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    status: Optional[str] = Query(None, description=\"Фильтр по статусу\"),\n    search: Optional[str] = Query(None, description=\"Поиск по названию или описанию\"),\n    db: AsyncSession = Depends(get_db),",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Project])\nasync def get_projects(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    status: Optional[str] = Query(None, description=\"Фильтр по статусу\"),\n    search: Optional[str] = Query(None, description=\"Поиск по названию или описанию\"),\n    db: SessionDep,",
         "detail": "app.api.v1.endpoints.projects",
         "documentation": {}
     },
@@ -11980,7 +11980,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.reference",
         "description": "app.api.v1.endpoints.reference",
-        "peekOfCode": "router = APIRouter()\n# Типы требований\n@router.get(\"/requirement-types\", response_model=List[schemas.RequirementType])\nasync def get_requirement_types(\n    skip: int = 0,\n    limit: int = 100,\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_current_active_user),\n):\n    \"\"\"Получить список типов требований.\"\"\"",
+        "peekOfCode": "router = APIRouter()\n# Типы требований\n@router.get(\"/requirement-types\", response_model=List[schemas.RequirementType])\nasync def get_requirement_types(\n    skip: int = 0,\n    limit: int = 100,\n    db: SessionDep,\n    current_user: User = Depends(get_current_active_user),\n):\n    \"\"\"Получить список типов требований.\"\"\"",
         "detail": "app.api.v1.endpoints.reference",
         "documentation": {}
     },
@@ -12016,7 +12016,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.specifications",
         "description": "app.api.v1.endpoints.specifications",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Spec])\nasync def get_specifications(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    project_id: Optional[int] = Query(None, description=\"Фильтр по ID проекта\"),\n    search: Optional[str] = Query(None, description=\"Поиск по названию или описанию\"),\n    db: AsyncSession = Depends(get_db),",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/\", response_model=List[schemas.Spec])\nasync def get_specifications(\n    skip: int = Query(0, ge=0, description=\"Количество пропускаемых записей\"),\n    limit: int = Query(\n        100, ge=1, le=1000, description=\"Максимальное количество записей\"\n    ),\n    project_id: Optional[int] = Query(None, description=\"Фильтр по ID проекта\"),\n    search: Optional[str] = Query(None, description=\"Поиск по названию или описанию\"),\n    db: SessionDep,",
         "detail": "app.api.v1.endpoints.specifications",
         "documentation": {}
     },
@@ -12025,7 +12025,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.teams",
         "description": "app.api.v1.endpoints.teams",
-        "peekOfCode": "router = APIRouter()\nlogger = logging.getLogger(__name__)\n# Utility functions removed - business logic moved to team_service\n# Team endpoints\n@router.get(\"/\", response_model=TeamListResponse, summary=\"Получить список команд\")\nasync def get_teams(\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_current_user),\n    skip: int = Query(0, ge=0),\n    limit: int = Query(20, ge=1, le=100),",
+        "peekOfCode": "router = APIRouter()\nlogger = logging.getLogger(__name__)\n# Utility functions removed - business logic moved to team_service\n# Team endpoints\n@router.get(\"/\", response_model=TeamListResponse, summary=\"Получить список команд\")\nasync def get_teams(\n    db: SessionDep,\n    current_user: User = Depends(get_current_user),\n    skip: int = Query(0, ge=0),\n    limit: int = Query(20, ge=1, le=100),",
         "detail": "app.api.v1.endpoints.teams",
         "documentation": {}
     },
@@ -12034,7 +12034,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.teams",
         "description": "app.api.v1.endpoints.teams",
-        "peekOfCode": "logger = logging.getLogger(__name__)\n# Utility functions removed - business logic moved to team_service\n# Team endpoints\n@router.get(\"/\", response_model=TeamListResponse, summary=\"Получить список команд\")\nasync def get_teams(\n    db: AsyncSession = Depends(get_db),\n    current_user: User = Depends(get_current_user),\n    skip: int = Query(0, ge=0),\n    limit: int = Query(20, ge=1, le=100),\n    query: Optional[str] = Query(None),",
+        "peekOfCode": "logger = logging.getLogger(__name__)\n# Utility functions removed - business logic moved to team_service\n# Team endpoints\n@router.get(\"/\", response_model=TeamListResponse, summary=\"Получить список команд\")\nasync def get_teams(\n    db: SessionDep,\n    current_user: User = Depends(get_current_user),\n    skip: int = Query(0, ge=0),\n    limit: int = Query(20, ge=1, le=100),\n    query: Optional[str] = Query(None),",
         "detail": "app.api.v1.endpoints.teams",
         "documentation": {}
     },
@@ -12043,7 +12043,7 @@
         "kind": 5,
         "importPath": "app.api.v1.endpoints.testing",
         "description": "app.api.v1.endpoints.testing",
-        "peekOfCode": "router = APIRouter()\n@router.get(\"/results\", response_model=List[schemas.TestResult])\nasync def get_test_results(\n    skip: int = 0,\n    limit: int = 100,\n    requirement_id: Optional[int] = None,\n    status: Optional[str] = None,\n    db: AsyncSession = Depends(get_db),\n    current_user=Depends(get_testing_read_user),\n):",
+        "peekOfCode": "router = APIRouter()\n@router.get(\"/results\", response_model=List[schemas.TestResult])\nasync def get_test_results(\n    skip: int = 0,\n    limit: int = 100,\n    requirement_id: Optional[int] = None,\n    status: Optional[str] = None,\n    db: SessionDep,\n    current_user=Depends(get_testing_read_user),\n):",
         "detail": "app.api.v1.endpoints.testing",
         "documentation": {}
     },

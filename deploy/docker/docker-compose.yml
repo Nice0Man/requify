@@ -4,6 +4,7 @@
 
 include:
   - docker-compose.base.yml
+  - docker-compose.init.yml
 
 # Дополнительные настройки по умолчанию (если нужны)
 services:

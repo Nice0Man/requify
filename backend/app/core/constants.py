@@ -1,74 +1,6 @@
 from enum import Enum as PyEnum
 
 
-class Permission(PyEnum):
-    """Системные разрешения"""
-    
-    # Basic permissions
-    USE_API = "use_api"
-    
-    # User management
-    VIEW_COMPANY_USERS = "view_company_users"
-    MANAGE_COMPANY_USERS = "manage_company_users"
-    INVITE_USERS = "invite_users"
-    REMOVE_USERS = "remove_users"
-    
-    # Company management
-    MANAGE_COMPANY = "manage_company"
-    VIEW_COMPANY_SETTINGS = "view_company_settings"
-    MANAGE_COMPANY_SETTINGS = "manage_company_settings"
-    VIEW_COMPANY_ANALYTICS = "view_company_analytics"
-    EXPORT_COMPANY_DATA = "export_company_data"
-    
-    # Project management
-    VIEW_PROJECT = "view_project"
-    CREATE_PROJECT = "create_project"
-    MANAGE_PROJECT = "manage_project"
-    DELETE_PROJECT = "delete_project"
-    ARCHIVE_PROJECT = "archive_project"
-    MANAGE_PROJECT_SETTINGS = "manage_project_settings"
-    MANAGE_PROJECT_MEMBERS = "manage_project_members"
-    VIEW_PROJECT_MEMBERS = "view_project_members"
-    VIEW_PROJECT_ANALYTICS = "view_project_analytics"
-    
-    # Requirements
-    VIEW_REQUIREMENT = "view_requirement"
-    CREATE_REQUIREMENT = "create_requirement"
-    EDIT_REQUIREMENT = "edit_requirement"
-    DELETE_REQUIREMENT = "delete_requirement"
-    APPROVE_REQUIREMENT = "approve_requirement"
-    REJECT_REQUIREMENT = "reject_requirement"
-    LINK_REQUIREMENTS = "link_requirements"
-    MANAGE_REQUIREMENT_VERSIONS = "manage_requirement_versions"
-    EXPORT_REQUIREMENTS = "export_requirements"
-    IMPORT_REQUIREMENTS = "import_requirements"
-    
-    # Releases
-    VIEW_RELEASE = "view_release"
-    CREATE_RELEASE = "create_release"
-    MANAGE_RELEASE = "manage_release"
-    DELETE_RELEASE = "delete_release"
-    PUBLISH_RELEASE = "publish_release"
-    DEPLOY_RELEASE = "deploy_release"
-    
-    # Testing
-    VIEW_TEST_RESULTS = "view_test_results"
-    CREATE_TEST = "create_test"
-    EXECUTE_TEST = "execute_test"
-    MANAGE_TEST_PLANS = "manage_test_plans"
-    
-    # System administration
-    MANAGE_SYSTEM = "manage_system"
-    VIEW_SYSTEM_LOGS = "view_system_logs"
-    MANAGE_SYSTEM_SETTINGS = "manage_system_settings"
-    
-    # Reports and analytics
-    VIEW_REPORTS = "view_reports"
-    CREATE_REPORTS = "create_reports"
-    EXPORT_REPORTS = "export_reports"
-    VIEW_ADVANCED_ANALYTICS = "view_advanced_analytics"
-
-
 class RoleScope(PyEnum):
     """Области действия ролей"""
 
@@ -181,6 +113,9 @@ class Permission(PyEnum):
     # Системные разрешения
     # =============================================================================
     MANAGE_SYSTEM = "manage_system"
+    VIEW_SYSTEM = "view_system"
+    MANAGE_USERS = "manage_users"
+    VIEW_USERS = "view_users"
     MANAGE_ALL_COMPANIES = "manage_all_companies"
     VIEW_SYSTEM_LOGS = "view_system_logs"
     MANAGE_SYSTEM_SETTINGS = "manage_system_settings"
@@ -201,6 +136,7 @@ class Permission(PyEnum):
     MANAGE_COMPANY_BILLING = "manage_company_billing"
     VIEW_COMPANY_BILLING = "view_company_billing"
     MANAGE_COMPANY_SUBSCRIPTION = "manage_company_subscription"
+    SEARCH_COMPANY = "search_company"
     VIEW_COMPANY_ANALYTICS = "view_company_analytics"
     EXPORT_COMPANY_DATA = "export_company_data"
 
@@ -252,9 +188,12 @@ class Permission(PyEnum):
     APPROVE_REQUIREMENT = "approve_requirement"
     REJECT_REQUIREMENT = "reject_requirement"
     LINK_REQUIREMENTS = "link_requirements"
+    UNLINK_REQUIREMENTS = "unlink_requirements"
     MANAGE_REQUIREMENT_VERSIONS = "manage_requirement_versions"
     EXPORT_REQUIREMENTS = "export_requirements"
     IMPORT_REQUIREMENTS = "import_requirements"
+    CHANGE_REQUIREMENT_STATUS = "change_requirement_status"
+    SEARCH_REQUIREMENTS = "search_requirements"
 
     # =============================================================================
     # Релизы
@@ -267,17 +206,36 @@ class Permission(PyEnum):
     DEPLOY_RELEASE = "deploy_release"
     ROLLBACK_RELEASE = "rollback_release"
     APPROVE_RELEASE = "approve_release"
+    GENERATE_RELEASE_SPECIFICATION = "generate_release_specification"
+    SYNC_RELEASE_REQUIREMENTS = "sync_release_requirements"
+    VIEW_RELEASE_CHANGELOG = "view_release_changelog"
 
     # =============================================================================
     # Тестирование
     # =============================================================================
     CREATE_TEST = "create_test"
     EXECUTE_TEST = "execute_test"
+    VIEW_TESTS = "view_tests"
+    DELETE_TEST = "delete_test"
+    MANAGE_TESTS = "manage_tests"
+    EXECUTE_INTEGRATION_TESTS = "execute_integration_tests"
     VIEW_TEST_RESULTS = "view_test_results"
     MANAGE_TEST_PLANS = "manage_test_plans"
     APPROVE_TEST_RESULTS = "approve_test_results"
     CREATE_TEST_AUTOMATION = "create_test_automation"
     MANAGE_TEST_ENVIRONMENTS = "manage_test_environments"
+    CREATE_TEST_CASE = "create_test_case"
+    EDIT_TEST_CASE = "edit_test_case"
+    DELETE_TEST_CASE = "delete_test_case"
+    VIEW_TEST_CASES = "view_test_cases"
+    EXECUTE_TEST_CASE = "execute_test_case"
+    CREATE_TEST_EXECUTION = "create_test_execution"
+    VIEW_TEST_EXECUTIONS = "view_test_executions"
+    VIEW_TESTING_SUMMARY = "view_testing_summary"
+    REQUEST_REQUIREMENT_TESTING_STATUS = "request_requirement_testing_status"
+    REQUEST_RELEASE_TESTING_STATUS = "request_release_testing_status"
+    RUN_INTEGRATION_TESTS = "run_integration_tests"
+    GET_INTEGRATION_TEST_STATUS = "get_integration_test_status"
 
     # =============================================================================
     # Документация и спецификации
@@ -285,9 +243,12 @@ class Permission(PyEnum):
     CREATE_SPECIFICATION = "create_specification"
     EDIT_SPECIFICATION = "edit_specification"
     VIEW_SPECIFICATION = "view_specification"
+    MANAGE_SPECIFICATION = "manage_specification"
     DELETE_SPECIFICATION = "delete_specification"
     APPROVE_SPECIFICATION = "approve_specification"
     GENERATE_DOCUMENTATION = "generate_documentation"
+    GENERATE_SPECIFICATION_DOCUMENT = "generate_specification_document"
+    VIEW_SPECIFICATION_REQUIREMENTS = "view_specification_requirements"
 
     # =============================================================================
     # Коментарии и обратная связь
@@ -296,6 +257,44 @@ class Permission(PyEnum):
     EDIT_COMMENT = "edit_comment"
     DELETE_COMMENT = "delete_comment"
     MODERATE_COMMENTS = "moderate_comments"
+    VIEW_COMMENT = "view_comment"
+    VIEW_REQUIREMENT_COMMENTS = "view_requirement_comments"
+    CREATE_REQUIREMENT_COMMENT = "create_requirement_comment"
+    VIEW_RECENT_COMMENTS = "view_recent_comments"
+    VIEW_COMMENTS_STATISTICS = "view_comments_statistics"
+
+    # =============================================================================
+    # Связи между требованиями
+    # =============================================================================
+    CREATE_RELATIONSHIP = "create_relationship"
+    VIEW_RELATIONSHIP = "view_relationship"
+    EDIT_RELATIONSHIP = "edit_relationship"
+    DELETE_RELATIONSHIP = "delete_relationship"
+    VIEW_REQUIREMENT_RELATIONSHIPS = "view_requirement_relationships"
+    CREATE_REQUIREMENT_RELATIONSHIP = "create_requirement_relationship"
+    VIEW_REQUIREMENT_DEPENDENCIES = "view_requirement_dependencies"
+    VIEW_REQUIREMENT_DEPENDENTS = "view_requirement_dependents"
+    VIEW_REQUIREMENT_TRACE_MATRIX = "view_requirement_trace_matrix"
+
+    # =============================================================================
+    # Справочники
+    # =============================================================================
+    VIEW_REQUIREMENT_TYPES = "view_requirement_types"
+    CREATE_REQUIREMENT_TYPE = "create_requirement_type"
+    EDIT_REQUIREMENT_TYPE = "edit_requirement_type"
+    DELETE_REQUIREMENT_TYPE = "delete_requirement_type"
+    VIEW_REQUIREMENT_PRIORITIES = "view_requirement_priorities"
+    CREATE_REQUIREMENT_PRIORITY = "create_requirement_priority"
+    EDIT_REQUIREMENT_PRIORITY = "edit_requirement_priority"
+    DELETE_REQUIREMENT_PRIORITY = "delete_requirement_priority"
+    VIEW_REQUIREMENT_STATUSES = "view_requirement_statuses"
+    CREATE_REQUIREMENT_STATUS = "create_requirement_status"
+    EDIT_REQUIREMENT_STATUS = "edit_requirement_status"
+    DELETE_REQUIREMENT_STATUS = "delete_requirement_status"
+    VIEW_RELATIONSHIP_TYPES = "view_relationship_types"
+    CREATE_RELATIONSHIP_TYPE = "create_relationship_type"
+    EDIT_RELATIONSHIP_TYPE = "edit_relationship_type"
+    DELETE_RELATIONSHIP_TYPE = "delete_relationship_type"
 
     # =============================================================================
     # Интеграции и API
@@ -311,4 +310,62 @@ class Permission(PyEnum):
     VIEW_REPORTS = "view_reports"
     CREATE_REPORTS = "create_reports"
     EXPORT_REPORTS = "export_reports"
+    VIEW_ANALYTICS = "view_analytics"
+    GENERATE_REPORTS = "generate_reports"
+    VIEW_QUALITY_METRICS = "view_quality_metrics"
     VIEW_ADVANCED_ANALYTICS = "view_advanced_analytics"
+
+    # =============================================================================
+    # Дашборд
+    # =============================================================================
+    VIEW_DASHBOARD = "view_dashboard"
+    VIEW_DASHBOARD_STATS = "view_dashboard_stats"
+    VIEW_DASHBOARD_OVERVIEW = "view_dashboard_overview"
+    VIEW_MY_PROJECTS = "view_my_projects"
+    VIEW_MY_REQUIREMENTS = "view_my_requirements"
+    VIEW_MY_ACTIVITY = "view_my_activity"
+    VIEW_MY_NOTIFICATIONS = "view_my_notifications"
+    VIEW_RECENT_DASHBOARD_ACTIVITY = "view_recent_dashboard_activity"
+    VIEW_DASHBOARD_PROJECTS_STATS = "view_dashboard_projects_stats"
+    VIEW_RECENT_PROJECTS_DASHBOARD = "view_recent_projects_dashboard"
+    VIEW_DASHBOARD_REQUIREMENTS_STATS = "view_dashboard_requirements_stats"
+    VIEW_RECENT_REQUIREMENTS_DASHBOARD = "view_recent_requirements_dashboard"
+    VIEW_DASHBOARD_HEALTH = "view_dashboard_health"
+    VIEW_DASHBOARD_METRICS = "view_dashboard_metrics"
+    SEARCH_DASHBOARD = "search_dashboard"
+    FILTER_DASHBOARD = "filter_dashboard"
+    EXPORT_DASHBOARD_STATS = "export_dashboard_stats"
+    EXPORT_DASHBOARD_ACTIVITY = "export_dashboard_activity"
+    CREATE_ACTIVITY_RECORD = "create_activity_record"
+    UPDATE_USER_PREFERENCES = "update_user_preferences"
+    CREATE_NOTIFICATION = "create_notification"
+    MARK_NOTIFICATION_READ = "mark_notification_read"
+
+    # =============================================================================
+    # Административные разрешения
+    # =============================================================================
+    VIEW_ADMIN_USERS = "view_admin_users"
+    VIEW_SYSTEM_INFO = "view_system_info"
+    VIEW_HEALTH_CHECK = "view_health_check"
+    VIEW_METRICS = "view_metrics"
+    VIEW_USERS_STATISTICS = "view_users_statistics"
+    VIEW_PROJECTS_STATISTICS = "view_projects_statistics"
+    CREATE_BACKUP = "create_backup"
+    VIEW_BACKUPS = "view_backups"
+    UPDATE_SYSTEM_SETTINGS = "update_system_settings"
+    VIEW_AUDIT_LOG = "view_audit_log"
+
+    # =============================================================================
+    # Сессии
+    # =============================================================================
+    VIEW_USER_SESSIONS = "view_user_sessions"
+    REVOKE_SESSIONS = "revoke_sessions"
+
+    # =============================================================================
+    # Роли
+    # =============================================================================
+    VIEW_ROLES = "view_roles"
+    CREATE_ROLE = "create_role"
+    EDIT_ROLE = "edit_role"
+    DELETE_ROLE = "delete_role"
+    ASSIGN_ROLE = "assign_role"

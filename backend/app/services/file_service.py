@@ -60,28 +60,86 @@ class FileService:
                 self.minio_client = None
         else:
             self.minio_client = None
+            logger.info(f"MinIO disabled, using local storage in: {self.upload_dir}")
             # Создаем директории если их нет (для локального хранения)
             self.upload_dir.mkdir(parents=True, exist_ok=True)
             self.quarantine_dir.mkdir(parents=True, exist_ok=True)
 
     def _ensure_buckets_exist(self):
-        """Создает необходимые buckets в MinIO если их нет."""
+        """Создает необходимые buckets в MinIO если их нет и устанавливает политики доступа."""
         if not self.minio_client:
             return
 
-        buckets = [
-            self.config.minio_bucket_uploads,
-            self.config.minio_bucket_avatars,
-            self.config.minio_bucket_documents,
+        # Конфигурация bucket'ов с политиками доступа
+        bucket_configs = [
+            {
+                "name": self.config.minio_bucket_uploads,
+                "policy": "none",  # Приватный доступ
+                "description": "General uploads bucket",
+            },
+            {
+                "name": self.config.minio_bucket_avatars,
+                "policy": "download",  # Публичный доступ на чтение
+                "description": "User avatars bucket",
+            },
+            {
+                "name": self.config.minio_bucket_documents,
+                "policy": "none",  # Приватный доступ
+                "description": "Documents bucket",
+            },
         ]
 
-        for bucket_name in buckets:
+        for bucket_config in bucket_configs:
+            bucket_name = bucket_config["name"]
             try:
+                # Создаем bucket если не существует
                 if not self.minio_client.bucket_exists(bucket_name):
                     self.minio_client.make_bucket(bucket_name)
                     logger.info(f"Created MinIO bucket: {bucket_name}")
+
+                # Устанавливаем политику доступа
+                self._set_bucket_policy(bucket_name, bucket_config["policy"])
+                logger.info(
+                    f"Set policy '{bucket_config['policy']}' for bucket: {bucket_name}"
+                )
+
             except S3Error as e:
                 logger.error(f"Error ensuring bucket {bucket_name} exists: {str(e)}")
+
+    def _set_bucket_policy(self, bucket_name: str, policy_type: str):
+        """Устанавливает политику доступа для bucket'а."""
+        try:
+            if policy_type == "download":
+                # Публичная политика для чтения (для аватаров)
+                policy = {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {"AWS": "*"},
+                            "Action": ["s3:GetObject"],
+                            "Resource": [f"arn:aws:s3:::{bucket_name}/*"],
+                        }
+                    ],
+                }
+            elif policy_type == "none":
+                # Приватная политика (только для авторизованных пользователей)
+                policy = {"Version": "2012-10-17", "Statement": []}
+            else:
+                logger.warning(f"Unknown policy type: {policy_type}")
+                return
+
+            import json
+
+            policy_json = json.dumps(policy)
+            self.minio_client.set_bucket_policy(bucket_name, policy_json)
+
+        except S3Error as e:
+            logger.error(f"Error setting bucket policy for {bucket_name}: {str(e)}")
+        except Exception as e:
+            logger.error(
+                f"Unexpected error setting bucket policy for {bucket_name}: {str(e)}"
+            )
 
     async def upload_avatar(
         self, file: UploadFile, user_id: int, db: AsyncSession
@@ -121,6 +179,7 @@ class FileService:
 
             if self.config.use_minio and self.minio_client:
                 # Загрузка в MinIO
+                logger.info(f"Using MinIO storage for user {user_id}")
                 avatar_url = await self._upload_to_minio(
                     processed_images,
                     user_id,
@@ -130,6 +189,9 @@ class FileService:
                 )
             else:
                 # Загрузка в локальное хранилище
+                logger.info(
+                    f"Using local storage for user {user_id} (MinIO: {self.config.use_minio}, client: {self.minio_client is not None})"
+                )
                 avatar_url = await self._upload_to_local(
                     processed_images, user_id, file_extension, "avatars"
                 )
@@ -857,9 +919,21 @@ class FileService:
             raise
 
     async def _log_security_incident(
-        self, scan_results: Dict[str, Any], incident_type: str
+        self,
+        scan_results: Dict[str, Any],
+        incident_type: str,
+        client_ip: str = "unknown",
+        user_agent: str = "unknown",
     ) -> None:
-        """Логирование инцидентов безопасности."""
+        """
+        Логирование инцидентов безопасности.
+
+        Args:
+            scan_results: Результаты сканирования
+            incident_type: Тип инцидента
+            client_ip: IP адрес клиента (получать из fastapi.Request.client.host)
+            user_agent: User-Agent клиента (получать из fastapi.Request.headers.get("user-agent"))
+        """
         if not self.config.security_log_enabled:
             return
 
@@ -877,8 +951,8 @@ class FileService:
                 "scan_duration_ms": scan_results.get("scan_duration_ms", 0),
                 "scan_engine": scan_results.get("scan_engine", "unknown"),
                 "threats_found": scan_results.get("threats_found", []),
-                "client_ip": "unknown",  # TODO: Получать IP из запроса
-                "user_agent": "unknown",  # TODO: Получать User-Agent из запроса
+                "client_ip": client_ip,
+                "user_agent": user_agent,
             }
 
             # Формируем сообщение для лога
@@ -1178,6 +1252,57 @@ The file has been quarantined and access blocked.
                 status["error"] = str(e)
 
         return status
+
+    def force_bucket_policies_update(self) -> dict:
+        """Принудительное обновление политик bucket'ов."""
+        if not self.minio_client:
+            return {"error": "MinIO client not initialized"}
+
+        results = {}
+        bucket_configs = [
+            {
+                "name": self.config.minio_bucket_uploads,
+                "policy": "none",
+                "description": "General uploads bucket",
+            },
+            {
+                "name": self.config.minio_bucket_avatars,
+                "policy": "download",
+                "description": "User avatars bucket",
+            },
+            {
+                "name": self.config.minio_bucket_documents,
+                "policy": "none",
+                "description": "Documents bucket",
+            },
+        ]
+
+        for bucket_config in bucket_configs:
+            bucket_name = bucket_config["name"]
+            try:
+                # Проверяем существование bucket'а
+                if not self.minio_client.bucket_exists(bucket_name):
+                    self.minio_client.make_bucket(bucket_name)
+                    logger.info(f"Created missing bucket: {bucket_name}")
+
+                # Принудительно устанавливаем политику
+                self._set_bucket_policy(bucket_name, bucket_config["policy"])
+                results[bucket_name] = {
+                    "status": "success",
+                    "policy": bucket_config["policy"],
+                    "description": bucket_config["description"],
+                }
+                logger.info(
+                    f"Updated policy for bucket {bucket_name}: {bucket_config['policy']}"
+                )
+
+            except Exception as e:
+                results[bucket_name] = {"status": "error", "error": str(e)}
+                logger.error(
+                    f"Failed to update policy for bucket {bucket_name}: {str(e)}"
+                )
+
+        return results
 
 
 # Создаем глобальный экземпляр сервиса

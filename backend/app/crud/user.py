@@ -13,6 +13,7 @@ from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash, verify_password
 from app.utils.logger import logger
+from app.models.enhanced_role_system import UserRoleAssignment
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -331,6 +332,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         result = await db.execute(stmt)
         return result.scalars().all()
 
+    async def get_by_auth0_id(
+        self, db: AsyncSession, *, auth_provider_id: str
+    ) -> Optional[User]:
+        """Получить пользователя по Auth0 ID."""
+        stmt = select(User).where(User.auth_provider_id == auth_provider_id)
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def search_users(
         self, db: AsyncSession, *, search_term: str, skip: int = 0, limit: int = 100
     ) -> List[User]:
@@ -426,6 +435,65 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return validation_result
         except Exception as e:
             return {"valid": False, "errors": [str(e)]}
+
+    async def get_multi_filtered(
+        self,
+        db: AsyncSession,
+        *,
+        skip: int = 0,
+        limit: int = 100,
+        is_active: Optional[bool] = None,
+        role: Optional[str] = None,
+        search: Optional[str] = None,
+        company_id: Optional[int] = None,
+    ) -> List[User]:
+        """Получить пользователей с фильтрацией"""
+        from sqlalchemy.orm import selectinload
+
+        stmt = select(User).options(
+            selectinload(User.profile),
+            selectinload(User.settings),
+            selectinload(User.company),
+            selectinload(User.role_assignments).selectinload(UserRoleAssignment.role),
+        )
+
+        if is_active is not None:
+            stmt = stmt.where(User.is_active == is_active)
+
+        if company_id is not None:
+            stmt = stmt.where(User.company_id == company_id)
+
+        if role:
+            stmt = stmt.where(User.role == role)
+
+        if search:
+            # Создаем условия поиска по всем полям пользователя
+            search_conditions = [
+                User.email.ilike(f"%{search}%"),
+                User.username.ilike(f"%{search}%"),
+            ]
+
+            # Добавляем поиск по полям профиля, если профиль существует
+            from app.models.user_profile import UserProfile
+
+            # Присоединяем профиль для поиска
+            stmt = stmt.outerjoin(User.profile)
+
+            # Добавляем условия поиска по полям профиля
+            search_conditions.extend(
+                [
+                    UserProfile.first_name.ilike(f"%{search}%"),
+                    UserProfile.last_name.ilike(f"%{search}%"),
+                    UserProfile.department.ilike(f"%{search}%"),
+                    UserProfile.phone.ilike(f"%{search}%"),
+                ]
+            )
+
+            stmt = stmt.where(or_(*search_conditions))
+
+        stmt = stmt.offset(skip).limit(limit).order_by(desc(User.created_at))
+        result = await db.execute(stmt)
+        return result.scalars().all()
 
     async def get_user_audit_log(
         self, db: AsyncSession, *, user_id: int, limit: int = 50

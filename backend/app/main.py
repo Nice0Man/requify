@@ -32,8 +32,22 @@ async def lifespan(app: FastAPI):
             # Rebuild Pydantic models with forward references
             try:
                 from app.schemas.auth import rebuild_auth_models
+                from app.api.v1.domains.auth.root.schemas import (
+                    rebuild_auth_models as rebuild_v1_auth_models,
+                )
+                from app.api.v1.domains.auth.me.schemas import rebuild_me_models
+                from app.api.v1.domains.auth.email.schemas import rebuild_email_models
+                from app.api.v1.domains.auth.oauth2.schemas import rebuild_oauth2_models
 
+                # Rebuild old schema models
                 rebuild_auth_models()
+
+                # Rebuild v1 domain models
+                rebuild_v1_auth_models()
+                rebuild_me_models()
+                rebuild_email_models()
+                rebuild_oauth2_models()
+
                 logger.info("Pydantic models rebuilt successfully")
             except Exception as e:
                 logger.warning(f"Failed to rebuild Pydantic models: {e}")

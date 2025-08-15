@@ -1033,7 +1033,7 @@ class TestRefreshTokenModel:
             token="expired_token",
             user_id=sample_user.id,
             expires_at=expires_at.replace(tzinfo=None),
-            is_active=True  # Set explicitly
+            is_active=True,  # Set explicitly
         )
 
         assert token.is_expired is True

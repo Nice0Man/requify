@@ -39,7 +39,7 @@ def test_settings():
 def test_engine_session():
     """
     Создает тестовый движок базы данных для всей сессии.
-    
+
     Использует SQLite in-memory для быстрых тестов.
     """
     engine = create_engine(
@@ -47,15 +47,15 @@ def test_engine_session():
         echo=False,  # Отключаем SQL логи в тестах
         connect_args={"check_same_thread": False},
     )
-    
+
     # Включаем поддержку внешних ключей в SQLite
     def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
-    
+
     event.listens_for(engine, "connect")(set_sqlite_pragma)
-    
+
     return engine
 
 
@@ -63,16 +63,16 @@ def test_engine_session():
 def test_db_session(test_engine_session: Engine) -> Generator[Session, None, None]:
     """
     Создает изолированную сессию для каждого теста.
-    
+
     Каждый тест получает чистую базу данных.
     """
     # Создаем все таблицы
     Base.metadata.create_all(test_engine_session)
-    
+
     # Создаем сессию
     with Session(test_engine_session) as session:
         yield session
-    
+
     # Очищаем все таблицы после теста
     Base.metadata.drop_all(test_engine_session)
 
@@ -87,7 +87,7 @@ def sample_user_data():
         "status": "active",
         "auth_provider": "local",
         "is_email_verified": True,
-        "is_active": True
+        "is_active": True,
     }
 
 
@@ -99,7 +99,7 @@ def sample_company_data():
         "description": "Test company description",
         "website": "https://test.com",
         "industry": "Technology",
-        "size": "startup"
+        "size": "startup",
     }
 
 
@@ -110,7 +110,7 @@ def sample_project_data():
         "name": "Test Project",
         "description": "Test project description",
         "status": "active",
-        "priority": "high"
+        "priority": "high",
     }
 
 
@@ -122,16 +122,14 @@ def sample_requirement_data():
         "description": "Test requirement description",
         "type": "functional",
         "priority": "high",
-        "status": "draft"
+        "status": "draft",
     }
 
 
 # Маркеры для категоризации тестов
 def pytest_configure(config):
     """Конфигурация pytest маркеров."""
-    config.addinivalue_line(
-        "markers", "unit: marks tests as unit tests (fast)"
-    )
+    config.addinivalue_line("markers", "unit: marks tests as unit tests (fast)")
     config.addinivalue_line(
         "markers", "integration: marks tests as integration tests (slower)"
     )
@@ -164,15 +162,15 @@ def user_with_profile_data(sample_user_data):
         "user": sample_user_data,
         "profile": {
             "first_name": "Test",
-            "last_name": "User", 
+            "last_name": "User",
             "display_name": "Test User",
             "bio": "Test bio",
             "avatar_url": "https://example.com/avatar.jpg",
             "phone": "+1234567890",
             "position": "Developer",
             "department": "Engineering",
-            "timezone": "UTC"
-        }
+            "timezone": "UTC",
+        },
     }
 
 
@@ -186,23 +184,23 @@ def user_with_settings_data(sample_user_data):
                 "email": True,
                 "sms": False,
                 "push": True,
-                "frequency": "daily"
+                "frequency": "daily",
             },
             "interface_settings": {
                 "theme": "dark",
                 "language": "ru",
                 "timezone": "Europe/Moscow",
-                "items_per_page": 25
+                "items_per_page": 25,
             },
             "privacy_settings": {
                 "profile_visibility": "public",
-                "activity_visibility": "private"
+                "activity_visibility": "private",
             },
             "security_settings": {
                 "two_factor_enabled": True,
-                "login_notifications": True
-            }
-        }
+                "login_notifications": True,
+            },
+        },
     }
 
 
@@ -218,19 +216,19 @@ def complex_user_data(sample_user_data, sample_company_data):
             "display_name": "Complex User",
             "bio": "Complex user bio",
             "position": "Senior Developer",
-            "department": "Engineering"
+            "department": "Engineering",
         },
         "settings": {
             "notification_settings": {"email": True},
-            "interface_settings": {"theme": "dark"}
-        }
+            "interface_settings": {"theme": "dark"},
+        },
     }
 
 
 # Утилиты для тестов
 class TestDataFactory:
     """Фабрика для создания тестовых данных."""
-    
+
     @staticmethod
     def create_user_data(index: int = 0, **overrides) -> dict:
         """Создает данные пользователя с уникальными значениями."""
@@ -239,18 +237,18 @@ class TestDataFactory:
             "email": f"user_{index}@example.com",
             "name": f"User {index}",
             "status": "active",
-            "is_active": True
+            "is_active": True,
         }
         base_data.update(overrides)
         return base_data
-    
+
     @staticmethod
     def create_company_data(index: int = 0, **overrides) -> dict:
         """Создает данные компании с уникальными значениями."""
         base_data = {
             "name": f"Company {index}",
             "description": f"Company {index} description",
-            "industry": "Technology"
+            "industry": "Technology",
         }
         base_data.update(overrides)
         return base_data

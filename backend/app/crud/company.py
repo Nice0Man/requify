@@ -372,6 +372,131 @@ class CRUDCompany(CRUDBase[Company, CompanyCreate, CompanyUpdate]):
             query = query.filter(self.model.id != exclude_id)
         return query.first() is None
 
+    def get_multi_with_filters(
+        self,
+        db: Session,
+        *,
+        skip: int = 0,
+        limit: int = 100,
+        search: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> tuple[List[Company], int]:
+        """
+        Получить список компаний с фильтрацией и подсчетом общего количества.
+        
+        Args:
+            db: Сессия базы данных
+            skip: Количество записей для пропуска
+            limit: Максимальное количество записей
+            search: Поисковый запрос
+            status: Фильтр по статусу
+            
+        Returns:
+            Кортеж (список компаний, общее количество)
+        """
+        query = db.query(self.model)
+        
+        # Применение фильтров
+        filters = []
+        
+        if search:
+            search_filter = or_(
+                self.model.name.ilike(f"%{search}%"),
+                self.model.legal_name.ilike(f"%{search}%"),
+                self.model.description.ilike(f"%{search}%"),
+                self.model.industry.ilike(f"%{search}%"),
+            )
+            filters.append(search_filter)
+        
+        if status:
+            filters.append(self.model.status == status)
+        
+        if filters:
+            query = query.filter(and_(*filters))
+        
+        # Подсчет общего количества
+        total = query.count()
+        
+        # Получение данных с пагинацией
+        companies = query.offset(skip).limit(limit).all()
+        
+        return companies, total
+
+    def get_company_statistics(
+        self,
+        db: Session,
+        *,
+        company_id: int,
+    ) -> Dict[str, Any]:
+        """
+        Получить статистику компании.
+        
+        Args:
+            db: Сессия базы данных
+            company_id: ID компании
+            
+        Returns:
+            Словарь со статистикой компании
+        """
+        from app.models.user import User
+        from app.models.project import Project
+        from app.models.department import Department
+        
+        # Базовая информация о компании
+        company = db.query(self.model).filter(self.model.id == company_id).first()
+        if not company:
+            return {}
+        
+        # Подсчет пользователей
+        users_count = db.query(func.count(User.id)).filter(User.company_id == company_id).scalar() or 0
+        
+        # Подсчет проектов
+        projects_count = db.query(func.count(Project.id)).filter(Project.company_id == company_id).scalar() or 0
+        
+        # Подсчет департаментов
+        departments_count = db.query(func.count(Department.id)).filter(Department.company_id == company_id).scalar() or 0
+        
+        # Активные проекты
+        from app.models.project import ProjectStatus
+        active_projects_count = (
+            db.query(func.count(Project.id))
+            .filter(
+                Project.company_id == company_id,
+                Project.status == ProjectStatus.ACTIVE
+            )
+            .scalar() or 0
+        )
+        
+        # Статистика пользователей по ролям
+        from app.models.user import UserStatus
+        active_users_count = (
+            db.query(func.count(User.id))
+            .filter(
+                User.company_id == company_id,
+                User.status == UserStatus.ACTIVE
+            )
+            .scalar() or 0
+        )
+        
+        return {
+            "company_id": company_id,
+            "company_name": company.name,
+            "company_status": company.status.value if company.status else None,
+            "users": {
+                "total": users_count,
+                "active": active_users_count,
+            },
+            "projects": {
+                "total": projects_count,
+                "active": active_projects_count,
+            },
+            "departments": {
+                "total": departments_count,
+            },
+            "created_at": company.created_at.isoformat() if company.created_at else None,
+            "updated_at": company.updated_at.isoformat() if company.updated_at else None,
+        }
+
 
 # Создаем экземпляр CRUD
 company = CRUDCompany(Company)

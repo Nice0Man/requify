@@ -3,13 +3,15 @@
 """
 
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 from datetime import datetime, timezone
 
 from app.crud.company_branding import company_branding as branding_crud
 from app.models.company_branding import CompanyBranding
 from app.models.user import User
+from app.services.permission_service import permission_service
+from app.core.constants import Permission, RoleScope
 from app.schemas.company_branding import (
     CompanyBrandingCreate,
     CompanyBrandingUpdate,
@@ -34,7 +36,7 @@ class CompanyBrandingService:
         self.crud = branding_crud
 
     def get_company_branding(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Optional[CompanyBranding]:
         """Получить брендинг компании"""
 
@@ -47,7 +49,7 @@ class CompanyBrandingService:
         return self.crud.get_by_company(db, company_id=company_id)
 
     def get_active_branding(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Optional[CompanyBranding]:
         """Получить активный брендинг компании"""
 
@@ -61,7 +63,7 @@ class CompanyBrandingService:
 
     def create_or_update_branding(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         branding_data: CompanyBrandingCreate,
@@ -100,7 +102,7 @@ class CompanyBrandingService:
 
     def update_branding(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         branding_data: CompanyBrandingUpdate,
@@ -138,7 +140,7 @@ class CompanyBrandingService:
 
     def update_color_palette(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         colors: ColorPalette,
@@ -167,7 +169,7 @@ class CompanyBrandingService:
 
     def update_typography(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         typography: TypographyConfig,
@@ -196,7 +198,7 @@ class CompanyBrandingService:
 
     def update_component_styles(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         styles: ComponentStyles,
@@ -225,7 +227,7 @@ class CompanyBrandingService:
 
     def update_social_links(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         social_links: SocialLinks,
@@ -256,7 +258,7 @@ class CompanyBrandingService:
 
     def apply_preset_theme(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         preset_name: str,
@@ -290,7 +292,9 @@ class CompanyBrandingService:
 
         return branding
 
-    def generate_css(self, db: Session, *, company_id: int, current_user: User) -> str:
+    def generate_css(
+        self, db: AsyncSession, *, company_id: int, current_user: User
+    ) -> str:
         """Сгенерировать CSS для компании"""
 
         # Проверить права доступа к компании
@@ -310,7 +314,7 @@ class CompanyBrandingService:
         return css
 
     def validate_branding(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Dict[str, Any]:
         """Валидировать брендинг компании"""
 
@@ -323,7 +327,7 @@ class CompanyBrandingService:
         return self.crud.validate_branding(db, company_id=company_id)
 
     def activate_branding(
-        self, db: Session, *, company_id: int, branding_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, branding_id: int, current_user: User
     ) -> CompanyBranding:
         """Активировать брендинг"""
 
@@ -347,7 +351,7 @@ class CompanyBrandingService:
         return branding
 
     def deactivate_branding(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> bool:
         """Деактивировать брендинг"""
 
@@ -370,7 +374,7 @@ class CompanyBrandingService:
 
     def clone_branding(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         source_company_id: int,
         target_company_id: int,
@@ -415,7 +419,7 @@ class CompanyBrandingService:
         return cloned_branding
 
     def get_similar_themes(
-        self, db: Session, *, company_id: int, current_user: User, limit: int = 5
+        self, db: AsyncSession, *, company_id: int, current_user: User, limit: int = 5
     ) -> List[CompanyBranding]:
         """Получить похожие темы"""
 
@@ -428,7 +432,7 @@ class CompanyBrandingService:
         return self.crud.get_similar_themes(db, company_id=company_id, limit=limit)
 
     def backup_branding(
-        self, db: Session, *, company_id: int, current_user: User
+        self, db: AsyncSession, *, company_id: int, current_user: User
     ) -> Dict[str, Any]:
         """Создать резервную копию брендинга"""
 
@@ -451,7 +455,7 @@ class CompanyBrandingService:
 
     def restore_branding(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         backup_data: Dict[str, Any],
@@ -480,7 +484,7 @@ class CompanyBrandingService:
 
     def export_branding(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         company_id: int,
         export_format: str,
@@ -566,7 +570,7 @@ class CompanyBrandingService:
         ]
 
     def get_branding_statistics(
-        self, db: Session, *, current_user: User
+        self, db: AsyncSession, *, current_user: User
     ) -> Dict[str, Any]:
         """Получить статистику брендинга"""
 
@@ -629,7 +633,9 @@ class CompanyBrandingService:
         valid_presets = ["default", "dark", "corporate", "modern"]
         return preset_name in valid_presets
 
-    def _can_access_company(self, user: User, company_id: int) -> bool:
+    async def _can_access_company(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права доступа к компании"""
         if user.is_system_admin:
             return True
@@ -637,10 +643,18 @@ class CompanyBrandingService:
         if user.company_id == company_id:
             return True
 
-        # TODO: Проверить доступ через Enhanced Role System
-        return False
+        # Проверить доступ через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.VIEW_PROJECT,  # Базовые права на просмотр компании
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
-    def _can_manage_company_branding(self, user: User, company_id: int) -> bool:
+    async def _can_manage_company_branding(
+        self, db: AsyncSession, user: User, company_id: int
+    ) -> bool:
         """Проверить права на управление брендингом компании"""
         if user.is_system_admin:
             return True
@@ -648,8 +662,14 @@ class CompanyBrandingService:
         if user.company_id == company_id and user.is_company_admin:
             return True
 
-        # TODO: Проверить права через Enhanced Role System
-        return False
+        # Проверить права через Enhanced Role System
+        return await permission_service.check_user_permission(
+            db=db,
+            user=user,
+            permission=Permission.MANAGE_PROJECT,  # Права на управление компанией
+            scope=RoleScope.COMPANY,
+            context_id=company_id,
+        )
 
 
 # Создаем экземпляр сервиса

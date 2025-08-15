@@ -164,9 +164,9 @@ class DashboardActivity(Base, TimestampedMixin):
     )  # Additional activity-specific data
 
     # Relationships
-    user: Mapped["User"] = relationship("User", back_populates="activities")
+    user: Mapped["User"] = relationship("User", back_populates="dashboard_activities")
     project: Mapped[Optional["Project"]] = relationship(
-        "Project", back_populates="activities"
+        "Project", back_populates="dashboard_activities"
     )
     requirement: Mapped[Optional["Requirement"]] = relationship(
         "Requirement", back_populates="activities"

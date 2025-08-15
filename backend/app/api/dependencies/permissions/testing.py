@@ -9,37 +9,33 @@ from .factory import PermissionDependencyFactory
 
 class TestingPermissions:
     """Testing permission dependencies."""
-    
+
     @staticmethod
     def read() -> Callable:
         """Dependency for reading test results."""
         return PermissionDependencyFactory.create_simple(
-            Permission.VIEW_TEST_RESULTS,
-            ["view_test_results"]
+            Permission.VIEW_TEST_RESULTS, ["view_test_results"]
         )
-    
+
     @staticmethod
     def write() -> Callable:
         """Dependency for creating tests."""
         return PermissionDependencyFactory.create_simple(
-            Permission.CREATE_TEST,
-            ["create_test"]
+            Permission.CREATE_TEST, ["create_test"]
         )
-    
+
     @staticmethod
     def execute() -> Callable:
         """Dependency for executing tests."""
         return PermissionDependencyFactory.create_simple(
-            Permission.EXECUTE_TEST,
-            ["execute_test"]
+            Permission.EXECUTE_TEST, ["execute_test"]
         )
-    
+
     @staticmethod
     def manage_plans() -> Callable:
         """Dependency for managing test plans."""
         return PermissionDependencyFactory.create_simple(
-            Permission.MANAGE_TEST_PLANS,
-            ["manage_test_plans"]
+            Permission.MANAGE_TEST_PLANS, ["manage_test_plans"]
         )
 
 

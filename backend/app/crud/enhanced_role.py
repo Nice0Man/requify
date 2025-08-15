@@ -3,8 +3,10 @@ CRUD операции для Enhanced Role System.
 """
 
 from typing import List, Optional, Dict, Any
-from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import and_, or_, func, desc, asc
+from datetime import datetime, timezone
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import and_, or_, func, desc, asc, select
+from sqlalchemy.orm import selectinload
 
 from app.crud.base import CRUDBase
 from app.models.enhanced_role_system import EnhancedRole, UserRoleAssignment
@@ -22,49 +24,54 @@ from app.schemas.enhanced_role import (
 class CRUDEnhancedRole(CRUDBase[EnhancedRole, EnhancedRoleCreate, EnhancedRoleUpdate]):
     """CRUD операции для расширенных ролей"""
 
-    def get_by_name(self, db: Session, *, name: str) -> Optional[EnhancedRole]:
+    async def get_by_name(
+        self, db: AsyncSession, *, name: str
+    ) -> Optional[EnhancedRole]:
         """Получить роль по имени"""
-        return db.query(self.model).filter(self.model.name == name).first()
+        result = await db.execute(select(self.model).filter(self.model.name == name))
+        return result.scalar_one_or_none()
 
-    def get_by_scope(
-        self, db: Session, *, scope: RoleScope, skip: int = 0, limit: int = 100
+    async def get_by_scope(
+        self, db: AsyncSession, *, scope: RoleScope, skip: int = 0, limit: int = 100
     ) -> List[EnhancedRole]:
         """Получить роли по области действия"""
-        return (
-            db.query(self.model)
+        result = await db.execute(
+            select(self.model)
             .filter(self.model.scope == scope.value)
             .offset(skip)
             .limit(limit)
-            .all()
         )
+        return result.scalars().all()
 
-    def get_system_roles(self, db: Session) -> List[EnhancedRole]:
+    async def get_system_roles(self, db: AsyncSession) -> List[EnhancedRole]:
         """Получить системные роли"""
-        return (
-            db.query(self.model)
+        result = await db.execute(
+            select(self.model)
             .filter(self.model.is_system == True)
             .order_by(self.model.priority.desc())
-            .all()
         )
+        return result.scalars().all()
 
-    def get_assignable_roles(
-        self, db: Session, *, scope: Optional[RoleScope] = None
+    async def get_assignable_roles(
+        self, db: AsyncSession, *, scope: Optional[RoleScope] = None
     ) -> List[EnhancedRole]:
         """Получить роли, которые можно назначать"""
-        query = db.query(self.model).filter(
+        query = select(self.model).filter(
             and_(self.model.is_active == True, self.model.is_assignable == True)
         )
 
         if scope:
             query = query.filter(self.model.scope == scope.value)
 
-        return query.order_by(self.model.priority.desc()).all()
+        query = query.order_by(self.model.priority.desc())
+        result = await db.execute(query)
+        return result.scalars().all()
 
-    def get_filtered(
-        self, db: Session, *, filters: RoleFilter, skip: int = 0, limit: int = 100
+    async def get_filtered(
+        self, db: AsyncSession, *, filters: RoleFilter, skip: int = 0, limit: int = 100
     ) -> List[EnhancedRole]:
         """Получить роли с фильтрацией"""
-        query = db.query(self.model)
+        query = select(self.model)
 
         if filters.scope:
             query = query.filter(self.model.scope == filters.scope.value)
@@ -84,13 +91,13 @@ class CRUDEnhancedRole(CRUDBase[EnhancedRole, EnhancedRoleCreate, EnhancedRoleUp
         if filters.max_level is not None:
             query = query.filter(self.model.role_level <= filters.max_level)
 
-        return (
-            query.order_by(self.model.priority.desc()).offset(skip).limit(limit).all()
-        )
+        query = query.order_by(self.model.priority.desc()).offset(skip).limit(limit)
+        result = await db.execute(query)
+        return result.scalars().all()
 
-    def search(
+    async def search(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         query: str,
         scope: Optional[RoleScope] = None,
@@ -98,7 +105,7 @@ class CRUDEnhancedRole(CRUDBase[EnhancedRole, EnhancedRoleCreate, EnhancedRoleUp
         limit: int = 100,
     ) -> List[EnhancedRole]:
         """Поиск ролей по названию и описанию"""
-        search_query = db.query(self.model).filter(
+        search_query = select(self.model).filter(
             or_(
                 self.model.name.ilike(f"%{query}%"),
                 self.model.display_name.ilike(f"%{query}%"),
@@ -109,12 +116,11 @@ class CRUDEnhancedRole(CRUDBase[EnhancedRole, EnhancedRoleCreate, EnhancedRoleUp
         if scope:
             search_query = search_query.filter(self.model.scope == scope.value)
 
-        return (
-            search_query.order_by(self.model.priority.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
+        search_query = (
+            search_query.order_by(self.model.priority.desc()).offset(skip).limit(limit)
         )
+        result = await db.execute(search_query)
+        return result.scalars().all()
 
 
 class CRUDUserRoleAssignment(
@@ -122,26 +128,28 @@ class CRUDUserRoleAssignment(
 ):
     """CRUD операции для назначения ролей пользователям"""
 
-    def get_user_assignments(
-        self, db: Session, *, user_id: int, active_only: bool = True
+    async def get_user_assignments(
+        self, db: AsyncSession, *, user_id: int, active_only: bool = True
     ) -> List[UserRoleAssignment]:
         """Получить все назначения ролей пользователя"""
-        query = db.query(self.model).filter(self.model.user_id == user_id)
+        query = select(self.model).filter(self.model.user_id == user_id)
 
         if active_only:
             query = query.filter(self.model.is_active == True)
 
-        return query.options(
+        query = query.options(
             selectinload(self.model.role),
             selectinload(self.model.company),
             selectinload(self.model.department),
             selectinload(self.model.team),
             selectinload(self.model.project),
-        ).all()
+        )
+        result = await db.execute(query)
+        return result.scalars().all()
 
-    def get_user_assignments_by_context(
+    async def get_user_assignments_by_context(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         user_id: int,
         company_id: Optional[int] = None,
@@ -151,7 +159,7 @@ class CRUDUserRoleAssignment(
         active_only: bool = True,
     ) -> List[UserRoleAssignment]:
         """Получить назначения ролей пользователя в определенном контексте"""
-        query = db.query(self.model).filter(self.model.user_id == user_id)
+        query = select(self.model).filter(self.model.user_id == user_id)
 
         if active_only:
             query = query.filter(self.model.is_active == True)
@@ -168,28 +176,32 @@ class CRUDUserRoleAssignment(
         if project_id is not None:
             query = query.filter(self.model.project_id == project_id)
 
-        return query.options(selectinload(self.model.role)).all()
+        query = query.options(selectinload(self.model.role))
+        result = await db.execute(query)
+        return result.scalars().all()
 
-    def get_role_assignments(
-        self, db: Session, *, role_id: int, active_only: bool = True
+    async def get_role_assignments(
+        self, db: AsyncSession, *, role_id: int, active_only: bool = True
     ) -> List[UserRoleAssignment]:
         """Получить все назначения определенной роли"""
-        query = db.query(self.model).filter(self.model.role_id == role_id)
+        query = select(self.model).filter(self.model.role_id == role_id)
 
         if active_only:
             query = query.filter(self.model.is_active == True)
 
-        return query.options(
+        query = query.options(
             selectinload(self.model.user),
             selectinload(self.model.company),
             selectinload(self.model.department),
             selectinload(self.model.team),
             selectinload(self.model.project),
-        ).all()
+        )
+        result = await db.execute(query)
+        return result.scalars().all()
 
-    def get_assignments_by_scope(
+    async def get_assignments_by_scope(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         scope: RoleScope,
         context_id: int,
@@ -197,7 +209,7 @@ class CRUDUserRoleAssignment(
     ) -> List[UserRoleAssignment]:
         """Получить назначения ролей в определенной области"""
         query = (
-            db.query(self.model)
+            select(self.model)
             .join(EnhancedRole)
             .filter(EnhancedRole.scope == scope.value)
         )
@@ -214,15 +226,22 @@ class CRUDUserRoleAssignment(
         if active_only:
             query = query.filter(self.model.is_active == True)
 
-        return query.options(
+        query = query.options(
             selectinload(self.model.role), selectinload(self.model.user)
-        ).all()
+        )
+        result = await db.execute(query)
+        return result.scalars().all()
 
-    def get_filtered(
-        self, db: Session, *, filters: AssignmentFilter, skip: int = 0, limit: int = 100
+    async def get_filtered(
+        self,
+        db: AsyncSession,
+        *,
+        filters: AssignmentFilter,
+        skip: int = 0,
+        limit: int = 100,
     ) -> List[UserRoleAssignment]:
         """Получить назначения ролей с фильтрацией"""
-        query = db.query(self.model)
+        query = select(self.model)
 
         if filters.user_id:
             query = query.filter(self.model.user_id == filters.user_id)
@@ -250,17 +269,18 @@ class CRUDUserRoleAssignment(
                 EnhancedRole.scope == filters.scope.value
             )
 
-        return (
+        query = (
             query.options(selectinload(self.model.role), selectinload(self.model.user))
             .order_by(self.model.created_at.desc())
             .offset(skip)
             .limit(limit)
-            .all()
         )
+        result = await db.execute(query)
+        return result.scalars().all()
 
-    def has_assignment(
+    async def has_assignment(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         user_id: int,
         role_id: int,
@@ -270,7 +290,7 @@ class CRUDUserRoleAssignment(
         project_id: Optional[int] = None,
     ) -> bool:
         """Проверить есть ли у пользователя назначение роли в контексте"""
-        query = db.query(self.model).filter(
+        query = select(self.model).filter(
             and_(
                 self.model.user_id == user_id,
                 self.model.role_id == role_id,
@@ -298,60 +318,59 @@ class CRUDUserRoleAssignment(
         else:
             query = query.filter(self.model.project_id.is_(None))
 
-        return query.first() is not None
+        result = await db.execute(query)
+        return result.scalar_one_or_none() is not None
 
-    def revoke_assignment(
+    async def revoke_assignment(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         assignment_id: int,
         revoked_by: Optional[int] = None,
         reason: Optional[str] = None,
     ) -> Optional[UserRoleAssignment]:
         """Отозвать назначение роли"""
-        assignment = self.get(db, id=assignment_id)
+        assignment = await self.get(db, id=assignment_id)
         if not assignment:
             return None
 
         assignment.revoke(revoked_by=revoked_by, reason=reason)
-        db.commit()
-        db.refresh(assignment)
+        await db.commit()
+        await db.refresh(assignment)
         return assignment
 
-    def approve_assignment(
-        self, db: Session, *, assignment_id: int, approved_by: int
+    async def approve_assignment(
+        self, db: AsyncSession, *, assignment_id: int, approved_by: int
     ) -> Optional[UserRoleAssignment]:
         """Одобрить назначение роли"""
-        assignment = self.get(db, id=assignment_id)
+        assignment = await self.get(db, id=assignment_id)
         if not assignment:
             return None
 
         assignment.approve(approved_by=approved_by)
-        db.commit()
-        db.refresh(assignment)
+        await db.commit()
+        await db.refresh(assignment)
         return assignment
 
-    def extend_assignment(
-        self, db: Session, *, assignment_id: int, days: int
+    async def extend_assignment(
+        self, db: AsyncSession, *, assignment_id: int, days: int
     ) -> Optional[UserRoleAssignment]:
         """Продлить назначение роли"""
-        assignment = self.get(db, id=assignment_id)
+        assignment = await self.get(db, id=assignment_id)
         if not assignment:
             return None
 
         assignment.extend_expiration(days=days)
-        db.commit()
-        db.refresh(assignment)
+        await db.commit()
+        await db.refresh(assignment)
         return assignment
 
-    def get_expired_assignments(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+    async def get_expired_assignments(
+        self, db: AsyncSession, *, skip: int = 0, limit: int = 100
     ) -> List[UserRoleAssignment]:
         """Получить истекшие назначения ролей"""
-        from datetime import datetime, timezone
-
-        return (
-            db.query(self.model)
+        query = (
+            select(self.model)
             .filter(
                 and_(
                     self.model.expires_at.isnot(None),
@@ -361,19 +380,21 @@ class CRUDUserRoleAssignment(
             )
             .offset(skip)
             .limit(limit)
-            .all()
         )
 
-    def cleanup_expired_assignments(self, db: Session) -> int:
+        result = await db.execute(query)
+        return result.scalars().all()
+
+    async def cleanup_expired_assignments(self, db: AsyncSession) -> int:
         """Очистить истекшие назначения ролей"""
-        expired = self.get_expired_assignments(db)
+        expired = await self.get_expired_assignments(db)
         count = 0
 
         for assignment in expired:
             assignment.is_active = False
             count += 1
 
-        db.commit()
+        await db.commit()
         return count
 
 

@@ -1,6 +1,5 @@
 """
 Role-based permission dependencies.
-Provides specific dependencies for common role-based access patterns.
 """
 
 from typing import Callable
@@ -10,50 +9,46 @@ from .factory import PermissionDependencyFactory
 
 class RolePermissions:
     """Role-based permission dependencies."""
-    
+
     @staticmethod
-    def analyst() -> Callable:
-        """Dependency for analyst role - can view and analyze data."""
-        return PermissionDependencyFactory.create_combined([
-            Permission.VIEW_PROJECT,
-            Permission.VIEW_REQUIREMENT,
-            Permission.VIEW_RELEASE,
-            Permission.VIEW_REPORTS,
-        ])
-    
+    def read() -> Callable:
+        """Dependency for reading role information."""
+        return PermissionDependencyFactory.create_simple(
+            Permission.VIEW_ROLES, ["view_roles"]
+        )
+
     @staticmethod
-    def manager() -> Callable:
-        """Dependency for manager role - can manage projects and teams."""
-        return PermissionDependencyFactory.create_combined([
-            Permission.MANAGE_PROJECT,
-            Permission.MANAGE_COMPANY_USERS,
-            Permission.VIEW_COMPANY_ANALYTICS,
-        ])
-    
+    def create() -> Callable:
+        """Dependency for creating roles."""
+        return PermissionDependencyFactory.create_simple(
+            Permission.CREATE_ROLE, ["create_role"]
+        )
+
     @staticmethod
-    def developer() -> Callable:
-        """Dependency for developer role - can work with requirements and testing."""
-        return PermissionDependencyFactory.create_combined([
-            Permission.VIEW_REQUIREMENT,
-            Permission.EDIT_REQUIREMENT,
-            Permission.CREATE_TEST,
-            Permission.EXECUTE_TEST,
-        ])
-    
+    def write() -> Callable:
+        """Dependency for updating roles."""
+        return PermissionDependencyFactory.create_simple(
+            Permission.EDIT_ROLE, ["edit_role"]
+        )
+
     @staticmethod
-    def qa_engineer() -> Callable:
-        """Dependency for QA engineer role - focused on testing."""
-        return PermissionDependencyFactory.create_combined([
-            Permission.VIEW_REQUIREMENT,
-            Permission.VIEW_TEST_RESULTS,
-            Permission.CREATE_TEST,
-            Permission.EXECUTE_TEST,
-            Permission.MANAGE_TEST_PLANS,
-        ])
+    def delete() -> Callable:
+        """Dependency for deleting roles."""
+        return PermissionDependencyFactory.create_simple(
+            Permission.DELETE_ROLE, ["delete_role"]
+        )
+
+    @staticmethod
+    def assign() -> Callable:
+        """Dependency for assigning roles."""
+        return PermissionDependencyFactory.create_simple(
+            Permission.ASSIGN_ROLE, ["assign_role"]
+        )
 
 
-# Export specialized role dependencies
-get_analyst_user = RolePermissions.analyst()
-get_manager_user = RolePermissions.manager()
-get_developer_user = RolePermissions.developer()
-get_qa_user = RolePermissions.qa_engineer()
+# Export instances
+get_roles_read_user = RolePermissions.read()
+get_roles_write_user = RolePermissions.write()
+get_roles_delete_user = RolePermissions.delete()
+get_role_creator_user = RolePermissions.create()
+get_role_assigner_user = RolePermissions.assign()

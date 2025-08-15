@@ -9,6 +9,7 @@ from .base import Base, TimestampedMixin
 if TYPE_CHECKING:
     from .user import User
     from .requirement import Requirement
+    from .specification import Specification
 
 
 class Comment(Base, TimestampedMixin):
@@ -21,6 +22,7 @@ class Comment(Base, TimestampedMixin):
     __tablename__ = "comments"
     __table_args__ = (
         Index("ix_comments_requirement_id", "requirement_id"),
+        Index("ix_comments_specification_id", "specification_id"),
         Index("ix_comments_author_id", "author_id"),
     )
 
@@ -31,11 +33,16 @@ class Comment(Base, TimestampedMixin):
         Text, nullable=False, comment="Содержание комментария"
     )
 
-    # Связи
-    requirement_id: Mapped[int] = mapped_column(
+    # Связи (комментарий может быть привязан к требованию ИЛИ спецификации)
+    requirement_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("requirements.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,
         comment="ID требования",
+    )
+    specification_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("specifications.id", ondelete="CASCADE"),
+        nullable=True,
+        comment="ID спецификации",
     )
     author_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT"),
@@ -47,8 +54,12 @@ class Comment(Base, TimestampedMixin):
     # Отношения
     # =============================================================================
 
-    requirement: Mapped["Requirement"] = relationship(
+    requirement: Mapped[Optional["Requirement"]] = relationship(
         "Requirement", back_populates="comments", lazy="select"
+    )
+
+    specification: Mapped[Optional["Specification"]] = relationship(
+        "Specification", back_populates="comments", lazy="select"
     )
 
     author: Mapped["User"] = relationship(

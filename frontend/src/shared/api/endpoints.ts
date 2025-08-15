@@ -237,6 +237,7 @@ export const API_ENDPOINTS = {
     SYSTEM_SETTINGS: "/admin/system-settings",
     AUDIT_LOG: "/admin/audit-log",
     FILE_SERVICE_HEALTH: "/admin/file-service/health",
+    FIX_BUCKET_POLICIES: "/admin/file-service/fix-bucket-policies",
   },
 
   // Reference endpoints
