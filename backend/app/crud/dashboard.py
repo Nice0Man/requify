@@ -3,26 +3,23 @@ CRUD operations for dashboard-related models.
 """
 
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
-from sqlalchemy import select, and_, or_, desc, func, update, delete
+from sqlalchemy import and_, delete, desc, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.crud.base import CRUDBase
 from app.models.dashboard import (
-    UserDashboardPreferences,
-    DashboardNotification,
     DashboardActivity,
+    DashboardNotification,
     DashboardWidget,
+    UserDashboardPreferences,
 )
-from app.schemas.dashboard import (
-    UserDashboardPreferences as PreferencesSchema,
-    DashboardNotification as NotificationSchema,
-    ActivityItem,
-    QuickProject,
-    QuickRequirement,
-)
+from app.schemas.dashboard import ActivityItem
+from app.schemas.dashboard import DashboardNotification as NotificationSchema
+from app.schemas.dashboard import QuickProject, QuickRequirement
+from app.schemas.dashboard import UserDashboardPreferences as PreferencesSchema
 
 
 class CRUDUserPreferences(
@@ -92,7 +89,7 @@ class CRUDDashboardNotification(
         *,
         user_id: int,
         unread_only: bool = False,
-        limit: int = 50
+        limit: int = 50,
     ) -> List[DashboardNotification]:
         """Get notifications for a user"""
         query = select(self.model).where(self.model.user_id == user_id)
@@ -152,7 +149,7 @@ class CRUDDashboardNotification(
         priority: str = "medium",
         project_id: Optional[int] = None,
         requirement_id: Optional[int] = None,
-        expires_at: Optional[datetime] = None
+        expires_at: Optional[datetime] = None,
     ) -> DashboardNotification:
         """Create a new notification"""
         notification_data = {
@@ -201,7 +198,7 @@ class CRUDDashboardActivity(
         project_id: Optional[int] = None,
         activity_types: Optional[List[str]] = None,
         limit: int = 20,
-        days_back: int = 30
+        days_back: int = 30,
     ) -> List[DashboardActivity]:
         """Get recent activities with filtering"""
         since_date = datetime.now() - timedelta(days=days_back)
@@ -238,7 +235,7 @@ class CRUDDashboardActivity(
         entity_name: Optional[str] = None,
         status: Optional[str] = None,
         priority: Optional[str] = None,
-        extra_data: Optional[Dict[str, Any]] = None
+        extra_data: Optional[Dict[str, Any]] = None,
     ) -> DashboardActivity:
         """Create a new activity record"""
         activity_data = {
@@ -269,7 +266,7 @@ class CRUDDashboardActivity(
         *,
         user_id: Optional[int] = None,
         project_id: Optional[int] = None,
-        days_back: int = 30
+        days_back: int = 30,
     ) -> Dict[str, int]:
         """Get activity statistics"""
         since_date = datetime.now() - timedelta(days=days_back)

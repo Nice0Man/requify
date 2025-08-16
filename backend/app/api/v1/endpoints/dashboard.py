@@ -4,45 +4,41 @@ Fixed timezone issues and improved performance with proper database queries.
 """
 
 from datetime import datetime, timedelta
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import func, select, and_
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import (
-    get_db,
     get_current_active_user,
-    get_dashboard_read_user,
     get_dashboard_admin_user,
-    get_stats_read_user,
+    get_dashboard_read_user,
+    get_db,
     get_export_user,
+    get_stats_read_user,
 )
-from app.crud import (
-    project as crud_project,
-    requirement as crud_requirement,
-    user as crud_user,
-    user_preferences,
-    notification,
-    activity,
-    widget,
-)
+from app.crud import activity, notification
+from app.crud import project as crud_project
+from app.crud import requirement as crud_requirement
+from app.crud import user as crud_user
+from app.crud import user_preferences, widget
 from app.models.project import Project
 from app.models.requirement import Requirement
-from app.schemas.user import UserProfile
+from app.schemas.dashboard import ActivityItem
+from app.schemas.dashboard import DashboardNotification as NotificationSchema
 from app.schemas.dashboard import (
-    DashboardStats,
     DashboardOverviewStats,
+    DashboardStats,
+    MyDashboardResponse,
     ProjectPerformanceStats,
-    TrendingMetricsData,
     QuickAccess,
     QuickProject,
     QuickRequirement,
-    ActivityItem,
-    MyDashboardResponse,
-    UserDashboardPreferences as PreferencesSchema,
-    DashboardNotification as NotificationSchema,
+    TrendingMetricsData,
 )
+from app.schemas.dashboard import UserDashboardPreferences as PreferencesSchema
+from app.schemas.user import UserProfile
 
 router = APIRouter()
 

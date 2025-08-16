@@ -1,5 +1,5 @@
 import enum
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text
@@ -8,8 +8,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
 if TYPE_CHECKING:
-    from .user import User
     from .requirement import Requirement
+    from .user import User
 
 
 class TestStatus(str, enum.Enum):

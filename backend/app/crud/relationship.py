@@ -1,15 +1,16 @@
 """CRUD операции для модели Relationship."""
 
-from typing import List, Dict, Any, Optional, Set, Tuple
-from sqlalchemy import select, or_, and_, func, desc
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Set, Tuple
+
+from sqlalchemy import and_, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from datetime import datetime
 
 from app.crud.base import CRUDBase
 from app.models.relationship import Relationship
 from app.schemas.relationship import RelationshipCreate, RelationshipUpdate
-from app.schemas.trace_matrix import TraceNode, TraceLink
+from app.schemas.trace_matrix import TraceLink, TraceNode
 
 
 class CRUDRelationship(CRUDBase[Relationship, RelationshipCreate, RelationshipUpdate]):
@@ -301,8 +302,8 @@ class CRUDRelationship(CRUDBase[Relationship, RelationshipCreate, RelationshipUp
         self, db: AsyncSession, *, project_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """Получить статистику связей."""
-        from app.models.requirement import Requirement
         from app.models.relationship_types import RelationshipType
+        from app.models.requirement import Requirement
 
         # Базовый запрос
         base_query = select(Relationship)

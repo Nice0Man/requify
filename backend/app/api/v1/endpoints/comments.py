@@ -4,19 +4,20 @@ API эндпоинты для работы с комментариями к тр
 Включает операции CRUD для комментариев и уведомления.
 """
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import crud, schemas
 from app.api.deps import (
-    get_db,
     get_current_active_user,
+    get_db,
     get_requirements_read_user,
     get_requirements_write_user,
 )
 from app.core.config import settings
-from app import crud, schemas
 from app.models.user import User
 from app.services.notification_service import notification_service
 

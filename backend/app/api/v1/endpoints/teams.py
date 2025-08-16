@@ -2,40 +2,42 @@
 API endpoints for team management.
 """
 
-from typing import List, Optional, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from typing import Any, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db, get_current_user
-from app.crud import team as crud_team, team_member as crud_team_member
-from app.models.user import User
+from app.api.deps import get_current_user, get_db
+from app.core.exceptions import (
+    BusinessLogicError,
+    NotFoundError,
+    PermissionDeniedError,
+    ValidationError,
+)
+from app.crud import team as crud_team
+from app.crud import team_member as crud_team_member
 from app.models.constants import TeamRole, TeamStatus
+from app.models.user import User
 from app.schemas.team import (
+    TeamBulkCreate,
+    TeamBulkDelete,
+    TeamBulkUpdate,
     TeamCreate,
-    TeamUpdate,
-    TeamResponse,
     TeamDetailResponse,
     TeamListResponse,
-    TeamMemberCreate,
-    TeamMemberUpdate,
-    TeamMemberResponse,
-    TeamSearchRequest,
-    TeamStats,
-    TeamMemberStats,
-    TeamBulkCreate,
-    TeamBulkUpdate,
-    TeamBulkDelete,
     TeamMemberBulkAdd,
     TeamMemberBulkRemove,
     TeamMemberBulkUpdate,
+    TeamMemberCreate,
+    TeamMemberResponse,
+    TeamMemberStats,
+    TeamMemberUpdate,
     TeamPermissionCheck,
     TeamPermissionResponse,
-)
-from app.core.exceptions import (
-    NotFoundError,
-    PermissionDeniedError,
-    BusinessLogicError,
-    ValidationError,
+    TeamResponse,
+    TeamSearchRequest,
+    TeamStats,
+    TeamUpdate,
 )
 
 router = APIRouter()

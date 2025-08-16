@@ -4,19 +4,20 @@ API эндпоинты для работы с системой тестиров�
 Включает интеграцию с внешними системами тестирования и управление тестовыми планами.
 """
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import crud, schemas
 from app.api.deps import (
     get_db,
+    get_testing_execute_user,
     get_testing_read_user,
     get_testing_write_user,
-    get_testing_execute_user,
 )
 from app.core.config import settings
-from app import crud, schemas
 from app.schemas.test_result import TestResultCreate, TestResultUpdate
 
 router = APIRouter()
@@ -157,7 +158,7 @@ async def create_test_plan(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    from datetime import datetime, UTC
+    from datetime import UTC, datetime
 
     # Создаем тестовый план как структуру данных
     plan = {
@@ -332,7 +333,7 @@ async def create_test_case(
         )
 
     # Создаем тест-результат как представление тестового случая
-    from datetime import datetime, UTC
+    from datetime import UTC, datetime
 
     test_result_data = TestResultCreate(
         requirement_id=requirement_id,
@@ -461,7 +462,7 @@ async def execute_test_case(
             status_code=status.HTTP_404_NOT_FOUND, detail="Requirement not found"
         )
 
-    from datetime import datetime, UTC
+    from datetime import UTC, datetime
 
     # Создаем или обновляем тест-результат
     existing_results = await crud.test_result.get_by_requirement(

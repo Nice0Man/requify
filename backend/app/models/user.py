@@ -1,26 +1,26 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import Boolean, DateTime, Integer, String, Index
+from sqlalchemy import Boolean, DateTime, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
-    from .project import Project
-    from .requirement import Requirement
     from .comment import Comment
-    from .requirement_group_version import RequirementGroupVersion
-    from .test_result import TestResult
+    from .dashboard import (
+        DashboardActivity,
+        DashboardNotification,
+        DashboardWidget,
+        UserDashboardPreferences,
+    )
+    from .project import Project
     from .refresh_token import RefreshToken
+    from .requirement import Requirement
+    from .requirement_group_version import RequirementGroupVersion
     from .team import Team
     from .team_member import TeamMember
-    from .dashboard import (
-        UserDashboardPreferences,
-        DashboardNotification,
-        DashboardActivity,
-        DashboardWidget,
-    )
+    from .test_result import TestResult
 
 
 class User(Base, TimestampedMixin):

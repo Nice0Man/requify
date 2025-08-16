@@ -6,11 +6,12 @@
 """
 
 import asyncio
-from typing import Dict, List, Optional, Any
+import logging
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
 import httpx
-import logging
 
 from app.core.config import settings
 from app.core.exceptions import ExternalSystemError

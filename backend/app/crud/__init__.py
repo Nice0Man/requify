@@ -6,27 +6,27 @@ CRUD операции для всех моделей.
 """
 
 from .base import CRUDBase
-from .user import user
-from .refresh_token import crud_refresh_token
-from .project import project
-from .requirement import requirement
-from .release import release
 from .comment import comment
+
+# Dashboard CRUD operations
+from .dashboard import activity, notification, user_preferences, widget
+from .project import project
+from .refresh_token import crud_refresh_token
 from .relationship import relationship
 from .relationship_types import relationship_type
+from .release import release
+from .requirement import requirement
 from .requirement_group import requirement_group
 from .requirement_group_version import requirement_group_version
 from .requirement_priorities import requirement_priority
 from .requirement_statuses import requirement_status
 from .requirement_types import requirement_type
 from .spec import spec
-from .test_result import test_result
 
 # Team CRUD operations
 from .team import team, team_member
-
-# Dashboard CRUD operations
-from .dashboard import user_preferences, notification, activity, widget
+from .test_result import test_result
+from .user import user
 
 __all__ = [
     "CRUDBase",

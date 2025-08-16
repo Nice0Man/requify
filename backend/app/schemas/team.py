@@ -4,10 +4,11 @@ Team schemas for API serialization and validation.
 
 from datetime import datetime
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.types import constr
 
-from app.models.constants import TeamStatus, TeamRole
+from app.models.constants import TeamRole, TeamStatus
 
 
 # Base schemas

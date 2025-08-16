@@ -6,55 +6,55 @@
 Следует принципам SOLID и современным практикам безопасности.
 """
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 from app.api.deps import (
-    get_db,
-    get_current_user,
     get_current_active_user,
+    get_current_user,
+    get_db,
     get_optional_user,
 )
 from app.core.config import settings
 from app.core.security import (
     JWTTokenManager,
     PasswordManager,
-    verify_password,
+    TokenType,
     get_client_ip,
     get_user_agent,
-    TokenType,
+    verify_password,
 )
-from app.crud import user as crud_user, crud_refresh_token
+from app.crud import crud_refresh_token
+from app.crud import user as crud_user
 from app.models.user import User
-from app.services.email_service import email_service
-from app.utils.logger import logger
 from app.schemas.auth import (
+    ActiveSession,
+    AuthError,
+    EmailVerificationConfirm,
+    EmailVerificationRequest,
+    EmailVerificationResponse,
     LoginRequest,
     LoginResponse,
-    RefreshTokenRequest,
-    RefreshTokenResponse,
     LogoutRequest,
     LogoutResponse,
     PasswordChangeRequest,
-    PasswordResetRequest,
     PasswordResetConfirm,
+    PasswordResetRequest,
+    RefreshTokenRequest,
+    RefreshTokenResponse,
+    RevokeSessionRequest,
+    SessionListResponse,
     TokenValidationRequest,
     TokenValidationResponse,
-    SessionListResponse,
-    RevokeSessionRequest,
-    ActiveSession,
     UserProfile,
-    AuthError,
-    EmailVerificationRequest,
-    EmailVerificationConfirm,
-    EmailVerificationResponse,
 )
 from app.schemas.user import UserCreate
+from app.services.email_service import email_service
+from app.utils.logger import logger
 
 router = APIRouter()
 

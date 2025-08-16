@@ -1,13 +1,11 @@
 from typing import List, Optional
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.base import CRUDBase
 from app.models.requirement_types import RequirementType
-from app.schemas.requirement_types import (
-    RequirementTypeCreate,
-    RequirementTypeUpdate,
-)
+from app.schemas.requirement_types import RequirementTypeCreate, RequirementTypeUpdate
 
 
 class CRUDRequirementType(

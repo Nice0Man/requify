@@ -3,7 +3,8 @@ CRUD операции для модели Project.
 """
 
 from typing import List, Optional
-from sqlalchemy import select, func, or_
+
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 

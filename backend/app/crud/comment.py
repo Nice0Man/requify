@@ -1,10 +1,11 @@
 """CRUD операции для модели Comment."""
 
-from typing import List, Dict, Any, Optional
-from sqlalchemy import select, desc, func, and_, or_
+from datetime import UTC, datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy import and_, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from datetime import UTC, datetime, timedelta
 
 from app.crud.base import CRUDBase
 from app.models.comment import Comment

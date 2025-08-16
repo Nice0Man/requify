@@ -5,19 +5,20 @@ API эндпоинты для работы с пользователями.
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import crud, schemas
 from app.api.deps import (
-    get_db,
     get_current_active_user,
+    get_db,
+    get_superuser,
+    get_users_delete_user,
     get_users_read_user,
     get_users_write_user,
-    get_users_delete_user,
-    get_superuser,
 )
 from app.core.config import settings
-from app import crud, schemas
 from app.models.user import User
 
 router = APIRouter()

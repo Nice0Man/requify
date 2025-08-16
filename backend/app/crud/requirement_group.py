@@ -1,14 +1,12 @@
 from typing import List, Optional
+
+from sqlalchemy import and_, desc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select, and_, or_, desc
 
 from app.crud.base import CRUDBase
 from app.models.requirement_group import RequirementGroup
-from app.schemas.requirement_group import (
-    RequirementGroupCreate,
-    RequirementGroupUpdate,
-)
+from app.schemas.requirement_group import RequirementGroupCreate, RequirementGroupUpdate
 
 
 class CRUDRequirementGroup(

@@ -6,23 +6,22 @@ Email Service для отправки уведомлений.
 Следует принципам SOLID и современным практикам.
 """
 
+import asyncio
 import logging
-from typing import Optional, Dict, Any, List
-from datetime import datetime
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
 import smtplib
 import ssl
-import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from jinja2 import Environment, FileSystemLoader, Template
 
 from app.core.config import settings
-
 
 # === Email Configuration ===
 

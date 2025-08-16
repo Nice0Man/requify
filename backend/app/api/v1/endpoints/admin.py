@@ -6,20 +6,20 @@ API эндпоинты для администрирования системы.
 
 import os
 import platform
-import psutil
 import shutil
-from datetime import datetime, UTC
-from typing import Dict, List, Any, Optional
+from datetime import UTC, datetime
+from typing import Any, Dict, List, Optional
 
+import psutil
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db, get_admin_user, get_dashboard_admin_user
+from app import crud
+from app.api.deps import get_admin_user, get_dashboard_admin_user, get_db
 from app.core.config import settings
 from app.models.user import User
 from app.schemas.auth import UserProfile
-from app import crud
 
 router = APIRouter()
 
@@ -350,8 +350,9 @@ async def get_users_statistics(
         Dict[str, Any]: Статистика пользователей
     """
     # Получаем реальную статистику из БД
+    from datetime import UTC, datetime, timedelta
+
     from sqlalchemy import func
-    from datetime import datetime, UTC, timedelta
 
     # Общее количество пользователей
     total_users_result = await db.execute(text("SELECT COUNT(*) FROM users"))

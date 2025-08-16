@@ -8,12 +8,12 @@
 import asyncio
 import csv
 import io
-from collections import defaultdict
-from datetime import datetime, UTC
-from enum import Enum
-from typing import Dict, List, Optional, Any, Union
 import logging
+from collections import defaultdict
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
 from app.core.config import settings
 from app.core.exceptions import ReportGenerationError
@@ -182,9 +182,10 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по статусам требований"""
+        from sqlalchemy import func, select
+
         from app import crud
         from app.db.session import async_session_scope
-        from sqlalchemy import func, select
         from app.models.requirement import Requirement
 
         async with async_session_scope() as db:
@@ -265,9 +266,10 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по требованиям в разрезе проектов"""
+        from sqlalchemy import func, select
+
         from app import crud
         from app.db.session import async_session_scope
-        from sqlalchemy import func, select
         from app.models.project import Project
         from app.models.requirement import Requirement
 
@@ -345,11 +347,12 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по требованиям в разрезе пользователей"""
+        from sqlalchemy import func, select
+
         from app import crud
         from app.db.session import async_session_scope
-        from sqlalchemy import select, func
-        from app.models.user import User
         from app.models.requirement import Requirement
+        from app.models.user import User
 
         async with async_session_scope() as db:
             # Получаем пользователей
@@ -423,9 +426,10 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по прогрессу проектов"""
+        from datetime import timedelta
+
         from app import crud
         from app.db.session import async_session_scope
-        from datetime import timedelta
 
         async with async_session_scope() as db:
             projects = await crud.project.get_multi(db)
@@ -588,9 +592,10 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по дедлайнам"""
+        from datetime import timedelta
+
         from app import crud
         from app.db.session import async_session_scope
-        from datetime import timedelta
 
         async with async_session_scope() as db:
             # Получаем релизы с планируемыми датами
@@ -777,9 +782,10 @@ class ReportingService:
         self, filters: ReportFilter, generated_by: Optional[str]
     ) -> ReportData:
         """Генерирует отчёт по активности пользователей"""
+        from sqlalchemy import func
+
         from app import crud
         from app.db.session import async_session_scope
-        from sqlalchemy import func
 
         async with async_session_scope() as db:
             users = await crud.user.get_multi(db)

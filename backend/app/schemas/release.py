@@ -1,8 +1,8 @@
-from datetime import datetime, UTC
-from typing import Optional, List
+import re
+from datetime import UTC, datetime
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-import re
 
 
 class ReleaseBase(BaseModel):

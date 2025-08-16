@@ -1,26 +1,26 @@
 import enum
 import uuid
 from datetime import UTC, datetime
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, Index, Float
+from sqlalchemy import DateTime, Enum, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
-    from .requirement_types import RequirementType
+    from .comment import Comment
+    from .dashboard import DashboardActivity, DashboardNotification
+    from .project import Project
+    from .relationship import Relationship
+    from .release import Release
     from .requirement_priorities import RequirementPriority
     from .requirement_statuses import RequirementStatus
-    from .project import Project
-    from .user import User
-    from .release import Release
+    from .requirement_types import RequirementType
     from .spec import Spec
-    from .comment import Comment
-    from .relationship import Relationship
     from .test_result import TestResult
-    from .dashboard import DashboardNotification, DashboardActivity
+    from .user import User
 
 
 class Requirement(Base, TimestampedMixin):

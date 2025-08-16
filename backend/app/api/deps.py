@@ -5,24 +5,25 @@
 следуя принципу Dependency Inversion из SOLID и современным практикам безопасности.
 """
 
-from typing import AsyncGenerator, Optional, List
-from fastapi import Depends, HTTPException, status, Request, Security
+from datetime import UTC, datetime
+from typing import AsyncGenerator, List, Optional
+
+from fastapi import Depends, HTTPException, Request, Security, status
 from fastapi.security import (
-    OAuth2PasswordBearer,
-    HTTPBearer,
     HTTPAuthorizationCredentials,
+    HTTPBearer,
+    OAuth2PasswordBearer,
     SecurityScopes,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime, UTC
 
 from app.core.config import settings
+from app.core.exceptions import PermissionDeniedError, UserNotFoundError
 from app.core.security import JWTTokenManager, TokenType, get_client_ip
-from app.db.db_helper import get_async_session
 from app.crud import user as crud_user
+from app.db.db_helper import get_async_session
 from app.models.user import User
 from app.utils.logger import logger
-from app.core.exceptions import UserNotFoundError, PermissionDeniedError
 
 # OAuth2 scheme for FastAPI docs - set auto_error=True for proper error handling
 oauth2_scheme = OAuth2PasswordBearer(
@@ -817,19 +818,21 @@ def _validate_user_access(request: Request, user: User, token_payload: dict) -> 
         f"User {user.id} ({user.username}) validated successfully with scopes: {token_scopes}"
     )
 
+
 # === Helper Functions ===
+
 
 async def get_user_by_id_or_404(db: AsyncSession, user_id: int) -> User:
     """
     Получить пользователя по ID или вернуть 404 ошибку.
-    
+
     Args:
         db: Сессия базы данных
         user_id: ID пользователя
-    
+
     Returns:
         User: Объект пользователя
-        
+
     Raises:
         UserNotFoundError: Если пользователь не найден
     """
@@ -842,14 +845,14 @@ async def get_user_by_id_or_404(db: AsyncSession, user_id: int) -> User:
 async def get_user_by_email_or_404(db: AsyncSession, email: str) -> User:
     """
     Получить пользователя по email или вернуть 404 ошибку.
-    
+
     Args:
         db: Сессия базы данных
         email: Email пользователя
-    
+
     Returns:
         User: Объект пользователя
-        
+
     Raises:
         UserNotFoundError: Если пользователь не найден
     """
@@ -862,14 +865,14 @@ async def get_user_by_email_or_404(db: AsyncSession, email: str) -> User:
 async def get_user_by_username_or_404(db: AsyncSession, username: str) -> User:
     """
     Получить пользователя по username или вернуть 404 ошибку.
-    
+
     Args:
         db: Сессия базы данных
         username: Имя пользователя
-    
+
     Returns:
         User: Объект пользователя
-        
+
     Raises:
         UserNotFoundError: Если пользователь не найден
     """
@@ -877,6 +880,7 @@ async def get_user_by_username_or_404(db: AsyncSession, username: str) -> User:
     if user is None:
         raise UserNotFoundError(username)
     return user
+
 
 # Алиасы для обратной совместимости
 get_current_user_dep = get_current_user

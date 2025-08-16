@@ -1,7 +1,8 @@
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy import and_, case, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select, and_, or_, func, desc, case
 
 from app.crud.base import CRUDBase
 from app.models.test_result import TestResult
@@ -44,11 +45,11 @@ class CRUDTestResult(CRUDBase[TestResult, TestResultCreate, TestResultUpdate]):
         db: AsyncSession,
         *,
         requirement_id: Optional[int] = None,
-        project_id: Optional[int] = None
+        project_id: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Get test execution summary with statistics"""
-        from app.models.requirement import Requirement
         from app.models.project import Project
+        from app.models.requirement import Requirement
 
         query = select(
             func.count(self.model.id).label("total_tests"),

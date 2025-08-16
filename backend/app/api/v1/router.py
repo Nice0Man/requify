@@ -7,19 +7,19 @@
 from fastapi import APIRouter
 
 from .endpoints import (
-    auth_router,
-    users_router,
-    projects_router,
-    requirements_router,
-    releases_router,
-    testing_router,
     admin_router,
-    reference_router,
-    specifications_router,
-    relationships_router,
+    auth_router,
     comments_router,
     dashboard_router,
+    projects_router,
+    reference_router,
+    relationships_router,
+    releases_router,
+    requirements_router,
+    specifications_router,
     teams_router,
+    testing_router,
+    users_router,
 )
 
 # Создаем основной роутер для API v1

@@ -5,11 +5,12 @@ API эндпоинты для работы со справочными данн�
 """
 
 from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db, get_current_active_user, get_admin_user
 from app import crud, schemas
+from app.api.deps import get_admin_user, get_current_active_user, get_db
 from app.models.user import User
 
 router = APIRouter()

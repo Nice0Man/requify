@@ -8,8 +8,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, EmailStr, field_validator, model_validator
-
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 # === Base Token Schemas (Single Responsibility Principle) ===
 

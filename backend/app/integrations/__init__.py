@@ -5,7 +5,7 @@
 и системами в соответствии с принципами SOLID.
 """
 
-from .testing_system import TestingSystemIntegration
 from .project_management import ProjectManagementIntegration
+from .testing_system import TestingSystemIntegration
 
 __all__ = ["TestingSystemIntegration", "ProjectManagementIntegration"]

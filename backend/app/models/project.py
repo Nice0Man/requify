@@ -2,20 +2,20 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import DateTime, Integer, String, Text, Index, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .constants import ProjectStatus
 from .base import Base, TimestampedMixin
+from .constants import ProjectStatus
 
 if TYPE_CHECKING:
-    from .requirement import Requirement
+    from .dashboard import DashboardActivity, DashboardNotification
     from .release import Release
-    from .spec import Spec
+    from .requirement import Requirement
     from .requirement_group import RequirementGroup
-    from .user import User
+    from .spec import Spec
     from .team import Team
-    from .dashboard import DashboardNotification, DashboardActivity
+    from .user import User
 
 
 class Project(Base, TimestampedMixin):

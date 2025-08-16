@@ -1,17 +1,17 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import String, Text, Index, ForeignKey, Integer, Boolean
+from sqlalchemy import Boolean, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
 from .constants import TeamStatus
 
 if TYPE_CHECKING:
-    from .user import User
+    from .dashboard import DashboardActivity, DashboardNotification
     from .project import Project
     from .team_member import TeamMember
-    from .dashboard import DashboardNotification, DashboardActivity
+    from .user import User
 
 
 class Team(Base, TimestampedMixin):

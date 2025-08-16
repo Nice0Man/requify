@@ -4,25 +4,26 @@ API эндпоинты для работы с релизами.
 Включает операции CRUD для релизов и управление их жизненным циклом.
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import crud, schemas
 from app.api.deps import (
+    get_analyst_user,
     get_db,
+    get_releases_delete_user,
     get_releases_read_user,
     get_releases_write_user,
-    get_releases_delete_user,
-    get_analyst_user,
 )
 from app.core.config import settings
-from app import crud, schemas
 from app.models.requirement import Requirement
 from app.schemas.release import (
     ReleaseCreate,
-    ReleaseUpdate,
-    ReleaseFromRequirementsCreate,
     ReleaseCreationSummary,
+    ReleaseFromRequirementsCreate,
+    ReleaseUpdate,
     ReleaseWithLinkedRequirements,
     RequirementSummary,
 )
@@ -698,7 +699,7 @@ async def generate_release_specification(
             ]
 
     # Подготавливаем содержимое спецификации
-    from datetime import datetime, UTC
+    from datetime import UTC, datetime
 
     content_data = {
         "release_info": {
@@ -869,7 +870,7 @@ async def publish_release(
             detail=f"Cannot publish release with status '{release.status}'",
         )
 
-    from datetime import datetime, UTC
+    from datetime import UTC, datetime
 
     # Обновляем статус релиза
     updated_release = await crud.release.update(

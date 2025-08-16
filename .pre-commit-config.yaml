@@ -1,0 +1,42 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        language_version: python3.13
+        files: ^backend/
+        args: [--config=backend/pyproject.toml]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^backend/
+        args: [--settings-file=backend/setup.cfg]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        files: ^backend/
+        args: [--config=backend/setup.cfg]
+
+  - repo: local
+    hooks:
+      - id: backend-tests
+        name: Run Backend Tests
+        entry: bash -c 'cd backend && poetry run pytest tests/ -m "unit" --tb=short'
+        language: system
+        files: ^backend/
+        types: [python]
+        pass_filenames: false

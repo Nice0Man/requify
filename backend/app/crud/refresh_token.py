@@ -5,18 +5,18 @@ CRUD операции для RefreshToken.
 с учетом безопасности и производительности.
 """
 
-from datetime import datetime, timedelta, UTC
-from typing import Optional, List
+from datetime import UTC, datetime, timedelta
+from typing import List, Optional
 from uuid import uuid4
 
-from sqlalchemy import select, delete, and_, func, update
+from sqlalchemy import and_, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.crud.base import CRUDBase
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
-from app.core.config import settings
 
 
 class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):

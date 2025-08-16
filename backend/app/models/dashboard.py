@@ -2,21 +2,22 @@
 Dashboard-related models for user preferences, notifications, and activity tracking.
 """
 
+import uuid
 from datetime import datetime
+
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     DateTime,
+    Float,
+    ForeignKey,
     Integer,
     String,
     Text,
-    ForeignKey,
-    Float,
-    JSON,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import uuid
 
 from app.models.base import Base
 

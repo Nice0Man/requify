@@ -4,22 +4,12 @@
 Содержит общие операции Create, Read, Update, Delete.
 """
 
-from typing import (
-    Any,
-    Dict,
-    Generic,
-    List,
-    Optional,
-    Protocol,
-    Type,
-    TypeVar,
-    Union,
-)
 from abc import ABC, abstractmethod
+from typing import Any, Dict, Generic, List, Optional, Protocol, Type, TypeVar, Union
 
-from sqlalchemy import select, func, delete, update
-from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
+from sqlalchemy import delete, func, select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.base import Base
 

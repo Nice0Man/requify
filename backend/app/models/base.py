@@ -1,8 +1,9 @@
 import re
-from typing import Any
 from datetime import UTC, datetime
-from sqlalchemy import MetaData, DateTime
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
+from typing import Any
+
+from sqlalchemy import DateTime, MetaData
+from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 
 
 def camel_to_snake(name: str) -> str:

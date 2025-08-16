@@ -9,14 +9,13 @@
 import re
 import secrets
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional, Union, List
 from enum import Enum
+from typing import Any, Dict, List, Optional, Union
 
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
-
 
 # === Enums для типов токенов ===
 

@@ -1,13 +1,14 @@
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
+
 from fastapi import FastAPI
 from sqlalchemy import text
-from contextlib import asynccontextmanager
-
-# from fastapi.middleware.cors import CORSMiddleware  # CORS handled by Nginx
 
 from app.api.v1.router import api_router
 from app.core.config import settings
-from app.utils.logger import logger, LoggedOperation
+from app.utils.logger import LoggedOperation, logger
+
+# from fastapi.middleware.cors import CORSMiddleware  # CORS handled by Nginx
 
 
 @asynccontextmanager
@@ -159,6 +160,7 @@ app = FastAPI(
 
 # Регистрация обработчиков исключений
 from app.core.exceptions import register_exception_handlers
+
 register_exception_handlers(app)
 
 # Подключение маршрутизатора API

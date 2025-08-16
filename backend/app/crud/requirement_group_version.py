@@ -1,7 +1,8 @@
 from typing import List, Optional
+
+from sqlalchemy import and_, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select, and_, or_, desc, func
 
 from app.crud.base import CRUDBase
 from app.models.requirement_group_version import RequirementGroupVersion

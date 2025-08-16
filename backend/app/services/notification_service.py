@@ -6,22 +6,22 @@
 """
 
 import asyncio
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-from datetime import datetime, UTC, timedelta
-from enum import Enum
 import logging
 import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
 from app.core.config import settings
 from app.core.exceptions import NotificationError
-from app.models.user import User
-from app.models.requirement import Requirement
 from app.models.project import Project
+from app.models.requirement import Requirement
+from app.models.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -542,9 +542,10 @@ class NotificationService:
         """Проверяет дедлайны и отправляет уведомления (для планировщика задач)"""
         # Реализуем получение требований с приближающимися дедлайнами из базы данных
         try:
+            from sqlalchemy import and_, select
+
             from app import crud
             from app.db.session import async_session_scope
-            from sqlalchemy import select, and_
             from app.models.requirement import Requirement
 
             logger.info("Выполняется проверка дедлайнов требований")

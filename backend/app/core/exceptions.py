@@ -4,14 +4,15 @@
 Содержит кастомные исключения и обработчики ошибок для FastAPI.
 """
 
-from datetime import datetime, UTC
-from typing import Any, Dict, Optional
-from fastapi import Request, status
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from sqlalchemy.exc import SQLAlchemyError, NoResultFound, IntegrityError
 import logging
+from datetime import UTC, datetime
+from typing import Any, Dict, Optional
+
+from fastapi import Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 logger = logging.getLogger(__name__)
 
@@ -342,7 +343,7 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
                 "exception_type": type(exc).__name__,
             },
         )
-        
+
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={
@@ -387,15 +388,15 @@ def register_exception_handlers(app):
     """
     # Кастомные исключения Requify
     app.add_exception_handler(RequifyException, requify_exception_handler)
-    
+
     # HTTP исключения
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    
+
     # SQLAlchemy исключения
     app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
-    
+
     # Ошибки валидации
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    
+
     # Общие исключения (должен быть последним)
     app.add_exception_handler(Exception, general_exception_handler)

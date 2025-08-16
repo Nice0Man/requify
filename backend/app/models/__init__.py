@@ -2,36 +2,37 @@
 SQLAlchemy модели.
 """
 
-# Импортируем все модели для Alembic автогенерации миграций
-from .user import User
-from .refresh_token import RefreshToken
+from .comment import Comment
+
+# Dashboard models
+from .dashboard import (
+    DashboardActivity,
+    DashboardNotification,
+    DashboardWidget,
+    UserDashboardPreferences,
+)
 from .project import Project
+from .refresh_token import RefreshToken
+from .relationship import Relationship
+from .relationship_types import RelationshipType
+from .release import Release
 from .requirement import Requirement
 from .requirement_group import RequirementGroup
 from .requirement_group_version import RequirementGroupVersion
+from .requirement_priorities import RequirementPriority
+
+# Импортируем энумы
+from .requirement_statuses import RequirementStatus
+from .requirement_types import RequirementType
 from .spec import Spec
-from .release import Release
-from .relationship import Relationship
-from .comment import Comment
-from .test_result import TestResult
 
 # Team models
 from .team import Team
 from .team_member import TeamMember
+from .test_result import TestResult
 
-# Dashboard models
-from .dashboard import (
-    UserDashboardPreferences,
-    DashboardNotification,
-    DashboardActivity,
-    DashboardWidget,
-)
-
-# Импортируем энумы
-from .requirement_statuses import RequirementStatus
-from .requirement_priorities import RequirementPriority
-from .requirement_types import RequirementType
-from .relationship_types import RelationshipType
+# Импортируем все модели для Alembic автогенерации миграций
+from .user import User
 
 __all__ = [
     "User",

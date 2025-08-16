@@ -1,15 +1,15 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import String, Index, ForeignKey, Integer, Boolean, DateTime
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
 from .constants import TeamRole
 
 if TYPE_CHECKING:
-    from .user import User
     from .team import Team
+    from .user import User
 
 
 class TeamMember(Base, TimestampedMixin):

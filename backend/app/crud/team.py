@@ -2,24 +2,25 @@
 CRUD operations for teams and team members.
 """
 
-from typing import List, Optional, Dict, Any
-from sqlalchemy import select, func, and_, or_, desc, asc
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy import and_, asc, desc, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.crud.base import CRUDBase
+from app.models.constants import TeamRole, TeamStatus
 from app.models.team import Team
 from app.models.team_member import TeamMember
 from app.models.user import User
-from app.models.constants import TeamStatus, TeamRole
 from app.schemas.team import (
     TeamCreate,
-    TeamUpdate,
     TeamMemberCreate,
+    TeamMemberStats,
     TeamMemberUpdate,
     TeamSearchRequest,
     TeamStats,
-    TeamMemberStats,
+    TeamUpdate,
 )
 
 

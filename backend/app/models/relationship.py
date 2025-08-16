@@ -7,8 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
 if TYPE_CHECKING:
-    from .requirement import Requirement
     from .relationship_type import RelationshipType
+    from .requirement import Requirement
 
 
 class Relationship(Base):

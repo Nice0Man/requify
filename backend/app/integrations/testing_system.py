@@ -5,10 +5,11 @@
 следуя принципам SOLID и паттерну Adapter.
 """
 
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
+
 import httpx
-import logging
 
 from app.core.config import settings
 from app.core.exceptions import ExternalServiceError

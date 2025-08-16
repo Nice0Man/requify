@@ -2,10 +2,11 @@
 Схемы для модели Project.
 """
 
+import re
 from datetime import datetime
 from typing import Optional
+
 from pydantic import BaseModel, Field, field_validator, model_validator
-import re
 
 
 class ProjectBase(BaseModel):
