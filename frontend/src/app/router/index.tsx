@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import { routes } from "./routes";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { ProtectedLayout } from "./ProtectedLayout";
 import { PublicRoute } from "./PublicRoute";
 import { CircularProgress, Box } from "@mui/material";
 
@@ -27,9 +28,9 @@ export const AppRouter: React.FC = () => {
             path={route.path}
             element={
               route.isProtected ? (
-                <ProtectedRoute requiredRole={route.requiredRole}>
+                <ProtectedLayout requiredRoles={route.requiredRoles}>
                   {route.element}
-                </ProtectedRoute>
+                </ProtectedLayout>
               ) : (
                 <PublicRoute>{route.element}</PublicRoute>
               )

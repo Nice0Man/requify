@@ -1,37 +1,69 @@
 """
-Сервис отчётности.
+Reporting Service.
 
-Генерирует различные отчёты для анализа данных о требованиях,
-проектах, пользователях и производительности системы.
+Рефакторен с использованием паттернов проектирования и принципов SOLID.
 """
 
 import asyncio
 import csv
 import io
+<<<<<<< HEAD
 import logging
 from collections import defaultdict
+=======
+import json
+from collections import defaultdict
+from datetime import datetime, UTC
+from enum import Enum
+from typing import Dict, List, Optional, Any, Union
+from abc import ABC, abstractmethod
+>>>>>>> dev-backend
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Union
 
-from app.core.config import settings
-from app.core.exceptions import ReportGenerationError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select, func, and_, or_, desc
 
-logger = logging.getLogger(__name__)
+from app.models.user import User
+from app.models.project import Project
+from app.models.requirement import Requirement
+from app.utils.logger import logger
+from .base import BaseService, ServiceError
+
+
+class ReportingServiceError(ServiceError):
+    """Ошибки сервиса отчетов."""
+
+    pass
+
+
+class ReportGenerationError(ReportingServiceError):
+    """Ошибка генерации отчета."""
+
+    pass
+
+
+class UnsupportedFormatError(ReportingServiceError):
+    """Ошибка неподдерживаемого формата."""
+
+    pass
 
 
 class ReportFormat(str, Enum):
-    """Форматы отчётов"""
+    """Форматы отчетов."""
 
     JSON = "json"
     CSV = "csv"
     HTML = "html"
-    PDF = "pdf"  # Для будущего расширения
+    PDF = "pdf"
+    EXCEL = "excel"
 
 
 class ReportType(str, Enum):
-    """Типы отчётов"""
+    """Типы отчетов."""
 
     REQUIREMENTS_STATUS = "requirements_status"
     REQUIREMENTS_BY_PROJECT = "requirements_by_project"
@@ -47,7 +79,7 @@ class ReportType(str, Enum):
 
 @dataclass
 class ReportFilter:
-    """Фильтры для отчётов"""
+    """Фильтры для отчетов."""
 
     project_ids: Optional[List[int]] = None
     user_ids: Optional[List[int]] = None
@@ -61,19 +93,21 @@ class ReportFilter:
 
 @dataclass
 class ReportConfig:
-    """Конфигурация отчёта"""
+    """Конфигурация отчета."""
 
-    type: ReportType
-    format: ReportFormat
+    report_type: ReportType
+    report_format: ReportFormat
     filters: ReportFilter
     include_details: bool = True
     include_statistics: bool = True
-    group_by: Optional[str] = None  # status, project, user, date
+    group_by: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
 
 
 @dataclass
 class ReportData:
-    """Данные отчёта"""
+    """Данные отчета."""
 
     title: str
     description: str
@@ -85,155 +119,108 @@ class ReportData:
     metadata: Dict[str, Any]
 
 
-class ReportingService:
-    """
-    Сервис отчётности.
+@dataclass
+class ReportResult:
+    """Результат генерации отчета."""
 
-    Предоставляет функциональность для генерации различных отчётов
-    по данным системы в разных форматах.
-    """
+    report_data: ReportData
+    content: Union[str, bytes]
+    content_type: str
+    file_extension: str
 
-    def __init__(self):
-        """Инициализация сервиса отчётности"""
-        self.supported_formats = [
-            ReportFormat.JSON,
-            ReportFormat.CSV,
-            ReportFormat.HTML,
-        ]
+
+# Абстрактные интерфейсы
+class IReportGenerator(ABC):
+    """Интерфейс генератора отчетов."""
+
+    @abstractmethod
+    async def generate_report(
+        self, db: AsyncSession, config: ReportConfig, user_id: Optional[int] = None
+    ) -> ReportData:
+        """Сгенерировать данные отчета."""
+        pass
+
+    @abstractmethod
+    def get_supported_types(self) -> List[ReportType]:
+        """Получить поддерживаемые типы отчетов."""
+        pass
+
+
+class IReportFormatter(ABC):
+    """Интерфейс форматировщика отчетов."""
+
+    @abstractmethod
+    def format_report(self, report_data: ReportData) -> ReportResult:
+        """Отформатировать отчет."""
+        pass
+
+    @abstractmethod
+    def get_supported_format(self) -> ReportFormat:
+        """Получить поддерживаемый формат."""
+        pass
+
+
+class IReportRepository(ABC):
+    """Интерфейс репозитория отчетов."""
+
+    @abstractmethod
+    async def save_report(
+        self,
+        db: AsyncSession,
+        report_result: ReportResult,
+        user_id: Optional[int] = None,
+    ) -> int:
+        """Сохранить отчет."""
+        pass
+
+    @abstractmethod
+    async def get_report_history(
+        self, db: AsyncSession, user_id: Optional[int] = None, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """Получить историю отчетов."""
+        pass
+
+
+# Конкретные реализации генераторов
+class RequirementsStatusGenerator(IReportGenerator):
+    """Генератор отчетов по статусам требований."""
 
     async def generate_report(
-        self, config: ReportConfig, generated_by: Optional[str] = None
-    ) -> Union[Dict[str, Any], str, bytes]:
-        """
-        Генерирует отчёт по указанной конфигурации
-
-        Args:
-            config: Конфигурация отчёта
-            generated_by: Пользователь, запросивший отчёт
-
-        Returns:
-            Отчёт в запрошенном формате
-
-        Raises:
-            ReportGenerationError: При ошибке генерации отчёта
-        """
-        try:
-            # Генерируем данные отчёта
-            if config.type == ReportType.REQUIREMENTS_STATUS:
-                report_data = await self._generate_requirements_status_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.REQUIREMENTS_BY_PROJECT:
-                report_data = await self._generate_requirements_by_project_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.REQUIREMENTS_BY_USER:
-                report_data = await self._generate_requirements_by_user_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.PROJECT_PROGRESS:
-                report_data = await self._generate_project_progress_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.TESTING_RESULTS:
-                report_data = await self._generate_testing_results_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.DEADLINES_OVERVIEW:
-                report_data = await self._generate_deadlines_overview_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.CHANGE_HISTORY:
-                report_data = await self._generate_change_history_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.PERFORMANCE_METRICS:
-                report_data = await self._generate_performance_metrics_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.USER_ACTIVITY:
-                report_data = await self._generate_user_activity_report(
-                    config.filters, generated_by
-                )
-            elif config.type == ReportType.EXPORT_ALL_DATA:
-                report_data = await self._generate_export_all_data_report(
-                    config.filters, generated_by
-                )
-            else:
-                raise ReportGenerationError(
-                    f"Неподдерживаемый тип отчёта: {config.type}"
-                )
-
-            # Форматируем отчёт
-            if config.format == ReportFormat.JSON:
-                return self._format_as_json(report_data)
-            elif config.format == ReportFormat.CSV:
-                return self._format_as_csv(report_data)
-            elif config.format == ReportFormat.HTML:
-                return self._format_as_html(report_data)
-            else:
-                raise ReportGenerationError(f"Неподдерживаемый формат: {config.format}")
-
-        except Exception as e:
-            logger.error(f"Ошибка генерации отчёта: {e}")
-            raise ReportGenerationError(f"Не удалось сгенерировать отчёт: {str(e)}")
-
-    async def _generate_requirements_status_report(
-        self, filters: ReportFilter, generated_by: Optional[str]
+        self, db: AsyncSession, config: ReportConfig, user_id: Optional[int] = None
     ) -> ReportData:
+<<<<<<< HEAD
         """Генерирует отчёт по статусам требований"""
         from sqlalchemy import func, select
 
         from app import crud
         from app.db.session import async_session_scope
         from app.models.requirement import Requirement
+=======
+        """Сгенерировать отчет по статусам требований."""
+        stmt = select(Requirement).options(selectinload(Requirement.project))
+>>>>>>> dev-backend
 
-        async with async_session_scope() as db:
-            # Базовый запрос для требований
-            query = select(Requirement).options(crud.requirement.get_loading_options())
+        # Применение фильтров
+        if config.filters.project_ids:
+            stmt = stmt.where(Requirement.project_id.in_(config.filters.project_ids))
 
-            # Применяем фильтры
-            if filters.project_ids:
-                query = query.where(Requirement.project_id.in_(filters.project_ids))
-            if filters.date_from:
-                query = query.where(Requirement.created_at >= filters.date_from)
-            if filters.date_to:
-                query = query.where(Requirement.created_at <= filters.date_to)
+        if config.filters.statuses:
+            stmt = stmt.where(Requirement.status.in_(config.filters.statuses))
 
-            result = await db.execute(query)
-            requirements = result.scalars().all()
+        if config.filters.date_from:
+            stmt = stmt.where(Requirement.created_at >= config.filters.date_from)
 
-            # Подготавливаем данные для отчёта
-            requirements_data = []
-            status_counts = defaultdict(int)
+        if config.filters.date_to:
+            stmt = stmt.where(Requirement.created_at <= config.filters.date_to)
 
-            for req in requirements:
-                status_name = req.status.name if req.status else "unknown"
-                priority_name = req.priority.name if req.priority else "unknown"
-                project_name = req.project.name if req.project else "unknown"
-                assignee_name = req.author.name if req.author else "unassigned"
+        result = await db.execute(stmt)
+        requirements = result.scalars().all()
 
-                requirements_data.append(
-                    {
-                        "id": req.id,
-                        "name": req.title,
-                        "status": status_name,
-                        "priority": priority_name,
-                        "project": project_name,
-                        "assignee": assignee_name,
-                        "created_at": (
-                            req.created_at.strftime("%Y-%m-%d")
-                            if req.created_at
-                            else ""
-                        ),
-                        "updated_at": (
-                            req.updated_at.strftime("%Y-%m-%d")
-                            if req.updated_at
-                            else ""
-                        ),
-                    }
-                )
+        # Группировка по статусам
+        status_counts = defaultdict(int)
+        data = []
 
+<<<<<<< HEAD
                 status_counts[status_name] += 1
 
             # Вычисляем статистику
@@ -871,202 +858,624 @@ class ReportingService:
             requirements = await crud.requirement.get_multi(db)
             for req in requirements:
                 all_data["requirements"].append(
+=======
+        for req in requirements:
+            status_counts[req.status] += 1
+            if config.include_details:
+                data.append(
+>>>>>>> dev-backend
                     {
                         "id": req.id,
                         "title": req.title,
-                        "description": req.description,
-                        "status": req.status.name if req.status else None,
-                        "priority": req.priority.name if req.priority else None,
-                        "type": req.type.name if req.type else None,
-                        "project_id": req.project_id,
-                        "author_id": req.author_id,
+                        "status": req.status,
+                        "priority": req.priority,
+                        "project_name": req.project.name if req.project else None,
                         "created_at": (
                             req.created_at.isoformat() if req.created_at else None
-                        ),
-                        "updated_at": (
-                            req.updated_at.isoformat() if req.updated_at else None
-                        ),
-                    }
-                )
-
-            # Проекты
-            projects = await crud.project.get_multi(db)
-            for project in projects:
-                all_data["projects"].append(
-                    {
-                        "id": project.id,
-                        "name": project.name,
-                        "code": project.code,
-                        "description": project.description,
-                        "status": project.status,
-                        "created_at": (
-                            project.created_at.isoformat()
-                            if project.created_at
-                            else None
-                        ),
-                        "updated_at": (
-                            project.updated_at.isoformat()
-                            if project.updated_at
-                            else None
-                        ),
-                    }
-                )
-
-            # Пользователи
-            users = await crud.user.get_multi(db)
-            for user in users:
-                all_data["users"].append(
-                    {
-                        "id": user.id,
-                        "name": user.name,
-                        "email": user.email,
-                        "role": user.role.value if user.role else None,
-                        "is_active": user.is_active,
-                        "created_at": (
-                            user.created_at.isoformat() if user.created_at else None
                         ),
                     }
                 )
 
             summary = {
-                "requirements_count": len(all_data["requirements"]),
-                "projects_count": len(all_data["projects"]),
-                "users_count": len(all_data["users"]),
-                "total_records": sum(len(data) for data in all_data.values()),
+                "total_requirements": len(requirements),
+                "status_distribution": dict(status_counts),
             }
 
             return ReportData(
-                title="Полный экспорт данных",
-                description="Экспорт всех данных системы",
+                title="Requirements Status Report",
+                description="Отчет по статусам требований",
                 generated_at=datetime.now(UTC),
-                generated_by=generated_by,
-                filters_applied=self._serialize_filters(filters),
+                generated_by=str(user_id) if user_id else None,
+                filters_applied=config.filters.__dict__,
                 summary=summary,
-                data=[all_data],  # Все данные в одном объекте
-                metadata={
-                    "export_type": "full",
-                    "tables_exported": list(all_data.keys()),
-                },
+                data=data,
+                metadata={"report_type": config.report_type.value},
             )
 
-    def _serialize_filters(self, filters: ReportFilter) -> Dict[str, Any]:
-        """Сериализует фильтры для отчёта"""
-        return {
-            "project_ids": filters.project_ids,
-            "user_ids": filters.user_ids,
-            "statuses": filters.statuses,
-            "priorities": filters.priorities,
-            "types": filters.types,
-            "date_from": filters.date_from.isoformat() if filters.date_from else None,
-            "date_to": filters.date_to.isoformat() if filters.date_to else None,
-            "include_archived": filters.include_archived,
+    def get_supported_types(self) -> List[ReportType]:
+        return [ReportType.REQUIREMENTS_STATUS]
+
+
+class ProjectProgressGenerator(IReportGenerator):
+    """Генератор отчетов по прогрессу проектов."""
+
+    async def generate_report(
+        self, db: AsyncSession, config: ReportConfig, user_id: Optional[int] = None
+    ) -> ReportData:
+        """Сгенерировать отчет по прогрессу проектов."""
+        stmt = select(Project).options(selectinload(Project.requirements))
+
+        if config.filters.project_ids:
+            stmt = stmt.where(Project.id.in_(config.filters.project_ids))
+
+        if not config.filters.include_archived:
+            stmt = stmt.where(Project.is_active == True)
+
+        result = await db.execute(stmt)
+        projects = result.scalars().all()
+
+        data = []
+        total_requirements = 0
+        total_completed = 0
+
+        for project in projects:
+            req_count = len(project.requirements)
+            completed_count = sum(
+                1 for req in project.requirements if req.status == "completed"
+            )
+            progress = (completed_count / req_count * 100) if req_count > 0 else 0
+
+            total_requirements += req_count
+            total_completed += completed_count
+
+            project_data = {
+                "id": project.id,
+                "name": project.name,
+                "description": project.description,
+                "requirements_total": req_count,
+                "requirements_completed": completed_count,
+                "progress_percentage": round(progress, 2),
+                "status": project.status if hasattr(project, "status") else "active",
+                "created_at": (
+                    project.created_at.isoformat() if project.created_at else None
+                ),
+            }
+
+            if config.include_details:
+                project_data["requirements"] = [
+                    {
+                        "id": req.id,
+                        "title": req.title,
+                        "status": req.status,
+                        "priority": req.priority,
+                    }
+                    for req in project.requirements
+                ]
+
+            data.append(project_data)
+
+        overall_progress = (
+            (total_completed / total_requirements * 100)
+            if total_requirements > 0
+            else 0
+        )
+
+        summary = {
+            "total_projects": len(projects),
+            "total_requirements": total_requirements,
+            "total_completed": total_completed,
+            "overall_progress": round(overall_progress, 2),
         }
 
-    def _format_as_json(self, report_data: ReportData) -> Dict[str, Any]:
-        """Форматирует отчёт в JSON"""
-        return {
-            "title": report_data.title,
-            "description": report_data.description,
-            "generated_at": report_data.generated_at.isoformat(),
-            "generated_by": report_data.generated_by,
-            "filters_applied": report_data.filters_applied,
-            "summary": report_data.summary,
-            "data": report_data.data,
-            "metadata": report_data.metadata,
+        return ReportData(
+            title="Project Progress Report",
+            description="Отчет по прогрессу проектов",
+            generated_at=datetime.now(UTC),
+            generated_by=str(user_id) if user_id else None,
+            filters_applied=config.filters.__dict__,
+            summary=summary,
+            data=data,
+            metadata={"report_type": config.report_type.value},
+        )
+
+    def get_supported_types(self) -> List[ReportType]:
+        return [ReportType.PROJECT_PROGRESS]
+
+
+class UserActivityGenerator(IReportGenerator):
+    """Генератор отчетов по активности пользователей."""
+
+    async def generate_report(
+        self, db: AsyncSession, config: ReportConfig, user_id: Optional[int] = None
+    ) -> ReportData:
+        """Сгенерировать отчет по активности пользователей."""
+        # Простая реализация - количество требований по пользователям
+        stmt = (
+            select(
+                User.id,
+                User.username,
+                User.email,
+                func.count(Requirement.id).label("requirements_count"),
+            )
+            .join(Requirement, User.id == Requirement.created_by, isouter=True)
+            .group_by(User.id, User.username, User.email)
+        )
+
+        if config.filters.user_ids:
+            stmt = stmt.where(User.id.in_(config.filters.user_ids))
+
+        if config.filters.date_from:
+            stmt = stmt.where(Requirement.created_at >= config.filters.date_from)
+
+        if config.filters.date_to:
+            stmt = stmt.where(Requirement.created_at <= config.filters.date_to)
+
+        result = await db.execute(stmt)
+        user_stats = result.fetchall()
+
+        data = []
+        total_users = 0
+        total_activity = 0
+
+        for row in user_stats:
+            total_users += 1
+            total_activity += row.requirements_count
+
+            data.append(
+                {
+                    "user_id": row.id,
+                    "username": row.username,
+                    "email": row.email,
+                    "requirements_created": row.requirements_count,
+                    "activity_level": (
+                        "high"
+                        if row.requirements_count > 10
+                        else "medium" if row.requirements_count > 5 else "low"
+                    ),
+                }
+            )
+
+        # Сортировка по активности
+        data.sort(key=lambda x: x["requirements_created"], reverse=True)
+
+        summary = {
+            "total_users": total_users,
+            "total_activity": total_activity,
+            "average_activity": (
+                round(total_activity / total_users, 2) if total_users > 0 else 0
+            ),
+            "most_active_user": data[0]["username"] if data else None,
         }
 
-    def _format_as_csv(self, report_data: ReportData) -> str:
-        """Форматирует отчёт в CSV"""
+        return ReportData(
+            title="User Activity Report",
+            description="Отчет по активности пользователей",
+            generated_at=datetime.now(UTC),
+            generated_by=str(user_id) if user_id else None,
+            filters_applied=config.filters.__dict__,
+            summary=summary,
+            data=data,
+            metadata={"report_type": config.report_type.value},
+        )
+
+    def get_supported_types(self) -> List[ReportType]:
+        return [ReportType.USER_ACTIVITY]
+
+
+# Конкретные реализации форматировщиков
+class JsonReportFormatter(IReportFormatter):
+    """Форматировщик отчетов в JSON."""
+
+    def format_report(self, report_data: ReportData) -> ReportResult:
+        """Отформатировать отчет в JSON."""
+        content = json.dumps(
+            {
+                "title": report_data.title,
+                "description": report_data.description,
+                "generated_at": report_data.generated_at.isoformat(),
+                "generated_by": report_data.generated_by,
+                "filters_applied": report_data.filters_applied,
+                "summary": report_data.summary,
+                "data": report_data.data,
+                "metadata": report_data.metadata,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+
+        return ReportResult(
+            report_data=report_data,
+            content=content,
+            content_type="application/json",
+            file_extension="json",
+        )
+
+    def get_supported_format(self) -> ReportFormat:
+        return ReportFormat.JSON
+
+
+class CsvReportFormatter(IReportFormatter):
+    """Форматировщик отчетов в CSV."""
+
+    def format_report(self, report_data: ReportData) -> ReportResult:
+        """Отформатировать отчет в CSV."""
         if not report_data.data:
-            return "No data available"
+            content = "No data available"
+        else:
+            output = io.StringIO()
 
-        output = io.StringIO()
+            # Заголовки
+            fieldnames = list(report_data.data[0].keys()) if report_data.data else []
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
 
-        # Заголовки CSV - берем ключи из первого элемента данных
-        fieldnames = report_data.data[0].keys()
-        writer = csv.DictWriter(output, fieldnames=fieldnames)
+            # Метаинформация
+            writer.writerow(
+                {fieldnames[0]: f"# {report_data.title}"} if fieldnames else {}
+            )
+            writer.writerow(
+                {fieldnames[0]: f"# Generated at: {report_data.generated_at}"}
+                if fieldnames
+                else {}
+            )
+            writer.writerow({})  # Пустая строка
 
-        writer.writeheader()
-        writer.writerows(report_data.data)
+            # Заголовки колонок
+            writer.writeheader()
 
-        return output.getvalue()
+            # Данные
+            for row in report_data.data:
+                # Преобразование сложных объектов в строки
+                clean_row = {}
+                for key, value in row.items():
+                    if isinstance(value, (list, dict)):
+                        clean_row[key] = json.dumps(value, ensure_ascii=False)
+                    else:
+                        clean_row[key] = value
+                writer.writerow(clean_row)
 
-    def _format_as_html(self, report_data: ReportData) -> str:
-        """Форматирует отчёт в HTML"""
-        html = f"""
+            content = output.getvalue()
+            output.close()
+
+        return ReportResult(
+            report_data=report_data,
+            content=content,
+            content_type="text/csv",
+            file_extension="csv",
+        )
+
+    def get_supported_format(self) -> ReportFormat:
+        return ReportFormat.CSV
+
+
+class HtmlReportFormatter(IReportFormatter):
+    """Форматировщик отчетов в HTML."""
+
+    def format_report(self, report_data: ReportData) -> ReportResult:
+        """Отформатировать отчет в HTML."""
+        html_content = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <title>{report_data.title}</title>
+            <meta charset="utf-8">
             <style>
-                body {{ font-family: Arial, sans-serif; margin: 40px; }}
-                .header {{ border-bottom: 2px solid #333; padding-bottom: 20px; }}
-                .summary {{ background-color: #f5f5f5; padding: 15px; margin: 20px 0; }}
-                table {{ border-collapse: collapse; width: 100%; margin-top: 20px; }}
-                th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-                th {{ background-color: #f2f2f2; }}
+                body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                .header {{ border-bottom: 2px solid #333; margin-bottom: 20px; }}
+                .summary {{ background-color: #f5f5f5; padding: 15px; margin-bottom: 20px; }}
+                .data-table {{ border-collapse: collapse; width: 100%; }}
+                .data-table th, .data-table td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+                .data-table th {{ background-color: #f2f2f2; }}
             </style>
         </head>
         <body>
             <div class="header">
                 <h1>{report_data.title}</h1>
                 <p>{report_data.description}</p>
-                <p><strong>Сгенерирован:</strong> {report_data.generated_at.strftime("%d.%m.%Y %H:%M")}</p>
-                <p><strong>Создал:</strong> {report_data.generated_by or "Система"}</p>
+                <p><strong>Generated:</strong> {report_data.generated_at}</p>
+                {f'<p><strong>Generated by:</strong> {report_data.generated_by}</p>' if report_data.generated_by else ''}
             </div>
             
             <div class="summary">
-                <h2>Сводка</h2>
-                {self._format_summary_as_html(report_data.summary)}
+                <h2>Summary</h2>
+                <ul>
+        """
+
+        for key, value in report_data.summary.items():
+            html_content += f"<li><strong>{key}:</strong> {value}</li>"
+
+        html_content += """
+                </ul>
             </div>
             
-            <div class="data">
-                <h2>Данные</h2>
-                {self._format_data_as_html_table(report_data.data)}
+            <div class="data-section">
+                <h2>Data</h2>
+        """
+
+        if report_data.data:
+            html_content += '<table class="data-table"><thead><tr>'
+
+            # Заголовки
+            headers = list(report_data.data[0].keys())
+            for header in headers:
+                html_content += f"<th>{header}</th>"
+
+            html_content += "</tr></thead><tbody>"
+
+            # Данные
+            for row in report_data.data:
+                html_content += "<tr>"
+                for header in headers:
+                    value = row.get(header, "")
+                    if isinstance(value, (list, dict)):
+                        value = json.dumps(value, ensure_ascii=False)
+                    html_content += f"<td>{value}</td>"
+                html_content += "</tr>"
+
+            html_content += "</tbody></table>"
+        else:
+            html_content += "<p>No data available</p>"
+
+        html_content += """
             </div>
         </body>
         </html>
         """
-        return html
 
-    def _format_summary_as_html(self, summary: Dict[str, Any]) -> str:
-        """Форматирует сводку в HTML"""
-        html = "<ul>"
-        for key, value in summary.items():
-            if isinstance(value, dict):
-                html += f"<li><strong>{key}:</strong><ul>"
-                for sub_key, sub_value in value.items():
-                    html += f"<li>{sub_key}: {sub_value}</li>"
-                html += "</ul></li>"
-            else:
-                html += f"<li><strong>{key}:</strong> {value}</li>"
-        html += "</ul>"
-        return html
+        return ReportResult(
+            report_data=report_data,
+            content=html_content,
+            content_type="text/html",
+            file_extension="html",
+        )
 
-    def _format_data_as_html_table(self, data: List[Dict[str, Any]]) -> str:
-        """Форматирует данные в HTML таблицу"""
-        if not data:
-            return "<p>Нет данных для отображения</p>"
-
-        html = "<table>"
-
-        # Заголовки
-        headers = data[0].keys()
-        html += "<tr>"
-        for header in headers:
-            html += f"<th>{header}</th>"
-        html += "</tr>"
-
-        # Данные
-        for row in data:
-            html += "<tr>"
-            for header in headers:
-                html += f"<td>{row.get(header, '')}</td>"
-            html += "</tr>"
-
-        html += "</table>"
-        return html
+    def get_supported_format(self) -> ReportFormat:
+        return ReportFormat.HTML
 
 
-# Экземпляр сервиса для использования в приложении
+class InMemoryReportRepository(IReportRepository):
+    """Репозиторий отчетов в памяти."""
+
+    def __init__(self):
+        self._reports_history = []
+
+    async def save_report(
+        self,
+        db: AsyncSession,
+        report_result: ReportResult,
+        user_id: Optional[int] = None,
+    ) -> int:
+        """Сохранить отчет."""
+        report_id = len(self._reports_history) + 1
+
+        self._reports_history.append(
+            {
+                "id": report_id,
+                "title": report_result.report_data.title,
+                "type": report_result.report_data.metadata.get("report_type"),
+                "format": report_result.file_extension,
+                "generated_at": report_result.report_data.generated_at,
+                "generated_by": user_id,
+                "size": len(report_result.content),
+            }
+        )
+
+        return report_id
+
+    async def get_report_history(
+        self, db: AsyncSession, user_id: Optional[int] = None, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """Получить историю отчетов."""
+        filtered_reports = self._reports_history
+
+        if user_id:
+            filtered_reports = [
+                report
+                for report in self._reports_history
+                if report["generated_by"] == user_id
+            ]
+
+        # Сортировка по дате создания (новые первыми)
+        filtered_reports.sort(key=lambda x: x["generated_at"], reverse=True)
+
+        return filtered_reports[:limit]
+
+
+class ReportingService(BaseService):
+    """
+    Основной сервис отчетности.
+
+    Реализует паттерны:
+    - Singleton (через BaseService)
+    - Strategy (разные генераторы и форматировщики)
+    - Factory (создание генераторов и форматировщиков)
+    - Template Method (процесс генерации отчета)
+    """
+
+    def __init__(self):
+        self._generators: Dict[ReportType, IReportGenerator] = {}
+        self._formatters: Dict[ReportFormat, IReportFormatter] = {}
+        self._repository: IReportRepository = InMemoryReportRepository()
+
+        # Регистрация генераторов
+        self._register_default_generators()
+
+        # Регистрация форматировщиков
+        self._register_default_formatters()
+
+        super().__init__()
+
+    def get_service_name(self) -> str:
+        return "ReportingService"
+
+    def _register_default_generators(self):
+        """Зарегистрировать стандартные генераторы."""
+        generators = [
+            RequirementsStatusGenerator(),
+            ProjectProgressGenerator(),
+            UserActivityGenerator(),
+        ]
+
+        for generator in generators:
+            for report_type in generator.get_supported_types():
+                self._generators[report_type] = generator
+
+    def _register_default_formatters(self):
+        """Зарегистрировать стандартные форматировщики."""
+        formatters = [
+            JsonReportFormatter(),
+            CsvReportFormatter(),
+            HtmlReportFormatter(),
+        ]
+
+        for formatter in formatters:
+            self._formatters[formatter.get_supported_format()] = formatter
+
+    def register_generator(self, generator: IReportGenerator):
+        """Зарегистрировать генератор отчетов."""
+        for report_type in generator.get_supported_types():
+            self._generators[report_type] = generator
+        self._log_operation(
+            "register_generator", {"generator": type(generator).__name__}
+        )
+
+    def register_formatter(self, formatter: IReportFormatter):
+        """Зарегистрировать форматировщик отчетов."""
+        self._formatters[formatter.get_supported_format()] = formatter
+        self._log_operation(
+            "register_formatter", {"formatter": type(formatter).__name__}
+        )
+
+    def set_repository(self, repository: IReportRepository):
+        """Установить репозиторий отчетов."""
+        self._repository = repository
+        self._log_operation("set_repository", {"repository": type(repository).__name__})
+
+    async def generate_report(
+        self,
+        db: AsyncSession,
+        config: ReportConfig,
+        user_id: Optional[int] = None,
+        save_to_history: bool = True,
+    ) -> ReportResult:
+        """Сгенерировать отчет."""
+        try:
+            self._log_operation(
+                "generate_report",
+                {
+                    "report_type": config.report_type.value,
+                    "format": config.report_format.value,
+                    "user_id": user_id,
+                },
+            )
+
+            # Поиск генератора
+            generator = self._generators.get(config.report_type)
+            if not generator:
+                raise ReportGenerationError(
+                    f"No generator found for report type: {config.report_type}"
+                )
+
+            # Поиск форматировщика
+            formatter = self._formatters.get(config.report_format)
+            if not formatter:
+                raise UnsupportedFormatError(
+                    f"Unsupported format: {config.report_format}"
+                )
+
+            # Генерация данных
+            report_data = await generator.generate_report(db, config, user_id)
+
+            # Применение custom заголовков
+            if config.title:
+                report_data.title = config.title
+            if config.description:
+                report_data.description = config.description
+
+            # Форматирование
+            report_result = formatter.format_report(report_data)
+
+            # Сохранение в историю
+            if save_to_history:
+                await self._repository.save_report(db, report_result, user_id)
+
+            return report_result
+
+        except Exception as e:
+            raise self._handle_error(e, "generate_report")
+
+    async def get_available_report_types(self) -> List[str]:
+        """Получить доступные типы отчетов."""
+        return [report_type.value for report_type in self._generators.keys()]
+
+    async def get_available_formats(self) -> List[str]:
+        """Получить доступные форматы."""
+        return [report_format.value for report_format in self._formatters.keys()]
+
+    async def get_report_history(
+        self, db: AsyncSession, user_id: Optional[int] = None, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """Получить историю отчетов."""
+        try:
+            self._log_operation(
+                "get_report_history", {"user_id": user_id, "limit": limit}
+            )
+
+            return await self._repository.get_report_history(db, user_id, limit)
+
+        except Exception as e:
+            raise self._handle_error(e, "get_report_history")
+
+    # Convenience методы для быстрой генерации
+    async def generate_requirements_status_report(
+        self,
+        db: AsyncSession,
+        user_id: Optional[int] = None,
+        project_ids: Optional[List[int]] = None,
+        format: ReportFormat = ReportFormat.JSON,
+    ) -> ReportResult:
+        """Сгенерировать отчет по статусам требований."""
+        config = ReportConfig(
+            report_type=ReportType.REQUIREMENTS_STATUS,
+            report_format=format,
+            filters=ReportFilter(project_ids=project_ids),
+        )
+        return await self.generate_report(db, config, user_id)
+
+    async def generate_project_progress_report(
+        self,
+        db: AsyncSession,
+        user_id: Optional[int] = None,
+        project_ids: Optional[List[int]] = None,
+        format: ReportFormat = ReportFormat.JSON,
+    ) -> ReportResult:
+        """Сгенерировать отчет по прогрессу проектов."""
+        config = ReportConfig(
+            report_type=ReportType.PROJECT_PROGRESS,
+            report_format=format,
+            filters=ReportFilter(project_ids=project_ids),
+        )
+        return await self.generate_report(db, config, user_id)
+
+    async def generate_user_activity_report(
+        self,
+        db: AsyncSession,
+        user_id: Optional[int] = None,
+        target_user_ids: Optional[List[int]] = None,
+        format: ReportFormat = ReportFormat.JSON,
+    ) -> ReportResult:
+        """Сгенерировать отчет по активности пользователей."""
+        config = ReportConfig(
+            report_type=ReportType.USER_ACTIVITY,
+            report_format=format,
+            filters=ReportFilter(user_ids=target_user_ids),
+        )
+        return await self.generate_report(db, config, user_id)
+
+
+# Регистрация сервиса в фабрике
+from .base import ServiceFactory
+
+ServiceFactory.register_service("reporting", ReportingService)
+
+# Singleton instance
 reporting_service = ReportingService()

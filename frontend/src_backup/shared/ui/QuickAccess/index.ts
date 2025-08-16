@@ -1,1 +1,0 @@
-﻿export { QuickAccess } from './QuickAccess';

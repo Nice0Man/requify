@@ -1,393 +1,310 @@
-# Requify API Test Suite
+# Тесты совместимости моделей и схем
 
-Comprehensive test suite for testing all CRUD operations via HTTP requests for the Requify requirements management system.
+Комплексная система тестирования для проверки совместимости между SQLAlchemy моделями и Pydantic схемами в проекте Requify.
 
-## Overview
+## 🎯 Цель
 
-This test suite provides comprehensive coverage for all API endpoints in the Requify system, including:
+Обеспечить полную совместимость между:
+- SQLAlchemy моделями (models/)
+- Pydantic схемами (schemas/)
+- API сериализацией/десериализацией
+- Валидацией данных
 
-- **Users API** - User management and authentication
-- **Projects API** - Project creation and management
-- **Requirements API** - Requirements lifecycle management
-- **Releases API** - Release planning and management
-- **Testing API** - Test case and execution management
-- **Reference Data API** - System configuration and lookup data
-
-## Test Structure
+## 📁 Структура тестов
 
 ```
-requify/tests/
-├── conftest.py              # Test configuration and fixtures
-├── test_users_api.py        # User management tests
-├── test_projects_api.py     # Project management tests
-├── test_requirements_api.py # Requirements management tests
-├── test_releases_api.py     # Release management tests
-├── test_reference_api.py    # Reference data tests
-├── test_testing_api.py      # Testing system tests
-├── test_runner.py           # Test execution utilities
-└── README.md               # This file
+tests/
+├── conftest.py                           # Общие фикстуры и конфигурация
+├── pytest.ini                            # Настройки pytest
+├── requirements-test.txt                  # Зависимости для тестирования
+├── test_runner.py                         # Скрипт запуска тестов
+├── test_models_schemas_compatibility.py   # Основные тесты совместимости
+├── test_schema_validation_edge_cases.py   # Тесты крайних случаев
+├── test_database_performance.py           # Тесты производительности
+└── README.md                             # Этот файл
 ```
 
-## Prerequisites
+## 🧪 Типы тестов
 
-1. **Database Setup**
-   ```bash
-   # Ensure PostgreSQL is running
-   make up
-   
-   # Run migrations
-   make migrate
-   ```
+### 1. Тесты совместимости моделей и схем
+**Файл:** `test_models_schemas_compatibility.py`
 
-2. **Python Dependencies**
-   ```bash
-   pip install pytest pytest-asyncio httpx pytest-cov pytest-html pytest-xdist click
-   ```
+- ✅ Соответствие полей между моделями и схемами
+- ✅ Корректная сериализация/десериализация
+- ✅ Валидация данных
+- ✅ Работа с ORM отношениями
+- ✅ Обработка сложных типов данных (JSON, datetime, decimal)
 
-3. **Environment Variables**
-   ```bash
-   export TESTING=1
-   export TEST_DATABASE_URL="postgresql://postgres:postgres@localhost:5432/requify_test"
-   export TEST_REDIS_URL="redis://localhost:6379/1"
-   ```
+### 2. Тесты крайних случаев валидации
+**Файл:** `test_schema_validation_edge_cases.py`
 
-## Running Tests
+- ⚠️ Неправильные форматы email
+- ⚠️ Запрещенные домены email  
+- ⚠️ Зарезервированные имена пользователей
+- ⚠️ Слабые пароли
+- ⚠️ Граничные значения полей
+- ⚠️ Unicode и специальные символы
 
-### Using the Test Runner (Recommended)
+### 3. Тесты производительности
+**Файл:** `test_database_performance.py`
 
-The test runner provides a convenient CLI for running different types of tests:
+- 🚀 Производительность CRUD операций
+- 🚀 Массовая сериализация
+- 🚀 Оптимизация запросов (N+1 проблема)
+- 🚀 Пагинация
+- 🚀 Использование памяти
+- 🚀 Конкурентный доступ
+
+## 🚀 Быстрый старт
+
+### Установка зависимостей
 
 ```bash
-# Run all tests
-python requify/tests/test_runner.py --test-type all
+# Установка тестовых зависимостей
+pip install -r tests/requirements-test.txt
 
-# Run with coverage report
-python requify/tests/test_runner.py --test-type all --coverage
-
-# Run smoke tests (basic CRUD operations only)
-python requify/tests/test_runner.py --test-type smoke
-
-# Run tests for specific entity
-python requify/tests/test_runner.py --test-type users
-python requify/tests/test_runner.py --test-type projects
-python requify/tests/test_runner.py --test-type requirements
-
-# Run tests in parallel
-python requify/tests/test_runner.py --parallel 4
-
-# Run tests matching a pattern
-python requify/tests/test_runner.py --pattern "test_create*"
-
-# Generate HTML report
-python requify/tests/test_runner.py --report test_report.html
+# Или через poetry (если используется)
+poetry install --with test
 ```
 
-### Using Pytest Directly
+### Запуск тестов
+
+#### Основные команды
 
 ```bash
-# Run all tests
-pytest requify/tests/ -v
+# Все тесты совместимости
+python tests/test_runner.py compatibility
 
-# Run specific test file
-pytest requify/tests/test_users_api.py -v
+# Тесты производительности  
+python tests/test_runner.py performance
 
-# Run with coverage
-pytest requify/tests/ --cov=requify.app --cov-report=html
+# Тесты крайних случаев
+python tests/test_runner.py edge_cases
 
-# Run tests matching pattern
-pytest requify/tests/ -k "test_create" -v
+# Все тесты
+python tests/test_runner.py all
 
-# Run in parallel
-pytest requify/tests/ -n 4
+# Только быстрые тесты (для CI/CD)
+python tests/test_runner.py fast
 ```
 
-### Using Make Commands
+#### Прямой запуск через pytest
 
 ```bash
-# Run all tests
-make test
+# Тесты совместимости с покрытием кода
+pytest tests/test_models_schemas_compatibility.py -v --cov=app.models --cov=app.schemas
 
-# Run with coverage
-make test-cov
+# Тесты производительности с подробным выводом
+pytest tests/test_database_performance.py -v -s --durations=0
 
-# Run linting
-make lint
+# Тесты крайних случаев
+pytest tests/test_schema_validation_edge_cases.py -v
 
-# Format code
-make format
+# Все тесты с HTML отчетом
+pytest tests/ --html=test_report.html --self-contained-html
 ```
 
-## Test Categories
+### Маркеры тестов
 
-### 1. CRUD Operations Tests
-Each entity has comprehensive CRUD tests:
-- **Create** - Test successful creation, validation, duplicate handling
-- **Read** - Test listing, filtering, searching, pagination, single item retrieval
-- **Update** - Test modifications, partial updates, validation
-- **Delete** - Test deletion, cascade effects, error handling
+```bash
+# Только unit тесты
+pytest -m unit
 
-### 2. Business Logic Tests
-- Workflow state transitions
-- Permission and authorization checks
-- Business rule validation
-- Cross-entity relationships
+# Только тесты производительности
+pytest -m performance  
 
-### 3. Integration Tests
-- External system integration
-- File upload/download operations
-- Bulk operations
-- Import/export functionality
+# Только тесты совместимости
+pytest -m compatibility
 
-### 4. Performance Tests
-- Concurrent operations
-- Large dataset handling
-- Response time validation
+# Исключить медленные тесты
+pytest -m "not slow"
+```
 
-### 5. Error Handling Tests
-- Invalid input validation
-- Not found scenarios
-- Permission denied cases
-- Server error simulation
+## 📊 Отчеты и метрики
 
-## Test Data Management
+### Генерация отчетов
 
-### Fixtures
-The test suite uses pytest fixtures for test data:
+```bash
+# Подробный HTML отчет
+python tests/test_runner.py report
+
+# Отчет покрытия кода
+pytest --cov=app --cov-report=html:htmlcov/
+
+# JSON отчет для интеграции
+pytest --json-report --json-report-file=test_report.json
+```
+
+### Метрики производительности
+
+Тесты автоматически проверяют:
+
+- **Время создания пользователей:** < 2 секунды для 1000 записей
+- **Скорость запросов:** < 0.5 секунды для 500 записей  
+- **Сериализация:** < 1 секунды для 500 объектов
+- **Использование памяти:** < 100MB для 2000 пользователей
+
+## 🔧 Конфигурация
+
+### pytest.ini
+Основные настройки в `pytest.ini`:
+
+```ini
+[pytest]
+markers =
+    unit: Unit tests (fast, isolated)
+    integration: Integration tests (slower, with database)
+    performance: Performance and load tests (slow)
+    compatibility: Model-schema compatibility tests
+
+addopts = 
+    --strict-markers
+    --verbose
+    --cov=app
+    --cov-fail-under=80
+```
+
+### Переменные окружения
+
+```bash
+# Режим тестирования
+export TESTING=true
+
+# Тестовая база данных
+export TEST_DATABASE_URL="sqlite:///:memory:"
+
+# Отключение логов в тестах
+export LOG_LEVEL=ERROR
+```
+
+## 📋 Фикстуры
+
+### Основные фикстуры
+
+- `test_db_session` - изолированная сессия БД для каждого теста
+- `sample_user_data` - базовые данные пользователя
+- `sample_company_data` - базовые данные компании
+- `test_data_factory` - фабрика для создания тестовых данных
+
+### Параметризованные фикстуры
+
+- `user_count` - количество пользователей (10, 50, 100)
+- `db_type` - тип БД для тестов (sqlite, memory)
+
+## 🐛 Отладка тестов
+
+### Запуск отдельного теста
+
+```bash
+# Конкретный тест
+pytest tests/test_models_schemas_compatibility.py::TestModelSchemaFieldCompatibility::test_user_model_base_schema_fields_match -v -s
+
+# Тест с отладкой
+pytest tests/test_models_schemas_compatibility.py::TestUserSerializationPerformance::test_user_serialization_performance -v -s --pdb
+```
+
+### Логирование в тестах
 
 ```python
-# Project-level fixtures in conftest.py
-@pytest.fixture
-async def client():
-    """HTTP test client"""
+import logging
+logger = logging.getLogger(__name__)
 
-@pytest.fixture
-async def test_session():
-    """Database session for tests"""
-
-# Entity-specific fixtures in each test file
-@pytest.fixture
-def sample_user_data():
-    """Sample user data for testing"""
-
-@pytest.fixture
-async def test_project():
-    """Create a test project"""
+def test_something():
+    logger.info("Начало теста")
+    # тест
+    logger.info("Завершение теста")
 ```
 
-### Data Isolation
-- Each test creates its own data using unique identifiers
-- Database transactions are isolated
-- Test data is automatically cleaned up after tests
+## 📈 CI/CD интеграция
 
-## Writing New Tests
+### GitHub Actions пример
 
-### 1. Follow the Existing Pattern
-
-```python
-class TestNewEntityAPI:
-    """Test class for New Entity API endpoints."""
-    
-    @pytest.fixture
-    def sample_entity_data(self):
-        """Sample data for creating entity."""
-        return {
-            "name": f"Test-{uuid.uuid4().hex[:8]}",
-            "description": "Test description"
-        }
-    
-    async def create_test_entity(self, client, entity_data):
-        """Helper to create test entity."""
-        response = await client.post("/api/v1/entities/", json=entity_data)
-        assert response.status_code == status.HTTP_201_CREATED
-        return response.json()
-    
-    async def test_create_entity_success(self, client, sample_entity_data):
-        """Test successful entity creation."""
-        response = await client.post("/api/v1/entities/", json=sample_entity_data)
-        
-        assert response.status_code == status.HTTP_201_CREATED
-        data = response.json()
-        assert data["name"] == sample_entity_data["name"]
-        assert "id" in data
-```
-
-### 2. Test Naming Convention
-
-- `test_create_*_success` - Successful creation tests
-- `test_create_*_failure` - Creation failure tests  
-- `test_get_*_list` - List retrieval tests
-- `test_get_*_by_id` - Single item retrieval
-- `test_update_*` - Update operation tests
-- `test_delete_*` - Deletion tests
-- `test_*_validation` - Input validation tests
-- `test_*_permissions` - Permission tests
-
-### 3. Assertions
-
-Always include comprehensive assertions:
-
-```python
-# Check status code
-assert response.status_code == status.HTTP_201_CREATED
-
-# Check response structure
-data = response.json()
-assert "id" in data
-assert "created_at" in data
-
-# Check specific values
-assert data["name"] == expected_name
-assert data["status"] == "active"
-
-# Check data types
-assert isinstance(data["items"], list)
-assert isinstance(data["count"], int)
-```
-
-## Debugging Tests
-
-### 1. Verbose Output
-```bash
-pytest requify/tests/test_users_api.py::TestUsersAPI::test_create_user_success -v -s
-```
-
-### 2. Debug with Print Statements
-```python
-async def test_debug_example(self, client):
-    response = await client.get("/api/v1/users/")
-    print(f"Status: {response.status_code}")
-    print(f"Response: {response.json()}")
-    assert response.status_code == 200
-```
-
-### 3. Use pytest-pdb for Debugging
-```bash
-pytest requify/tests/test_users_api.py --pdb
-```
-
-## Continuous Integration
-
-### GitHub Actions Example
 ```yaml
-name: API Tests
-on: [push, pull_request]
+- name: Run compatibility tests
+  run: |
+    python tests/test_runner.py fast
+    python tests/test_runner.py compatibility --no-verbose
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: requify_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.11
-    
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install pytest pytest-asyncio pytest-cov
-    
-    - name: Run tests
-      run: |
-        python requify/tests/test_runner.py --test-type all --coverage
+- name: Upload coverage reports
+  uses: codecov/codecov-action@v3
+  with:
+    file: ./coverage.xml
 ```
 
-## Best Practices
+### Проверки качества
 
-### 1. Test Independence
-- Each test should be independent and not rely on other tests
-- Use fixtures to create required test data
-- Clean up test data appropriately
+- **Покрытие кода:** минимум 80%
+- **Производительность:** все benchmarks должны пройти
+- **Валидация:** все edge cases покрыты
 
-### 2. Meaningful Test Names
-- Test names should clearly describe what is being tested
-- Include the expected outcome in the test name
+## 🔍 Что проверяют тесты
 
-### 3. Comprehensive Coverage
-- Test both success and failure scenarios
-- Include edge cases and boundary conditions
-- Test error handling and validation
+### Модели ↔ Схемы
 
-### 4. Performance Considerations
-- Use async/await for database operations
-- Run tests in parallel when possible
-- Use appropriate test data sizes
+- [x] Все поля модели есть в соответствующих схемах
+- [x] Типы данных совпадают
+- [x] Ограничения валидации корректны
+- [x] Отношения ORM работают правильно
 
-### 5. Maintainability
-- Keep tests simple and focused
-- Use helper methods to reduce duplication
-- Document complex test scenarios
+### Сериализация
 
-## Troubleshooting
+- [x] ORM объекты корректно преобразуются в схемы
+- [x] JSON сериализация работает
+- [x] Datetime, Decimal, JSON поля обрабатываются
+- [x] None значения корректно сериализуются
 
-### Common Issues
+### Производительность
 
-1. **Database Connection Errors**
-   ```bash
-   # Check if database is running
-   docker-compose ps
-   
-   # Restart database services
-   make down && make up
-   ```
+- [x] CRUD операции выполняются быстро
+- [x] Нет проблемы N+1 запросов
+- [x] Пагинация эффективна
+- [x] Память используется разумно
 
-2. **Import Errors**
-   ```bash
-   # Ensure you're in the correct directory
-   cd /path/to/requify
-   
-   # Check Python path
-   export PYTHONPATH=/path/to/requify:$PYTHONPATH
-   ```
+### Валидация
 
-3. **Test Data Conflicts**
-   ```bash
-   # Reset test database
-   make reset-db
-   ```
+- [x] Неправильные данные отклоняются
+- [x] Граничные случаи обработаны
+- [x] Сообщения об ошибках информативны
+- [x] Unicode и спецсимволы поддерживаются
 
-4. **Authentication Issues**
-   - Check if authentication is properly mocked in tests
-   - Verify test user creation in fixtures
+## 🤝 Участие в разработке
 
-### Getting Help
+### Добавление новых тестов
 
-1. Check test logs for detailed error messages
-2. Run individual tests to isolate issues
-3. Use verbose mode (`-v`) for more detailed output
-4. Check the project documentation for API specifications
+1. Выберите подходящий файл тестов
+2. Добавьте тест в соответствующий класс
+3. Используйте существующие фикстуры
+4. Добавьте маркеры для категоризации
+5. Запустите тесты и проверьте покрытие
 
-## Contributing
+### Создание фикстур
 
-When adding new tests:
+```python
+@pytest.fixture
+def my_test_data():
+    """Описание фикстуры."""
+    return {"key": "value"}
+```
 
-1. Follow the existing test structure and naming conventions
-2. Include comprehensive test coverage for new features
-3. Update this README if adding new test categories
-4. Ensure all tests pass before submitting changes
+### Маркировка тестов
 
-## Performance Benchmarks
+```python
+@pytest.mark.unit
+@pytest.mark.compatibility
+def test_something():
+    """Тест совместимости."""
+    pass
+```
 
-The test suite should complete within these timeframes:
+## 📚 Полезные ссылки
 
-- **Smoke tests**: < 30 seconds
-- **Single entity tests**: < 2 minutes  
-- **Full test suite**: < 10 minutes
-- **With coverage**: < 15 minutes
+- [Pytest документация](https://docs.pytest.org/)
+- [SQLModel тестирование](https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/)
+- [Pydantic валидация](https://docs.pydantic.dev/latest/concepts/validators/)
+- [SQLAlchemy тестирование](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites)
 
-If tests are taking longer, consider:
-- Running tests in parallel
-- Optimizing test data creation
-- Using database transactions for faster cleanup 
+---
+
+**Создано для проекта Requify**  
+Версия: 1.0  
+Дата: 2025-01-08

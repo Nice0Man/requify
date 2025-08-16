@@ -1,5 +1,6 @@
 """
-API v1 endpoints.
-"""
+API Version 2 - Modern Domain-Oriented Architecture
 
-"""API версии 1."""
+Новая версия API организованная по доменно-ориентированной архитектуре
+с улучшенной структурой, современными практиками FastAPI и детальным RBAC.
+"""

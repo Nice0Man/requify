@@ -1,13 +1,7 @@
-/**
- * Comment UI components exports
- * TODO: Создать компоненты для комментариев
- */
+// Comment UI components exports
+export { CommentCard } from './CommentCard';
+export { CommentList } from './CommentList';
 
-// export { CommentList } from './CommentList';
-// export { CommentForm } from './CommentForm';
-// export { CommentItem } from './CommentItem';
-
-// Временная заглушка
-export const CommentUIPlaceholder = {
-  // TODO: Добавить компоненты
-};
+// Export types for external usage
+export type { CommentCardProps } from './CommentCard';
+export type { CommentListProps } from './CommentList';

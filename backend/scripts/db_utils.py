@@ -271,13 +271,19 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", help="Доступные команды")
 
-    # Команда create-db
+    # Команда create-db / create
     create_parser = subparsers.add_parser("create-db", help="Создать базу данных")
     create_parser.add_argument("--name", help="Имя базы данных")
 
-    # Команда drop-db
+    create2_parser = subparsers.add_parser("create", help="Создать базу данных")
+    create2_parser.add_argument("--name", help="Имя базы данных")
+
+    # Команда drop-db / drop
     drop_parser = subparsers.add_parser("drop-db", help="Удалить базу данных")
     drop_parser.add_argument("--name", help="Имя базы данных")
+
+    drop2_parser = subparsers.add_parser("drop", help="Удалить базу данных")
+    drop2_parser.add_argument("--name", help="Имя базы данных")
 
     # Команда backup
     backup_parser = subparsers.add_parser("backup", help="Создать резервную копию")
@@ -306,9 +312,9 @@ def main():
 
     utils = DatabaseUtilities()
 
-    if args.command == "create-db":
+    if args.command == "create-db" or args.command == "create":
         utils.create_database(args.name)
-    elif args.command == "drop-db":
+    elif args.command == "drop-db" or args.command == "drop":
         utils.drop_database(args.name)
     elif args.command == "backup":
         utils.backup_database(args.path, args.name)

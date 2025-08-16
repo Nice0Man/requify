@@ -1,2 +1,2 @@
-// Project stats widget exports
-export * from './ui'; 
+export { ProjectStatsWidget } from "./ui";
+export type { ProjectStatsWidgetProps } from "./model"; 

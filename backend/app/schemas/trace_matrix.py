@@ -1,14 +1,30 @@
 """
 Схемы для матрицы трассируемости требований.
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from datetime import datetime
+<<<<<<< HEAD
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
+=======
+from typing import List, Dict, Any, Optional
+from sqlmodel import Field
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
+>>>>>>> dev-backend
 
 
-class TraceNode(BaseModel):
+class TraceNode(BaseSchema):
     """Узел в матрице трассируемости."""
 
     requirement_id: int = Field(..., description="ID требования")
@@ -23,7 +39,7 @@ class TraceNode(BaseModel):
     )
 
 
-class TraceLink(BaseModel):
+class TraceLink(BaseSchema):
     """Связь в матрице трассируемости."""
 
     source_id: int = Field(..., description="ID исходного требования")
@@ -32,7 +48,7 @@ class TraceLink(BaseModel):
     strength: float = Field(default=1.0, ge=0, le=1, description="Сила связи")
 
 
-class TraceMatrix(BaseModel):
+class TraceMatrix(BaseSchema):
     """Матрица трассируемости требований."""
 
     requirement_id: int = Field(..., description="ID центрального требования")
@@ -49,11 +65,8 @@ class TraceMatrix(BaseModel):
     )
     generated_at: str = Field(..., description="Время генерации")
 
-    class Config:
-        from_attributes = True
 
-
-class TraceMatrixConfig(BaseModel):
+class TraceMatrixConfig(BaseSchema):
     """Конфигурация для генерации матрицы трассируемости."""
 
     include_forward: bool = Field(default=True, description="Включать прямые связи")
@@ -70,7 +83,7 @@ class TraceMatrixConfig(BaseModel):
     )
 
 
-class TraceMatrixSummary(BaseModel):
+class TraceMatrixSummary(BaseSchema):
     """Сводка по матрице трассируемости."""
 
     total_requirements: int = Field(
@@ -91,7 +104,7 @@ class TraceMatrixSummary(BaseModel):
     )
 
 
-class TraceMatrixExport(BaseModel):
+class TraceMatrixExport(BaseSchema):
     """Экспорт матрицы трассируемости."""
 
     format: str = Field(..., description="Формат экспорта")
@@ -99,9 +112,6 @@ class TraceMatrixExport(BaseModel):
     file_size: int = Field(..., ge=0, description="Размер файла")
     download_url: str = Field(..., description="URL для скачивания")
     expires_at: datetime = Field(..., description="Время истечения ссылки")
-
-    class Config:
-        from_attributes = True
 
 
 # Обновляем TraceNode для поддержки рекурсивных ссылок

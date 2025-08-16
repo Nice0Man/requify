@@ -30,7 +30,7 @@ export const ScrollNavigationWidget: React.FC<ScrollNavigationWidgetProps> = ({
     enableKeyboard = true,
     enableWheel = true,
     enableTouch = true,
-    animationDuration = 800,
+    animationDuration = 600,
     autoScrollToHash = true,
   } = config;
 
@@ -49,8 +49,8 @@ export const ScrollNavigationWidget: React.FC<ScrollNavigationWidgetProps> = ({
     );
   }
 
-  // Получаем IDs секций для навигатора
-  const sectionIds = sections.map((section) => section.title);
+  // Получаем названия секций для навигатора
+  const sectionIds = sections.map((section) => section.title || section.id);
 
   return (
     <>

@@ -1,4 +1,5 @@
-import { UserRole } from "./types";
+import type { UserRole } from "./types";
+import { USER_ROLES } from "./types";
 import { useTranslation } from "react-i18next";
 
 // Функции валидации для пользователя
@@ -24,7 +25,7 @@ export const validateUserEmail = (email: string): string | null => {
 
 export const validateUserRole = (role: string): string | null => {
   const { t } = useTranslation();
-  if (!Object.values(UserRole).includes(role as UserRole)) {
+  if (!USER_ROLES.includes(role as UserRole)) {
     return t("user.validation.invalidRole");
   }
   return null;

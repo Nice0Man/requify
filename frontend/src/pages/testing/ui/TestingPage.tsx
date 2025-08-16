@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   Box,
   Typography,
@@ -27,19 +26,54 @@ import {
   Assignment as AssignmentIcon,
   PlayArrow as PlayArrowIcon,
 } from "@mui/icons-material";
-import {
-  useTestCases,
-  useTestStats,
-  useUpdateTestCase,
-} from "@/features/test-management";
+import { PageLayout } from "@/shared/ui/PageLayout";
 import { LoadingSpinner } from "@/shared/ui";
-import type {
-  TestCase,
-  TestFilters,
-} from "@/features/test-management/api/testApi";
+// TODO: Implement these hooks when testing feature is ready
+// import {
+//   useTestCases,
+//   useTestStats,
+//   useUpdateTestCase,
+// } from "@/features/testing";
+// import type { TestCase, TestFilters } from "@/features/testing/api/testApi";
+
+// Temporary mock types and hooks for demo
+interface TestCase {
+  id: string;
+  title: string;
+  description?: string;
+  steps: string[];
+  status: 'draft' | 'active' | 'deprecated';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  createdAt: string;
+}
+
+interface TestFilters {
+  search?: string;
+  status?: string;
+  priority?: string;
+  projectId?: string;
+}
+
+// Mock hooks
+const useTestCases = (filters: TestFilters) => ({
+  data: [] as TestCase[],
+  isPending: false,
+  error: null,
+});
+
+const useTestStats = () => ({
+  data: {
+    totalTests: 0,
+    passedTests: 0,
+    failedTests: 0,
+  },
+  isPending: false,
+  error: null,
+});
+
+const useUpdateTestCase = () => ({});
 
 const TestingPage: React.FC = () => {
-  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     "all" | "draft" | "active" | "deprecated"
@@ -146,13 +180,13 @@ const TestingPage: React.FC = () => {
           </Typography>
           <Box display="flex" gap={1}>
             <Chip
-              label={t(`testing.status.${testCase.status}`)}
+              label={`Статус: ${testCase.status}`}
               color={getStatusColor(testCase.status)}
               size="small"
               sx={{ fontWeight: 600 }}
             />
             <Chip
-              label={t(`testing.priority.${testCase.priority}`)}
+              label={`Приоритет: ${testCase.priority}`}
               color={getPriorityColor(testCase.priority)}
               size="small"
               variant="outlined"
@@ -162,21 +196,21 @@ const TestingPage: React.FC = () => {
         </Box>
 
         <Typography variant="body2" color="text.secondary" mb={2}>
-          {testCase.description || t("testing.placeholders.noDescription")}
+          {testCase.description || "Описание отсутствует"}
         </Typography>
 
         <Box display="flex" gap={2} mb={2}>
           <Box>
             <Typography variant="body2" color="text.secondary">
-              {t("testing.fields.steps")}
+              Шаги
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {testCase.steps.length} {t("testing.fields.stepsCount")}
+              {testCase.steps.length} шагов
             </Typography>
           </Box>
           <Box>
             <Typography variant="body2" color="text.secondary">
-              {t("testing.fields.createdAt")}
+              Создан
             </Typography>
             <Typography variant="body2" fontWeight={500}>
               {formatDate(testCase.createdAt)}
@@ -187,7 +221,7 @@ const TestingPage: React.FC = () => {
 
       <CardActions sx={{ p: 2, pt: 0 }}>
         <Button size="small" startIcon={<EditIcon />} sx={{ fontWeight: 600 }}>
-          {t("common.edit")}
+          Редактировать
         </Button>
         <Button
           size="small"
@@ -195,215 +229,219 @@ const TestingPage: React.FC = () => {
           sx={{ fontWeight: 600 }}
           color="primary"
         >
-          {t("testing.execute")}
+          Выполнить
         </Button>
         <Button
           size="small"
           startIcon={<AssignmentIcon />}
           sx={{ fontWeight: 600 }}
         >
-          {t("common.view")}
+          Просмотр
         </Button>
       </CardActions>
     </Card>
   );
 
   if (testCasesLoading || testStatsLoading) {
-    return <LoadingSpinner fullScreen />;
+    return (
+      <PageLayout title="Тестирование">
+        <LoadingSpinner fullScreen />
+      </PageLayout>
+    );
   }
 
   if (testCasesError || testStatsError) {
     return (
-      <Box p={3} textAlign="center">
-        <Typography color="error">{t("errors.loadingError")}</Typography>
-      </Box>
+      <PageLayout title="Тестирование">
+        <Box p={3} textAlign="center">
+          <Typography color="error">Ошибка загрузки данных</Typography>
+        </Box>
+      </PageLayout>
     );
   }
 
   return (
-    <Box p={3}>
-      {/* Заголовок */}
-      <Box mb={3}>
-        <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
-          {t("testing.title")}
-        </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
-          {t("testing.subtitle")}
-        </Typography>
-      </Box>
+    <PageLayout title="Тестирование">
+      <Box p={3}>
+        {/* Заголовок */}
+        <Box mb={3}>
+          <Typography variant="h4" component="h1" gutterBottom fontWeight={700}>
+            Тестирование
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Управление тест-кейсами и выполнение тестов
+          </Typography>
+        </Box>
 
-      {/* Статистика */}
-      {testStats && (
-        <Grid container spacing={3} mb={3}>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="primary" fontWeight={700}>
-                {testStats.totalTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.totalTests")}
-              </Typography>
-            </Paper>
+        {/* Статистика */}
+        {testStats && (
+          <Grid container spacing={3} mb={3}>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="primary" fontWeight={700}>
+                  {testStats.totalTests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  Всего тестов
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="success.main" fontWeight={700}>
+                  {testStats.passedTests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  Пройдено
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="error.main" fontWeight={700}>
+                  {testStats.failedTests}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  Провалено
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Paper
+                elevation={1}
+                sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
+              >
+                <Typography variant="h4" color="warning.main" fontWeight={700}>
+                  {(testStats?.totalTests || 0) -
+                    (testStats?.passedTests || 0) -
+                    (testStats?.failedTests || 0)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mb={1}>
+                  Пропущено
+                </Typography>
+              </Paper>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="success.main" fontWeight={700}>
-                {testStats.passedTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.passedTests")}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="error.main" fontWeight={700}>
-                {testStats.failedTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.failedTests")}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <Paper
-              elevation={1}
-              sx={{ p: 3, borderRadius: 2, textAlign: "center" }}
-            >
-              <Typography variant="h4" color="warning.main" fontWeight={700}>
-                {testStats.skippedTests}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={1}>
-                {t("testing.stats.skippedTests")}
-              </Typography>
-            </Paper>
-          </Grid>
-        </Grid>
-      )}
+        )}
 
-      {/* Фильтры и поиск */}
-      <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={3}>
-            <TextField
-              fullWidth
-              placeholder={t("testing.searchPlaceholder")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <SearchIcon sx={{ mr: 1, color: "action.active" }} />
-                ),
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>{t("testing.fields.status")}</InputLabel>
-              <Select
-                value={statusFilter}
-                label={t("testing.fields.status")}
-                onChange={(e) =>
-                  setStatusFilter(e.target.value as typeof statusFilter)
+        {/* Фильтры и поиск */}
+        <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={3}>
+              <TextField
+                fullWidth
+                placeholder="Поиск тест-кейсов..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <SearchIcon sx={{ mr: 1, color: "action.active" }} />
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Статус</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label="Статус"
+                  onChange={(e) =>
+                    setStatusFilter(e.target.value as typeof statusFilter)
+                  }
+                >
+                  <MenuItem value="all">Все статусы</MenuItem>
+                  <MenuItem value="draft">Черновик</MenuItem>
+                  <MenuItem value="active">Активный</MenuItem>
+                  <MenuItem value="deprecated">Устаревший</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Приоритет</InputLabel>
+                <Select
+                  value={priorityFilter}
+                  label="Приоритет"
+                  onChange={(e) =>
+                    setPriorityFilter(e.target.value as typeof priorityFilter)
+                  }
+                >
+                  <MenuItem value="all">Все приоритеты</MenuItem>
+                  <MenuItem value="low">Низкий</MenuItem>
+                  <MenuItem value="medium">Средний</MenuItem>
+                  <MenuItem value="high">Высокий</MenuItem>
+                  <MenuItem value="critical">Критический</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, newViewMode) =>
+                  newViewMode && setViewMode(newViewMode)
                 }
+                aria-label="Режим просмотра"
               >
-                <MenuItem value="all">{t("testing.status.all")}</MenuItem>
-                <MenuItem value="draft">{t("testing.status.draft")}</MenuItem>
-                <MenuItem value="active">{t("testing.status.active")}</MenuItem>
-                <MenuItem value="deprecated">
-                  {t("testing.status.deprecated")}
-                </MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <FormControl fullWidth>
-              <InputLabel>{t("testing.fields.priority")}</InputLabel>
-              <Select
-                value={priorityFilter}
-                label={t("testing.fields.priority")}
-                onChange={(e) =>
-                  setPriorityFilter(e.target.value as typeof priorityFilter)
-                }
+                <ToggleButton value="grid" aria-label="grid view">
+                  <ViewModuleIcon />
+                </ToggleButton>
+                <ToggleButton value="list" aria-label="list view">
+                  <ViewListIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<AddIcon />}
+                sx={{ fontWeight: 600 }}
               >
-                <MenuItem value="all">{t("testing.priority.all")}</MenuItem>
-                <MenuItem value="low">{t("testing.priority.low")}</MenuItem>
-                <MenuItem value="medium">
-                  {t("testing.priority.medium")}
-                </MenuItem>
-                <MenuItem value="high">{t("testing.priority.high")}</MenuItem>
-                <MenuItem value="critical">
-                  {t("testing.priority.critical")}
-                </MenuItem>
-              </Select>
-            </FormControl>
+                Создать тест-кейс
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={3}>
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={(_, newViewMode) =>
-                newViewMode && setViewMode(newViewMode)
-              }
-              aria-label={t("common.view")}
-            >
-              <ToggleButton value="grid" aria-label="grid view">
-                <ViewModuleIcon />
-              </ToggleButton>
-              <ToggleButton value="list" aria-label="list view">
-                <ViewListIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Grid>
-          <Grid item xs={12} md={2}>
+        </Paper>
+
+        {/* Список тест-кейсов */}
+        {filteredTestCases.length === 0 ? (
+          <Paper
+            elevation={1}
+            sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
+          >
+            <Typography variant="h6" color="text.secondary" mb={2}>
+              Тест-кейсы не найдены
+            </Typography>
             <Button
-              fullWidth
               variant="contained"
               startIcon={<AddIcon />}
               sx={{ fontWeight: 600 }}
             >
-              {t("testing.createTestCase")}
+              Создать первый тест-кейс
             </Button>
+          </Paper>
+        ) : (
+          <Grid container spacing={3}>
+            {filteredTestCases.map((testCase) => (
+              <Grid item xs={12} md={6} lg={4} key={testCase.id}>
+                <TestCaseCard testCase={testCase} />
+              </Grid>
+            ))}
           </Grid>
-        </Grid>
-      </Paper>
-
-      {/* Список тест-кейсов */}
-      {filteredTestCases.length === 0 ? (
-        <Paper
-          elevation={1}
-          sx={{ p: 6, textAlign: "center", borderRadius: 2 }}
-        >
-          <Typography variant="h6" color="text.secondary" mb={2}>
-            {t("testing.notFound")}
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{ fontWeight: 600 }}
-          >
-            {t("testing.createFirstTestCase")}
-          </Button>
-        </Paper>
-      ) : (
-        <Grid container spacing={3}>
-          {filteredTestCases.map((testCase) => (
-            <Grid item xs={12} md={6} lg={4} key={testCase.id}>
-              <TestCaseCard testCase={testCase} />
-            </Grid>
-          ))}
-        </Grid>
-      )}
-    </Box>
+        )}
+      </Box>
+    </PageLayout>
   );
 };
 

@@ -1,13 +1,12 @@
-/**
- * TestCase UI components exports
- * TODO: Создать компоненты для тест-кейсов
- */
+// Test Case UI components exports
+export { TestCaseCard } from './TestCaseCard';
+export { TestCaseList } from './TestCaseList';
+export { TestExecutionStatus, TestExecutionProgress } from './TestExecutionStatus';
 
-// export { TestCaseCard } from './TestCaseCard';
-// export { TestCaseList } from './TestCaseList';
-// export { TestCaseForm } from './TestCaseForm';
-
-// Временная заглушка
-export const TestCaseUIPlaceholder = {
-  // TODO: Добавить компоненты
-};
+// Export types for external usage
+export type { TestCaseCardProps } from './TestCaseCard';
+export type { TestCaseListProps } from './TestCaseList';
+export type { 
+  TestExecutionStatusProps, 
+  TestExecutionProgressProps 
+} from './TestExecutionStatus';

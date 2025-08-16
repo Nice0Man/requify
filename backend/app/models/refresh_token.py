@@ -52,7 +52,13 @@ class RefreshToken(Base):
         nullable=False,
         comment="ID пользователя",
     )
-
+    # Связь с компанией
+    company_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        ForeignKey("companies.id", ondelete="CASCADE"),
+        nullable=True,
+        comment="ID компании",
+    )
     # Временные метки
     created_at: Mapped[datetime] = mapped_column(
         DateTime,

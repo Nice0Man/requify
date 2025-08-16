@@ -1,62 +1,110 @@
 """
 Схемы для модели RequirementPriority (приоритеты требований).
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from datetime import datetime
+<<<<<<< HEAD
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+=======
+from typing import Optional, List, Dict, Any
+from sqlmodel import SQLModel, Field
+from pydantic import field_validator, model_validator
+from enum import Enum
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ListResponseSchema,
+    StatisticsSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
+from .common import PriorityEnum
+>>>>>>> dev-backend
 
 
-class RequirementPriorityBase(BaseModel):
-    """Базовая схема приоритета требования."""
+# === Перечисления ===
+
+
+class RequirementPriorityLevel(str, Enum):
+    """Стандартные уровни приоритетов требований"""
+
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    MINIMAL = "minimal"
+
+
+# === Базовые схемы ===
+
+
+class RequirementPriorityBase(BaseSchema, ValidationMixin):
+    """
+    Базовая схема приоритета требования.
+    Содержит основные поля без служебных данных.
+    """
 
     name: str = Field(
-        ..., min_length=1, max_length=100, description="Название приоритета требования"
+        ...,
+        min_length=1,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description=StandardDescriptions.NAME + " приоритета требования",
     )
     description: Optional[str] = Field(
-        None, description="Описание приоритета требования"
-    )
-    level: Optional[int] = Field(
         None,
-        ge=1,
-        le=10,
+        max_length=FieldLimits.LONG_STRING_MAX,
+        description=StandardDescriptions.DESCRIPTION + " приоритета требования",
+    )
+    level: int = Field(
+        ...,
+        ge=FieldLimits.PRIORITY_MIN,
+        le=FieldLimits.PRIORITY_MAX,
         description="Уровень приоритета (1-10, где 1 - самый высокий)",
     )
+    color: Optional[str] = Field(
+        None,
+        regex="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+        description="Цвет приоритета в формате hex",
+    )
+    is_active: bool = Field(True, description=StandardDescriptions.IS_ACTIVE)
 
     @field_validator("name")
-    def validate_name(cls, v):
+    @classmethod
+    def validate_name(cls, v: str) -> str:
         """Валидация названия приоритета требования"""
-        if not v or not v.strip():
-            raise ValueError("Requirement priority name cannot be empty")
+        v = cls.validate_non_empty_string(v, "name")
 
-        # Allow any reasonable priority name (remove strict validation)
-        v = v.strip()
-
-        # Basic validation for security
-        forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "script"]
-        if any(char in v.lower() for char in forbidden_chars):
+        # Базовая валидация для безопасности
+        forbidden_chars = ["<", ">", "&", '"', "'", ";", "|"]
+        if any(char in v for char in forbidden_chars):
             raise ValueError("Priority name contains forbidden characters")
 
         return v
 
     @field_validator("description")
-    def validate_description(cls, v):
+    @classmethod
+    def validate_description(cls, v: Optional[str]) -> Optional[str]:
         """Валидация описания приоритета требования"""
         if v is not None:
             v = v.strip()
-            if len(v) > 500:  # Максимальная длина описания
-                raise ValueError("Description cannot exceed 500 characters")
-            return v if v else None
+            if not v:
+                return None
+            if len(v) > FieldLimits.LONG_STRING_MAX:
+                raise ValueError(
+                    f"Description cannot exceed {FieldLimits.LONG_STRING_MAX} characters"
+                )
         return v
 
     @model_validator(mode="after")
-    def validate_level(self):
-        """Валидация уровня приоритета в соответствии с названием"""
-        # Skip validation if level is not provided
-        if self.level is None:
-            return self
-
+    def validate_priority_consistency(self):
+        """Валидация соответствия названия и уровня приоритета"""
         name = self.name.lower()
 
         # Соответствие названий и уровней приоритета
@@ -68,80 +116,210 @@ class RequirementPriorityBase(BaseModel):
             "minimal": [9, 10],
         }
 
-        if name in priority_levels:
-            if self.level not in priority_levels[name]:
-                expected_levels = priority_levels[name]
+        for priority_name, levels in priority_levels.items():
+            if priority_name in name and self.level not in levels:
                 raise ValueError(
-                    f'Priority level {self.level} does not match priority name "{name}". Expected levels: {expected_levels}'
+                    f'Priority level {self.level} does not match priority name "{name}". '
+                    f'Expected levels for "{priority_name}": {levels}'
                 )
 
         return self
 
 
-class RequirementPriorityCreate(RequirementPriorityBase):
-    """Схема для создания приоритета требования."""
+# === CRUD схемы ===
+
+
+class RequirementPriorityCreate(RequirementPriorityBase, CreateSchema):
+    """
+    Схема для создания приоритета требования.
+    Наследует все поля от базовой схемы.
+    """
 
     pass
 
 
-class RequirementPriorityUpdate(BaseModel):
-    """Схема для обновления приоритета требования."""
+class RequirementPriorityUpdate(UpdateSchema, ValidationMixin):
+    """
+    Схема для обновления приоритета требования.
+    Все поля опциональны для частичных обновлений.
+    """
 
     name: Optional[str] = Field(
-        None, min_length=1, max_length=100, description="Название приоритета требования"
+        None,
+        min_length=1,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description=StandardDescriptions.NAME + " приоритета требования",
     )
     description: Optional[str] = Field(
-        None, description="Описание приоритета требования"
+        None,
+        max_length=FieldLimits.LONG_STRING_MAX,
+        description=StandardDescriptions.DESCRIPTION + " приоритета требования",
     )
     level: Optional[int] = Field(
-        None, ge=1, le=10, description="Уровень приоритета (1-10)"
+        None,
+        ge=FieldLimits.PRIORITY_MIN,
+        le=FieldLimits.PRIORITY_MAX,
+        description="Уровень приоритета (1-10, где 1 - самый высокий)",
     )
+    color: Optional[str] = Field(
+        None,
+        regex="^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+        description="Цвет приоритета в формате hex",
+    )
+    is_active: Optional[bool] = Field(None, description=StandardDescriptions.IS_ACTIVE)
 
     @field_validator("name")
-    def validate_name(cls, v):
+    @classmethod
+    def validate_name(cls, v: Optional[str]) -> Optional[str]:
         """Валидация названия при обновлении"""
         if v is not None:
-            if not v or not v.strip():
-                raise ValueError("Requirement priority name cannot be empty")
+            v = cls.validate_non_empty_string(v, "name")
 
-            # Allow any reasonable priority name (remove strict validation)
-            v = v.strip()
-
-            # Basic validation for security
-            forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "script"]
-            if any(char in v.lower() for char in forbidden_chars):
+            forbidden_chars = ["<", ">", "&", '"', "'", ";", "|"]
+            if any(char in v for char in forbidden_chars):
                 raise ValueError("Priority name contains forbidden characters")
-
-            return v
         return v
 
     @field_validator("description")
-    def validate_description(cls, v):
+    @classmethod
+    def validate_description(cls, v: Optional[str]) -> Optional[str]:
         """Валидация описания при обновлении"""
         if v is not None:
             v = v.strip()
-            if len(v) > 500:
-                raise ValueError("Description cannot exceed 500 characters")
-            return v if v else None
+            if not v:
+                return None
+            if len(v) > FieldLimits.LONG_STRING_MAX:
+                raise ValueError(
+                    f"Description cannot exceed {FieldLimits.LONG_STRING_MAX} characters"
+                )
         return v
 
 
-class RequirementPriorityInDBBase(RequirementPriorityBase):
-    """Базовая схема приоритета требования с данными из БД."""
-
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class RequirementPriority(RequirementPriorityInDBBase):
-    """Схема приоритета требования для ответов API."""
+class RequirementPriorityResponse(RequirementPriorityBase, ResponseSchema):
+    """
+    Схема ответа для приоритета требования.
+    Включает все данные из БД включая id и временные метки.
+    """
 
     pass
 
 
-class RequirementPriorityInDB(RequirementPriorityInDBBase):
-    """Схема приоритета требования в БД."""
+# === Списки и пагинация ===
+
+
+class RequirementPriorityListResponse(ListResponseSchema[RequirementPriorityResponse]):
+    """Список приоритетов требований с пагинацией"""
 
     pass
+
+
+# === Статистика ===
+
+
+class RequirementPriorityStatistics(StatisticsSchema):
+    """
+    Схема статистики приоритетов требований.
+    """
+
+    total_priorities: int = Field(0, ge=0, description="Общее количество приоритетов")
+    active_priorities: int = Field(0, ge=0, description="Активных приоритетов")
+    inactive_priorities: int = Field(0, ge=0, description="Неактивных приоритетов")
+
+    usage_by_level: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Использование по уровням приоритета"
+    )
+
+    distribution: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Распределение требований по приоритетам"
+    )
+
+
+# === Поиск и фильтрация ===
+
+
+class RequirementPriorityFilter(BaseSchema):
+    """
+    Фильтр для приоритетов требований.
+    """
+
+    is_active: Optional[bool] = Field(None, description="Фильтр по активности")
+    level_min: Optional[int] = Field(
+        None, ge=FieldLimits.PRIORITY_MIN, description="Минимальный уровень приоритета"
+    )
+    level_max: Optional[int] = Field(
+        None, le=FieldLimits.PRIORITY_MAX, description="Максимальный уровень приоритета"
+    )
+    name_contains: Optional[str] = Field(
+        None, min_length=1, description="Поиск по содержанию в названии"
+    )
+
+
+# === Массовые операции ===
+
+
+class RequirementPriorityBulkCreate(BaseSchema):
+    """
+    Схема для массового создания приоритетов требований.
+    """
+
+    priorities: List[RequirementPriorityCreate] = Field(
+        ..., min_length=1, max_length=20, description="Список приоритетов для создания"
+    )
+
+
+# === Константы и утилиты ===
+
+
+class RequirementPriorityConfig:
+    """
+    Конфигурация схем приоритетов требований.
+    """
+
+    # Стандартные приоритеты для инициализации
+    STANDARD_PRIORITIES = [
+        {
+            "name": "Critical",
+            "description": "Критически важные требования",
+            "level": 1,
+            "color": "#dc2626",
+            "is_active": True,
+        },
+        {
+            "name": "High",
+            "description": "Высокоприоритетные требования",
+            "level": 3,
+            "color": "#ea580c",
+            "is_active": True,
+        },
+        {
+            "name": "Medium",
+            "description": "Среднеприоритетные требования",
+            "level": 5,
+            "color": "#d97706",
+            "is_active": True,
+        },
+        {
+            "name": "Low",
+            "description": "Низкоприоритетные требования",
+            "level": 7,
+            "color": "#65a30d",
+            "is_active": True,
+        },
+        {
+            "name": "Minimal",
+            "description": "Минимальные требования",
+            "level": 9,
+            "color": "#6b7280",
+            "is_active": True,
+        },
+    ]
+
+    # Схемы для различных контекстов
+    MINIMAL = RequirementPriorityResponse
+    DETAILED = RequirementPriorityResponse
+    LIST = RequirementPriorityListResponse
+
+
+# === Псевдонимы для обратной совместимости ===
+
+RequirementPriority = RequirementPriorityResponse  # Базовый приоритет требования

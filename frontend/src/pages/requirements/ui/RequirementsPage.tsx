@@ -27,9 +27,9 @@ import {
   Search as SearchIcon,
   Assignment as AssignmentIcon,
 } from "@mui/icons-material";
-import { useRequirements } from "../../../features/requirement-management/model/useRequirementQuery";
-import { LoadingSpinner } from "../../../shared/ui";
-import type { Requirement } from "../../../entities/requirement";
+import { useRequirements } from "@/features/requirements/model/useRequirementQuery";
+import { LoadingSpinner } from "@/shared/ui";
+import type { Requirement } from "@/entities/requirement";
 
 const RequirementsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -62,7 +62,7 @@ const RequirementsPage: React.FC = () => {
         return "default";
       case "approved":
         return "success";
-      case "in_progress":
+      case "in_development":
         return "warning";
       case "completed":
         return "primary";
@@ -146,7 +146,7 @@ const RequirementsPage: React.FC = () => {
             </Typography>
             <LinearProgress
               variant="determinate"
-              value={requirement.progress}
+              value={requirement.progress || 0}
               sx={{ height: 8, borderRadius: 4, mb: 1 }}
             />
             <Typography variant="body2" color="text.secondary">
@@ -161,16 +161,16 @@ const RequirementsPage: React.FC = () => {
               {t("requirements.fields.project")}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {requirement.projectId ||
+              {requirement.project_id ||
                 t("requirements.placeholders.noProject")}
             </Typography>
           </Box>
           <Box>
-            <Typography variant="body2" color="text.secondary">
-              {t("requirements.fields.createdAt")}
+            <Typography variant="caption" color="text.secondary">
+              {t("requirements.fields.created")}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
-              {formatDate(requirement.createdAt)}
+              {formatDate(requirement.created_at)}
             </Typography>
           </Box>
         </Box>
@@ -333,7 +333,7 @@ const RequirementsPage: React.FC = () => {
         </Paper>
       ) : (
         <Grid container spacing={3}>
-          {filteredRequirements.map((requirement) => (
+          {filteredRequirements.map((requirement: Requirement) => (
             <Grid item xs={12} md={6} lg={4} key={requirement.id}>
               <RequirementCard requirement={requirement} />
             </Grid>

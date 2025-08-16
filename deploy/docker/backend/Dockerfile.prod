@@ -1,10 +1,16 @@
 # Production Backend Dockerfile - Multi-stage build
 FROM python:3.13-slim as builder
 
-# Системные зависимости для сборки
+# Системные зависимости для сборки включая библиотеки для Pillow
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libwebp-dev \
+    libtiff5-dev \
+    libfreetype6-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем Poetry
@@ -17,8 +23,8 @@ ENV POETRY_NO_INTERACTION=1 \
 
 WORKDIR /app
 
-# Копируем зависимости и устанавливаем их
-COPY config/pyproject.toml poetry.lock ./
+# Копируем зависимости из backend директории и устанавливаем их
+COPY backend/pyproject.toml backend/poetry.lock* ./
 RUN poetry config virtualenvs.create true && \
     poetry install --only=main && \
     rm -rf $POETRY_CACHE_DIR
@@ -26,10 +32,16 @@ RUN poetry config virtualenvs.create true && \
 # Production stage
 FROM python:3.13-slim as production
 
-# Минимальные системные зависимости
+# Минимальные системные зависимости включая runtime библиотеки для Pillow
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     curl \
+    libjpeg62-turbo \
+    libpng16-16 \
+    libwebp7 \
+    libtiff6 \
+    libfreetype6 \
+    zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
 # Создаем пользователя раньше
@@ -43,9 +55,9 @@ COPY --from=builder /app/.venv /app/.venv
 # Активируем виртуальное окружение
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Копируем код приложения
-COPY app/ ./app/
-COPY config/alembic.ini .env* ./
+# Копируем код приложения из backend директории
+COPY backend/app/ ./app/
+COPY backend/alembic.ini backend/.env* ./
 
 # Создаем директории с правильными правами и устанавливаем права
 RUN mkdir -p logs uploads static backups && \

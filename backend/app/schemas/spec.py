@@ -1,23 +1,50 @@
 """
 Схемы для модели Spec (спецификации).
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from datetime import datetime
+<<<<<<< HEAD
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
+=======
+from typing import Optional, List, Dict, Any
+from sqlmodel import Field
+from pydantic import field_validator
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ProjectRelatedSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
+>>>>>>> dev-backend
 
 
-class SpecBase(BaseModel):
+class SpecBase(BaseSchema, ValidationMixin):
     """Базовая схема спецификации."""
 
     name: str = Field(
-        ..., min_length=1, max_length=100, description="Название спецификации"
+        ...,
+        min_length=1,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Название спецификации",
     )
-    description: Optional[str] = Field(None, description="Описание спецификации")
-    version: str = Field("1.0", description="Версия спецификации")
-    format: str = Field("pdf", description="Формат документа")
-    language: str = Field("ru", description="Язык спецификации")
+    description: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Описание спецификации"
+    )
+    version: str = Field(
+        "1.0", max_length=FieldLimits.VERSION_MAX, description="Версия спецификации"
+    )
+    format: str = Field(
+        "pdf", max_length=FieldLimits.SHORT_STRING_MAX, description="Формат документа"
+    )
+    language: str = Field("ru", max_length=10, description="Язык спецификации")
 
     @field_validator("version")
     def validate_version(cls, v):
@@ -50,14 +77,17 @@ class SpecBase(BaseModel):
         return v
 
 
-class SpecCreate(SpecBase):
+class SpecCreate(CreateSchema, SpecBase, ProjectRelatedSchema):
     """Схема для создания спецификации."""
 
-    project_id: int = Field(..., gt=0, description="ID проекта")
     content: Optional[Dict[str, Any]] = Field(
         None, description="Содержимое спецификации в JSON формате"
     )
-    status: str = Field("draft", description="Статус спецификации")
+    status: str = Field(
+        "draft",
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Статус спецификации",
+    )
     template_id: Optional[int] = Field(
         None, gt=0, description="ID шаблона спецификации"
     )
@@ -74,76 +104,68 @@ class SpecCreate(SpecBase):
         return v
 
 
-class SpecUpdate(BaseModel):
+class SpecUpdate(UpdateSchema):
     """Схема для обновления спецификации."""
 
     name: Optional[str] = Field(
-        None, min_length=1, max_length=100, description="Название спецификации"
+        None,
+        min_length=1,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Название спецификации",
     )
-    description: Optional[str] = Field(None, description="Описание спецификации")
-    version: Optional[str] = Field(None, description="Версия спецификации")
+    description: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Описание спецификации"
+    )
+    version: Optional[str] = Field(
+        None, max_length=FieldLimits.VERSION_MAX, description="Версия спецификации"
+    )
     content: Optional[Dict[str, Any]] = Field(
         None, description="Содержимое спецификации в JSON формате"
     )
-    format: Optional[str] = Field(None, description="Формат документа")
-    language: Optional[str] = Field(None, description="Язык спецификации")
-    status: Optional[str] = Field(None, description="Статус спецификации")
+    format: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Формат документа"
+    )
+    language: Optional[str] = Field(
+        None, max_length=10, description="Язык спецификации"
+    )
+    status: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Статус спецификации"
+    )
     template_id: Optional[int] = Field(
         None, gt=0, description="ID шаблона спецификации"
     )
 
 
-class SpecInDBBase(SpecBase):
-    """Базовая схема спецификации с данными из БД."""
-
-    id: int
-    project_id: int
-    content: Optional[Dict[str, Any]] = None
-    status: str = "draft"
-    template_id: Optional[int] = None
-    generated_by: Optional[int] = None
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-
-
-class Spec(SpecInDBBase):
+class Spec(ResponseSchema, SpecBase, ProjectRelatedSchema):
     """Схема спецификации для ответов API."""
 
-    pass
+    content: Optional[Dict[str, Any]] = Field(
+        None, description="Содержимое спецификации"
+    )
+    status: str = Field(..., description="Статус спецификации")
+    template_id: Optional[int] = Field(None, description="ID шаблона")
+    generated_by: Optional[int] = Field(None, description="ID создателя")
 
 
 class SpecWithRequirements(Spec):
     """Схема спецификации с информацией о требованиях."""
 
-    requirements_count: int = 0
-
-    @field_validator("requirements_count")
-    def validate_requirements_count(cls, v):
-        """Валидация количества требований"""
-        if v < 0:
-            raise ValueError("Requirements count cannot be negative")
-        return v
-
-
-class SpecInDB(SpecInDBBase):
-    """Схема спецификации в БД."""
-
-    pass
+    requirements_count: int = Field(0, ge=0, description="Количество требований")
 
 
 class SpecDetailed(Spec):
     """Детальная схема спецификации с дополнительной информацией."""
 
-    project_name: Optional[str] = None
-    generated_by_name: Optional[str] = None
-    requirements_count: int = 0
+    project_name: Optional[str] = Field(
+        None, max_length=FieldLimits.MEDIUM_STRING_MAX, description="Название проекта"
+    )
+    generated_by_name: Optional[str] = Field(
+        None, max_length=FieldLimits.MEDIUM_STRING_MAX, description="Имя создателя"
+    )
+    requirements_count: int = Field(0, ge=0, description="Количество требований")
 
-    @field_validator("requirements_count")
-    def validate_requirements_count(cls, v):
-        """Валидация количества требований"""
-        if v < 0:
-            raise ValueError("Requirements count cannot be negative")
-        return v
+
+# === Псевдонимы для обратной совместимости ===
+
+SpecificationGenerationResponse = SpecDetailed  # Ответ генерации спецификации
+SpecificationGenerationOptions = SpecCreate  # Опции генерации спецификации

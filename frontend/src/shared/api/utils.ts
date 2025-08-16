@@ -2,7 +2,7 @@
  * API utilities
  */
 
-import type { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosResponse } from "axios";
 
 /**
  * Обработчик ошибок API
@@ -10,14 +10,14 @@ import type { AxiosError, AxiosResponse } from 'axios';
 export const handleApiError = (error: AxiosError): string => {
   if (error.response?.data) {
     const data = error.response.data as any;
-    return data.detail || data.message || 'Произошла ошибка API';
+    return data.detail || data.message || "Произошла ошибка API";
   }
-  
+
   if (error.request) {
-    return 'Нет ответа от сервера';
+    return "Нет ответа от сервера";
   }
-  
-  return error.message || 'Неизвестная ошибка';
+
+  return error.message || "Неизвестная ошибка";
 };
 
 /**
@@ -37,9 +37,11 @@ export const extractResponseData = <T>(response: AxiosResponse<T>): T => {
 /**
  * Создание заголовков для запроса
  */
-export const createHeaders = (additionalHeaders: Record<string, string> = {}): Record<string, string> => {
+export const createHeaders = (
+  additionalHeaders: Record<string, string> = {}
+): Record<string, string> => {
   return {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...additionalHeaders,
   };
 };
@@ -47,14 +49,17 @@ export const createHeaders = (additionalHeaders: Record<string, string> = {}): R
 /**
  * Формирование URL с параметрами
  */
-export const buildUrl = (baseUrl: string, params: Record<string, any> = {}): string => {
+export const buildUrl = (
+  baseUrl: string,
+  params: Record<string, any> = {}
+): string => {
   const url = new URL(baseUrl);
-  
+
   Object.entries(params).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
       url.searchParams.append(key, String(value));
     }
   });
-  
+
   return url.toString();
-}; 
+};

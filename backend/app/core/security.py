@@ -14,8 +14,10 @@ from typing import Any, Dict, List, Optional, Union
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from fastapi import HTTPException, status
 
 from app.core.config import settings
+from app.core.constants import Permission, RoleScope
 
 # === Enums для типов токенов ===
 
@@ -219,6 +221,7 @@ class JWTTokenManager:
     def create_access_token(
         subject: Union[str, Any],
         user_id: int,
+        roles: Optional[List[str]] = None,
         scopes: Optional[List[str]] = None,
         expires_delta: Optional[timedelta] = None,
     ) -> str:
@@ -228,6 +231,7 @@ class JWTTokenManager:
         Args:
             subject: Субъект токена (обычно email пользователя)
             user_id: ID пользователя
+            roles: Роли пользователя
             scopes: Права доступа
             expires_delta: Время жизни токена
 
@@ -249,6 +253,7 @@ class JWTTokenManager:
             "exp": int(expire.timestamp()),
             "iat": int(now.timestamp()),
             "type": TokenType.ACCESS,
+            "roles": roles or [],
             "scopes": scopes or [],
         }
 
@@ -325,6 +330,41 @@ class JWTTokenManager:
             # Проверяем тип токена
             if payload.get("type") != token_type:
                 return None
+
+            return payload
+        except JWTError:
+            return None
+
+    @staticmethod
+    def decode_token(
+        token: str, token_type: TokenType = TokenType.ACCESS, verify: bool = True
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Декодировать JWT токен с опциональной верификацией.
+
+        Args:
+            token: JWT токен
+            token_type: Тип токена для проверки
+            verify: Выполнять ли верификацию токена
+
+        Returns:
+            Optional[Dict[str, Any]]: Декодированные данные токена или None
+        """
+        try:
+            if verify:
+                # Полная верификация токена
+                payload = jwt.decode(
+                    token,
+                    settings.security.secret_key,
+                    algorithms=[ALGORITHMS[token_type]],
+                )
+
+                # Проверяем тип токена
+                if payload.get("type") != token_type:
+                    return None
+            else:
+                # Декодирование без верификации (для получения информации)
+                payload = jwt.decode(token, options={"verify_signature": False})
 
             return payload
         except JWTError:
@@ -716,3 +756,527 @@ class PermissionChecker:
 
 # Экземпляр проверщика прав
 permission_checker = PermissionChecker()
+
+
+# === Enhanced Role System Security ===
+
+
+class EnhancedRolePermissionChecker:
+    """
+    Проверщик прав доступа для Enhanced Role System.
+    Интегрируется с системой ролей для проверки разрешений.
+    """
+
+    @staticmethod
+    def get_user_role_assignments(user) -> List[Dict[str, Any]]:
+        """
+        Получить назначения ролей пользователя.
+
+        Args:
+            user: Объект пользователя
+
+        Returns:
+            List[Dict[str, Any]]: Список назначений ролей
+        """
+        if hasattr(user, "role_assignments") and user.role_assignments:
+            assignments = []
+            for assignment in user.role_assignments:
+                # Check if assignment is active
+                if not assignment.is_active:
+                    continue
+
+                # Check if role exists and is active
+                if not assignment.role or not assignment.role.is_active:
+                    continue
+
+                # Get permissions from role
+                permissions = []
+                if assignment.role.permissions_config:
+                    permissions = assignment.role.permissions_config.get(
+                        "permissions", []
+                    )
+
+                assignments.append(
+                    {
+                        "role": assignment.role,
+                        "assignment": assignment,
+                        "is_valid": True,  # We already validated above
+                        "permissions": permissions,
+                        "role_name": assignment.role.name,  # Added role_name
+                    }
+                )
+            return assignments
+        return []
+
+    @staticmethod
+    def has_permission(
+        user,
+        permission: Union[str, Permission],
+        scope: Optional[RoleScope] = None,
+        context_id: Optional[int] = None,
+    ) -> bool:
+        """
+        Проверить наличие разрешения у пользователя.
+
+        Args:
+            user: Объект пользователя
+            permission: Требуемое разрешение
+            scope: Область действия (опционально)
+            context_id: ID контекста (опционально)
+
+        Returns:
+            bool: True если разрешение есть
+        """
+        # Преобразуем в строку если передан enum
+        permission_str = (
+            permission.value if isinstance(permission, Permission) else permission
+        )
+
+        # Проверяем системного администратора
+        if EnhancedRolePermissionChecker.is_system_admin(user):
+            return True
+
+        # Получаем назначения ролей пользователя
+        role_assignments = EnhancedRolePermissionChecker.get_user_role_assignments(user)
+
+        for assignment_data in role_assignments:
+            if not assignment_data["is_valid"]:
+                continue
+
+            role = assignment_data["role"]
+            assignment = assignment_data["assignment"]
+            permissions = assignment_data["permissions"]
+
+            # Проверяем область действия если указана
+            if scope:
+                role_scope = getattr(role, "scope", None)
+                if role_scope and role_scope != scope.value:
+                    # Проверяем иерархию ролей (система > компания > департамент > команда > проект)
+                    if not EnhancedRolePermissionChecker._is_scope_hierarchical(
+                        role_scope, scope.value
+                    ):
+                        continue
+
+                # Проверяем контекст если указан
+                if context_id and hasattr(assignment, "company_id"):
+                    assignment_context = (
+                        EnhancedRolePermissionChecker._get_assignment_context(
+                            assignment, scope
+                        )
+                    )
+                    if assignment_context and assignment_context != context_id:
+                        continue
+
+            # Проверяем наличие разрешения
+            if permission_str in permissions:
+                return True
+
+        return False
+
+    @staticmethod
+    def has_any_permission(
+        user,
+        permissions: List[Union[str, Permission]],
+        scope: Optional[RoleScope] = None,
+        context_id: Optional[int] = None,
+    ) -> bool:
+        """
+        Проверить наличие любого из указанных разрешений.
+
+        Args:
+            user: Объект пользователя
+            permissions: Список требуемых разрешений
+            scope: Область действия (опционально)
+            context_id: ID контекста (опционально)
+
+        Returns:
+            bool: True если есть хотя бы одно разрешение
+        """
+        return any(
+            EnhancedRolePermissionChecker.has_permission(user, perm, scope, context_id)
+            for perm in permissions
+        )
+
+    @staticmethod
+    def has_all_permissions(
+        user,
+        permissions: List[Union[str, Permission]],
+        scope: Optional[RoleScope] = None,
+        context_id: Optional[int] = None,
+    ) -> bool:
+        """
+        Проверить наличие всех указанных разрешений.
+
+        Args:
+            user: Объект пользователя
+            permissions: Список требуемых разрешений
+            scope: Область действия (опционально)
+            context_id: ID контекста (опционально)
+
+        Returns:
+            bool: True если есть все разрешения
+        """
+        return all(
+            EnhancedRolePermissionChecker.has_permission(user, perm, scope, context_id)
+            for perm in permissions
+        )
+
+    @staticmethod
+    def get_user_permissions(
+        user, scope: Optional[RoleScope] = None, context_id: Optional[int] = None
+    ) -> List[str]:
+        """
+        Получить все разрешения пользователя.
+
+        Args:
+            user: Объект пользователя
+            scope: Область действия (опционально)
+            context_id: ID контекста (опционально)
+
+        Returns:
+            List[str]: Список разрешений
+        """
+        # Проверяем системного администратора
+        if EnhancedRolePermissionChecker.is_system_admin(user):
+            return [perm.value for perm in Permission]
+
+        permissions = set()
+        role_assignments = EnhancedRolePermissionChecker.get_user_role_assignments(user)
+
+        for assignment_data in role_assignments:
+            if not assignment_data["is_valid"]:
+                continue
+
+            role = assignment_data["role"]
+            assignment = assignment_data["assignment"]
+            role_permissions = assignment_data["permissions"]
+
+            # Проверяем область действия если указана
+            if scope:
+                role_scope = getattr(role, "scope", None)
+                if role_scope and role_scope != scope.value:
+                    if not EnhancedRolePermissionChecker._is_scope_hierarchical(
+                        role_scope, scope.value
+                    ):
+                        continue
+
+                # Проверяем контекст если указан
+                if context_id and hasattr(assignment, "company_id"):
+                    assignment_context = (
+                        EnhancedRolePermissionChecker._get_assignment_context(
+                            assignment, scope
+                        )
+                    )
+                    if assignment_context and assignment_context != context_id:
+                        continue
+
+            permissions.update(role_permissions)
+
+        return list(permissions)
+
+    @staticmethod
+    def is_system_admin(user) -> bool:
+        """
+        Проверить является ли пользователь системным администратором.
+
+        Args:
+            user: Объект пользователя
+
+        Returns:
+            bool: True если системный администратор
+        """
+        # Проверяем legacy флаги
+        if hasattr(user, "is_superuser") and user.is_superuser:
+            return True
+
+        # Проверяем через enhanced role system (избегаем рекурсии)
+        role_assignments = EnhancedRolePermissionChecker.get_user_role_assignments(user)
+        for assignment_data in role_assignments:
+            if assignment_data["is_valid"]:
+                # Проверяем по имени роли (system_admin)
+                role_name = assignment_data.get("role_name", "")
+                if role_name == "system_admin":
+                    return True
+
+                # Проверяем по разрешениям
+                permissions = assignment_data["permissions"]
+                if Permission.MANAGE_SYSTEM.value in permissions:
+                    return True
+
+        return False
+
+    @staticmethod
+    def is_company_admin(user, company_id: Optional[int] = None) -> bool:
+        """
+        Проверить является ли пользователь администратором компании.
+
+        Args:
+            user: Объект пользователя
+            company_id: ID компании (опционально)
+
+        Returns:
+            bool: True если администратор компании
+        """
+        return EnhancedRolePermissionChecker.has_permission(
+            user, Permission.MANAGE_COMPANY, RoleScope.COMPANY, company_id
+        )
+
+    @staticmethod
+    def can_manage_users(
+        user, scope: RoleScope = RoleScope.SYSTEM, context_id: Optional[int] = None
+    ) -> bool:
+        """
+        Проверить может ли пользователь управлять другими пользователями.
+
+        Args:
+            user: Объект пользователя
+            scope: Область действия
+            context_id: ID контекста
+
+        Returns:
+            bool: True если может управлять пользователями
+        """
+        if scope == RoleScope.SYSTEM:
+            return EnhancedRolePermissionChecker.has_permission(
+                user, Permission.MANAGE_SYSTEM
+            )
+        elif scope == RoleScope.COMPANY:
+            return EnhancedRolePermissionChecker.has_permission(
+                user, Permission.MANAGE_COMPANY_USERS, scope, context_id
+            )
+        elif scope == RoleScope.TEAM:
+            return EnhancedRolePermissionChecker.has_permission(
+                user, Permission.MANAGE_TEAM_MEMBERS, scope, context_id
+            )
+        elif scope == RoleScope.PROJECT:
+            return EnhancedRolePermissionChecker.has_permission(
+                user, Permission.MANAGE_PROJECT_MEMBERS, scope, context_id
+            )
+        return False
+
+    @staticmethod
+    def _is_scope_hierarchical(user_scope: str, required_scope: str) -> bool:
+        """
+        Проверить иерархию областей действия.
+        Системные роли имеют доступ ко всем уровням ниже.
+
+        Args:
+            user_scope: Область роли пользователя
+            required_scope: Требуемая область
+
+        Returns:
+            bool: True если роль охватывает требуемую область
+        """
+        hierarchy = {
+            "system": 5,
+            "company": 4,
+            "department": 3,
+            "team": 2,
+            "project": 1,
+            "resource": 0,
+        }
+
+        user_level = hierarchy.get(user_scope, 0)
+        required_level = hierarchy.get(required_scope, 0)
+
+        return user_level >= required_level
+
+    @staticmethod
+    def _get_assignment_context(assignment, scope: RoleScope) -> Optional[int]:
+        """
+        Получить контекст назначения роли в зависимости от области.
+
+        Args:
+            assignment: Объект назначения роли
+            scope: Область действия
+
+        Returns:
+            Optional[int]: ID контекста или None
+        """
+        if scope == RoleScope.COMPANY:
+            return getattr(assignment, "company_id", None)
+        elif scope == RoleScope.DEPARTMENT:
+            return getattr(assignment, "department_id", None)
+        elif scope == RoleScope.TEAM:
+            return getattr(assignment, "team_id", None)
+        elif scope == RoleScope.PROJECT:
+            return getattr(assignment, "project_id", None)
+        return None
+
+
+class PermissionDecorator:
+    """
+    Декоратор для проверки разрешений в эндпоинтах.
+    """
+
+    @staticmethod
+    def require_permission(
+        permission: Union[str, Permission],
+        scope: Optional[RoleScope] = None,
+        context_param: Optional[str] = None,
+    ):
+        """
+        Декоратор для проверки разрешения.
+
+        Args:
+            permission: Требуемое разрешение
+            scope: Область действия
+            context_param: Имя параметра для получения context_id
+        """
+
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                # Получаем пользователя из зависимостей FastAPI
+                current_user = kwargs.get("current_user")
+                if not current_user:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Authentication required",
+                    )
+
+                # Получаем context_id если указан параметр
+                context_id = None
+                if context_param and context_param in kwargs:
+                    context_id = kwargs[context_param]
+
+                # Проверяем разрешение
+                if not EnhancedRolePermissionChecker.has_permission(
+                    current_user, permission, scope, context_id
+                ):
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Insufficient permissions",
+                    )
+
+                return func(*args, **kwargs)
+
+            return wrapper
+
+        return decorator
+
+    @staticmethod
+    def require_any_permission(
+        permissions: List[Union[str, Permission]],
+        scope: Optional[RoleScope] = None,
+        context_param: Optional[str] = None,
+    ):
+        """
+        Декоратор для проверки любого из разрешений.
+        """
+
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                current_user = kwargs.get("current_user")
+                if not current_user:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Authentication required",
+                    )
+
+                context_id = None
+                if context_param and context_param in kwargs:
+                    context_id = kwargs[context_param]
+
+                if not EnhancedRolePermissionChecker.has_any_permission(
+                    current_user, permissions, scope, context_id
+                ):
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Insufficient permissions",
+                    )
+
+                return func(*args, **kwargs)
+
+            return wrapper
+
+        return decorator
+
+
+# Создаем экземпляры для использования
+enhanced_permission_checker = EnhancedRolePermissionChecker()
+
+
+# === Utility Functions for Enhanced Role System ===
+
+
+def check_user_permission(
+    user,
+    permission: Union[str, Permission],
+    scope: Optional[RoleScope] = None,
+    context_id: Optional[int] = None,
+) -> bool:
+    """
+    Утилитарная функция для проверки разрешений пользователя.
+
+    Args:
+        user: Объект пользователя
+        permission: Требуемое разрешение
+        scope: Область действия (опционально)
+        context_id: ID контекста (опционально)
+
+    Returns:
+        bool: True если разрешение есть
+    """
+    return EnhancedRolePermissionChecker.has_permission(
+        user, permission, scope, context_id
+    )
+
+
+def get_user_permissions(
+    user, scope: Optional[RoleScope] = None, context_id: Optional[int] = None
+) -> List[str]:
+    """
+    Утилитарная функция для получения разрешений пользователя.
+
+    Args:
+        user: Объект пользователя
+        scope: Область действия (опционально)
+        context_id: ID контекста (опционально)
+
+    Returns:
+        List[str]: Список разрешений
+    """
+    return EnhancedRolePermissionChecker.get_user_permissions(user, scope, context_id)
+
+
+def require_system_admin(user) -> bool:
+    """
+    Проверить является ли пользователь системным администратором.
+
+    Args:
+        user: Объект пользователя
+
+    Returns:
+        bool: True если системный администратор
+
+    Raises:
+        HTTPException: Если нет прав системного администратора
+    """
+    if not EnhancedRolePermissionChecker.is_system_admin(user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="System administrator privileges required",
+        )
+    return True
+
+
+def require_company_admin(user, company_id: Optional[int] = None) -> bool:
+    """
+    Проверить является ли пользователь администратором компании.
+
+    Args:
+        user: Объект пользователя
+        company_id: ID компании (опционально)
+
+    Returns:
+        bool: True если администратор компании
+
+    Raises:
+        HTTPException: Если нет прав администратора компании
+    """
+    if not EnhancedRolePermissionChecker.is_company_admin(user, company_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Company administrator privileges required",
+        )
+    return True

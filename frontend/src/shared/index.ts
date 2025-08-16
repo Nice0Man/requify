@@ -1,7 +1,13 @@
-// Shared components, utilities, and types
-export * from './ui';
-export * from './api';
-export * from './types';
-export * from './utils';
-export * from './hooks';
-export * from './lib'; 
+/**
+ * Shared layer exports
+ * Экспорт общих компонентов и утилит
+ */
+
+export * from "./api";
+export * from "./components";
+export * from "./contexts";
+export * from "./ui";
+export * from "./hooks";
+export * from "./lib";
+export * from "./utils";
+export * from "./types"; 

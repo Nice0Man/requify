@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import {
   Box,
   IconButton,
@@ -14,14 +14,10 @@ import {
   Divider,
   Button,
   Chip,
-  Avatar,
   Tabs,
   Tab,
   CircularProgress,
-  Alert,
   Tooltip,
-  Card,
-  CardContent,
 } from "@mui/material";
 import {
   Notifications as NotificationsIcon,
@@ -37,15 +33,30 @@ import {
 } from "@mui/icons-material";
 import { format, isToday, isYesterday } from "date-fns";
 import { ru } from "date-fns/locale";
-import {
-  useNotifications,
-  useMarkAsRead,
-  useMarkAllAsRead,
-  useDeleteNotification,
-  useArchiveNotification,
-  useUnreadCount,
-} from "@/features/notification-management/model/useNotificationQuery";
-import type { Notification } from "@/features/notification-management/api/notificationApi";
+// TODO: Заменить на shared типы и хуки
+// import {
+//   useNotifications,
+//   useMarkAsRead,
+//   useMarkAllAsRead,
+//   useDeleteNotification,
+//   useArchiveNotification,
+//   useUnreadCount,
+// } from "@/features/notifications/model/useNotificationQuery";
+
+// Временные заглушки для демонстрации
+export interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+  archived: boolean;
+  status?: string;
+  actionUrl?: string;
+  priority?: string;
+  createdAt?: Date;
+}
 
 interface NotificationCenterProps {
   onSettingsClick?: () => void;
@@ -64,19 +75,38 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const open = Boolean(anchorEl);
 
   // Используем хуки для получения уведомлений в реальном времени
-  const { data: allNotifications = [], isLoading } = useNotifications();
-  const { data: unreadCount = 0 } = useUnreadCount();
+  // TODO: Заменить на настоящие хуки из features когда они будут переданы через props
+  const allNotifications: Notification[] = [];
+  const isLoading = false;
+  const unreadCount = 0;
 
-  // Мутации
-  const markAsRead = useMarkAsRead();
-  const markAllAsRead = useMarkAllAsRead();
-  const deleteNotification = useDeleteNotification();
-  const archiveNotification = useArchiveNotification();
+  // Заглушки для мутаций
+  const markAsRead = { 
+    mutate: (id: string) => console.log('Mark as read:', id),
+    mutateAsync: async (id: string) => console.log('Mark as read async:', id)
+  };
+  const markAllAsRead = { 
+    mutate: () => console.log('Mark all as read'),
+    mutateAsync: async () => console.log('Mark all as read async'),
+    isPending: false
+  };
+  const deleteNotification = { 
+    mutate: (id: string) => console.log('Delete:', id),
+    mutateAsync: async (id: string) => console.log('Delete async:', id)
+  };
+  const archiveNotification = { 
+    mutate: (id: string) => console.log('Archive:', id),
+    mutateAsync: async (id: string) => console.log('Archive async:', id)
+  };
 
   // Фильтруем уведомления по статусу
-  const unreadNotifications = allNotifications.filter(n => n.status === 'unread');
-  const readNotifications = allNotifications.filter(n => n.status === 'read');
-  const archivedNotifications = allNotifications.filter(n => n.status === 'archived');
+  const unreadNotifications = allNotifications.filter(
+    (n) => n.status === "unread"
+  );
+  const readNotifications = allNotifications.filter((n) => n.status === "read");
+  const archivedNotifications = allNotifications.filter(
+    (n) => n.status === "archived"
+  );
   const latestNotifications = unreadNotifications.slice(0, 5);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -178,22 +208,30 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
     if (isToday(date)) {
       return format(date, "HH:mm", { locale: ru });
     } else if (isYesterday(date)) {
-      return t('common.yesterday') + " " + format(date, "HH:mm", { locale: ru });
+      return (
+        t("common.yesterday") + " " + format(date, "HH:mm", { locale: ru })
+      );
     } else {
       return format(date, "dd.MM.yyyy HH:mm", { locale: ru });
     }
   };
 
-  const TabPanel = ({ children, value, index }: { children: React.ReactNode; value: number; index: number }) => (
-    <div hidden={value !== index}>{value === index && children}</div>
-  );
+  const TabPanel = ({
+    children,
+    value,
+    index,
+  }: {
+    children: React.ReactNode;
+    value: number;
+    index: number;
+  }) => <div hidden={value !== index}>{value === index && children}</div>;
 
   const renderNotificationList = (notificationList: Notification[]) => {
     if (notificationList.length === 0) {
       return (
         <Box sx={{ textAlign: "center", p: 4 }}>
           <Typography variant="body2" color="text.secondary">
-            {t('notifications.noNotifications')}
+            {t("notifications.noNotifications")}
           </Typography>
         </Box>
       );
@@ -216,10 +254,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 },
               }}
               onClick={() =>
-                handleNotificationClick(
-                  notification.id,
-                  notification.actionUrl
-                )
+                handleNotificationClick(notification.id, notification.actionUrl)
               }
             >
               <ListItemIcon sx={{ minWidth: 40, mt: 1 }}>
@@ -238,8 +273,10 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       {notification.title}
                     </Typography>
                     <Chip
-                      label={t(`notifications.priority.${notification.priority}`)}
-                      color={getPriorityColor(notification.priority) as any}
+                      label={t(
+                        `notifications.priority.${notification.priority}`
+                      )}
+                      color={getPriorityColor(notification.priority || 'low') as any}
                       size="small"
                     />
                   </Box>
@@ -250,7 +287,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                       {notification.message}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {formatNotificationDate(notification.createdAt)}
+                      {formatNotificationDate((notification.createdAt || notification.timestamp)?.toString() || '')}
                     </Typography>
                   </Box>
                 }
@@ -285,7 +322,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   return (
     <>
-      <Tooltip title={t('notifications.title')}>
+      <Tooltip title={t("notifications.title")}>
         <IconButton color="inherit" onClick={handleClick} size="large">
           <Badge badgeContent={unreadCount} color="error">
             <NotificationsIcon />
@@ -321,7 +358,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
               alignItems: "center",
             }}
           >
-            <Typography variant="h6">{t('notifications.title')}</Typography>
+            <Typography variant="h6">{t("notifications.title")}</Typography>
             <Box>
               {unreadCount > 0 && (
                 <Button
@@ -336,7 +373,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                     )
                   }
                 >
-                  {t('notifications.markAllAsRead')}
+                  {t("notifications.markAllAsRead")}
                 </Button>
               )}
               {onSettingsClick && (
@@ -354,9 +391,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
           variant="fullWidth"
           sx={{ borderBottom: 1, borderColor: "divider" }}
         >
-          <Tab label={`${t('notifications.new')} (${unreadCount})`} />
-          <Tab label={t('notifications.read')} />
-          <Tab label={t('notifications.archived')} />
+          <Tab label={`${t("notifications.new")} (${unreadCount})`} />
+          <Tab label={t("notifications.read")} />
+          <Tab label={t("notifications.archived")} />
         </Tabs>
 
         <Box sx={{ height: 400, overflow: "auto" }}>
@@ -392,7 +429,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 // TODO: открыть полную страницу уведомлений
               }}
             >
-              {t('notifications.showAll')}
+              {t("notifications.showAll")}
             </Button>
           </Box>
         )}

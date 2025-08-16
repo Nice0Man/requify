@@ -4,8 +4,23 @@
 Содержит общие операции Create, Read, Update, Delete.
 """
 
+<<<<<<< HEAD
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Generic, List, Optional, Protocol, Type, TypeVar, Union
+=======
+from typing import (
+    Any,
+    Dict,
+    Generic,
+    List,
+    Optional,
+    Protocol,
+    Type,
+    TypeVar,
+    Union,
+)
+
+>>>>>>> dev-backend
 
 from pydantic import BaseModel
 from sqlalchemy import delete, func, select, update

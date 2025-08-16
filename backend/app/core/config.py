@@ -131,6 +131,29 @@ class TestDatabaseConfig(BaseModel):
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}?command_timeout={self.command_timeout}"
 
 
+class Auth0Config(BaseModel):
+    """Настройки Auth0 OAuth2."""
+
+    domain: str = ""
+    client_id: str = ""
+    client_secret: str = ""
+    audience: str = "https://api.requify.local"
+    algorithms: list[str] = ["RS256"]
+    issuer: str = ""  # Will be set based on domain
+
+    # Настройки для управления пользователями
+    management_client_id: str = ""
+    management_client_secret: str = ""
+
+    # Включение/выключение Auth0
+    enabled: bool = False
+
+    def model_post_init(self, __context):
+        """Автоматически устанавливает issuer на основе domain."""
+        if self.domain and self.domain.strip() and not self.issuer:
+            self.issuer = f"https://{self.domain.strip()}/"
+
+
 class SecurityConfig(BaseModel):
     """Настройки безопасности."""
 
@@ -139,7 +162,7 @@ class SecurityConfig(BaseModel):
     algorithm: str = "HS256"
 
     # URL фронтенда для ссылок в email
-    frontend_url: str = "http://localhost:3000"
+    frontend_url: str = "http://localhost"
 
     # Настройки access токенов
     access_token_expire_minutes: int = 30
@@ -191,8 +214,8 @@ class SecurityConfig(BaseModel):
 
 
 class AdminConfig(BaseModel):
-    email: str = "admin@requify.local"
-    password: str = "admin123"
+    email: str = "admin@example.com"
+    password: str = "SecurePass123!"
     name: str = "Admin User"
 
 
@@ -201,6 +224,15 @@ class IntegrationsConfig(BaseModel):
     testing_system_api_key: str = "test-api-key-change-in-production"
     project_management_api_url: str = "http://localhost:8002/api/v1"
     project_management_api_key: str = "project-api-key-change-in-production"
+    file_storage_api_url: str = "http://localhost:8003/api/v1"
+    file_storage_api_key: str = "file-storage-api-key-change-in-production"
+    email_service_api_url: str = "http://localhost:8004/api/v1"
+    email_service_api_key: str = "email-service-api-key-change-in-production"
+    notification_service_api_url: str = "http://localhost:8005/api/v1"
+    notification_service_api_key: str = (
+        "notification-service-api-key-change-in-production"
+    )
+    security_service_api_url: str = "http://localhost:8006/api/v1"
 
 
 class LoggingConfig(BaseModel):
@@ -229,9 +261,87 @@ class EmailConfig(BaseModel):
 
 
 class FileStorageConfig(BaseModel):
+    # Local storage settings
     upload_dir: str = "uploads"
-    max_file_size: int = 10485760
-    allowed_extensions: str = "pdf,doc,docx,txt,jpg,jpeg,png,gif"
+    max_file_size: int = 10485760  # 10MB default
+    allowed_extensions: str = "pdf,doc,docx,txt,jpg,jpeg,png,gif,webp,svg"
+
+    # Avatar specific settings
+    avatar_max_size: int = 2097152  # 2MB for avatars
+    avatar_allowed_extensions: str = "jpg,jpeg,png,webp"
+    avatar_resize_dimensions: str = (
+        "128x128,256x256,512x512"  # Multiple sizes for optimization
+    )
+
+    # MinIO Object Storage settings
+    use_minio: bool = True
+    minio_endpoint: str = "localhost:9000"
+    minio_access_key: str = "admin"
+    minio_secret_key: str = "minioadmin123"
+    minio_secure: bool = False  # True for HTTPS
+    minio_region: str = "us-east-1"
+
+    # MinIO bucket configuration
+    minio_bucket_uploads: str = "requify-uploads"
+    minio_bucket_avatars: str = "requify-avatars"
+    minio_bucket_documents: str = "requify-documents"
+
+    # CDN Configuration
+    cdn_enabled: bool = False  # Disable CDN when using local storage
+    cdn_base_url: str = (
+        "http://localhost"  # NGINX CDN proxy (изменил порт с 8080 на 80)
+    )
+    cdn_avatar_path: str = "/cdn/avatars"
+    cdn_uploads_path: str = "/cdn/uploads"
+    cdn_documents_path: str = "/cdn/documents"
+    cdn_static_path: str = "/cdn/static"  # Добавил новый путь для статических файлов
+    cdn_images_path: str = "/cdn/images"  # Добавил новый путь для изображений
+
+    # Legacy blob storage settings (for Azure/AWS migration)
+    use_blob_storage: bool = False
+    blob_storage_container: str = "requify-uploads"
+    blob_storage_cdn_url: str = ""
+    blob_storage_connection_string: str = ""
+
+    # File organization
+    organize_by_date: bool = True  # uploads/2025/01/28/file.jpg
+    organize_by_user: bool = True  # uploads/users/{user_id}/avatar.jpg
+
+    # Security settings
+    enable_virus_scan: bool = True  # Включаем по умолчанию
+    quarantine_dir: str = "quarantine"
+
+    # Антивирусные настройки
+    virus_scan_engine: str = "clamav"  # clamav, pattern_match, both
+    clamav_socket_path: str = "/var/run/clamav/clamd.ctl"  # Unix socket для ClamAV
+    clamav_host: str = "localhost"
+    clamav_port: int = 3310
+    clamav_timeout: int = 30
+
+    # Настройки проверки паттернов
+    scan_patterns_enabled: bool = True
+    scan_magic_bytes: bool = True  # Проверка магических байтов
+    scan_embedded_content: bool = True  # Проверка встроенного контента
+
+    # Логирование безопасности
+    security_log_enabled: bool = True
+    security_log_file: str = "logs/security.log"
+    security_log_level: str = "WARNING"
+
+    # Уведомления администратора
+    admin_notifications_enabled: bool = True
+    admin_notification_methods: str = "email,log"  # email, log, webhook
+    admin_notification_threshold: int = 3  # Количество инцидентов для уведомления
+    admin_notification_webhook_url: str = ""
+
+    # Карантин
+    quarantine_retention_days: int = 30  # Сколько дней хранить файлы в карантине
+    auto_delete_quarantine: bool = True
+
+    # Cache and performance
+    cache_control_max_age: int = 86400  # 24 hours
+    avatar_cache_max_age: int = 604800  # 7 days
+    enable_compression: bool = True
 
 
 class AccessToken(BaseModel):
@@ -251,7 +361,7 @@ class Settings(BaseSettings):
     )
 
     # Main app config
-    app_config: RunConfig = Field(default_factory=RunConfig)
+    run: RunConfig = Field(default_factory=RunConfig)
 
     # Database configs
     db: DatabaseConfig = Field(default_factory=DatabaseConfig)
@@ -259,6 +369,9 @@ class Settings(BaseSettings):
 
     # Security
     security: SecurityConfig = Field(default_factory=SecurityConfig)
+
+    # Auth0 OAuth2
+    auth0: Auth0Config = Field(default_factory=Auth0Config)
 
     # CORS origins
     cors_origins: List[str] = [
@@ -298,70 +411,81 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context):
         """Post-initialization to handle legacy variables and setup derived fields"""
-        from urllib.parse import urlparse
+        try:
+            from urllib.parse import urlparse
 
-        # Handle legacy database URIs if they exist
-        if self.database_uri:
-            # Parse legacy URI format for main DB
-            parsed = urlparse(self.database_uri)
-            if parsed.hostname:
-                self.db.host = parsed.hostname
-            if parsed.port:
-                self.db.port = parsed.port
-            if parsed.username:
-                self.db.user = parsed.username
-            if parsed.password:
-                self.db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.db.name = parsed.path[1:]  # Remove leading '/'
+            # Handle legacy database URIs if they exist
+            if self.database_uri:
+                # Parse legacy URI format for main DB
+                parsed = urlparse(self.database_uri)
+                if parsed.hostname:
+                    self.db.host = parsed.hostname
+                if parsed.port:
+                    self.db.port = parsed.port
+                if parsed.username:
+                    self.db.user = parsed.username
+                if parsed.password:
+                    self.db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.db.name = parsed.path[1:]  # Remove leading '/'
 
-        if self.async_database_uri:
-            # Parse legacy URI format for main DB (async)
-            parsed = urlparse(self.async_database_uri)
-            if parsed.hostname:
-                self.db.host = parsed.hostname
-            if parsed.port:
-                self.db.port = parsed.port
-            if parsed.username:
-                self.db.user = parsed.username
-            if parsed.password:
-                self.db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.db.name = parsed.path[1:]
+            if self.async_database_uri:
+                # Parse legacy URI format for main DB (async)
+                parsed = urlparse(self.async_database_uri)
+                if parsed.hostname:
+                    self.db.host = parsed.hostname
+                if parsed.port:
+                    self.db.port = parsed.port
+                if parsed.username:
+                    self.db.user = parsed.username
+                if parsed.password:
+                    self.db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.db.name = parsed.path[1:]
 
-        if self.test_database_uri:
-            # Parse legacy URI format for test DB
-            parsed = urlparse(self.test_database_uri)
-            if parsed.hostname:
-                self.test_db.host = parsed.hostname
-            if parsed.port:
-                self.test_db.port = parsed.port
-            if parsed.username:
-                self.test_db.user = parsed.username
-            if parsed.password:
-                self.test_db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.test_db.name = parsed.path[1:]
+            if self.test_database_uri:
+                # Parse legacy URI format for test DB
+                parsed = urlparse(self.test_database_uri)
+                if parsed.hostname:
+                    self.test_db.host = parsed.hostname
+                if parsed.port:
+                    self.test_db.port = parsed.port
+                if parsed.username:
+                    self.test_db.user = parsed.username
+                if parsed.password:
+                    self.test_db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.test_db.name = parsed.path[1:]
 
-        if self.test_async_database_uri:
-            # Parse legacy URI format for test DB (async)
-            parsed = urlparse(self.test_async_database_uri)
-            if parsed.hostname:
-                self.test_db.host = parsed.hostname
-            if parsed.port:
-                self.test_db.port = parsed.port
-            if parsed.username:
-                self.test_db.user = parsed.username
-            if parsed.password:
-                self.test_db.password = parsed.password
-            if parsed.path and len(parsed.path) > 1:
-                self.test_db.name = parsed.path[1:]
+            if self.test_async_database_uri:
+                # Parse legacy URI format for test DB (async)
+                parsed = urlparse(self.test_async_database_uri)
+                if parsed.hostname:
+                    self.test_db.host = parsed.hostname
+                if parsed.port:
+                    self.test_db.port = parsed.port
+                if parsed.username:
+                    self.test_db.user = parsed.username
+                if parsed.password:
+                    self.test_db.password = parsed.password
+                if parsed.path and len(parsed.path) > 1:
+                    self.test_db.name = parsed.path[1:]
 
-        # Validate critical settings
-        self._validate_security_settings()
-        self._validate_database_settings()
-        self._validate_email_settings()
-        self._validate_file_storage_settings()
+            # Validate critical settings (skip in development if validation fails)
+            if self.run.env != "development":
+                self._validate_security_settings()
+                self._validate_database_settings()
+                self._validate_email_settings()
+                self._validate_file_storage_settings()
+        except Exception as e:
+            # In development, log the error but don't fail startup
+            if self.run.env == "development":
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Settings validation warning: {e}")
+            else:
+                raise
 
     def _validate_security_settings(self) -> None:
         """Validate security configuration"""
@@ -370,7 +494,7 @@ class Settings(BaseSettings):
             raise ValueError("Security secret key must be at least 32 characters long")
 
         # Check if using default secrets in production
-        if self.app_config.env == "production":
+        if self.run.env == "production":
             dangerous_defaults = [
                 "super-secret-key-change-in-production-minimum-32-characters",
                 "password-reset-secret-change-in-production",
@@ -429,7 +553,7 @@ class Settings(BaseSettings):
         # Check SMTP settings if email is configured
         if self.email.smtp_host:
             if not self.email.smtp_user or not self.email.smtp_password:
-                if self.app_config.env == "production":
+                if self.run.env == "production":
                     raise ValueError(
                         "SMTP user and password are required in production"
                     )
@@ -500,15 +624,15 @@ class Settings(BaseSettings):
 
     def is_development(self) -> bool:
         """Check if running in development mode"""
-        return self.app_config.env.lower() in ("development", "dev", "local")
+        return self.run.env.lower() in ("development", "dev", "local")
 
     def is_production(self) -> bool:
         """Check if running in production mode"""
-        return self.app_config.env.lower() in ("production", "prod")
+        return self.run.env.lower() in ("production", "prod")
 
     def is_testing(self) -> bool:
         """Check if running in testing mode"""
-        return self.app_config.env.lower() in ("testing", "test")
+        return self.run.env.lower() in ("testing", "test")
 
 
 settings = Settings()

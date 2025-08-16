@@ -1,218 +1,440 @@
 """
-Конфигурация тестов для pytest.
+Конфигурация pytest для тестов Requify Backend API.
 
-Содержит фикстуры и настройки для тестирования.
+Содержит общие фикстуры и настройки для всех тестов.
+Следует лучшим практикам pytest для тестирования FastAPI приложений.
 """
 
-import os
 import pytest
-import pytest_asyncio
-
-# Configure pytest-asyncio mode
-pytestmark = pytest.mark.asyncio(mode="auto")
-
-# Set testing environment variable
-os.environ["TESTING"] = "true"
-
 import asyncio
-from typing import AsyncGenerator
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+import os
+import sys
+from pathlib import Path
+from typing import Generator, Any, AsyncGenerator
+from unittest.mock import MagicMock
+
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import Session
+from sqlalchemy.engine import Engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlmodel import SQLModel
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.append(str(project_root))
 
 from app.main import app
-from app.core.config import settings
 from app.models.base import Base
-from app.api.deps import get_db
-from app.crud import user as crud_user
-from app.schemas.user import UserCreate
+from app.core.config import settings as app_settings
+from app.db.db_helper import db_helper
 from app.core.security import get_password_hash
-
-
-# Тестовая база данных
-TEST_DATABASE_URL = settings.test_db.async_url
-
-
-# Test database engine and session
-test_engine = create_async_engine(
-    TEST_DATABASE_URL,
-    echo=False,
-    future=True,
-    pool_pre_ping=True,
-)
-
-TestSessionLocal = async_sessionmaker(
-    bind=test_engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autoflush=False,
+from app.models.user import User
+from app.models.enhanced_role_system import (
+    EnhancedRole,
+    UserRoleAssignment,
+    SystemRole,
+    RoleScope,
 )
 
 
-async def get_test_db() -> AsyncGenerator[AsyncSession, None]:
-    """Database session override for testing."""
-    async with TestSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
-
-
+# Автоматическое включение asyncio для асинхронных тестов
 @pytest.fixture(scope="session")
 def event_loop():
-    """Create event loop for the test session."""
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
+    """Создает event loop для всей сессии тестов."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
     loop.close()
 
 
-@pytest.fixture(scope="session", autouse=True)
-async def setup_test_db():
-    """Setup test database for the session."""
-    # Create all tables
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
-    yield
-
-    # Drop all tables after tests
-    async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+@pytest.fixture(scope="session")
+def test_settings():
+    """Настройки для тестов."""
+    # Используем копию настроек для тестов
+    test_config = app_settings.model_copy()
+    test_config.run.env = "testing"
+    return test_config
 
 
-@pytest.fixture
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
-    """Database session for individual tests."""
-    async with TestSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
+@pytest.fixture(scope="session")
+def test_engine_session():
+    """
+    Создает тестовый движок базы данных для всей сессии.
 
-
-@pytest.fixture
-async def client() -> AsyncGenerator[AsyncClient, None]:
-    """HTTP client fixture with database override."""
-
-    # Override only database dependency
-    app.dependency_overrides[get_db] = get_test_db
-
-    # Create transport
-    transport = ASGITransport(app=app)
-
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
-        yield client
-
-    # Clear overrides after test
-    app.dependency_overrides.clear()
-
-
-@pytest.fixture
-async def test_user(db_session: AsyncSession) -> dict:
-    """Create a test user for authentication."""
-    user_data = UserCreate(
-        email="testuser@example.com",
-        username="testuser",
-        password="testpassword123",
-        name="Test User",
-        role="user",
-        is_active=True,
-        is_superuser=False,
+    Использует SQLite in-memory для быстрых тестов.
+    """
+    engine = create_engine(
+        "sqlite:///:memory:",
+        echo=False,  # Отключаем SQL логи в тестах
+        connect_args={"check_same_thread": False},
     )
 
-    user = await crud_user.create(db_session, obj_in=user_data)
+    # Включаем поддержку внешних ключей в SQLite
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+    event.listens_for(engine, "connect")(set_sqlite_pragma)
+
+    return engine
+
+
+@pytest.fixture(scope="function")
+def test_db_session(test_engine_session: Engine) -> Generator[Session, None, None]:
+    """
+    Создает изолированную сессию для каждого теста.
+
+    Каждый тест получает чистую базу данных.
+    """
+    # Создаем все таблицы
+    Base.metadata.create_all(test_engine_session)
+
+    # Создаем сессию
+    with Session(test_engine_session) as session:
+        yield session
+
+    # Очищаем все таблицы после теста
+    Base.metadata.drop_all(test_engine_session)
+
+
+@pytest.fixture
+def sample_user_data():
+    """Базовые данные пользователя для тестов."""
     return {
-        "id": user.id,
-        "email": user.email,
-        "username": user.username,
-        "name": user.name,
-        "password": "testpassword123",  # Keep plain password for login
-    }
-
-
-@pytest.fixture
-async def test_superuser(db_session: AsyncSession) -> dict:
-    """Create a test superuser for authentication."""
-    user_data = UserCreate(
-        email="admin@example.com",
-        username="admin",
-        password="adminpassword123",
-        name="Admin User",
-        role="admin",
-        is_active=True,
-        is_superuser=True,
-    )
-
-    user = await crud_user.create(db_session, obj_in=user_data)
-    return {
-        "id": user.id,
-        "email": user.email,
-        "username": user.username,
-        "name": user.name,
-        "password": "adminpassword123",  # Keep plain password for login
-    }
-
-
-@pytest.fixture
-async def auth_headers(client: AsyncClient, test_user: dict) -> dict:
-    """Get authentication headers for test user."""
-    # Login to get token
-    login_data = {"username": test_user["email"], "password": test_user["password"]}
-
-    response = await client.post("/api/v1/auth/login", data=login_data)
-    assert response.status_code == 200
-
-    token_data = response.json()
-    return {"Authorization": f"Bearer {token_data['access_token']}"}
-
-
-@pytest.fixture
-async def superuser_headers(client: AsyncClient, test_superuser: dict) -> dict:
-    """Get authentication headers for test superuser."""
-    # Login to get token
-    login_data = {
-        "username": test_superuser["email"],
-        "password": test_superuser["password"],
-    }
-
-    response = await client.post("/api/v1/auth/login", data=login_data)
-    assert response.status_code == 200
-
-    token_data = response.json()
-    return {"Authorization": f"Bearer {token_data['access_token']}"}
-
-
-# User-related fixtures
-@pytest.fixture
-def sample_user_create_data():
-    """Sample user creation data."""
-    return {
-        "email": "newuser@example.com",
-        "username": "newuser",
-        "password": "securepassword123",
-        "name": "New User",
-        "role": "user",
+        "username": "testuser",
+        "email": "test@example.com",
+        "name": "Test User",
+        "status": "active",
+        "auth_provider": "local",
+        "is_email_verified": True,
         "is_active": True,
-        "is_superuser": False,
     }
 
 
 @pytest.fixture
-def sample_project_create_data():
-    """Sample project creation data."""
+def sample_company_data():
+    """Базовые данные компании для тестов."""
+    return {
+        "name": "Test Company",
+        "description": "Test company description",
+        "website": "https://test.com",
+        "industry": "Technology",
+        "size": "startup",
+    }
+
+
+@pytest.fixture
+def sample_project_data():
+    """Базовые данные проекта для тестов."""
     return {
         "name": "Test Project",
         "description": "Test project description",
         "status": "active",
+        "priority": "high",
     }
 
 
 @pytest.fixture
-def sample_requirement_create_data():
-    """Sample requirement creation data."""
+def sample_requirement_data():
+    """Базовые данные требования для тестов."""
     return {
         "title": "Test Requirement",
         "description": "Test requirement description",
-        "priority": "medium",
+        "type": "functional",
+        "priority": "high",
         "status": "draft",
     }
+
+
+# Маркеры для категоризации тестов
+def pytest_configure(config):
+    """Конфигурация pytest маркеров."""
+    config.addinivalue_line("markers", "unit: marks tests as unit tests (fast)")
+    config.addinivalue_line(
+        "markers", "integration: marks tests as integration tests (slower)"
+    )
+    config.addinivalue_line(
+        "markers", "performance: marks tests as performance tests (slow)"
+    )
+    config.addinivalue_line(
+        "markers", "compatibility: marks tests as model-schema compatibility tests"
+    )
+
+
+# Хуки для логирования и отчетности
+def pytest_runtest_setup(item):
+    """Выполняется перед каждым тестом."""
+    # Можно добавить логирование начала теста
+    pass
+
+
+def pytest_runtest_teardown(item, nextitem):
+    """Выполняется после каждого теста."""
+    # Можно добавить логирование завершения теста
+    pass
+
+
+# Фикстуры для конкретных сценариев тестирования
+@pytest.fixture
+def user_with_profile_data(sample_user_data):
+    """Данные пользователя с профилем."""
+    return {
+        "user": sample_user_data,
+        "profile": {
+            "first_name": "Test",
+            "last_name": "User",
+            "display_name": "Test User",
+            "bio": "Test bio",
+            "avatar_url": "https://example.com/avatar.jpg",
+            "phone": "+1234567890",
+            "position": "Developer",
+            "department": "Engineering",
+            "timezone": "UTC",
+        },
+    }
+
+
+@pytest.fixture
+def user_with_settings_data(sample_user_data):
+    """Данные пользователя с настройками."""
+    return {
+        "user": sample_user_data,
+        "settings": {
+            "notification_settings": {
+                "email": True,
+                "sms": False,
+                "push": True,
+                "frequency": "daily",
+            },
+            "interface_settings": {
+                "theme": "dark",
+                "language": "ru",
+                "timezone": "Europe/Moscow",
+                "items_per_page": 25,
+            },
+            "privacy_settings": {
+                "profile_visibility": "public",
+                "activity_visibility": "private",
+            },
+            "security_settings": {
+                "two_factor_enabled": True,
+                "login_notifications": True,
+            },
+        },
+    }
+
+
+@pytest.fixture
+def complex_user_data(sample_user_data, sample_company_data):
+    """Данные для комплексного пользователя со всеми связями."""
+    return {
+        "user": sample_user_data,
+        "company": sample_company_data,
+        "profile": {
+            "first_name": "Complex",
+            "last_name": "User",
+            "display_name": "Complex User",
+            "bio": "Complex user bio",
+            "position": "Senior Developer",
+            "department": "Engineering",
+        },
+        "settings": {
+            "notification_settings": {"email": True},
+            "interface_settings": {"theme": "dark"},
+        },
+    }
+
+
+# Утилиты для тестов
+class TestDataFactory:
+    """Фабрика для создания тестовых данных."""
+
+    @staticmethod
+    def create_user_data(index: int = 0, **overrides) -> dict:
+        """Создает данные пользователя с уникальными значениями."""
+        base_data = {
+            "username": f"user_{index}",
+            "email": f"user_{index}@example.com",
+            "name": f"User {index}",
+            "status": "active",
+            "is_active": True,
+        }
+        base_data.update(overrides)
+        return base_data
+
+    @staticmethod
+    def create_company_data(index: int = 0, **overrides) -> dict:
+        """Создает данные компании с уникальными значениями."""
+        base_data = {
+            "name": f"Company {index}",
+            "description": f"Company {index} description",
+            "industry": "Technology",
+        }
+        base_data.update(overrides)
+        return base_data
+
+
+@pytest.fixture
+def test_data_factory():
+    """Предоставляет фабрику тестовых данных."""
+    return TestDataFactory
+
+
+# Параметризованные фикстуры для массового тестирования
+@pytest.fixture(params=[10, 50, 100])
+def user_count(request):
+    """Параметризованное количество пользователей для массовых тестов."""
+    return request.param
+
+
+@pytest.fixture(params=["sqlite", "memory"])
+def db_type(request):
+    """Параметризованный тип базы данных для тестов."""
+    return request.param
+
+
+# Настройки для различных типов тестов
+pytest_plugins = [
+    # Можно добавить дополнительные плагины
+]
+
+
+# Дополнительные фикстуры для CI/CD и интеграционного тестирования
+@pytest.fixture(scope="function")
+def client() -> Generator[TestClient, None, None]:
+    """
+    Фикстура для синхронного HTTP клиента.
+    Создает TestClient для тестирования FastAPI endpoints.
+    """
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+@pytest.fixture(scope="function")
+async def async_client() -> AsyncGenerator[AsyncClient, None]:
+    """
+    Фикстура для асинхронного HTTP клиента.
+    Создает AsyncClient для асинхронного тестирования endpoints.
+    """
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest.fixture(scope="function")
+def admin_credentials() -> dict[str, str]:
+    """
+    Фикстура с учетными данными администратора для тестирования.
+    """
+    return {
+        "username": app_settings.admin.email,
+        "password": app_settings.admin.password,
+        "email": app_settings.admin.email,
+        "name": app_settings.admin.name,
+    }
+
+
+@pytest.fixture(scope="function")
+def temp_directory(tmp_path: Path) -> Path:
+    """
+    Фикстура для создания временной директории для тестов.
+    """
+    test_dir = tmp_path / "test_files"
+    test_dir.mkdir(exist_ok=True)
+    return test_dir
+
+
+@pytest.fixture(scope="function")
+def sample_files(temp_directory: Path) -> dict[str, Path]:
+    """
+    Фикстура для создания образцов файлов для тестирования загрузки.
+    """
+    files = {}
+
+    # Текстовый файл
+    text_file = temp_directory / "sample.txt"
+    text_file.write_text("Sample text content", encoding="utf-8")
+    files["text"] = text_file
+
+    # JSON файл
+    json_file = temp_directory / "sample.json"
+    json_file.write_text('{"test": "data"}', encoding="utf-8")
+    files["json"] = json_file
+
+    # Пустой файл
+    empty_file = temp_directory / "empty.txt"
+    empty_file.touch()
+    files["empty"] = empty_file
+
+    return files
+
+
+@pytest.fixture(autouse=True)
+def clean_environment():
+    """
+    Автоматическая очистка окружения для каждого теста.
+    """
+    # Сохраняем исходное состояние переменных окружения
+    original_env = os.environ.copy()
+
+    yield
+
+    # Восстанавливаем переменные окружения
+    os.environ.clear()
+    os.environ.update(original_env)
+
+
+# Хуки для расширенной функциональности
+def pytest_configure(config):
+    """
+    Конфигурация pytest при запуске.
+    """
+    # Добавляем custom markers
+    config.addinivalue_line("markers", "ci: mark test to run in CI environment")
+    config.addinivalue_line("markers", "domain: mark test as domain-specific")
+
+
+def pytest_collection_modifyitems(config, items):
+    """
+    Модификация собранных тестов.
+    """
+    for item in items:
+        # Автоматически добавляем маркер unit для быстрых тестов
+        if item.fspath.pname.startswith("test_") and not any(
+            marker.name in ["integration", "performance", "security"]
+            for marker in item.iter_markers()
+        ):
+            item.add_marker(pytest.mark.unit)
+
+
+def pytest_runtest_setup(item):
+    """
+    Настройка перед запуском каждого теста.
+    """
+    # Пропускаем интеграционные тесты если нет соответствующего флага
+    if "integration" in item.keywords:
+        if not item.config.getoption("--run-integration", default=False):
+            pytest.skip("integration tests not requested")
+
+
+# Дополнительные опции командной строки
+def pytest_addoption(parser):
+    """
+    Добавляет дополнительные опции командной строки для pytest.
+    """
+    parser.addoption(
+        "--run-integration",
+        action="store_true",
+        default=False,
+        help="run integration tests",
+    )
+    parser.addoption(
+        "--run-performance",
+        action="store_true",
+        default=False,
+        help="run performance tests",
+    )
+    parser.addoption(
+        "--run-security", action="store_true", default=False, help="run security tests"
+    )

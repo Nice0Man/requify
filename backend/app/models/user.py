@@ -1,12 +1,18 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 
+<<<<<<< HEAD
 from sqlalchemy import Boolean, DateTime, Index, Integer, String
+=======
+from sqlalchemy import DateTime, Integer, String, Index, ForeignKey, Boolean
+>>>>>>> dev-backend
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
+from .mixins import AuthMixin, PermissionsMixin, EmailVerificationMixin, ActivityMixin
 
 if TYPE_CHECKING:
+<<<<<<< HEAD
     from .comment import Comment
     from .dashboard import (
         DashboardActivity,
@@ -21,127 +27,160 @@ if TYPE_CHECKING:
     from .team import Team
     from .team_member import TeamMember
     from .test_result import TestResult
+=======
+    from .company import Company
+    from .user_profile import UserProfile
+    from .project import Project
+    from .requirement import Requirement
+    from .specification import Specification
+    from .test_case import TestCase, TestPlan, TestExecution
+    from .comment import Comment
+    from .team import Team
+    from .team_member import TeamMember
+    from .enhanced_role_system import UserRoleAssignment
+    from .dashboard import (
+        UserDashboardPreferences,
+        DashboardNotification,
+        DashboardActivity,
+        DashboardWidget,
+    )
+    from .requirement_group_version import RequirementGroupVersion
+    from .test_result import TestResult
+    from .user_settings import UserSettings, UserSettingsHistory
+    from .refresh_token import RefreshToken
+    from .activity import Activity
+    from .notification import Notification
+>>>>>>> dev-backend
 
 
-class User(Base, TimestampedMixin):
+class User(
+    Base,
+    AuthMixin,
+    PermissionsMixin,
+    EmailVerificationMixin,
+    ActivityMixin,
+    TimestampedMixin,
+):
     """
-    Модель пользователя системы.
+    Основная модель пользователя системы.
 
-    Представляет пользователя с его ролями, созданными требованиями,
-    комментариями и другими связанными сущностями.
+    Упрощенная структура с основными полями согласно лучшим практикам SQLAlchemy.
     """
 
     __tablename__ = "users"
     __table_args__ = (
-        Index("ix_users_email_unique", "email", unique=True),
-        Index("ix_users_username_unique", "username", unique=True),
-        Index("ix_users_role_created", "role", "created_at"),
+        Index("ix_users_email", "email", unique=True),
+        Index("ix_users_username", "username", unique=True),
+        Index("ix_users_company_id", "company_id"),
         Index("ix_users_is_active", "is_active"),
-        Index("ix_users_last_login", "last_login"),
-        Index("ix_users_email_verified", "email_verified"),
+        Index("ix_users_status", "status"),
+        Index("ix_users_is_email_verified", "is_email_verified"),
+        Index("ix_users_last_login_at", "last_login_at"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(
-        String(50), unique=True, nullable=False, comment="Уникальное имя пользователя"
-    )
-    email: Mapped[str] = mapped_column(
-        String(100), unique=True, nullable=False, comment="Email адрес пользователя"
-    )
-    hashed_password: Mapped[str] = mapped_column(
-        String(128), nullable=False, comment="Хэшированный пароль"
+
+    # Дополнительные поля (не из mixins)
+    name: Mapped[str] = mapped_column(
+        String(100), nullable=False, comment="Имя пользователя"
     )
 
-    # Профиль пользователя
-    name: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True, comment="Полное имя пользователя"
-    )
-    first_name: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True, comment="Имя пользователя"
-    )
-    last_name: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True, comment="Фамилия пользователя"
-    )
-    department: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True, comment="Отдел пользователя"
-    )
-    phone: Mapped[Optional[str]] = mapped_column(
-        String(20), nullable=True, comment="Телефон пользователя"
-    )
-    role: Mapped[str] = mapped_column(
-        String(20),
-        nullable=False,
-        default="user",
-        comment="Роль пользователя (admin, manager, analyst, developer, tester, user)",
+    # Связь с компанией
+    company_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("companies.id", ondelete="SET NULL"),
+        nullable=True,
+        comment="ID компании пользователя",
     )
 
-    # Статус и права доступа
-    is_active: Mapped[bool] = mapped_column(
-        Boolean, default=True, nullable=False, comment="Активен ли пользователь"
-    )
-    is_superuser: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
-        nullable=False,
-        comment="Является ли пользователь суперпользователем",
-    )
-    email_verified: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
-        nullable=False,
-        comment="Подтвержден ли email пользователя",
-    )
-    email_verified_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime, nullable=True, comment="Время подтверждения email"
-    )
-
-    # Временные метки активности
-    last_login: Mapped[Optional[datetime]] = mapped_column(
-        DateTime, nullable=True, comment="Время последнего входа в систему"
-    )
-
+    # =============================================================================
     # Отношения
-    owned_projects: Mapped[List["Project"]] = relationship(
-        "Project", back_populates="owner", lazy="select"
+    # =============================================================================
+
+    company: Mapped[Optional["Company"]] = relationship(
+        "Company", back_populates="users", lazy="select"
     )
 
-    authored_requirements: Mapped[List["Requirement"]] = relationship(
-        "Requirement",
-        foreign_keys="Requirement.author_id",
-        back_populates="author",
+    profile: Mapped[Optional["UserProfile"]] = relationship(
+        "UserProfile",
+        back_populates="user",
         lazy="select",
+        uselist=False,
+        cascade="all, delete-orphan",
     )
 
-    modified_requirements: Mapped[List["Requirement"]] = relationship(
-        "Requirement",
-        foreign_keys="Requirement.last_modified_by",
-        back_populates="last_modifier",
-        lazy="select",
-    )
-
-    comments: Mapped[List["Comment"]] = relationship(
-        "Comment", back_populates="author", lazy="select"
-    )
-
-    group_versions: Mapped[List["RequirementGroupVersion"]] = relationship(
-        "RequirementGroupVersion",
-        foreign_keys="RequirementGroupVersion.created_by",
-        back_populates="created_by_user",
-        lazy="select",
-    )
-
-    test_results: Mapped[List["TestResult"]] = relationship(
-        "TestResult", back_populates="tester", lazy="select"
-    )
-
-    refresh_tokens: Mapped[List["RefreshToken"]] = relationship(
-        "RefreshToken",
+    # Роли пользователя
+    role_assignments: Mapped[List["UserRoleAssignment"]] = relationship(
+        "UserRoleAssignment",
+        foreign_keys="UserRoleAssignment.user_id",
         back_populates="user",
         lazy="select",
         cascade="all, delete-orphan",
     )
 
-    # Dashboard relationships
+    # Проекты в собственности
+    owned_projects: Mapped[List["Project"]] = relationship(
+        "Project", back_populates="owner", lazy="select"
+    )
+
+    # Требования автора
+    authored_requirements: Mapped[List["Requirement"]] = relationship(
+        "Requirement", back_populates="author", lazy="select"
+    )
+
+    # Спецификации автора
+    authored_specifications: Mapped[List["Specification"]] = relationship(
+        "Specification",
+        foreign_keys="Specification.author_id",
+        back_populates="author",
+        lazy="select",
+    )
+
+    # Утвержденные спецификации
+    approved_specifications: Mapped[List["Specification"]] = relationship(
+        "Specification",
+        foreign_keys="Specification.approved_by_id",
+        back_populates="approved_by",
+        lazy="select",
+    )
+
+    # Тестовые сущности
+    authored_test_cases: Mapped[List["TestCase"]] = relationship(
+        "TestCase",
+        foreign_keys="TestCase.author_id",
+        back_populates="author",
+        lazy="select",
+    )
+
+    authored_test_plans: Mapped[List["TestPlan"]] = relationship(
+        "TestPlan",
+        foreign_keys="TestPlan.author_id",
+        back_populates="author",
+        lazy="select",
+    )
+
+    executed_tests: Mapped[List["TestExecution"]] = relationship(
+        "TestExecution",
+        foreign_keys="TestExecution.executor_id",
+        back_populates="executor",
+        lazy="select",
+    )
+
+    # Комментарии
+    comments: Mapped[List["Comment"]] = relationship(
+        "Comment", back_populates="author", lazy="select"
+    )
+
+    # Команды в собственности
+    owned_teams: Mapped[List["Team"]] = relationship(
+        "Team", back_populates="owner", lazy="select"
+    )
+
+    # Участие в командах
+    team_memberships: Mapped[List["TeamMember"]] = relationship(
+        "TeamMember", back_populates="user", lazy="select", cascade="all, delete-orphan"
+    )
+
+    # Dashboard-related relationships
     dashboard_preferences: Mapped[Optional["UserDashboardPreferences"]] = relationship(
         "UserDashboardPreferences",
         back_populates="user",
@@ -157,7 +196,7 @@ class User(Base, TimestampedMixin):
         cascade="all, delete-orphan",
     )
 
-    activities: Mapped[List["DashboardActivity"]] = relationship(
+    dashboard_activities: Mapped[List["DashboardActivity"]] = relationship(
         "DashboardActivity",
         back_populates="user",
         lazy="select",
@@ -171,20 +210,81 @@ class User(Base, TimestampedMixin):
         cascade="all, delete-orphan",
     )
 
-    # Team relationships
-    owned_teams: Mapped[List["Team"]] = relationship(
-        "Team",
-        back_populates="owner",
-        lazy="select",
-        cascade="all, delete-orphan",
-    )
-
-    team_memberships: Mapped[List["TeamMember"]] = relationship(
-        "TeamMember",
+    # Новые отношения для collaboration
+    activities: Mapped[List["Activity"]] = relationship(
+        "Activity",
         back_populates="user",
         lazy="select",
         cascade="all, delete-orphan",
     )
 
+    user_notifications: Mapped[List["Notification"]] = relationship(
+        "Notification",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    # Additional relationships
+    group_versions: Mapped[List["RequirementGroupVersion"]] = relationship(
+        "RequirementGroupVersion", back_populates="created_by_user", lazy="select"
+    )
+
+    test_results: Mapped[List["TestResult"]] = relationship(
+        "TestResult", back_populates="tester", lazy="select"
+    )
+
+    # Settings and tokens
+    settings: Mapped[Optional["UserSettings"]] = relationship(
+        "UserSettings",
+        back_populates="user",
+        lazy="select",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+    refresh_tokens: Mapped[List["RefreshToken"]] = relationship(
+        "RefreshToken",
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+
+    # Settings history
+    settings_history: Mapped[List["UserSettingsHistory"]] = relationship(
+        "UserSettingsHistory", lazy="select", cascade="all, delete-orphan"
+    )
+
+    @property
+    def roles(self) -> List[dict]:
+        """Получить список ролей пользователя из role_assignments."""
+        if not hasattr(self, "role_assignments") or not self.role_assignments:
+            return []
+
+        roles = []
+        for assignment in self.role_assignments:
+            if assignment.is_active and hasattr(assignment, "role") and assignment.role:
+                role_data = {
+                    "id": assignment.role.id,
+                    "name": assignment.role.name,
+                    "display_name": getattr(
+                        assignment.role, "display_name", assignment.role.name
+                    ),
+                    "scope": assignment.role.scope,
+                    "assignment_id": assignment.id,
+                    "assigned_at": (
+                        assignment.created_at.isoformat()
+                        if assignment.created_at
+                        else None
+                    ),
+                    "expires_at": (
+                        assignment.expires_at.isoformat()
+                        if assignment.expires_at
+                        else None
+                    ),
+                }
+                roles.append(role_data)
+        return roles
+
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, username='{self.username}', email='{self.email}')>"
+        return f"<User(id={self.id}, email='{self.email}', name='{self.name}')>"

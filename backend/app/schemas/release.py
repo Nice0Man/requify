@@ -1,306 +1,140 @@
+<<<<<<< HEAD
 import re
 from datetime import UTC, datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+=======
+"""
+Схемы для модели Release.
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
+"""
+
+from datetime import datetime
+from typing import Optional, List, Dict, Any
+from sqlmodel import SQLModel, Field
+from pydantic import field_validator, model_validator
+from enum import Enum
+import re
+>>>>>>> dev-backend
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ListResponseSchema,
+    StatisticsSchema,
+    UserRelatedSchema,
+    ProjectRelatedSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
+from .common import SearchRequest, DateRangeFilter
 
 
-class ReleaseBase(BaseModel):
+# === Перечисления ===
+
+
+class ReleaseStatus(str, Enum):
+    """Статусы релизов"""
+
+    PLANNED = "planned"
+    IN_DEVELOPMENT = "in_development"
+    TESTING = "testing"
+    REVIEW = "review"
+    READY = "ready"
+    RELEASED = "released"
+    CANCELLED = "cancelled"
+    HOTFIX = "hotfix"
+
+
+class ReleaseType(str, Enum):
+    """Типы релизов"""
+
+    MAJOR = "major"
+    MINOR = "minor"
+    PATCH = "patch"
+    HOTFIX = "hotfix"
+    BETA = "beta"
+    ALPHA = "alpha"
+    RC = "rc"  # Release Candidate
+
+
+class ReleasePriority(str, Enum):
+    """Приоритеты релизов"""
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
+# === Базовые схемы ===
+
+
+class ReleaseBase(ProjectRelatedSchema, ValidationMixin):
     """
     Базовая схема релиза.
+    Содержит основные поля без служебных данных.
     """
 
-    name: str = Field(..., min_length=2, max_length=100)
+    name: str = Field(
+        ...,
+        min_length=2,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description=StandardDescriptions.NAME + " релиза",
+    )
     version: str = Field(
-        ..., min_length=1, max_length=50, description="Версия релиза в формате SemVer"
+        ...,
+        min_length=1,
+        max_length=FieldLimits.VERSION_MAX,
+        description="Версия релиза в формате SemVer",
     )
-    description: Optional[str] = None
-    planned_date: Optional[datetime] = None
-    release_date: Optional[datetime] = None
-
-    @field_validator("name")
-    def validate_name(cls, v):
-        """Валидация названия релиза"""
-        if not v or not v.strip():
-            raise ValueError("Release name cannot be empty")
-
-        v = v.strip()
-
-        # Проверяем на недопустимые символы
-        forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "\n", "\r"]
-        if any(char in v for char in forbidden_chars):
-            raise ValueError(
-                f"Release name contains forbidden characters: {forbidden_chars}"
-            )
-
-        return v
-
-    @field_validator("version")
-    def validate_version(cls, v):
-        """Валидация версии релиза"""
-        if not v or not v.strip():
-            raise ValueError("Release version cannot be empty")
-
-        v = v.strip()
-
-        # Проверяем формат версии (например, 1.0.0, 2.1.3, v1.0.0)
-        version_patterns = [
-            r"^\d+\.\d+\.\d+$",  # 1.0.0
-            r"^v\d+\.\d+\.\d+$",  # v1.0.0
-            r"^\d+\.\d+$",  # 1.0
-            r"^v\d+\.\d+$",  # v1.0
-            r"^\d+\.\d+\.\d+-\w+$",  # 1.0.0-alpha
-            r"^v\d+\.\d+\.\d+-\w+$",  # v1.0.0-beta
-        ]
-
-        if not any(re.match(pattern, v) for pattern in version_patterns):
-            raise ValueError(
-                "Invalid version format. Use formats like 1.0.0, v1.0.0, 1.0.0-alpha, etc."
-            )
-
-        return v
-
-    @field_validator("description")
-    def validate_description(cls, v):
-        """Валидация описания релиза"""
-        if v is not None:
-            v = v.strip()
-            if len(v) > 2000:  # Максимальная длина описания
-                raise ValueError("Description cannot exceed 2000 characters")
-            return v if v else None
-        return v
-
-    @field_validator("planned_date", "release_date")
-    def validate_dates(cls, v):
-        """Валидация дат релиза"""
-        if v is not None:
-            # Convert timezone-aware datetime to timezone-naive for database compatibility
-            if v.tzinfo is not None:
-                # Convert to UTC first, then strip timezone info
-                v = v.astimezone(UTC).replace(tzinfo=None)
-
-            # Дата не может быть слишком далеко в прошлом (больше 5 лет назад)
-            five_years_ago = datetime.now(UTC).replace(
-                tzinfo=None, year=datetime.now(UTC).year - 5
-            )
-            if v < five_years_ago:
-                raise ValueError("Date cannot be more than 5 years in the past")
-
-            # Дата не может быть слишком далеко в будущем (больше 10 лет)
-            max_future = datetime.now(UTC).replace(
-                tzinfo=None, year=datetime.now(UTC).year + 10
-            )
-            if v > max_future:
-                raise ValueError("Date cannot be more than 10 years in the future")
-
-        return v
-
-
-class ReleaseCreate(ReleaseBase):
-    """
-    Схема для создания релиза.
-    """
-
-    project_id: int = Field(..., gt=0, description="ID проекта")
-    status: str = Field("planned", description="Статус релиза")
-    release_date: Optional[datetime] = Field(None, description="Дата релиза")
-
-
-class ReleaseUpdate(BaseModel):
-    """
-    Схема для обновления релиза.
-    """
-
-    name: Optional[str] = Field(None, min_length=2, max_length=100)
-    version: Optional[str] = Field(
-        None, min_length=1, max_length=50, description="Версия релиза в формате SemVer"
+    description: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.TEXT_MAX,
+        description=StandardDescriptions.DESCRIPTION + " релиза",
     )
-    description: Optional[str] = None
-    status: Optional[str] = Field(None, description="Статус релиза")
-    planned_date: Optional[datetime] = None
-    release_date: Optional[datetime] = Field(None, description="Дата релиза")
-
-    @field_validator("planned_date", "release_date")
-    def validate_dates(cls, v):
-        """Валидация дат релиза при обновлении"""
-        if v is not None:
-            # Convert timezone-aware datetime to timezone-naive for database compatibility
-            if v.tzinfo is not None:
-                # Convert to UTC first, then strip timezone info
-                v = v.astimezone(UTC).replace(tzinfo=None)
-
-            # Дата не может быть слишком далеко в прошлом (больше 5 лет назад)
-            five_years_ago = datetime.now(UTC).replace(
-                tzinfo=None, year=datetime.now(UTC).year - 5
-            )
-            if v < five_years_ago:
-                raise ValueError("Date cannot be more than 5 years in the past")
-
-            # Дата не может быть слишком далеко в будущем (больше 10 лет)
-            max_future = datetime.now(UTC).replace(
-                tzinfo=None, year=datetime.now(UTC).year + 10
-            )
-            if v > max_future:
-                raise ValueError("Date cannot be more than 10 years in the future")
-
-        return v
-
-
-class ReleaseInDBBase(ReleaseBase):
-    """
-    Базовая схема релиза с данными из БД.
-    """
-
-    id: int
-    project_id: int
-    status: str
-    created_at: datetime
-    updated_at: datetime
-    release_date: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
-
-
-class Release(ReleaseInDBBase):
-    """
-    Схема релиза для API.
-    """
-
-    @property
-    def is_released(self) -> bool:
-        """Проверяет, выпущен ли релиз"""
-        return self.status == "released" and self.release_date is not None
-
-    @property
-    def is_overdue(self) -> bool:
-        """Проверяет, просрочен ли релиз"""
-        if self.planned_date and not self.is_released:
-            return datetime.now(UTC).replace(tzinfo=None) > self.planned_date
-        return False
-
-
-class ReleaseWithRequirements(Release):
-    """
-    Схема релиза с требованиями.
-    """
-
-    total_requirements: int = 0
-    completed_requirements: int = 0
-    requirements_in_testing: int = 0
-
-    @field_validator(
-        "total_requirements", "completed_requirements", "requirements_in_testing"
+    status: ReleaseStatus = Field(ReleaseStatus.PLANNED, description="Статус релиза")
+    release_type: Optional[ReleaseType] = Field(None, description="Тип релиза")
+    priority: ReleasePriority = Field(
+        ReleasePriority.MEDIUM, description="Приоритет релиза"
     )
-    def validate_counts(cls, v):
-        """Валидация счетчиков требований"""
-        if v < 0:
-            raise ValueError("Requirement counts cannot be negative")
-        return v
-
-    @model_validator(mode="after")
-    def validate_partial_counts(self):
-        """Проверка, что частичные счетчики не превышают общее количество"""
-        if self.completed_requirements > self.total_requirements:
-            raise ValueError("Completed requirements cannot exceed total requirements")
-        if self.requirements_in_testing > self.total_requirements:
-            raise ValueError("Requirements in testing cannot exceed total requirements")
-        return self
-
-    @property
-    def completion_percentage(self) -> float:
-        """Вычисляет процент завершения релиза"""
-        if self.total_requirements == 0:
-            return 0.0
-        return round((self.completed_requirements / self.total_requirements) * 100, 2)
-
-    @property
-    def testing_percentage(self) -> float:
-        """Вычисляет процент требований в тестировании"""
-        if self.total_requirements == 0:
-            return 0.0
-        return round((self.requirements_in_testing / self.total_requirements) * 100, 2)
-
-
-class ReleaseWithDetails(Release):
-    """
-    Схема релиза с подробной информацией.
-    """
-
-    project_name: Optional[str] = None
-
-
-class ReleaseInDB(ReleaseInDBBase):
-    """
-    Схема релиза в БД.
-    """
-
-    pass
-
-
-class ReleaseFromRequirementsCreate(BaseModel):
-    """
-    Схема для создания релиза на основе требований.
-
-    Функция 11 из ТЗ: Создание релиза с учетом связей требований.
-    """
-
-    name: str = Field(..., min_length=2, max_length=100, description="Название релиза")
-    version: str = Field(
-        ..., min_length=1, max_length=50, description="Версия релиза в формате SemVer"
-    )
-    description: Optional[str] = Field(None, description="Описание релиза")
-    project_id: int = Field(..., gt=0, description="ID проекта")
-    requirement_ids: List[int] = Field(
-        ..., min_length=1, description="Список ID требований для включения в релиз"
-    )
-    status: str = Field("planning", description="Статус релиза")
     planned_date: Optional[datetime] = Field(
         None, description="Планируемая дата релиза"
     )
     release_date: Optional[datetime] = Field(
         None, description="Фактическая дата релиза"
     )
-    auto_description: bool = Field(
-        True, description="Автоматически генерировать описание на основе требований"
+    changelog: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Список изменений"
     )
-    include_requirement_details: bool = Field(
-        True, description="Включать детали требований в описание релиза"
+    release_notes: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Заметки к релизу"
     )
-    analyze_dependencies: bool = Field(
-        True, description="Анализировать зависимости между требованиями"
+    is_prerelease: bool = Field(
+        False, description="Является ли предварительным релизом"
     )
-    auto_include_dependencies: bool = Field(
-        False, description="Автоматически включать недостающие зависимости"
+    is_draft: bool = Field(False, description="Черновик релиза")
+    tags: Optional[List[str]] = Field(default_factory=list, description="Теги релиза")
+    repository_tag: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Тег в репозитории"
     )
-
-    @field_validator("requirement_ids")
-    def validate_requirement_ids(cls, v):
-        """Валидация списка ID требований"""
-        if not v:
-            raise ValueError("At least one requirement ID must be provided")
-
-        # Проверяем уникальность ID
-        if len(v) != len(set(v)):
-            raise ValueError("Requirement IDs must be unique")
-
-        # Проверяем, что все ID положительные
-        for req_id in v:
-            if req_id <= 0:
-                raise ValueError("All requirement IDs must be positive integers")
-
-        return v
+    build_number: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Номер сборки"
+    )
+    is_active: bool = Field(True, description=StandardDescriptions.IS_ACTIVE)
 
     @field_validator("name")
-    def validate_name(cls, v):
+    @classmethod
+    def validate_name(cls, v: str) -> str:
         """Валидация названия релиза"""
-        if not v or not v.strip():
-            raise ValueError("Release name cannot be empty")
-
-        v = v.strip()
+        v = cls.validate_non_empty_string(v, "name")
 
         # Проверяем на недопустимые символы
-        forbidden_chars = ["<", ">", "&", '"', "'", ";", "|", "\n", "\r"]
+        forbidden_chars = ["<", ">", "&", '"', "'", ";", "|"]
         if any(char in v for char in forbidden_chars):
             raise ValueError(
                 f"Release name contains forbidden characters: {forbidden_chars}"
@@ -309,237 +143,554 @@ class ReleaseFromRequirementsCreate(BaseModel):
         return v
 
     @field_validator("version")
-    def validate_version(cls, v):
-        """Валидация версии релиза"""
-        if not v or not v.strip():
-            raise ValueError("Release version cannot be empty")
+    @classmethod
+    def validate_version(cls, v: str) -> str:
+        """Валидация версии релиза в формате SemVer"""
+        v = cls.validate_non_empty_string(v, "version")
 
-        v = v.strip()
-
-        # Проверяем формат версии (например, 1.0.0, 2.1.3, v1.0.0)
+        # Паттерны для проверки версии (SemVer)
         version_patterns = [
             r"^\d+\.\d+\.\d+$",  # 1.0.0
             r"^v\d+\.\d+\.\d+$",  # v1.0.0
             r"^\d+\.\d+$",  # 1.0
             r"^v\d+\.\d+$",  # v1.0
-            r"^\d+\.\d+\.\d+-\w+$",  # 1.0.0-alpha
-            r"^v\d+\.\d+\.\d+-\w+$",  # v1.0.0-beta
+            r"^\d+\.\d+\.\d+-[a-zA-Z0-9\-\.]+$",  # 1.0.0-alpha, 1.0.0-beta.1
+            r"^v\d+\.\d+\.\d+-[a-zA-Z0-9\-\.]+$",  # v1.0.0-alpha, v1.0.0-rc.1
         ]
 
         if not any(re.match(pattern, v) for pattern in version_patterns):
             raise ValueError(
-                "Invalid version format. Use formats like 1.0.0, v1.0.0, 1.0.0-alpha, etc."
+                "Invalid version format. Use SemVer format like 1.0.0, v1.0.0, 1.0.0-alpha, etc."
             )
 
         return v
 
+    @field_validator("description", "changelog", "release_notes")
+    @classmethod
+    def validate_text_fields(cls, v: Optional[str]) -> Optional[str]:
+        """Валидация текстовых полей"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            if len(v) > FieldLimits.TEXT_MAX:
+                raise ValueError(
+                    f"Text field cannot exceed {FieldLimits.TEXT_MAX} characters"
+                )
+        return v
+
     @field_validator("planned_date", "release_date")
-    def validate_dates(cls, v):
+    @classmethod
+    def validate_dates(cls, v: Optional[datetime]) -> Optional[datetime]:
         """Валидация дат релиза"""
         if v is not None:
-            # Convert timezone-aware datetime to timezone-naive for database compatibility
-            if v.tzinfo is not None:
-                v = v.astimezone(UTC).replace(tzinfo=None)
+            now = datetime.now()
 
-            # Дата не может быть слишком далеко в прошлом (больше 5 лет назад)
-            five_years_ago = datetime.now(UTC).replace(
-                tzinfo=None, year=datetime.now(UTC).year - 5
-            )
-            if v < five_years_ago:
+            # Дата не может быть слишком далеко в прошлом (5 лет)
+            min_date = now.replace(year=now.year - 5)
+            if v < min_date:
                 raise ValueError("Date cannot be more than 5 years in the past")
 
-            # Дата не может быть слишком далеко в будущем (больше 10 лет)
-            max_future = datetime.now(UTC).replace(
-                tzinfo=None, year=datetime.now(UTC).year + 10
-            )
-            if v > max_future:
+            # Дата не может быть слишком далеко в будущем (10 лет)
+            max_date = now.replace(year=now.year + 10)
+            if v > max_date:
                 raise ValueError("Date cannot be more than 10 years in the future")
 
         return v
 
+    @field_validator("tags")
+    @classmethod
+    def validate_tags(cls, v: Optional[List[str]]) -> List[str]:
+        """Валидация тегов"""
+        if v is None:
+            return []
 
-class RequirementSummary(BaseModel):
-    """
-    Краткая информация о требовании для релиза.
-    """
+        validated_tags = []
+        for tag in v:
+            if isinstance(tag, str) and tag.strip():
+                clean_tag = tag.strip().lower()
+                if len(clean_tag) <= 30 and clean_tag not in validated_tags:
+                    validated_tags.append(clean_tag)
 
-    id: int
-    title: str
-    description: Optional[str] = None
-    type_name: Optional[str] = None
-    priority_name: Optional[str] = None
-    status_name: Optional[str] = None
+        return validated_tags[:15]  # Максимум 15 тегов
 
-
-class ReleaseWithLinkedRequirements(Release):
-    """
-    Схема релиза с привязанными требованиями.
-
-    Расширенный ответ для создания релиза на основе требований.
-    """
-
-    linked_requirements: List[RequirementSummary] = Field(
-        default_factory=list, description="Список требований, привязанных к релизу"
-    )
-    requirements_count: int = Field(0, description="Количество привязанных требований")
-    auto_generated_description: bool = Field(
-        False, description="Было ли описание сгенерировано автоматически"
-    )
-
-    @field_validator("requirements_count")
-    def validate_requirements_count(cls, v):
-        """Валидация количества требований"""
-        if v < 0:
-            raise ValueError("Requirements count cannot be negative")
+    @field_validator("repository_tag", "build_number")
+    @classmethod
+    def validate_technical_fields(cls, v: Optional[str]) -> Optional[str]:
+        """Валидация технических полей"""
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            # Проверяем на допустимые символы для тегов/номеров сборки
+            if not re.match(r"^[a-zA-Z0-9\-\._]+$", v):
+                raise ValueError(
+                    "Field can only contain letters, numbers, hyphens, dots and underscores"
+                )
         return v
 
-
-class ReleaseCreationSummary(BaseModel):
-    """
-    Итоговая информация о создании релиза.
-    """
-
-    release: ReleaseWithLinkedRequirements
-    operation_summary: dict = Field(
-        default_factory=dict, description="Сводка операции создания релиза"
-    )
-
     @model_validator(mode="after")
-    def validate_summary_consistency(self):
-        """Проверка согласованности данных в итоговой информации"""
-        if self.release.requirements_count != len(self.release.linked_requirements):
-            raise ValueError(
-                "Requirements count must match linked requirements list length"
-            )
+    def validate_date_consistency(self):
+        """Валидация согласованности дат"""
+        if self.planned_date and self.release_date:
+            if self.release_date < self.planned_date:
+                # Предупреждение, но не ошибка - релиз может быть выпущен раньше
+                pass
+
+        # Проверяем соответствие статуса и дат
+        if self.status == ReleaseStatus.RELEASED and not self.release_date:
+            raise ValueError("Released status requires release_date to be set")
+
+        if self.release_date and self.status == ReleaseStatus.PLANNED:
+            raise ValueError("Planned status cannot have release_date set")
+
         return self
 
 
-# === Function 12 Schemas: Specification Generation ===
+# === CRUD схемы ===
 
 
-class SpecificationGenerationOptions(BaseModel):
+class ReleaseCreate(ReleaseBase, CreateSchema, UserRelatedSchema):
     """
-    Опции генерации спецификации релиза.
+    Схема для создания релиза.
+    Включает связи с проектом и пользователем.
+    """
 
-    Функция 12 из ТЗ: Автоматическая генерация спецификаций.
+    based_on_release_id: Optional[int] = Field(
+        None, gt=0, description="ID релиза, на основе которого создается новый"
+    )
+
+    @field_validator("based_on_release_id")
+    @classmethod
+    def validate_based_on_release_id(cls, v: Optional[int]) -> Optional[int]:
+        """Валидация ID базового релиза"""
+        if v is not None and v <= 0:
+            raise ValueError(
+                "Based on release ID must be a positive integer when provided"
+            )
+        return v
+
+
+class ReleaseUpdate(UpdateSchema, ValidationMixin):
+    """
+    Схема для обновления релиза.
+    Все поля опциональны для частичных обновлений.
+    """
+
+    name: Optional[str] = Field(
+        None,
+        min_length=2,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description=StandardDescriptions.NAME + " релиза",
+    )
+    version: Optional[str] = Field(
+        None,
+        min_length=1,
+        max_length=FieldLimits.VERSION_MAX,
+        description="Версия релиза в формате SemVer",
+    )
+    description: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.TEXT_MAX,
+        description=StandardDescriptions.DESCRIPTION + " релиза",
+    )
+    status: Optional[ReleaseStatus] = Field(None, description="Статус релиза")
+    release_type: Optional[ReleaseType] = Field(None, description="Тип релиза")
+    priority: Optional[ReleasePriority] = Field(None, description="Приоритет релиза")
+    planned_date: Optional[datetime] = Field(
+        None, description="Планируемая дата релиза"
+    )
+    release_date: Optional[datetime] = Field(
+        None, description="Фактическая дата релиза"
+    )
+    changelog: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Список изменений"
+    )
+    release_notes: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Заметки к релизу"
+    )
+    is_prerelease: Optional[bool] = Field(
+        None, description="Является ли предварительным релизом"
+    )
+    is_draft: Optional[bool] = Field(None, description="Черновик релиза")
+    tags: Optional[List[str]] = Field(None, description="Теги релиза")
+    repository_tag: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Тег в репозитории"
+    )
+    build_number: Optional[str] = Field(
+        None, max_length=FieldLimits.SHORT_STRING_MAX, description="Номер сборки"
+    )
+    is_active: Optional[bool] = Field(None, description=StandardDescriptions.IS_ACTIVE)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: Optional[str]) -> Optional[str]:
+        """Валидация названия при обновлении"""
+        if v is not None:
+            v = cls.validate_non_empty_string(v, "name")
+
+            forbidden_chars = ["<", ">", "&", '"', "'", ";", "|"]
+        if any(char in v for char in forbidden_chars):
+            raise ValueError(
+                f"Release name contains forbidden characters: {forbidden_chars}"
+            )
+
+        return v
+
+    @field_validator("version")
+    @classmethod
+    def validate_version(cls, v: Optional[str]) -> Optional[str]:
+        """Валидация версии при обновлении"""
+        if v is not None:
+            v = cls.validate_non_empty_string(v, "version")
+
+        version_patterns = [
+            r"^\d+\.\d+\.\d+$",
+            r"^v\d+\.\d+\.\d+$",
+            r"^\d+\.\d+$",
+            r"^v\d+\.\d+$",
+            r"^\d+\.\d+\.\d+-[a-zA-Z0-9\-\.]+$",
+            r"^v\d+\.\d+\.\d+-[a-zA-Z0-9\-\.]+$",
+        ]
+
+        if not any(re.match(pattern, v) for pattern in version_patterns):
+            raise ValueError(
+                "Invalid version format. Use SemVer format like 1.0.0, v1.0.0, 1.0.0-alpha, etc."
+            )
+
+        return v
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_at_least_one_field(cls, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Проверка, что хотя бы одно поле указано для обновления"""
+        if isinstance(data, dict):
+            if not any(v is not None for v in data.values()):
+                raise ValueError("At least one field must be provided for update")
+        return data
+
+
+class ReleaseResponse(ReleaseBase, ResponseSchema, UserRelatedSchema):
+    """
+    Схема ответа для релиза.
+    Включает все данные из БД включая связи.
+    """
+
+    based_on_release_id: Optional[int] = None
+
+
+# === Расширенные схемы ===
+
+
+class ReleaseWithRelations(ReleaseResponse):
+    """
+    Схема релиза с информацией о связанных сущностях.
+    """
+
+    project_name: Optional[str] = Field(None, description="Название проекта")
+    project_code: Optional[str] = Field(None, description="Код проекта")
+    owner_name: Optional[str] = Field(None, description="Имя создателя релиза")
+    based_on_release_name: Optional[str] = Field(
+        None, description="Название базового релиза"
+    )
+
+
+class ReleaseDetailed(ReleaseWithRelations):
+    """
+    Детальная схема релиза с полной информацией.
+    """
+
+    requirements_count: int = Field(0, ge=0, description="Количество требований")
+    completed_requirements: int = Field(0, ge=0, description="Выполненных требований")
+    progress_percentage: float = Field(
+        0.0, ge=0, le=100, description="Процент готовности"
+    )
+
+    # Статистика по статусам требований
+    requirements_by_status: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Распределение требований по статусам"
+    )
+
+    # Связанные релизы
+    dependent_releases: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Зависимые релизы"
+    )
+
+    # Активность
+    last_activity_date: Optional[datetime] = Field(
+        None, description="Дата последней активности"
+    )
+
+    # Права доступа для текущего пользователя
+    can_edit: bool = Field(False, description="Можно ли редактировать")
+    can_delete: bool = Field(False, description="Можно ли удалить")
+    can_publish: bool = Field(False, description="Можно ли опубликовать")
+    can_rollback: bool = Field(False, description="Можно ли откатить")
+
+
+# === Списки и пагинация ===
+
+
+class ReleaseListResponse(ListResponseSchema[ReleaseWithRelations]):
+    """Список релизов с пагинацией"""
+
+    pass
+
+
+class ReleaseDetailedListResponse(ListResponseSchema[ReleaseDetailed]):
+    """Детальный список релизов с пагинацией"""
+
+    pass
+
+
+# === Поиск и фильтрация ===
+
+
+class ReleaseSearchRequest(SearchRequest):
+    """
+    Запрос поиска релизов.
+    """
+
+    project_ids: Optional[List[int]] = Field(None, description="Фильтр по проектам")
+    statuses: Optional[List[ReleaseStatus]] = Field(
+        None, description="Фильтр по статусам"
+    )
+    types: Optional[List[ReleaseType]] = Field(None, description="Фильтр по типам")
+    priorities: Optional[List[ReleasePriority]] = Field(
+        None, description="Фильтр по приоритетам"
+    )
+    owner_ids: Optional[List[int]] = Field(None, description="Фильтр по создателям")
+    is_prerelease: Optional[bool] = Field(None, description="Предварительные релизы")
+    is_draft: Optional[bool] = Field(None, description="Черновики")
+    is_active: Optional[bool] = Field(None, description="Активные релизы")
+    tags: Optional[List[str]] = Field(None, description="Фильтр по тегам")
+    version_pattern: Optional[str] = Field(
+        None, description="Паттерн версии (регулярное выражение)"
+    )
+
+
+class ReleaseFilter(BaseSchema):
+    """
+    Расширенный фильтр для релизов.
+    """
+
+    progress_min: Optional[float] = Field(
+        None, ge=0.0, le=100.0, description="Минимальный прогресс"
+    )
+    progress_max: Optional[float] = Field(
+        None, ge=0.0, le=100.0, description="Максимальный прогресс"
+    )
+    requirements_count_min: Optional[int] = Field(
+        None, ge=0, description="Минимальное количество требований"
+    )
+    requirements_count_max: Optional[int] = Field(
+        None, ge=0, description="Максимальное количество требований"
+    )
+    planned_date_range: Optional[DateRangeFilter] = Field(
+        None, description="Диапазон планируемых дат"
+    )
+    release_date_range: Optional[DateRangeFilter] = Field(
+        None, description="Диапазон дат релиза"
+    )
+    overdue_only: Optional[bool] = Field(None, description="Только просроченные релизы")
+
+
+# === Статистика ===
+
+
+class ReleaseStatistics(StatisticsSchema):
+    """
+    Схема статистики релизов.
+    """
+
+    total_releases: int = Field(0, ge=0, description="Общее количество релизов")
+    released_count: int = Field(0, ge=0, description="Выпущенных релизов")
+    in_development_count: int = Field(0, ge=0, description="В разработке")
+    overdue_count: int = Field(0, ge=0, description="Просроченных релизов")
+
+    average_progress: float = Field(0.0, ge=0, le=100, description="Средний прогресс")
+    average_requirements_per_release: float = Field(
+        0.0, ge=0, description="Среднее количество требований"
+    )
+    average_development_time: float = Field(
+        0.0, ge=0, description="Среднее время разработки (дни)"
+    )
+
+    by_status: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Распределение по статусам"
+    )
+    by_type: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Распределение по типам"
+    )
+    by_priority: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Распределение по приоритетам"
+    )
+    by_project: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Распределение по проектам"
+    )
+
+    release_frequency: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Частота релизов по времени"
+    )
+    velocity_trends: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Тренды скорости разработки"
+    )
+    most_used_tags: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Самые популярные теги"
+    )
+
+
+# === Операции с релизами ===
+
+
+class ReleasePublishRequest(BaseSchema):
+    """
+    Запрос на публикацию релиза.
+    """
+
+    release_date: Optional[datetime] = Field(
+        None, description="Дата релиза (по умолчанию - текущая)"
+    )
+    notify_stakeholders: bool = Field(
+        True, description="Уведомить заинтересованных лиц"
+    )
+    generate_changelog: bool = Field(
+        True, description="Автоматически сгенерировать changelog"
+    )
+    create_repository_tag: bool = Field(True, description="Создать тег в репозитории")
+
+
+class ReleaseRollbackRequest(BaseSchema):
+    """
+    Запрос на откат релиза.
+    """
+
+    reason: str = Field(
+        ...,
+        min_length=10,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description="Причина отката",
+    )
+    rollback_to_version: Optional[str] = Field(None, description="Версия для отката")
+    notify_stakeholders: bool = Field(
+        True, description="Уведомить заинтересованных лиц"
+    )
+
+
+class ReleaseMergeRequest(BaseSchema):
+    """
+    Запрос на слияние релизов.
+    """
+
+    source_release_id: int = Field(..., gt=0, description="Исходный релиз")
+    target_release_id: int = Field(..., gt=0, description="Целевой релиз")
+    merge_strategy: str = Field(
+        "requirements_only",
+        regex="^(requirements_only|full_merge|selective)$",
+        description="Стратегия слияния",
+    )
+    reason: str = Field(
+        ...,
+        min_length=10,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description="Причина слияния",
+    )
+
+
+# === Массовые операции ===
+
+
+class ReleaseBulkUpdate(BaseSchema):
+    """
+    Схема для массового обновления релизов.
+    """
+
+    release_ids: List[int] = Field(..., min_length=1, description="Список ID релизов")
+    update_data: ReleaseUpdate = Field(..., description="Данные для обновления")
+    reason: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description="Причина массового обновления",
+    )
+
+
+class ReleaseBulkStatusChange(BaseSchema):
+    """
+    Схема для массового изменения статуса релизов.
+    """
+
+    release_ids: List[int] = Field(..., min_length=1, description="Список ID релизов")
+    new_status: ReleaseStatus = Field(..., description="Новый статус")
+    reason: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description="Причина изменения статуса",
+    )
+
+
+# === Экспорт и импорт ===
+
+
+class ReleaseExportRequest(BaseSchema):
+    """
+    Запрос на экспорт релизов.
     """
 
     format: str = Field(
-        "pdf",
-        description="Формат документа спецификации",
-        pattern="^(pdf|html|docx|markdown)$",
+        "xlsx", regex="^(xlsx|csv|pdf|json|changelog)$", description="Формат экспорта"
     )
-    language: str = Field("ru", description="Язык спецификации", pattern="^(ru|en)$")
-    include_requirements: bool = Field(
-        True, description="Включать подробности требований в спецификацию"
-    )
-    include_relationships: bool = Field(
-        True, description="Включать информацию о связях между требованиями"
-    )
-    include_test_cases: bool = Field(False, description="Включать связанные тест-кейсы")
-    include_changelog: bool = Field(
-        True, description="Включать журнал изменений релиза"
-    )
-    include_statistics: bool = Field(True, description="Включать статистику требований")
-    custom_sections: Optional[List[str]] = Field(
-        None, description="Пользовательские разделы спецификации"
-    )
-    template_style: str = Field(
-        "standard",
-        description="Стиль шаблона спецификации",
-        pattern="^(standard|detailed|compact|technical)$",
-    )
-    auto_numbering: bool = Field(
-        True, description="Автоматическая нумерация разделов и требований"
-    )
-
-    @field_validator("custom_sections")
-    def validate_custom_sections(cls, v):
-        """Валидация пользовательских разделов"""
-        if v is not None:
-            if len(v) > 20:
-                raise ValueError("Cannot have more than 20 custom sections")
-            for section in v:
-                if not section or len(section.strip()) == 0:
-                    raise ValueError("Section names cannot be empty")
-                if len(section) > 100:
-                    raise ValueError("Section names cannot exceed 100 characters")
-        return v
+    filter: Optional[ReleaseFilter] = Field(None, description="Фильтр для экспорта")
+    include_requirements: bool = Field(False, description="Включить требования")
+    include_changelog: bool = Field(True, description="Включить changelog")
+    include_statistics: bool = Field(False, description="Включить статистику")
 
 
-class SpecificationGenerationResponse(BaseModel):
+# === Константы и утилиты ===
+
+
+class ReleaseConfig:
     """
-    Ответ генерации спецификации релиза.
-
-    Результат выполнения Function 12.
+    Конфигурация схем релизов.
     """
 
-    release_id: int = Field(..., description="ID релиза")
-    specification_id: int = Field(..., description="ID созданной спецификации")
-    specification_name: str = Field(..., description="Название спецификации")
-    format: str = Field(..., description="Формат документа")
-    language: str = Field(..., description="Язык спецификации")
-    status: str = Field(..., description="Статус генерации")
-    generated_at: str = Field(..., description="Время генерации в ISO формате")
-    generated_by: Optional[int] = Field(
-        None, description="ID пользователя, создавшего спецификацию"
-    )
+    # Схемы для различных контекстов
+    MINIMAL = ReleaseResponse
+    STANDARD = ReleaseWithRelations
+    DETAILED = ReleaseDetailed
+    LIST = ReleaseListResponse
+    SEARCH = ReleaseSearchRequest
 
-    # Содержимое спецификации
-    sections: List[str] = Field(
-        default_factory=list, description="Список разделов спецификации"
-    )
-    requirements_count: int = Field(0, description="Количество включенных требований")
-    relationships_count: int = Field(0, description="Количество анализируемых связей")
+    # Ограничения
+    MAX_TAGS_PER_RELEASE = 15
+    MAX_TAG_LENGTH = 30
+    MAX_VERSION_LENGTH = 50
 
-    # Ссылки и доступ
-    download_url: str = Field(..., description="URL для скачивания спецификации")
-    preview_url: Optional[str] = Field(
-        None, description="URL для предварительного просмотра"
-    )
+    # Паттерны версий
+    SEMVER_PATTERNS = [
+        r"^\d+\.\d+\.\d+$",  # 1.0.0
+        r"^v\d+\.\d+\.\d+$",  # v1.0.0
+        r"^\d+\.\d+$",  # 1.0
+        r"^v\d+\.\d+$",  # v1.0
+        r"^\d+\.\d+\.\d+-[a-zA-Z0-9\-\.]+$",  # 1.0.0-alpha.1
+        r"^v\d+\.\d+\.\d+-[a-zA-Z0-9\-\.]+$",  # v1.0.0-rc.1
+    ]
 
-    # Статистика генерации
-    generation_stats: dict = Field(
-        default_factory=dict, description="Статистика процесса генерации"
-    )
-
-    @field_validator("status")
-    def validate_status(cls, v):
-        """Валидация статуса генерации"""
-        allowed_statuses = ["generated", "processing", "failed", "pending"]
-        if v not in allowed_statuses:
-            raise ValueError(f"Status must be one of: {allowed_statuses}")
-        return v
-
-    @field_validator("requirements_count", "relationships_count")
-    def validate_counts(cls, v):
-        """Валидация счетчиков"""
-        if v < 0:
-            raise ValueError("Counts cannot be negative")
-        return v
+    # Стандартные типы релизов для автоопределения
+    VERSION_TYPE_MAPPING = {
+        "major": r"^\d+\.0\.0",
+        "minor": r"^\d+\.\d+\.0",
+        "patch": r"^\d+\.\d+\.\d+$",
+        "alpha": r".*-alpha",
+        "beta": r".*-beta",
+        "rc": r".*-rc",
+        "hotfix": r".*hotfix.*",
+    }
 
 
-class SpecificationGenerationSummary(BaseModel):
-    """
-    Подробная сводка генерации спецификации.
+# === Псевдонимы для обратной совместимости ===
 
-    Расширенная информация о процессе создания спецификации.
-    """
-
-    specification: SpecificationGenerationResponse
-    processing_details: dict = Field(
-        default_factory=dict, description="Детали обработки и генерации"
-    )
-    validation_results: dict = Field(
-        default_factory=dict, description="Результаты валидации данных"
-    )
-    warnings: List[str] = Field(
-        default_factory=list, description="Предупреждения в процессе генерации"
-    )
-
-    @model_validator(mode="after")
-    def validate_consistency(self):
-        """Проверка согласованности данных сводки"""
-        if len(self.warnings) > 50:
-            raise ValueError("Too many warnings - possible generation issues")
-        return self
+Release = ReleaseResponse  # Базовый релиз
+ReleaseFromRequirementsCreate = ReleaseCreate  # Создание релиза из требований
+ReleaseCreationSummary = ReleaseWithRelations  # Сводка создания релиза
+ReleaseWithLinkedRequirements = ReleaseDetailed  # Релиз со связанными требованиями
+RequirementSummary = ReleaseWithRelations  # Сводка требований (временный псевдоним)

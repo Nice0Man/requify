@@ -3,9 +3,43 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { fileURLToPath, URL } from "node:url";
 
+// Plugin для CSP в зависимости от среды
+const cspPlugin = () => {
+  return {
+    name: 'csp-plugin',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html, context) {
+        // В production используем более строгую CSP политику
+        if (context.server) {
+          // Development CSP - более разрешающая для requify.local доменов
+          return html.replace(
+            /connect-src 'self' ws: wss: http:\/\/localhost:\* http:\/\/backend:\*;/,
+            "connect-src 'self' ws: wss: http://localhost:* http://backend:* http://*.requify.local;"
+          );
+        } else {
+          // Production CSP - более строгая
+          return html.replace(
+            /<meta http-equiv="Content-Security-Policy"[^>]*>/,
+            `<meta http-equiv="Content-Security-Policy" content="
+              default-src 'self';
+              script-src 'self' 'unsafe-inline';
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com;
+              font-src 'self' https://fonts.gstatic.com;
+              img-src 'self' data: blob: http://cdn.requify.local https://cdn.requify.local;
+              connect-src 'self' https: http://*.requify.local;
+              worker-src 'self' blob:;
+            ">`
+          );
+        }
+      }
+    }
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), cspPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(path.dirname(fileURLToPath(import.meta.url)), "./src"),
@@ -48,9 +82,14 @@ export default defineConfig({
     allowedHosts: [
       "backend",
       "localhost",
+      "requify.local",
+      "api.requify.local",
+      "cdn.requify.local",
+      "admin.requify.local",
+      "docs.requify.local",
       "127.0.0.1",
       "requify_frontend",
-      "requify-frontend-dev",
+      "requify-frontend-dev", 
     ],
     proxy: {
       "/api": {

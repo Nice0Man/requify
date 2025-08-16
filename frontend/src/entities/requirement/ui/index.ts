@@ -1,13 +1,19 @@
 /**
  * Requirement UI components exports
- * TODO: Создать компоненты для требований
+ * Экспорт всех UI компонентов для работы с требованиями
  */
 
-// export { RequirementCard } from './RequirementCard';
-// export { RequirementList } from './RequirementList';
-// export { RequirementForm } from './RequirementForm';
+export { RequirementCard } from './RequirementCard';
+export type { RequirementCardProps } from './RequirementCard';
 
-// Временная заглушка
-export const RequirementUIPlaceholder = {
-  // TODO: Добавить компоненты
-};
+export { RequirementList } from './RequirementList';
+export type { RequirementListProps, RequirementListItem } from './RequirementList';
+
+export { RequirementStatus } from './RequirementStatus';
+export type { RequirementStatusProps } from './RequirementStatus';
+
+export { RequirementPriority } from './RequirementPriority';
+export type { RequirementPriorityProps } from './RequirementPriority';
+
+export { RequirementType } from './RequirementType';
+export type { RequirementTypeProps } from './RequirementType';

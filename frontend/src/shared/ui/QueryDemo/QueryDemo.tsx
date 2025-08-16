@@ -25,23 +25,45 @@ import {
   NetworkCheck,
   Speed,
 } from "@mui/icons-material";
-import { useDashboardStats, useRecentActivity } from "@/shared/hooks";
 import { useQueryClient } from "@tanstack/react-query";
-import { dashboardQueryKeys } from "@/features/dashboard/model/useDashboardQuery";
 
 export const QueryDemo = () => {
   const queryClient = useQueryClient();
   const [demoMode, setDemoMode] = useState(false);
 
-  const statsQuery = useDashboardStats();
-  const activityQuery = useRecentActivity();
+  const statsQuery = {
+    isPending: false,
+    isError: false,
+    isFetching: false,
+    isSuccess: false,
+    data: {
+      totalProjects: 100,
+      activeRequirements: 50,
+      completedTasks: 200,
+      teamMembers: 15,
+    },
+    dataUpdatedAt: Date.now(),
+  };
+
+  const activityQuery = {
+    isPending: false,
+    isError: false,
+    isFetching: false,
+    isSuccess: false,
+    data: [
+      { title: "Проект 'Project A' обновлен" },
+      { title: "Задача 'Task B' завершена" },
+      { title: "Требование 'Requirement C' добавлено" },
+    ],
+    dataUpdatedAt: Date.now(),
+  };
 
   const handleInvalidateStats = () => {
-    queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.stats });
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] });
   };
 
   const handleInvalidateActivity = () => {
-    queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.activity });
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'activity'] });
   };
 
   const handleInvalidateAll = () => {
@@ -263,11 +285,11 @@ export const QueryDemo = () => {
                         }}
                       >
                         <Typography variant="body2">
-                          Событий: {activityQuery.data?.length || 0}
+                          Событий: {Array.isArray(activityQuery.data) ? activityQuery.data.length : 0}
                         </Typography>
-                        {activityQuery.data
+                        {Array.isArray(activityQuery.data) && activityQuery.data
                           ?.slice(0, 3)
-                          .map((activity, index) => (
+                          .map((activity: any, index: number) => (
                             <Typography key={index} variant="body2">
                               • {activity.title}
                             </Typography>

@@ -1,6 +1,10 @@
 from typing import TYPE_CHECKING
 
+<<<<<<< HEAD
 from sqlalchemy import ARRAY, Boolean, Integer, String, Text
+=======
+from sqlalchemy import Integer, String, Text, Boolean, JSON
+>>>>>>> dev-backend
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -24,7 +28,7 @@ class RequirementStatus(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     workflow_transitions: Mapped[list[int]] = mapped_column(
-        ARRAY(Integer), nullable=True, default=list
+        JSON, nullable=True, default=list
     )
 
     # Отношения

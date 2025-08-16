@@ -1,0 +1,522 @@
+{% extends "base.html.jinja" %}
+
+{% block title %}{{ alert_type | upper }} - Системное предупреждение - Requify{% endblock %}
+
+{% block content %}
+<h1 class="email-title alert-{{ severity | default('warning') }}">
+    <span class="icon">{{ severity_icon | default('⚠️') }}</span>{{ alert_title | default('Системное предупреждение') }}
+</h1>
+
+<div class="alert alert-{{ severity | default('warning') }}">
+    <div class="alert-title">
+        <span class="icon">🖥️</span>Состояние системы
+    </div>
+    <div class="alert-text">
+        {{ alert_message | default('Обнаружена проблема в работе системы, требующая внимания.') | safe }}
+    </div>
+</div>
+
+<div class="system-info">
+    <h3 class="section-title">
+        <span class="icon">📊</span>Информация о системе
+    </h3>
+    
+    <div class="info-grid">
+        <div class="info-item">
+            <div class="info-label">🖥️ Сервис</div>
+            <div class="info-value">{{ service_name | default('Requify Platform') }}</div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-label">⏰ Время события</div>
+            <div class="info-value">{{ event_timestamp | default('Неизвестно') }}</div>
+        </div>
+        
+        {% if environment %}
+        <div class="info-item">
+            <div class="info-label">🌍 Окружение</div>
+            <div class="info-value code">{{ environment }}</div>
+        </div>
+        {% endif %}
+        
+        {% if server_info %}
+        <div class="info-item">
+            <div class="info-label">🖥️ Сервер</div>
+            <div class="info-value code">{{ server_info }}</div>
+        </div>
+        {% endif %}
+        
+        {% if error_code %}
+        <div class="info-item">
+            <div class="info-label">🔢 Код ошибки</div>
+            <div class="info-value code">{{ error_code }}</div>
+        </div>
+        {% endif %}
+        
+        {% if affected_users %}
+        <div class="info-item">
+            <div class="info-label">👥 Затронуто пользователей</div>
+            <div class="info-value">{{ affected_users }}</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if error_details %}
+<div class="alert alert-danger">
+    <div class="alert-title">
+        <span class="icon">🐛</span>Детали ошибки
+    </div>
+    <div class="alert-text">
+        <pre class="error-details">{{ error_details }}</pre>
+    </div>
+</div>
+{% endif %}
+
+{% if stack_trace %}
+<div class="collapsible-section">
+    <details>
+        <summary class="collapsible-header">
+            <span class="icon">📋</span>Stack Trace (техническая информация)
+        </summary>
+        <div class="collapsible-content">
+            <pre class="stack-trace">{{ stack_trace }}</pre>
+        </div>
+    </details>
+</div>
+{% endif %}
+
+{% if metrics %}
+<div class="metrics-section">
+    <h3 class="section-title">
+        <span class="icon">📈</span>Метрики системы
+    </h3>
+    
+    <div class="metrics-grid">
+        {% for metric in metrics %}
+        <div class="metric-item {{ 'critical' if metric.status == 'critical' else 'warning' if metric.status == 'warning' else '' }}">
+            <div class="metric-label">{{ metric.name }}</div>
+            <div class="metric-value">{{ metric.value }}</div>
+            {% if metric.threshold %}
+            <div class="metric-threshold">Порог: {{ metric.threshold }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="action-section">
+    <h3 class="section-title">
+        <span class="icon">🔧</span>Необходимые действия
+    </h3>
+    
+    <div class="action-list">
+        {% if severity == 'critical' %}
+        <div class="action-item urgent">
+            <span class="action-icon">🚨</span>
+            <span class="action-text">КРИТИЧНО: Немедленное вмешательство администратора</span>
+        </div>
+        {% endif %}
+        
+        {% if auto_recovery %}
+        <div class="action-item {{ 'completed' if auto_recovery.success else 'pending' }}">
+            <span class="action-icon">{{ '✅' if auto_recovery.success else '🔄' }}</span>
+            <span class="action-text">{{ auto_recovery.message }}</span>
+        </div>
+        {% endif %}
+        
+        {% if recommended_actions %}
+        {% for action in recommended_actions %}
+        <div class="action-item {{ action.priority | default('') }}">
+            <span class="action-icon">{{ action.icon | default('🔧') }}</span>
+            <span class="action-text">{{ action.text }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+{% if monitoring_urls %}
+<div class="button-container">
+    {% for url in monitoring_urls %}
+    <a href="{{ url.link }}" class="button {{ url.style | default('button-info') }}">
+        <span class="icon">{{ url.icon | default('📊') }}</span>{{ url.text }}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if resolution_steps %}
+<div class="alert alert-info">
+    <div class="alert-title">
+        <span class="icon">🛠️</span>Шаги по устранению
+    </div>
+    <div class="alert-text">
+        <ol class="resolution-list">
+            {% for step in resolution_steps %}
+            <li>{{ step }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+</div>
+{% endif %}
+
+<div class="system-status">
+    <h3 class="section-title">
+        <span class="icon">🔍</span>Статус других сервисов
+    </h3>
+    
+    <div class="status-grid">
+        {% if service_status %}
+        {% for service in service_status %}
+        <div class="status-item {{ service.status }}">
+            <div class="status-indicator"></div>
+            <div class="status-name">{{ service.name }}</div>
+            <div class="status-value">{{ service.status | upper }}</div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="status-item unknown">
+            <div class="status-indicator"></div>
+            <div class="status-name">Общий статус</div>
+            <div class="status-value">ПРОВЕРЯЕТСЯ</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="footer-info">
+    <p class="text-small text-muted">
+        Это автоматическое системное уведомление от платформы Requify.
+        Время генерации: {{ event_timestamp | default('сейчас') }}
+    </p>
+</div>
+
+<style>
+/* Severity colors */
+.email-title.alert-low {
+    color: #388e3c;
+    background: linear-gradient(135deg, #f1f8e9, #c8e6c9);
+    border: 2px solid #66bb6a;
+}
+
+.email-title.alert-medium {
+    color: #f57c00;
+    background: linear-gradient(135deg, #fff8e1, #ffcc02);
+    border: 2px solid #ffb74d;
+}
+
+.email-title.alert-high {
+    color: #d32f2f;
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border: 2px solid #ef5350;
+}
+
+.email-title.alert-critical {
+    color: #b71c1c;
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border: 2px solid #d32f2f;
+    animation: pulse 2s infinite;
+}
+
+/* System info */
+.system-info {
+    margin: 32px 0;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.info-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid #2196f3;
+}
+
+.info-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.info-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.info-value.code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: #f1f3f4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Error details */
+.error-details, .stack-trace {
+    background: #2c2c2c;
+    color: #ff6b6b;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Collapsible sections */
+.collapsible-section {
+    margin: 24px 0;
+}
+
+.collapsible-header {
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+}
+
+.collapsible-header:hover {
+    background: #e9ecef;
+}
+
+.collapsible-content {
+    margin-top: 8px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+/* Metrics */
+.metrics-section {
+    margin: 32px 0;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.metric-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid #4caf50;
+    text-align: center;
+}
+
+.metric-item.warning {
+    border-left-color: #ff9800;
+    background: #fff8e1;
+}
+
+.metric-item.critical {
+    border-left-color: #f44336;
+    background: #ffebee;
+}
+
+.metric-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.metric-threshold {
+    font-size: 12px;
+    color: #999;
+}
+
+/* Actions */
+.action-section {
+    margin: 32px 0;
+}
+
+.action-list {
+    list-style: none;
+    padding: 0;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #2196f3;
+}
+
+.action-item.completed {
+    border-left-color: #4caf50;
+    background: #f1f8e9;
+}
+
+.action-item.pending {
+    border-left-color: #ffc107;
+    background: #fffbf0;
+}
+
+.action-item.urgent {
+    border-left-color: #f44336;
+    background: #ffebee;
+    animation: pulse 2s infinite;
+}
+
+.action-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.action-text {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Resolution steps */
+.resolution-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.resolution-list li {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+/* Service status */
+.system-status {
+    margin: 32px 0;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid #4caf50;
+}
+
+.status-item.warning {
+    border-left-color: #ff9800;
+}
+
+.status-item.critical {
+    border-left-color: #f44336;
+}
+
+.status-item.unknown {
+    border-left-color: #9e9e9e;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4caf50;
+    margin-right: 12px;
+}
+
+.status-item.warning .status-indicator {
+    background: #ff9800;
+}
+
+.status-item.critical .status-indicator {
+    background: #f44336;
+    animation: pulse 1s infinite;
+}
+
+.status-item.unknown .status-indicator {
+    background: #9e9e9e;
+}
+
+.status-name {
+    flex: 1;
+    font-weight: 600;
+    color: #333;
+}
+
+.status-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+
+/* Footer */
+.footer-info {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.text-small {
+    font-size: 14px;
+}
+
+.text-muted {
+    color: #666;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+    .info-grid, .metrics-grid, .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-item {
+        padding: 8px 12px;
+    }
+    
+    .error-details, .stack-trace {
+        font-size: 11px;
+        padding: 12px;
+    }
+}
+</style>
+{% endblock %} 
