@@ -4,10 +4,7 @@ version = "0.1.0"
 description = "Автоматизированная система управления требованиями"
 authors = ["Eugene <e.krotov03@gmail.com>"]
 readme = "README.md"
-<<<<<<< HEAD
 packages = [{include = "app"}]
-=======
->>>>>>> dev-backend
 
 [tool.poetry.dependencies]
 python = "^3.13"
@@ -46,18 +43,12 @@ pytest-cov = "^6.0.0"
 isort = "^5.13.0"
 flake8 = "^7.0.0"
 pylint = "^3.3.7"
-<<<<<<< HEAD
 safety = "^3.0.0"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-=======
 sqlmodel = "^0.0.24"
 pyyaml = "^6.0.2"
 
 [tool.pytest.ini_options]
-testpaths = ["app/tests"]
->>>>>>> dev-backend
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
