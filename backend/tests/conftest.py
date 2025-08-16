@@ -1,20 +1,42 @@
 """
-Конфигурация pytest для тестов совместимости моделей и схем.
+Конфигурация pytest для тестов Requify Backend API.
 
 Содержит общие фикстуры и настройки для всех тестов.
+Следует лучшим практикам pytest для тестирования FastAPI приложений.
 """
 
 import pytest
 import asyncio
-from typing import Generator, Any
+import os
+import sys
+from pathlib import Path
+from typing import Generator, Any, AsyncGenerator
+from unittest.mock import MagicMock
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
 from sqlalchemy.engine import Engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlmodel import SQLModel
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.append(str(project_root))
+
+from app.main import app
 from app.models.base import Base
 from app.core.config import settings as app_settings
+from app.db.db_helper import db_helper
+from app.core.security import get_password_hash
+from app.models.user import User
+from app.models.enhanced_role_system import (
+    EnhancedRole,
+    UserRoleAssignment,
+    SystemRole,
+    RoleScope,
+)
 
 
 # Автоматическое включение asyncio для асинхронных тестов
@@ -277,3 +299,145 @@ def db_type(request):
 pytest_plugins = [
     # Можно добавить дополнительные плагины
 ]
+
+
+# Дополнительные фикстуры для CI/CD и интеграционного тестирования
+@pytest.fixture(scope="function")
+def client() -> Generator[TestClient, None, None]:
+    """
+    Фикстура для синхронного HTTP клиента.
+    Создает TestClient для тестирования FastAPI endpoints.
+    """
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+@pytest.fixture(scope="function")
+async def async_client() -> AsyncGenerator[AsyncClient, None]:
+    """
+    Фикстура для асинхронного HTTP клиента.
+    Создает AsyncClient для асинхронного тестирования endpoints.
+    """
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest.fixture(scope="function")
+def admin_credentials() -> dict[str, str]:
+    """
+    Фикстура с учетными данными администратора для тестирования.
+    """
+    return {
+        "username": app_settings.admin.email,
+        "password": app_settings.admin.password,
+        "email": app_settings.admin.email,
+        "name": app_settings.admin.name,
+    }
+
+
+@pytest.fixture(scope="function")
+def temp_directory(tmp_path: Path) -> Path:
+    """
+    Фикстура для создания временной директории для тестов.
+    """
+    test_dir = tmp_path / "test_files"
+    test_dir.mkdir(exist_ok=True)
+    return test_dir
+
+
+@pytest.fixture(scope="function") 
+def sample_files(temp_directory: Path) -> dict[str, Path]:
+    """
+    Фикстура для создания образцов файлов для тестирования загрузки.
+    """
+    files = {}
+    
+    # Текстовый файл
+    text_file = temp_directory / "sample.txt"
+    text_file.write_text("Sample text content", encoding="utf-8")
+    files["text"] = text_file
+    
+    # JSON файл
+    json_file = temp_directory / "sample.json"
+    json_file.write_text('{"test": "data"}', encoding="utf-8")
+    files["json"] = json_file
+    
+    # Пустой файл
+    empty_file = temp_directory / "empty.txt"
+    empty_file.touch()
+    files["empty"] = empty_file
+    
+    return files
+
+
+@pytest.fixture(autouse=True)
+def clean_environment():
+    """
+    Автоматическая очистка окружения для каждого теста.
+    """
+    # Сохраняем исходное состояние переменных окружения
+    original_env = os.environ.copy()
+    
+    yield
+    
+    # Восстанавливаем переменные окружения
+    os.environ.clear()
+    os.environ.update(original_env)
+
+
+# Хуки для расширенной функциональности
+def pytest_configure(config):
+    """
+    Конфигурация pytest при запуске.
+    """
+    # Добавляем custom markers
+    config.addinivalue_line("markers", "ci: mark test to run in CI environment")
+    config.addinivalue_line("markers", "domain: mark test as domain-specific")
+
+
+def pytest_collection_modifyitems(config, items):
+    """
+    Модификация собранных тестов.
+    """
+    for item in items:
+        # Автоматически добавляем маркер unit для быстрых тестов
+        if item.fspath.pname.startswith("test_") and not any(
+            marker.name in ["integration", "performance", "security"]
+            for marker in item.iter_markers()
+        ):
+            item.add_marker(pytest.mark.unit)
+
+
+def pytest_runtest_setup(item):
+    """
+    Настройка перед запуском каждого теста.
+    """
+    # Пропускаем интеграционные тесты если нет соответствующего флага
+    if "integration" in item.keywords:
+        if not item.config.getoption("--run-integration", default=False):
+            pytest.skip("integration tests not requested")
+
+
+# Дополнительные опции командной строки
+def pytest_addoption(parser):
+    """
+    Добавляет дополнительные опции командной строки для pytest.
+    """
+    parser.addoption(
+        "--run-integration",
+        action="store_true",
+        default=False,
+        help="run integration tests"
+    )
+    parser.addoption(
+        "--run-performance",
+        action="store_true", 
+        default=False,
+        help="run performance tests"
+    )
+    parser.addoption(
+        "--run-security",
+        action="store_true",
+        default=False,
+        help="run security tests"
+    )
