@@ -3,43 +3,9 @@ SQLAlchemy модели.
 Полностью обновлено для 4NF архитектуры с многопользовательской поддержкой.
 """
 
-<<<<<<< HEAD
-from .comment import Comment
-
-# Dashboard models
-from .dashboard import (
-    DashboardActivity,
-    DashboardNotification,
-    DashboardWidget,
-    UserDashboardPreferences,
-)
-from .project import Project
-from .refresh_token import RefreshToken
-from .relationship import Relationship
-from .relationship_types import RelationshipType
-from .release import Release
-from .requirement import Requirement
-from .requirement_group import RequirementGroup
-from .requirement_group_version import RequirementGroupVersion
-from .requirement_priorities import RequirementPriority
-
-# Импортируем энумы
-from .requirement_statuses import RequirementStatus
-from .requirement_types import RequirementType
-from .spec import Spec
-
-# Team models
-from .team import Team
-from .team_member import TeamMember
-from .test_result import TestResult
-
-# Импортируем все модели для Alembic автогенерации миграций
-from .user import User
-=======
 import os
 import importlib
 from typing import List
-
 
 # Автоматический импорт всех моделей из папки models
 def _import_all_models():
@@ -59,7 +25,6 @@ def _import_all_models():
         ):
             module_name = filename[:-3]  # убираем .py
             model_files.append(module_name)
->>>>>>> dev-backend
 
     # Импортируем модули и собираем все экспортируемые объекты
     all_exports = []

@@ -5,18 +5,10 @@ from fastapi import FastAPI
 from sqlalchemy import text
 
 from app.api.v1.router import api_router
-<<<<<<< HEAD
 from app.core.config import settings
 from app.utils.logger import LoggedOperation, logger
 
 # from fastapi.middleware.cors import CORSMiddleware  # CORS handled by Nginx
-=======
-
-# from app.core.config import settings  # Temporarily commented out
-from app.utils.logger import logger, LoggedOperation
->>>>>>> dev-backend
-
-from app.core.config import settings
 
 
 @asynccontextmanager

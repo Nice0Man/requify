@@ -1,8 +1,6 @@
 """
 Автоматический импорт всех схем Pydantic из папки schemas.
 """
-
-<<<<<<< HEAD
 # Auth schemas
 from .auth import (
     AuthError,
