@@ -1,13 +1,15 @@
 /**
  * Project UI components exports
- * TODO: Создать компоненты для проектов
+ * Экспорт UI компонентов для работы с проектами
  */
 
-// export { ProjectCard } from './ProjectCard';
-// export { ProjectList } from './ProjectList';
-// export { ProjectForm } from './ProjectForm';
+export { ProjectCard } from './ProjectCard';
+export type { ProjectCardProps } from './ProjectCard';
 
-// Временная заглушка
-export const ProjectUIPlaceholder = {
-  // TODO: Добавить компоненты
-}; 
+export { ProjectList } from './ProjectList';
+export type { 
+  ProjectListProps, 
+  ProjectFilters,
+  ProjectSortField,
+  ProjectSortOrder 
+} from './ProjectList'; 

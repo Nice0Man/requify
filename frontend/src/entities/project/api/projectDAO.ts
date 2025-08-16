@@ -3,7 +3,8 @@
  * Основано на схемах из backend/app/schemas/project.py
  */
 
-import { client } from '@/shared/api/client';
+import { client } from "@/app/providers/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
 import type {
   Project,
   ProjectCreate,
@@ -12,10 +13,6 @@ import type {
   ProjectListResponse,
   ProjectDetailResponse,
   ProjectQueryParams,
-  ProjectBulkOperation,
-  ProjectImportData,
-  ProjectExportOptions,
-  ProjectValidationResult,
   ProjectTeamMember,
   ProjectTeamRequest,
   ProjectTeamResponse,
@@ -26,7 +23,14 @@ import type {
   ProjectTemplateCreate,
   ProjectFromTemplate,
   ProjectDashboard,
-} from '@/shared/types/project';
+  ProjectBulkOperation,
+  ProjectImportData,
+  ProjectExportOptions,
+  ProjectValidationResult,
+} from "../model/types";
+
+// Дополнительные типы для DAO (если нужны)
+// (убираем дублированные типы, которые теперь есть в model/types)
 
 /**
  * ProjectDAO - класс для работы с API проектов
@@ -53,10 +57,12 @@ export class ProjectDAO {
    */
   async getProjects(params?: ProjectQueryParams): Promise<ProjectListResponse> {
     try {
-      const response = await client.get<ProjectListResponse>('/projects', { params });
+      const response = await client.get<ProjectListResponse>("/projects", {
+        params,
+      });
       return response.data;
     } catch (error) {
-      console.error('Failed to get projects:', error);
+      console.error("Failed to get projects:", error);
       throw error;
     }
   }
@@ -66,7 +72,9 @@ export class ProjectDAO {
    */
   async getProjectById(id: number): Promise<ProjectDetailResponse> {
     try {
-      const response = await client.get<ProjectDetailResponse>(`/projects/${id}`);
+      const response = await client.get<ProjectDetailResponse>(
+        `/projects/${id}`
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project ${id}:`, error);
@@ -79,7 +87,9 @@ export class ProjectDAO {
    */
   async getProjectByCode(code: string): Promise<ProjectDetailResponse> {
     try {
-      const response = await client.get<ProjectDetailResponse>(`/projects/code/${code}`);
+      const response = await client.get<ProjectDetailResponse>(
+        `/projects/code/${code}`
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project by code ${code}:`, error);
@@ -92,10 +102,10 @@ export class ProjectDAO {
    */
   async createProject(projectData: ProjectCreate): Promise<Project> {
     try {
-      const response = await client.post<Project>('/projects', projectData);
+      const response = await client.post<Project>("/projects", projectData);
       return response.data;
     } catch (error) {
-      console.error('Failed to create project:', error);
+      console.error("Failed to create project:", error);
       throw error;
     }
   }
@@ -103,9 +113,15 @@ export class ProjectDAO {
   /**
    * Обновить проект
    */
-  async updateProject(id: number, projectData: ProjectUpdate): Promise<Project> {
+  async updateProject(
+    id: number,
+    projectData: ProjectUpdate
+  ): Promise<Project> {
     try {
-      const response = await client.put<Project>(`/projects/${id}`, projectData);
+      const response = await client.put<Project>(
+        `/projects/${id}`,
+        projectData
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to update project ${id}:`, error);
@@ -116,9 +132,15 @@ export class ProjectDAO {
   /**
    * Частично обновить проект
    */
-  async patchProject(id: number, projectData: Partial<ProjectUpdate>): Promise<Project> {
+  async patchProject(
+    id: number,
+    projectData: Partial<ProjectUpdate>
+  ): Promise<Project> {
     try {
-      const response = await client.patch<Project>(`/projects/${id}`, projectData);
+      const response = await client.patch<Project>(
+        `/projects/${id}`,
+        projectData
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to patch project ${id}:`, error);
@@ -131,7 +153,7 @@ export class ProjectDAO {
    */
   async deleteProject(id: number): Promise<void> {
     try {
-      await client.delete(`/projects/${id}`);
+      await client.delete(API_ENDPOINTS.PROJECTS.DELETE(id.toString()));
     } catch (error) {
       console.error(`Failed to delete project ${id}:`, error);
       throw error;
@@ -145,7 +167,9 @@ export class ProjectDAO {
    */
   async getProjectWithStats(id: number): Promise<ProjectWithStats> {
     try {
-      const response = await client.get<ProjectWithStats>(`/projects/${id}/stats`);
+      const response = await client.get<ProjectWithStats>(
+        `/projects/${id}/stats`
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project stats for ${id}:`, error);
@@ -156,12 +180,17 @@ export class ProjectDAO {
   /**
    * Получить список проектов со статистикой
    */
-  async getProjectsWithStats(params?: ProjectQueryParams): Promise<{ projects: ProjectWithStats[]; total: number }> {
+  async getProjectsWithStats(
+    params?: ProjectQueryParams
+  ): Promise<{ projects: ProjectWithStats[]; total: number }> {
     try {
-      const response = await client.get<{ projects: ProjectWithStats[]; total: number }>('/projects/with-stats', { params });
+      const response = await client.get<{
+        projects: ProjectWithStats[];
+        total: number;
+      }>("/projects/with-stats", { params });
       return response.data;
     } catch (error) {
-      console.error('Failed to get projects with stats:', error);
+      console.error("Failed to get projects with stats:", error);
       throw error;
     }
   }
@@ -173,7 +202,9 @@ export class ProjectDAO {
    */
   async getProjectTeam(id: number): Promise<ProjectTeamResponse> {
     try {
-      const response = await client.get<ProjectTeamResponse>(`/projects/${id}/team`);
+      const response = await client.get<ProjectTeamResponse>(
+        `/projects/${id}/team`
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project team for ${id}:`, error);
@@ -184,9 +215,15 @@ export class ProjectDAO {
   /**
    * Добавить участника в команду проекта
    */
-  async addTeamMember(id: number, memberData: ProjectTeamRequest): Promise<ProjectTeamMember> {
+  async addTeamMember(
+    id: number,
+    memberData: ProjectTeamRequest
+  ): Promise<ProjectTeamMember> {
     try {
-      const response = await client.post<ProjectTeamMember>(`/projects/${id}/team`, memberData);
+      const response = await client.post<ProjectTeamMember>(
+        `/projects/${id}/team`,
+        memberData
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to add team member to project ${id}:`, error);
@@ -197,12 +234,22 @@ export class ProjectDAO {
   /**
    * Обновить роль участника команды
    */
-  async updateTeamMember(id: number, userId: number, memberData: Partial<ProjectTeamRequest>): Promise<ProjectTeamMember> {
+  async updateTeamMember(
+    id: number,
+    userId: number,
+    memberData: ProjectTeamRequest
+  ): Promise<ProjectTeamMember> {
     try {
-      const response = await client.put<ProjectTeamMember>(`/projects/${id}/team/${userId}`, memberData);
+      const response = await client.put<ProjectTeamMember>(
+        `/projects/${id}/team/${userId}`,
+        memberData
+      );
       return response.data;
     } catch (error) {
-      console.error(`Failed to update team member ${userId} in project ${id}:`, error);
+      console.error(
+        `Failed to update team member ${userId} in project ${id}:`,
+        error
+      );
       throw error;
     }
   }
@@ -212,9 +259,17 @@ export class ProjectDAO {
    */
   async removeTeamMember(id: number, userId: number): Promise<void> {
     try {
-      await client.delete(`/projects/${id}/team/${userId}`);
+      await client.delete(
+        API_ENDPOINTS.PROJECTS.REMOVE_TEAM_MEMBER(
+          id.toString(),
+          userId.toString()
+        )
+      );
     } catch (error) {
-      console.error(`Failed to remove team member ${userId} from project ${id}:`, error);
+      console.error(
+        `Failed to remove team member ${userId} from project ${id}:`,
+        error
+      );
       throw error;
     }
   }
@@ -226,7 +281,9 @@ export class ProjectDAO {
    */
   async getProjectStatistics(id: number): Promise<ProjectStatistics> {
     try {
-      const response = await client.get<ProjectStatistics>(`/projects/${id}/statistics`);
+      const response = await client.get<ProjectStatistics>(
+        `/projects/${id}/statistics`
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project statistics for ${id}:`, error);
@@ -237,11 +294,18 @@ export class ProjectDAO {
   /**
    * Получить активность проекта
    */
-  async getProjectActivity(id: number, page = 1, perPage = 20): Promise<ProjectActivityResponse> {
+  async getProjectActivity(
+    id: number,
+    page = 1,
+    perPage = 20
+  ): Promise<ProjectActivityResponse> {
     try {
-      const response = await client.get<ProjectActivityResponse>(`/projects/${id}/activity`, {
-        params: { page, per_page: perPage },
-      });
+      const response = await client.get<ProjectActivityResponse>(
+        `/projects/${id}/activity`,
+        {
+          params: { page, per_page: perPage },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project activity for ${id}:`, error);
@@ -254,7 +318,9 @@ export class ProjectDAO {
    */
   async getProjectDashboard(id: number): Promise<ProjectDashboard> {
     try {
-      const response = await client.get<ProjectDashboard>(`/projects/${id}/dashboard`);
+      const response = await client.get<ProjectDashboard>(
+        `/projects/${id}/dashboard`
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project dashboard for ${id}:`, error);
@@ -269,7 +335,9 @@ export class ProjectDAO {
    */
   async getProjectSettings(id: number): Promise<ProjectSettings> {
     try {
-      const response = await client.get<ProjectSettings>(`/projects/${id}/settings`);
+      const response = await client.get<ProjectSettings>(
+        `/projects/${id}/settings`
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get project settings for ${id}:`, error);
@@ -280,9 +348,15 @@ export class ProjectDAO {
   /**
    * Обновить настройки проекта
    */
-  async updateProjectSettings(id: number, settings: Partial<ProjectSettings>): Promise<ProjectSettings> {
+  async updateProjectSettings(
+    id: number,
+    settings: Partial<ProjectSettings>
+  ): Promise<ProjectSettings> {
     try {
-      const response = await client.put<ProjectSettings>(`/projects/${id}/settings`, settings);
+      const response = await client.put<ProjectSettings>(
+        `/projects/${id}/settings`,
+        settings
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to update project settings for ${id}:`, error);
@@ -297,9 +371,9 @@ export class ProjectDAO {
    */
   async bulkOperation(operation: ProjectBulkOperation): Promise<void> {
     try {
-      await client.post('/projects/bulk', operation);
+      await client.post(API_ENDPOINTS.PROJECTS.BULK, operation);
     } catch (error) {
-      console.error('Failed to perform bulk operation:', error);
+      console.error("Failed to perform bulk operation:", error);
       throw error;
     }
   }
@@ -309,9 +383,9 @@ export class ProjectDAO {
    */
   async importProjects(data: ProjectImportData): Promise<void> {
     try {
-      await client.post('/projects/import', data);
+      await client.post(API_ENDPOINTS.PROJECTS.IMPORT, data);
     } catch (error) {
-      console.error('Failed to import projects:', error);
+      console.error("Failed to import projects:", error);
       throw error;
     }
   }
@@ -321,12 +395,16 @@ export class ProjectDAO {
    */
   async exportProjects(options: ProjectExportOptions): Promise<Blob> {
     try {
-      const response = await client.post('/projects/export', options, {
-        responseType: 'blob',
-      });
+      const response = await client.post(
+        API_ENDPOINTS.PROJECTS.EXPORT,
+        options,
+        {
+          responseType: "blob",
+        }
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to export projects:', error);
+      console.error("Failed to export projects:", error);
       throw error;
     }
   }
@@ -336,12 +414,17 @@ export class ProjectDAO {
   /**
    * Валидация данных проекта
    */
-  async validateProject(projectData: ProjectCreate | ProjectUpdate): Promise<ProjectValidationResult> {
+  async validateProject(
+    projectData: ProjectCreate | ProjectUpdate
+  ): Promise<ProjectValidationResult> {
     try {
-      const response = await client.post<ProjectValidationResult>('/projects/validate', projectData);
+      const response = await client.post<ProjectValidationResult>(
+        "/projects/validate",
+        projectData
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to validate project data:', error);
+      console.error("Failed to validate project data:", error);
       throw error;
     }
   }
@@ -351,10 +434,12 @@ export class ProjectDAO {
    */
   async checkCodeAvailability(code: string): Promise<boolean> {
     try {
-      const response = await client.get<{ available: boolean }>(`/projects/check-code/${code}`);
+      const response = await client.get<{ available: boolean }>(
+        `/projects/check-code/${code}`
+      );
       return response.data.available;
     } catch (error) {
-      console.error('Failed to check code availability:', error);
+      console.error("Failed to check code availability:", error);
       throw error;
     }
   }
@@ -364,10 +449,12 @@ export class ProjectDAO {
    */
   async checkNameAvailability(name: string): Promise<boolean> {
     try {
-      const response = await client.get<{ available: boolean }>(`/projects/check-name/${encodeURIComponent(name)}`);
+      const response = await client.get<{ available: boolean }>(
+        `/projects/check-name/${encodeURIComponent(name)}`
+      );
       return response.data.available;
     } catch (error) {
-      console.error('Failed to check name availability:', error);
+      console.error("Failed to check name availability:", error);
       throw error;
     }
   }
@@ -377,14 +464,20 @@ export class ProjectDAO {
   /**
    * Поиск проектов
    */
-  async searchProjects(query: string, filters?: ProjectQueryParams): Promise<ProjectListResponse> {
+  async searchProjects(
+    query: string,
+    filters?: ProjectQueryParams
+  ): Promise<ProjectListResponse> {
     try {
-      const response = await client.get<ProjectListResponse>('/projects/search', {
-        params: { q: query, ...filters },
-      });
+      const response = await client.get<ProjectListResponse>(
+        "/projects/search",
+        {
+          params: { q: query, ...filters },
+        }
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to search projects:', error);
+      console.error("Failed to search projects:", error);
       throw error;
     }
   }
@@ -396,7 +489,7 @@ export class ProjectDAO {
    */
   async archiveProject(id: number): Promise<void> {
     try {
-      await client.post(`/projects/${id}/archive`);
+      await client.post(API_ENDPOINTS.PROJECTS.ARCHIVE(id.toString()));
     } catch (error) {
       console.error(`Failed to archive project ${id}:`, error);
       throw error;
@@ -408,7 +501,7 @@ export class ProjectDAO {
    */
   async unarchiveProject(id: number): Promise<void> {
     try {
-      await client.post(`/projects/${id}/unarchive`);
+      await client.post(API_ENDPOINTS.PROJECTS.UNARCHIVE(id.toString()));
     } catch (error) {
       console.error(`Failed to unarchive project ${id}:`, error);
       throw error;
@@ -420,9 +513,15 @@ export class ProjectDAO {
   /**
    * Клонировать проект
    */
-  async cloneProject(id: number, newProjectData: { code: string; name: string; description?: string }): Promise<Project> {
+  async cloneProject(
+    id: number,
+    newProjectData: { code: string; name: string; description?: string }
+  ): Promise<Project> {
     try {
-      const response = await client.post<Project>(`/projects/${id}/clone`, newProjectData);
+      const response = await client.post<Project>(
+        `/projects/${id}/clone`,
+        newProjectData
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to clone project ${id}:`, error);
@@ -437,10 +536,12 @@ export class ProjectDAO {
    */
   async getProjectTemplates(): Promise<ProjectTemplate[]> {
     try {
-      const response = await client.get<ProjectTemplate[]>('/projects/templates');
+      const response = await client.get<ProjectTemplate[]>(
+        "/projects/templates"
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to get project templates:', error);
+      console.error("Failed to get project templates:", error);
       throw error;
     }
   }
@@ -448,12 +549,17 @@ export class ProjectDAO {
   /**
    * Создать шаблон проекта
    */
-  async createProjectTemplate(templateData: ProjectTemplateCreate): Promise<ProjectTemplate> {
+  async createProjectTemplate(
+    templateData: ProjectTemplateCreate
+  ): Promise<ProjectTemplate> {
     try {
-      const response = await client.post<ProjectTemplate>('/projects/templates', templateData);
+      const response = await client.post<ProjectTemplate>(
+        "/projects/templates",
+        templateData
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to create project template:', error);
+      console.error("Failed to create project template:", error);
       throw error;
     }
   }
@@ -463,10 +569,13 @@ export class ProjectDAO {
    */
   async createProjectFromTemplate(data: ProjectFromTemplate): Promise<Project> {
     try {
-      const response = await client.post<Project>('/projects/from-template', data);
+      const response = await client.post<Project>(
+        "/projects/from-template",
+        data
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to create project from template:', error);
+      console.error("Failed to create project from template:", error);
       throw error;
     }
   }
@@ -476,12 +585,16 @@ export class ProjectDAO {
   /**
    * Получить проекты текущего пользователя
    */
-  async getMyProjects(params?: ProjectQueryParams): Promise<ProjectListResponse> {
+  async getMyProjects(
+    params?: ProjectQueryParams
+  ): Promise<ProjectListResponse> {
     try {
-      const response = await client.get<ProjectListResponse>('/projects/my', { params });
+      const response = await client.get<ProjectListResponse>("/projects/my", {
+        params,
+      });
       return response.data;
     } catch (error) {
-      console.error('Failed to get my projects:', error);
+      console.error("Failed to get my projects:", error);
       throw error;
     }
   }
@@ -489,12 +602,17 @@ export class ProjectDAO {
   /**
    * Получить проекты где пользователь участник команды
    */
-  async getMyTeamProjects(params?: ProjectQueryParams): Promise<ProjectListResponse> {
+  async getMyTeamProjects(
+    params?: ProjectQueryParams
+  ): Promise<ProjectListResponse> {
     try {
-      const response = await client.get<ProjectListResponse>('/projects/my-team', { params });
+      const response = await client.get<ProjectListResponse>(
+        "/projects/my-team",
+        { params }
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to get my team projects:', error);
+      console.error("Failed to get my team projects:", error);
       throw error;
     }
   }
@@ -528,16 +646,21 @@ export class ProjectDAO {
   /**
    * Получить избранные проекты
    */
-  async getFavoriteProjects(params?: ProjectQueryParams): Promise<ProjectListResponse> {
+  async getFavoriteProjects(
+    params?: ProjectQueryParams
+  ): Promise<ProjectListResponse> {
     try {
-      const response = await client.get<ProjectListResponse>('/projects/favorites', { params });
+      const response = await client.get<ProjectListResponse>(
+        "/projects/favorites",
+        { params }
+      );
       return response.data;
     } catch (error) {
-      console.error('Failed to get favorite projects:', error);
+      console.error("Failed to get favorite projects:", error);
       throw error;
     }
   }
 }
 
 // Экспортируем singleton instance
-export const projectDAO = ProjectDAO.getInstance(); 
+export const projectDAO = ProjectDAO.getInstance();

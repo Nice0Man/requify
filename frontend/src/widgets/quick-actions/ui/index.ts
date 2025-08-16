@@ -1,2 +1,2 @@
-// Quick actions widget UI
-export * from './QuickActionsWidget'; 
+// Quick Actions UI Components
+export { QuickActionsWidget } from "./QuickActionsWidget"; 

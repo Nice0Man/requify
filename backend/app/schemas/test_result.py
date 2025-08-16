@@ -1,11 +1,22 @@
 """
 Схемы для модели TestResult.
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, Field
+from sqlmodel import Field
 from enum import Enum
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
 class TestStatus(str, Enum):
@@ -18,7 +29,7 @@ class TestStatus(str, Enum):
     BLOCKED = "blocked"
 
 
-class TestResultBase(BaseModel):
+class TestResultBase(BaseSchema):
     """Базовая схема результата тестирования."""
 
     status: TestStatus = Field(
@@ -36,14 +47,14 @@ class TestResultBase(BaseModel):
     )
 
 
-class TestResultCreate(TestResultBase):
+class TestResultCreate(CreateSchema, TestResultBase):
     """Схема для создания результата тестирования."""
 
     requirement_id: int = Field(..., gt=0, description="ID требования")
     tester_id: Optional[int] = Field(None, gt=0, description="ID тестировщика")
 
 
-class TestResultUpdate(BaseModel):
+class TestResultUpdate(UpdateSchema):
     """Схема для обновления результата тестирования."""
 
     status: Optional[TestStatus] = Field(None, description="Статус тестирования")
@@ -60,33 +71,15 @@ class TestResultUpdate(BaseModel):
     tester_id: Optional[int] = Field(None, gt=0, description="ID тестировщика")
 
 
-class TestResultInDBBase(TestResultBase):
-    """Базовая схема результата тестирования с данными из БД."""
-
-    id: int
-    requirement_id: int
-    tester_id: Optional[int] = None
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class TestResult(TestResultInDBBase):
+class TestResult(ResponseSchema, TestResultBase):
     """Схема результата тестирования для ответов API."""
 
-    pass
+    requirement_id: int = Field(..., description="ID требования")
+    tester_id: Optional[int] = Field(None, description="ID тестировщика")
 
 
 class TestResultWithDetails(TestResult):
     """Схема результата тестирования с подробной информацией."""
 
-    requirement_title: Optional[str] = None
-    tester_name: Optional[str] = None
-
-
-class TestResultInDB(TestResultInDBBase):
-    """Схема результата тестирования в БД."""
-
-    pass
+    requirement_title: Optional[str] = Field(None, description="Заголовок требования")
+    tester_name: Optional[str] = Field(None, description="Имя тестировщика")

@@ -27,4 +27,14 @@ export const config = {
     enableRealTimeUpdates: true,
     enableOfflineMode: false,
   },
-} as const; 
+} as const;
+
+// Re-export Auth0 configuration functions
+export { 
+  auth0Config, 
+  isAuth0Configured, 
+  shouldUseAuth0,
+  hasRealAuth0Credentials, 
+  isDemoMode, 
+  shouldCheckAuth0Backend 
+} from './auth0.config'; 

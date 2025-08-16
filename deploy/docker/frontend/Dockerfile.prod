@@ -1,5 +1,5 @@
 # Production Frontend Dockerfile - Multi-stage build
-FROM node:20-alpine as builder
+FROM node:24-alpine as builder
 
 WORKDIR /app
 

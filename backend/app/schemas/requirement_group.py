@@ -1,46 +1,53 @@
 """
 Схемы для модели RequirementGroup (группы требований).
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from sqlmodel import Field
+
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ProjectRelatedSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
 
-class RequirementGroupBase(BaseModel):
+class RequirementGroupBase(BaseSchema, ValidationMixin):
     """Базовая схема группы требований."""
 
     name: str = Field(
-        ..., min_length=1, max_length=100, description="Название группы требований"
+        ...,
+        min_length=1,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Название группы требований",
     )
 
 
-class RequirementGroupCreate(RequirementGroupBase):
+class RequirementGroupCreate(CreateSchema, RequirementGroupBase, ProjectRelatedSchema):
     """Схема для создания группы требований."""
 
-    project_id: int = Field(..., gt=0, description="ID проекта")
+    pass
 
 
-class RequirementGroupUpdate(BaseModel):
+class RequirementGroupUpdate(UpdateSchema):
     """Схема для обновления группы требований."""
 
     name: Optional[str] = Field(
-        None, min_length=1, max_length=100, description="Название группы требований"
+        None,
+        min_length=1,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Название группы требований",
     )
 
 
-class RequirementGroupInDBBase(RequirementGroupBase):
-    """Базовая схема группы требований с данными из БД."""
-
-    id: int
-    project_id: int
-    created_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class RequirementGroup(RequirementGroupInDBBase):
+class RequirementGroup(ResponseSchema, RequirementGroupBase, ProjectRelatedSchema):
     """Схема группы требований для ответов API."""
 
     pass
@@ -49,11 +56,5 @@ class RequirementGroup(RequirementGroupInDBBase):
 class RequirementGroupWithVersions(RequirementGroup):
     """Схема группы требований с информацией о версиях."""
 
-    versions_count: int = 0
-    latest_version: Optional[int] = None
-
-
-class RequirementGroupInDB(RequirementGroupInDBBase):
-    """Схема группы требований в БД."""
-
-    pass
+    versions_count: int = Field(0, ge=0, description="Количество версий")
+    latest_version: Optional[int] = Field(None, ge=1, description="Последняя версия")

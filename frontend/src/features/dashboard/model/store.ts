@@ -1,21 +1,11 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { dashboardApi } from '../api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { dashboardApi } from "@/entities/dashboard";
 
-interface DashboardStats {
-  totalProjects: number;
-  totalRequirements: number;
-  totalReleases: number;
-  totalTestCases: number;
-  activeProjects: number;
-  completedProjects: number;
-  pendingRequirements: number;
-  completedRequirements: number;
-}
-
+// Types
 interface DashboardState {
-  stats: DashboardStats | null;
+  stats: any;
   recentActivity: any[];
-  chartData: any[];
+  chartData: any;
   isLoading: boolean;
   error: string | null;
 }
@@ -23,14 +13,14 @@ interface DashboardState {
 const initialState: DashboardState = {
   stats: null,
   recentActivity: [],
-  chartData: [],
+  chartData: null,
   isLoading: false,
   error: null,
 };
 
 // Async thunks
 export const fetchDashboardStats = createAsyncThunk(
-  'dashboard/fetchStats',
+  "dashboard/fetchStats",
   async (_, { rejectWithValue }) => {
     try {
       const response = await dashboardApi.getStats();
@@ -42,7 +32,7 @@ export const fetchDashboardStats = createAsyncThunk(
 );
 
 export const fetchRecentActivity = createAsyncThunk(
-  'dashboard/fetchRecentActivity',
+  "dashboard/fetchRecentActivity",
   async (_, { rejectWithValue }) => {
     try {
       const response = await dashboardApi.getActivity();
@@ -54,7 +44,7 @@ export const fetchRecentActivity = createAsyncThunk(
 );
 
 export const fetchChartData = createAsyncThunk(
-  'dashboard/fetchChartData',
+  "dashboard/fetchChartData",
   async (_, { rejectWithValue }) => {
     try {
       // TODO: добавить метод getChartData в dashboardApi
@@ -67,7 +57,7 @@ export const fetchChartData = createAsyncThunk(
 );
 
 const dashboardSlice = createSlice({
-  name: 'dashboard',
+  name: "dashboard",
   initialState,
   reducers: {
     clearError: (state) => {
@@ -91,7 +81,7 @@ const dashboardSlice = createSlice({
       })
       // Fetch recent activity
       .addCase(fetchRecentActivity.fulfilled, (state, action) => {
-        state.recentActivity = action.payload;
+        state.recentActivity = action.payload.data || [];
       })
       // Fetch chart data
       .addCase(fetchChartData.fulfilled, (state, action) => {
@@ -101,4 +91,4 @@ const dashboardSlice = createSlice({
 });
 
 export const { clearError } = dashboardSlice.actions;
-export { dashboardSlice }; 
+export { dashboardSlice };

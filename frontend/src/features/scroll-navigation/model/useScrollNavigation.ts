@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, startTransition } from "react";
 import {
   ScrollSection,
   hashUtils,
@@ -50,10 +50,16 @@ export const useScrollNavigation = ({
       }
 
       // Предотвращаем циклы при навигации
-      if (isNavigatingRef.current) return;
+      if (isNavigatingRef.current) {
+        return;
+      }
+      
       isNavigatingRef.current = true;
-
-      setActiveSection(newSectionIndex);
+      
+      // Используем startTransition для более плавного обновления UI
+      startTransition(() => {
+        setActiveSection(newSectionIndex);
+      });
 
       const section = sectionsRef.current[newSectionIndex];
 
@@ -145,10 +151,7 @@ export const useScrollNavigation = ({
   // Навигация к секции по hash
   const navigateToHash = useCallback(
     (hash: string) => {
-      console.log('navigateToHash called with:', hash);
-      
       if (!enableHashSync) {
-        console.log('Hash sync disabled, skipping navigation');
         return;
       }
 
@@ -156,13 +159,15 @@ export const useScrollNavigation = ({
         sectionsRef.current,
         hash
       );
-      console.log('Found section index:', sectionIndex, 'for hash:', hash);
       
       if (sectionIndex >= 0) {
-        console.log('Calling handleSectionChange with index:', sectionIndex);
         handleSectionChange(sectionIndex);
       } else {
-        console.log('Section not found for hash:', hash);
+        // Fallback: пробуем найти по id
+        const fallbackIndex = sectionsRef.current.findIndex(s => s.id === hash);
+        if (fallbackIndex >= 0) {
+          handleSectionChange(fallbackIndex);
+        }
       }
     },
     [enableHashSync, handleSectionChange]

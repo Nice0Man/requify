@@ -1,2 +1,1 @@
-// Kanban widget UI
-export * from './KanbanWidget'; 
+export { KanbanWidget } from "./KanbanWidget"; 

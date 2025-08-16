@@ -28,6 +28,9 @@ from .team import team, team_member
 # Dashboard CRUD operations
 from .dashboard import user_preferences, notification, activity, widget
 
+# Enhanced Role System CRUD operations
+from .enhanced_role import enhanced_role, user_role_assignment
+
 __all__ = [
     "CRUDBase",
     "user",
@@ -53,4 +56,7 @@ __all__ = [
     "notification",
     "activity",
     "widget",
+    # Enhanced Role System CRUD
+    "enhanced_role",
+    "user_role_assignment",
 ]

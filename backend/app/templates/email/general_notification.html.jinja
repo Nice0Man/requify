@@ -1,0 +1,268 @@
+{% extends "base.html.jinja" %}
+
+{% block title %}{{ notification_title | default('Уведомление') }} - Requify{% endblock %}
+
+{% block content %}
+<h1 class="email-title {{ 'alert-' + notification_type if notification_type else '' }}">
+    <span class="icon">{{ notification_icon | default('📢') }}</span>{{ notification_title | default('Уведомление от Requify') }}
+</h1>
+
+{% if user_name %}
+<p class="email-text">
+    Здравствуйте, <strong>{{ user_name }}</strong>!
+</p>
+{% endif %}
+
+<p class="email-text">
+    {{ notification_message | default('У нас есть важная информация для вас.') }}
+</p>
+
+{% if notification_type %}
+<div class="alert alert-{{ notification_type }}">
+    <div class="alert-title">
+        <span class="icon">{{ alert_icon | default('ℹ️') }}</span>{{ alert_title | default('Важная информация') }}
+    </div>
+    <div class="alert-text">
+        {{ alert_message | default('Подробности уведомления.') | safe }}
+    </div>
+</div>
+{% endif %}
+
+{% if details_list %}
+<div class="details-section">
+    <h3 class="section-title">
+        <span class="icon">📋</span>Подробности
+    </h3>
+    
+    <div class="details-grid">
+        {% for detail in details_list %}
+        <div class="detail-item">
+            <div class="detail-label">{{ detail.label }}</div>
+            <div class="detail-value {{ 'code' if detail.is_code else '' }}">{{ detail.value }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if action_items %}
+<div class="action-section">
+    <h3 class="section-title">
+        <span class="icon">⚡</span>Необходимые действия
+    </h3>
+    
+    <div class="action-list">
+        {% for action in action_items %}
+        <div class="action-item {{ action.status | default('') }}">
+            <span class="action-icon">{{ action.icon | default('•') }}</span>
+            <span class="action-text">{{ action.text }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if action_button %}
+<div class="button-container">
+    <a href="{{ action_button.url }}" class="button {{ action_button.style | default('') }}">
+        <span class="icon">{{ action_button.icon | default('🔗') }}</span>{{ action_button.text }}
+    </a>
+</div>
+{% endif %}
+
+{% if additional_info %}
+<div class="alert alert-info">
+    <div class="alert-title">
+        <span class="icon">💡</span>Дополнительная информация
+    </div>
+    <div class="alert-text">
+        {{ additional_info | safe }}
+    </div>
+</div>
+{% endif %}
+
+<div class="footer-info">
+    <p class="text-small text-muted">
+        Это автоматическое уведомление от системы Requify.
+        {% if unsubscribe_url %}
+        <a href="{{ unsubscribe_url }}" class="link-muted">Отписаться от уведомлений</a>
+        {% endif %}
+    </p>
+</div>
+
+<style>
+/* Стили для типов уведомлений */
+.email-title.alert-success {
+    color: #2e7d32;
+    background: linear-gradient(135deg, #f1f8e9, #c8e6c9);
+    border: 2px solid #66bb6a;
+}
+
+.email-title.alert-info {
+    color: #1976d2;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border: 2px solid #42a5f5;
+}
+
+.email-title.alert-warning {
+    color: #f57c00;
+    background: linear-gradient(135deg, #fff8e1, #ffcc02);
+    border: 2px solid #ffb74d;
+}
+
+.email-title.alert-danger {
+    color: #d32f2f;
+    background: linear-gradient(135deg, #ffebee, #ffcdd2);
+    border: 2px solid #ef5350;
+}
+
+/* Детали */
+.details-section {
+    margin: 32px 0;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 8px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.detail-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid #2196f3;
+}
+
+.detail-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.detail-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.detail-value.code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: #f1f3f4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Действия */
+.action-section {
+    margin: 32px 0;
+}
+
+.action-list {
+    list-style: none;
+    padding: 0;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin: 8px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #2196f3;
+}
+
+.action-item.completed {
+    border-left-color: #4caf50;
+    background: #f1f8e9;
+}
+
+.action-item.pending {
+    border-left-color: #ffc107;
+    background: #fffbf0;
+}
+
+.action-item.urgent {
+    border-left-color: #f44336;
+    background: #ffebee;
+}
+
+.action-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
+
+.action-text {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Кнопки */
+.button.button-success {
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+}
+
+.button.button-info {
+    background: linear-gradient(135deg, #2196f3, #1976d2);
+}
+
+.button.button-warning {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+}
+
+.button.button-danger {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+/* Footer */
+.footer-info {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.text-small {
+    font-size: 14px;
+}
+
+.text-muted {
+    color: #666;
+}
+
+.link-muted {
+    color: #999;
+    text-decoration: underline;
+}
+
+.link-muted:hover {
+    color: #666;
+}
+
+@media (max-width: 600px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-item {
+        padding: 8px 12px;
+    }
+    
+    .detail-item {
+        padding: 12px;
+    }
+}
+</style>
+{% endblock %} 

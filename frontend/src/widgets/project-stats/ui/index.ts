@@ -1,2 +1,1 @@
-// Project stats widget UI
-export * from './ProjectStatsWidget'; 
+export { ProjectStatsWidget } from "./ProjectStatsWidget"; 

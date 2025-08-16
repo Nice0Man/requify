@@ -1,44 +1,61 @@
-# Development Backend Dockerfile
-FROM python:3.13-slim as base
+# Development Dockerfile for Requify Backend
+FROM python:3.13-slim
 
-# Системные зависимости
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    curl \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Устанавливаем Poetry
-RUN pip install poetry==1.8.3
-
-# Настройки Poetry для разработки
-ENV POETRY_NO_INTERACTION=1 \
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    POETRY_NO_INTERACTION=1 \
     POETRY_VENV_IN_PROJECT=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+    POETRY_CACHE_DIR=/opt/poetry/cache \
+    POETRY_HOME="/opt/poetry"
 
+# Set work directory
 WORKDIR /app
 
-# Копируем файлы зависимостей и конфигурации
-COPY config/pyproject.toml poetry.lock* ./
-COPY config/alembic.ini ./alembic.ini
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем зависимости с dev пакетами
+# Install poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+# Copy poetry files (correct path from project root context)
+COPY backend/pyproject.toml ./
+
+# Configure poetry and install dependencies as root (without lock file for dev)
 RUN poetry config virtualenvs.create false && \
-    poetry install --with dev && \
-    rm -rf $POETRY_CACHE_DIR
+    poetry install --no-root --no-interaction --no-ansi
 
-# Создаем пользователя и группу раньше
-RUN groupadd -r requify && useradd -r -g requify -s /bin/bash requify
+# Copy source code (correct path from project root context)
+COPY backend ./
 
-# Создаем необходимые директории с правильными правами
+# Create non-root user AFTER installing dependencies
+RUN groupadd -r requify && useradd -r -g requify requify
+
+# Create directories and set permissions
 RUN mkdir -p logs uploads static backups && \
-    chown -R requify:requify /app && \
-    chmod -R 755 /app
+    chown -R requify:requify /app
 
+# Health check script
+RUN echo '#!/bin/bash\ncurl -f http://localhost:8000/health || exit 1' > /app/healthcheck.sh && \
+    chmod +x /app/healthcheck.sh && \
+    chown requify:requify /app/healthcheck.sh
+
+# Switch to non-root user for runtime
 USER requify
 
+# Expose port
 EXPOSE 8000
 
-# Hot reload для разработки
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"] 
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD /app/healthcheck.sh
+
+# Default command (can be overridden by docker-compose)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 

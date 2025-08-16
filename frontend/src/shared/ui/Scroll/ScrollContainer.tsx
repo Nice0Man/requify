@@ -177,13 +177,14 @@ export const ScrollContainer: React.FC<ScrollContainerProps> = ({
         }}
         transition={{
           duration: animationDuration / 1000,
-          ease: [0.25, 0.1, 0.25, 1],
+          ease: [0.25, 0.46, 0.45, 0.94], // Более плавная анимация
         }}
         style={{
           height: `${totalSections * 100}vh`,
           width: "100%",
           display: "flex",
           flexDirection: "column",
+          willChange: "transform", // Оптимизация для GPU
         }}
       >
         {React.Children.map(children, (child, index) => (

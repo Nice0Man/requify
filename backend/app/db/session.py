@@ -124,6 +124,12 @@ async def get_async_session():
             await session.close()
 
 
+# Контекстный менеджер для асинхронной сессии
+def async_db_session():
+    """Контекстный менеджер для асинхронной сессии"""
+    return AsyncSessionLocal()
+
+
 # Функция для проверки соединения
 def check_db_connection():
     """Проверяет соединение с основной базой данных"""

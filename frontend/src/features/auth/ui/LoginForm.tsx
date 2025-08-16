@@ -16,24 +16,23 @@ import {
   useTheme,
 } from "@mui/material";
 import { Email, Lock, Login } from "@mui/icons-material";
-import { useOAuth2 } from "@/app/providers/OAuth2Provider";
-import { oauth2API } from "@/shared/api";
 import type { LoginRequest } from "@/shared/types/auth";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@/shared/hooks/useTranslation";
 import { FloatingLabelInput } from "@/shared/ui";
+import { validateField } from "../model/validation";
+import { authApi } from "../api";
 
 interface LoginFormProps {
   onForgotPassword?: () => void;
   onRegister?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({
+export const LoginForm: React.FC<LoginFormProps> = ({
   onForgotPassword,
   onRegister,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const { refreshUser } = useOAuth2();
 
   const [credentials, setCredentials] = useState<LoginRequest>({
     username: "",
@@ -53,65 +52,42 @@ const LoginForm: React.FC<LoginFormProps> = ({
     password?: boolean;
   }>({});
 
-  // Валидация в реальном времени
-  const validateField = (field: keyof LoginRequest, value: string) => {
-    switch (field) {
-      case "username":
-        if (!value)
-          return t(
-            "auth.validation.usernameRequired",
-            "Имя пользователя обязательно"
-          );
-        if (value.length < 3)
-          return t(
-            "auth.validation.usernameMinLength",
-            "Имя пользователя должно содержать не менее 3 символов"
-          );
-        return "";
-      case "password":
-        if (!value)
-          return t("auth.validation.passwordRequired", "Пароль обязателен");
-        if (value.length < 6)
-          return t(
-            "auth.validation.passwordMinLength",
-            "Пароль должен содержать не менее 6 символов"
-          );
-        return "";
-      default:
-        return "";
-    }
-  };
-
-      // Валидация при изменении полей
+  // Валидация при изменении полей
   useEffect(() => {
     const newErrors: typeof fieldErrors = {};
-    
-    const fieldsToValidate: Array<keyof typeof fieldErrors> = ['username', 'password'];
+
+    const fieldsToValidate: Array<keyof typeof fieldErrors> = [
+      "username",
+      "password",
+    ];
     fieldsToValidate.forEach((field) => {
       if (touched[field]) {
         const error = validateField(field, credentials[field] || "");
         if (error) newErrors[field] = error;
       }
     });
-    
+
     setFieldErrors(newErrors);
   }, [credentials, touched, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Проверяем все поля
     const newTouched = { username: true, password: true };
     setTouched(newTouched);
-    
+
     // Валидируем все поля
     const newErrors: typeof fieldErrors = {};
-    const fieldsToValidate: Array<keyof typeof fieldErrors> = ['username', 'password'];
+    const fieldsToValidate: Array<keyof typeof fieldErrors> = [
+      "username",
+      "password",
+    ];
     fieldsToValidate.forEach((field) => {
       const error = validateField(field, credentials[field] || "");
       if (error) newErrors[field] = error;
     });
-    
+
     if (Object.keys(newErrors).length > 0) {
       setFieldErrors(newErrors);
       return;
@@ -121,11 +97,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
       setIsPending(true);
       setError("");
 
-      // Используем OAuth2API для логина
-      await oauth2API.login(credentials);
-
-      // Обновляем пользователя в AuthProvider
-      await refreshUser();
+      // Всегда используем OAuth2API для логина по форме
+      // Наши провайдеры подхватят изменения автоматически
+      await authApi.login(credentials);
 
       // Принудительный редирект на dashboard после успешного логина
       window.location.href = "/dashboard";
@@ -410,5 +384,3 @@ const LoginForm: React.FC<LoginFormProps> = ({
     </Card>
   );
 };
-
-export { LoginForm };

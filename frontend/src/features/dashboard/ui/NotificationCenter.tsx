@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import i18n from '@/shared/lib/i18n';
 import { 
   Box, 
   Paper, 
@@ -32,7 +32,7 @@ interface Notification {
 }
 
 export const NotificationCenter: React.FC = () => {
-  const { t } = useTranslation();
+  const t = i18n.t;
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: '1',

@@ -1,2 +1,2 @@
-// Dashboard API exports
-export * from './dashboardApi'; 
+// Export dashboard API from entities
+export * from '@/entities/dashboard/api/dashboardApi'; 

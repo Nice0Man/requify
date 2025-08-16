@@ -15,7 +15,7 @@ from typing import (
     TypeVar,
     Union,
 )
-from abc import ABC, abstractmethod
+
 
 from sqlalchemy import select, func, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession

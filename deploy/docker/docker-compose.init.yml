@@ -1,0 +1,34 @@
+# MinIO Initialization Profile
+# Use: docker-compose --profile init up mc
+# This will run the MinIO client container to initialize buckets and policies
+
+services:
+  # MinIO Client for initialization
+  mc:
+    image: minio/mc:latest
+    container_name: requify_mc_init
+    profiles:
+      - init
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+      MINIO_BUCKET_UPLOADS: ${MINIO_BUCKET_UPLOADS:-requify-uploads}
+      MINIO_BUCKET_AVATARS: ${MINIO_BUCKET_AVATARS:-requify-avatars}
+      MINIO_BUCKET_DOCUMENTS: ${MINIO_BUCKET_DOCUMENTS:-requify-documents}
+    volumes:
+      - ./minio/init-buckets.sh:/init-buckets.sh:ro
+    entrypoint: >
+      bash -c "
+        chmod +x /init-buckets.sh &&
+        /init-buckets.sh
+      "
+    networks:
+      - requify-network
+    depends_on:
+      - minio
+    restart: "no"  # Run once and exit
+
+networks:
+  requify-network:
+    external: true
+    name: requify_network

@@ -148,6 +148,45 @@ class UserNotFoundError(RequifyException):
         )
 
 
+class ServiceError(RequifyException):
+    """Исключение для ошибок внутренних сервисов."""
+
+    def __init__(
+        self, service_name: str, message: str, error_code: Optional[str] = None
+    ):
+        super().__init__(
+            message=f"Service '{service_name}' error: {message}",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            details={
+                "service": service_name,
+                "error_code": error_code,
+                "original_message": message,
+            },
+        )
+
+
+class ConflictError(RequifyException):
+    """Исключение для конфликтов ресурсов."""
+
+    def __init__(self, message: str, resource: Optional[str] = None):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_409_CONFLICT,
+            details={"resource": resource} if resource else {},
+        )
+
+
+class CyclicDependencyError(RequifyException):
+    """Исключение для циклических зависимостей в иерархии ролей."""
+
+    def __init__(self, message: str, cycle_path: Optional[list] = None):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            details={"cycle_path": cycle_path} if cycle_path else {},
+        )
+
+
 # Обработчики исключений для FastAPI
 
 
@@ -298,12 +337,20 @@ async def validation_exception_handler(
     # Преобразуем ошибки в более понятный формат
     validation_errors = []
     for error in exc.errors():
+        # Handle bytes input that cannot be JSON serialized
+        input_value = error.get("input")
+        if isinstance(input_value, bytes):
+            try:
+                input_value = input_value.decode("utf-8")
+            except UnicodeDecodeError:
+                input_value = str(input_value)
+
         validation_errors.append(
             {
                 "field": ".".join(str(loc) for loc in error["loc"]),
                 "message": error["msg"],
                 "type": error["type"],
-                "input": error.get("input"),
+                "input": input_value,
             }
         )
 
@@ -342,7 +389,7 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
                 "exception_type": type(exc).__name__,
             },
         )
-        
+
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={
@@ -387,15 +434,15 @@ def register_exception_handlers(app):
     """
     # Кастомные исключения Requify
     app.add_exception_handler(RequifyException, requify_exception_handler)
-    
+
     # HTTP исключения
     app.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    
+
     # SQLAlchemy исключения
     app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
-    
+
     # Ошибки валидации
     app.add_exception_handler(RequestValidationError, validation_exception_handler)
-    
+
     # Общие исключения (должен быть последним)
     app.add_exception_handler(Exception, general_exception_handler)

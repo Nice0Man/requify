@@ -9,6 +9,7 @@ from .base import Base
 if TYPE_CHECKING:
     from .project import Project
     from .requirement import Requirement
+    from .user import User
 
 
 class Spec(Base):
@@ -62,8 +63,4 @@ class Spec(Base):
     project: Mapped["Project"] = relationship("Project", back_populates="specs")
     generated_by_user: Mapped[Optional["User"]] = relationship(
         "User", foreign_keys=[generated_by]
-    )
-
-    requirements: Mapped[List["Requirement"]] = relationship(
-        "Requirement", back_populates="spec"
     )

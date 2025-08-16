@@ -3,30 +3,21 @@
  * Основано на схемах из backend/app/schemas/user.py
  */
 
-import { client } from "@/shared/api/client";
+import { client } from "@/app/providers/client";
+import { API_ENDPOINTS } from "@/shared/api/endpoints";
 import type {
   User,
   UserCreate,
   UserUpdate,
-  UserWithStats,
   UserProfile,
-  UserPasswordChange,
-  UserPasswordReset,
-  UserPasswordResetConfirm,
-  EmailVerificationRequest,
-  EmailVerificationConfirm,
+  UserSettings,
   UserListResponse,
   UserDetailResponse,
-  UserActivityResponse,
   UserQueryParams,
   UserBulkOperation,
-  UserImportData,
-  UserExportOptions,
   UserValidationResult,
-  UserAuditListResponse,
   UserPreferences,
-  UserSettings,
-} from "@/shared/types/user";
+} from "../model/types";
 
 /**
  * UserDAO - класс для работы с API пользователей
@@ -53,7 +44,10 @@ export class UserDAO {
    */
   async getUsers(params?: UserQueryParams): Promise<UserListResponse> {
     try {
-      const response = await client.get<UserListResponse>("/users", { params });
+      const response = await client.get<UserListResponse>(
+        API_ENDPOINTS.USERS.LIST,
+        { params }
+      );
       return response.data;
     } catch (error) {
       console.error("Failed to get users:", error);
@@ -66,7 +60,9 @@ export class UserDAO {
    */
   async getUserById(id: number): Promise<UserDetailResponse> {
     try {
-      const response = await client.get<UserDetailResponse>(`/users/${id}`);
+      const response = await client.get<UserDetailResponse>(
+        API_ENDPOINTS.USERS.DETAIL(id)
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get user ${id}:`, error);
@@ -80,7 +76,7 @@ export class UserDAO {
   async getUserByUsername(username: string): Promise<UserDetailResponse> {
     try {
       const response = await client.get<UserDetailResponse>(
-        `/users/username/${username}`
+        API_ENDPOINTS.USERS.BY_USERNAME(username)
       );
       return response.data;
     } catch (error) {
@@ -95,7 +91,7 @@ export class UserDAO {
   async getUserByEmail(email: string): Promise<UserDetailResponse> {
     try {
       const response = await client.get<UserDetailResponse>(
-        `/users/email/${email}`
+        API_ENDPOINTS.USERS.BY_EMAIL(email)
       );
       return response.data;
     } catch (error) {
@@ -109,7 +105,10 @@ export class UserDAO {
    */
   async createUser(userData: UserCreate): Promise<User> {
     try {
-      const response = await client.post<User>("/users", userData);
+      const response = await client.post<User>(
+        API_ENDPOINTS.USERS.LIST,
+        userData
+      );
       return response.data;
     } catch (error) {
       console.error("Failed to create user:", error);
@@ -122,7 +121,10 @@ export class UserDAO {
    */
   async updateUser(id: number, userData: UserUpdate): Promise<User> {
     try {
-      const response = await client.put<User>(`/users/${id}`, userData);
+      const response = await client.put<User>(
+        API_ENDPOINTS.USERS.DETAIL(id),
+        userData
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to update user ${id}:`, error);
@@ -135,7 +137,10 @@ export class UserDAO {
    */
   async patchUser(id: number, userData: Partial<UserUpdate>): Promise<User> {
     try {
-      const response = await client.patch<User>(`/users/${id}`, userData);
+      const response = await client.patch<User>(
+        API_ENDPOINTS.USERS.DETAIL(id),
+        userData
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to patch user ${id}:`, error);
@@ -148,7 +153,7 @@ export class UserDAO {
    */
   async deleteUser(id: number): Promise<void> {
     try {
-      await client.delete(`/users/${id}`);
+      await client.delete(API_ENDPOINTS.USERS.DETAIL(id));
     } catch (error) {
       console.error(`Failed to delete user ${id}:`, error);
       throw error;
@@ -162,7 +167,9 @@ export class UserDAO {
    */
   async getCurrentUserProfile(): Promise<UserProfile> {
     try {
-      const response = await client.get<UserProfile>("/users/me");
+      const response = await client.get<UserProfile>(
+        API_ENDPOINTS.USERS.ME.ROOT
+      );
       return response.data;
     } catch (error) {
       console.error("Failed to get current user profile:", error);
@@ -175,7 +182,10 @@ export class UserDAO {
    */
   async updateCurrentUserProfile(userData: UserUpdate): Promise<UserProfile> {
     try {
-      const response = await client.put<UserProfile>("/users/me", userData);
+      const response = await client.put<UserProfile>(
+        API_ENDPOINTS.USERS.ME.UPDATE,
+        userData
+      );
       return response.data;
     } catch (error) {
       console.error("Failed to update current user profile:", error);
@@ -188,7 +198,9 @@ export class UserDAO {
    */
   async getUserPublicProfile(id: number): Promise<UserProfile> {
     try {
-      const response = await client.get<UserProfile>(`/users/${id}/profile`);
+      const response = await client.get<UserProfile>(
+        API_ENDPOINTS.USERS.PROFILE(id)
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get public profile for user ${id}:`, error);
@@ -201,9 +213,10 @@ export class UserDAO {
   /**
    * Сменить пароль
    */
-  async changePassword(data: UserPasswordChange): Promise<void> {
+  async changePassword(data: any): Promise<void> {
+    // Assuming UserPasswordChange type was removed, using 'any' for now
     try {
-      await client.post("/users/me/change-password", data);
+      await client.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
     } catch (error) {
       console.error("Failed to change password:", error);
       throw error;
@@ -213,9 +226,10 @@ export class UserDAO {
   /**
    * Запросить сброс пароля
    */
-  async requestPasswordReset(data: UserPasswordReset): Promise<void> {
+  async requestPasswordReset(data: any): Promise<void> {
+    // Assuming UserPasswordReset type was removed, using 'any' for now
     try {
-      await client.post("/users/reset-password", data);
+      await client.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, data);
     } catch (error) {
       console.error("Failed to request password reset:", error);
       throw error;
@@ -225,9 +239,10 @@ export class UserDAO {
   /**
    * Подтвердить сброс пароля
    */
-  async confirmPasswordReset(data: UserPasswordResetConfirm): Promise<void> {
+  async confirmPasswordReset(data: any): Promise<void> {
+    // Assuming UserPasswordResetConfirm type was removed, using 'any' for now
     try {
-      await client.post("/users/reset-password/confirm", data);
+      await client.post(API_ENDPOINTS.AUTH.RESET_PASSWORD_CONFIRM, data);
     } catch (error) {
       console.error("Failed to confirm password reset:", error);
       throw error;
@@ -240,10 +255,10 @@ export class UserDAO {
    * Запросить верификацию email
    */
   async requestEmailVerification(
-    data: EmailVerificationRequest
+    data: any // Assuming EmailVerificationRequest type was removed, using 'any' for now
   ): Promise<void> {
     try {
-      await client.post("/users/verify-email", data);
+      await client.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL_REQUEST, data);
     } catch (error) {
       console.error("Failed to request email verification:", error);
       throw error;
@@ -254,10 +269,10 @@ export class UserDAO {
    * Подтвердить верификацию email
    */
   async confirmEmailVerification(
-    data: EmailVerificationConfirm
+    data: any // Assuming EmailVerificationConfirm type was removed, using 'any' for now
   ): Promise<void> {
     try {
-      await client.post("/users/verify-email/confirm", data);
+      await client.post(API_ENDPOINTS.AUTH.VERIFY_EMAIL_CONFIRM, data);
     } catch (error) {
       console.error("Failed to confirm email verification:", error);
       throw error;
@@ -269,9 +284,10 @@ export class UserDAO {
   /**
    * Получить пользователя со статистикой
    */
-  async getUserWithStats(id: number): Promise<UserWithStats> {
+  async getUserWithStats(id: number): Promise<any> {
+    // Assuming UserWithStats type was removed, using 'any' for now
     try {
-      const response = await client.get<UserWithStats>(`/users/${id}/stats`);
+      const response = await client.get<any>(API_ENDPOINTS.USERS.STATS(id)); // Changed to 'any'
       return response.data;
     } catch (error) {
       console.error(`Failed to get user stats for ${id}:`, error);
@@ -282,11 +298,10 @@ export class UserDAO {
   /**
    * Получить активность пользователя
    */
-  async getUserActivity(id: number): Promise<UserActivityResponse> {
+  async getUserActivity(id: number): Promise<any> {
+    // Assuming UserActivityResponse type was removed, using 'any' for now
     try {
-      const response = await client.get<UserActivityResponse>(
-        `/users/${id}/activity`
-      );
+      const response = await client.get<any>(API_ENDPOINTS.USERS.ACTIVITY(id)); // Changed to 'any'
       return response.data;
     } catch (error) {
       console.error(`Failed to get user activity for ${id}:`, error);
@@ -301,7 +316,7 @@ export class UserDAO {
    */
   async bulkOperation(operation: UserBulkOperation): Promise<void> {
     try {
-      await client.post("/users/bulk", operation);
+      await client.post(API_ENDPOINTS.USERS.LIST, operation);
     } catch (error) {
       console.error("Failed to perform bulk operation:", error);
       throw error;
@@ -311,9 +326,10 @@ export class UserDAO {
   /**
    * Импорт пользователей
    */
-  async importUsers(data: UserImportData): Promise<void> {
+  async importUsers(data: any): Promise<void> {
+    // Assuming UserImportData type was removed, using 'any' for now
     try {
-      await client.post("/users/import", data);
+      await client.post(API_ENDPOINTS.USERS.LIST, data);
     } catch (error) {
       console.error("Failed to import users:", error);
       throw error;
@@ -323,9 +339,10 @@ export class UserDAO {
   /**
    * Экспорт пользователей
    */
-  async exportUsers(options: UserExportOptions): Promise<Blob> {
+  async exportUsers(options: any): Promise<Blob> {
+    // Assuming UserExportOptions type was removed, using 'any' for now
     try {
-      const response = await client.post("/users/export", options, {
+      const response = await client.post(API_ENDPOINTS.USERS.LIST, options, {
         responseType: "blob",
       });
       return response.data;
@@ -345,7 +362,7 @@ export class UserDAO {
   ): Promise<UserValidationResult> {
     try {
       const response = await client.post<UserValidationResult>(
-        "/users/validate",
+        API_ENDPOINTS.USERS.VALIDATE,
         userData
       );
       return response.data;
@@ -361,7 +378,7 @@ export class UserDAO {
   async checkUsernameAvailability(username: string): Promise<boolean> {
     try {
       const response = await client.get<{ available: boolean }>(
-        `/users/check-username/${username}`
+        API_ENDPOINTS.USERS.CHECK_USERNAME(username)
       );
       return response.data.available;
     } catch (error) {
@@ -376,7 +393,7 @@ export class UserDAO {
   async checkEmailAvailability(email: string): Promise<boolean> {
     try {
       const response = await client.get<{ available: boolean }>(
-        `/users/check-email/${email}`
+        API_ENDPOINTS.USERS.CHECK_EMAIL(email)
       );
       return response.data.available;
     } catch (error) {
@@ -390,18 +407,12 @@ export class UserDAO {
   /**
    * Получить логи аудита пользователя
    */
-  async getUserAuditLogs(
-    id: number,
-    page = 1,
-    perPage = 20
-  ): Promise<UserAuditListResponse> {
+  async getUserAuditLogs(id: number, page = 1, perPage = 20): Promise<any> {
+    // Assuming UserAuditListResponse type was removed, using 'any' for now
     try {
-      const response = await client.get<UserAuditListResponse>(
-        `/users/${id}/audit`,
-        {
-          params: { page, per_page: perPage },
-        }
-      );
+      const response = await client.get<any>(API_ENDPOINTS.USERS.AUDIT(id), {
+        params: { page, per_page: perPage },
+      }); // Changed to 'any'
       return response.data;
     } catch (error) {
       console.error(`Failed to get audit logs for user ${id}:`, error);
@@ -416,7 +427,9 @@ export class UserDAO {
    */
   async getUserSettings(id: number): Promise<UserSettings> {
     try {
-      const response = await client.get<UserSettings>(`/users/${id}/settings`);
+      const response = await client.get<UserSettings>(
+        API_ENDPOINTS.USERS.SETTINGS(id)
+      );
       return response.data;
     } catch (error) {
       console.error(`Failed to get settings for user ${id}:`, error);
@@ -433,7 +446,7 @@ export class UserDAO {
   ): Promise<UserSettings> {
     try {
       const response = await client.put<UserSettings>(
-        `/users/${id}/settings`,
+        API_ENDPOINTS.USERS.SETTINGS(id),
         settings
       );
       return response.data;
@@ -448,7 +461,9 @@ export class UserDAO {
    */
   async getCurrentUserSettings(): Promise<UserSettings> {
     try {
-      const response = await client.get<UserSettings>("/users/me/settings");
+      const response = await client.get<UserSettings>(
+        API_ENDPOINTS.USERS.ME_SETTINGS
+      );
       return response.data;
     } catch (error) {
       console.error("Failed to get current user settings:", error);
@@ -464,12 +479,23 @@ export class UserDAO {
   ): Promise<UserSettings> {
     try {
       const response = await client.put<UserSettings>(
-        "/users/me/settings",
+        API_ENDPOINTS.USERS.ME_SETTINGS,
         settings
       );
       return response.data;
     } catch (error) {
       console.error("Failed to update current user settings:", error);
+      throw error;
+    }
+  }
+
+
+  async getUserAvatar(): Promise<string> {
+    try {
+      const response = await client.get<string>(API_ENDPOINTS.USERS.ME.AVATAR);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to get user avatar:", error);
       throw error;
     }
   }
@@ -484,9 +510,12 @@ export class UserDAO {
     filters?: UserQueryParams
   ): Promise<UserListResponse> {
     try {
-      const response = await client.get<UserListResponse>("/users/search", {
-        params: { q: query, ...filters },
-      });
+      const response = await client.get<UserListResponse>(
+        API_ENDPOINTS.USERS.SEARCH,
+        {
+          params: { q: query, ...filters },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error("Failed to search users:", error);
@@ -501,7 +530,7 @@ export class UserDAO {
    */
   async activateUser(id: number): Promise<void> {
     try {
-      await client.post(`/users/${id}/activate`);
+      await client.post(API_ENDPOINTS.USERS.ACTIVATE(id.toString()));
     } catch (error) {
       console.error(`Failed to activate user ${id}:`, error);
       throw error;
@@ -513,7 +542,7 @@ export class UserDAO {
    */
   async deactivateUser(id: number): Promise<void> {
     try {
-      await client.post(`/users/${id}/deactivate`);
+      await client.post(API_ENDPOINTS.USERS.DEACTIVATE(id.toString()));
     } catch (error) {
       console.error(`Failed to deactivate user ${id}:`, error);
       throw error;

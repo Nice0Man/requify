@@ -3,14 +3,17 @@ CRUD операции для модели User.
 """
 
 from datetime import datetime
-from typing import List, Optional
-from sqlalchemy import select, func
+from typing import List, Optional, Dict, Any
+from sqlalchemy import func, select, or_, and_, desc
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import get_password_hash, verify_password
+from app.utils.logger import logger
+from app.models.enhanced_role_system import UserRoleAssignment
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -31,6 +34,35 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_email_with_profile(
+        self, db: AsyncSession, *, email: str
+    ) -> Optional[User]:
+        """
+        Получить пользователя по email с предварительной загрузкой профиля и ролей.
+
+        Args:
+            db: Сессия базы данных
+            email: Email пользователя
+
+        Returns:
+            Пользователь с загруженным профилем и ролями или None если не найден
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(User)
+            .where(User.email == email)
+            .options(
+                selectinload(User.profile),
+                selectinload(User.settings),
+                selectinload(User.role_assignments).selectinload(
+                    UserRoleAssignment.role
+                ),
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def get_by_username(
         self, db: AsyncSession, *, username: str
     ) -> Optional[User]:
@@ -48,6 +80,103 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_username_with_profile(
+        self, db: AsyncSession, *, username: str
+    ) -> Optional[User]:
+        """
+        Получить пользователя по имени пользователя с предварительной загрузкой профиля и ролей.
+
+        Args:
+            db: Сессия базы данных
+            username: Имя пользователя
+
+        Returns:
+            Пользователь с загруженным профилем и ролями или None если не найден
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(User)
+            .where(User.username == username)
+            .options(
+                selectinload(User.profile),
+                selectinload(User.settings),
+                selectinload(User.role_assignments).selectinload(
+                    UserRoleAssignment.role
+                ),
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_with_profile(self, db: AsyncSession, id: Any) -> Optional[User]:
+        """
+        Получить пользователя по ID с предварительной загрузкой профиля и ролей.
+
+        Args:
+            db: Сессия базы данных
+            id: ID пользователя
+
+        Returns:
+            Пользователь с загруженным профилем и ролями или None если не найден
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(User)
+            .where(User.id == id)
+            .options(
+                selectinload(User.profile),
+                selectinload(User.settings),
+                selectinload(User.role_assignments).selectinload(
+                    UserRoleAssignment.role
+                ),
+            )
+        )
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_user_role_assignments(self, db: AsyncSession, *, user_id: int):
+        """
+        Получить активные назначения ролей пользователя.
+
+        Args:
+            db: Сессия базы данных
+            user_id: ID пользователя
+
+        Returns:
+            Список активных назначений ролей
+        """
+        from app.models.enhanced_role_system import UserRoleAssignment
+
+        stmt = (
+            select(UserRoleAssignment)
+            .where(
+                UserRoleAssignment.user_id == user_id,
+                UserRoleAssignment.is_active == True,
+            )
+            .options(selectinload(UserRoleAssignment.role))
+        )
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
+    async def get_by_auth0_id(
+        self, db: AsyncSession, *, auth0_id: str
+    ) -> Optional[User]:
+        """
+        Получить пользователя по Auth0 ID.
+
+        Args:
+            db: Сессия базы данных
+            auth0_id: Auth0 ID пользователя
+
+        Returns:
+            Пользователь или None если не найден
+        """
+        stmt = select(User).where(User.auth0_id == auth0_id)
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def create(self, db: AsyncSession, *, obj_in: UserCreate) -> User:
         """
         Создать нового пользователя с хэшированным паролем.
@@ -62,11 +191,21 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         # Хэшируем пароль
         hashed_password = get_password_hash(obj_in.password)
 
-        # Создаем пользователя, исключая password из схемы
-        user_data = obj_in.model_dump(exclude={"password"})
+        # Создаем пользователя, исключая поля которые есть только в схеме
+        user_data = obj_in.model_dump(
+            exclude={
+                "password",
+                "confirm_password",
+                "invite_token",
+                "first_name",
+                "last_name",
+                "timezone",
+                "language",
+            }
+        )
         db_obj = User(
             **user_data,
-            hashed_password=hashed_password,
+            password_hash=hashed_password,
         )
 
         db.add(db_obj)
@@ -91,7 +230,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         user = await self.get_by_email(db, email=email)
         if not user:
             return None
-        if not verify_password(password, user.hashed_password):
+        if not verify_password(password, user.password_hash):
             return None
         return user
 
@@ -110,7 +249,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             Обновленный пользователь
         """
         hashed_password = get_password_hash(new_password)
-        user.hashed_password = hashed_password
+        user.password_hash = hashed_password
 
         db.add(user)
         await db.commit()
@@ -193,12 +332,18 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         result = await db.execute(stmt)
         return result.scalars().all()
 
+    async def get_by_auth0_id(
+        self, db: AsyncSession, *, auth_provider_id: str
+    ) -> Optional[User]:
+        """Получить пользователя по Auth0 ID."""
+        stmt = select(User).where(User.auth_provider_id == auth_provider_id)
+        result = await db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def search_users(
         self, db: AsyncSession, *, search_term: str, skip: int = 0, limit: int = 100
     ) -> List[User]:
         """Поиск пользователей по email или имени."""
-        from sqlalchemy import or_
-
         stmt = (
             select(User)
             .where(
@@ -232,6 +377,207 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             await db.commit()
             await db.refresh(user)
         return user
+
+    async def get_user_stats(self, db: AsyncSession, *, user_id: int) -> Dict[str, Any]:
+        """Получить статистику пользователя"""
+        try:
+            # Получаем базовую информацию о пользователе
+            user = await self.get(db, id=user_id)
+            if not user:
+                return {}
+
+            # Простая статистика - можно расширить
+            return {
+                "user_id": user_id,
+                "projects_count": 0,  # TODO: реализовать подсчет проектов
+                "requirements_count": 0,  # TODO: реализовать подсчет требований
+                "comments_count": 0,  # TODO: реализовать подсчет комментариев
+                "last_login": user.last_login.isoformat() if user.last_login else None,
+                "created_at": user.created_at.isoformat(),
+                "is_active": user.is_active,
+                "role": user.role,
+            }
+        except Exception as e:
+            return {"error": str(e)}
+
+    async def get_user_activity(
+        self, db: AsyncSession, *, user_id: int, limit: int = 20
+    ) -> List[Dict[str, Any]]:
+        """Получить активность пользователя"""
+        try:
+            # Базовая реализация - возвращаем пустой список
+            # TODO: реализовать получение активности из таблицы активности
+            return []
+        except Exception as e:
+            return [{"error": str(e)}]
+
+    async def validate_user_data(
+        self, db: AsyncSession, *, user_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Валидация данных пользователя"""
+        try:
+            validation_result = {"valid": True, "errors": []}
+
+            # Проверяем email
+            if "email" in user_data:
+                email = user_data["email"]
+                if await self.is_email_taken(db, email=email):
+                    validation_result["errors"].append("Email уже используется")
+                    validation_result["valid"] = False
+
+            # Проверяем username
+            if "username" in user_data:
+                username = user_data["username"]
+                if await self.is_username_taken(db, username=username):
+                    validation_result["errors"].append("Username уже используется")
+                    validation_result["valid"] = False
+
+            return validation_result
+        except Exception as e:
+            return {"valid": False, "errors": [str(e)]}
+
+    async def get_multi_filtered(
+        self,
+        db: AsyncSession,
+        *,
+        skip: int = 0,
+        limit: int = 100,
+        is_active: Optional[bool] = None,
+        role: Optional[str] = None,
+        search: Optional[str] = None,
+        company_id: Optional[int] = None,
+    ) -> List[User]:
+        """Получить пользователей с фильтрацией"""
+        from sqlalchemy.orm import selectinload
+
+        stmt = select(User).options(
+            selectinload(User.profile),
+            selectinload(User.settings),
+            selectinload(User.company),
+            selectinload(User.role_assignments).selectinload(UserRoleAssignment.role),
+        )
+
+        if is_active is not None:
+            stmt = stmt.where(User.is_active == is_active)
+
+        if company_id is not None:
+            stmt = stmt.where(User.company_id == company_id)
+
+        if role:
+            stmt = stmt.where(User.role == role)
+
+        if search:
+            # Создаем условия поиска по всем полям пользователя
+            search_conditions = [
+                User.email.ilike(f"%{search}%"),
+                User.username.ilike(f"%{search}%"),
+            ]
+
+            # Добавляем поиск по полям профиля, если профиль существует
+            from app.models.user_profile import UserProfile
+
+            # Присоединяем профиль для поиска
+            stmt = stmt.outerjoin(User.profile)
+
+            # Добавляем условия поиска по полям профиля
+            search_conditions.extend(
+                [
+                    UserProfile.first_name.ilike(f"%{search}%"),
+                    UserProfile.last_name.ilike(f"%{search}%"),
+                    UserProfile.department.ilike(f"%{search}%"),
+                    UserProfile.phone.ilike(f"%{search}%"),
+                ]
+            )
+
+            stmt = stmt.where(or_(*search_conditions))
+
+        stmt = stmt.offset(skip).limit(limit).order_by(desc(User.created_at))
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
+    async def get_user_audit_log(
+        self, db: AsyncSession, *, user_id: int, limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """Получить журнал аудита пользователя"""
+        try:
+            # Базовая реализация - возвращаем пустой список
+            # TODO: реализовать получение из таблицы аудита
+            return []
+        except Exception as e:
+            return [{"error": str(e)}]
+
+    async def update_avatar(
+        self, db: AsyncSession, *, user_id: int, avatar_url: str
+    ) -> User:
+        """Обновить аватар пользователя"""
+        try:
+            # Получаем пользователя
+            user = await self.get(db, id=user_id)
+            if not user:
+                raise ValueError(f"User with id {user_id} not found")
+
+            # Сохраняем старый URL для удаления
+            old_avatar_url = user.avatar_url
+
+            # Обновляем аватар
+            user.avatar_url = avatar_url
+            await db.commit()
+            await db.refresh(user)
+
+            logger.info(f"Avatar updated for user {user_id}: {avatar_url}")
+
+            # Удаляем старый аватар если он был
+            if old_avatar_url:
+                try:
+                    from app.services.file_service import file_service
+
+                    await file_service.delete_avatar(old_avatar_url)
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to delete old avatar for user {user_id}: {str(e)}"
+                    )
+                    pass
+
+            return user
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Failed to update avatar for user {user_id}: {str(e)}")
+            raise e
+
+    async def remove_avatar(self, db: AsyncSession, *, user_id: int) -> User:
+        """Удалить аватар пользователя"""
+        try:
+            # Получаем пользователя
+            user = await self.get(db, id=user_id)
+            if not user:
+                raise ValueError(f"User with id {user_id} not found")
+
+            # Сохраняем URL для удаления файла
+            avatar_url = user.avatar_url
+
+            # Удаляем аватар из БД
+            user.avatar_url = None
+            await db.commit()
+            await db.refresh(user)
+
+            # Удаляем файл
+            if avatar_url:
+                try:
+                    from app.services.file_service import file_service
+
+                    await file_service.delete_avatar(avatar_url)
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to delete avatar file for user {user_id}: {str(e)}"
+                    )
+                    pass
+
+            logger.info(f"Avatar removed for user {user_id}")
+            return user
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Failed to remove avatar for user {user_id}: {str(e)}")
+            raise e
 
 
 # Создаем экземпляр CRUD для использования в API

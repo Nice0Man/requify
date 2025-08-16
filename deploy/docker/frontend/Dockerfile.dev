@@ -1,26 +1,39 @@
-# Development Frontend Dockerfile
-FROM node:20-alpine
+# Development Dockerfile for Requify Frontend
+FROM node:24-alpine
 
+# Set work directory
 WORKDIR /app
 
-# Create non-root user with home directory for npm cache
-RUN addgroup -g 1001 -S frontend && \
-    adduser -S -u 1001 -G frontend -h /home/frontend frontend
+# Install system dependencies  
+RUN apk add --no-cache \
+    git \
+    openssh-client \
+    curl \
+    && rm -rf /var/cache/apk/*
 
-# Change ownership of app directory to frontend user
+# Create user
+RUN addgroup -g 1001 -S frontend && \
+    adduser -S -u 1001 -G frontend -h /app frontend
+
+# Copy package files first to leverage Docker cache (correct path from project root)
+COPY frontend/package.json frontend/package-lock.json* ./
+
+# Install dependencies as root first, then fix permissions
+RUN npm ci --no-audit --no-fund && \
+    chown -R frontend:frontend /app
+
+# Copy source code (correct path from project root)
+COPY frontend ./
+
+# Set final permissions
 RUN chown -R frontend:frontend /app
 
-# Copy package files first to leverage Docker cache
-COPY --chown=frontend:frontend package*.json ./
-
-# Install dependencies as non-root user
-USER frontend
-RUN npm install
-
-# Copy application code with proper ownership
-COPY --chown=frontend:frontend . .
-
+# Expose port
 EXPOSE 3000
+EXPOSE 24678
 
-# Hot reload for development
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Switch to non-root user
+USER frontend
+
+# Start development server
+CMD ["npm", "run", "dev", "--", "--host", "http://requify.local"]

@@ -1,13 +1,7 @@
 /**
  * Release UI components exports
- * TODO: Создать компоненты для релизов
+ * Экспорт UI компонентов для работы с релизами
  */
 
-// export { ReleaseCard } from './ReleaseCard';
-// export { ReleaseList } from './ReleaseList';
-// export { ReleaseForm } from './ReleaseForm';
-
-// Временная заглушка
-export const ReleaseUIPlaceholder = {
-  // TODO: Добавить компоненты
-};
+export { ReleaseCard } from './ReleaseCard';
+export type { ReleaseCardProps } from './ReleaseCard';

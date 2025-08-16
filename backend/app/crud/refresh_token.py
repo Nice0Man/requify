@@ -57,11 +57,18 @@ class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):
 
         db.add(refresh_token)
         await db.commit()
-        await db.refresh(refresh_token)
-        return refresh_token
+
+        # Загружаем с предварительной загрузкой пользователя
+        query = (
+            select(RefreshToken)
+            .where(RefreshToken.id == refresh_token.id)
+            .options(selectinload(RefreshToken.user))
+        )
+        result = await db.execute(query)
+        return result.scalar_one()
 
     async def get_by_token(
-        self, db: AsyncSession, *, token: str, include_user: bool = False
+        self, db: AsyncSession, *, token: str, include_user: bool = True
     ) -> Optional[RefreshToken]:
         """
         Получить refresh токен по значению токена.
@@ -69,7 +76,7 @@ class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):
         Args:
             db: Сессия базы данных
             token: Значение токена
-            include_user: Включить информацию о пользователе
+            include_user: Включить информацию о пользователе (по умолчанию True)
 
         Returns:
             Optional[RefreshToken]: Токен или None
@@ -119,6 +126,7 @@ class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):
         user_id: int,
         active_only: bool = True,
         limit: Optional[int] = None,
+        include_user: bool = False,
     ) -> List[RefreshToken]:
         """
         Получить токены пользователя.
@@ -128,6 +136,7 @@ class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):
             user_id: ID пользователя
             active_only: Только активные токены
             limit: Лимит результатов
+            include_user: Включить информацию о пользователе
 
         Returns:
             List[RefreshToken]: Список токенов
@@ -142,6 +151,9 @@ class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):
                     RefreshToken.expires_at > now,
                 )
             )
+
+        if include_user:
+            query = query.options(selectinload(RefreshToken.user))
 
         query = query.order_by(RefreshToken.created_at.desc())
 
@@ -166,8 +178,15 @@ class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):
         """
         token.mark_used()
         await db.commit()
-        await db.refresh(token)
-        return token
+
+        # Перезагружаем с предварительной загрузкой пользователя
+        query = (
+            select(RefreshToken)
+            .where(RefreshToken.id == token.id)
+            .options(selectinload(RefreshToken.user))
+        )
+        result = await db.execute(query)
+        return result.scalar_one()
 
     async def revoke_token(
         self,
@@ -189,8 +208,15 @@ class CRUDRefreshToken(CRUDBase[RefreshToken, dict, dict]):
         """
         token.revoke(reason)
         await db.commit()
-        await db.refresh(token)
-        return token
+
+        # Перезагружаем с предварительной загрузкой пользователя
+        query = (
+            select(RefreshToken)
+            .where(RefreshToken.id == token.id)
+            .options(selectinload(RefreshToken.user))
+        )
+        result = await db.execute(query)
+        return result.scalar_one()
 
     async def revoke_user_tokens(
         self,

@@ -1,6 +1,7 @@
-// Auth UI components exports
-export * from "./LoginForm";
-export * from "./RegisterForm";
-export * from "./LogoutButton";
-export * from './ForgotPasswordForm'; // Created component
-export * from './ResetPasswordForm'; // Created component
+// export * from './AuthForm';          // TODO: create main auth form
+export * from './LoginForm';        // Форма входа в систему
+export * from './RegisterForm';     // Форма регистрации
+export * from './ForgotPasswordForm'; // Форма восстановления пароля
+export * from './ResetPasswordForm';  // Форма сброса пароля
+export * from './LogoutButton';     // Кнопка выхода
+// export * from './UserProfile';      // TODO: create user profile component

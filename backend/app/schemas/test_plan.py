@@ -1,49 +1,67 @@
-from pydantic import BaseModel, Field
+"""
+Схемы для модели TestPlan.
+Мигрировано на новую архитектуру SQLModel с базовыми классами.
+"""
+
+from sqlmodel import Field
 from datetime import datetime
 from typing import Optional
 
+from .base import (
+    BaseSchema,
+    CreateSchema,
+    UpdateSchema,
+    ResponseSchema,
+    ProjectRelatedSchema,
+    ValidationMixin,
+    FieldLimits,
+    StandardDescriptions,
+)
 
-class TestPlanBase(BaseModel):
+
+class TestPlanBase(BaseSchema):
     """Базовая схема тестового плана."""
 
-    name: str = Field(..., description="Название тестового плана")
-    description: Optional[str] = Field(None, description="Описание тестового плана")
-    project_id: int = Field(..., gt=0, description="ID проекта")
-    status: str = Field(default="active", description="Статус тестового плана")
+    name: str = Field(
+        ...,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description="Название тестового плана",
+    )
+    description: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Описание тестового плана"
+    )
+    status: str = Field(
+        default="active",
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Статус тестового плана",
+    )
 
 
-class TestPlanCreate(TestPlanBase):
+class TestPlanCreate(CreateSchema, TestPlanBase, ProjectRelatedSchema):
     """Схема для создания тестового плана."""
 
     pass
 
 
-class TestPlanUpdate(BaseModel):
+class TestPlanUpdate(UpdateSchema):
     """Схема для обновления тестового плана."""
 
-    name: Optional[str] = Field(None, description="Название тестового плана")
-    description: Optional[str] = Field(None, description="Описание тестового плана")
-    status: Optional[str] = Field(None, description="Статус тестового плана")
+    name: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.MEDIUM_STRING_MAX,
+        description="Название тестового плана",
+    )
+    description: Optional[str] = Field(
+        None, max_length=FieldLimits.TEXT_MAX, description="Описание тестового плана"
+    )
+    status: Optional[str] = Field(
+        None,
+        max_length=FieldLimits.SHORT_STRING_MAX,
+        description="Статус тестового плана",
+    )
 
 
-class TestPlanInDBBase(TestPlanBase):
-    """Базовая схема тестового плана с данными из БД."""
-
-    id: int
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class TestPlan(TestPlanInDBBase):
+class TestPlan(ResponseSchema, TestPlanBase, ProjectRelatedSchema):
     """Схема тестового плана для ответов API."""
-
-    pass
-
-
-class TestPlanInDB(TestPlanInDBBase):
-    """Схема тестового плана в БД."""
 
     pass

@@ -1,6 +1,5 @@
-// Dashboard UI components exports
-export * from "./DashboardStats";
-export * from "./DashboardCharts";
-export * from "./RecentActivity";
-export * from './QuickActions'; // Created component
-export * from './NotificationCenter'; // Created component
+// Dashboard Feature UI Components
+export { EnhancedDashboardStatsWidget } from "./EnhancedDashboardStatsWidget";
+export { MetricCard } from "./MetricCard";
+export { QuickActionsWidget } from "./QuickActionsWidget";
+export { DashboardPerformanceOptimizations } from "./DashboardPerformanceOptimizations";
