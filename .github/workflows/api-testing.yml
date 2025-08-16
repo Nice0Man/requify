@@ -50,7 +50,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Cache Poetry installation
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: poetry-cache
         with:
           path: ~/.local/share/pypoetry
@@ -77,7 +77,7 @@ jobs:
           python-version: ${{ needs.setup.outputs.python-version }}
 
       - name: Restore Poetry cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.local/share/pypoetry
           key: poetry-${{ runner.os }}-${{ env.POETRY_VERSION }}
@@ -162,13 +162,13 @@ jobs:
           python-version: ${{ needs.setup.outputs.python-version }}
 
       - name: Restore Poetry cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.local/share/pypoetry
           key: poetry-${{ runner.os }}-${{ env.POETRY_VERSION }}
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: backend/.venv
           key: venv-${{ runner.os }}-${{ hashFiles('backend/pyproject.toml') }}
@@ -241,7 +241,7 @@ jobs:
             -m "not integration and not performance"
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: unit-test-results
@@ -251,12 +251,13 @@ jobs:
             backend/coverage.xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         if: always()
         with:
           file: backend/coverage.xml
           flags: unittests
           name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   integration-tests:
     needs: [setup, unit-tests]
@@ -298,13 +299,13 @@ jobs:
           python-version: ${{ needs.setup.outputs.python-version }}
 
       - name: Restore Poetry cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.local/share/pypoetry
           key: poetry-${{ runner.os }}-${{ env.POETRY_VERSION }}
 
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: backend/.venv
           key: venv-${{ runner.os }}-${{ hashFiles('backend/pyproject.toml') }}
@@ -375,7 +376,7 @@ jobs:
           poetry run python tests/manual_auth_test.py --mode comprehensive --url http://localhost:8000
 
       - name: Upload integration test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: integration-test-results
@@ -421,7 +422,7 @@ jobs:
           python-version: ${{ needs.setup.outputs.python-version }}
 
       - name: Restore Poetry cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.local/share/pypoetry
           key: poetry-${{ runner.os }}-${{ env.POETRY_VERSION }}
@@ -486,7 +487,7 @@ jobs:
           echo "Load testing results saved" >> performance_report.txt
 
       - name: Upload performance results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: performance-test-results
           path: performance_report.txt
@@ -522,7 +523,7 @@ jobs:
           safety check
 
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-reports
@@ -540,7 +541,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download test artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: test-artifacts
 
