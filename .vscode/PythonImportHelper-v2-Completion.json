@@ -9305,6 +9305,14 @@
         "documentation": {}
     },
     {
+        "label": "Column",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
         "label": "DateTime",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -9313,7 +9321,7 @@
         "documentation": {}
     },
     {
-        "label": "Foreig",
+        "label": "ForeignKey",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -9321,7 +9329,7 @@
         "documentation": {}
     },
     {
-        "label": "Foreig",
+        "label": "JSON",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -9329,47 +9337,7 @@
         "documentation": {}
     },
     {
-        "label": "JSONnKeyn",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "ForeignKey\r\n\r\nspecification_requirements = Table\r\n    \"specification_requirements\"",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "Base.metadata",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "Column\r\n        \"specification_id\"",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "ForeignKey\"specifications.id\"",
-        "importPath": "sqlalchemy",
-        "description": "sqlalchemy",
-        "isExtraImport": true,
-        "detail": "sqlalchemy",
-        "documentation": {}
-    },
-    {
-        "label": "ondelete=\"CASCADE\"",
+        "label": "Table",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
         "isExtraImport": true,
@@ -27127,38 +27095,6 @@
         "description": "app.schemas.test_result",
         "isExtraImport": true,
         "detail": "app.schemas.test_result",
-        "documentation": {}
-    },
-    {
-        "label": "Path",
-        "importPath": "pathlib",
-        "description": "pathlib",
-        "isExtraImport": true,
-        "detail": "pathlib",
-        "documentation": {}
-    },
-    {
-        "label": "Path",
-        "importPath": "pathlib",
-        "description": "pathlib",
-        "isExtraImport": true,
-        "detail": "pathlib",
-        "documentation": {}
-    },
-    {
-        "label": "Path",
-        "importPath": "pathlib",
-        "description": "pathlib",
-        "isExtraImport": true,
-        "detail": "pathlib",
-        "documentation": {}
-    },
-    {
-        "label": "Path",
-        "importPath": "pathlib",
-        "description": "pathlib",
-        "isExtraImport": true,
-        "detail": "pathlib",
         "documentation": {}
     },
     {
@@ -53262,96 +53198,6 @@
         "description": "frontend.node_modules.flatted.python.flatted",
         "peekOfCode": "def stringify(value, *args, **kwargs):\n    known = _Known()\n    input = []\n    output = []\n    i = int(_index(known, input, value))\n    while i < len(input):\n        output.append(_transform(known, input, input[i]))\n        i += 1\n    return _json.dumps(output, *args, **kwargs)",
         "detail": "frontend.node_modules.flatted.python.flatted",
-        "documentation": {}
-    },
-    {
-        "label": "fix_file_imports",
-        "kind": 2,
-        "importPath": "fix_all_imports",
-        "description": "fix_all_imports",
-        "peekOfCode": "def fix_file_imports(file_path: Path) -> bool:\n    \"\"\"Исправляет импорты в файле.\"\"\"\n    try:\n        with open(file_path, 'r', encoding='utf-8') as f:\n            content = f.read()\n    except:\n        return False\n    original_content = content\n    changed = False\n    # Проверяем наличие TYPE_CHECKING без импорта",
-        "detail": "fix_all_imports",
-        "documentation": {}
-    },
-    {
-        "label": "main",
-        "kind": 2,
-        "importPath": "fix_all_imports",
-        "description": "fix_all_imports",
-        "peekOfCode": "def main():\n    \"\"\"Основная функция.\"\"\"\n    print(\"🔧 Fixing all import errors in models...\")\n    # Исправляем файлы моделей\n    model_files = list(Path('backend/app/models').rglob('*.py'))\n    fixed_count = 0\n    for file_path in model_files:\n        print(f\"🔍 Checking {file_path}\")\n        if fix_file_imports(file_path):\n            fixed_count += 1",
-        "detail": "fix_all_imports",
-        "documentation": {}
-    },
-    {
-        "label": "COMMON_FIXES",
-        "kind": 5,
-        "importPath": "fix_all_imports",
-        "description": "fix_all_imports",
-        "peekOfCode": "COMMON_FIXES = {\n    # SQLAlchemy imports\n    \"NameError: name 'ForeignKey' is not defined\": {\n        'pattern': r'from sqlalchemy import (.+)',\n        'add_import': 'ForeignKey'\n    },\n    \"NameError: name 'JSON' is not defined\": {\n        'pattern': r'from sqlalchemy import (.+)',\n        'add_import': 'JSON'\n    },",
-        "detail": "fix_all_imports",
-        "documentation": {}
-    },
-    {
-        "label": "fix_imports_in_file",
-        "kind": 2,
-        "importPath": "fix_imports",
-        "description": "fix_imports",
-        "peekOfCode": "def fix_imports_in_file(file_path: Path) -> bool:\n    \"\"\"Исправляет импорты в одном файле.\"\"\"\n    try:\n        with open(file_path, 'r', encoding='utf-8') as f:\n            content = f.read()\n    except:\n        return False\n    changed = False\n    lines = content.split('\\n')\n    # Находим строку с основными импортами SQLAlchemy",
-        "detail": "fix_imports",
-        "documentation": {}
-    },
-    {
-        "label": "main",
-        "kind": 2,
-        "importPath": "fix_imports",
-        "description": "fix_imports",
-        "peekOfCode": "def main():\n    \"\"\"Основная функция.\"\"\"\n    print(\"🔧 Fixing SQLAlchemy imports...\")\n    # Находим все Python файлы в models\n    model_files = list(Path('app/models').rglob('*.py'))\n    fixed_count = 0\n    for file_path in model_files:\n        if fix_imports_in_file(file_path):\n            fixed_count += 1\n    print(f\"✅ Fixed imports in {fixed_count} files\")",
-        "detail": "fix_imports",
-        "documentation": {}
-    },
-    {
-        "label": "SQLALCHEMY_IMPORTS",
-        "kind": 5,
-        "importPath": "fix_imports",
-        "description": "fix_imports",
-        "peekOfCode": "SQLALCHEMY_IMPORTS = {\n    'JSON': 'from sqlalchemy import JSON',\n    'ForeignKey': 'from sqlalchemy import ForeignKey',\n    'DECIMAL': 'from sqlalchemy import DECIMAL',\n    'TIMESTAMP': 'from sqlalchemy import TIMESTAMP',\n    'UUID': 'from sqlalchemy import UUID',\n    'LargeBinary': 'from sqlalchemy import LargeBinary',\n    'UniqueConstraint': 'from sqlalchemy import UniqueConstraint',\n    'CheckConstraint': 'from sqlalchemy import CheckConstraint',\n    'Index': 'from sqlalchemy import Index',",
-        "detail": "fix_imports",
-        "documentation": {}
-    },
-    {
-        "label": "resolve_conflict_in_file",
-        "kind": 2,
-        "importPath": "resolve_all_conflicts",
-        "description": "resolve_all_conflicts",
-        "peekOfCode": "def resolve_conflict_in_file(file_path: Path) -> bool:\n    \"\"\"\n    Агрессивно разрешает все merge конфликты в файле.\n    Стратегия: приоритет HEAD версии, сохранение уникальных элементов.\n    \"\"\"\n    try:\n        with open(file_path, \"r\", encoding=\"utf-8\") as f:\n            content = f.read()\n    except (UnicodeDecodeError, PermissionError) as e:\n        print(f\"⚠️  Skipping {file_path}: {e}\")",
-        "detail": "resolve_all_conflicts",
-        "documentation": {}
-    },
-    {
-        "label": "main",
-        "kind": 2,
-        "importPath": "resolve_all_conflicts",
-        "description": "resolve_all_conflicts",
-        "peekOfCode": "def main():\n    \"\"\"Основная функция для разрешения всех конфликтов.\"\"\"\n    print(\"🚀 STARTING AGGRESSIVE CONFLICT RESOLUTION\")\n    print(\"=\" * 60)\n    # Находим все Python файлы\n    python_files = list(Path(\".\").rglob(\"*.py\"))\n    total_files = len(python_files)\n    resolved_count = 0\n    print(f\"📊 Found {total_files} Python files to check\")\n    for file_path in python_files:",
-        "detail": "resolve_all_conflicts",
-        "documentation": {}
-    },
-    {
-        "label": "clean_file",
-        "kind": 2,
-        "importPath": "ultimate_conflict_resolver",
-        "description": "ultimate_conflict_resolver",
-        "peekOfCode": "def clean_file(file_path: Path) -> bool:\n    \"\"\"Полная очистка файла от всех merge маркеров.\"\"\"\n    try:\n        with open(file_path, \"r\", encoding=\"utf-8\") as f:\n            content = f.read()\n    except:\n        return False\n    # Проверяем наличие любых merge маркеров\n    has_conflicts = any(marker in content for marker in [\n        \"\", \"\", \"\"",
-        "detail": "ultimate_conflict_resolver",
-        "documentation": {}
-    },
-    {
-        "label": "main",
-        "kind": 2,
-        "importPath": "ultimate_conflict_resolver",
-        "description": "ultimate_conflict_resolver",
-        "peekOfCode": "def main():\n    \"\"\"Основная функция.\"\"\"\n    print(\"🚀 ULTIMATE CONFLICT RESOLUTION\")\n    print(\"=\" * 50)\n    # Находим ВСЕ файлы рекурсивно\n    all_files = []\n    for ext in ['*.py', '*.yml', '*.yaml', '*.md', '*.txt', '*.json']:\n        all_files.extend(Path('.').rglob(ext))\n    total_files = len(all_files)\n    cleaned_count = 0",
-        "detail": "ultimate_conflict_resolver",
         "documentation": {}
     }
 ]

@@ -241,7 +241,8 @@ class Specification(Base, TimestampedMixin):
 # # Association Table для связи спецификаций и требований
 # 
 from sqlalchemy import (
-    DateTime, Foreig, Foreig, JSONnKeyn, ForeignKey
+    Column, DateTime, ForeignKey, JSON, Table
+)
 
 specification_requirements = Table(
     "specification_requirements",

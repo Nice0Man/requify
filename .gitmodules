@@ -1,0 +1,8 @@
+[submodule "backend"]
+	path = backend
+	branch = dev
+	url = https://github.com/Nice0Man/requify-backend.git
+[submodule "frontend"]
+	path = frontend
+	branch = dev
+	url = https://github.com/Nice0Man/requify-frontend.git
