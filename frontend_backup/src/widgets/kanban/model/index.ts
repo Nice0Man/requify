@@ -1,1 +1,0 @@
-export type { KanbanWidgetProps } from "./types"; 

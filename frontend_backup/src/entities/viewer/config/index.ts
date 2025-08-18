@@ -1,1 +1,0 @@
-export { BASE_VIEWER_PERSONAL_SECTIONS } from "./config";
