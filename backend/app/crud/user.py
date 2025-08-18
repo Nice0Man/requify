@@ -3,14 +3,8 @@ CRUD операции для модели User.
 """
 
 from datetime import datetime
-<<<<<<< HEAD
-from typing import List, Optional
-
-from sqlalchemy import func, select
-=======
 from typing import List, Optional, Dict, Any
 from sqlalchemy import func, select, or_, and_, desc
->>>>>>> dev-backend
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -18,12 +12,9 @@ from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
-<<<<<<< HEAD
-=======
 from app.core.security import get_password_hash, verify_password
 from app.utils.logger import logger
 from app.models.enhanced_role_system import UserRoleAssignment
->>>>>>> dev-backend
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):

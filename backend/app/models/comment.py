@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from .requirement import Requirement
     from .specification import Specification
 
-
 class Comment(Base, TimestampedMixin):
     """
     Модель комментария.
@@ -50,10 +49,8 @@ class Comment(Base, TimestampedMixin):
         comment="Автор комментария",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     requirement: Mapped[Optional["Requirement"]] = relationship(
         "Requirement", back_populates="comments", lazy="select"
     )

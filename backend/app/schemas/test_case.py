@@ -1,20 +1,7 @@
-<<<<<<< HEAD
 from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
-=======
-"""
-Схемы для тестовых случаев и связанных сущностей.
-"""
-
-from typing import Optional, List, Dict, Any
-from datetime import datetime
-from enum import Enum
-from pydantic import BaseModel, Field
-
-from .base import BaseSchema, ResponseSchema, CreateSchema, UpdateSchema, FieldLimits
->>>>>>> dev-backend
 
 
 # Enums для тестовых случаев

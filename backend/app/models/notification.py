@@ -15,7 +15,6 @@ from .base import Base, TimestampedMixin
 if TYPE_CHECKING:
     from .user import User
 
-
 class Notification(Base, TimestampedMixin):
     """
     Модель уведомлений пользователей.
@@ -66,10 +65,8 @@ class Notification(Base, TimestampedMixin):
         comment="Получатель уведомления",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     user: Mapped["User"] = relationship(
         "User", back_populates="user_notifications", lazy="select"
     )

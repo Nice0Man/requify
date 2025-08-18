@@ -41,10 +41,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Test Plans Management
-# =============================================================================
-
+# # Test Plans Management
+# 
 
 @router.get(
     "/plans",
@@ -111,7 +109,6 @@ async def get_test_plans(
             detail=f"Failed to get test plans: {str(e)}",
         )
 
-
 @router.post(
     "/plans",
     status_code=status.HTTP_201_CREATED,
@@ -166,7 +163,6 @@ async def create_test_plan(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to create test plan: {str(e)}",
         )
-
 
 @router.get(
     "/plans/{plan_id}",
@@ -227,7 +223,6 @@ async def get_test_plan(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get test plan: {str(e)}",
         )
-
 
 @router.put(
     "/plans/{plan_id}",
@@ -294,7 +289,6 @@ async def update_test_plan(
             detail=f"Failed to update test plan: {str(e)}",
         )
 
-
 @router.delete(
     "/plans/{plan_id}",
     summary="Delete Test Plan",
@@ -341,7 +335,6 @@ async def delete_test_plan(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to delete test plan: {str(e)}",
         )
-
 
 @router.post(
     "/plans/{plan_id}/execute",
@@ -390,11 +383,8 @@ async def execute_test_plan(
             detail=f"Failed to execute test plan: {str(e)}",
         )
 
-
-# =============================================================================
-# Test Cases Management
-# =============================================================================
-
+# # Test Cases Management
+# 
 
 @router.get(
     "/cases",
@@ -462,7 +452,6 @@ async def get_test_cases(
             detail=f"Failed to get test cases: {str(e)}",
         )
 
-
 @router.post(
     "/cases",
     status_code=status.HTTP_201_CREATED,
@@ -520,11 +509,8 @@ async def create_test_case(
             detail=f"Failed to create test case: {str(e)}",
         )
 
-
-# =============================================================================
-# Integration Testing
-# =============================================================================
-
+# # Integration Testing
+# 
 
 @router.post(
     "/integration/run",
@@ -565,7 +551,6 @@ async def run_integration_tests(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to run integration tests: {str(e)}",
         )
-
 
 @router.get(
     "/integration/jobs/{job_id}",
@@ -608,7 +593,6 @@ async def get_integration_test_status(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get integration test status: {str(e)}",
         )
-
 
 @router.get(
     "/integration/results",

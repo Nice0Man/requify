@@ -37,10 +37,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Role CRUD Operations
-# =============================================================================
-
+# # Role CRUD Operations
+# 
 
 @router.get(
     "/",
@@ -93,7 +91,6 @@ async def get_roles(
             detail=f"Failed to get roles: {str(e)}",
         )
 
-
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
@@ -144,7 +141,6 @@ async def create_role(
             detail=f"Failed to create role: {str(e)}",
         )
 
-
 @router.get(
     "/{role_id}",
     summary="Get Role Details",
@@ -192,7 +188,6 @@ async def get_role_details(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get role details: {str(e)}",
         )
-
 
 @router.put(
     "/{role_id}",
@@ -259,7 +254,6 @@ async def update_role(
             detail=f"Failed to update role: {str(e)}",
         )
 
-
 @router.delete(
     "/{role_id}",
     summary="Delete Role",
@@ -295,11 +289,8 @@ async def delete_role(
             detail=f"Failed to delete role: {str(e)}",
         )
 
-
-# =============================================================================
-# Role Permissions Management
-# =============================================================================
-
+# # Role Permissions Management
+# 
 
 @router.get(
     "/{role_id}/permissions",
@@ -325,7 +316,6 @@ async def get_role_permissions(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get role permissions: {str(e)}",
         )
-
 
 @router.put(
     "/{role_id}/permissions",
@@ -372,11 +362,8 @@ async def update_role_permissions(
             detail=f"Failed to update role permissions: {str(e)}",
         )
 
-
-# =============================================================================
-# Role Users Management
-# =============================================================================
-
+# # Role Users Management
+# 
 
 @router.get(
     "/{role_id}/users",
@@ -407,11 +394,8 @@ async def get_role_users(
             detail=f"Failed to get role users: {str(e)}",
         )
 
-
-# =============================================================================
-# Role Statistics
-# =============================================================================
-
+# # Role Statistics
+# 
 
 @router.get(
     "/{role_id}/stats",

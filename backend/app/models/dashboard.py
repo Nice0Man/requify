@@ -2,14 +2,9 @@
 Dashboard-related models for user preferences, notifications, and activity tracking.
 """
 
-<<<<<<< HEAD
 import uuid
 from datetime import datetime
 
-=======
-from datetime import datetime, UTC
-from typing import TYPE_CHECKING, List, Optional
->>>>>>> dev-backend
 from sqlalchemy import (
     JSON,
     Boolean,
@@ -20,12 +15,8 @@ from sqlalchemy import (
     String,
     Text,
 )
-<<<<<<< HEAD
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-=======
-from sqlalchemy.orm import Mapped, mapped_column, relationship
->>>>>>> dev-backend
 
 from .base import Base, TimestampedMixin
 

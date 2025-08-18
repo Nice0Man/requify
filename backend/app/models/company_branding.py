@@ -13,7 +13,6 @@ from .base import Base, TimestampedMixin
 if TYPE_CHECKING:
     from .company import Company
 
-
 class CompanyBranding(Base, TimestampedMixin):
     """
     Брендинг и визуальная идентичность компании.
@@ -37,10 +36,8 @@ class CompanyBranding(Base, TimestampedMixin):
         comment="ID компании",
     )
 
-    # =============================================================================
-    # Логотип и изображения
-    # =============================================================================
-
+    #     # Логотип и изображения
+    # 
     logo_url: Mapped[Optional[str]] = mapped_column(
         String(500), nullable=True, comment="URL основного логотипа"
     )
@@ -65,10 +62,8 @@ class CompanyBranding(Base, TimestampedMixin):
         String(500), nullable=True, comment="URL водяного знака"
     )
 
-    # =============================================================================
-    # Цветовая схема
-    # =============================================================================
-
+    #     # Цветовая схема
+    # 
     # Основные цвета
     primary_color: Mapped[Optional[str]] = mapped_column(
         String(7), nullable=True, comment="Основной цвет (hex, например #007bff)"
@@ -108,10 +103,8 @@ class CompanyBranding(Base, TimestampedMixin):
         String(7), nullable=True, default="#17a2b8", comment="Информационный цвет (hex)"
     )
 
-    # =============================================================================
-    # Типографика
-    # =============================================================================
-
+    #     # Типографика
+    # 
     # Шрифты
     primary_font_family: Mapped[Optional[str]] = mapped_column(
         String(200),
@@ -154,10 +147,8 @@ class CompanyBranding(Base, TimestampedMixin):
         String(10), nullable=True, default="20px", comment="Размер шрифта H3"
     )
 
-    # =============================================================================
-    # UI компоненты
-    # =============================================================================
-
+    #     # UI компоненты
+    # 
     # Кнопки
     button_border_radius: Mapped[Optional[str]] = mapped_column(
         String(10), nullable=True, default="4px", comment="Радиус границ кнопок"
@@ -185,10 +176,8 @@ class CompanyBranding(Base, TimestampedMixin):
         String(7), nullable=True, default="#ddd", comment="Цвет границ полей ввода"
     )
 
-    # =============================================================================
-    # Тема и стиль
-    # =============================================================================
-
+    #     # Тема и стиль
+    # 
     theme_name: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
@@ -207,10 +196,8 @@ class CompanyBranding(Base, TimestampedMixin):
         Text, nullable=True, comment="Кастомный JavaScript код"
     )
 
-    # =============================================================================
-    # Настройки отображения
-    # =============================================================================
-
+    #     # Настройки отображения
+    # 
     # Макет
     layout_type: Mapped[str] = mapped_column(
         String(20),
@@ -233,10 +220,8 @@ class CompanyBranding(Base, TimestampedMixin):
         String(10), nullable=True, default="0.3s", comment="Длительность анимаций"
     )
 
-    # =============================================================================
-    # Брендинг компании
-    # =============================================================================
-
+    #     # Брендинг компании
+    # 
     # Слоган и описание
     company_slogan: Mapped[Optional[str]] = mapped_column(
         String(200), nullable=True, comment="Слоган компании"
@@ -250,10 +235,8 @@ class CompanyBranding(Base, TimestampedMixin):
         JSON, nullable=True, comment="Ссылки на социальные сети (JSON)"
     )
 
-    # =============================================================================
-    # White Label настройки
-    # =============================================================================
-
+    #     # White Label настройки
+    # 
     # Кастомизация названий
     product_name: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True, comment="Кастомное название продукта"
@@ -273,10 +256,8 @@ class CompanyBranding(Base, TimestampedMixin):
         Boolean, default=False, nullable=False, comment="Скрыть ссылки на помощь"
     )
 
-    # =============================================================================
-    # Статус и метаданные
-    # =============================================================================
-
+    #     # Статус и метаданные
+    # 
     is_active: Mapped[bool] = mapped_column(
         Boolean, default=True, nullable=False, comment="Активна ли схема брендинга"
     )
@@ -292,10 +273,8 @@ class CompanyBranding(Base, TimestampedMixin):
         JSON, nullable=True, comment="Дополнительные настройки брендинга (JSON)"
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     company: Mapped["Company"] = relationship(
         "Company", back_populates="branding", lazy="select"
     )
@@ -303,10 +282,8 @@ class CompanyBranding(Base, TimestampedMixin):
     def __repr__(self) -> str:
         return f"<CompanyBranding(id={self.id}, company_id={self.company_id}, theme='{self.theme_name}')>"
 
-    # =============================================================================
-    # Business Logic Methods
-    # =============================================================================
-
+    #     # Business Logic Methods
+    # 
     def get_color_palette(self) -> dict:
         """Получить полную цветовую палитру"""
         return {

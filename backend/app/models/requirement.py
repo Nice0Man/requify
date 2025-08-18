@@ -1,12 +1,8 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 
-<<<<<<< HEAD
 from sqlalchemy import DateTime, Enum, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
-=======
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, Index
->>>>>>> dev-backend
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
@@ -19,22 +15,10 @@ if TYPE_CHECKING:
     from .release import Release
     from .requirement_priorities import RequirementPriority
     from .requirement_statuses import RequirementStatus
-<<<<<<< HEAD
     from .requirement_types import RequirementType
     from .spec import Spec
     from .test_result import TestResult
     from .user import User
-=======
-    from .project import Project
-    from .user import User
-    from .specification import Specification
-    from .test_case import TestCase
-    from .comment import Comment
-    from .relationship import Relationship
-    from .dashboard import DashboardNotification, DashboardActivity
-    from .test_result import TestResult
->>>>>>> dev-backend
-
 
 class Requirement(Base, TimestampedMixin):
     """
@@ -88,10 +72,8 @@ class Requirement(Base, TimestampedMixin):
         comment="Статус требования",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     project: Mapped["Project"] = relationship(
         "Project", back_populates="requirements", lazy="select"
     )

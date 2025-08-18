@@ -5,22 +5,8 @@
 
 from datetime import datetime
 from typing import Optional
-<<<<<<< HEAD
 
 from pydantic import BaseModel, Field
-=======
-from sqlmodel import Field
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
->>>>>>> dev-backend
 
 
 class RelationshipBase(BaseSchema):

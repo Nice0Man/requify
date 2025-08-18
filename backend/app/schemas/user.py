@@ -6,23 +6,9 @@
 
 import re
 from datetime import datetime
-<<<<<<< HEAD
 from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
-=======
-from typing import Optional, Dict, Any, List, Union, TYPE_CHECKING
-from sqlmodel import SQLModel, Field
-from pydantic import (
-    EmailStr,
-    field_validator,
-    model_validator,
-    field_serializer,
-    computed_field,
-)
-from enum import Enum
-import re
->>>>>>> dev-backend
 
 from .base import (
     BaseSchema,
@@ -45,7 +31,6 @@ if TYPE_CHECKING:
     from .dashboard import UserDashboardPreferences, DashboardNotification
     from .team import TeamResponse, TeamMemberResponse
     from .settings import UserSettings, UserSettingsResponse
-
 
 # === Перечисления ===
 

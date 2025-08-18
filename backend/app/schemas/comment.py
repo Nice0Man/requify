@@ -4,31 +4,9 @@
 """
 
 from datetime import datetime
-<<<<<<< HEAD
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
-=======
-from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
-from pydantic import field_validator
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ListResponseSchema,
-    StatisticsSchema,
-    UserRelatedSchema,
-    ProjectRelatedSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
-from .common import PriorityEnum, SearchRequest, DateRangeFilter
->>>>>>> dev-backend
-
 
 # === Базовые схемы ===
 

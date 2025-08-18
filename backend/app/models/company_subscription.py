@@ -25,7 +25,6 @@ from .base import Base, TimestampedMixin
 if TYPE_CHECKING:
     from .company import Company
 
-
 class SubscriptionStatus(PyEnum):
     """Статусы подписки"""
 
@@ -36,7 +35,6 @@ class SubscriptionStatus(PyEnum):
     EXPIRED = "expired"
     SUSPENDED = "suspended"
 
-
 class SubscriptionPlan(PyEnum):
     """Планы подписки"""
 
@@ -46,7 +44,6 @@ class SubscriptionPlan(PyEnum):
     ENTERPRISE = "enterprise"
     CUSTOM = "custom"
 
-
 class BillingPeriod(PyEnum):
     """Периоды биллинга"""
 
@@ -54,7 +51,6 @@ class BillingPeriod(PyEnum):
     QUARTERLY = "quarterly"
     YEARLY = "yearly"
     CUSTOM = "custom"
-
 
 class CompanySubscription(Base, TimestampedMixin):
     """
@@ -81,10 +77,8 @@ class CompanySubscription(Base, TimestampedMixin):
         comment="ID компании",
     )
 
-    # =============================================================================
-    # Основная информация о подписке
-    # =============================================================================
-
+    #     # Основная информация о подписке
+    # 
     status: Mapped[SubscriptionStatus] = mapped_column(
         String(20), nullable=False, default="trial", comment="Статус подписки"
     )
@@ -95,10 +89,8 @@ class CompanySubscription(Base, TimestampedMixin):
         String(20), nullable=False, default="monthly", comment="Период биллинга"
     )
 
-    # =============================================================================
-    # Временные рамки
-    # =============================================================================
-
+    #     # Временные рамки
+    # 
     started_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
@@ -118,10 +110,8 @@ class CompanySubscription(Base, TimestampedMixin):
         DateTime, nullable=True, comment="Дата следующего списания"
     )
 
-    # =============================================================================
-    # Финансовая информация
-    # =============================================================================
-
+    #     # Финансовая информация
+    # 
     price: Mapped[Optional[Decimal]] = mapped_column(
         Numeric(10, 2), nullable=True, comment="Цена подписки"
     )
@@ -143,10 +133,8 @@ class CompanySubscription(Base, TimestampedMixin):
         Numeric(10, 2), nullable=False, default=0, comment="Сумма задолженности"
     )
 
-    # =============================================================================
-    # Лимиты и квоты
-    # =============================================================================
-
+    #     # Лимиты и квоты
+    # 
     max_users: Mapped[Optional[int]] = mapped_column(
         Integer, nullable=True, comment="Максимальное количество пользователей"
     )
@@ -166,10 +154,8 @@ class CompanySubscription(Base, TimestampedMixin):
         Integer, nullable=True, comment="Лимит API запросов в месяц"
     )
 
-    # =============================================================================
-    # Функциональные возможности
-    # =============================================================================
-
+    #     # Функциональные возможности
+    # 
     features_enabled: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True, comment="Включенные функции (JSON массив)"
     )
@@ -194,10 +180,8 @@ class CompanySubscription(Base, TimestampedMixin):
         Boolean, default=False, nullable=False, comment="White label решение"
     )
 
-    # =============================================================================
-    # Биллинг и платежи
-    # =============================================================================
-
+    #     # Биллинг и платежи
+    # 
     billing_contact_id: Mapped[Optional[int]] = mapped_column(
         Integer, nullable=True, comment="ID контакта для биллинга"
     )
@@ -218,10 +202,8 @@ class CompanySubscription(Base, TimestampedMixin):
         Integer, nullable=False, default=7, comment="Льготный период (дни)"
     )
 
-    # =============================================================================
-    # Метаданные
-    # =============================================================================
-
+    #     # Метаданные
+    # 
     external_subscription_id: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True, comment="ID в внешней платежной системе"
     )
@@ -229,10 +211,8 @@ class CompanySubscription(Base, TimestampedMixin):
         Text, nullable=True, comment="Заметки о подписке"
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     company: Mapped["Company"] = relationship(
         "Company", back_populates="subscriptions", lazy="select"
     )
@@ -240,10 +220,8 @@ class CompanySubscription(Base, TimestampedMixin):
     def __repr__(self) -> str:
         return f"<CompanySubscription(id={self.id}, company_id={self.company_id}, plan='{self.plan}', status='{self.status}')>"
 
-    # =============================================================================
-    # Business Logic Methods - Status
-    # =============================================================================
-
+    #     # Business Logic Methods - Status
+    # 
     @property
     def is_active(self) -> bool:
         """Активна ли подписка"""
@@ -289,10 +267,8 @@ class CompanySubscription(Base, TimestampedMixin):
         """Есть ли просроченные платежи"""
         return self.outstanding_amount > 0
 
-    # =============================================================================
-    # Business Logic Methods - Limits
-    # =============================================================================
-
+    #     # Business Logic Methods - Limits
+    # 
     def get_limit(self, resource: str) -> Optional[int]:
         """Получить лимит для ресурса"""
         limits_map = {
@@ -320,10 +296,8 @@ class CompanySubscription(Base, TimestampedMixin):
 
         return integration in self.integrations_allowed
 
-    # =============================================================================
-    # Business Logic Methods - Billing
-    # =============================================================================
-
+    #     # Business Logic Methods - Billing
+    # 
     def calculate_next_payment_amount(self) -> Decimal:
         """Вычислить сумму следующего платежа"""
         if not self.price:

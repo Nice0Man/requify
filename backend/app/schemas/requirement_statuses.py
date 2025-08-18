@@ -3,31 +3,9 @@
 Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
-<<<<<<< HEAD
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
-=======
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
-from pydantic import field_validator
-from enum import Enum
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ListResponseSchema,
-    StatisticsSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
-from .common import StatusEnum
->>>>>>> dev-backend
-
 
 # === Перечисления ===
 

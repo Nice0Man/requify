@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from .company_branding import CompanyBranding
     from .company_subscription import CompanySubscription
 
-
 class CompanyStatus(PyEnum):
     """Статусы компании"""
 
@@ -25,7 +24,6 @@ class CompanyStatus(PyEnum):
     INACTIVE = "inactive"
     TRIAL = "trial"
     ARCHIVED = "archived"
-
 
 class CompanyType(PyEnum):
     """Типы компаний"""
@@ -37,7 +35,6 @@ class CompanyType(PyEnum):
     NON_PROFIT = "non_profit"
     GOVERNMENT = "government"
     EDUCATIONAL = "educational"
-
 
 class Company(Base, TimestampedMixin):
     """
@@ -84,10 +81,8 @@ class Company(Base, TimestampedMixin):
         Boolean, default=True, nullable=False, comment="Активна ли компания"
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     users: Mapped[List["User"]] = relationship(
         "User", back_populates="company", lazy="select"
     )

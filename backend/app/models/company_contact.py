@@ -13,7 +13,6 @@ from .base import Base, TimestampedMixin
 if TYPE_CHECKING:
     from .company import Company
 
-
 class CompanyContact(Base, TimestampedMixin):
     """
     Контактная информация компании.
@@ -38,10 +37,8 @@ class CompanyContact(Base, TimestampedMixin):
         comment="ID компании",
     )
 
-    # =============================================================================
-    # Типизация контакта
-    # =============================================================================
-
+    #     # Типизация контакта
+    # 
     contact_type: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
@@ -57,10 +54,8 @@ class CompanyContact(Base, TimestampedMixin):
         comment="Название контакта (Головной офис, Филиал в Москве и т.д.)",
     )
 
-    # =============================================================================
-    # Email контакты
-    # =============================================================================
-
+    #     # Email контакты
+    # 
     email: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True, comment="Основной email"
     )
@@ -74,10 +69,8 @@ class CompanyContact(Base, TimestampedMixin):
         String(100), nullable=True, comment="Email отдела продаж"
     )
 
-    # =============================================================================
-    # Телефонные контакты
-    # =============================================================================
-
+    #     # Телефонные контакты
+    # 
     phone: Mapped[Optional[str]] = mapped_column(
         String(20), nullable=True, comment="Основной телефон"
     )
@@ -91,10 +84,8 @@ class CompanyContact(Base, TimestampedMixin):
         String(20), nullable=True, comment="Телефон поддержки"
     )
 
-    # =============================================================================
-    # Физический адрес
-    # =============================================================================
-
+    #     # Физический адрес
+    # 
     # Страна и регион
     country: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True, comment="Страна"
@@ -125,10 +116,8 @@ class CompanyContact(Base, TimestampedMixin):
         String(50), nullable=True, comment="Офис/кабинет"
     )
 
-    # =============================================================================
-    # Онлайн присутствие
-    # =============================================================================
-
+    #     # Онлайн присутствие
+    # 
     website: Mapped[Optional[str]] = mapped_column(
         String(500), nullable=True, comment="Основной веб-сайт"
     )
@@ -136,10 +125,8 @@ class CompanyContact(Base, TimestampedMixin):
         Text, nullable=True, comment="Социальные сети (JSON)"
     )
 
-    # =============================================================================
-    # Часовой пояс и рабочее время
-    # =============================================================================
-
+    #     # Часовой пояс и рабочее время
+    # 
     timezone: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
@@ -150,10 +137,8 @@ class CompanyContact(Base, TimestampedMixin):
         String(200), nullable=True, comment="Рабочие часы (пн-пт 9:00-18:00)"
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     company: Mapped["Company"] = relationship(
         "Company", back_populates="contacts", lazy="select"
     )
@@ -161,10 +146,8 @@ class CompanyContact(Base, TimestampedMixin):
     def __repr__(self) -> str:
         return f"<CompanyContact(id={self.id}, company_id={self.company_id}, type='{self.contact_type}')>"
 
-    # =============================================================================
-    # Business Logic Methods
-    # =============================================================================
-
+    #     # Business Logic Methods
+    # 
     @property
     def full_address(self) -> str:
         """Полный адрес в одну строку"""

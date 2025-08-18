@@ -16,10 +16,8 @@ from app.api.dependencies import (
 
 router = APIRouter()
 
-# =============================================================================
-# Team Management
-# =============================================================================
-
+# # Team Management
+# 
 
 @router.get("/")
 async def get_teams(
@@ -38,7 +36,6 @@ async def get_teams(
     # TODO: Implement teams list with filtering
     return {"teams": []}
 
-
 @router.post("/")
 async def create_team(
     # team_data: TeamCreate,
@@ -53,7 +50,6 @@ async def create_team(
     # TODO: Implement team creation
     return {"message": "Team created"}
 
-
 @router.get("/my")
 async def get_my_teams(
     # db: SessionDep,
@@ -66,7 +62,6 @@ async def get_my_teams(
     """
     # TODO: Implement my teams retrieval
     return {"teams": []}
-
 
 @router.get("/{team_id}")
 async def get_team(
@@ -81,7 +76,6 @@ async def get_team(
     """
     # TODO: Implement team retrieval
     return {"team": {"id": team_id}}
-
 
 @router.put("/{team_id}")
 async def update_team(
@@ -98,7 +92,6 @@ async def update_team(
     # TODO: Implement team update
     return {"message": "Team updated"}
 
-
 @router.delete("/{team_id}")
 async def delete_team(
     team_id: int,
@@ -113,11 +106,8 @@ async def delete_team(
     # TODO: Implement team deletion
     return {"message": f"Team {team_id} deleted"}
 
-
-# =============================================================================
-# Team Members Management
-# =============================================================================
-
+# # Team Members Management
+# 
 
 @router.get("/{team_id}/members")
 async def get_team_members(
@@ -135,7 +125,6 @@ async def get_team_members(
     # TODO: Implement team members list
     return {"members": []}
 
-
 @router.post("/{team_id}/members")
 async def add_team_member(
     team_id: int,
@@ -150,7 +139,6 @@ async def add_team_member(
     """
     # TODO: Implement adding team member
     return {"message": "Member added to team"}
-
 
 @router.put("/{team_id}/members/{user_id}")
 async def update_team_member_role(
@@ -168,7 +156,6 @@ async def update_team_member_role(
     # TODO: Implement updating team member role
     return {"message": f"Role updated for user {user_id} in team {team_id}"}
 
-
 @router.delete("/{team_id}/members/{user_id}")
 async def remove_team_member(
     team_id: int,
@@ -184,11 +171,8 @@ async def remove_team_member(
     # TODO: Implement removing team member
     return {"message": f"User {user_id} removed from team {team_id}"}
 
-
-# =============================================================================
-# Team Statistics
-# =============================================================================
-
+# # Team Statistics
+# 
 
 @router.get("/{team_id}/stats")
 async def get_team_stats(

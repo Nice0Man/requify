@@ -7,6 +7,7 @@ import os
 import importlib
 from typing import List
 
+
 # Автоматический импорт всех моделей из папки models
 def _import_all_models():
     """

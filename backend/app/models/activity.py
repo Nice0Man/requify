@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from .user import User
     from .project import Project
 
-
 class Activity(Base, TimestampedMixin):
     """
     Модель активности пользователей.
@@ -64,10 +63,8 @@ class Activity(Base, TimestampedMixin):
         comment="Проект (если применимо)",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     user: Mapped["User"] = relationship(
         "User", back_populates="activities", lazy="select"
     )

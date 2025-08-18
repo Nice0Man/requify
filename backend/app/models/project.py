@@ -11,25 +11,11 @@ from .constants import ProjectStatus
 if TYPE_CHECKING:
     from .dashboard import DashboardActivity, DashboardNotification
     from .release import Release
-<<<<<<< HEAD
     from .requirement import Requirement
     from .requirement_group import RequirementGroup
     from .spec import Spec
     from .team import Team
     from .user import User
-=======
-    from .spec import Spec
-    from .specification import Specification
-    from .requirement_group import RequirementGroup
-    from .test_case import TestCase, TestPlan
-    from .user import User
-    from .team import Team
-    from .company import Company
-    from .department import Department
-    from .dashboard import DashboardNotification, DashboardActivity
-    from .activity import Activity
->>>>>>> dev-backend
-
 
 class Project(Base, TimestampedMixin):
     """
@@ -65,10 +51,8 @@ class Project(Base, TimestampedMixin):
         nullable=False,
     )
 
-    # =============================================================================
-    # Организационная принадлежность
-    # =============================================================================
-
+    #     # Организационная принадлежность
+    # 
     company_id: Mapped[int] = mapped_column(
         ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
@@ -80,10 +64,8 @@ class Project(Base, TimestampedMixin):
         comment="ID департамента (проект принадлежит департаменту)",
     )
 
-    # =============================================================================
-    # Управление проектом
-    # =============================================================================
-
+    #     # Управление проектом
+    # 
     owner_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("users.id", ondelete="RESTRICT"),
@@ -97,10 +79,8 @@ class Project(Base, TimestampedMixin):
         comment="Основная команда проекта (может быть NULL)",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     # Организационные связи
     company: Mapped["Company"] = relationship(
         "Company", back_populates="projects", lazy="select"

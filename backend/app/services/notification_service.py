@@ -5,7 +5,6 @@
 """
 
 import asyncio
-<<<<<<< HEAD
 import logging
 import smtplib
 from dataclasses import dataclass
@@ -22,23 +21,6 @@ from app.core.exceptions import NotificationError
 from app.models.project import Project
 from app.models.requirement import Requirement
 from app.models.user import User
-=======
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass
-from datetime import datetime, UTC
-from enum import Enum
-from abc import ABC, abstractmethod
-import logging
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-from app.core.config import settings
-from app.models.user import User
-from app.models.requirement import Requirement
-from app.models.project import Project
-from .base import BaseService, ServiceError
->>>>>>> dev-backend
 
 logger = logging.getLogger(__name__)
 
@@ -378,7 +360,6 @@ class NotificationService(BaseService):
     ):
         """Отправить уведомление о требовании."""
         try:
-<<<<<<< HEAD
             from sqlalchemy import and_, select
 
             from app import crud
@@ -451,15 +432,6 @@ class NotificationService(BaseService):
                 "checked": checked_requirements,
                 "notifications_sent": notifications_sent,
                 "status": "completed",
-=======
-            data = {
-                "requirement_name": requirement.name,
-                "requirement_id": requirement.id,
-                "project_name": (
-                    requirement.project.name if requirement.project else "Unknown"
-                ),
-                **(additional_data or {}),
->>>>>>> dev-backend
             }
 
             notification_recipients = [

@@ -30,7 +30,6 @@ if TYPE_CHECKING:
     from .requirement import Requirement
     from .comment import Comment
 
-
 class SpecificationType(str, Enum):
     """Типы спецификаций."""
 
@@ -42,7 +41,6 @@ class SpecificationType(str, Enum):
     TEST = "test"  # Тестовая спецификация
     INTEGRATION = "integration"  # Интеграционная спецификация
 
-
 class SpecificationStatus(str, Enum):
     """Статусы спецификации."""
 
@@ -53,7 +51,6 @@ class SpecificationStatus(str, Enum):
     ARCHIVED = "archived"  # Архивирована
     REJECTED = "rejected"  # Отклонена
 
-
 class SpecificationFormat(str, Enum):
     """Форматы экспорта спецификации."""
 
@@ -62,7 +59,6 @@ class SpecificationFormat(str, Enum):
     PDF = "pdf"
     DOCX = "docx"
     JSON = "json"
-
 
 class Specification(Base, TimestampedMixin):
     """
@@ -170,10 +166,8 @@ class Specification(Base, TimestampedMixin):
         comment="Кто утвердил спецификацию",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     project: Mapped[Optional["Project"]] = relationship(
         "Project", back_populates="specifications", lazy="select"
     )
@@ -211,10 +205,8 @@ class Specification(Base, TimestampedMixin):
         lazy="select",
     )
 
-    # =============================================================================
-    # Методы
-    # =============================================================================
-
+    #     # Методы
+    # 
     def __repr__(self) -> str:
         return f"<Specification(id={self.id}, title='{self.title}', type={self.type}, status={self.status})>"
 
@@ -247,11 +239,8 @@ class Specification(Base, TimestampedMixin):
             return [SpecificationFormat(fmt) for fmt in self.export_formats]
         return [SpecificationFormat.PDF, SpecificationFormat.MARKDOWN]
 
-
-# =============================================================================
-# Association Table для связи спецификаций и требований
-# =============================================================================
-
+# # Association Table для связи спецификаций и требований
+# 
 from sqlalchemy import Table, Column, ForeignKey
 
 specification_requirements = Table(

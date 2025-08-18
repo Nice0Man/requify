@@ -38,14 +38,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate]):
     """CRUD для настроек пользователя"""
 
-    # =============================================================================
-    # Получение настроек
-    # =============================================================================
-
+    #     # Получение настроек
+    # 
     async def get_user_settings(
         self, db: AsyncSession, *, user_id: int
     ) -> UserSettings:
@@ -100,10 +97,8 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
             logger.error(f"Failed to get profile settings for user {user_id}: {e}")
             raise
 
-    # =============================================================================
-    # Обновление настроек
-    # =============================================================================
-
+    #     # Обновление настроек
+    # 
     async def update_user_settings(
         self, db: AsyncSession, *, user_id: int, settings_update: UserSettingsUpdate
     ) -> SettingsResponse:
@@ -335,10 +330,8 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
                 message=f"Ошибка при обновлении настроек приватности: {str(e)}",
             )
 
-    # =============================================================================
-    # Управление паролем
-    # =============================================================================
-
+    #     # Управление паролем
+    # 
     async def change_password(
         self, db: AsyncSession, *, user_id: int, password_data: ChangePasswordRequest
     ) -> SettingsResponse:
@@ -385,10 +378,8 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
                 success=False, message=f"Ошибка при смене пароля: {str(e)}"
             )
 
-    # =============================================================================
-    # Управление сессиями
-    # =============================================================================
-
+    #     # Управление сессиями
+    # 
     async def get_user_sessions(
         self, db: AsyncSession, *, user_id: int
     ) -> UserSessionsResponse:
@@ -452,10 +443,8 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
                 success=False, message=f"Ошибка при отзыве сессий: {str(e)}"
             )
 
-    # =============================================================================
-    # Импорт/экспорт настроек
-    # =============================================================================
-
+    #     # Импорт/экспорт настроек
+    # 
     async def export_settings(self, db: AsyncSession, *, user_id: int) -> str:
         """Экспортировать настройки пользователя в JSON"""
         try:
@@ -523,10 +512,8 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
                 success=False, message=f"Ошибка при импорте настроек: {str(e)}"
             )
 
-    # =============================================================================
-    # Вспомогательные методы
-    # =============================================================================
-
+    #     # Вспомогательные методы
+    # 
     async def _create_default_settings_for_user(
         self, db: AsyncSession, user: User
     ) -> UserSettings:
@@ -623,7 +610,6 @@ class CRUDSettings(CRUDBase[UserSettings, UserSettingsUpdate, UserSettingsUpdate
                 security=SecuritySettings(),
                 privacy=PrivacySettings(),
             )
-
 
 # Создаем singleton instance
 settings_crud = CRUDSettings(UserSettingsModel)

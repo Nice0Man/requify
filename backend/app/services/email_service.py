@@ -6,16 +6,12 @@ Email Service для отправки уведомлений.
 
 import asyncio
 import logging
-<<<<<<< HEAD
-=======
 from typing import Optional, Dict, Any, List
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
->>>>>>> dev-backend
 import smtplib
 import ssl
 from concurrent.futures import ThreadPoolExecutor
-<<<<<<< HEAD
 from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
@@ -29,13 +25,6 @@ from jinja2 import Environment, FileSystemLoader, Template
 from app.core.config import settings
 
 # === Email Configuration ===
-=======
-from abc import ABC, abstractmethod
-from enum import Enum
-
-from app.core.config import settings
-from .base import BaseService, ServiceError
->>>>>>> dev-backend
 
 logger = logging.getLogger(__name__)
 

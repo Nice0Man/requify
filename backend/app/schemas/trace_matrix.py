@@ -4,24 +4,9 @@
 """
 
 from datetime import datetime
-<<<<<<< HEAD
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
-=======
-from typing import List, Dict, Any, Optional
-from sqlmodel import Field
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
->>>>>>> dev-backend
 
 
 class TraceNode(BaseSchema):

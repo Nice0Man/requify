@@ -6,7 +6,7 @@
 
 from fastapi import APIRouter
 
-<<<<<<< HEAD
+
 from .endpoints import (
     admin_router,
     auth_router,
@@ -21,8 +21,9 @@ from .endpoints import (
     teams_router,
     testing_router,
     users_router,
-=======
+)
 from app import __version__
+
 from .domains import (
     auth_router,
     identity_router,
@@ -33,7 +34,6 @@ from .domains import (
     analytics_router,
     configuration_router,
     system_router,
->>>>>>> dev-backend
 )
 
 # Создаем основной роутер для API v2

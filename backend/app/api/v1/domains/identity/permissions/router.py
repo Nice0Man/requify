@@ -39,10 +39,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Permission Checking
-# =============================================================================
-
+# # Permission Checking
+# 
 
 @router.post(
     "/check",
@@ -82,7 +80,6 @@ async def check_permissions(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to check permission: {str(e)}",
         )
-
 
 @router.post(
     "/check-bulk",
@@ -129,7 +126,6 @@ async def check_bulk_permissions(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to check permissions: {str(e)}",
         )
-
 
 @router.get(
     "/my-permissions",
@@ -185,11 +181,8 @@ async def get_my_permissions(
             detail=f"Failed to get user permissions: {str(e)}",
         )
 
-
-# =============================================================================
-# System Permission Management
-# =============================================================================
-
+# # System Permission Management
+# 
 
 @router.get(
     "/",
@@ -216,7 +209,6 @@ async def get_all_permissions(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get permissions: {str(e)}",
         )
-
 
 @router.get(
     "/matrix",
@@ -248,11 +240,8 @@ async def get_permission_matrix(
             detail=f"Failed to get permission matrix: {str(e)}",
         )
 
-
-# =============================================================================
-# User-Specific Permission Management
-# =============================================================================
-
+# # User-Specific Permission Management
+# 
 
 @router.get(
     "/users/{user_id}",
@@ -282,7 +271,6 @@ async def get_user_permissions(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get user permissions: {str(e)}",
         )
-
 
 @router.post(
     "/users/{user_id}/grant",
@@ -333,7 +321,6 @@ async def grant_permission_to_user(
             detail=f"Failed to grant permission: {str(e)}",
         )
 
-
 @router.post(
     "/users/{user_id}/revoke",
     summary="Revoke Permission from User",
@@ -382,11 +369,8 @@ async def revoke_permission_from_user(
             detail=f"Failed to revoke permission: {str(e)}",
         )
 
-
-# =============================================================================
-# Permission Auditing
-# =============================================================================
-
+# # Permission Auditing
+# 
 
 @router.get(
     "/audit/{user_id}",
@@ -414,7 +398,6 @@ async def get_permission_audit_trail(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get permission audit trail: {str(e)}",
         )
-
 
 @router.get(
     "/usage-stats",

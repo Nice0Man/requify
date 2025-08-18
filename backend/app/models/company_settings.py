@@ -13,7 +13,6 @@ from .base import Base, TimestampedMixin
 if TYPE_CHECKING:
     from .company import Company
 
-
 class CompanySettings(Base, TimestampedMixin):
     """
     Настройки компании.
@@ -38,10 +37,8 @@ class CompanySettings(Base, TimestampedMixin):
         comment="ID компании",
     )
 
-    # =============================================================================
-    # Домен и безопасность
-    # =============================================================================
-
+    #     # Домен и безопасность
+    # 
     domain: Mapped[Optional[str]] = mapped_column(
         String(100), nullable=True, comment="Корпоративный домен (для SSO)"
     )
@@ -85,10 +82,8 @@ class CompanySettings(Base, TimestampedMixin):
         comment="Таймаут сессии в минутах (8 часов)",
     )
 
-    # =============================================================================
-    # Локализация и форматирование
-    # =============================================================================
-
+    #     # Локализация и форматирование
+    # 
     default_language: Mapped[str] = mapped_column(
         String(10), nullable=False, default="ru", comment="Язык по умолчанию"
     )
@@ -111,10 +106,8 @@ class CompanySettings(Base, TimestampedMixin):
         String(20), nullable=False, default="1 234,56", comment="Формат чисел"
     )
 
-    # =============================================================================
-    # Настройки приложения
-    # =============================================================================
-
+    #     # Настройки приложения
+    # 
     # Уведомления
     enable_email_notifications: Mapped[bool] = mapped_column(
         Boolean, default=True, nullable=False, comment="Включить email уведомления"
@@ -145,10 +138,8 @@ class CompanySettings(Base, TimestampedMixin):
         Text, nullable=True, comment="Разрешенные IP для API (через запятую)"
     )
 
-    # =============================================================================
-    # Рабочие процессы
-    # =============================================================================
-
+    #     # Рабочие процессы
+    # 
     # Процессы утверждения
     require_requirement_approval: Mapped[bool] = mapped_column(
         Boolean,
@@ -188,10 +179,8 @@ class CompanySettings(Base, TimestampedMixin):
         Boolean, default=True, nullable=False, comment="Разрешить межотдельские команды"
     )
 
-    # =============================================================================
-    # Аналитика и отчеты
-    # =============================================================================
-
+    #     # Аналитика и отчеты
+    # 
     enable_analytics: Mapped[bool] = mapped_column(
         Boolean, default=True, nullable=False, comment="Включить аналитику"
     )
@@ -213,10 +202,8 @@ class CompanySettings(Base, TimestampedMixin):
         comment="Разрешенные форматы экспорта",
     )
 
-    # =============================================================================
-    # Кастомизация
-    # =============================================================================
-
+    #     # Кастомизация
+    # 
     # Кастомные поля
     custom_user_fields: Mapped[Optional[dict]] = mapped_column(
         JSON, nullable=True, comment="Кастомные поля пользователей (JSON)"
@@ -236,10 +223,8 @@ class CompanySettings(Base, TimestampedMixin):
         JSON, nullable=True, comment="Кастомные рабочие процессы (JSON)"
     )
 
-    # =============================================================================
-    # Хранение и бэкапы
-    # =============================================================================
-
+    #     # Хранение и бэкапы
+    # 
     # Хранение файлов
     file_storage_provider: Mapped[str] = mapped_column(
         String(50),
@@ -268,18 +253,14 @@ class CompanySettings(Base, TimestampedMixin):
         Integer, default=30, nullable=False, comment="Срок хранения бэкапов (дни)"
     )
 
-    # =============================================================================
-    # Дополнительные настройки
-    # =============================================================================
-
+    #     # Дополнительные настройки
+    # 
     custom_settings: Mapped[Optional[dict]] = mapped_column(
         JSON, nullable=True, comment="Дополнительные кастомные настройки (JSON)"
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     company: Mapped["Company"] = relationship(
         "Company", back_populates="settings", lazy="select"
     )
@@ -287,10 +268,8 @@ class CompanySettings(Base, TimestampedMixin):
     def __repr__(self) -> str:
         return f"<CompanySettings(id={self.id}, company_id={self.company_id}, domain='{self.domain}')>"
 
-    # =============================================================================
-    # Business Logic Methods
-    # =============================================================================
-
+    #     # Business Logic Methods
+    # 
     def is_domain_allowed(self, email: str) -> bool:
         """Проверить, разрешен ли домен email"""
         if not self.domain or not self.allow_domain_signup:

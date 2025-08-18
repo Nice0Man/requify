@@ -1,10 +1,6 @@
 from typing import TYPE_CHECKING
 
-<<<<<<< HEAD
 from sqlalchemy import ARRAY, Boolean, Integer, String, Text
-=======
-from sqlalchemy import Integer, String, Text, Boolean, JSON
->>>>>>> dev-backend
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base

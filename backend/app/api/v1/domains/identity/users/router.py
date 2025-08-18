@@ -41,7 +41,6 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-
 def _get_context_type(assignment):
     """Determine context type based on assignment fields"""
     if assignment.project_id:
@@ -54,7 +53,6 @@ def _get_context_type(assignment):
         return "company"
     else:
         return "system"
-
 
 def _get_context_id(assignment):
     """Determine context ID based on assignment fields"""
@@ -69,11 +67,8 @@ def _get_context_id(assignment):
     else:
         return None
 
-
-# =============================================================================
-# User CRUD Operations
-# =============================================================================
-
+# # User CRUD Operations
+# 
 
 @router.get(
     "/",
@@ -135,7 +130,6 @@ async def get_users(
             detail=f"Failed to get users: {str(e)}",
         )
 
-
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
@@ -188,7 +182,6 @@ async def create_user(
             detail=f"Failed to create user: {str(e)}",
         )
 
-
 @router.get(
     "/me",
     summary="Get My Profile",
@@ -231,7 +224,6 @@ async def get_my_profile(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get user profile: {str(e)}",
         )
-
 
 @router.put(
     "/me",
@@ -305,7 +297,6 @@ async def update_my_profile(
             detail=f"Failed to update profile: {str(e)}",
         )
 
-
 @router.get(
     "/{user_id}",
     summary="Get User by ID",
@@ -364,7 +355,6 @@ async def get_user_by_id(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get user: {str(e)}",
         )
-
 
 @router.put(
     "/{user_id}",
@@ -450,7 +440,6 @@ async def update_user(
             detail=f"Failed to update user: {str(e)}",
         )
 
-
 @router.delete(
     "/{user_id}",
     summary="Delete User",
@@ -498,11 +487,8 @@ async def delete_user(
             detail=f"Failed to delete user: {str(e)}",
         )
 
-
-# =============================================================================
-# User State Management
-# =============================================================================
-
+# # User State Management
+# 
 
 @router.post(
     "/{user_id}/activate",
@@ -541,7 +527,6 @@ async def activate_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to activate user: {str(e)}",
         )
-
 
 @router.post(
     "/{user_id}/deactivate",
@@ -588,11 +573,8 @@ async def deactivate_user(
             detail=f"Failed to deactivate user: {str(e)}",
         )
 
-
-# =============================================================================
-# User Role Management
-# =============================================================================
-
+# # User Role Management
+# 
 
 @router.get(
     "/{user_id}/roles",
@@ -642,7 +624,6 @@ async def get_user_roles(
             detail=f"Failed to get user roles: {str(e)}",
         )
 
-
 @router.post(
     "/{user_id}/roles",
     summary="Assign Role to User",
@@ -689,7 +670,6 @@ async def assign_role_to_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to assign role: {str(e)}",
         )
-
 
 @router.delete(
     "/{user_id}/roles/{assignment_id}",

@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from .team import Team
     from .project import Project
 
-
 class DepartmentType(PyEnum):
     """Типы департаментов"""
 
@@ -28,7 +27,6 @@ class DepartmentType(PyEnum):
     OPERATIONS = "operations"
     ADMINISTRATION = "administration"
     CUSTOM = "custom"
-
 
 class Department(Base, TimestampedMixin):
     """
@@ -71,10 +69,8 @@ class Department(Base, TimestampedMixin):
         comment="ID компании",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     company: Mapped["Company"] = relationship(
         "Company", back_populates="departments", lazy="select"
     )

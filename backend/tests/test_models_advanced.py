@@ -29,7 +29,6 @@ from app.models.enhanced_role_system import EnhancedRole, UserRoleAssignment
 from app.models.constants import TeamRole, ProjectStatus
 from app.core.constants import RoleScope, SystemRole, CompanyRole
 
-
 @pytest.fixture(scope="function")
 def advanced_db_session():
     """Create a test database session with more complex setup."""
@@ -44,7 +43,6 @@ def advanced_db_session():
     finally:
         session.rollback()
         session.close()
-
 
 @pytest.fixture
 def complete_company_setup(advanced_db_session: Session):
@@ -115,11 +113,9 @@ def complete_company_setup(advanced_db_session: Session):
         "subscription": subscription,
     }
 
-
-# ============================================================================
+# ======
 # COMPANY SETTINGS MODEL TESTS
-# ============================================================================
-
+# ======
 
 class TestCompanySettingsModel:
     """Test CompanySettings model."""
@@ -191,11 +187,9 @@ class TestCompanySettingsModel:
         assert invalid_settings.session_timeout_minutes == -1
         assert invalid_settings.api_rate_limit == -10
 
-
-# ============================================================================
+# ======
 # COMPANY BRANDING MODEL TESTS
-# ============================================================================
-
+# ======
 
 class TestCompanyBrandingModel:
     """Test CompanyBranding model."""
@@ -248,11 +242,9 @@ class TestCompanyBrandingModel:
         assert branding.theme_data["dark_mode"] is True
         assert branding.theme_data["sidebar_color"] == "#2c3e50"
 
-
-# ============================================================================
+# ======
 # COMPANY CONTACT MODEL TESTS
-# ============================================================================
-
+# ======
 
 class TestCompanyContactModel:
     """Test CompanyContact model."""
@@ -322,11 +314,9 @@ class TestCompanyContactModel:
         assert contact.email.endswith("@advancedtest.com")
         assert contact.email == "admin@advancedtest.com"
 
-
-# ============================================================================
+# ======
 # COMPANY SUBSCRIPTION MODEL TESTS
-# ============================================================================
-
+# ======
 
 class TestCompanySubscriptionModel:
     """Test CompanySubscription model."""
@@ -408,11 +398,9 @@ class TestCompanySubscriptionModel:
         assert subscription.cancelled_at is not None
         assert "User requested" in subscription.cancellation_reason
 
-
-# ============================================================================
+# ======
 # ENHANCED ROLE SYSTEM ADVANCED TESTS
-# ============================================================================
-
+# ======
 
 class TestEnhancedRoleSystemAdvanced:
     """Advanced tests for Enhanced Role System."""
@@ -577,11 +565,9 @@ class TestEnhancedRoleSystemAdvanced:
         assert assignment.is_valid is False
         assert "Access no longer needed" in assignment.assignment_reason
 
-
-# ============================================================================
+# ======
 # PERFORMANCE AND OPTIMIZATION TESTS
-# ============================================================================
-
+# ======
 
 class TestModelPerformance:
     """Test model performance and optimization."""
@@ -783,11 +769,9 @@ class TestModelPerformance:
         assert stats.active_users == 10
         assert stats.inactive_users == 5
 
-
-# ============================================================================
+# ======
 # EDGE CASES AND ERROR HANDLING TESTS
-# ============================================================================
-
+# ======
 
 class TestModelEdgeCases:
     """Test edge cases and error handling."""
@@ -897,7 +881,6 @@ class TestModelEdgeCases:
         # Verify final state
         final_user = advanced_db_session.get(User, user.id)
         assert final_user.name in ["Modified by Session 1", "Modified by Session 2"]
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

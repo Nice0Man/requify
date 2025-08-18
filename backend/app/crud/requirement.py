@@ -2,17 +2,10 @@
 CRUD операции для модели Requirement.
 """
 
-<<<<<<< HEAD
 from datetime import UTC, datetime
 from typing import List, Optional
 
 from sqlalchemy import func, or_, select
-=======
-import logging
-from datetime import datetime, UTC, timedelta
-from typing import List, Optional, Dict, Any
-from sqlalchemy import select, func, or_, and_, text
->>>>>>> dev-backend
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 

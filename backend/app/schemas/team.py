@@ -4,35 +4,12 @@
 """
 
 from datetime import datetime
-<<<<<<< HEAD
 from typing import List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.types import constr
 
 from app.models.constants import TeamRole, TeamStatus
-=======
-from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
-from pydantic import field_validator, model_validator
-from enum import Enum
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ListResponseSchema,
-    StatisticsSchema,
-    UserRelatedSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
-from .common import SearchRequest, DateRangeFilter
-from app.core.constants import TeamRole
->>>>>>> dev-backend
-
 
 # === Перечисления ===
 

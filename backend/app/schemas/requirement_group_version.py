@@ -4,25 +4,9 @@
 """
 
 from datetime import datetime
-<<<<<<< HEAD
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field
-=======
-from typing import Optional, Dict, Any
-from sqlmodel import Field
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    UserRelatedSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
->>>>>>> dev-backend
 
 
 class RequirementGroupVersionBase(BaseSchema):

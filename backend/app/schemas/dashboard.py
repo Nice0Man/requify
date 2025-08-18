@@ -1,12 +1,9 @@
-<<<<<<< HEAD
-=======
 """
 Схемы для Dashboard.
 Мигрировано на новую архитектуру SQLModel с базовыми классами.
 Поддерживает полную функциональность дашборда с виджетами, уведомлениями и аналитикой.
 """
 
->>>>>>> dev-backend
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Union, Literal
 from sqlmodel import SQLModel, Field
@@ -16,15 +13,6 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-<<<<<<< HEAD
-from app.models.constants import (
-    DashboardLayout,
-    NotificationType,
-    Priority,
-    ProjectStatus,
-    RequirementStatus,
-    Theme,
-=======
 from .base import (
     BaseSchema,
     CreateSchema,
@@ -36,7 +24,6 @@ from .base import (
     ValidationMixin,
     FieldLimits,
     StandardDescriptions,
->>>>>>> dev-backend
 )
 from .common import SearchRequest, DateRangeFilter
 

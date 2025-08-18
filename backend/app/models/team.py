@@ -1,26 +1,16 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 
-<<<<<<< HEAD
 from sqlalchemy import Boolean, ForeignKey, Index, Integer, String, Text
-=======
-from sqlalchemy import String, Boolean, Integer, Index, ForeignKey
->>>>>>> dev-backend
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
 
 if TYPE_CHECKING:
-<<<<<<< HEAD
     from .dashboard import DashboardActivity, DashboardNotification
-=======
-    from .user import User
-    from .department import Department
->>>>>>> dev-backend
     from .project import Project
     from .team_member import TeamMember
     from .user import User
-
 
 class Team(Base, TimestampedMixin):
     """
@@ -62,10 +52,8 @@ class Team(Base, TimestampedMixin):
         comment="Владелец команды",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     department: Mapped["Department"] = relationship(
         "Department", back_populates="teams", lazy="select"
     )

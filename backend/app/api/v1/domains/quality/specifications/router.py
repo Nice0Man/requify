@@ -34,10 +34,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Specifications Management
-# =============================================================================
-
+# # Specifications Management
+# 
 
 @router.get(
     "/",
@@ -107,7 +105,6 @@ async def get_specifications(
             detail=f"Failed to get specifications: {str(e)}",
         )
 
-
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
@@ -163,7 +160,6 @@ async def create_specification(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to create specification: {str(e)}",
         )
-
 
 @router.get(
     "/{spec_id}",
@@ -225,7 +221,6 @@ async def get_specification(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get specification: {str(e)}",
         )
-
 
 @router.put(
     "/{spec_id}",
@@ -293,7 +288,6 @@ async def update_specification(
             detail=f"Failed to update specification: {str(e)}",
         )
 
-
 @router.delete(
     "/{spec_id}",
     summary="Delete Specification",
@@ -341,11 +335,8 @@ async def delete_specification(
             detail=f"Failed to delete specification: {str(e)}",
         )
 
-
-# =============================================================================
-# Specification Requirements Management
-# =============================================================================
-
+# # Specification Requirements Management
+# 
 
 @router.get(
     "/{spec_id}/requirements",
@@ -389,11 +380,8 @@ async def get_specification_requirements(
             detail=f"Failed to get specification requirements: {str(e)}",
         )
 
-
-# =============================================================================
-# Document Generation
-# =============================================================================
-
+# # Document Generation
+# 
 
 @router.post(
     "/{spec_id}/generate-document",
@@ -452,7 +440,6 @@ async def generate_specification_document(
             detail=f"Failed to generate document: {str(e)}",
         )
 
-
 @router.get(
     "/{spec_id}/download/{format}",
     summary="Download Specification",
@@ -501,11 +488,8 @@ async def download_specification(
             detail=f"Failed to prepare download: {str(e)}",
         )
 
-
-# =============================================================================
-# Specification Coverage Analysis
-# =============================================================================
-
+# # Specification Coverage Analysis
+# 
 
 @router.get(
     "/{spec_id}/coverage",

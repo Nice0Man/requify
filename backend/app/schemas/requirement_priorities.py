@@ -4,30 +4,9 @@
 """
 
 from datetime import datetime
-<<<<<<< HEAD
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-=======
-from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
-from pydantic import field_validator, model_validator
-from enum import Enum
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ListResponseSchema,
-    StatisticsSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
-from .common import PriorityEnum
->>>>>>> dev-backend
-
 
 # === Перечисления ===
 

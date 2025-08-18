@@ -39,10 +39,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Current User Profile Management
-# =============================================================================
-
+# # Current User Profile Management
+# 
 
 @router.get(
     "/me",
@@ -86,7 +84,6 @@ async def get_my_extended_profile(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get extended profile: {str(e)}",
         )
-
 
 @router.put(
     "/me",
@@ -156,7 +153,6 @@ async def update_my_extended_profile(
             detail=f"Failed to update profile: {str(e)}",
         )
 
-
 @router.put(
     "/me/avatar",
     summary="Upload Avatar",
@@ -195,7 +191,6 @@ async def upload_avatar(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to upload avatar: {str(e)}",
         )
-
 
 @router.delete(
     "/me/avatar",
@@ -238,7 +233,6 @@ async def remove_avatar(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to remove avatar: {str(e)}",
         )
-
 
 @router.put(
     "/me/preferences",
@@ -308,7 +302,6 @@ async def update_user_preferences(
             detail=f"Failed to update preferences: {str(e)}",
         )
 
-
 @router.get(
     "/me/preferences",
     summary="Get User Preferences",
@@ -343,11 +336,8 @@ async def get_user_preferences(
             detail=f"Failed to get user preferences: {str(e)}",
         )
 
-
-# =============================================================================
-# Other User Profiles
-# =============================================================================
-
+# # Other User Profiles
+# 
 
 @router.get(
     "/{user_id}",
@@ -414,7 +404,6 @@ async def get_user_profile(
             detail=f"Failed to get user profile: {str(e)}",
         )
 
-
 @router.get(
     "/{user_id}/public",
     summary="Get Public Profile",
@@ -461,11 +450,8 @@ async def get_public_profile(
             detail=f"Failed to get public profile: {str(e)}",
         )
 
-
-# =============================================================================
-# Profile Statistics and Activity
-# =============================================================================
-
+# # Profile Statistics and Activity
+# 
 
 @router.get(
     "/{user_id}/activity",
@@ -535,7 +521,6 @@ async def get_user_activity(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get user activity: {str(e)}",
         )
-
 
 @router.get(
     "/{user_id}/stats",

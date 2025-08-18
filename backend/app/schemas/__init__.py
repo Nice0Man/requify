@@ -1,6 +1,7 @@
 """
 Автоматический импорт всех схем Pydantic из папки schemas.
 """
+
 # Auth schemas
 from .auth import (
     AuthError,
@@ -496,7 +497,7 @@ __all__ = [
     "Token",
     "TokenPayload",
 ]
-=======
+
 import os
 import importlib
 from pathlib import Path
@@ -543,4 +544,3 @@ for file_path in current_dir.glob("*.py"):
 
 # Сортируем __all__ для лучшей читаемости
 __all__.sort()
->>>>>>> dev-backend

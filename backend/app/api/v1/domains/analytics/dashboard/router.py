@@ -37,10 +37,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Dashboard Overview
-# =============================================================================
-
+# # Dashboard Overview
+# 
 
 @router.get(
     "/overview",
@@ -86,7 +84,6 @@ async def get_dashboard_overview(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get dashboard overview: {str(e)}",
         )
-
 
 @router.get(
     "/metrics",
@@ -139,7 +136,6 @@ async def get_dashboard_metrics(
             detail=f"Failed to get dashboard metrics: {str(e)}",
         )
 
-
 @router.get(
     "/widgets",
     summary="Get Dashboard Widgets",
@@ -184,7 +180,6 @@ async def get_dashboard_widgets(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to get dashboard widgets: {str(e)}",
         )
-
 
 @router.get(
     "/config",

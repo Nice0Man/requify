@@ -18,11 +18,8 @@ from .base import (
     StandardDescriptions,
 )
 
-
-# =============================================================================
-# Базовые схемы настроек
-# =============================================================================
-
+# # Базовые схемы настроек
+# 
 
 class UserProfileSettings(BaseSchema):
     """Настройки профиля пользователя"""
@@ -44,7 +41,6 @@ class UserProfileSettings(BaseSchema):
             v = "+" + v.strip()
         return v
 
-
 class NotificationSettings(BaseSchema):
     """Настройки уведомлений"""
 
@@ -57,7 +53,6 @@ class NotificationSettings(BaseSchema):
     system_notifications: bool = Field(False, description="Системные уведомления")
     weekly_digest: bool = Field(True, description="Еженедельная сводка")
     mention_notifications: bool = Field(True, description="Уведомления об упоминаниях")
-
 
 class InterfaceSettings(BaseSchema):
     """Настройки интерфейса"""
@@ -76,7 +71,6 @@ class InterfaceSettings(BaseSchema):
     show_hints: bool = Field(True, description="Показывать подсказки")
     animations_enabled: bool = Field(True, description="Включить анимации")
 
-
 class SecuritySettings(BaseSchema):
     """Настройки безопасности"""
 
@@ -90,7 +84,6 @@ class SecuritySettings(BaseSchema):
     )
     auto_logout: bool = Field(False, description="Автоматический выход")
 
-
 class PrivacySettings(BaseSchema):
     """Настройки приватности"""
 
@@ -101,11 +94,8 @@ class PrivacySettings(BaseSchema):
     show_phone: bool = Field(False, description="Показывать телефон")
     activity_visibility: bool = Field(True, description="Показывать активность")
 
-
-# =============================================================================
-# Комплексные схемы
-# =============================================================================
-
+# # Комплексные схемы
+# 
 
 class UserSettings(BaseSchema):
     """Полные настройки пользователя (соответствует frontend)
@@ -124,7 +114,6 @@ class UserSettings(BaseSchema):
     interface: InterfaceSettings = Field(..., description="Настройки интерфейса")
     security: SecuritySettings = Field(..., description="Настройки безопасности")
     privacy: PrivacySettings = Field(..., description="Настройки приватности")
-
 
 class UserSettingsUpdate(UpdateSchema):
     """Схема для обновления настроек (частичное обновление)
@@ -151,11 +140,8 @@ class UserSettingsUpdate(UpdateSchema):
         None, description="Настройки приватности"
     )
 
-
-# =============================================================================
-# Схемы ответов
-# =============================================================================
-
+# # Схемы ответов
+# 
 
 class SettingsResponse(BaseSchema):
     """Ответ на операции с настройками"""
@@ -163,7 +149,6 @@ class SettingsResponse(BaseSchema):
     success: bool = Field(..., description="Успешность операции")
     message: str = Field(..., description="Сообщение")
     data: Optional[Dict[str, Any]] = Field(None, description="Дополнительные данные")
-
 
 class UserSettingsRead(BaseSchema):
     """Схема для чтения настроек пользователя"""
@@ -173,11 +158,8 @@ class UserSettingsRead(BaseSchema):
     updated_at: Optional[datetime] = Field(None, description="Дата обновления")
     created_at: Optional[datetime] = Field(None, description="Дата создания")
 
-
-# =============================================================================
-# Схемы для сессий
-# =============================================================================
-
+# # Схемы для сессий
+# 
 
 class UserSession(BaseSchema):
     """Схема пользовательской сессии"""
@@ -190,13 +172,11 @@ class UserSession(BaseSchema):
     last_active: datetime = Field(..., description="Последняя активность")
     is_current: bool = Field(False, description="Текущая сессия")
 
-
 class UserSessionsResponse(BaseSchema):
     """Ответ со списком сессий"""
 
     sessions: List[UserSession] = Field(..., description="Список сессий")
     total_count: int = Field(..., description="Общее количество")
-
 
 class RevokeSessionsRequest(BaseSchema):
     """Запрос на отзыв сессий"""
@@ -206,11 +186,8 @@ class RevokeSessionsRequest(BaseSchema):
         description="ID сессий для отзыва (если None - отзывать все кроме текущей)",
     )
 
-
-# =============================================================================
-# Схемы для смены пароля
-# =============================================================================
-
+# # Схемы для смены пароля
+# 
 
 class ChangePasswordRequest(BaseSchema):
     """Запрос на смену пароля"""
@@ -252,11 +229,8 @@ class ChangePasswordRequest(BaseSchema):
             raise ValueError("Пароли не совпадают")
         return values
 
-
-# =============================================================================
-# Схемы для импорта/экспорта настроек
-# =============================================================================
-
+# # Схемы для импорта/экспорта настроек
+# 
 
 class ExportSettingsResponse(BaseSchema):
     """Ответ на экспорт настроек"""
@@ -264,7 +238,6 @@ class ExportSettingsResponse(BaseSchema):
     export_url: str = Field(..., description="URL для скачивания файла")
     filename: str = Field(..., description="Имя файла")
     expires_at: datetime = Field(..., description="Время истечения ссылки")
-
 
 class ImportSettingsRequest(BaseSchema):
     """Запрос на импорт настроек"""

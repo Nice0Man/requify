@@ -13,51 +13,7 @@
 from datetime import datetime, UTC
 from typing import Annotated, Optional, List, Dict, Any, TYPE_CHECKING
 
-<<<<<<< HEAD
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
-=======
-from pydantic import Field, EmailStr, field_validator, model_validator
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
-
-if TYPE_CHECKING:
-    from app.schemas.user import UserDetailed
-
-
-def rebuild_auth_models():
-    """Rebuild models to resolve forward references."""
-    try:
-        from app.schemas.user import UserDetailed
-
-        # Import all response models that use UserDetailed
-        globals_dict = globals()
-        models_to_rebuild = [
-            "LoginResponse",
-            "RegisterResponse",
-            "TokenValidationResponse",
-            "EmailVerificationResponse",
-        ]
-
-        for model_name in models_to_rebuild:
-            if model_name in globals_dict:
-                model_class = globals_dict[model_name]
-                if hasattr(model_class, "model_rebuild"):
-                    try:
-                        model_class.model_rebuild()
-                    except Exception:
-                        pass  # Ignore rebuild errors
-    except Exception:
-        pass  # Ignore any import or rebuild errors
-
->>>>>>> dev-backend
 
 # === Base Token Schemas (Single Responsibility Principle) ===
 

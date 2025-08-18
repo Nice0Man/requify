@@ -7,17 +7,8 @@ Reporting Service.
 import asyncio
 import csv
 import io
-<<<<<<< HEAD
 import logging
 from collections import defaultdict
-=======
-import json
-from collections import defaultdict
-from datetime import datetime, UTC
-from enum import Enum
-from typing import Dict, List, Optional, Any, Union
-from abc import ABC, abstractmethod
->>>>>>> dev-backend
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import Enum
@@ -188,17 +179,12 @@ class RequirementsStatusGenerator(IReportGenerator):
     async def generate_report(
         self, db: AsyncSession, config: ReportConfig, user_id: Optional[int] = None
     ) -> ReportData:
-<<<<<<< HEAD
         """Генерирует отчёт по статусам требований"""
         from sqlalchemy import func, select
 
         from app import crud
         from app.db.session import async_session_scope
         from app.models.requirement import Requirement
-=======
-        """Сгенерировать отчет по статусам требований."""
-        stmt = select(Requirement).options(selectinload(Requirement.project))
->>>>>>> dev-backend
 
         # Применение фильтров
         if config.filters.project_ids:
@@ -219,35 +205,30 @@ class RequirementsStatusGenerator(IReportGenerator):
         # Группировка по статусам
         status_counts = defaultdict(int)
         data = []
+        status_counts[status_name] += 1
+        # Вычисляем статистику
+        total = len(requirements_data)
+        completed_count = status_counts.get("completed", 0) + status_counts.get(
+            "implemented", 0
+        )
+        completion_rate = round((completed_count / total) * 100, 2) if total > 0 else 0
 
-<<<<<<< HEAD
-                status_counts[status_name] += 1
+        summary = {
+            "total_requirements": total,
+            "by_status": dict(status_counts),
+            "completion_rate": completion_rate,
+        }
 
-            # Вычисляем статистику
-            total = len(requirements_data)
-            completed_count = status_counts.get("completed", 0) + status_counts.get(
-                "implemented", 0
-            )
-            completion_rate = (
-                round((completed_count / total) * 100, 2) if total > 0 else 0
-            )
-
-            summary = {
-                "total_requirements": total,
-                "by_status": dict(status_counts),
-                "completion_rate": completion_rate,
-            }
-
-            return ReportData(
-                title="Отчёт по статусам требований",
-                description="Сводка по текущим статусам всех требований в системе",
-                generated_at=datetime.now(UTC),
-                generated_by=generated_by,
-                filters_applied=self._serialize_filters(filters),
-                summary=summary,
-                data=requirements_data,
-                metadata={"total_count": total},
-            )
+        return ReportData(
+            title="Отчёт по статусам требований",
+            description="Сводка по текущим статусам всех требований в системе",
+            generated_at=datetime.now(UTC),
+            generated_by=generated_by,
+            filters_applied=self._serialize_filters(filters),
+            summary=summary,
+            data=requirements_data,
+            metadata={"total_count": total},
+        )
 
     async def _generate_requirements_by_project_report(
         self, filters: ReportFilter, generated_by: Optional[str]
@@ -858,12 +839,6 @@ class RequirementsStatusGenerator(IReportGenerator):
             requirements = await crud.requirement.get_multi(db)
             for req in requirements:
                 all_data["requirements"].append(
-=======
-        for req in requirements:
-            status_counts[req.status] += 1
-            if config.include_details:
-                data.append(
->>>>>>> dev-backend
                     {
                         "id": req.id,
                         "title": req.title,

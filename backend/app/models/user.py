@@ -1,18 +1,13 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 
-<<<<<<< HEAD
 from sqlalchemy import Boolean, DateTime, Index, Integer, String
-=======
-from sqlalchemy import DateTime, Integer, String, Index, ForeignKey, Boolean
->>>>>>> dev-backend
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
 from .mixins import AuthMixin, PermissionsMixin, EmailVerificationMixin, ActivityMixin
 
 if TYPE_CHECKING:
-<<<<<<< HEAD
     from .comment import Comment
     from .dashboard import (
         DashboardActivity,
@@ -27,31 +22,6 @@ if TYPE_CHECKING:
     from .team import Team
     from .team_member import TeamMember
     from .test_result import TestResult
-=======
-    from .company import Company
-    from .user_profile import UserProfile
-    from .project import Project
-    from .requirement import Requirement
-    from .specification import Specification
-    from .test_case import TestCase, TestPlan, TestExecution
-    from .comment import Comment
-    from .team import Team
-    from .team_member import TeamMember
-    from .enhanced_role_system import UserRoleAssignment
-    from .dashboard import (
-        UserDashboardPreferences,
-        DashboardNotification,
-        DashboardActivity,
-        DashboardWidget,
-    )
-    from .requirement_group_version import RequirementGroupVersion
-    from .test_result import TestResult
-    from .user_settings import UserSettings, UserSettingsHistory
-    from .refresh_token import RefreshToken
-    from .activity import Activity
-    from .notification import Notification
->>>>>>> dev-backend
-
 
 class User(
     Base,
@@ -92,10 +62,8 @@ class User(
         comment="ID компании пользователя",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     company: Mapped[Optional["Company"]] = relationship(
         "Company", back_populates="users", lazy="select"
     )

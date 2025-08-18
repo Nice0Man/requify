@@ -9,7 +9,6 @@ from typing import Optional, List
 from datetime import datetime
 from enum import Enum
 
-
 class TeamType(str, Enum):
     """Типы команд."""
 
@@ -24,7 +23,6 @@ class TeamType(str, Enum):
     CROSS_FUNCTIONAL = "cross_functional"
     OTHER = "other"
 
-
 class TeamStatus(str, Enum):
     """Статусы команд."""
 
@@ -33,11 +31,8 @@ class TeamStatus(str, Enum):
     ARCHIVED = "archived"
     FORMING = "forming"
 
-
-# =============================================================================
-# Base Schemas
-# =============================================================================
-
+# # Base Schemas
+# 
 
 class TeamBase(BaseModel):
     """Базовая схема команды."""
@@ -64,13 +59,11 @@ class TeamBase(BaseModel):
         }
     )
 
-
 class TeamCreate(TeamBase):
     """Схема для создания команды."""
 
     department_id: int = Field(..., description="ID департамента")
     lead_user_id: Optional[int] = Field(None, description="ID лидера команды")
-
 
 class TeamUpdate(BaseModel):
     """Схема для обновления команды."""
@@ -82,11 +75,8 @@ class TeamUpdate(BaseModel):
     status: Optional[TeamStatus] = Field(None)
     lead_user_id: Optional[int] = Field(None)
 
-
-# =============================================================================
-# Response Schemas
-# =============================================================================
-
+# # Response Schemas
+# 
 
 class TeamRead(TeamBase):
     """Схема для чтения информации о команде."""
@@ -107,7 +97,6 @@ class TeamRead(TeamBase):
 
     model_config = ConfigDict(from_attributes=True)
 
-
 class TeamListResponse(BaseModel):
     """Схема для списка команд."""
 
@@ -116,11 +105,8 @@ class TeamListResponse(BaseModel):
     skip: int = Field(..., description="Пропущено записей")
     limit: int = Field(..., description="Лимит записей")
 
-
-# =============================================================================
-# Team Members Schemas
-# =============================================================================
-
+# # Team Members Schemas
+# 
 
 class TeamMemberRole(str, Enum):
     """Роли участников команды."""
@@ -139,7 +125,6 @@ class TeamMemberRole(str, Enum):
     MEMBER = "member"
     VIEWER = "viewer"
 
-
 class TeamMemberBase(BaseModel):
     """Базовая схема участника команды."""
 
@@ -147,19 +132,16 @@ class TeamMemberBase(BaseModel):
     role: TeamMemberRole = Field(TeamMemberRole.MEMBER, description="Роль в команде")
     joined_at: Optional[datetime] = Field(None, description="Дата присоединения")
 
-
 class TeamMemberAdd(BaseModel):
     """Схема для добавления участника в команду."""
 
     user_id: int = Field(..., description="ID пользователя")
     role: TeamMemberRole = Field(TeamMemberRole.MEMBER, description="Роль")
 
-
 class TeamMemberRoleUpdate(BaseModel):
     """Схема для обновления роли участника команды."""
 
     role: TeamMemberRole = Field(..., description="Новая роль")
-
 
 class TeamMemberRead(TeamMemberBase):
     """Схема для чтения информации об участнике команды."""
@@ -177,7 +159,6 @@ class TeamMemberRead(TeamMemberBase):
 
     model_config = ConfigDict(from_attributes=True)
 
-
 class TeamMembersResponse(BaseModel):
     """Схема для списка участников команды."""
 
@@ -187,11 +168,8 @@ class TeamMembersResponse(BaseModel):
     skip: int = Field(..., description="Пропущено записей")
     limit: int = Field(..., description="Лимит записей")
 
-
-# =============================================================================
-# Team Statistics Schemas
-# =============================================================================
-
+# # Team Statistics Schemas
+# 
 
 class TeamStats(BaseModel):
     """Схема статистики команды."""
@@ -213,7 +191,6 @@ class TeamStats(BaseModel):
     monthly_tasks_completed: int = Field(0, description="Завершенные задачи за месяц")
 
     model_config = ConfigDict(from_attributes=True)
-
 
 class TeamStatsResponse(BaseModel):
     """Схема ответа статистики команды."""

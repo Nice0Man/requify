@@ -3,16 +3,8 @@
 Мигрировано на новую архитектуру SQLModel с базовыми классами.
 """
 
-<<<<<<< HEAD
 from datetime import UTC, datetime
 from typing import Optional
-=======
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
-from pydantic import field_validator, model_validator
-from enum import Enum
->>>>>>> dev-backend
 
 from .base import (
     BaseSchema,
@@ -28,7 +20,6 @@ from .base import (
     StandardDescriptions,
 )
 from .common import PriorityEnum, StatusEnum, SearchRequest, DateRangeFilter
-
 
 # === Перечисления ===
 

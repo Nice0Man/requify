@@ -33,10 +33,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Test Reports
-# =============================================================================
-
+# # Test Reports
+# 
 
 @router.get(
     "/summary",
@@ -81,7 +79,6 @@ async def get_test_summary(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to generate test summary: {str(e)}",
         )
-
 
 @router.get(
     "/coverage",
@@ -129,7 +126,6 @@ async def get_coverage_report(
             detail=f"Failed to generate coverage report: {str(e)}",
         )
 
-
 @router.get(
     "/quality-metrics",
     summary="Get Quality Metrics Report",
@@ -173,7 +169,6 @@ async def get_quality_metrics(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to generate quality metrics: {str(e)}",
         )
-
 
 @router.get(
     "/defect-analysis",
@@ -219,11 +214,8 @@ async def get_defect_analysis(
             detail=f"Failed to generate defect analysis: {str(e)}",
         )
 
-
-# =============================================================================
-# Custom Reports Generation
-# =============================================================================
-
+# # Custom Reports Generation
+# 
 
 @router.post(
     "/generate",
@@ -273,7 +265,6 @@ async def generate_custom_report(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Failed to generate report: {str(e)}",
         )
-
 
 @router.get(
     "/",
@@ -327,7 +318,6 @@ async def get_reports_list(
             detail=f"Failed to get reports list: {str(e)}",
         )
 
-
 @router.get(
     "/{report_id}/download",
     summary="Download Report",
@@ -372,11 +362,8 @@ async def download_report(
             detail=f"Failed to prepare download: {str(e)}",
         )
 
-
-# =============================================================================
-# Automation Rate Reports
-# =============================================================================
-
+# # Automation Rate Reports
+# 
 
 @router.get(
     "/automation-rate",
@@ -416,11 +403,8 @@ async def get_automation_rate(
             detail=f"Failed to generate automation rate report: {str(e)}",
         )
 
-
-# =============================================================================
-# Trend Analysis
-# =============================================================================
-
+# # Trend Analysis
+# 
 
 @router.get(
     "/trends",

@@ -1,30 +1,7 @@
-<<<<<<< HEAD
 from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
-
-=======
-"""
-Схемы для модели TestPlan.
-Мигрировано на новую архитектуру SQLModel с базовыми классами.
-"""
-
-from sqlmodel import Field
-from datetime import datetime
-from typing import Optional
-
-from .base import (
-    BaseSchema,
-    CreateSchema,
-    UpdateSchema,
-    ResponseSchema,
-    ProjectRelatedSchema,
-    ValidationMixin,
-    FieldLimits,
-    StandardDescriptions,
-)
->>>>>>> dev-backend
 
 
 class TestPlanBase(BaseSchema):

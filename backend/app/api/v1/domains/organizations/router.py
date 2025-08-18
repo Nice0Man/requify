@@ -43,8 +43,7 @@ router.include_router(
     tags=["Organizations - Subscriptions"],
 )
 # # Company Management
-# # =============================================================================
-
+# # 
 
 # @router.get(
 #     "/companies",
@@ -56,7 +55,6 @@ router.include_router(
 #     """Получение списка всех компаний (только для системных администраторов)."""
 #     # TODO: Implement companies listing
 #     pass
-
 
 # @router.post(
 #     "/companies",
@@ -72,7 +70,6 @@ router.include_router(
 #     # TODO: Implement company creation
 #     pass
 
-
 # @router.get(
 #     "/companies/my",
 #     summary="Get My Company",
@@ -82,7 +79,6 @@ router.include_router(
 #     """Получение информации о компании текущего пользователя."""
 #     # TODO: Implement my company retrieval
 #     pass
-
 
 # @router.put(
 #     "/companies/my",
@@ -97,11 +93,8 @@ router.include_router(
 #     # TODO: Implement company update
 #     pass
 
-
-# # =============================================================================
-# # Company Configuration
-# # =============================================================================
-
+# # # # Company Configuration
+# # 
 
 # @router.get(
 #     "/companies/{company_id}/settings",
@@ -115,7 +108,6 @@ router.include_router(
 #     """Получение настроек компании."""
 #     # TODO: Implement settings retrieval
 #     pass
-
 
 # @router.put(
 #     "/companies/{company_id}/settings",
@@ -132,7 +124,6 @@ router.include_router(
 #     # TODO: Implement settings update
 #     pass
 
-
 # @router.get(
 #     "/companies/{company_id}/branding",
 #     summary="Get Company Branding",
@@ -145,7 +136,6 @@ router.include_router(
 #     """Получение брендинга компании."""
 #     # TODO: Implement branding retrieval
 #     pass
-
 
 # @router.put(
 #     "/companies/{company_id}/branding",
@@ -162,11 +152,8 @@ router.include_router(
 #     # TODO: Implement branding update
 #     pass
 
-
-# # =============================================================================
-# # Department Management
-# # =============================================================================
-
+# # # # Department Management
+# # 
 
 # @router.get(
 #     "/departments",
@@ -180,7 +167,6 @@ router.include_router(
 #     """Получение списка департаментов компании."""
 #     # TODO: Implement departments listing
 #     pass
-
 
 # @router.post(
 #     "/departments",
@@ -196,7 +182,6 @@ router.include_router(
 #     # TODO: Implement department creation
 #     pass
 
-
 # @router.get(
 #     "/departments/{department_id}",
 #     summary="Get Department",
@@ -209,7 +194,6 @@ router.include_router(
 #     """Получение информации о департаменте."""
 #     # TODO: Implement department retrieval
 #     pass
-
 
 # @router.put(
 #     "/departments/{department_id}",
@@ -224,7 +208,6 @@ router.include_router(
 #     # TODO: Implement department update
 #     pass
 
-
 # @router.delete(
 #     "/departments/{department_id}",
 #     summary="Delete Department",
@@ -237,7 +220,6 @@ router.include_router(
 #     """Удаление департамента."""
 #     # TODO: Implement department deletion
 #     pass
-
 
 # @router.get(
 #     "/departments/hierarchy",
@@ -252,11 +234,8 @@ router.include_router(
 #     # TODO: Implement hierarchy retrieval
 #     pass
 
-
-# # =============================================================================
-# # Team Management
-# # =============================================================================
-
+# # # # Team Management
+# # 
 
 # @router.get(
 #     "/teams",
@@ -268,7 +247,6 @@ router.include_router(
 #     """Получение списка команд."""
 #     # TODO: Implement teams listing
 #     pass
-
 
 # @router.post(
 #     "/teams",
@@ -284,7 +262,6 @@ router.include_router(
 #     # TODO: Implement team creation
 #     pass
 
-
 # @router.get(
 #     "/teams/{team_id}",
 #     summary="Get Team",
@@ -295,7 +272,6 @@ router.include_router(
 #     """Получение информации о команде."""
 #     # TODO: Implement team retrieval
 #     pass
-
 
 # @router.put(
 #     "/teams/{team_id}",
@@ -310,7 +286,6 @@ router.include_router(
 #     # TODO: Implement team update
 #     pass
 
-
 # @router.delete(
 #     "/teams/{team_id}",
 #     summary="Delete Team",
@@ -324,7 +299,6 @@ router.include_router(
 #     # TODO: Implement team deletion
 #     pass
 
-
 # @router.get(
 #     "/teams/{team_id}/members",
 #     summary="Get Team Members",
@@ -335,7 +309,6 @@ router.include_router(
 #     """Получение списка участников команды."""
 #     # TODO: Implement team members listing
 #     pass
-
 
 # @router.post(
 #     "/teams/{team_id}/members",
@@ -350,7 +323,6 @@ router.include_router(
 #     # TODO: Implement team member addition
 #     pass
 
-
 # @router.delete(
 #     "/teams/{team_id}/members/{user_id}",
 #     summary="Remove Team Member",
@@ -363,7 +335,6 @@ router.include_router(
 #     """Удаление участника из команды."""
 #     # TODO: Implement team member removal
 #     pass
-
 
 # @router.get(
 #     "/teams/my",

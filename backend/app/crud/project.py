@@ -2,16 +2,11 @@
 CRUD операции для модели Project.
 """
 
-<<<<<<< HEAD
-from typing import List, Optional
-
-from sqlalchemy import func, or_, select
-=======
 import logging
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict
-from sqlalchemy import select, func, or_, and_, text
->>>>>>> dev-backend
+
+from sqlalchemy import func, or_, select, and_, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 

@@ -33,7 +33,6 @@ from .base import Base, TimestampedMixin
 if TYPE_CHECKING:
     from .enhanced_role_system import EnhancedRole
 
-
 class InheritanceType(str, Enum):
     """Типы наследования ролей."""
 
@@ -41,7 +40,6 @@ class InheritanceType(str, Enum):
     PARTIAL = "partial"  # Частичное наследование (только указанные разрешения)
     OVERRIDE = "override"  # Переопределение разрешений родителя
     RESTRICT = "restrict"  # Ограничение разрешений родителя
-
 
 class RoleHierarchy(Base, TimestampedMixin):
     """
@@ -75,10 +73,8 @@ class RoleHierarchy(Base, TimestampedMixin):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    # =============================================================================
-    # Основные связи
-    # =============================================================================
-
+    #     # Основные связи
+    # 
     parent_role_id: Mapped[int] = mapped_column(
         ForeignKey("enhanced_roles.id", ondelete="CASCADE"),
         nullable=False,
@@ -90,10 +86,8 @@ class RoleHierarchy(Base, TimestampedMixin):
         comment="ID дочерней роли",
     )
 
-    # =============================================================================
-    # Конфигурация наследования
-    # =============================================================================
-
+    #     # Конфигурация наследования
+    # 
     inheritance_type: Mapped[InheritanceType] = mapped_column(
         String(20),
         default=InheritanceType.FULL,
@@ -108,10 +102,8 @@ class RoleHierarchy(Base, TimestampedMixin):
         comment="Приоритет наследования (при множественном наследовании)",
     )
 
-    # =============================================================================
-    # Условия и ограничения
-    # =============================================================================
-
+    #     # Условия и ограничения
+    # 
     conditions: Mapped[Optional[Dict[str, Any]]] = mapped_column(
         JSON, nullable=True, comment="Условия наследования (JSON)"
     )
@@ -131,10 +123,8 @@ class RoleHierarchy(Base, TimestampedMixin):
         JSON, nullable=True, comment="Переопределения разрешений (для OVERRIDE)"
     )
 
-    # =============================================================================
-    # Метаданные
-    # =============================================================================
-
+    #     # Метаданные
+    # 
     is_active: Mapped[bool] = mapped_column(
         Boolean, default=True, nullable=False, comment="Активна ли связь наследования"
     )
@@ -160,10 +150,8 @@ class RoleHierarchy(Base, TimestampedMixin):
         ForeignKey("users.id"), nullable=True, comment="Кем создана связь"
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     parent_role: Mapped["EnhancedRole"] = relationship(
         "EnhancedRole",
         foreign_keys=[parent_role_id],
@@ -184,10 +172,8 @@ class RoleHierarchy(Base, TimestampedMixin):
             f")>"
         )
 
-    # =============================================================================
-    # Business Logic Methods
-    # =============================================================================
-
+    #     # Business Logic Methods
+    # 
     @property
     def is_effective(self) -> bool:
         """Проверить, действует ли наследование в данный момент."""
@@ -255,7 +241,6 @@ class RoleHierarchy(Base, TimestampedMixin):
 
         return True
 
-
 class RoleHierarchyCache(Base, TimestampedMixin):
     """
     Кеш вычисленных путей в иерархии ролей для производительности.
@@ -312,7 +297,6 @@ class RoleHierarchyCache(Base, TimestampedMixin):
             return True
 
         return False
-
 
 # Добавляем обратные связи к EnhancedRole (через отдельный файл обновления)
 def add_hierarchy_relationships():

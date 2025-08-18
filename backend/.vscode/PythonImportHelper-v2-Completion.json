@@ -13204,7 +13204,7 @@
         "kind": 5,
         "importPath": "app.db.session",
         "description": "app.db.session",
-        "peekOfCode": "SessionLocal = sessionmaker(\n    autocommit=False, autoflush=False, bind=engine, class_=Session\n)\n# Создаем фабрику асинхронных сессий для основной БД\nAsyncSessionLocal = async_sessionmaker(\n    async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ТЕСТОВАЯ БАЗА ДАННЫХ\n# =============================================================================",
+        "peekOfCode": "SessionLocal = sessionmaker(\n    autocommit=False, autoflush=False, bind=engine, class_=Session\n)\n# Создаем фабрику асинхронных сессий для основной БД\nAsyncSessionLocal = async_sessionmaker(\n    async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# \n# ТЕСТОВАЯ БАЗА ДАННЫХ\n# ",
         "detail": "app.db.session",
         "documentation": {}
     },
@@ -13213,7 +13213,7 @@
         "kind": 5,
         "importPath": "app.db.session",
         "description": "app.db.session",
-        "peekOfCode": "AsyncSessionLocal = async_sessionmaker(\n    async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ТЕСТОВАЯ БАЗА ДАННЫХ\n# =============================================================================\n# Создаем движки для тестовой базы данных\ntest_engine = create_engine(\n    settings.test_db.sync_url,\n    pool_size=5,  # Меньший пул для тестов",
+        "peekOfCode": "AsyncSessionLocal = async_sessionmaker(\n    async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# \n# ТЕСТОВАЯ БАЗА ДАННЫХ\n# \n# Создаем движки для тестовой базы данных\ntest_engine = create_engine(\n    settings.test_db.sync_url,\n    pool_size=5,  # Меньший пул для тестов",
         "detail": "app.db.session",
         "documentation": {}
     },
@@ -13240,7 +13240,7 @@
         "kind": 5,
         "importPath": "app.db.session",
         "description": "app.db.session",
-        "peekOfCode": "TestSessionLocal = sessionmaker(\n    autocommit=False, autoflush=False, bind=test_engine, class_=Session\n)\nTestAsyncSessionLocal = async_sessionmaker(\n    test_async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ФУНКЦИИ ДЛЯ РАБОТЫ С ОСНОВНОЙ БД\n# =============================================================================\n# Функция для получения синхронной сессии",
+        "peekOfCode": "TestSessionLocal = sessionmaker(\n    autocommit=False, autoflush=False, bind=test_engine, class_=Session\n)\nTestAsyncSessionLocal = async_sessionmaker(\n    test_async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# \n# ФУНКЦИИ ДЛЯ РАБОТЫ С ОСНОВНОЙ БД\n# \n# Функция для получения синхронной сессии",
         "detail": "app.db.session",
         "documentation": {}
     },
@@ -13249,7 +13249,7 @@
         "kind": 5,
         "importPath": "app.db.session",
         "description": "app.db.session",
-        "peekOfCode": "TestAsyncSessionLocal = async_sessionmaker(\n    test_async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# =============================================================================\n# ФУНКЦИИ ДЛЯ РАБОТЫ С ОСНОВНОЙ БД\n# =============================================================================\n# Функция для получения синхронной сессии\ndef get_db():\n    db = SessionLocal()\n    try:",
+        "peekOfCode": "TestAsyncSessionLocal = async_sessionmaker(\n    test_async_engine, expire_on_commit=False, autoflush=False, class_=AsyncSession\n)\n# \n# ФУНКЦИИ ДЛЯ РАБОТЫ С ОСНОВНОЙ БД\n# \n# Функция для получения синхронной сессии\ndef get_db():\n    db = SessionLocal()\n    try:",
         "detail": "app.db.session",
         "documentation": {}
     },

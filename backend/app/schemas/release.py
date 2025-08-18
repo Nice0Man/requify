@@ -1,22 +1,8 @@
-<<<<<<< HEAD
 import re
 from datetime import UTC, datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-=======
-"""
-Схемы для модели Release.
-Мигрировано на новую архитектуру SQLModel с базовыми классами.
-"""
-
-from datetime import datetime
-from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
-from pydantic import field_validator, model_validator
-from enum import Enum
-import re
->>>>>>> dev-backend
 
 from .base import (
     BaseSchema,
@@ -32,7 +18,6 @@ from .base import (
     StandardDescriptions,
 )
 from .common import SearchRequest, DateRangeFilter
-
 
 # === Перечисления ===
 

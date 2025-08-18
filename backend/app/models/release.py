@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from .project import Project
     from .specification import Specification
 
-
 class ReleaseStatus(PyEnum):
     """Статусы релиза"""
 
@@ -23,7 +22,6 @@ class ReleaseStatus(PyEnum):
     RELEASED = "released"
     CANCELLED = "cancelled"
     HOTFIX = "hotfix"
-
 
 class Release(Base, TimestampedMixin):
     """
@@ -73,10 +71,8 @@ class Release(Base, TimestampedMixin):
         comment="ID проекта",
     )
 
-    # =============================================================================
-    # Отношения
-    # =============================================================================
-
+    #     # Отношения
+    # 
     project: Mapped["Project"] = relationship(
         "Project", back_populates="releases", lazy="select"
     )

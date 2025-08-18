@@ -37,10 +37,8 @@ permission_checker = PermissionChecker()
 
 router = APIRouter()
 
-# =============================================================================
-# Metrics Definition Management
-# =============================================================================
-
+# # Metrics Definition Management
+# 
 
 @router.get(
     "/definitions",

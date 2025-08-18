@@ -2,13 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
-<<<<<<< HEAD
 from app.db.session import engine
 from app.models.base import Base
-=======
-from app.models.base import Base
-from app.db.session import engine, async_engine
->>>>>>> dev-backend
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.crud.user import user as user_crud

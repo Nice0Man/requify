@@ -34,7 +34,6 @@ from app.services.role_hierarchy_service import role_hierarchy_service
 from app.utils.logger import logger
 from .base import BaseService
 
-
 class RoleInitializationService(BaseService):
     """Сервис инициализации системы ролей."""
 
@@ -48,10 +47,8 @@ class RoleInitializationService(BaseService):
     def get_enhanced_role_definitions(self) -> List[Dict]:
         """Получить расширенные определения ролей с правильной иерархией."""
         return [
-            # =============================================================================
-            # Системные роли (высший уровень)
-            # =============================================================================
-            {
+            #             # Системные роли (высший уровень)
+            #             {
                 "name": "system_administrator",
                 "display_name": "System Administrator",
                 "description": "Полный доступ ко всей системе",
@@ -272,10 +269,8 @@ class RoleInitializationService(BaseService):
                     ]
                 },
             },
-            # =============================================================================
-            # Компанийные роли (высокий уровень управления)
-            # =============================================================================
-            {
+            #             # Компанийные роли (высокий уровень управления)
+            #             {
                 "name": "company_owner",
                 "display_name": "Company Owner",
                 "description": "Владелец компании с полным контролем",
@@ -464,10 +459,8 @@ class RoleInitializationService(BaseService):
                     ]
                 },
             },
-            # =============================================================================
-            # Департаментские роли (управление подразделениями)
-            # =============================================================================
-            {
+            #             # Департаментские роли (управление подразделениями)
+            #             {
                 "name": "department_head",
                 "display_name": "Department Head",
                 "description": "Руководитель департамента",
@@ -647,10 +640,8 @@ class RoleInitializationService(BaseService):
                     ]
                 },
             },
-            # =============================================================================
-            # Командные роли (управление командами и проектами)
-            # =============================================================================
-            {
+            #             # Командные роли (управление командами и проектами)
+            #             {
                 "name": "team_lead",
                 "display_name": "Team Lead",
                 "description": "Лидер команды с правами управления проектами",
@@ -1140,10 +1131,8 @@ class RoleInitializationService(BaseService):
                     ]
                 },
             },
-            # =============================================================================
-            # Проектные роли (специализированные роли в проектах)
-            # =============================================================================
-            {
+            #             # Проектные роли (специализированные роли в проектах)
+            #             {
                 "name": "project_manager",
                 "display_name": "Project Manager",
                 "description": "Менеджер проекта с полными правами управления",
@@ -1718,10 +1707,8 @@ class RoleInitializationService(BaseService):
                     ]
                 },
             },
-            # =============================================================================
-            # Базовые роли (низший уровень)
-            # =============================================================================
-            {
+            #             # Базовые роли (низший уровень)
+            #             {
                 "name": "viewer",
                 "display_name": "Viewer",
                 "description": "Просмотр информации без возможности изменения",
@@ -1764,10 +1751,8 @@ class RoleInitializationService(BaseService):
             List[Tuple[parent_name, child_name, inheritance_type]]
         """
         return [
-            # =============================================================================
-            # Системные роли - полная иерархия
-            # =============================================================================
-            ("system_administrator", "platform_administrator", InheritanceType.FULL),
+            #             # Системные роли - полная иерархия
+            #             ("system_administrator", "platform_administrator", InheritanceType.FULL),
             ("platform_administrator", "support_admin", InheritanceType.FULL),
             ("support_admin", "support_agent", InheritanceType.FULL),
             ("support_admin", "billing_admin", InheritanceType.FULL),
@@ -1775,10 +1760,8 @@ class RoleInitializationService(BaseService):
             ("security_auditor", "compliance_officer", InheritanceType.FULL),
             ("compliance_officer", "system_developer", InheritanceType.PARTIAL),
             ("system_developer", "system_data_analyst", InheritanceType.PARTIAL),
-            # =============================================================================
-            # Компанийные роли - полная иерархия
-            # =============================================================================
-            ("system_administrator", "company_owner", InheritanceType.FULL),
+            #             # Компанийные роли - полная иерархия
+            #             ("system_administrator", "company_owner", InheritanceType.FULL),
             ("company_owner", "company_administrator", InheritanceType.FULL),
             ("company_administrator", "hr_manager", InheritanceType.PARTIAL),
             ("company_administrator", "billing_manager", InheritanceType.PARTIAL),
@@ -1788,20 +1771,16 @@ class RoleInitializationService(BaseService):
             ("billing_manager", "company_viewer", InheritanceType.PARTIAL),
             ("security_manager", "company_viewer", InheritanceType.PARTIAL),
             ("compliance_manager", "company_viewer", InheritanceType.PARTIAL),
-            # =============================================================================
-            # Департаментские роли - иерархия управления
-            # =============================================================================
-            ("company_administrator", "department_head", InheritanceType.FULL),
+            #             # Департаментские роли - иерархия управления
+            #             ("company_administrator", "department_head", InheritanceType.FULL),
             ("department_head", "department_admin", InheritanceType.FULL),
             ("department_admin", "deputy_head", InheritanceType.PARTIAL),
             ("deputy_head", "senior_manager", InheritanceType.PARTIAL),
             ("senior_manager", "manager", InheritanceType.PARTIAL),
             ("manager", "coordinator", InheritanceType.PARTIAL),
             ("coordinator", "department_viewer", InheritanceType.PARTIAL),
-            # =============================================================================
-            # Командные роли - иерархия команд
-            # =============================================================================
-            ("department_head", "team_lead", InheritanceType.FULL),
+            #             # Командные роли - иерархия команд
+            #             ("department_head", "team_lead", InheritanceType.FULL),
             ("team_lead", "product_owner", InheritanceType.PARTIAL),
             ("team_lead", "scrum_master", InheritanceType.PARTIAL),
             ("team_lead", "tech_lead", InheritanceType.PARTIAL),
@@ -1818,10 +1797,8 @@ class RoleInitializationService(BaseService):
             ("mentor", "consultant", InheritanceType.PARTIAL),
             ("consultant", "observer", InheritanceType.PARTIAL),
             ("observer", "team_viewer", InheritanceType.PARTIAL),
-            # =============================================================================
-            # Проектные роли - специализированная иерархия
-            # =============================================================================
-            ("team_lead", "project_manager", InheritanceType.PARTIAL),
+            #             # Проектные роли - специализированная иерархия
+            #             ("team_lead", "project_manager", InheritanceType.PARTIAL),
             ("project_manager", "project_owner", InheritanceType.PARTIAL),
             ("project_manager", "architect", InheritanceType.PARTIAL),
             ("architect", "qa_engineer", InheritanceType.PARTIAL),
@@ -1839,10 +1816,8 @@ class RoleInitializationService(BaseService):
             ("business_analyst", "data_analyst", InheritanceType.PARTIAL),
             ("business_analyst", "stakeholder", InheritanceType.PARTIAL),
             ("stakeholder", "client", InheritanceType.PARTIAL),
-            # =============================================================================
-            # Все роли наследуют от viewer (базовый уровень)
-            # =============================================================================
-            ("client", "viewer", InheritanceType.FULL),
+            #             # Все роли наследуют от viewer (базовый уровень)
+            #             ("client", "viewer", InheritanceType.FULL),
             ("technical_writer", "viewer", InheritanceType.FULL),
             ("data_analyst", "viewer", InheritanceType.FULL),
             ("product_analyst", "viewer", InheritanceType.FULL),
@@ -2233,7 +2208,6 @@ class RoleInitializationService(BaseService):
                 f"Ошибка назначения роли администратора: {str(e)}", exc_info=True
             )
             return False
-
 
 # Регистрация сервиса в фабрике
 from .base import ServiceFactory

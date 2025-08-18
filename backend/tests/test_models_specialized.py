@@ -57,7 +57,6 @@ from app.models.dashboard import (
 )
 from app.models.enhanced_role_system import EnhancedRole, UserRoleAssignment
 
-
 @pytest.fixture(scope="function")
 def specialized_db_session():
     """Create a test database session for specialized tests."""
@@ -72,7 +71,6 @@ def specialized_db_session():
     finally:
         session.rollback()
         session.close()
-
 
 @pytest.fixture
 def minimal_test_data(specialized_db_session: Session):
@@ -110,11 +108,9 @@ def minimal_test_data(specialized_db_session: Session):
         "relationship_type": rel_type,
     }
 
-
-# ============================================================================
+# ======
 # MIXIN TESTS
-# ============================================================================
-
+# ======
 
 class TestMixins:
     """Test all mixin functionality."""
@@ -155,11 +151,9 @@ class TestMixins:
         assert user.created_at is not None
         assert user.updated_at is not None
 
-
-# ============================================================================
+# ======
 # CONSTANTS TESTS
-# ============================================================================
-
+# ======
 
 class TestConstants:
     """Test all constants and enums."""
@@ -259,11 +253,9 @@ class TestConstants:
         # Verify enum value is stored correctly
         assert project.status == ProjectStatus.ACTIVE
 
-
-# ============================================================================
+# ======
 # REFERENCE DATA MODELS TESTS
-# ============================================================================
-
+# ======
 
 class TestReferenceDataModels:
     """Test reference data models (types, priorities, statuses)."""
@@ -374,11 +366,9 @@ class TestReferenceDataModels:
         assert requirement in req_priority.requirements
         assert requirement in req_status.requirements
 
-
-# ============================================================================
+# ======
 # USER PROFILE AND SETTINGS TESTS
-# ============================================================================
-
+# ======
 
 class TestUserProfileAndSettings:
     """Test UserProfile and UserSettings models."""
@@ -488,11 +478,9 @@ class TestUserProfileAndSettings:
         assert settings.notification_settings["push"] is True
         assert settings.interface_settings["theme"] == "light"
 
-
-# ============================================================================
+# ======
 # REFRESH TOKEN ADVANCED TESTS
-# ============================================================================
-
+# ======
 
 class TestRefreshTokenAdvanced:
     """Advanced tests for RefreshToken model."""
@@ -571,11 +559,9 @@ class TestRefreshTokenAdvanced:
         active_tokens = [t for t in user.refresh_tokens if t.is_active]
         assert len(active_tokens) == 2
 
-
-# ============================================================================
+# ======
 # SPEC MODEL ADVANCED TESTS
-# ============================================================================
-
+# ======
 
 class TestSpecModelAdvanced:
     """Advanced tests for Spec model."""
@@ -693,11 +679,9 @@ class TestSpecModelAdvanced:
 
         assert latest_approved.version == "2.0"
 
-
-# ============================================================================
+# ======
 # REQUIREMENT GROUP MODELS ADVANCED TESTS
-# ============================================================================
-
+# ======
 
 class TestRequirementGroupAdvanced:
     """Advanced tests for RequirementGroup models."""
@@ -793,11 +777,9 @@ class TestRequirementGroupAdvanced:
         assert latest_version.version == 2
         assert len(latest_version.snapshot_data["requirements"]) == 3
 
-
-# ============================================================================
+# ======
 # DASHBOARD MODELS ADVANCED TESTS
-# ============================================================================
-
+# ======
 
 class TestDashboardModelsAdvanced:
     """Advanced tests for Dashboard models."""
@@ -958,11 +940,9 @@ class TestDashboardModelsAdvanced:
 
         assert unread_count == 1
 
-
-# ============================================================================
+# ======
 # COMPREHENSIVE INTEGRATION TESTS
-# ============================================================================
-
+# ======
 
 class TestComprehensiveIntegration:
     """Comprehensive integration tests across all models."""
@@ -1195,7 +1175,6 @@ class TestComprehensiveIntegration:
             .where(Requirement.project_id == project.id)
         ).scalar()
         assert total_comments == 2
-
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

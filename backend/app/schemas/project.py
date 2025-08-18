@@ -5,17 +5,9 @@
 
 import re
 from datetime import datetime
-<<<<<<< HEAD
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
-=======
-from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
-from pydantic import field_validator, model_validator
-from enum import Enum
-import re
->>>>>>> dev-backend
 
 from .base import (
     BaseSchema,
@@ -30,7 +22,6 @@ from .base import (
     StandardDescriptions,
 )
 from .common import SearchRequest, DateRangeFilter
-
 
 # === Перечисления ===
 

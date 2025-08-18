@@ -10,12 +10,9 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-# =============================================================================
-# Utility Endpoints
-# =============================================================================
-
+# # Utility Endpoints
+# 
 from .schemas import TimezoneListResponse, LanguageListResponse
-
 
 @router.get(
     "/timezones",
@@ -46,7 +43,6 @@ async def get_available_timezones():
         },
     ]
     return {"timezones": timezones}
-
 
 @router.get(
     "/languages",
