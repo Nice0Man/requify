@@ -15,7 +15,7 @@ from app.core.constants import (
 )
 
 from sqlalchemy import (
-    String,
+    Stri, Foreig, JSONnKeyng,
     Boolean,
     DateTime,
     Integer,

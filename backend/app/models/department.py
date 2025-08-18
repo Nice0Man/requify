@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, List, Optional
 from enum import Enum as PyEnum
 
-from sqlalchemy import String, Boolean, Integer, Index, ForeignKey, Enum
+from sqlalchemy import ForeignKey, String, Boolean, Integer, Index, ForeignKey, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin

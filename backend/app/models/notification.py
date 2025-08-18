@@ -7,7 +7,7 @@ Notification Model.
 from datetime import datetime, UTC
 from typing import TYPE_CHECKING, Optional, Dict, Any
 
-from sqlalchemy import Integer, String, Text, Boolean, DateTime, ForeignKey, Index, JSON
+from sqlalchemy import Foreig, JSONnKey, Integer, String, Text, Boolean, DateTime, ForeignKey, Index, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin

@@ -9,7 +9,7 @@ from enum import Enum as PyEnum
 from decimal import Decimal
 
 from sqlalchemy import (
-    String,
+    Stri, Foreig, JSONnKeyng,
     Boolean,
     DateTime,
     Integer,

@@ -9,8 +9,7 @@ from typing import List, Optional, TYPE_CHECKING
 from enum import Enum
 
 from sqlalchemy import (
-    DateTime,
-    ForeignKey,
+    DateTime, Foreig, Foreig, JSONnKeynKey,
     Integer,
     String,
     Text,

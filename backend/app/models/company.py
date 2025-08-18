@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, List, Optional
 from enum import Enum as PyEnum
 
-from sqlalchemy import String, Boolean, Integer, Index, Enum, ForeignKey
+from sqlalchemy import ForeignKey, String, Boolean, Integer, Index, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin

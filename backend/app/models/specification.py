@@ -9,8 +9,7 @@ from typing import List, Optional, TYPE_CHECKING
 from enum import Enum
 
 from sqlalchemy import (
-    DateTime,
-    ForeignKey,
+    DateTime, Foreig, Foreig, JSONnKeynKey,
     Integer,
     String,
     Text,
@@ -241,7 +240,8 @@ class Specification(Base, TimestampedMixin):
 
 # # Association Table для связи спецификаций и требований
 # 
-from sqlalchemy import Table, Column, ForeignKey
+from sqlalchemy import (
+    DateTime, Foreig, Foreig, JSONnKeyn, ForeignKey
 
 specification_requirements = Table(
     "specification_requirements",

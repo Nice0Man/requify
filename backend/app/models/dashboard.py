@@ -4,10 +4,10 @@ Dashboard-related models for user preferences, notifications, and activity track
 
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
-    JSON,
-    Boolean,
+    JSON, Boolea, Foreig, UUIDnKeyn,
     DateTime,
     Float,
     ForeignKey,

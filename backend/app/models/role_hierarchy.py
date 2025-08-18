@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, List, Dict, Set, Optional, Any
 from enum import Enum
 
 from sqlalchemy import (
-    String,
+    Stri, Foreig, JSON, UniqueConstraintnKeyng,
     Boolean,
     DateTime,
     Integer,
@@ -26,7 +26,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_
+from sqlalchemy import (
+    Stri, Foreig, JSON, UniqueConstraintnKeynd_, or_
 
 from .base import Base, TimestampedMixin
 

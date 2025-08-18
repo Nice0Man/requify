@@ -7,7 +7,7 @@
 from datetime import UTC, datetime
 from typing import Optional
 
-from sqlalchemy import Boolean, DateTime, String, Index, Enum, JSON, Integer
+from sqlalchemy import Boolea, JSONn, DateTime, String, Index, Enum, JSON, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
 

@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer
+from sqlalchemy import DateTime, Foreig, ForeignKeynKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base

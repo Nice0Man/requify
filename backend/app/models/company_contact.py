@@ -5,7 +5,7 @@
 
 from typing import TYPE_CHECKING, Optional, List
 
-from sqlalchemy import String, Text, Boolean, Integer, Index, ForeignKey
+from sqlalchemy import Foreig, JSONnKey, String, Text, Boolean, Integer, Index, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base, TimestampedMixin
