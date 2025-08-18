@@ -2,15 +2,22 @@ name: Backend CI/CD
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, dev ]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, dev ]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
+  workflow_dispatch:
+    inputs:
+      submodule_ref:
+        description: 'Backend submodule reference to test'
+        required: false
+        default: 'main'
+        type: string
 
 env:
   PYTHON_VERSION: '3.13'
@@ -24,6 +31,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update backend submodule
+      if: github.event.inputs.submodule_ref != ''
+      run: |
+        cd backend
+        git fetch origin ${{ github.event.inputs.submodule_ref }}
+        git checkout ${{ github.event.inputs.submodule_ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -31,7 +48,7 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Cache Poetry installation
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.local
         key: poetry-${{ env.POETRY_VERSION }}-${{ runner.os }}
@@ -46,7 +63,7 @@ jobs:
 
     - name: Cache dependencies
       id: cache-deps
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: backend/.venv
         key: pydeps-${{ hashFiles('backend/pyproject.toml') }}-${{ env.PYTHON_VERSION }}
@@ -113,6 +130,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update backend submodule
+      if: github.event.inputs.submodule_ref != ''
+      run: |
+        cd backend
+        git fetch origin ${{ github.event.inputs.submodule_ref }}
+        git checkout ${{ github.event.inputs.submodule_ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -120,7 +147,7 @@ jobs:
         python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Cache Poetry installation
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.local
         key: poetry-${{ env.POETRY_VERSION }}-${{ runner.os }}
@@ -135,7 +162,7 @@ jobs:
 
     - name: Cache dependencies
       id: cache-deps
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: backend/.venv
         key: pydeps-${{ hashFiles('backend/pyproject.toml') }}-${{ env.PYTHON_VERSION }}
@@ -218,9 +245,10 @@ jobs:
       continue-on-error: true  # Integration tests can be flaky
 
     - name: Upload coverage reports
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: always()
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         file: ./backend/coverage.xml
         directory: ./backend/htmlcov
         flags: backend
@@ -228,7 +256,7 @@ jobs:
         fail_ci_if_error: false
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results
@@ -246,6 +274,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update backend submodule
+      if: github.event.inputs.submodule_ref != ''
+      run: |
+        cd backend
+        git fetch origin ${{ github.event.inputs.submodule_ref }}
+        git checkout ${{ github.event.inputs.submodule_ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -269,7 +307,7 @@ jobs:
       continue-on-error: true
 
     - name: Upload security report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: security-report
@@ -285,6 +323,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update backend submodule
+      if: github.event.inputs.submodule_ref != ''
+      run: |
+        cd backend
+        git fetch origin ${{ github.event.inputs.submodule_ref }}
+        git checkout ${{ github.event.inputs.submodule_ref }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -302,7 +350,7 @@ jobs:
         poetry build
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: backend/dist/

@@ -1,0 +1,314 @@
+name: Submodule Sync & Management
+
+on:
+  push:
+    branches: [ main, develop, dev ]
+  pull_request:
+    branches: [ main, develop, dev ]
+  workflow_dispatch:
+    inputs:
+      update_backend:
+        description: 'Update backend submodule to latest'
+        required: false
+        default: false
+        type: boolean
+      update_frontend:
+        description: 'Update frontend submodule to latest'
+        required: false
+        default: false
+        type: boolean
+      backend_ref:
+        description: 'Backend reference to update to'
+        required: false
+        default: 'main'
+        type: string
+      frontend_ref:
+        description: 'Frontend reference to update to'
+        required: false
+        default: 'main'
+        type: string
+  schedule:
+    # Run daily at 06:00 UTC to check for submodule updates
+    - cron: '0 6 * * *'
+
+env:
+  SUBMODULES_CHANGED: false
+
+jobs:
+  detect-changes:
+    name: Detect Submodule Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend-changed: ${{ steps.changes.outputs.backend }}
+      frontend-changed: ${{ steps.changes.outputs.frontend }}
+      submodules-changed: ${{ steps.changes.outputs.submodules }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        submodules: false
+    
+    - name: Detect changed files
+      uses: dorny/paths-filter@v3
+      id: changes
+      with:
+        filters: |
+          backend:
+            - 'backend/**'
+          frontend:
+            - 'frontend/**'
+          submodules:
+            - '.gitmodules'
+            - 'backend'
+            - 'frontend'
+
+  sync-backend:
+    name: Sync Backend Submodule
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.backend-changed == 'true' || 
+      github.event.inputs.update_backend == 'true' ||
+      github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update backend submodule
+      run: |
+        cd backend
+        git fetch origin
+        
+        if [ "${{ github.event.inputs.backend_ref }}" != "" ]; then
+          TARGET_REF="${{ github.event.inputs.backend_ref }}"
+        else
+          TARGET_REF="main"
+        fi
+        
+        CURRENT_COMMIT=$(git rev-parse HEAD)
+        LATEST_COMMIT=$(git rev-parse origin/$TARGET_REF)
+        
+        echo "Current backend commit: $CURRENT_COMMIT"
+        echo "Latest backend commit: $LATEST_COMMIT"
+        
+        if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
+          echo "Backend submodule is behind, updating..."
+          git checkout $TARGET_REF
+          git pull origin $TARGET_REF
+          
+          cd ..
+          git add backend
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "chore(submodule): update backend to latest commit
+          
+          Backend submodule updated from $CURRENT_COMMIT to $LATEST_COMMIT
+          Branch: $TARGET_REF"
+          
+          echo "BACKEND_UPDATED=true" >> $GITHUB_ENV
+        else
+          echo "Backend submodule is up to date"
+        fi
+    
+    - name: Push changes
+      if: env.BACKEND_UPDATED == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
+  sync-frontend:
+    name: Sync Frontend Submodule
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.frontend-changed == 'true' || 
+      github.event.inputs.update_frontend == 'true' ||
+      github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Update frontend submodule
+      run: |
+        cd frontend
+        git fetch origin
+        
+        if [ "${{ github.event.inputs.frontend_ref }}" != "" ]; then
+          TARGET_REF="${{ github.event.inputs.frontend_ref }}"
+        else
+          TARGET_REF="main"
+        fi
+        
+        CURRENT_COMMIT=$(git rev-parse HEAD)
+        LATEST_COMMIT=$(git rev-parse origin/$TARGET_REF)
+        
+        echo "Current frontend commit: $CURRENT_COMMIT"
+        echo "Latest frontend commit: $LATEST_COMMIT"
+        
+        if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
+          echo "Frontend submodule is behind, updating..."
+          git checkout $TARGET_REF
+          git pull origin $TARGET_REF
+          
+          cd ..
+          git add frontend
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "chore(submodule): update frontend to latest commit
+          
+          Frontend submodule updated from $CURRENT_COMMIT to $LATEST_COMMIT
+          Branch: $TARGET_REF"
+          
+          echo "FRONTEND_UPDATED=true" >> $GITHUB_ENV
+        else
+          echo "Frontend submodule is up to date"
+        fi
+    
+    - name: Push changes
+      if: env.FRONTEND_UPDATED == 'true'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
+  validate-submodules:
+    name: Validate Submodule Integrity
+    runs-on: ubuntu-latest
+    needs: [sync-backend, sync-frontend]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Validate submodule structure
+      run: |
+        echo "Validating submodule structure..."
+        
+        # Check if .gitmodules is correctly configured
+        if [ ! -f .gitmodules ]; then
+          echo "❌ .gitmodules file not found"
+          exit 1
+        fi
+        
+        # Check backend submodule
+        if [ ! -d backend ]; then
+          echo "❌ Backend submodule directory not found"
+          exit 1
+        fi
+        
+        # Check frontend submodule
+        if [ ! -d frontend ]; then
+          echo "❌ Frontend submodule directory not found"
+          exit 1
+        fi
+        
+        # Validate backend submodule
+        cd backend
+        if [ ! -f pyproject.toml ]; then
+          echo "❌ Backend submodule missing pyproject.toml"
+          exit 1
+        fi
+        
+        cd ../frontend
+        if [ ! -f package.json ]; then
+          echo "❌ Frontend submodule missing package.json"
+          exit 1
+        fi
+        
+        cd ..
+        echo "✅ All submodules are properly configured"
+    
+    - name: Generate submodule status report
+      run: |
+        echo "## Submodule Status Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Get backend submodule info
+        cd backend
+        BACKEND_COMMIT=$(git rev-parse HEAD)
+        BACKEND_BRANCH=$(git branch --show-current)
+        BACKEND_REMOTE=$(git config --get remote.origin.url)
+        
+        echo "### Backend Submodule" >> $GITHUB_STEP_SUMMARY
+        echo "- **Repository**: $BACKEND_REMOTE" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: $BACKEND_BRANCH" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: $BACKEND_COMMIT" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Get frontend submodule info
+        cd ../frontend
+        FRONTEND_COMMIT=$(git rev-parse HEAD)
+        FRONTEND_BRANCH=$(git branch --show-current)
+        FRONTEND_REMOTE=$(git config --get remote.origin.url)
+        
+        echo "### Frontend Submodule" >> $GITHUB_STEP_SUMMARY
+        echo "- **Repository**: $FRONTEND_REMOTE" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: $FRONTEND_BRANCH" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: $FRONTEND_COMMIT" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "- **Validation**: ✅ All submodules validated successfully" >> $GITHUB_STEP_SUMMARY
+
+  trigger-ci:
+    name: Trigger Component CI
+    runs-on: ubuntu-latest
+    needs: [detect-changes, validate-submodules]
+    if: needs.detect-changes.outputs.submodules-changed == 'true'
+    
+    steps:
+    - name: Trigger Backend CI
+      if: needs.detect-changes.outputs.backend-changed == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'backend-ci.yml',
+            ref: context.ref
+          });
+    
+    - name: Trigger Frontend CI
+      if: needs.detect-changes.outputs.frontend-changed == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            workflow_id: 'frontend-ci.yml',
+            ref: context.ref
+          });
+
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [sync-backend, sync-frontend, validate-submodules]
+    if: always()
+    
+    steps:
+    - name: Generate notification
+      run: |
+        echo "## Submodule Sync Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Backend Sync**: ${{ needs.sync-backend.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Frontend Sync**: ${{ needs.sync-frontend.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Validation**: ${{ needs.validate-submodules.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Workflow**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Submodule synchronization completed at $(date)" >> $GITHUB_STEP_SUMMARY

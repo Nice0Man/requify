@@ -1,0 +1,436 @@
+name: Integration Testing CI/CD
+
+on:
+  push:
+    branches: [ main, develop, dev ]
+  pull_request:
+    branches: [ main, develop, dev ]
+  workflow_dispatch:
+    inputs:
+      test_environment:
+        description: 'Test environment to deploy to'
+        required: false
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - testing
+          - dev
+      run_performance_tests:
+        description: 'Run performance tests'
+        required: false
+        default: false
+        type: boolean
+      run_security_tests:
+        description: 'Run security tests'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
+  PYTHON_VERSION: '3.13'
+  NODE_VERSION: '20'
+
+jobs:
+  setup:
+    name: Setup Integration Environment
+    runs-on: ubuntu-latest
+    outputs:
+      backend-version: ${{ steps.versions.outputs.backend }}
+      frontend-version: ${{ steps.versions.outputs.frontend }}
+      docker-compose-file: ${{ steps.setup.outputs.compose-file }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Get component versions
+      id: versions
+      run: |
+        cd backend
+        BACKEND_VERSION=$(git rev-parse --short HEAD)
+        echo "backend=$BACKEND_VERSION" >> $GITHUB_OUTPUT
+        
+        cd ../frontend
+        FRONTEND_VERSION=$(git rev-parse --short HEAD)
+        echo "frontend=$FRONTEND_VERSION" >> $GITHUB_OUTPUT
+        
+        echo "Backend version: $BACKEND_VERSION"
+        echo "Frontend version: $FRONTEND_VERSION"
+    
+    - name: Setup test environment
+      id: setup
+      run: |
+        ENV="${{ github.event.inputs.test_environment || 'staging' }}"
+        
+        # Determine which docker-compose file to use
+        if [ "$ENV" = "staging" ]; then
+          COMPOSE_FILE="docker-compose.yml"
+        elif [ "$ENV" = "dev" ]; then
+          COMPOSE_FILE="docker-compose.dev.yml"
+        else
+          COMPOSE_FILE="docker-compose.yml"
+        fi
+        
+        echo "compose-file=$COMPOSE_FILE" >> $GITHUB_OUTPUT
+        echo "Using compose file: $COMPOSE_FILE"
+    
+    - name: Validate Docker configurations
+      working-directory: deploy/docker
+      run: |
+        # Check if required docker-compose files exist
+        if [ ! -f "docker-compose.yml" ]; then
+          echo "❌ docker-compose.yml not found"
+          exit 1
+        fi
+        
+        if [ ! -f "docker-compose.dev.yml" ]; then
+          echo "❌ docker-compose.dev.yml not found"
+          exit 1
+        fi
+        
+        # Validate compose files
+        docker-compose -f docker-compose.yml config
+        docker-compose -f docker-compose.dev.yml config
+        
+        echo "✅ Docker configurations validated"
+
+  build-backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+    needs: setup
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build backend image
+      working-directory: backend
+      run: |
+        docker build \
+          --tag requify-backend:${{ needs.setup.outputs.backend-version }} \
+          --tag requify-backend:latest \
+          --build-arg PYTHON_VERSION=${{ env.PYTHON_VERSION }} \
+          .
+    
+    - name: Test backend container
+      run: |
+        docker run --rm \
+          -e DATABASE_URL=sqlite:///test.db \
+          -e SECRET_KEY=test-secret \
+          requify-backend:latest \
+          python -c "import app; print('Backend container works')"
+
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    needs: setup
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: frontend
+      run: npm ci
+    
+    - name: Build frontend
+      working-directory: frontend
+      env:
+        VITE_API_URL: http://localhost:8000
+        NODE_ENV: production
+      run: npm run build
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build frontend image
+      working-directory: frontend
+      run: |
+        docker build \
+          --tag requify-frontend:${{ needs.setup.outputs.frontend-version }} \
+          --tag requify-frontend:latest \
+          --build-arg NODE_VERSION=${{ env.NODE_VERSION }} \
+          .
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [setup, build-backend, build-frontend]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: requify_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: requify_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Start application stack
+      working-directory: deploy/docker
+      env:
+        COMPOSE_FILE: ${{ needs.setup.outputs.docker-compose-file }}
+        DATABASE_URL: postgresql+asyncpg://requify_test:test_password@localhost:5432/requify_test
+        REDIS_URL: redis://localhost:6379/0
+        SECRET_KEY: integration-test-secret-key
+        BACKEND_IMAGE: requify-backend:${{ needs.setup.outputs.backend-version }}
+        FRONTEND_IMAGE: requify-frontend:${{ needs.setup.outputs.frontend-version }}
+      run: |
+        # Copy environment files
+        cp ../../backend/.env.example .env.backend
+        cp ../../frontend/.env.example .env.frontend
+        
+        # Update environment files with test values
+        sed -i 's|DATABASE_URL=.*|DATABASE_URL=postgresql+asyncpg://requify_test:test_password@postgres:5432/requify_test|' .env.backend
+        sed -i 's|REDIS_URL=.*|REDIS_URL=redis://redis:6379/0|' .env.backend
+        sed -i 's|SECRET_KEY=.*|SECRET_KEY=integration-test-secret-key|' .env.backend
+        
+        # Start services
+        docker-compose -f $COMPOSE_FILE up -d
+        
+        # Wait for services to be ready
+        sleep 30
+        
+        # Check service health
+        docker-compose -f $COMPOSE_FILE ps
+    
+    - name: Run database migrations
+      working-directory: deploy/docker
+      run: |
+        docker-compose -f ${{ needs.setup.outputs.docker-compose-file }} \
+          exec -T backend \
+          alembic upgrade head
+    
+    - name: Setup Node.js for testing
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: Install test dependencies
+      run: |
+        npm install -g newman wait-on
+    
+    - name: Wait for services
+      run: |
+        wait-on http://localhost:8000/health \
+          http://localhost:3000 \
+          --timeout 120000 \
+          --interval 2000 \
+          --verbose
+    
+    - name: Run API integration tests
+      run: |
+        # Test basic API endpoints
+        curl -f http://localhost:8000/health || exit 1
+        curl -f http://localhost:8000/api/v1/ || exit 1
+        
+        # Test database connectivity
+        curl -f -X POST http://localhost:8000/api/v1/auth/register \
+          -H "Content-Type: application/json" \
+          -d '{"email":"test@example.com","password":"testpass123","username":"testuser"}' || exit 1
+    
+    - name: Run frontend integration tests
+      working-directory: frontend
+      run: |
+        npm run test:integration
+    
+    - name: Run end-to-end tests
+      working-directory: frontend
+      run: |
+        npx playwright test --config=playwright-integration.config.ts
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: integration-test-results
+        path: |
+          frontend/test-results/
+          frontend/playwright-report/
+        retention-days: 7
+    
+    - name: Generate test report
+      if: always()
+      run: |
+        echo "## Integration Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Backend**: ${{ needs.setup.outputs.backend-version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Frontend**: ${{ needs.setup.outputs.frontend-version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment**: ${{ github.event.inputs.test_environment || 'staging' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Cleanup
+      if: always()
+      working-directory: deploy/docker
+      run: |
+        docker-compose -f ${{ needs.setup.outputs.docker-compose-file }} down -v
+        docker system prune -f
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [setup, integration-tests]
+    if: github.event.inputs.run_performance_tests == 'true' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Install k6
+      run: |
+        sudo gpg -k
+        sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+        echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install k6
+    
+    - name: Start application for performance testing
+      working-directory: deploy/docker
+      run: |
+        docker-compose -f docker-compose.yml up -d
+        sleep 30
+    
+    - name: Run performance tests
+      run: |
+        k6 run --out json=performance-results.json tests/performance/load-test.js
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-test-results
+        path: performance-results.json
+
+  security-tests:
+    name: Security Tests
+    runs-on: ubuntu-latest
+    needs: [setup, integration-tests]
+    if: github.event.inputs.run_security_tests == 'true' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Run OWASP ZAP security scan
+      uses: zaproxy/action-baseline@v0.10.0
+      with:
+        target: 'http://localhost:8000'
+        rules_file_name: '.zap/rules.tsv'
+        cmd_options: '-a'
+    
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: security-scan-results
+        path: report_html.html
+
+  deploy-test-reports:
+    name: Deploy Test Reports
+    runs-on: ubuntu-latest
+    needs: [integration-tests, performance-tests, security-tests]
+    if: always()
+    
+    steps:
+    - name: Download test artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: test-artifacts
+    
+    - name: Generate comprehensive report
+      run: |
+        mkdir -p test-reports
+        
+        echo "# Integration Test Report" > test-reports/README.md
+        echo "" >> test-reports/README.md
+        echo "## Test Summary" >> test-reports/README.md
+        echo "- **Integration Tests**: ${{ needs.integration-tests.result }}" >> test-reports/README.md
+        echo "- **Performance Tests**: ${{ needs.performance-tests.result }}" >> test-reports/README.md
+        echo "- **Security Tests**: ${{ needs.security-tests.result }}" >> test-reports/README.md
+        echo "" >> test-reports/README.md
+        echo "Generated on: $(date)" >> test-reports/README.md
+        
+        # Copy all test artifacts
+        cp -r test-artifacts/* test-reports/ 2>/dev/null || true
+    
+    - name: Upload consolidated report
+      uses: actions/upload-artifact@v4
+      with:
+        name: comprehensive-test-report
+        path: test-reports/
+        retention-days: 30
+
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [integration-tests, performance-tests, security-tests, deploy-test-reports]
+    if: always()
+    
+    steps:
+    - name: Generate final report
+      run: |
+        echo "## Integration Testing Pipeline Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "- **Integration Tests**: ${{ needs.integration-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Performance Tests**: ${{ needs.performance-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Security Tests**: ${{ needs.security-tests.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Test Reports**: ${{ needs.deploy-test-reports.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Environment Details" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment**: ${{ github.event.inputs.test_environment || 'staging' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Integration testing completed at $(date)" >> $GITHUB_STEP_SUMMARY
